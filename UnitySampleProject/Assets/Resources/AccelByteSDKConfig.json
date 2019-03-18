@@ -1,0 +1,15 @@
+{
+  "PublisherNamespace":"<YOUR-PUBLISHER-NAMESPACE>",
+  "AppId":"<YOUR-APP-ID>",
+  "Namespace":"<YOUR-GAME-NAMESPACE>",
+  "IamServerUrl":"<IAM-SERVER-URL>",
+  "PlatformServerUrl":"<PLATFORM-SERVER-URL>",
+  "BasicServerUrl":"<BASIC-SERVER-URL>",
+  "LobbyServerUrl":"<LOBBY-SERVER-URL>",
+  "TelemetryServerUrl":"<TELEMETRY-SERVER-URL>",
+  "CloudStorageServerUrl":"<CLOUDSTORAGE-SERVER-URL>",
+  "GameProfileServerUrl": "<GAMEPROFILE-SERVER-URL>",
+  "ClientId":"<YOUR-CLIENT-ID>",
+  "ClientSecret":"<YOUR-CLIENT-SECRET>",
+  "RedirectUri":"<YOUR-REDIRECT-URI>"
+}

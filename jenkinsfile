@@ -1,0 +1,319 @@
+def FAILED_STAGE = "";
+pipeline {
+  agent {
+      node {
+          label 'windows-sdk'
+      }
+  }
+
+  stages {
+
+    stage('turn on EC2') {
+      agent {
+          label "master"
+      }
+
+      steps {
+        sh '''
+          aws ec2 start-instances --instance-ids i-${SDK_INSTANCE_ID}
+          sleep 60
+        ''' 
+      }
+
+      post {
+        failure {
+          script{
+            FAILED_STAGE = "turnOn_EC2";
+          }
+        }
+      }
+    }
+
+    stage('setting up proxy') {
+      steps {
+        powershell '''
+          $internetSettings = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"
+          Set-ItemProperty -Path $internetSettings -Name ProxyServer -Value "$Env:PROXY_SERVER"
+          Set-ItemProperty -Path $internetSettings -Name ProxyEnable -Value 1
+        '''
+      }
+    }
+
+    stage('cleanup') {
+      steps {
+        bat '''
+          IF EXIST output (
+            rd /s /q output
+          )
+          mkdir "%WORKSPACE%\\output"
+
+          IF EXIST outputpackage (
+            rd /s /q outputpackage
+          )
+
+          mkdir "%WORKSPACE%\\outputpackage"
+          IF EXIST %WORKSPACE%\\unity.log ( del %WORKSPACE%\\unity.log )
+          IF EXIST %WORKSPACE%\\unityTest.log ( del %WORKSPACE%\\unityTest.log )
+          IF EXIST %WORKSPACE%\\unitypackage.log ( del %WORKSPACE%\\unitypackage.log )
+          IF EXIST %WORKSPACE%\\testResult.xml ( del %WORKSPACE%\\testResult.xml )
+        '''
+      }
+
+      post {
+        failure {
+          script{
+            FAILED_STAGE = "cleanUp";
+          }
+        }
+      }
+    }
+
+    stage('build') {
+      steps {
+        powershell '''
+          $GIT_PATH = $Env:GIT_PATH     
+          $GIT_SHA = $GIT_COMMIT      
+          $UNITY_PATH = $Env:UNITY_PATH
+          $WORKSPACE = $Env:WORKSPACE
+          $logfile = "$WORKSPACE\\unity.log"
+
+          & Start-process -Wait $UNITY_PATH -ArgumentList "-quit","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-executeMethod","JenkinsScript.PerformBuild","-logFile","`"$logfile`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
+          $lastOutput = Get-Content $logfile -Tail 1
+          Get-Content $logfile
+
+          if ( $lastOutput -eq "Exiting batchmode successfully now!" ) {
+            echo "Unity Build successfully"
+          } else {
+            echo "Unity Build Error: Unexpected output"
+            echo "Last Output:[$lastOutput]"
+            exit 1
+          }
+        '''
+      }
+
+      post {
+        failure {
+          script{
+            FAILED_STAGE = "build";
+          }
+        }
+      }
+    }
+
+    stage('test') {
+      steps {
+        bat '''
+          SET IAM_DATABASE_URL = %IAM_DATABASE_URL%
+          SET NAMESPACE = %NAMESPACE%
+          SET TABLE_PREFIX = %TABLE_PREFIX%
+          SET AWS_ACCESS_KEY_ID = %AWS_ACCESS_KEY_ID%
+          SET AWS_SECRET_ACCESS_KEY = %AWS_SECRET_ACCESS_KEY%
+          SET AWS_REGION = %AWS_REGION%
+
+          set IAM_BASE_URL=%IAM_DATABASE_URL%
+          set ADMIN_CLIENT_ID=%ADMIN_CLIENT_ID%
+          set ADMIN_CLIENT_SECRET=%ADMIN_CLIENT_SECRET%
+          set ADMIN_NAMESPACE=%ADMIN_NAMESPACE%
+          set ADMIN_USER=%ADMIN_USER%
+          set ADMIN_PASSWORD=%ADMIN_PASSWORD%
+
+          set UTILITIES_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Plugins\\TestUtilities
+          set VARIABLE_FILE_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Resources\\EcommerceVariables.json
+
+          set ROOT_CATEGORY_PATH=/EcommRoot
+          set CHILD_CATEGORY_PATH=/EcommRoot/SubPath
+          set GRANDCHILD_CATEGORY_PATH=/EcommRoot/SubPath/Children
+          set TEST_EMAIL=ecommuser@example.com
+          set TEST_PASSWORD=123456
+          set CURRENCY_CODE=ECOMMCOIN
+          set INGAME_ITEM_TITLE=In Game E-Commerce Item
+          set CURRENCY_ITEM_TITLE=In Game Currency Item
+
+          set VARIABLES_FILE_CONTENT={"rootCategoryPath":"%ROOT_CATEGORY_PATH%", "childCategoryPath":"%CHILD_CATEGORY_PATH%", "grandChildCategoryPath":"%GRANDCHILD_CATEGORY_PATH%", "email":"%TEST_EMAIL%", "password":"%TEST_PASSWORD%", "currencyCode":"%CURRENCY_CODE%", "inGameItemTitle":"%INGAME_ITEM_TITLE%", "currencyItemTitle":"%CURRENCY_ITEM_TITLE%"}
+          echo %VARIABLES_FILE_CONTENT%> "%VARIABLE_FILE_PATH%"
+
+          "%UTILITIES_PATH%\\justice-test-utilities-windows_amd64.exe" ecommerce --setup --rootcategorypath %ROOT_CATEGORY_PATH% --childcategorypath %CHILD_CATEGORY_PATH% --grandchildcategorypath %GRANDCHILD_CATEGORY_PATH% --testemail %TEST_EMAIL% --testpassword %TEST_PASSWORD% --currencycode %CURRENCY_CODE% --ingameitemtitle "%INGAME_ITEM_TITLE%" --currencyitemtitle "%CURRENCY_ITEM_TITLE%"
+        '''
+
+        script {
+          def UNITY_CONFIG_JSON = '''
+            {
+              "PublisherNamespace":"${env.NAMESPACE}",
+              "AppId":"${env.SDK_APP_ID}",
+              "Namespace":"${env.ADMIN_NAMESPACE}",
+              "IamServerUrl":"${env.IAM_BASE_URL}",
+              "PlatformServerUrl":"${env.UE4_BASE_URL}",
+              "BasicServerUrl":"${env.UE4_BASE_URL}",
+              "LobbyServerUrl":"${env.UE4_BASE_URL}",
+              "TelemetryServerUrl":"${env.UE4_BASE_URL}",
+              "ClientId":"${env.UE4_CLIENT_ID}",
+              "ClientSecret":"${env.UE4_CLIENT_SECRET}",
+              "WebLoginUrl":"${env.SDK_WEB_LOGIN_URL}",
+              "RedirectUri":"${env.UE4_RedirectURI}"
+            }
+          '''
+        }
+
+        powershell '''      
+          $GIT_PATH = $Env:GIT_PATH     
+          $GIT_SHA = $GIT_COMMIT      
+          $UNITY_PATH = $Env:UNITY_PATH
+          $WORKSPACE = $Env:WORKSPACE
+          $logfile = "$WORKSPACE\\unityTest.log"
+          $testresult = "$WORKSPACE\\testResult.xml"
+
+          if ( ![System.IO.File]::Exists($testresult) ) {
+            New-Item $WORKSPACE\\testResult.xml -ItemType file
+            dir $WORKSPACE
+          }
+
+          $UNITY_CONFIG_JSON = @"''' + UNITY_CONFIG_JSON + '''"@
+
+          $UNITY_CONFIG_JSON | Out-File -FilePath "$WORKSPACE\\UnitysampleProject\\Assets\\Resources\\JusticeSDKConfig.json"
+          & Start-process -Wait $UNITY_PATH -ArgumentList "-runTests","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-logFile","`"$logfile`"","-testPlatform","playmode","-testResults","`"$testresult`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
+          $lastOutput = Get-Content $logfile -Tail 1
+          Get-Content $logfile
+          [xml]$xmlTestResult = Get-Content -Path $testresult 
+
+          if ( $xmlTestResult.'test-run'.failed -eq 0 ) {
+            if ( $xmlTestResult.ChildNodes -ne 0 ){
+              Get-Content $testresult -Head 2
+              echo "Unity Test successfully"
+            }
+          } else {
+            Get-Content $testresult -Head 2
+            echo "Unity Test Error: Unexpected output"
+            exit 1
+          }
+
+          Get-Content $testresult | Select -Index 1 | Write-Host
+        '''
+
+        bat '''
+          set IAM_BASE_URL=%IAM_DATABASE_URL%
+          set ADMIN_CLIENT_ID=%ADMIN_CLIENT_ID%
+          set ADMIN_CLIENT_SECRET=%ADMIN_CLIENT_SECRET%
+          set ADMIN_NAMESPACE=%ADMIN_NAMESPACE%
+          set ADMIN_USER=%ADMIN_USER%
+          set ADMIN_PASSWORD=%ADMIN_PASSWORD%
+          set UTILITIES_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Plugins\\TestUtilities
+          "%UTILITIES_PATH%\\justice-test-utilities-windows_amd64.exe" ecommerce --teardown
+        '''
+      }
+
+      post {
+        failure {
+          script{
+            FAILED_STAGE = "test";
+          }
+        }
+      }
+    }  
+
+  stage('package') {
+    steps {
+      powershell '''
+        $GIT_PATH = $Env:GIT_PATH      
+        $GIT_SHA = $GIT_COMMIT       
+        $UNITY_PATH = $Env:UNITY_PATH
+        $WORKSPACE = $Env:WORKSPACE
+        $BUILD_NUMBER = $Env:BUILD_NUMBER
+
+        $logfile = "$WORKSPACE\\unitypackage.log"
+        $unitypackage = "$WORKSPACE\\outputpackage\\JusticeSDK-$GIT_SHA-BUILD-$BUILD_NUMBER.unitypackage"         
+
+        & Start-process -Wait "$UNITY_PATH" -ArgumentList "-quit","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-logFile","`"$logfile`"","-exportPackage","Assets\\Justice","`"$unitypackage`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
+        Get-Content $logfile
+      '''
+    }
+
+    post {
+      failure {
+        script{
+          FAILED_STAGE = "package";
+        }
+      }
+    }
+  }
+
+  stage('publishapidocs') {
+    steps {
+      bat '''
+        doxygen Doxyfile        
+        aws s3 cp "%WORKSPACE%\\apidocs\\html" s3://docs.accelbyte.net/sdk/unity/ --recursive      
+      '''
+    }
+
+    post {
+      failure {
+        script{
+          FAILED_STAGE = "publishapidocs";
+        }
+      }
+    }
+  }
+
+  stage('archive') {
+    steps {        
+      powershell '''
+        $GIT_PATH = $Env:GIT_PATH 
+        $GIT_SHA = $GIT_COMMIT
+
+        $WORKSPACE = $Env:WORKSPACE
+        $BUILD_NUMBER = $Env:BUILD_NUMBER        
+        $ZIP_PATH = $Env:ZIP_PATH
+        & "$ZIP_PATH\\7z.exe" a -t7z "$WORKSPACE\\outputpackage\\JusticeSampleGameDemo-$GIT_SHA-BUILD-$BUILD_NUMBER.7z" "$WORKSPACE\\output"
+      '''
+    }
+
+    post {
+      failure {
+        script{
+          FAILED_STAGE = "archive";
+        }
+      }
+    }
+  }
+}
+
+  post {
+    success {
+      script {
+        def message = ""
+        message = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+        slackSend (channel: "#sdk-pipeline", color: '#36B37E', message: "<${env.BUILD_URL}console|Jenkin's Job #${env.BUILD_NUMBER}> *SUCCESSFUL* for `${env.JOB_NAME}` on branch `${env.GIT_BRANCH}` \n `${env.GIT_COMMIT}`: ${message} ")
+
+        def turnOff = true       
+        if (turnOff) {
+          node('master') {
+            sh 'aws ec2 stop-instances --instance-ids i-${SDK_INSTANCE_ID}'
+          }
+        }
+      }
+    }
+
+    failure {
+      script {
+        def jobName = "${JOB_NAME}"
+        def buildNumber = "${BUILD_NUMBER}"
+        def gitBranch = "${GIT_BRANCH}"
+        def buildURL = "${BUILD_URL}"
+        def message = ""
+        message = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()        
+
+        echo "jobName: ${JOB_NAME}"
+        echo "buildNumber: ${BUILD_NUMBER}"
+        echo "gitBranch: ${GIT_BRANCH}"
+        echo "buildURL: ${BUILD_URL}"
+
+        slackSend (channel: "#sdk-pipeline", color: '#FF0000', message: "<${env.BUILD_URL}console|Jenkin's Job #${env.BUILD_NUMBER}> *FAILED* on Stage `${FAILED_STAGE}` \nProject: `${env.JOB_NAME}` \nBranch: `${env.GIT_BRANCH}` \nCommit: `${env.GIT_COMMIT}` \nMessage: `${message}` ")
+        def turnOff = true
+        if (turnOff) {
+          node('master') {
+            sh 'aws ec2 stop-instances --instance-ids i-${SDK_INSTANCE_ID}'
+          }
+        }
+      }
+    }
+  }
+}
