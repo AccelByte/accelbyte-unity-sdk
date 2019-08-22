@@ -14,20 +14,20 @@ namespace AccelByte.Api
     public class Orders
     {
         private readonly OrdersApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Orders(OrdersApi api, User user, AsyncTaskDispatcher taskDispatcher, CoroutineRunner coroutineRunner)
+        internal Orders(OrdersApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can't construct purchase manager! PurchaseService parameter is null!");
-            Assert.IsNotNull(user, "Can't construct purchase manager! UserAccount parameter is null!");
-            Assert.IsNotNull(taskDispatcher, "taskReactor must not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner must not be null");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
+            this.session = session;
+            this.@namespace = @namespace;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -40,23 +40,20 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(orderRequest, "Can't create order; OrderRequest parameter is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.CreateOrder(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        orderRequest,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<OrderInfo>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.CreateOrder(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    orderRequest,
+                    callback));
         }
 
         /// <summary>
@@ -68,23 +65,15 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(orderNo, "Can't get user's order; OrderNo parameter is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetUserOrder(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        orderNo,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<OrderInfo>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetUserOrder(this.@namespace, this.session.UserId, this.session.AuthorizationToken, orderNo, callback));
         }
 
         /// <summary>
@@ -95,24 +84,21 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains PagedOrderInfo via callback when completed</param>
         public void GetUserOrders(uint startPage, uint size, ResultCallback<PagedOrderInfo> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetUserOrders(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        startPage,
-                        size,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<PagedOrderInfo>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetUserOrders(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    startPage,
+                    size,
+                    callback));
         }
 
         /// <summary>
@@ -125,23 +111,20 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(orderNo, "Can't get user's order history info; OrderNo parameter is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetUserOrderHistory(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        orderNo,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<OrderHistoryInfo[]>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetUserOrderHistory(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    orderNo,
+                    callback));
         }
     }
 }

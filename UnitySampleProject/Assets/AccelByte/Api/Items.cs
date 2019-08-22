@@ -14,20 +14,20 @@ namespace AccelByte.Api
     public class Items
     {
         private readonly ItemsApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Items(ItemsApi api, User user, AsyncTaskDispatcher taskDispatcher, CoroutineRunner coroutineRunner)
+        internal Items(ItemsApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can't construct Catalog manager; CatalogService parameter is null!");
-            Assert.IsNotNull(user, "Can't construct Catalog manager; UserAccount parameter isnull!");
-            Assert.IsNotNull(taskDispatcher, "taskReactor must not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner must not be null");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
+            this.session = session;
+            this.@namespace = @namespace;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -44,24 +44,15 @@ namespace AccelByte.Api
             Assert.IsNotNull(region, "Can't get item; Region parameter is null!");
             Assert.IsNotNull(language, "Can't get item; Language parameter is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetItem(
-                        this.user.Namespace,
-                        this.user.AccessToken,
-                        itemId,
-                        region,
-                        language,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<Item>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetItem(this.@namespace, this.session.AuthorizationToken, itemId, region, language, callback));
         }
 
         /// <summary>
@@ -78,24 +69,21 @@ namespace AccelByte.Api
             Assert.IsNotNull(criteria, "Can't get items by criteria; Criteria parameter is null!");
             Assert.IsNotNull(language, "Can't get items by criteria; Language parameter is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetItemsByCriteria(
-                        this.user.Namespace,
-                        this.user.AccessToken,
-                        region,
-                        language,
-                        criteria,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<PagedItems>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetItemsByCriteria(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    region,
+                    language,
+                    criteria,
+                    callback));
         }
     }
 }

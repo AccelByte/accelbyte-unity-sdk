@@ -1,7 +1,6 @@
 
 # Getting Started
 
-## Introduction
 ## Preparation
 
 1. Download the whole repository.

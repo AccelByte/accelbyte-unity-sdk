@@ -3,11 +3,9 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
-using Random = System.Random;
 
 namespace AccelByte.Api
 {
@@ -18,127 +16,88 @@ namespace AccelByte.Api
     public class User
     {
         //Constants
-        private const uint MaxWaitTokenRefresh = 60000;
-        private const uint WaitExpiryDelay = 100;
-        private static readonly TimeSpan MaxBackoffInterval = TimeSpan.FromDays(1);
         private const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
 
         //Readonly members
-        private readonly AuthenticationApi authApi;
-        private readonly UserApi userApi;
-        private readonly string @namespace;
-        private readonly string clientId;
-        private readonly string clientSecret;
-        private readonly string redirectUri;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ILoginSession loginSession;
+        private readonly IUserAccount userAccount;
         private readonly CoroutineRunner coroutineRunner;
+        private readonly bool needsUserId;
+        private readonly AccelByteSession sessionAdapter;
 
-        private TokenData tokenData;
-        private DateTime nextRefreshTime;
+        public ISession Session { get { return this.sessionAdapter; } }
 
-        private string clientToken;
-        private DateTime clientTokenExpiryTime;
-        
-        /// <summary>
-        /// Check if user is logged in or not
-        /// </summary>
-        public bool IsLoggedIn
+        private UserData userDataCache;
+
+        internal User(ILoginSession loginSession, IUserAccount userAccount, CoroutineRunner coroutineRunner,
+            bool needsUserId)
         {
-            get { return this.tokenData != null; }
-        }
-
-        /// <summary>
-        /// Logged in username (email or phone number)
-        /// </summary>
-        public string UserName { get; private set; }
-
-        /// <summary>
-        /// Logged in user display name
-        /// </summary>
-        public string DisplayName
-        {
-            get { return this.tokenData != null ? this.tokenData.display_name : null; }
-        }
-
-        /// <summary>
-        /// Logged in user namespace
-        /// </summary>
-        public string Namespace
-        {
-            get { return this.tokenData != null ? this.tokenData.@namespace : null; }
-        }
-
-        /// <summary>
-        /// Logged in user id
-        /// </summary>
-        public string UserId
-        {
-            get { return this.tokenData != null ? this.tokenData.user_id : null; }
-        }
-
-        /// <summary>
-        /// User access token to be used on other services
-        /// </summary>
-        public string AccessToken
-        {
-            get { return this.tokenData != null ? this.tokenData.access_token : null; }
-        }
-
-        internal User(AuthenticationApi authApi, UserApi userApi, string @namespace, 
-            string clientId, string clientSecret, string redirectUri, AsyncTaskDispatcher taskDispatcher, 
-            CoroutineRunner coroutineRunner)
-        {
-            this.authApi = authApi;
-            this.userApi = userApi;
-            this.@namespace = @namespace;
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
-            this.redirectUri = redirectUri;
-            this.taskDispatcher = taskDispatcher;
+            this.loginSession = loginSession;
+            this.userAccount = userAccount;
             this.coroutineRunner = coroutineRunner;
-            this.taskDispatcher.Start(Refresh());
+            this.needsUserId = needsUserId;
+            this.sessionAdapter = new AccelByteSession();
         }
 
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password
         /// </summary>
-        /// <param name="userName">Could be email or phone (right now, only email supported)</param>
+        /// <param name="username">Could be email or phone (right now, only email supported)</param>
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithUserName(string userName, string password, ResultCallback callback)
+        public void LoginWithUsername(string username, string password, ResultCallback callback)
         {
-            this.UserName = userName;
-            
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => LoginWithUserNameAsync(userName, password, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback));
         }
 
-        private IEnumerator<ITask> LoginWithUserNameAsync(string email, string password, ResultCallback callback)
+        private IEnumerator LoginAsync(Func<ResultCallback, IEnumerator> loginMethod, ResultCallback callback)
         {
-            if (this.IsLoggedIn)
+            if (this.sessionAdapter.IsValid())
             {
-                Logout();
+                callback.TryError(ErrorCode.InvalidRequest, "User is already logged in.");
+
+                yield break;
             }
 
-            Result<TokenData> loginResult = null;
-        
-            yield return Task.Await(this.authApi.GetUserToken(this.@namespace, 
-                this.clientId, this.clientSecret, email, password, 
-                result => { loginResult = result; }));
+            Result loginResult = null;
+
+            yield return loginMethod(r => loginResult = r);
 
             if (loginResult.IsError)
             {
-                callback.TryError(ErrorCode.GenerateTokenFailed, "Generate token with password grant failed.",
-                    loginResult.Error);
+                callback.TryError(loginResult.Error);
+
                 yield break;
             }
-            
-            this.tokenData = loginResult.Value;
-            this.nextRefreshTime = User.ScheduleNormalRefresh(this.tokenData.expires_in);
+
+            this.sessionAdapter.AuthorizationToken = this.loginSession.AuthorizationToken;
+
+            if (this.needsUserId)
+            {
+                Result<UserData> userDataResult = null;
+
+                yield return RefreshDataAsync(result => userDataResult = result);
+
+                if (userDataResult.IsError)
+                {
+                    callback.TryError(userDataResult.Error);
+
+                    yield break;
+                }
+
+                this.sessionAdapter.UserId = this.userDataCache.UserId;
+            }
+            else
+            {
+                this.sessionAdapter.UserId = this.loginSession.UserId;
+            }
+
             callback.TryOk();
+        }
+
+        private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback callback)
+        {
+            yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb), callback);
         }
 
         /// <summary>
@@ -151,39 +110,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void LoginWithOtherPlatform(PlatformType platformType, string platformToken, ResultCallback callback)
         {
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => LoginWithOtherPlatformAsync(platformType, platformToken, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback));
         }
 
-        private IEnumerator<ITask> LoginWithOtherPlatformAsync(PlatformType platformType, string platformToken,
+        private IEnumerator LoginWithOtherPlatformAsync(PlatformType platformType, string platformToken,
             ResultCallback callback)
         {
-            if (this.IsLoggedIn)
-            {
-                Logout();
-            }
-
-            Result<TokenData> loginResult = null;
-
-            yield return Task.Await(this.authApi.GetUserTokenWithOtherPlatform(this.@namespace,
-                this.clientId, this.clientSecret, platformType, platformToken,
-                result => { loginResult = result; }));
-
-            if (loginResult.IsError)
-            {
-                callback.TryError(ErrorCode.GenerateTokenFailed, 
-                    "cannot generate platform token for " + platformType, loginResult.Error);
-                
-                yield break;
-            }
-
-            this.tokenData = loginResult.Value;
-            this.nextRefreshTime = User.ScheduleNormalRefresh(this.tokenData.expires_in);
-
-            callback.TryOk();
+            yield return LoginAsync(
+                cb => this.loginSession.LoginWithOtherPlatform(platformType, platformToken, cb),
+                callback);
         }
 
         /// <summary>
@@ -194,39 +129,14 @@ namespace AccelByte.Api
         {
             string authCode = Environment.GetEnvironmentVariable(User.AuthorizationCodeEnvironmentVariable);
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => LoginWithLauncherAsync(authCode, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
         }
-        
-        private IEnumerator<ITask> LoginWithLauncherAsync(string authCode, ResultCallback callback)
+
+        private IEnumerator LoginWithAuthorizationCodeAsync(string authCode, ResultCallback callback)
         {
-            if (this.IsLoggedIn)
-            {
-                Logout();
-            }
-
-            Result<TokenData> loginResult = null;
-
-            yield return Task.Await(this.authApi.GetUserTokenWithAuthorizationCode(this.clientId,
-                this.clientSecret, authCode, this.redirectUri,
-                result => { loginResult = result; }));
-
-            if (loginResult.IsError)
-            {
-                callback.Try(Result.CreateError(ErrorCode.GenerateTokenFailed, 
-                    "Generate token with authorization code grant failed.", loginResult.Error));
-                yield break;
-            }
-
-            this.tokenData = loginResult.Value;
-            this.nextRefreshTime = User.ScheduleNormalRefresh(this.tokenData.expires_in);
-
-            callback.Try(Result.CreateOk());
+            yield return LoginAsync(cb => this.loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
         }
-        
+
         /// <summary>
         /// Login with device id. A user registered with this method is called a headless account because it doesn't
         /// have username yet.
@@ -234,138 +144,29 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void LoginWithDeviceId(ResultCallback callback)
         {
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => LoginWithDeviceIdAsync(deviceProvider, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
         }
 
-        private IEnumerator<ITask> LoginWithDeviceIdAsync(DeviceProvider deviceProvider, ResultCallback callback)
+        private IEnumerator LoginWithDeviceIdAsync(ResultCallback callback)
         {
-            if (this.IsLoggedIn)
-            {
-                Logout();
-            }
-
-            Result<TokenData> loginResult = null;
-
-            yield return Task.Await(
-                this.authApi.GetUserTokenWithDeviceId(
-                    this.@namespace, this.clientId, this.clientSecret, deviceProvider.DeviceType, 
-                    deviceProvider.DeviceId, 
-                    result => loginResult = result));
-
-            if (loginResult.IsError)
-            {
-                callback.TryError(loginResult.Error.Code, loginResult.Error.Message);
-                
-                yield break;
-            }
-
-            this.tokenData = loginResult.Value;
-            this.nextRefreshTime = User.ScheduleNormalRefresh(this.tokenData.expires_in);
-
-            callback.TryOk();
+            yield return LoginAsync(this.loginSession.LoginWithDeviceId, callback);
         }
 
         /// <summary>
         /// Logout current user session
         /// </summary>
-        public void Logout()
+        public void Logout(ResultCallback callback)
         {
-            this.tokenData = null;
-            this.nextRefreshTime = DateTime.UtcNow;
-        }
+            this.sessionAdapter.UserId = null;
 
-        /// <summary>
-        /// Force refresh session. This method is AccelByte coroutine-like special method.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator<ITask> ForceRefresh()
-        {
-            string oldAccessToken = this.AccessToken;
-            this.nextRefreshTime = DateTime.UtcNow;
-
-            //TODO: Handle if refresh failed
-            while (oldAccessToken == this.AccessToken)
+            if (!this.sessionAdapter.IsValid())
             {
-                yield return Task.Delay(User.WaitExpiryDelay);
+                callback.TryOk();
+
+                return;
             }
-        }
 
-        private IEnumerator<ITask> Refresh()
-        {
-            TimeSpan tokenRefreshBackoff = TimeSpan.FromSeconds(10);
-            var rand = new Random();
-
-            while (true)
-            {
-                if (tokenRefreshBackoff >= User.MaxBackoffInterval)
-                {
-                    yield break;
-                }
-
-                if (this.tokenData == null || DateTime.UtcNow < this.nextRefreshTime)
-                {
-                    yield return Task.Delay(User.WaitExpiryDelay);
-                    
-                    continue;
-                }
-
-                Result<TokenData> refreshResult = null;
-
-                yield return Task.Await(
-                    this.authApi.GetUserTokenWithRefreshToken(
-                        this.clientId, this.clientSecret, this.tokenData.refresh_token,
-                        result => { refreshResult = result; }));
-
-                if (!refreshResult.IsError)
-                {
-                    this.tokenData = refreshResult.Value;
-                    this.nextRefreshTime = User.ScheduleNormalRefresh(refreshResult.Value.expires_in);
-                }
-                else
-                {
-                    tokenRefreshBackoff = User.CalculateBackoffInterval(tokenRefreshBackoff, rand.Next(1, 60));
-                    this.nextRefreshTime = DateTime.UtcNow + tokenRefreshBackoff;
-                }
-            }
-        }
-
-        private static DateTime ScheduleNormalRefresh(int expiresIn)
-        {
-            return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn + 1) * 0.8);
-        }
-
-        private static TimeSpan CalculateBackoffInterval(TimeSpan previousRefreshBackoff, int randomNum)
-        {
-            previousRefreshBackoff = TimeSpan.FromSeconds(previousRefreshBackoff.Seconds * 2);
-
-            return previousRefreshBackoff + TimeSpan.FromSeconds(randomNum);
-        }
-        
-        private IEnumerator<ITask> GetClientToken(ResultCallback<string> callback)
-        {
-            if (this.clientToken == null || this.clientTokenExpiryTime < DateTime.UtcNow)
-            {
-                Result<TokenData> tokenResult = null;
-                yield return Task.Await(this.authApi.GetClientToken(this.clientId,
-                    this.clientSecret, result => tokenResult = result));
-
-                if (tokenResult.IsError)
-                {
-                    callback.TryError(tokenResult.Error.Code, tokenResult.Error.Message);
-                    yield break;
-                }
-
-                this.clientToken = tokenResult.Value.access_token;
-                this.clientTokenExpiryTime = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResult.Value.expires_in);
-            }
-            
-            callback.TryOk(this.clientToken);
+            this.coroutineRunner.Run(this.loginSession.Logout(callback));
         }
 
         /// <summary>
@@ -375,57 +176,69 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Usernam</param>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void Register(string userName, string password, string displayName,
+        public void Register(string userName, string password, string displayName, string country, DateTime dateOfBirth,
             ResultCallback<UserData> callback)
         {
-            var userInfo = new RegisterUserRequest
+            var registerUserRequest = new RegisterUserRequest
             {
                 AuthType = AuthenticationType.EMAILPASSWD, //Right now, it's hardcoded to email
-                UserName = userName,
+                Username = userName,
                 Password = password,
-                DisplayName = displayName
+                DisplayName = displayName,
+                Country = country,
+                DateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => RegisterAsync(userInfo, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserData>) result)),
-                    null));
+            this.coroutineRunner.Run(this.userAccount.Register(registerUserRequest, callback));
         }
 
-        private IEnumerator<ITask> RegisterAsync(RegisterUserRequest registerUserRequest, ResultCallback<UserData> callback)
-        {
-            Result<string> clientTokenResult = null;
-
-            yield return Task.Await(GetClientToken(result => clientTokenResult = result));
-
-            if (clientTokenResult.IsError)
-            {
-                callback.TryError(ErrorCode.GeneralClientError, "Getting client access token failed.", clientTokenResult.Error);
-                yield break;
-            }
-
-            yield return Task.Await(this.userApi.Register(this.@namespace, clientTokenResult.Value, registerUserRequest,
-                callback));
-        }
-        
         /// <summary>
-        /// Get current logged in user data
+        /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
         public void GetData(ResultCallback<UserData> callback)
         {
-            if (!this.IsLoggedIn)
+            this.coroutineRunner.Run(GetDataAsync(callback));
+        }
+
+        private IEnumerator GetDataAsync(ResultCallback<UserData> callback)
+        {
+            if (this.userDataCache != null)
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
+                callback.TryOk(this.userDataCache);
+            }
+            else
+            {
+                yield return RefreshDataAsync(callback);
+            }
+        }
+
+        /// <summary>
+        /// Refresh currrent cached user data.
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains UserData via callback</param>
+        public void RefreshData(ResultCallback<UserData> callback)
+        {
+            this.userDataCache = null;
+
+            this.coroutineRunner.Run(RefreshDataAsync(callback));
+        }
+
+        private IEnumerator RefreshDataAsync(ResultCallback<UserData> callback)
+        {
+            Result<UserData> result = null;
+
+            yield return this.userAccount.GetData(r => result = r);
+
+            if (!result.IsError)
+            {
+                this.userDataCache = result.Value;
+                callback.TryOk(this.userDataCache);
+
+                yield break;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.GetData(this.Namespace, this.UserId, this.AccessToken, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserData>) result)),
-                    this));
+            callback.Try(result);
         }
 
         /// <summary>
@@ -433,33 +246,20 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="updateRequest">Set its field if you want to change it, otherwise leave it</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void Update(UpdateUserRequest updateRequest,
-            ResultCallback<UserData> callback)
+        public void Update(UpdateUserRequest updateRequest, ResultCallback<UserData> callback)
         {
-            if (!this.IsLoggedIn)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => UpdateAsync(updateRequest, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserData>) result)),
-                    this));
+            this.coroutineRunner.Run(UpdateAsync(updateRequest, callback));
         }
 
-        private IEnumerator<ITask> UpdateAsync(UpdateUserRequest updateRequest,
-            ResultCallback<UserData> callback)
+        private IEnumerator UpdateAsync(UpdateUserRequest updateRequest, ResultCallback<UserData> callback)
         {
             Result<UserData> updateResult = null;
 
-            yield return Task.Await(this.userApi.Update(this.Namespace, this.UserId, 
-                this.AccessToken, updateRequest, result => updateResult = result));
+            yield return this.userAccount.Update(updateRequest, result => updateResult = result);
 
             if (!updateResult.IsError)
             {
-                yield return Task.Await(ForceRefresh());
+                this.userDataCache = updateResult.Value;
             }
 
             callback.Try(updateResult);
@@ -472,36 +272,23 @@ namespace AccelByte.Api
         /// <param name="userName">Username the user is upgraded to</param>
         /// <param name="password">Password to login with username</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void Upgrade(string userName, string password,
-            ResultCallback<UserData> callback)
+        public void Upgrade(string userName, string password, ResultCallback<UserData> callback)
         {
-            if (!this.IsLoggedIn)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => UpgradeAsync(userName, password, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserData>) result)),
-                    this));
+            this.coroutineRunner.Run(UpgradeAsync(userName, password, callback));
         }
 
-        private IEnumerator<ITask> UpgradeAsync(string userName, string password,
-            ResultCallback<UserData> callback)
+        private IEnumerator UpgradeAsync(string username, string password, ResultCallback<UserData> callback)
         {
-            Result<UserData> apiResult = null;
-            yield return Task.Await(this.userApi.Upgrade(this.Namespace, this.AccessToken, 
-                this.UserId, userName, password, 
-                result => { apiResult = result; }));
+            Result<UserData> result = null;
 
-            if (!apiResult.IsError)
+            yield return this.userAccount.Upgrade(username, password, r => result = r);
+
+            if (!result.IsError)
             {
-                yield return Task.Await(ForceRefresh());
+                this.userDataCache = result.Value;
             }
-            
-            callback.Try(apiResult);
+
+            callback.Try(result);
         }
 
         /// <summary>
@@ -510,19 +297,30 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendVerificationCode(ResultCallback callback)
         {
-            if (!this.IsLoggedIn)
+            this.coroutineRunner.Run(SendVerificationCodeAsync(callback));
+        }
+
+        private IEnumerator SendVerificationCodeAsync(ResultCallback callback)
+        {
+            Result<UserData> userDataResult = null;
+
+            yield return GetDataAsync(r => userDataResult = r);
+
+            if (userDataResult.IsError)
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
+                callback.TryError(
+                    new Error(
+                        ErrorCode.GeneralClientError,
+                        "Failed when trying to get username",
+                        userDataResult.Error));
+
+                yield break;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.SendVerificationCode(this.Namespace, this.AccessToken,
-                        this.UserId, VerificationContext.UserAccountRegistration, this.UserName,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this));
+            yield return this.userAccount.SendVerificationCode(
+                VerificationContext.UserAccountRegistration,
+                this.userDataCache.LoginId,
+                callback);
         }
 
         /// <summary>
@@ -532,83 +330,16 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void Verify(string verificationCode, ResultCallback callback)
         {
-            if (!this.IsLoggedIn)
+            if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
+
                 return;
             }
 
             //TODO: Hard-coded contact type, if phone is activated in the future, we should add UserName to User
             //class and determine whether it's email or phone by regex.
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.Verify(this.Namespace, this.AccessToken, this.UserId, verificationCode, "email", 
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this));
-        }
-
-        /// <summary>
-        /// Trigger an email that contains verification code to be sent to user's email, if he/she wants to also verify
-        /// while upgrading.
-        /// </summary>
-        /// <param name="userName">Username to upgrade to (headless/device account doesn't have username)</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        public void SendUpgradeVerificationCode(string userName, ResultCallback callback)
-        {
-            if (!this.IsLoggedIn)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.SendVerificationCode(this.Namespace, this.AccessToken, this.UserId, 
-                        VerificationContext.UpgradeHeadlessAccount, userName, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this));
-        }
-
-        /// <summary>
-        /// Upgrade and verify the upgraded account. User must be logged in
-        /// </summary>
-        /// <param name="userName">Username to upgrade</param>
-        /// <param name="password">Password to login</param>
-        /// <param name="verificationCode">Verification code retrieved from email or phone </param>
-        /// <param name="callback">Returns Result that contains UserData via callback when completed</param>
-        public void UpgradeAndVerify(string userName, string password,
-            string verificationCode, ResultCallback<UserData> callback)
-        {
-            if (!this.IsLoggedIn)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => UpgradeAndVerifyAsync(userName, password, verificationCode, 
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserData>) result)),
-                    this));
-        }
-
-        private IEnumerator<ITask> UpgradeAndVerifyAsync(string userName, string password,
-            string verificationCode, ResultCallback<UserData> callback)
-        {
-            Result<UserData> apiResult = null;
-            
-            yield return Task.Await(this.userApi.UpgradeAndVerify(this.Namespace, 
-                this.AccessToken, this.UserId, userName, password, verificationCode, 
-                result => { apiResult = result; }));
-
-            if (!apiResult.IsError)
-            {
-                yield return Task.Await(ForceRefresh());
-            }
-            
-            callback.Try(apiResult);
+            this.coroutineRunner.Run(this.userAccount.Verify(verificationCode, "email", callback));
         }
 
         /// <summary>
@@ -618,13 +349,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendResetPasswordCode(string userName, ResultCallback callback)
         {
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.SendPasswordResetCode(AccelBytePlugin.Config.Namespace,
-                        AccelBytePlugin.Config.ClientId, AccelBytePlugin.Config.ClientSecret, userName,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(this.userAccount.SendPasswordResetCode(userName, callback));
         }
 
         /// <summary>
@@ -636,12 +361,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void ResetPassword(string resetCode, string userName, string newPassword, ResultCallback callback)
         {
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.ResetPassword(AccelBytePlugin.Config.Namespace, AccelBytePlugin.Config.ClientId,
-                        AccelBytePlugin.Config.ClientSecret, resetCode, userName, newPassword, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    null));
+            this.coroutineRunner.Run(this.userAccount.ResetPassword(resetCode, userName, newPassword, callback));
         }
 
         /// <summary>
@@ -650,22 +370,17 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformTicket">Ticket / token from other platform to be linked to </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void LinkOtherPlatform(PlatformType platformType, string platformTicket,
-            ResultCallback callback)
+        public void LinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
         {
-            if (!this.IsLoggedIn)
+            if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
+
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.LinkOtherPlatform(this.Namespace, this.AccessToken, 
-                        this.UserId, platformType.ToString().ToLower(), platformTicket, 
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this));
+            this.coroutineRunner.Run(
+                this.userAccount.LinkOtherPlatform(platformType.ToString().ToLower(), platformTicket, callback));
         }
 
         /// <summary>
@@ -675,22 +390,16 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformTicket">Ticket / token from other platform to unlink from this user</param>
         /// <param name="callback">Returns a result via callback when completed</param>
-        public void UnlinkOtherPlatform(PlatformType platformType, string platformTicket,
-            ResultCallback callback)
+        public void UnlinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
         {
-            if (!this.IsLoggedIn)
+            if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
+
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.UnlinkOtherPlatform(this.Namespace, this.AccessToken, 
-                        this.UserId, platformType.ToString(), 
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this));
+            this.coroutineRunner.Run(this.userAccount.UnlinkOtherPlatform(platformType.ToString(), callback));
         }
 
         /// <summary>
@@ -700,18 +409,54 @@ namespace AccelByte.Api
         /// completed.</param>
         public void GetPlatformLinks(ResultCallback<PlatformLink[]> callback)
         {
-            if (!this.IsLoggedIn)
+            if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
+
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.userApi.GetPlatformLinks(this.Namespace, this.AccessToken, this.UserId,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<PlatformLink[]>) result)),
-                    this));
+            this.coroutineRunner.Run(this.userAccount.GetPlatformLinks(callback));
+        }
+
+        private class AccelByteSession : ISession
+        {
+            public string AuthorizationToken { get; set; }
+            public string UserId { get; set; }
+        }
+
+        /// <summary>
+        /// Get user data from another user by login id or email
+        /// </summary>
+        /// <param name="loginId"> email or login id that needed to get user data</param>
+        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+        public void GetUserByLoginId(string loginId, ResultCallback<UserData> callback)
+        {
+            if (!this.sessionAdapter.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(this.userAccount.GetUserByLoginId(loginId, callback));
+        }
+
+        /// <summary>
+        /// Get user data from another user by user id
+        /// </summary>
+        /// <param name="userId"> user id that needed to get user data</param>
+        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+        public void GetUserByUserId(string userId, ResultCallback<UserData> callback)
+        {
+            if (!this.sessionAdapter.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(this.userAccount.GetUserByUserId(userId, callback));
         }
     }
 }

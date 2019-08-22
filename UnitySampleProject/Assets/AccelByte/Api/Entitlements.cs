@@ -15,23 +15,19 @@ namespace AccelByte.Api
     {
         private readonly string @namespace;
         private readonly EntitlementApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Entitlements(string @namespace, EntitlementApi api, User user, AsyncTaskDispatcher taskDispatcher,
-            CoroutineRunner coroutineRunner)
+        internal Entitlements(EntitlementApi api, ISession session, string ns, CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can't construct Entitlement! api is null!");
-            Assert.IsNotNull(@namespace, "Can't construct Entitlement! namespace parameter is null!");
-            Assert.IsNotNull(user, "Can't construct Entitlement! user parameter is null!");
-            Assert.IsNotNull(taskDispatcher, "taskDispatcher must not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner must not be null");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(ns), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
-            this.@namespace = @namespace;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
+            this.session = session;
+            this.@namespace = ns;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -39,26 +35,23 @@ namespace AccelByte.Api
         /// Get list of entitlements owned by a user
         /// </summary>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void GetUserEntitlements(int page, int size, ResultCallback<PagedEntitlements> callback)
+        public void GetUserEntitlements(int offset, int limit, ResultCallback<PagedEntitlements> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetUserEntitlements(
-                        this.@namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        page,
-                        size,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<PagedEntitlements>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlements(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    offset,
+                    limit,
+                    callback));
         }
     }
 }

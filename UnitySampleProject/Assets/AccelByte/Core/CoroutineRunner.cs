@@ -16,7 +16,7 @@ namespace AccelByte.Core
         private readonly MonoBehaviour monoBehaviour;
         private readonly Queue<Action> callbacks = new Queue<Action>();
         private readonly object syncToken = new object();
-        
+
         private bool isRunning = true;
 
         public CoroutineRunner()
@@ -27,17 +27,18 @@ namespace AccelByte.Core
             {
                 this.gameObject = new GameObject("AccelByteDummyGameObject");
             }
-            
+
             this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
             this.monoBehaviour.StartCoroutine(RunCallbacks());
             Object.DontDestroyOnLoad(this.gameObject);
         }
 
-        ~CoroutineRunner()
-        {
-            this.isRunning = false;
-        }
-        
+        ~CoroutineRunner() { this.isRunning = false; }
+
+        public Coroutine Run(IEnumerator coroutine) { return this.monoBehaviour.StartCoroutine(coroutine); }
+
+        public void Stop(Coroutine coroutine) { this.monoBehaviour.StopCoroutine(coroutine); }
+
         public void Run(Action callback)
         {
             lock (this.syncToken)
@@ -62,10 +63,7 @@ namespace AccelByte.Core
                 callback();
             }
         }
-        
-        private class DummyBehaviour : MonoBehaviour
-        {
-            
-        }
+
+        private class DummyBehaviour : MonoBehaviour { }
     }
 }

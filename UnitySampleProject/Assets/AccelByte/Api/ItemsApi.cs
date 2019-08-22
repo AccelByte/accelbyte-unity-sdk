@@ -3,8 +3,8 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Net;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -14,16 +14,19 @@ namespace AccelByte.Api
     internal class ItemsApi
     {
         private readonly string baseUrl;
+        private readonly IHttpWorker httpWorker;
 
-        internal ItemsApi(string baseUrl)
+        internal ItemsApi(string baseUrl, IHttpWorker httpWorker)
         {
-            Assert.IsNotNull(baseUrl, "Can't construct CatalogService; BaseUrl parameter is null!");
+            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
+            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
+            this.httpWorker = httpWorker;
         }
 
-        public IEnumerator<ITask> GetItem(string @namespace, string accessToken, string itemId, string region,
-            string language, ResultCallback<Item> callback)
+        public IEnumerator GetItem(string @namespace, string accessToken, string itemId, string region, string language,
+            ResultCallback<Item> callback)
         {
             Assert.IsNotNull(@namespace, "Can't get item! Namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't get item! AccessToken parameter is null!");
@@ -31,26 +34,27 @@ namespace AccelByte.Api
             Assert.IsNotNull(region, "Can't get item! Region parameter is null!");
             Assert.IsNotNull(language, "Can't get item! Language parameter is null!");
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/platform/public/namespaces/{namespace}/items/{itemId}/locale")
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("itemId", itemId)
                 .WithQueryParam("region", region)
                 .WithQueryParam("language", language)
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<Item> result = response.TryParseJsonBody<Item>();
+            var result = response.TryParseJson<Item>();
+
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> GetItemsByCriteria(string @namespace, string accessToken, string region,
-            string language, ItemCriteria criteria, ResultCallback<PagedItems> callback)
+        public IEnumerator GetItemsByCriteria(string @namespace, string accessToken, string region, string language,
+            ItemCriteria criteria, ResultCallback<PagedItems> callback)
         {
             Assert.IsNotNull(@namespace, "Can't get items by criteria! Namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't get items by criteria! AccessToken parameter is null!");
@@ -88,21 +92,21 @@ namespace AccelByte.Api
                 }
             }
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/platform/public/namespaces/{namespace}/items/byCriteria")
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/byCriteria")
                 .WithPathParam("namespace", @namespace)
                 .WithQueryParam("region", region)
                 .WithQueryParam("language", language)
                 .WithQueries(queries)
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<PagedItems> result = response.TryParseJsonBody<PagedItems>();
+            var result = response.TryParseJson<PagedItems>();
+
             callback.Try(result);
         }
     }

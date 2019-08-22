@@ -69,6 +69,11 @@ namespace AccelByte.Models
         cancelMatchmakingRequest,
         cancelMatchmakingResponse,
         matchmakingNotif,
+        dsNotif,
+        setReadyConsentRequest,
+        setReadyConsentResponse,
+        setReadyConsentNotif,
+        rematchmakingNotif,
     }
 
     public enum UserStatus
@@ -176,6 +181,13 @@ namespace AccelByte.Models
         [DataMember] public string partyID;
     }
 
+    [DataContract]
+    public class LeaveNotification
+    {
+        [DataMember] public string leaderID;
+        [DataMember] public string userID;
+    }
+
     #endregion
 
     #region Matchmaking
@@ -191,14 +203,43 @@ namespace AccelByte.Models
     {
         [DataMember] public string status;
         [DataMember] public string matchId;
-        [DataMember] public string[] partyMember;
-        [DataMember] public string[] counterPartyMember;
+    }
+
+    [DataContract]
+    public class DsNotif
+    {
+        [DataMember] public string status;
+        [DataMember] public string matchId;
+        [DataMember] public string podName;
+        [DataMember] public string ip;
+        [DataMember] public int port;
+        [DataMember] public string message;
+        [DataMember] public string isOK;
     }
 
     [DataContract]
     public class MatchmakingCode
     {
         [DataMember] public int code;
+    }
+    
+    [DataContract]
+    public class ReadyConsentRequest
+    {
+        [DataMember] public string matchId;
+    }
+
+    [DataContract]
+    public class ReadyForMatchConfirmation
+    {
+        [DataMember] public string matchId;
+        [DataMember] public string userId;
+    }
+
+    [DataContract]
+    public class RematchmakingNotification
+    {
+        [DataMember] public int banDuration;
     }
     
     #endregion

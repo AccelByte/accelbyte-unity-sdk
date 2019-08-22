@@ -22,24 +22,30 @@ namespace AccelByte.Models
         [DataMember] public string token_type { get; set; }
         [DataMember] public string user_id { get; set; }
         [DataMember] public string display_name { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+    }
+
+    [DataContract]
+    public class SessionData
+    {
+        [DataMember] public string session_id { get; set; }
     }
 
     [DataContract]
     public class UserData
     {
-        [DataMember] public string Namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string UserId { get; set; }
         [DataMember] public string DisplayName { get; set; }
         [DataMember] public string AuthType { get; set; }
         [DataMember] public string LoginId { get; set; }
         [DataMember] public string EmailAddress { get; set; }
         [DataMember] public string OldEmailAddress { get; set; }
-//        [DataMember] public DateTime CreatedAt { get; set; }
+        [DataMember] public DateTime CreatedAt { get; set; }
         [DataMember] public bool PhoneVerified { get; set; }
         [DataMember] public bool EmailVerified { get; set; }
         [DataMember] public bool Enabled { get; set; }
-//        [DataMember] public DateTime LastEnabledChangedTime { get; set; }
+        [DataMember] public DateTime LastEnabledChangedTime { get; set; }
         [DataMember] public string Country { get; set; }
     }
 
@@ -48,14 +54,17 @@ namespace AccelByte.Models
     {
         [DataMember] public AuthenticationType AuthType { get; set; }
         [DataMember] public string DisplayName { get; set; }
-        [DataMember(Name = "LoginId")] public string UserName { get; set; }
+        [DataMember(Name = "LoginId")] public string Username { get; set; }
         [DataMember] public string Password { get; set; }
+        [DataMember] public string Country { get; set; }
+        [DataMember] public string DateOfBirth { get; set; }
     }
 
     [DataContract]
     public class UpdateUserRequest
     {
         [DataMember] public string Country { get; set; }
+        [DataMember] public string DateOfBirth { get; set; }
         [DataMember] public string DisplayName { get; set; }
         [DataMember] public string EmailAddress { get; set; }
         [DataMember] public string LanguageTag { get; set; }
@@ -85,7 +94,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string PlatformId { get; set; }
         [DataMember] public string PlatformUserId { get; set; }
-        [DataMember] public string Namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string UserId { get; set; }
     }
 }

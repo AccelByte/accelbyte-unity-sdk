@@ -3,11 +3,11 @@
 // and restrictions contact your company contract manager.
 
 using System.Collections;
+using System.Threading;
 using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Tests.IntegrationTests
@@ -33,18 +33,33 @@ namespace Tests.IntegrationTests
                 };
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language, result =>
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
+                    result =>
                     {
                         getItemResult = result;
                         this.expectedItemId = result.Value.data[0].itemId;
                     });
 
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
 
                 categories.GetChildCategories(
-                    TestVariables.childCategoryPath, TestVariables.language,
+                    TestVariables.childCategoryPath,
+                    TestVariables.language,
                     result => { getChildCategoryResult = result; });
-                while (getChildCategoryResult == null) { yield return new WaitForSeconds(0.1f); }
+
+                while (getChildCategoryResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
 
                 Assert.That(!getItemResult.IsError);
                 Assert.That(!getChildCategoryResult.IsError);
@@ -57,14 +72,22 @@ namespace Tests.IntegrationTests
                 Result<Item> getItemResult = null;
 
                 items.GetItemById(
-                    this.expectedItemId, TestVariables.region, TestVariables.language,
+                    this.expectedItemId,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(() => Assert.IsTrue(!getItemResult.IsError, "Get item failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
-                        getItemResult.Value.categoryPath.Contains(this.expectedCategoryName), "Get item failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemResult.IsError, "Get item failed.");
+                TestHelper.Assert.IsTrue(
+                        getItemResult.Value.categoryPath.Contains(this.expectedCategoryName),
+                        "Get item failed.");
             }
 
             [UnityTest]
@@ -75,13 +98,22 @@ namespace Tests.IntegrationTests
                 const string invalidItemId = "000000000";
 
                 items.GetItemById(
-                    invalidItemId, TestVariables.region, TestVariables.language, result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
+                    invalidItemId,
+                    TestVariables.region,
+                    TestVariables.language,
+                    result => { getItemResult = result; });
 
-                TestHelper.Assert(() => Assert.IsTrue(getItemResult.IsError, "Request error on get item failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
-                        getItemResult.Error.Code.Equals(ErrorCode.ItemNotFound), "Request error on get item failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(getItemResult.IsError, "Request error on get item failed.");
+                TestHelper.Assert.IsTrue(
+                        getItemResult.Error.Code.Equals(ErrorCode.ItemNotFound),
+                        "Request error on get item failed.");
             }
 
             [UnityTest]
@@ -91,13 +123,22 @@ namespace Tests.IntegrationTests
                 Result<Item> getItemResult = null;
 
                 items.GetItemById(
-                    "", TestVariables.region, TestVariables.language, result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
+                    "",
+                    TestVariables.region,
+                    TestVariables.language,
+                    result => { getItemResult = result; });
 
-                TestHelper.Assert(() => Assert.IsTrue(getItemResult.IsError, "Request error on get item failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
-                        getItemResult.Error.Code.Equals(ErrorCode.NotFound), "Request error on get get item failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(getItemResult.IsError, "Request error on get item failed.");
+                TestHelper.Assert.IsTrue(
+                        getItemResult.Error.Code.Equals(ErrorCode.NotFound),
+                        "Request error on get get item failed.");
             }
 
             [UnityTest]
@@ -108,14 +149,20 @@ namespace Tests.IntegrationTests
                 const string invalidItemRegion = "ID";
 
                 items.GetItemById(
-                    this.expectedItemId, invalidItemRegion, TestVariables.language,
+                    this.expectedItemId,
+                    invalidItemRegion,
+                    TestVariables.language,
                     result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemResult.IsError, "Get item failed with invalid region failed."));
-                TestHelper.Assert(
-                    () => Assert.IsNotNull(getItemResult.Value, "Get item failed with invalid region failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemResult.IsError, "Get item failed with invalid region failed.");
+                TestHelper.Assert.That(getItemResult.Value, Is.Not.Null, "Get item failed with invalid region failed.");
             }
 
             [UnityTest]
@@ -125,10 +172,19 @@ namespace Tests.IntegrationTests
                 Result<Item> getItemResult = null;
 
                 items.GetItemById(
-                    this.expectedItemId, "", TestVariables.language, result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
+                    this.expectedItemId,
+                    "",
+                    TestVariables.language,
+                    result => { getItemResult = result; });
 
-                TestHelper.Assert(() => Assert.IsTrue(getItemResult.IsError, "Get item with empty region not failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(getItemResult.IsError, "Get item with empty region not failed.");
             }
 
             [UnityTest]
@@ -139,16 +195,22 @@ namespace Tests.IntegrationTests
                 const string invalidItemLanguage = "id";
 
                 items.GetItemById(
-                    this.expectedItemId, TestVariables.region, invalidItemLanguage,
+                    this.expectedItemId,
+                    TestVariables.region,
+                    invalidItemLanguage,
                     result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemResult.IsError, "Get item with invalid language failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemResult.IsError, "Get item with invalid language failed.");
+                TestHelper.Assert.IsTrue(
                         getItemResult.Value.categoryPath.Contains(this.expectedCategoryName),
-                        "Get item with invalid language failed."));
+                        "Get item with invalid language failed.");
             }
 
             [UnityTest]
@@ -158,10 +220,15 @@ namespace Tests.IntegrationTests
                 Result<Item> getItemResult = null;
 
                 items.GetItemById(this.expectedItemId, TestVariables.region, "", result => { getItemResult = result; });
-                while (getItemResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(getItemResult.IsError, "Get item with empty language not failed."));
+                while (getItemResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(getItemResult.IsError, "Get item with empty language not failed.");
             }
         }
 
@@ -176,16 +243,22 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by valid criteria failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by valid criteria failed.");
+                TestHelper.Assert.IsTrue(
                         getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.childCategoryPath),
-                        "Get item by valid criteria failed."));
+                        "Get item by valid criteria failed.");
             }
 
             [UnityTest]
@@ -196,15 +269,22 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by valid criteria failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
-                        getItemByCriteriaResult.Value.data.Length > 0, "Get item by valid criteria failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by valid criteria failed.");
+                TestHelper.Assert.IsTrue(
+                        getItemByCriteriaResult.Value.data.Length > 0,
+                        "Get item by valid criteria failed.");
             }
 
             [UnityTest]
@@ -216,15 +296,22 @@ namespace Tests.IntegrationTests
                 ItemCriteria itemCriteria = new ItemCriteria {CategoryPath = invalidCategoryPath};
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by invalid category path failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
-                        getItemByCriteriaResult.Value.data.Length == 0, "Get item by invalid category path failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by invalid category path failed.");
+                TestHelper.Assert.IsTrue(
+                        getItemByCriteriaResult.Value.data.Length == 0,
+                        "Get item by invalid category path failed.");
             }
 
             [UnityTest]
@@ -235,12 +322,19 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type COINS failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type COINS failed.");
             }
 
             [UnityTest]
@@ -251,12 +345,19 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type INGAMEITEM failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type INGAMEITEM failed.");
             }
 
             [UnityTest]
@@ -267,12 +368,19 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type BUNDLE failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type BUNDLE failed.");
             }
 
             [UnityTest]
@@ -284,16 +392,22 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, invalidCategoryLanguage,
+                    itemCriteria,
+                    TestVariables.region,
+                    invalidCategoryLanguage,
                     result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by invalid language failed."));
-                TestHelper.Assert(
-                    () => Assert.IsTrue(
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by invalid language failed.");
+                TestHelper.Assert.IsTrue(
                         getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.childCategoryPath),
-                        "Get item by invalid language failed."));
+                        "Get item by invalid language failed.");
             }
 
             [UnityTest]
@@ -304,11 +418,19 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, "", result => { getItemByCriteriaResult = result; });
-                while (getItemByCriteriaResult == null) { yield return new WaitForSeconds(0.1f); }
+                    itemCriteria,
+                    TestVariables.region,
+                    "",
+                    result => { getItemByCriteriaResult = result; });
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(getItemByCriteriaResult.IsError, "Get item by empty language not failed."));
+                while (getItemByCriteriaResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(getItemByCriteriaResult.IsError, "Get item by empty language not failed.");
             }
 
             [UnityTest]
@@ -319,12 +441,14 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
+
                 while (getItemByCriteriaResult == null) { yield return null; }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status ACTIVE failed."));
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status ACTIVE failed.");
             }
 
             [UnityTest]
@@ -335,12 +459,14 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
+
                 while (getItemByCriteriaResult == null) { yield return null; }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status INACTIVE failed."));
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status INACTIVE failed.");
             }
 
             [UnityTest]
@@ -351,12 +477,14 @@ namespace Tests.IntegrationTests
                 Result<PagedItems> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
-                    itemCriteria, TestVariables.region, TestVariables.language,
+                    itemCriteria,
+                    TestVariables.region,
+                    TestVariables.language,
                     result => { getItemByCriteriaResult = result; });
+
                 while (getItemByCriteriaResult == null) { yield return null; }
 
-                TestHelper.Assert(
-                    () => Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status DELETED failed."));
+                TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item status DELETED failed.");
             }
         }
     }

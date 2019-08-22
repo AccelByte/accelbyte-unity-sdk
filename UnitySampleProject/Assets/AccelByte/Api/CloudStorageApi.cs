@@ -3,7 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Net;
 using System.Security.Cryptography;
 using AccelByte.Core;
@@ -15,38 +15,41 @@ namespace AccelByte.Api
     public class CloudStorageApi
     {
         private readonly string baseUrl;
+        private readonly IHttpWorker httpWorker;
 
-        internal CloudStorageApi(string baseUrl)
+        internal CloudStorageApi(string baseUrl, IHttpWorker httpWorker)
         {
-            Assert.IsNotNull(baseUrl, "Can not construct CloudStorage service; baseUrl is null!");
+            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
+            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
+            this.httpWorker = httpWorker;
         }
 
-        public IEnumerator<ITask> GetAllSlots(string @namespace, string userId, string accessToken,
+        public IEnumerator GetAllSlots(string @namespace, string userId, string accessToken,
             ResultCallback<Slot[]> callback)
         {
             Assert.IsNotNull(@namespace, "Can't get all slots! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get all slots! userId parameter is null!");
             Assert.IsNotNull(accessToken, "Can't get all slots! accessToken parameter is null!");
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots")
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<Slot[]> result = response.TryParseJsonBody<Slot[]>();
+            var result = response.TryParseJson<Slot[]>();
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> GetSlot(string @namespace, string userId, string accessToken, string slotId,
+        public IEnumerator GetSlot(string @namespace, string userId, string accessToken, string slotId,
             ResultCallback<byte[]> callback)
         {
             Assert.IsNotNull(@namespace, "Can't get the slot! namespace parameter is null!");
@@ -54,40 +57,31 @@ namespace AccelByte.Api
             Assert.IsNotNull(accessToken, "Can't get the slot! accessToken parameter is null!");
             Assert.IsNotNull(slotId, "Can't get the slot! slotId parameter is null!");
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithPathParam("slotId", slotId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.OctedStream)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            if (response == null)
-            {
-                callback.Try(Result<byte[]>.CreateError(ErrorCode.NetworkError, "There is no response"));
-
-                yield break;
-            }
-
-            //TODO: Might need to transfer data via stream for big files
-            byte[] responseBytes = response.GetBodyRaw();
-            response.Close();
             Result<byte[]> result;
 
-            switch (response.StatusCode)
+            switch ((HttpStatusCode) response.Code)
             {
             case HttpStatusCode.OK:
-                result = Result<byte[]>.CreateOk(responseBytes);
+                result = Result<byte[]>.CreateOk(response.BodyBytes);
 
                 break;
+
             default:
-                result = Result<byte[]>.CreateError((ErrorCode) response.StatusCode);
+                result = Result<byte[]>.CreateError((ErrorCode) response.Code);
 
                 break;
             }
@@ -95,7 +89,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> CreateSlot(string @namespace, string userId, string accessToken, byte[] data,
+        public IEnumerator CreateSlot(string @namespace, string userId, string accessToken, byte[] data,
             string filename, ResultCallback<Slot> callback)
         {
             Assert.IsNotNull(@namespace, "Can't create a slot! namespace parameter is null!");
@@ -113,10 +107,10 @@ namespace AccelByte.Api
             }
 
             FormDataContent formDataContent = new FormDataContent();
-            formDataContent.Add(data, filename);
+            formDataContent.Add(filename, data);
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots")
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("checksum", checkSum)
@@ -124,18 +118,18 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(formDataContent.GetMediaType())
                 .WithBody(formDataContent)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<Slot> result = response.TryParseJsonBody<Slot>();
+            var result = response.TryParseJson<Slot>();
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> UpdateSlot(string @namespace, string userId, string accessToken, string slotId,
-            byte[] data, string filename, ResultCallback<Slot> callback)
+        public IEnumerator UpdateSlot(string @namespace, string userId, string accessToken, string slotId, byte[] data,
+            string filename, ResultCallback<Slot> callback)
         {
             Assert.IsNotNull(@namespace, "Can't update a slot! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update a slot! userId parameter is null!");
@@ -153,10 +147,10 @@ namespace AccelByte.Api
             }
 
             FormDataContent formDataContent = new FormDataContent();
-            formDataContent.Add(data, filename);
+            formDataContent.Add(filename, data);
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithPathParam("slotId", slotId)
@@ -165,18 +159,18 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(formDataContent.GetMediaType())
                 .WithBody(formDataContent)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<Slot> result = response.TryParseJsonBody<Slot>();
+            var result = response.TryParseJson<Slot>();
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> UpdateSlotMetadata(string @namespace, string userId, string accessToken,
-            string slotId, string[] tags, string label, string customMetadata, ResultCallback<Slot> callback)
+        public IEnumerator UpdateSlotMetadata(string @namespace, string userId, string accessToken, string slotId,
+            string[] tags, string label, string customMetadata, ResultCallback<Slot> callback)
         {
             Assert.IsNotNull(@namespace, "Can't update a slot! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update a slot! userId parameter is null!");
@@ -186,9 +180,8 @@ namespace AccelByte.Api
             FormDataContent customAttribute = new FormDataContent();
             customAttribute.Add("customAttribute", customMetadata);
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreatePut(
-                    this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots/{slotId}/metadata")
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots/{slotId}/metadata")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithPathParam("slotId", slotId)
@@ -198,17 +191,17 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(customAttribute.GetMediaType())
                 .WithBody(customAttribute)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<Slot> result = response.TryParseJsonBody<Slot>();
+            var result = response.TryParseJson<Slot>();
             callback.Try(result);
         }
 
-        public IEnumerator<ITask> DeleteSlot(string @namespace, string userId, string accessToken, string slotId,
+        public IEnumerator DeleteSlot(string @namespace, string userId, string accessToken, string slotId,
             ResultCallback callback)
         {
             Assert.IsNotNull(@namespace, "Can't create a slot! namespace parameter is null!");
@@ -216,21 +209,20 @@ namespace AccelByte.Api
             Assert.IsNotNull(accessToken, "Can't create a slot! accessToken parameter is null!");
             Assert.IsNotNull(slotId, "Can't create a slot! fileSection parameter is null!");
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreateDelete(
-                    this.baseUrl + "/binary-store/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
+            var request = HttpRequestBuilder
+                .CreateDelete(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots/{slotId}")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithPathParam("slotId", slotId)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBearerAuth(accessToken)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result result = response.TryParse();
+            var result = response.TryParse();
             callback.Try(result);
         }
     }

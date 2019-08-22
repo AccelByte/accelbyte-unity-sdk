@@ -4,24 +4,27 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
     public class UserProfiles
     {
-        private readonly string @namespace;
         private readonly UserProfilesApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal UserProfiles(string @namespace, UserProfilesApi api, User user, AsyncTaskDispatcher taskDispatcher,
-            CoroutineRunner coroutineRunner)
+        internal UserProfiles(UserProfilesApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
         {
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+
             this.api = api;
+            this.session = session;
             this.@namespace = @namespace;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -31,18 +34,14 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed.</param>
         public void GetUserProfile(ResultCallback<UserProfile> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetUserProfile(this.@namespace, this.user.AccessToken, result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserProfile>) result)),
-                    null));
+            this.coroutineRunner.Run(this.api.GetUserProfile(this.@namespace, this.session.AuthorizationToken, callback));
         }
 
         /// <summary>
@@ -52,22 +51,18 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
         public void CreateUserProfile(CreateUserProfileRequest createRequest, ResultCallback<UserProfile> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.CreateUserProfile(
+            this.coroutineRunner.Run(this.api.CreateUserProfile(
                         this.@namespace,
-                        this.user.AccessToken,
+                        this.session.AuthorizationToken,
                         createRequest,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserProfile>) result)),
-                    null));
+                        callback));
         }
 
         /// <summary>
@@ -77,22 +72,18 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
         public void UpdateUserProfile(UpdateUserProfileRequest updateRequest, ResultCallback<UserProfile> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.UpdateUserProfile(
+            this.coroutineRunner.Run(this.api.UpdateUserProfile(
                         this.@namespace,
-                        this.user.AccessToken,
+                        this.session.AuthorizationToken,
                         updateRequest,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<UserProfile>) result)),
-                    null));
+                        callback));
         }
     }
 }

@@ -10,7 +10,6 @@ class JenkinsScript
     static void PerformBuild()
     {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-        buildPlayerOptions.scenes = new[] {"Assets/SampleScene/TestScene.unity"};
         buildPlayerOptions.locationPathName = "../output/JusticeDemoGame.exe";
         buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
         buildPlayerOptions.options = BuildOptions.None;

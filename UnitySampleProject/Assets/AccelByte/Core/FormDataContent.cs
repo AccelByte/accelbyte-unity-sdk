@@ -22,7 +22,7 @@ namespace AccelByte.Api
             this.writer.Write("--{0}", this.boundary);
         }
 
-        public FormDataContent Add(byte[] data, string filename)
+        public FormDataContent Add(string filename, byte[] data)
         {
             this.writer.Write(
                 "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{0}\"\r\nContent-Type: {1}\r\n\r\n",

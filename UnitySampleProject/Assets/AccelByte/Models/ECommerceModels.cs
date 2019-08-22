@@ -12,8 +12,8 @@ namespace AccelByte.Models
     [DataContract]
     public class Paging
     {
-        [DataMember] string previous { get; set; }
-        [DataMember] string next { get; set; }
+        [DataMember] public string previous { get; set; }
+        [DataMember] public string next { get; set; }
     }
 
     #endregion
@@ -26,7 +26,7 @@ namespace AccelByte.Models
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencySymbol { get; set; }
         [DataMember] public string currencyType { get; set; } // = ['REAL', 'VIRTUAL'],
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public int decimals { get; set; }
     }
 
@@ -47,7 +47,7 @@ namespace AccelByte.Models
     public class WalletInfo
     {
         [DataMember] public string id { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string userId { get; set; }
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencySymbol { get; set; }
@@ -64,7 +64,7 @@ namespace AccelByte.Models
         [DataMember] public int amount { get; set; }
         [DataMember] public string reason { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public string @operator { get; set; }
+        [DataMember(Name = "operator")] public string Operator { get; set; }
         [DataMember] public string walletAction { get; set; }
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string balanceSource { get; set; }
@@ -86,7 +86,7 @@ namespace AccelByte.Models
     [DataContract]
     public class Category
     {
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string parentCategoryPath { get; set; }
         [DataMember] public string categoryPath { get; set; }
         [DataMember] public string displayName { get; set; }
@@ -157,7 +157,7 @@ namespace AccelByte.Models
         [DataMember] public string appId { get; set; }
         [DataMember] public EntitlementAppType appType { get; set; }
         [DataMember] public string sku { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string name { get; set; }
         [DataMember] public int useCount { get; set; }
         [DataMember] public ItemType itemType { get; set; }
@@ -204,7 +204,7 @@ namespace AccelByte.Models
         [DataMember] public string appId { get; set; }
         [DataMember] public string appType { get; set; } //"GAME"
         [DataMember] public string sku { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string entitlementName { get; set; }
         [DataMember] public string entitlementType { get; set; }
         [DataMember] public int useCount { get; set; }
@@ -246,14 +246,14 @@ namespace AccelByte.Models
         [DataMember] public int value { get; set; }
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencyType { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
     }
 
     [DataContract]
     public class OrderHistoryInfo
     {
         [DataMember] public string orderNo { get; set; }
-        [DataMember] public string @operator { get; set; }
+        [DataMember(Name = "operator")] public string Operator { get; set; }
         [DataMember] public string action { get; set; }
         [DataMember] public string reason { get; set; }
         [DataMember] public string userId { get; set; }
@@ -285,7 +285,7 @@ namespace AccelByte.Models
         [DataMember] public string status { get; set; }
 
         [DataMember] public string statusReason { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public DateTime createdTime { get; set; }
         [DataMember] public DateTime chargedTime { get; set; }
         [DataMember] public DateTime fulfilledTime { get; set; }
@@ -399,7 +399,7 @@ namespace AccelByte.Models
     public class Entitlement
     {
         [DataMember] public string id { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string clazz { get; set; }
         [DataMember] public string type { get; set; }
         [DataMember] public string status { get; set; }

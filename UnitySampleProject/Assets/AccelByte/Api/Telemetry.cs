@@ -11,24 +11,24 @@ namespace AccelByte.Api
     public class Telemetry
     {
         private readonly TelemetryApi api;
-        private readonly User user;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly string clientId;
-        private readonly AsyncTaskDispatcher taskDispatcher;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Telemetry(TelemetryApi api, User user, string clientId, AsyncTaskDispatcher taskDispatcher,
+        internal Telemetry(TelemetryApi api, ISession session, string @namespace, string clientId,
             CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can't construct purchase manager! PurchaseService parameter is null!");
-            Assert.IsNotNull(user, "Can't construct purchase manager! UserAccount parameter is null!");
-            Assert.IsNotNull(clientId, "clientId must not be null");
-            Assert.IsNotNull(taskDispatcher, "taskReactor must not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner must not be null");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsFalse(string.IsNullOrEmpty(clientId), "clientId paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
-            this.user = user;
+            this.session = session;
+            this.@namespace = @namespace;
             this.clientId = clientId;
-            this.taskDispatcher = taskDispatcher;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -42,31 +42,15 @@ namespace AccelByte.Api
         /// <typeparam name="T">A class that implements DataContract and DataMember attribute</typeparam>
         public void SendEvent<T>(TelemetryEventTag eventTag, T eventData, ResultCallback callback) where T : class
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            if (eventData is string)
-            {
-                callback.TryError(ErrorCode.InvalidRequest, "string is not allowed as event data");
-
-                return;
-            }
-
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.SendEvent(
-                        this.user.Namespace,
-                        this.clientId,
-                        this.user.UserId,
-                        eventTag,
-                        eventData,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.SendEvent(this.@namespace, this.clientId, this.session.UserId, eventTag, eventData, callback));
         }
     }
 }

@@ -7,34 +7,46 @@ pipeline {
   }
 
   stages {
-
-    stage('turn on EC2') {
-      agent {
-          label "master"
-      }
-
+	stage('setting up license') {
       steps {
-        sh '''
-          aws ec2 start-instances --instance-ids i-${SDK_INSTANCE_ID}
-          sleep 60
-        ''' 
-      }
+        powershell '''
+          $UNITY_PATH = $Env:UNITY_PATH
+          $UNITY_SERIAL_KEY = $Env:UNITY_SERIAL_KEY
+          $UNITY_ACCOUNT_EMAIL = $Env:UNITY_ACCOUNT_EMAIL
+          $UNITY_ACCOUNT_PASSWORD = $Env:UNITY_ACCOUNT_PASSWORD
 
-      post {
-        failure {
-          script{
-            FAILED_STAGE = "turnOn_EC2";
-          }
-        }
+          $internetSettings = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"
+          Set-ItemProperty -Path $internetSettings -Name ProxyServer -Value "$Env:PROXY_SERVER"
+          Set-ItemProperty -Path $internetSettings -Name ProxyEnable -Value 0
+		  
+          & $UNITY_PATH -batchmode -nographics -quit -returnlicense
+          Start-Sleep -s 30
+          & $UNITY_PATH -batchmode -serial $UNITY_SERIAL_KEY -username $UNITY_ACCOUNT_EMAIL -password $UNITY_ACCOUNT_PASSWORD -nographics -quit
+        '''
       }
     }
-
+	
     stage('setting up proxy') {
       steps {
         powershell '''
           $internetSettings = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"
           Set-ItemProperty -Path $internetSettings -Name ProxyServer -Value "$Env:PROXY_SERVER"
           Set-ItemProperty -Path $internetSettings -Name ProxyEnable -Value 1
+          
+          $XMLfile = $Env:UNITY_PATH -replace "unity.exe","Data\\Mono\\etc\\mono\\2.0\\machine.config";
+          [XML]$xml = Get-Content $XMLfile;
+
+          if($xml.DocumentElement.'system.net'.defaultProxy -eq $null){
+              $xml.DocumentElement.'system.net'.AppendChild($xml.CreateElement("defaultProxy"));}
+          if($xml.DocumentElement.'system.net'.defaultProxy.proxy -eq $null){
+              $child = $xml.DocumentElement.'system.net'["defaultProxy"].AppendChild($xml.CreateElement("proxy"));
+              $child.setAttribute("proxyaddress","http://" + $Env:PROXY_SERVER);
+              }
+          else{
+              $child = $xml.DocumentElement.'system.net'.defaultProxy.proxy;
+              $child.setAttribute("proxyaddress","http://" + $Env:PROXY_SERVER);
+              }
+          $xml.Save($XMLfile);
         '''
       }
     }
@@ -58,14 +70,6 @@ pipeline {
           IF EXIST %WORKSPACE%\\testResult.xml ( del %WORKSPACE%\\testResult.xml )
         '''
       }
-
-      post {
-        failure {
-          script{
-            FAILED_STAGE = "cleanUp";
-          }
-        }
-      }
     }
 
     stage('build') {
@@ -74,11 +78,12 @@ pipeline {
           $GIT_PATH = $Env:GIT_PATH     
           $GIT_SHA = $GIT_COMMIT      
           $UNITY_PATH = $Env:UNITY_PATH
+          $UNITY_SERIAL_KEY = $Env:UNITY_SERIAL_KEY
           $WORKSPACE = $Env:WORKSPACE
           $logfile = "$WORKSPACE\\unity.log"
-
+          
           & Start-process -Wait $UNITY_PATH -ArgumentList "-quit","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-executeMethod","JenkinsScript.PerformBuild","-logFile","`"$logfile`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
-          $lastOutput = Get-Content $logfile -Tail 1
+          $lastOutput = Get-Content $logfile -Tail 2
           Get-Content $logfile
 
           if ( $lastOutput -eq "Exiting batchmode successfully now!" ) {
@@ -110,70 +115,45 @@ pipeline {
           SET AWS_SECRET_ACCESS_KEY = %AWS_SECRET_ACCESS_KEY%
           SET AWS_REGION = %AWS_REGION%
 
-          set IAM_BASE_URL=%IAM_DATABASE_URL%
+          set IAM_BASE_URL=%IAM_BASE_URL%
           set ADMIN_CLIENT_ID=%ADMIN_CLIENT_ID%
           set ADMIN_CLIENT_SECRET=%ADMIN_CLIENT_SECRET%
           set ADMIN_NAMESPACE=%ADMIN_NAMESPACE%
           set ADMIN_USER=%ADMIN_USER%
           set ADMIN_PASSWORD=%ADMIN_PASSWORD%
-
-          set UTILITIES_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Plugins\\TestUtilities
-          set VARIABLE_FILE_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Resources\\EcommerceVariables.json
-
-          set ROOT_CATEGORY_PATH=/EcommRoot
-          set CHILD_CATEGORY_PATH=/EcommRoot/SubPath
-          set GRANDCHILD_CATEGORY_PATH=/EcommRoot/SubPath/Children
-          set TEST_EMAIL=ecommuser@example.com
-          set TEST_PASSWORD=123456
-          set CURRENCY_CODE=ECOMMCOIN
-          set INGAME_ITEM_TITLE=In Game E-Commerce Item
-          set CURRENCY_ITEM_TITLE=In Game Currency Item
-
-          set VARIABLES_FILE_CONTENT={"rootCategoryPath":"%ROOT_CATEGORY_PATH%", "childCategoryPath":"%CHILD_CATEGORY_PATH%", "grandChildCategoryPath":"%GRANDCHILD_CATEGORY_PATH%", "email":"%TEST_EMAIL%", "password":"%TEST_PASSWORD%", "currencyCode":"%CURRENCY_CODE%", "inGameItemTitle":"%INGAME_ITEM_TITLE%", "currencyItemTitle":"%CURRENCY_ITEM_TITLE%"}
-          echo %VARIABLES_FILE_CONTENT%> "%VARIABLE_FILE_PATH%"
-
-          "%UTILITIES_PATH%\\justice-test-utilities-windows_amd64.exe" ecommerce --setup --rootcategorypath %ROOT_CATEGORY_PATH% --childcategorypath %CHILD_CATEGORY_PATH% --grandchildcategorypath %GRANDCHILD_CATEGORY_PATH% --testemail %TEST_EMAIL% --testpassword %TEST_PASSWORD% --currencycode %CURRENCY_CODE% --ingameitemtitle "%INGAME_ITEM_TITLE%" --currencyitemtitle "%CURRENCY_ITEM_TITLE%"
-        '''
-
-        script {
-          def UNITY_CONFIG_JSON = '''
-            {
-              "PublisherNamespace":"${env.NAMESPACE}",
-              "AppId":"${env.SDK_APP_ID}",
-              "Namespace":"${env.ADMIN_NAMESPACE}",
-              "IamServerUrl":"${env.IAM_BASE_URL}",
-              "PlatformServerUrl":"${env.UE4_BASE_URL}",
-              "BasicServerUrl":"${env.UE4_BASE_URL}",
-              "LobbyServerUrl":"${env.UE4_BASE_URL}",
-              "TelemetryServerUrl":"${env.UE4_BASE_URL}",
-              "ClientId":"${env.UE4_CLIENT_ID}",
-              "ClientSecret":"${env.UE4_CLIENT_SECRET}",
-              "WebLoginUrl":"${env.SDK_WEB_LOGIN_URL}",
-              "RedirectUri":"${env.UE4_RedirectURI}"
-            }
           '''
-        }
 
         powershell '''      
-          $GIT_PATH = $Env:GIT_PATH     
-          $GIT_SHA = $GIT_COMMIT      
+          $GIT_PATH = $Env:GIT_PATH
+          $GIT_SHA = $GIT_COMMIT
           $UNITY_PATH = $Env:UNITY_PATH
           $WORKSPACE = $Env:WORKSPACE
           $logfile = "$WORKSPACE\\unityTest.log"
           $testresult = "$WORKSPACE\\testResult.xml"
+
+          $STEAM_PATH = $Env:STEAM_PATH
+          $STEAM_ID = $Env:STEAM_ID
+          $STEAM_PASS = $Env:STEAM_PASS
+
+          & $STEAM_PATH -login $STEAM_ID $STEAM_PASS
 
           if ( ![System.IO.File]::Exists($testresult) ) {
             New-Item $WORKSPACE\\testResult.xml -ItemType file
             dir $WORKSPACE
           }
 
-          $UNITY_CONFIG_JSON = @"''' + UNITY_CONFIG_JSON + '''"@
+          $UNITY_CONFIG_JSON = @{PublisherNamespace=$Env:NAMESPACE; AppId=$Env:SDK_APP_ID; Namespace=$Env:ADMIN_NAMESPACE; IamServerUrl=$Env:IAM_BASE_URL; PlatformServerUrl=$Env:PLATFORM_BASE_URL; BasicServerUrl=$Env:BASIC_BASE_URL; LobbyServerUrl=$Env:LOBBY_SERVER_URL; TelemetryServerUrl=$Env:TELEMETRY_BASE_URL; ClientId=$Env:UE4_CLIENT_ID; ClientSecret=$Env:UE4_CLIENT_SECRET; WebLoginUrl=$Env:WEB_LOGIN_BASE_URL; RedirectUri=$Env:UE4_RedirectURI; CloudStorageServerUrl=$Env:CLOUD_STORAGE_BASE_URL; GameProfileServerUrl=$Env:GAME_PROFILE_BASE_URL; StatisticServerUrl=$Env:STATISTIC_BASE_URL} | ConvertTo-Json -Compress
 
-          $UNITY_CONFIG_JSON | Out-File -FilePath "$WORKSPACE\\UnitysampleProject\\Assets\\Resources\\JusticeSDKConfig.json"
+          $UNITY_CONFIG_JSON | Out-File -FilePath "$WORKSPACE\\UnitySampleProject\\Assets\\Resources\\AccelByteSDKConfig.json"
+          Get-Content -Path "$WORKSPACE\\UnitySampleProject\\Assets\\Resources\\AccelByteSDKConfig.json"
+
           & Start-process -Wait $UNITY_PATH -ArgumentList "-runTests","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-logFile","`"$logfile`"","-testPlatform","playmode","-testResults","`"$testresult`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
           $lastOutput = Get-Content $logfile -Tail 1
           Get-Content $logfile
-          [xml]$xmlTestResult = Get-Content -Path $testresult 
+          [xml]$xmlTestResult = Get-Content -Path $testresult
+          
+          # Cannot exit from test stage if "Steam" is active.
+          Stop-Process -Name "Steam" -Force
 
           if ( $xmlTestResult.'test-run'.failed -eq 0 ) {
             if ( $xmlTestResult.ChildNodes -ne 0 ){
@@ -188,17 +168,6 @@ pipeline {
 
           Get-Content $testresult | Select -Index 1 | Write-Host
         '''
-
-        bat '''
-          set IAM_BASE_URL=%IAM_DATABASE_URL%
-          set ADMIN_CLIENT_ID=%ADMIN_CLIENT_ID%
-          set ADMIN_CLIENT_SECRET=%ADMIN_CLIENT_SECRET%
-          set ADMIN_NAMESPACE=%ADMIN_NAMESPACE%
-          set ADMIN_USER=%ADMIN_USER%
-          set ADMIN_PASSWORD=%ADMIN_PASSWORD%
-          set UTILITIES_PATH=%WORKSPACE%\\UnitySampleProject\\Assets\\Plugins\\TestUtilities
-          "%UTILITIES_PATH%\\justice-test-utilities-windows_amd64.exe" ecommerce --teardown
-        '''
       }
 
       post {
@@ -208,7 +177,7 @@ pipeline {
           }
         }
       }
-    }  
+    }
 
   stage('package') {
     steps {
@@ -220,9 +189,9 @@ pipeline {
         $BUILD_NUMBER = $Env:BUILD_NUMBER
 
         $logfile = "$WORKSPACE\\unitypackage.log"
-        $unitypackage = "$WORKSPACE\\outputpackage\\JusticeSDK-$GIT_SHA-BUILD-$BUILD_NUMBER.unitypackage"         
+        $unitypackage = "$WORKSPACE\\outputpackage\\AccelByteSDK-$GIT_SHA-BUILD-$BUILD_NUMBER.unitypackage"         
 
-        & Start-process -Wait "$UNITY_PATH" -ArgumentList "-quit","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-logFile","`"$logfile`"","-exportPackage","Assets\\Justice","`"$unitypackage`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
+        & Start-process -Wait "$UNITY_PATH" -ArgumentList "-quit","-batchmode","-nographics","-projectPath","`"$WORKSPACE\\UnitySampleProject`"","-logFile","`"$logfile`"","-exportPackage","Assets\\AccelByte","`"$unitypackage`"","-serial","$Env:UNITY_SERIAL_KEY","-username","$Env:UNITY_ACCOUNT_EMAIL","-password","$Env:UNITY_ACCOUNT_PASSWORD"
         Get-Content $logfile
       '''
     }
@@ -281,14 +250,18 @@ pipeline {
       script {
         def message = ""
         message = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+        
         slackSend (channel: "#sdk-pipeline", color: '#36B37E', message: "<${env.BUILD_URL}console|Jenkin's Job #${env.BUILD_NUMBER}> *SUCCESSFUL* for `${env.JOB_NAME}` on branch `${env.GIT_BRANCH}` \n `${env.GIT_COMMIT}`: ${message} ")
-
-        def turnOff = true       
-        if (turnOff) {
-          node('master') {
-            sh 'aws ec2 stop-instances --instance-ids i-${SDK_INSTANCE_ID}'
-          }
-        }
+        
+        powershell'''
+          $UNITY_PATH = $Env:UNITY_PATH
+          
+          $internetSettings = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"
+          Set-ItemProperty -Path $internetSettings -Name ProxyServer -Value "$Env:PROXY_SERVER"
+          Set-ItemProperty -Path $internetSettings -Name ProxyEnable -Value 0
+              
+          & $UNITY_PATH -batchmode -returnlicense -nographics -quit
+		'''
       }
     }
 
@@ -300,19 +273,23 @@ pipeline {
         def buildURL = "${BUILD_URL}"
         def message = ""
         message = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()        
-
+		
         echo "jobName: ${JOB_NAME}"
         echo "buildNumber: ${BUILD_NUMBER}"
         echo "gitBranch: ${GIT_BRANCH}"
         echo "buildURL: ${BUILD_URL}"
-
+		
         slackSend (channel: "#sdk-pipeline", color: '#FF0000', message: "<${env.BUILD_URL}console|Jenkin's Job #${env.BUILD_NUMBER}> *FAILED* on Stage `${FAILED_STAGE}` \nProject: `${env.JOB_NAME}` \nBranch: `${env.GIT_BRANCH}` \nCommit: `${env.GIT_COMMIT}` \nMessage: `${message}` ")
-        def turnOff = true
-        if (turnOff) {
-          node('master') {
-            sh 'aws ec2 stop-instances --instance-ids i-${SDK_INSTANCE_ID}'
-          }
-        }
+		
+        powershell'''	
+          $UNITY_PATH = $Env:UNITY_PATH
+        
+          $internetSettings = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"
+          Set-ItemProperty -Path $internetSettings -Name ProxyServer -Value "$Env:PROXY_SERVER"
+          Set-ItemProperty -Path $internetSettings -Name ProxyEnable -Value 0
+        
+          & $UNITY_PATH -batchmode -returnlicense -nographics -quit
+        '''
       }
     }
   }

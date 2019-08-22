@@ -2,6 +2,9 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using Utf8Json;
+using AccelByte.Models;
+
 namespace AccelByte.Api
 {
     using System.Collections.Generic;
@@ -18,6 +21,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.PublisherNamespace = value; }
         }
 
+        public static bool UseSessionManagement
+        {
+            get { return AccelByteSettings.Instance.config.UseSessionManagement; }
+            set { AccelByteSettings.Instance.config.UseSessionManagement = value; }
+        }
+
         public static string Namespace
         {
             get { return AccelByteSettings.Instance.config.Namespace; }
@@ -28,6 +37,12 @@ namespace AccelByte.Api
         {
             get { return AccelByteSettings.Instance.config.BaseUrl; }
             set { AccelByteSettings.Instance.config.BaseUrl = value; }
+        }
+
+        public static string LoginServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.LoginServerUrl; }
+            set { AccelByteSettings.Instance.config.LoginServerUrl = value; }
         }
 
         public static string IamServerUrl
@@ -64,6 +79,18 @@ namespace AccelByte.Api
         {
             get { return AccelByteSettings.Instance.config.TelemetryServerUrl; }
             set { AccelByteSettings.Instance.config.TelemetryServerUrl = value; }
+        }
+
+        public static string GameProfileServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.GameProfileServerUrl; }
+            set { AccelByteSettings.Instance.config.GameProfileServerUrl = value; }
+        }
+
+        public static string StatisticServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.StatisticServerUrl; }
+            set { AccelByteSettings.Instance.config.StatisticServerUrl = value; }
         }
 
         public static string ClientId
@@ -143,7 +170,7 @@ namespace AccelByte.Api
             else
             {
                 string wholeJsonText = ((TextAsset) configFile).text;
-                this.config = SimpleJson.SimpleJson.DeserializeObject<Config>(wholeJsonText);
+                this.config = JsonSerializer.Deserialize<Config>(wholeJsonText);
             }
         }
 
@@ -152,7 +179,6 @@ namespace AccelByte.Api
         /// </summary>
         public void Save()
         {
-            string jsonContent = SimpleJson.SimpleJson.SerializeObject(this.config);
             IDictionary<string, string> dict = this.config as IDictionary<string, string>;
             Debug.Log(dict);
             // Only in the editor should we save it to disk
@@ -168,7 +194,7 @@ namespace AccelByte.Api
             string fullPath =
                 System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKConfig.json");
 
-            System.IO.File.WriteAllText(fullPath, jsonContent);
+            System.IO.File.WriteAllBytes(fullPath, JsonSerializer.Serialize(this.config));
         }
     }
 }

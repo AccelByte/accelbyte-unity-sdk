@@ -4,6 +4,8 @@
 
 using System;
 using System.Collections;
+using System.Runtime.Serialization;
+using System.Threading;
 using AccelByte.Models;
 using AccelByte.Api;
 using AccelByte.Core;
@@ -23,35 +25,38 @@ namespace Tests.IntegrationTests
 
             Result<UserData> registerResult = null;
             var user = AccelBytePlugin.GetUser();
-            user.Register("johndoe@example.com", "password", "johndoe_example_com",
-                result => registerResult = result);
+            user.Register("johndoe@example.com", "password", "johndoe_example_com", "US", DateTime.Now.AddYears(-22), result => registerResult = result);
 
             while (registerResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
 
-            userAccount.LoginWithUserName("johndoe@example.com", "password",
-                result => { emailLoginResult = result; });
+            userAccount.LoginWithUsername("johndoe@example.com", "password", result => { emailLoginResult = result; });
 
             while (emailLoginResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
-            
-            TestHelper.Assert(() => Assert.That(!emailLoginResult.IsError));
+
+            TestHelper.Assert.That(!emailLoginResult.IsError);
 
             var telemetry = AccelBytePlugin.GetTelemetry();
             Result telemetryResult = null;
-            
-            telemetry.SendEvent(new TelemetryEventTag(), "stringdata", result => { telemetryResult = result; });
+
+            telemetry.SendEvent(new TelemetryEventTag(), "string data", result => { telemetryResult = result; });
 
             while (telemetryResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
 
-            TestHelper.Assert(() => Assert.That(telemetryResult.IsError));        
 
             Result deleteResult = null;
             var helper = new TestHelper();
@@ -59,20 +64,34 @@ namespace Tests.IntegrationTests
 
             while (deleteResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
-            
-            TestHelper.Assert(() => Assert.That(!deleteResult.IsError));
+
+            Result logoutResult = null;
+            userAccount.Logout(r => logoutResult = r);
+
+            while (logoutResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.Assert.That(telemetryResult.IsError);
+            TestHelper.Assert.That(deleteResult.IsError, Is.False);
+            TestHelper.Assert.That(logoutResult.IsError, Is.False);
         }
 
-        [Serializable]
-        class ClassData
+        [DataContract]
+        public class ClassData
         {
-            public int someInt;
-            public float someFloat;
-            public string someString;
+            [DataMember] public int someInt;
+            [DataMember] public float someFloat;
+            [DataMember] public string someString;
         }
-        
+
         [UnityTest]
         public IEnumerator TestSendEvent_WithClassData_ReturnsOK()
         {
@@ -81,40 +100,41 @@ namespace Tests.IntegrationTests
 
             Result<UserData> registerResult = null;
             var user = AccelBytePlugin.GetUser();
-            user.Register("johndoe@example.com", "password", "johndoe_example_com",
-                result => registerResult = result);
+            user.Register("johndoe@example.com", "password", "johndoe_example_com", "US", DateTime.Now.AddYears(-22), result => registerResult = result);
 
             while (registerResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
 
-            userAccount.LoginWithUserName("johndoe@example.com", "password",
-                result => { emailLoginResult = result; });
+            userAccount.LoginWithUsername("johndoe@example.com", "password", result => { emailLoginResult = result; });
 
             while (emailLoginResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
-            
-            TestHelper.Assert(() => Assert.That(!emailLoginResult.IsError));
+
+            TestHelper.Assert.That(!emailLoginResult.IsError);
 
             var telemetry = AccelBytePlugin.GetTelemetry();
             Result telemetryResult = null;
-            
-            telemetry.SendEvent(new TelemetryEventTag(), new ClassData
-            {
-                someInt = 7,
-                someFloat = 27.0f,
-                someString = "someString"
-            }, result => { telemetryResult = result; });
+
+            telemetry.SendEvent(
+                new TelemetryEventTag(),
+                new ClassData {someInt = 7, someFloat = 27.0f, someString = "someString"},
+                result => { telemetryResult = result; });
 
             while (telemetryResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
 
-            TestHelper.Assert(() => Assert.That(!telemetryResult.IsError));        
 
             Result deleteResult = null;
             var helper = new TestHelper();
@@ -122,10 +142,24 @@ namespace Tests.IntegrationTests
 
             while (deleteResult == null)
             {
+                Thread.Sleep(100);
+
                 yield return null;
             }
-            
-            TestHelper.Assert(() => Assert.That(!deleteResult.IsError));
+
+            Result logoutResult = null;
+            userAccount.Logout(r => logoutResult = r);
+
+            while (logoutResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.Assert.That(telemetryResult.IsError, Is.False);
+            TestHelper.Assert.That(deleteResult.IsError, Is.False);
+            TestHelper.Assert.That(logoutResult.IsError, Is.False);
         }
     }
 }

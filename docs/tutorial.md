@@ -1,62 +1,40 @@
 # AccelByte SDK Tutorial
 
-- [AccelByte SDK Tutorial](#accelbyte-sdk-tutorial)
-  - [Features](#features)
-    - [Overview](#overview)
-    - [Custom Coroutine System Under The Hood](#custom-coroutine-system-under-the-hood)
-    - [Easy to Use API](#easy-to-use-api)
-    - [Automatically retry temporary server errors](#automatically-retry-temporary-server-errors)
-    - [Access Token Management](#access-token-management)
-  - [User Management and Authorization](#user-management-and-authorization)
-  - [Basic Services](#basic-services)
-    - [User Profiles](#user-profiles)
-  - [Platform Services](#platform-services)
-    - [Catalog (Categories and Items)](#catalog-categories-and-items)
-    - [Orders](#orders)
-    - [Wallet](#wallet)
-  - [Social Services](#social-services)
-    - [Lobby Protocol](#lobby-protocol)
-    - [Party](#party)
-    - [Personal chat](#personal-chat)
-    - [Notifications](#notifications)
-    - [Friends](#friends)
-    - [Matchmaking](#matchmaking)
+- [AccelByte SDK Tutorial](#AccelByte-SDK-Tutorial)
+  - [Introduction](#Introduction)
+  - [Key Features](#Key-Features)
+    - [Easy to Use API](#Easy-to-Use-API)
+    - [Automatically Retry Temporary Server Errors](#Automatically-Retry-Temporary-Server-Errors)
+    - [Access Token Management](#Access-Token-Management)
+    - [Session Management](#Session-Management)
+  - [User Management and Authorization](#User-Management-and-Authorization)
+  - [Basic Services](#Basic-Services)
+    - [User Profiles](#User-Profiles)
+  - [Platform Services](#Platform-Services)
+    - [Catalog (Categories and Items)](#Catalog-Categories-and-Items)
+    - [Orders](#Orders)
+    - [Wallet](#Wallet)
+    - [Entitlement] (#Entitlement)
+  - [Social Services](#Social-Services)
+    - [Lobby Protocol](#Lobby-Protocol)
+    - [Party](#Party)
+    - [Personal chat](#Personal-chat)
+    - [Notifications](#Notifications)
+    - [Friends](#Friends)
+    - [Matchmaking](#Matchmaking)
 
 ---
 
-## Features
+## Introduction
 
-### Overview
+The AccelByte SDK is a specialized set of libraries and examples that seamlessly integrate with AccelByte backend services. This service gives you a convenience way to wrap web requests in function calls, so that you will be able to save more time to focus on your game while the service is working for you in the backstage. In doing so, the AccelByte SDK provides you with these key features:
 
-AccelByte SDK for Unity is not auto-generated so that we can provide excellent developer experience. It interfaces with multiple AccelByte backend services, so make sure that you have access to those services before you can use corresponding APIs in the SDK.
+- Easy to Use API
+- Automatically Retry Temporary Server Errors
+- Access Token Management
+- Session Management
 
-![sdk-components](http://www.plantuml.com/plantuml/png/ZP3BQiGm34Nt_WgH_Vn2cSmKIcWBWIn35ewZ55FR2hRI4ah-lGzeiC1zRA-Eq3qw9zQHL-yKMtO8jJ7eBXiZTBVtS2M_KC30IHb7wmHLDiVuOWsc2jvKtzIFty6W-ejErXp0Hz0wpJD5dsSFD8vRjdJzEj0nHVs4MNwdFK8RQROkYtUb5csUFz5AT3xgr6qpm6cYrt2wWM91IVnSMd2_k0Zk3p_9_ijThfJVKbGxtb5qae0maTE2GvcIhSlGhiuOfjMxTm00)
-
-AccelByte SDK consists of:
-
-1. IAM API
-2. Basic API
-3. Platform API
-4. Lobby API
-5. Cloud Storage API
-6. Game Profile API (coming soon)
-
-### Custom Coroutine System Under The Hood
-
-AccelByte SDK is compatible with Unity 2017 or newer. Due to Unity 2017 still lags behind state of the art .NET technology, we make our own coroutine system inspired by Unity. Having our own coroutine system has some advantages:
-
-1. It enables us to have it run on separate thread from main thread
-2. It can leverage more mature HttpWebRequest from .NET framework, instead of UnityWebRequest
-3. It can return value, unlike Unity coroutine that doesn't really care about returning a value
-4. It can have multiple HTTP requests running with only a single worker thread
-
-We use this custom coroutine system under the hood, so most of the time user don't need to care about it. Any HTTP call will be mostly executed in background thread, except a little bit at the end of its execution. Unity doesn't support manipulating Unity objects from other thread. So, for convenience, we have our own coroutine runner just to give back objects from HTTP call to the main thread.
-
-![typical-sdk-call](http://www.plantuml.com/plantuml/png/XL9BQiCm4Dth57E1N22Bac93Kxe9YKlN4tbAXyYoAeq3wUahHuX4haeMnfhn-poUjGc2NgR1A64n1Dt5iKO3xvRb0eVs3Pvthz2WCSf586jsQ0LUSA36C5bHjoEidcR6-Wg_yZudguL7gp2-pYWqVrVncQ4TXbFBmQ7eB_9hE93jmTFtH46WHy4RguGcWQXmbwAdmg8arDqye-4VAYn1HjXstIulAq9R4VT1ntq2fDY9arOfIprutYz4L3d2gf9tJvhuJDafkD46IbOroN-xUznCIo5tKxhDvVXydjlwAvRkJJFwSHAsbDfPa1xNir1HvGZ5du_DtAk3HcEEg4_9fYgtYPccmVm2)
-
-
-
-This is actually a stop-gap solution before we upgrade to Unity 2018 and .NET 4.x as target platform, where a much nicer async/await syntax is available in Unity.
+## Key Features
 
 ### Easy to Use API
 
@@ -74,7 +52,7 @@ ResultCallback\<T\> is a delegate that accepts Result\<T\> as its parameter, whi
 
 Because of this, making HTTP requests is as easy as calling a method.
 
-### Automatically retry temporary server errors
+### Automatically Retry Temporary Server Errors
 
 Temporary server errors (HTTP status 5xx) will be automatically retried if it failed, with exponential backoff and some randomization.
 
@@ -82,11 +60,15 @@ Temporary server errors (HTTP status 5xx) will be automatically retried if it fa
 
 AccelByte SDK will automatically handle user access tokens expiry, by calling refresh token to get new access token at about 70% - 90% near expiration time (randomly spread).
 
+### Session Management
+
+If you choose to use our backend services with Session Management feature provided in API Gateway, AccelByte Unity SDK will not keep raw JWT access token and refresh token. The API Gateway will create and maintain session on server side, with the game client getting a hold for user session through SessionId. This will also enable possibility for a user to logout from other device.
+
 ---
 
 ## User Management and Authorization
 
-![iam-api](http://www.plantuml.com/plantuml/png/TP31ReCm38RlVGgEsw4li5FHgbMLs5gniPsjn81LS51iDcrFFw15WRRSuk_xRKVUY8BNjgvMIbfXb0dww1KO2goHDGAsKTngwJpzWPBZrP1mw_KGZHiAuD07Ut96JqDYRxk7g2SkHlm6DKe31czCR0oAVBWJSd2ZJ5n1_4LQzdK_u-7nHXsqH7-iG7Fdwpj-YzzaS6_lg0HQDbttJBbMG_tYlC4KSuzI1ffYGQBJlXtg5XG2o1eBYg5-HxQVw2adCzpqsTc97SplF9sYe1v1vCTvEu_Fr7HduS5UBRt0vTsNGCps-XS9yMdXkXbNotA7Ei9-X7HcWspRkle7)
+![iam-api](http://www.plantuml.com/plantuml/png/TP31JeD048RlVGgEUkWBU2gnITC4RLD5pvFTlp0fp9ATGQDFBs08aBOtvli-PfFPg56qjgvMnbOXoHKnUI6X0ZN44XAVfAsL8V8l6GTP3KLOhuSqRNW2XpxioJzw6egzxpxK8ainubUgeGqvN9dKEQY-XmjaSgFCGi7ooLRsSx_ZuV5A7Qn4F5Pavn3h6twBBtRO-nigerPSz_T2XTQc-OI2rUR53hObemdaZIV3DBz1_0SYdzaDrtiEVcO7yxEiJr3OaLI_G_JBVA7cRnQHvbt6ShbpY5og-t876s6_GZkpWVYshlu0)
 
 For convenience, AccelByte maintains and keeps user credentials under the hood. Except for some user management cases (e.g. registration, reset password, and login itself), user needs to login before accessing backend services. Below are some examples on how to do common user management tasks in Unity SDK. User class holds user credentials (access token, refresh token, and userId) and will be used implicitly by other API to make requests.
 
@@ -212,12 +194,13 @@ For convenience, AccelByte maintains and keeps user credentials under the hood. 
         // show the login with device id
         Debug.Log(result.IsError);
     }
-
+    
     public static void Main(string[] args)
     {
         User user = AccelBytePlugin.GetUser();
         user.LoginWithDeviceId(OnLoginWithDeviceId);
     }
+    ```
 
 - Login With Launcher
 
@@ -235,12 +218,13 @@ For convenience, AccelByte maintains and keeps user credentials under the hood. 
         // show the login with device id
         Debug.Log(result.IsError);
     }
-
+    
     public static void Main(string[] args)
     {
         User user = AccelBytePlugin.GetUser();
         user.LoginWithLauncher(OnLoginWithDeviceId);
     }
+    ```
 
 - Logout
     Logout will removes user credentials from memory. User needs to re-login after logout.
@@ -416,6 +400,7 @@ For convenience, AccelByte maintains and keeps user credentials under the hood. 
         User user = AccelBytePlugin.GetUser();
         user.LoginWithDeviceId(OnLoginWithDeviceId);
     }
+    ```
 
 - Upgrading headless account with verification code
 
@@ -465,6 +450,7 @@ For convenience, AccelByte maintains and keeps user credentials under the hood. 
         User user = AccelBytePlugin.GetUser();
         user.LoginWithDeviceId(OnLoginWithDeviceId);
     }
+    ```
 
 - Resetting password
 
@@ -515,6 +501,56 @@ For convenience, AccelByte maintains and keeps user credentials under the hood. 
     }
     ```
 
+- Get another user data with email/ login id
+
+    User data from another user can be gotten by login id (email). This can be used to get display name, user id, etc from another user.
+
+    ```csharp
+    public void GetUserByLoginId(string loginId, ResultCallback<UserData> callback) {}
+    ```
+
+    Usage:
+
+    ```csharp
+    public static void Main(string[] args)
+    {
+        //user should be logged in first
+        User user = AccelBytePlugin.GetUser();
+        user.GetUserByLoginId(result => {
+            // result type is Result<UserData>
+            // result.Value type is UserData
+
+            // showing the display name of the user
+            Debug.Log(result.Value.DisplayName);
+        });
+    }
+    ```
+
+- Get another user data with user id
+
+    User data from another user can be gotten by user id. This can be used to get display name, user id, etc from another user.
+
+    ```csharp
+    public void GetUserByUserId(string userId, ResultCallback<UserData> callback) {}
+    ```
+
+    Usage:
+    
+    ```csharp
+    public static void Main(string[] args)
+    {
+        //user should be logged in first
+        User user = AccelBytePlugin.GetUser();
+        user.GetUserByUserId(result => {
+            // result type is Result<UserData>
+            // result.Value type is UserData
+
+            // showing the display name of the user
+            Debug.Log(result.Value.DisplayName);
+        });
+    }
+    ```
+
 ---
 
 ## Basic Services
@@ -546,8 +582,8 @@ The service stores user profiles at platform level, which means it can be accese
             // result type is Result<UserProfile>
             // result.Value type is UserProfile
 
-            // showing the display name of the user
-            Debug.Log(result.Value.displayName);
+            // showing the avatar URL of the user
+            Debug.Log(result.Value.avatarUrl);
         });
     }
     ```
@@ -582,8 +618,8 @@ The service stores user profiles at platform level, which means it can be accese
             // result type is Result<UserProfile>
             // result.Value type is UserProfile
 
-            // showing the display name of the user
-            Debug.Log(result.Value.displayName);
+            // showing the avatar URL of the user
+            Debug.Log(result.Value.avatarUrl);
         });
     }
     ```
@@ -617,8 +653,8 @@ The service stores user profiles at platform level, which means it can be accese
             // result type is Result<UserProfile>
             // result.Value type is UserProfile
 
-            // showing the display name of the user
-            Debug.Log(result.Value.displayName);
+            // showing the avatar URL of the user
+            Debug.Log(result.Value.avatarUrl);
         });
     }
     ```
@@ -747,7 +783,7 @@ public class Item
             category.GetDescendantCategories("/game/potion", "en", result => {
                 // result type is Result<Category[]>
                 // result.Value type is Category[]
-
+    
                 // showing the amount of descendant categories
                 Debug.Log(result.Value.Length);
             });
@@ -936,7 +972,7 @@ public class OrderInfo
 
 ### Wallet
 
-    Wallet stores in-game virtual currency to make purchases (create orders) on in-game items in in-game store.
+Wallet stores in-game virtual currency to make purchases (create orders) on in-game items in in-game store.
 
 - Get WalletInfo by Currency Code
 
@@ -958,6 +994,74 @@ public class OrderInfo
     }
     ```
 
+### Entitlement
+
+Entitlement contains in-game items from current user.
+
+```csharp
+[DataContract]
+public class Entitlement
+{
+    [DataMember] public string id { get; set; }
+    [DataMember(Name = "namespace")] public string Namespace { get; set; }
+    [DataMember] public string clazz { get; set; }
+    [DataMember] public string type { get; set; }
+    [DataMember] public string status { get; set; }
+    [DataMember] public string appId { get; set; }
+    [DataMember] public string appType { get; set; }
+    [DataMember] public string sku { get; set; }
+    [DataMember] public string userId { get; set; }
+    [DataMember] public string itemId { get; set; }
+    [DataMember] public string bundleItemId { get; set; }
+    [DataMember] public string grantedCode { get; set; }
+    [DataMember] public string itemNamespace { get; set; }
+    [DataMember] public string name { get; set; }
+    [DataMember] public int useCount { get; set; }
+    [DataMember] public int quantity { get; set; }
+    [DataMember] public int distributedQuantity { get; set; }
+    [DataMember] public string targetNamespace { get; set; }
+    [DataMember] public ItemSnapshot itemSnapshot { get; set; }
+    [DataMember] public DateTime startDate { get; set; }
+    [DataMember] public DateTime endDate { get; set; }
+    [DataMember] public DateTime grantedAt { get; set; }
+    [DataMember] public DateTime createdAt { get; set; }
+    [DataMember] public DateTime updatedAt { get; set; }
+}
+```
+
+```csharp
+[DataContract]
+public class PagedEntitlements
+{
+    [DataMember] public Entitlement[] data { get; set; }
+    [DataMember] public Paging paging { get; set; }
+}
+```
+
+- Get User Entitlement
+
+    Get Entitlement from a current user. It requires **offset** and **limit** as the parameters. It'll return a PagedEntitlements from the result callback.
+
+    ```csharp
+    public void GetUserEntitlements(int offset, int limit, ResultCallback<PagedEntitlements> callback) {}
+    ```
+
+    Usage without limit:
+
+    ```csharp
+    public static void Main(string[] args)
+    {
+        AccelByte.Api.Entitlements entitlements = AccelBytePlugin.GetEntitlements();
+        entitlements.GetUserEntitlements("0", "10", result => {
+            // result type is Result<PagedEntitlements>
+            // result.Value type is PagedEntitlements
+
+            // showing the entitlement's item id from first entitlement 
+            Debug.Log(result.Value.data[0].itemId);
+        });
+    }
+    ```
+    
 ---
 
 ## Social Services
@@ -1098,7 +1202,6 @@ public class PartyInfo
     Party leader can invite another user to join his party.
 
     Usage:
-
 
     ```csharp
     public static void OnInvited(Result result)
@@ -1355,7 +1458,7 @@ For a user to make friends with other users, he has to know other user id.
         var lobby = AccelBytePlugin.GetLobby();
         lobby.Connect();
     }
-    ```
+     ```
 
 - Getting list of friends
 

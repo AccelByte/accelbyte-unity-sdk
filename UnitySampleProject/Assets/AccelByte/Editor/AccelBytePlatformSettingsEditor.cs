@@ -2,13 +2,13 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
+
 namespace AccelByte.Api
 {
-    using System;
     using System.Collections.Generic;
     using UnityEditor;
     using UnityEngine;
-    using Api;
 
     [CustomEditor(typeof(AccelByteSettings))]
     public class AccelBytePlatformSettingsEditor : Editor
@@ -40,6 +40,9 @@ namespace AccelByte.Api
             GUIContent namespaceLabel = new GUIContent("Namespace");
             AccelByteSettings.Namespace = MakeTextBox(namespaceLabel, AccelByteSettings.Namespace);
 
+            GUIContent useSessionManagementLabel = new GUIContent("Use Session Management");
+            AccelByteSettings.UseSessionManagement = MakeToggle(useSessionManagementLabel, AccelByteSettings.UseSessionManagement);
+
             GUIContent baseUrlLabel = new GUIContent("Base Url");
 
             if (AccelByteSettings.BaseUrl != null)
@@ -51,6 +54,20 @@ namespace AccelByte.Api
                 workers.Add(() =>
                 {
                     MakeSelectableLabel(baseUrlLabel, this.expandedConfig.BaseUrl);
+                });
+            }
+
+            GUIContent loginServerUrlLabel = new GUIContent("Login Server Url");
+
+            if (AccelByteSettings.LoginServerUrl != null)
+            {
+                AccelByteSettings.LoginServerUrl = MakeTextBox(loginServerUrlLabel, AccelByteSettings.LoginServerUrl);
+            }
+            else
+            {
+                workers.Add(() =>
+                {
+                    MakeSelectableLabel(loginServerUrlLabel, this.expandedConfig.LoginServerUrl);
                 });
             }
 
@@ -85,7 +102,7 @@ namespace AccelByte.Api
 
             GUIContent basicServerUrlLabel = new GUIContent("Basic Server Url");
 
-            if (AccelByteSettings.PublisherNamespace != null)
+            if (AccelByteSettings.BasicServerUrl != null)
             {
                 AccelByteSettings.BasicServerUrl = MakeTextBox(basicServerUrlLabel, AccelByteSettings.BasicServerUrl);
             }
@@ -138,6 +155,36 @@ namespace AccelByte.Api
                 workers.Add(() =>
                 {
                     MakeSelectableLabel(telemetryServerUrlLabel, this.expandedConfig.TelemetryServerUrl);
+                });
+            }
+
+            GUIContent gameProfileServerUrlLabel = new GUIContent("Game Profile Server Url");
+
+            if (AccelByteSettings.GameProfileServerUrl != null)
+            {
+                AccelByteSettings.GameProfileServerUrl =
+                    MakeTextBox(gameProfileServerUrlLabel, AccelByteSettings.GameProfileServerUrl);
+            }
+            else
+            {
+                workers.Add(() =>
+                {
+                    MakeSelectableLabel(gameProfileServerUrlLabel, this.expandedConfig.GameProfileServerUrl);
+                });
+            }
+
+            GUIContent statisticServerUrlLabel = new GUIContent("Statistic Server Url");
+
+            if (AccelByteSettings.StatisticServerUrl != null)
+            {
+                AccelByteSettings.StatisticServerUrl =
+                    MakeTextBox(statisticServerUrlLabel, AccelByteSettings.StatisticServerUrl);
+            }
+            else
+            {
+                workers.Add(() =>
+                {
+                    MakeSelectableLabel(statisticServerUrlLabel, this.expandedConfig.StatisticServerUrl);
                 });
             }
 

@@ -3,8 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic;
-using System.Net;
+using System.Collections;
 using AccelByte.Models;
 using AccelByte.Core;
 using UnityEngine;
@@ -15,66 +14,92 @@ namespace AccelByte.Api
     internal class TelemetryApi
     {
         private readonly string baseUrl;
+        private readonly IHttpWorker httpWorker;
         private readonly uint agentType;
         private readonly string deviceId;
 
-        public TelemetryApi(string baseUrl)
+        public TelemetryApi(string baseUrl, IHttpWorker httpWorker)
         {
+            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
+            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+
             this.baseUrl = baseUrl;
+            this.httpWorker = httpWorker;
 
             switch (Application.platform)
             {
-                case RuntimePlatform.WindowsPlayer:
-                    this.agentType = 70;
-                    break;
-                case RuntimePlatform.OSXPlayer:
-                    this.agentType = 80;
-                    break;
-                case RuntimePlatform.LinuxPlayer:
-                    this.agentType = 90;
-                    break;
-                case RuntimePlatform.Android:
-                    this.agentType = 110;
-                    break;
-                case RuntimePlatform.IPhonePlayer:
-                    this.agentType = 120;
-                    break;
-                case RuntimePlatform.XboxOne:
-                    this.agentType = 130;
-                    break;
-                case RuntimePlatform.PS4:
-                    this.agentType = 140;
-                    break;
-                case RuntimePlatform.Switch:
-                    this.agentType = 170;
-                    break;
-                case RuntimePlatform.tvOS:
-                    this.agentType = 200;
-                    break;
-                case RuntimePlatform.WSAPlayerX86:
-                    this.agentType = 210;
-                    break;
-                case RuntimePlatform.WSAPlayerX64:
-                    this.agentType = 211;
-                    break;
-                case RuntimePlatform.WSAPlayerARM:
-                    this.agentType = 212;
-                    break;
-                case RuntimePlatform.WebGLPlayer:
-                    this.agentType = 220;
-                    break;
+            case RuntimePlatform.WindowsPlayer:
+                this.agentType = 70;
+
+                break;
+
+            case RuntimePlatform.OSXPlayer:
+                this.agentType = 80;
+
+                break;
+
+            case RuntimePlatform.LinuxPlayer:
+                this.agentType = 90;
+
+                break;
+
+            case RuntimePlatform.Android:
+                this.agentType = 110;
+
+                break;
+
+            case RuntimePlatform.IPhonePlayer:
+                this.agentType = 120;
+
+                break;
+
+            case RuntimePlatform.XboxOne:
+                this.agentType = 130;
+
+                break;
+
+            case RuntimePlatform.PS4:
+                this.agentType = 140;
+
+                break;
+
+            case RuntimePlatform.Switch:
+                this.agentType = 170;
+
+                break;
+
+            case RuntimePlatform.tvOS:
+                this.agentType = 200;
+
+                break;
+
+            case RuntimePlatform.WSAPlayerX86:
+                this.agentType = 210;
+
+                break;
+
+            case RuntimePlatform.WSAPlayerX64:
+                this.agentType = 211;
+
+                break;
+
+            case RuntimePlatform.WSAPlayerARM:
+                this.agentType = 212;
+
+                break;
+
+            case RuntimePlatform.WebGLPlayer:
+                this.agentType = 220;
+
+                break;
             }
 
             this.deviceId = DeviceProvider.GetFromSystemInfo().DeviceId;
         }
 
-        public IEnumerator<ITask> SendEvent<T>(string @namespace, string clientId, string userID,
-            TelemetryEventTag eventTag, T eventData, ResultCallback callback)
-        where T : class
+        public IEnumerator SendEvent<T>(string @namespace, string clientId, string userID, TelemetryEventTag eventTag,
+            T eventData, ResultCallback callback) where T : class
         {
-            Assert.IsTrue(typeof(T).IsSerializable,
-                "Event data of type " + typeof(T) + " is not serializable. Try add [Serializable] attribute.");
-
             string nowTime = DateTime.UtcNow.ToString("O");
             string strEventData;
 
@@ -84,7 +109,7 @@ namespace AccelByte.Api
             }
             else
             {
-                strEventData = SimpleJson.SimpleJson.SerializeObject(eventData);
+                strEventData = eventData.ToJsonString();
             }
 
             string jsonString = string.Format(
@@ -101,7 +126,8 @@ namespace AccelByte.Api
                 "\"UUID\": \"{9:N}\"," +
                 "\"UX\": {10}," +
                 "\"UserID\": \"{11}\"" +
-                "}}", this.agentType,
+                "}}",
+                this.agentType,
                 eventTag.AppId,
                 clientId,
                 strEventData,
@@ -114,9 +140,10 @@ namespace AccelByte.Api
                 eventTag.UX,
                 userID);
 
-            HttpWebRequest request = HttpRequestBuilder
-                .CreatePost(this.baseUrl +
-                            "/telemetry/public/namespaces/{namespace}/events/gameclient/{appID}/{eventType}/{eventLevel}/{eventID}")
+            var request = HttpRequestBuilder
+                .CreatePost(
+                    this.baseUrl +
+                    "/public/namespaces/{namespace}/events/gameclient/{appID}/{eventType}/{eventLevel}/{eventID}")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("appID", eventTag.AppId.ToString())
                 .WithPathParam("eventType", eventTag.Type.ToString())
@@ -124,31 +151,13 @@ namespace AccelByte.Api
                 .WithPathParam("eventID", eventTag.Id.ToString())
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(jsonString)
-                .ToRequest();
+                .GetResult();
 
-            HttpWebResponse response = null;
+            IHttpResponse response = null;
 
-            yield return Task.Await(request, rsp => response = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            if (response == null)
-            {
-                callback.Try(Result.CreateError(ErrorCode.NetworkError, "There is no response"));
-                yield break;
-            }
-
-            response.Close();
-            Result result;
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.NoContent:
-                    result = Result.CreateOk();
-                    break;
-                default:
-                    result = Result.CreateError((ErrorCode) response.StatusCode, "Sending telemetry event failed");
-                    break;
-            }
-
+            var result = response.TryParse();
             callback.Try(result);
         }
     }

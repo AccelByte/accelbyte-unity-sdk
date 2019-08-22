@@ -6,9 +6,9 @@ using System;
 
 namespace AccelByte.Core
 {
-    public static class AwsXRayTraceIdFactory
+    internal static class AwsXRayTraceIdFactory
     {
-        public static string GetNewXRayTraceId()
+        internal static string GetNewXRayTraceId()
         {
             const int version = 1;
             uint unixTimestamp = (uint) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;

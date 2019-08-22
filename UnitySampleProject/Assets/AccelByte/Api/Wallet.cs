@@ -13,25 +13,21 @@ namespace AccelByte.Api
     /// </summary>
     public class Wallet
     {
-        private readonly string @namespace;
         private readonly WalletApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Wallet(string @namespace, WalletApi api, User user, AsyncTaskDispatcher taskDispatcher,
-            CoroutineRunner coroutineRunner)
+        internal Wallet(WalletApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can't construct Wallet! api is null!");
-            Assert.IsNotNull(@namespace, "Can't construct Wallet! namespace parameter is null!");
-            Assert.IsNotNull(user, "Can't construct Wallet! user parameter is null!");
-            Assert.IsNotNull(taskDispatcher, "taskDispatcher must not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner must not be null");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
+            this.session = session;
             this.@namespace = @namespace;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -44,23 +40,19 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code; CurrencyCode is null!");
 
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetWalletInfoByCurrencyCode(
+            this.coroutineRunner.Run(this.api.GetWalletInfoByCurrencyCode(
                         this.@namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
+                        this.session.UserId,
+                        this.session.AuthorizationToken,
                         currencyCode,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<WalletInfo>) result)),
-                    this.user));
+                        callback));
         }
     }
 }

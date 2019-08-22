@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Runtime.Serialization;
-using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace Tests.AUnitTests
+namespace Tests.UnitTests
 {
     [TestFixture]
     public class AwesomeFormatTest
@@ -104,8 +103,8 @@ namespace Tests.AUnitTests
             public string theta;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithId_Successful()
+        [Test]
+        public void Deserialize_WithId_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -130,12 +129,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo("iki huruf beta"));
             Assert.That(payload.gamma, Is.EqualTo("iki_hurup_gama"));
             Assert.That(payload.delta, Is.EqualTo("iki hurop delta"));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithId_Successful()
+        [Test]
+        public void Serialize_WithId_Successful()
         {
             var payload = new AllString
             {
@@ -159,12 +156,10 @@ namespace Tests.AUnitTests
                 "beta: beta content should be something too\n" +
                 "gamma: gamma also needs placeholder string\n" +
                 "delta: I've run out of idea for delta content"));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithIdAndCode_Successful()
+        [Test]
+        public void Deserialize_WithIdAndCode_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -190,12 +185,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo("iki huruf beta"));
             Assert.That(payload.gamma, Is.EqualTo("iki_hurup_gama"));
             Assert.That(payload.delta, Is.EqualTo("iki hurop delta"));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithIdAndCode_Successful()
+        [Test]
+        public void Serialize_WithIdAndCode_Successful()
         {
             var payload = new AllString
             {
@@ -220,12 +213,10 @@ namespace Tests.AUnitTests
                 "beta: beta content should be something too\n" +
                 "gamma: gamma also needs placeholder string\n" +
                 "delta: I've run out of idea for delta content"));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithNonErrorCode_Successful()
+        [Test]
+        public void Deserialize_WithNonErrorCode_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -250,12 +241,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo("iki huruf beta"));
             Assert.That(payload.gamma, Is.EqualTo("iki_hurup_gama"));
             Assert.That(payload.delta, Is.EqualTo("iki hurop delta"));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithErrorCode_IsError()
+        [Test]
+        public void Deserialize_WithErrorCode_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -273,12 +262,10 @@ namespace Tests.AUnitTests
             ErrorCode headerErr = AwesomeFormat.ReadHeader(input, out type, out id);
             
             Assert.That(headerErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithNonNumericCode_IsError()
+        [Test]
+        public void Deserialize_WithNonNumericCode_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -293,16 +280,13 @@ namespace Tests.AUnitTests
 
             MessageType type;
             long id;
-            AllStringNoTypeName payload;
             ErrorCode headerErr = AwesomeFormat.ReadHeader(input, out type, out id);
             
             Assert.That(headerErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithNoTypeName_Successful()
+        [Test]
+        public void Deserialize_WithNoTypeName_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -327,12 +311,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo("iki huruf beta"));
             Assert.That(payload.gamma, Is.EqualTo("iki_hurup_gama"));
             Assert.That(payload.delta, Is.EqualTo("iki hurop delta"));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithAllStringMembers_ForAllDataMemberAttributes_Successful()
+        [Test]
+        public void Deserialize_WithAllStringMembers_ForAllDataMemberAttributes_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -356,12 +338,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo("iki huruf beta"));
             Assert.That(payload.gamma, Is.EqualTo("iki_hurup_gama"));
             Assert.That(payload.delta, Is.EqualTo("iki hurop delta"));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Serialize_WithAllStringMembers_ForAllDataMemberAttributes_Successful()
+        [Test]
+        public void Serialize_WithAllStringMembers_ForAllDataMemberAttributes_Successful()
         {
             var payload = new AllString
             {
@@ -384,12 +364,10 @@ namespace Tests.AUnitTests
                 "beta: beta content should be something too\n" +
                 "gamma: gamma also needs placeholder string\n" +
                 "delta: I've run out of idea for delta content"));
-
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithPrimitives_ForAllDataMemberAttributes_Successful()
+        [Test]
+        public void Deserialize_WithPrimitives_ForAllDataMemberAttributes_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -413,11 +391,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo(true));
             Assert.That(payload.gamma, Is.EqualTo(123000).Within(0.1));
             Assert.That(payload.delta, Is.EqualTo("isih string iki"));
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithPrimitives_ForAllDataMemberAttributes_Successful()
+        [Test]
+        public void Serialize_WithPrimitives_ForAllDataMemberAttributes_Successful()
         {
             var payload = new AllPrimitives
             {
@@ -440,12 +417,10 @@ namespace Tests.AUnitTests
                 "beta: True\n" +
                 "gamma: 1230\n" +
                 "delta: this should be string, still"));
-
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithPrimitivesAndStringArrays_Successful()
+        [Test]
+        public void Deserialize_WithPrimitivesAndStringArrays_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -473,12 +448,10 @@ namespace Tests.AUnitTests
                 "deserialize", " string", " arrays", "so", "this",
                 "should", "  work"
             }));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithPrimitivesAndStringArrays_Successful()
+        [Test]
+        public void Serialize_WithPrimitivesAndStringArrays_Successful()
         {
             var payload = new PrimitivesAndStringArrays
             {
@@ -502,12 +475,10 @@ namespace Tests.AUnitTests
                     "beta: True\n" +
                     "gamma: 1230\n" +
                     "delta: [deserialize, string, arrays,so,this,should,  work]"));
-
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithPrimitivesAndBoolArrays_Successful()
+        [Test]
+        public void Deserialize_WithPrimitivesAndBoolArrays_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -531,11 +502,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo(true));
             Assert.That(payload.gamma, Is.EqualTo(123000).Within(0.1));
             Assert.That(payload.delta, Is.EquivalentTo(new[] {true, false, true, false, true, true, true}));
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithPrimitivesAndBoolArrays_Successful()
+        [Test]
+        public void Serialize_WithPrimitivesAndBoolArrays_Successful()
         {
             var payload = new PrimitivesAndBoolArrays
             {
@@ -558,12 +528,10 @@ namespace Tests.AUnitTests
                     "beta: True\n" +
                     "gamma: 1230\n" +
                     "delta: [True,False,True,False,True,True,True]"));
-
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithPrimitivesAndDoubleArrays_Successful()
+        [Test]
+        public void Deserialize_WithPrimitivesAndDoubleArrays_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -587,12 +555,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo(true));
             Assert.That(payload.gamma, Is.EqualTo(123000).Within(0.1));
             Assert.That(payload.delta, Is.EquivalentTo(new[] {16.125, 2.25, 7.375, 8}));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithPrimitivesAndDoubleArrays_Successful()
+        [Test]
+        public void Serialize_WithPrimitivesAndDoubleArrays_Successful()
         {
             var payload = new PrimitivesAndDoubleArrays
             {
@@ -615,12 +581,10 @@ namespace Tests.AUnitTests
                     "beta: True\n" +
                     "gamma: 1230\n" +
                     "delta: [16.125,2.25,7.375,8]"));
-
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithPrimitivesAndDateTime_Successful()
+        [Test]
+        public void Deserialize_WithPrimitivesAndDateTime_Successful()
         {
             string input =
                 "type: unknown\n" +
@@ -644,12 +608,10 @@ namespace Tests.AUnitTests
             Assert.That(payload.beta, Is.EqualTo(true));
             Assert.That(payload.gamma, Is.EqualTo(123000).Within(0.1));
             Assert.That(payload.delta, Is.EqualTo(new DateTime(2018, 03, 01, 07, 00, 00, DateTimeKind.Utc)));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Serialize_WithPrimitivesAndDateTime_Successful()
+        [Test]
+        public void Serialize_WithPrimitivesAndDateTime_Successful()
         {
             var payload = new PrimitivesAndDateTime
             {
@@ -672,12 +634,10 @@ namespace Tests.AUnitTests
                 "beta: True\n" +
                 "gamma: 1230\n" +
                 "delta: 2018-03-01T07:00:00.0000000Z"));
-
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithMissingFields_IsError()
+        [Test]
+        public void Deserialize_WithMissingFields_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -696,12 +656,10 @@ namespace Tests.AUnitTests
             
             Assert.That(headerErr, Is.EqualTo(ErrorCode.None));
             Assert.That(payloadErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithEmptyNonStringField_IsError()
+        [Test]
+        public void Deserialize_WithEmptyNonStringField_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -721,12 +679,10 @@ namespace Tests.AUnitTests
             
             Assert.That(headerErr, Is.EqualTo(ErrorCode.None));
             Assert.That(payloadErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
         
-        [UnityTest]
-        public IEnumerator Deserialize_WithInvalidMessage_IsError()
+        [Test]
+        public void Deserialize_WithInvalidMessage_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -746,12 +702,10 @@ namespace Tests.AUnitTests
             
             Assert.That(headerErr, Is.EqualTo(ErrorCode.None));
             Assert.That(payloadErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithDuplicateFields_IsError()
+        [Test]
+        public void Deserialize_WithDuplicateFields_IsError()
         {
             string input =
                 "type: unknown\n" +
@@ -771,12 +725,10 @@ namespace Tests.AUnitTests
             
             Assert.That(headerErr, Is.EqualTo(ErrorCode.None));
             Assert.That(payloadErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_WithNoType_IsError()
+        [Test]
+        public void Deserialize_WithNoType_IsError()
         {
             string input =
                 "alpha: 707070\n" +
@@ -792,12 +744,10 @@ namespace Tests.AUnitTests
             ErrorCode headerErr = AwesomeFormat.ReadHeader(input, out type, out id);
             
             Assert.That(headerErr, Is.Not.EqualTo(ErrorCode.None));
-            
-            yield break;
         }
 
-        [UnityTest]
-        public IEnumerator Deserialize_FriendStatusResponse_CorrectNaming()
+        [Test]
+        public void Deserialize_FriendStatusResponse_CorrectNaming()
         {
             string input = 
             "type: friendsStatusResponse" + "\n" +
@@ -813,8 +763,6 @@ namespace Tests.AUnitTests
             ErrorCode headerErrorCode = AwesomeFormat.ReadHeader(input, out type, out id);
             
             Assert.That(headerErrorCode, Is.EqualTo(ErrorCode.None));
-            yield return null;
-            
         }
     }
 }

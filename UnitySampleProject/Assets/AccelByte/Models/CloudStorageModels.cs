@@ -2,7 +2,6 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
@@ -12,9 +11,9 @@ namespace AccelByte.Models
     {
         [DataMember] public string checksum { get; set; }
         [DataMember] public string customAttribute { get; set; }
-        [DataMember] public DateTime dateAccessed { get; set; }
-        [DataMember] public DateTime dateCreated { get; set; }
-        [DataMember] public DateTime dateModified { get; set; }
+        [DataMember] public double dateAccessed { get; set; }
+        [DataMember] public double dateCreated { get; set; }
+        [DataMember] public double dateModified { get; set; }
         [DataMember] public string label { get; set; }
         [DataMember] public string mimeType { get; set; }
         [DataMember] public string namespaceId { get; set; }

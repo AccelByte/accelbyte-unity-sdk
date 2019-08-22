@@ -3,11 +3,13 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using AccelByte.Core;
 using AccelByte.Models;
-using WebSocketSharp;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -17,86 +19,125 @@ namespace AccelByte.Api
     public class Lobby
     {
         /// <summary>
+        /// Raised when lobby is disconnected
+        /// </summary>
+        public event Action Disconnected;
+
+        /// <summary>
         /// Raised when a user is invited to party
         /// </summary>
         public event ResultCallback<PartyInvitation> InvitedToParty;
-        
+
         /// <summary>
         /// Raised when some user joined our party
         /// </summary>
         public event ResultCallback<JoinNotification> JoinedParty;
-        
+
         /// <summary>
         /// Raised when the user is kicked from party
         /// </summary>
         public event ResultCallback<KickNotification> KickedFromParty;
-        
+
+        /// <summary>
+        /// Raised when the user leave from party
+        /// </summary>
+        public event ResultCallback<LeaveNotification> LeaveFromParty;
+
         /// <summary>
         /// Raised when personal chat message received.
         /// </summary>
         public event ResultCallback<ChatMesssage> PersonalChatReceived;
-        
+
         /// <summary>
         /// Raised when party chat message received.
         /// </summary>
         public event ResultCallback<ChatMesssage> PartyChatReceived;
-        
+
         /// <summary>
         /// Raised when a notification (usually from the system or admin) is received.
         /// </summary>
         public event ResultCallback<Notification> OnNotification;
-        
+
         /// <summary>
         /// Raised when friends status changed 
         /// </summary>
         public event ResultCallback<FriendsStatusNotif> FriendsStatusChanged;
-        
+
         /// <summary>
         /// Raised when friend request accepted
         /// </summary>        
         public event ResultCallback<Friend> FriendRequestAccepted;
-        
+
         /// <summary>
         /// Raised when there is an incoming friend request
         /// </summary>
         public event ResultCallback<Friend> OnIncomingFriendRequest;
-        
+
         /// <summary>
         /// Raised when matchmaking process is completed.
         /// </summary>
         public event ResultCallback<MatchmakingNotif> MatchmakingCompleted;
 
-        private const int PingDelay = 30000;
-        
-        private readonly User account;
-        private readonly AsyncTaskDispatcher taskDispatcher;
-        private readonly CoroutineRunner coroutineRunner;
-        private readonly WebSocket webSocket;
-        private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks;
-        private readonly object syncToken = new object();
-        private bool Connected;
-        
-        private long id;
+        /// <summary>
+        /// Raised when user from within the same party confirmed he/she is ready for match
+        /// </summary>
+        public event ResultCallback<ReadyForMatchConfirmation> ReadyForMatchConfirmed;
 
-        internal Lobby(string url, User account, AsyncTaskDispatcher taskDispatcher,
-            CoroutineRunner coroutineRunner)
+        /// <summary>
+        /// Raised when DS process is updated.
+        /// </summary>
+        public event ResultCallback<DsNotif> DSUpdated;
+
+        public event ResultCallback<RematchmakingNotification> RematchmakingNotif;
+
+        private const int PingDelay = 30000;
+
+        private const int BackoffDelay = 1000;
+        private const int MaxDelay = 30000;
+        private const int TotalTimeout = 1000;
+
+        private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks =
+            new Dictionary<long, Action<ErrorCode, string>>();
+        
+        private readonly string websocketUrl;
+        private readonly ISession session;
+        private readonly CoroutineRunner coroutineRunner;
+        private readonly object syncToken = new object();
+        private readonly IWebSocket webSocket;
+        private long id;
+        private Coroutine maintainConnectionCoroutine;
+
+        public event EventHandler OnRetryAttemptFailed;
+
+        internal Lobby(string websocketUrl, IWebSocket webSocket, ISession session, CoroutineRunner coroutineRunner)
         {
-            this.account = account;
-            this.taskDispatcher = taskDispatcher;
+            Assert.IsNotNull(webSocket);
+            Assert.IsNotNull(coroutineRunner);
+
+            this.websocketUrl = websocketUrl;
+            this.webSocket = webSocket;
+            this.session = session;
             this.coroutineRunner = coroutineRunner;
-            this.responseCallbacks = new Dictionary<long, Action<ErrorCode, string>>();
-            this.webSocket = new WebSocket(url + "/lobby/");
-            this.webSocket.OnMessage += HandleMessages;
-            this.webSocket.SslConfiguration.ServerCertificateValidationCallback =
-                (sender, certificate, chain, sslPolicyErrors) => true;
+        }
+
+        private void HandleOnClose(ushort closecode)
+        {
+            Action handler = this.Disconnected;
+
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <summary>
         /// Lobby connection status
         /// </summary>
-        public bool IsConnected
-        {
-            get { return this.Connected; }
+        public bool IsConnected {
+            get
+            {
+                return this.webSocket.ReadyState == WsState.Open;
+            } 
         }
 
         /// <summary>
@@ -104,11 +145,80 @@ namespace AccelByte.Api
         /// </summary>
         public void Connect()
         {
-            this.webSocket.CustomHeaders = new Dictionary<string, string>
-                {{"Authorization", "Bearer " + this.account.AccessToken}};
-            this.webSocket.Connect();
-            this.Connected = true;
-            this.taskDispatcher.Start(Ping());
+            if (!this.session.IsValid())
+            {
+                throw new Exception("Cannot connect to websocket because user is not logged in.");
+            }
+
+            this.webSocket.OnMessage += HandleOnMessage;
+            this.webSocket.OnClose += HandleOnClose;
+            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken);
+            this.maintainConnectionCoroutine = this.coroutineRunner.Run(
+                MaintainConnection(Lobby.BackoffDelay, Lobby.MaxDelay, Lobby.TotalTimeout));
+        }
+
+        /// <summary>
+        /// Retrying connection with exponential backoff if disconnected, ping if connected
+        /// </summary>
+        /// <param name="backoffDelay">Initial delay time</param>
+        /// <param name="maxDelay">Maximum delay time</param>
+        /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
+        /// <returns></returns>
+        private IEnumerator MaintainConnection(int backoffDelay, int maxDelay, int totalTimeout)
+        {
+            while (true)
+            {
+                switch (this.webSocket.ReadyState)
+                {
+                    case WsState.Open:
+                        this.webSocket.Ping();
+
+                        yield return new WaitForSeconds(Lobby.PingDelay / 1000f);
+
+                        break;
+                    case WsState.Connecting:
+                        while (this.webSocket.ReadyState == WsState.Connecting)
+                        {
+                            yield return new WaitForSeconds(1f);
+                        }
+                        break;
+                    case WsState.Closing:
+                        while (this.webSocket.ReadyState == WsState.Closing)
+                        {
+                            yield return new WaitForSeconds(1f);
+                        }
+                        break;
+                    case WsState.Closed:
+                        System.Random rand = new System.Random();
+                        int nextDelay = backoffDelay;
+                        var firstClosedTime = DateTime.Now;
+
+                        while (this.webSocket.ReadyState == WsState.Closed &&
+                            (DateTime.Now - firstClosedTime) < TimeSpan.FromSeconds(totalTimeout))
+                        {
+                            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken);
+                            float randomizedDelay = (float) (nextDelay + ((rand.NextDouble()*0.5) - 0.5));
+
+                            yield return new WaitForSeconds(randomizedDelay / 1000f);
+
+                            nextDelay *= 2;
+
+                            if (nextDelay > maxDelay)
+                            {
+                                nextDelay = maxDelay;
+                            }
+                        }
+
+                        if (this.webSocket.ReadyState == WsState.Closed)
+                        {
+                            RaiseOnRetryAttemptFailed();
+
+                            yield break;
+                        }
+                        
+                        break;
+                }
+            }
         }
 
         /// <summary>
@@ -116,8 +226,24 @@ namespace AccelByte.Api
         /// </summary>
         public void Disconnect()
         {
-            this.webSocket.Close();
-            this.Connected = false;
+            this.webSocket.OnMessage -= HandleOnMessage;
+            this.webSocket.OnClose -= HandleOnClose;
+
+            this.coroutineRunner.Stop(this.maintainConnectionCoroutine);
+
+            if (this.webSocket != null)
+            {
+                this.webSocket.Close();
+            }
+        }
+
+        // Invoker for OnRetryAttemptFailed
+        protected virtual void RaiseOnRetryAttemptFailed()
+        {
+            if (this.OnRetryAttemptFailed != null)
+            {
+                this.OnRetryAttemptFailed(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -165,8 +291,10 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains PartyInfo via callback when completed</param>
         public void JoinParty(string partyID, string invitationToken, ResultCallback<PartyInfo> callback)
         {
-            SendRequest(MessageType.partyJoinRequest,
-                new PartyJoinRequest {partyID = partyID, invitationToken = invitationToken}, callback);
+            SendRequest(
+                MessageType.partyJoinRequest,
+                new PartyJoinRequest {partyID = partyID, invitationToken = invitationToken},
+                callback);
         }
 
         /// <summary>
@@ -197,8 +325,10 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendPersonalChat(string userId, string chatMessage, ResultCallback callback)
         {
-            SendRequest(MessageType.personalChatRequest,
-                new PersonalChatRequest {to = userId, payload = chatMessage}, callback);
+            SendRequest(
+                MessageType.personalChatRequest,
+                new PersonalChatRequest {to = userId, payload = chatMessage},
+                callback);
         }
 
         /// <summary>
@@ -211,11 +341,7 @@ namespace AccelByte.Api
         {
             SendRequest(
                 MessageType.setUserStatusRequest,
-                new SetUserStatusRequest
-                {
-                    availability = (uint) status,
-                    activity = activity
-                },
+                new SetUserStatusRequest {availability = (uint) status, activity = activity},
                 callback);
         }
 
@@ -227,7 +353,7 @@ namespace AccelByte.Api
         {
             SendRequest(MessageType.friendsStatusRequest, callback);
         }
-        
+
         /// <summary>
         ///  Ask lobby to send all pending notification to user. Listen to OnNotification.
         /// </summary> 
@@ -236,7 +362,7 @@ namespace AccelByte.Api
         {
             SendRequest(MessageType.offlineNotificationRequest, callback);
         }
-        
+
         /// <summary>
         /// Send request friend request.
         /// </summary>
@@ -244,7 +370,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public void RequestFriend(string userId, ResultCallback callback)
         {
-            SendRequest(MessageType.requestFriendsRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.requestFriendsRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -254,7 +380,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public void Unfriend(string userId, ResultCallback callback)
         {
-            SendRequest(MessageType.unfriendRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.unfriendRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -273,7 +399,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public void CancelFriendRequest(string userId, ResultCallback callback)
         {
-            SendRequest(MessageType.cancelFriendsRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.cancelFriendsRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -292,7 +418,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function.</param>
         public void AcceptFriend(string userId, ResultCallback callback)
         {
-            SendRequest(MessageType.acceptFriendsRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.acceptFriendsRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -302,7 +428,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function.</param>
         public void RejectFriend(string userId, ResultCallback callback)
         {
-            SendRequest(MessageType.rejectFriendsRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.rejectFriendsRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -321,7 +447,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains FriendshipStatus via callback when completed.</param>
         public void GetFriendshipStatus(string userId, ResultCallback<FriendshipStatus> callback)
         {
-            SendRequest(MessageType.getFriendshipStatusRequest, new Friend { friendId = userId }, callback);
+            SendRequest(MessageType.getFriendshipStatusRequest, new Friend {friendId = userId}, callback);
         }
 
         /// <summary>
@@ -331,8 +457,17 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function with a start matchmaking status code.</param>
         public void StartMatchmaking(string gameMode, ResultCallback<MatchmakingCode> callback)
         {
-            SendRequest(MessageType.startMatchmakingRequest,
-                new GameMode { gameMode = gameMode }, callback);
+            SendRequest(MessageType.startMatchmakingRequest, new GameMode {gameMode = gameMode}, callback);
+        }
+
+        /// <summary>
+        /// Send a message to matchmaking service to indicate the user is ready for match
+        /// </summary>
+        /// <param name="matchId"></param>
+        /// <param name="callback"></param>
+        public void ConfirmReadyForMatch(string matchId, ResultCallback callback)
+        {
+            SendRequest(MessageType.setReadyConsentRequest, new ReadyConsentRequest { matchId = matchId }, callback);
         }
 
         /// <summary>
@@ -342,8 +477,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function with a cancel matchmaking status code.</param>
         public void CancelMatchmaking(string gameMode, ResultCallback<MatchmakingCode> callback)
         {
-            SendRequest(MessageType.cancelMatchmakingRequest,
-                new GameMode { gameMode = gameMode }, callback);
+            SendRequest(MessageType.cancelMatchmakingRequest, new GameMode {gameMode = gameMode}, callback);
         }
 
         private long GenerateId()
@@ -364,8 +498,7 @@ namespace AccelByte.Api
         }
 
         private void SendRequest<T, U>(MessageType requestType, T requestPayload, ResultCallback<U> callback)
-            where T : class, new()
-            where U : class, new()
+            where T : class, new() where U : class, new()
         {
             long messageId = GenerateId();
             var writer = new StringWriter();
@@ -375,7 +508,7 @@ namespace AccelByte.Api
             this.responseCallbacks[messageId] = (errorCode, response) =>
             {
                 Result<U> result;
-                
+
                 if (errorCode != ErrorCode.None)
                 {
                     result = Result<U>.CreateError(errorCode);
@@ -389,13 +522,13 @@ namespace AccelByte.Api
                         ? Result<U>.CreateError(errorCode)
                         : Result<U>.CreateOk(responsePayload);
                 }
-                
+
                 this.coroutineRunner.Run(() => callback(result));
             };
-            
-            this.webSocket.SendAsync(writer.ToString(), null);
+
+            this.webSocket.Send(writer.ToString());
         }
-        
+
         private void SendRequest<T>(MessageType requestType, T requestPayload, ResultCallback callback)
             where T : class, new()
         {
@@ -410,12 +543,11 @@ namespace AccelByte.Api
 
                 this.coroutineRunner.Run(() => callback(result));
             };
-            
-            this.webSocket.SendAsync(writer.ToString(), null);
+
+            this.webSocket.Send(writer.ToString());
         }
 
-        private void SendRequest<U>(MessageType requestType, ResultCallback<U> callback)
-            where U : class, new()
+        private void SendRequest<U>(MessageType requestType, ResultCallback<U> callback) where U : class, new()
         {
             long messageId = GenerateId();
             var writer = new StringWriter();
@@ -442,7 +574,7 @@ namespace AccelByte.Api
                 this.coroutineRunner.Run(() => callback(result));
             };
 
-            this.webSocket.SendAsync(writer.ToString(), null);
+            this.webSocket.Send(writer.ToString());
         }
 
         private void SendRequest(MessageType requestType, ResultCallback callback)
@@ -457,87 +589,91 @@ namespace AccelByte.Api
 
                 this.coroutineRunner.Run(() => callback(result));
             };
-            
-            this.webSocket.SendAsync(writer.ToString(), null);
+
+            this.webSocket.Send(writer.ToString());
         }
 
-        private void HandleMessages(object sender, MessageEventArgs eventArgs)
+        private void HandleOnMessage(string message)
         {
             long messageId;
             MessageType messageType;
-            ErrorCode errorCode = AwesomeFormat.ReadHeader(eventArgs.Data, out messageType, out messageId);
+            ErrorCode errorCode = AwesomeFormat.ReadHeader(message, out messageType, out messageId);
 
             switch (messageType)
             {
-                case MessageType.partyGetInvitedNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.InvitedToParty);
+            case MessageType.partyGetInvitedNotif:
+                Lobby.HandleNotification(message, this.InvitedToParty);
 
-                    break;
-                case MessageType.partyJoinNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.JoinedParty);
+                break;
+            case MessageType.partyJoinNotif:
+                Lobby.HandleNotification(message, this.JoinedParty);
 
-                    break;
-                case MessageType.partyKickNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.KickedFromParty);
+                break;
+            case MessageType.partyKickNotif:
+                Lobby.HandleNotification(message, this.KickedFromParty);
 
-                    break;
-                case MessageType.personalChatNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.PersonalChatReceived);
+                break;
+            case MessageType.partyLeaveNotif:
+                Lobby.HandleNotification(message, this.LeaveFromParty);
 
-                    break;
-                case MessageType.partyChatNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.PartyChatReceived);
+                break;
+            case MessageType.personalChatNotif:
+                Lobby.HandleNotification(message, this.PersonalChatReceived);
 
-                    break;
-                case MessageType.messageNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.OnNotification);
+                break;
+            case MessageType.partyChatNotif:
+                Lobby.HandleNotification(message, this.PartyChatReceived);
 
-                    break;
-                case MessageType.userStatusNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.FriendsStatusChanged);
+                break;
+            case MessageType.messageNotif:
+                Lobby.HandleNotification(message, this.OnNotification);
 
-                    break;
-                case MessageType.matchmakingNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.MatchmakingCompleted);
+                break;
+            case MessageType.userStatusNotif:
+                Lobby.HandleNotification(message, this.FriendsStatusChanged);
 
-                    break;
-                case MessageType.acceptFriendsNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.FriendRequestAccepted);
+                break;
+            case MessageType.matchmakingNotif:
+                Lobby.HandleNotification(message, this.MatchmakingCompleted);
 
-                    break;
-                case MessageType.requestFriendsNotif:
-                    Lobby.HandleNotification(eventArgs.Data, this.OnIncomingFriendRequest);
+                break;
+            case MessageType.dsNotif:
+                Lobby.HandleNotification(message, this.DSUpdated);
 
-                    break;
-                case MessageType.connectNotif:
-                    this.Connected = true;
+                break;
+            case MessageType.acceptFriendsNotif:
+                Lobby.HandleNotification(message, this.FriendRequestAccepted);
 
-                    break;
-                default:
-                    Action<ErrorCode, string> handler;
+                break;
+            case MessageType.requestFriendsNotif:
+                Lobby.HandleNotification(message, this.OnIncomingFriendRequest);
 
-                    if (messageId != -1 && this.responseCallbacks.TryGetValue(messageId, out handler))
-                    {
-                        this.responseCallbacks.Remove(messageId);
-                        handler(errorCode, eventArgs.Data);
-                    }
+                break;
+            case MessageType.setReadyConsentNotif: 
+                Lobby.HandleNotification(message, this.ReadyForMatchConfirmed);
+                
+                break;
+            case MessageType.rematchmakingNotif:
+                Lobby.HandleNotification(message, this.RematchmakingNotif);
 
-                    break;
+                break;
+            case MessageType.connectNotif:
+
+                break;
+            default:
+                Action<ErrorCode, string> handler;
+
+                if (messageId != -1 && this.responseCallbacks.TryGetValue(messageId, out handler))
+                {
+                    this.responseCallbacks.Remove(messageId);
+                    handler(errorCode, message);
+                }
+
+                break;
             }
         }
 
-        private IEnumerator<ITask> Ping()
-        {
-            while (this.IsConnected)
-            {
-                yield return new DelayTask(Lobby.PingDelay);
-
-                this.webSocket.Ping();
-            }
-        }
-
-        private static void HandleNotification<T>(string message, ResultCallback<T> handler)
-            where T : class, new()
+        private static void HandleNotification<T>(string message, ResultCallback<T> handler) where T : class, new()
         {
             if (handler == null)
             {
@@ -546,7 +682,7 @@ namespace AccelByte.Api
 
             T payload;
             ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out payload);
-            
+
             if (errorCode != ErrorCode.None)
             {
                 handler(Result<T>.CreateError(errorCode));

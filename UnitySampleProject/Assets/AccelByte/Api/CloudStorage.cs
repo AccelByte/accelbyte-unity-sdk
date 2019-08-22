@@ -11,21 +11,20 @@ namespace AccelByte.Api
     public class CloudStorage
     {
         private readonly CloudStorageApi api;
-        private readonly User user;
-        private readonly AsyncTaskDispatcher taskDispatcher;
+        private readonly ISession session;
+        private readonly string @namespace;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal CloudStorage(CloudStorageApi api, User user, AsyncTaskDispatcher taskDispatcher,
-            CoroutineRunner coroutineRunner)
+        internal CloudStorage(CloudStorageApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
         {
-            Assert.IsNotNull(api, "Can not construct CloudStorage manager; api is null!");
-            Assert.IsNotNull(user, "Can not construct CloudStorage manager; userAccount is null!");
-            Assert.IsNotNull(taskDispatcher, "Can not construct CloudStorage manager; taskDispatcher is null!");
-            Assert.IsNotNull(coroutineRunner, "Can not construct CloudStorage manager; coroutineRunner is null!");
+            Assert.IsNotNull(api, "api parameter can not be null.");
+            Assert.IsNotNull(session, "session parameter can not be null");
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
+            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
 
             this.api = api;
-            this.user = user;
-            this.taskDispatcher = taskDispatcher;
+            this.session = session;
+            this.@namespace = @namespace;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -35,22 +34,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains Slot info array via callback when completed.</param>
         public void GetAllSlots(ResultCallback<Slot[]> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
-                callback.Try(Result<Slot[]>.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
+                callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetAllSlots(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<Slot[]>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetAllSlots(this.@namespace, this.session.UserId, this.session.AuthorizationToken, callback));
         }
 
         /// <summary>
@@ -60,23 +52,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains data via callback when completed.</param>
         public void GetSlot(string slotId, ResultCallback<byte[]> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
-                callback.Try(Result<byte[]>.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
+                callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.GetSlot(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        slotId,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<byte[]>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.GetSlot(this.@namespace, this.session.UserId, this.session.AuthorizationToken, slotId, callback));
         }
 
         /// <summary>
@@ -87,24 +71,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains Slot info via callback when completed.</param>
         public void CreateSlot(byte[] data, string dataName, ResultCallback<Slot> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
-                callback.Try(Result<Slot>.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
+                callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.CreateSlot(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        data,
-                        dataName,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<Slot>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.CreateSlot(this.@namespace, this.session.UserId, this.session.AuthorizationToken, data, dataName, callback));
         }
 
         /// <summary>
@@ -116,25 +91,22 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains Slot info via callback when completed.</param>
         public void UpdateSlot(string slotId, byte[] data, string dataName, ResultCallback<Slot> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
-                callback.Try(Result<Slot>.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
+                callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.UpdateSlot(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        slotId,
-                        data,
-                        dataName,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<Slot>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.UpdateSlot(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    slotId,
+                    data,
+                    dataName,
+                    callback));
         }
 
         /// <summary>
@@ -148,26 +120,23 @@ namespace AccelByte.Api
         public void UpdateSlotMetadata(string slotId, string[] tags, string label, string customMetadata,
             ResultCallback<Slot> callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
                 callback.Try(Result<Slot>.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.UpdateSlotMetadata(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        slotId,
-                        tags,
-                        label,
-                        customMetadata,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result<Slot>) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.UpdateSlotMetadata(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    this.session.AuthorizationToken,
+                    slotId,
+                    tags,
+                    label,
+                    customMetadata,
+                    callback));
         }
 
         /// <summary>
@@ -177,23 +146,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void DeleteSlot(string slotId, ResultCallback callback)
         {
-            if (!this.user.IsLoggedIn)
+            if (!this.session.IsValid())
             {
-                callback.Try(Result.CreateError(ErrorCode.IsNotLoggedIn, "User is not logged in"));
+                callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.taskDispatcher.Start(
-                Task.Retry(
-                    cb => this.api.DeleteSlot(
-                        this.user.Namespace,
-                        this.user.UserId,
-                        this.user.AccessToken,
-                        slotId,
-                        result => cb(result)),
-                    result => this.coroutineRunner.Run(() => callback((Result) result)),
-                    this.user));
+            this.coroutineRunner.Run(
+                this.api.DeleteSlot(this.@namespace, this.session.UserId, this.session.AuthorizationToken, slotId, callback));
         }
     }
 }

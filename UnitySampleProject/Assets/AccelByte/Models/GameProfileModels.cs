@@ -10,7 +10,7 @@ namespace AccelByte.Models
     [DataContract]
     public class GameProfile
     {
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string profileId { get; set; }
         [DataMember] public string userId { get; set; }
 
@@ -54,7 +54,7 @@ namespace AccelByte.Models
     public class GameProfilePublicInfo
     {
         [DataMember] public string profileId { get; set; }
-        [DataMember] public string @namespace { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string profileName { get; set; }
         [DataMember] public string avatarUrl { get; set; }
     }
