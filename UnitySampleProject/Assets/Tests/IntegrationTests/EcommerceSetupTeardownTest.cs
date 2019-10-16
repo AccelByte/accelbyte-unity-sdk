@@ -163,12 +163,15 @@ namespace Tests.IntegrationTests.EcommerceTest
 
             if (publishedStore.IsError)
             {
-                if (publishedStore.Error.Code.ToString() == "30044")
-                {
-                    TestVariables.bPublishedStoreIsExist = false;
-                }
+                Debug.Log(publishedStore.Error.Code);
+                TestHelper.Assert.That(publishedStore.Error.Code == ErrorCode.PublisherStoreNotExist);
+                TestVariables.bPublishedStoreIsExist = false;
             }
-            TestHelper.Assert.That(!publishedStore.IsError || publishedStore.Error.Code.ToString() == "30044");
+            else
+            {
+                TestHelper.Assert.That(!publishedStore.IsError);
+            }
+            
             if (TestVariables.bPublishedStoreIsExist) TestVariables.publishedStoreId = publishedStore.Value.storeId;
 
             //Create temp store

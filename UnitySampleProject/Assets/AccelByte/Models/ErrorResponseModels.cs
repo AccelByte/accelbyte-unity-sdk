@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
@@ -6,6 +7,7 @@ namespace AccelByte.Models
     public class ServiceError
     {
         [DataMember] public int numericErrorCode { get; set; }
+        [DataMember] public long errorCode { get; set; }
         [DataMember] public string errorMessage { get; set; }
     }
 

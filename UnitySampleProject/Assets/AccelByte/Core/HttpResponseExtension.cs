@@ -62,7 +62,12 @@ namespace AccelByte.Core
 
                     if (error.numericErrorCode == 0)
                     {
-                        return Result.CreateError((ErrorCode) response.Code);
+                        if (error.errorCode == 0)
+                        {
+                            return Result.CreateError((ErrorCode)response.Code);
+                        }
+
+                        return Result.CreateError((ErrorCode)error.errorCode, error.errorMessage);
                     }
 
                     return Result.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);
@@ -172,7 +177,11 @@ namespace AccelByte.Core
 
                     if (error.numericErrorCode == 0)
                     {
-                        return Result<T>.CreateError((ErrorCode) response.Code);
+                        if (error.errorCode == 0)
+                        {
+                            return Result<T>.CreateError((ErrorCode)response.Code);
+                        }
+                        return Result<T>.CreateError((ErrorCode)error.errorCode, error.errorMessage);
                     }
 
                     return Result<T>.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);

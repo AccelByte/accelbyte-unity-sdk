@@ -1955,7 +1955,7 @@ namespace Tests.IntegrationTests
             int responseNum = 0;
             int matchMakingNotifNum = 0;
             int readyConsentNotifNum = 0;
-            //int dsNotifNum = 0;
+            int dsNotifNum = 0;
 
             for (int i = 0; i < NumUsers; i++)
             {
@@ -1980,17 +1980,19 @@ namespace Tests.IntegrationTests
                     readyConsentNotifNum++;
                 };
 
-                //lobbies[index].DSUpdated += result =>
-                //{
-                //    Debug.Log(
-                //        string.Format(
-                //            "DS Notif {0} for user {1}: {2}",
-                //            index,
-                //            this.users[index],
-                //            result.Value.matchId));
-
-                //    dsNotifNum++;
-                //};
+                lobbies[index].DSUpdated += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "DS Notif {0} for user {1}: {2}",
+                            index,
+                            this.users[index],
+                            result.Value.matchId));
+                    if (result.Value.status == "READY")
+                    {
+                        dsNotifNum++;
+                    }
+                };
 
                 lobbies[index]
                     .StartMatchmaking(
@@ -2035,10 +2037,10 @@ namespace Tests.IntegrationTests
                 yield return new WaitForSeconds(0.2f);
             }
 
-            //while (dsNotifNum < NumUsers)
-            //{
-            //    yield return new WaitForSeconds(0.2f);
-            //}
+            while (dsNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
 
             foreach (var lobby in lobbies)
             {
@@ -2091,7 +2093,7 @@ namespace Tests.IntegrationTests
             int matchMakingNotifNum = 0;
             int readyConsentNotifNum = 0;
             int rematchmakingNotifNum = 0;
-            //int dsNotifNum = 0;
+            int dsNotifNum = 0;
 
             for (int i = 0; i < NumUsers; i++)
             {
@@ -2145,17 +2147,19 @@ namespace Tests.IntegrationTests
                     Interlocked.Increment(ref rematchmakingNotifNum);
                 };
 
-                //lobbies[index].DSUpdated += result =>
-                //{
-                //    Debug.Log(
-                //        string.Format(
-                //            "DS Notif {0} for user {1}: {2}",
-                //            index,
-                //            this.users[index],
-                //            result.Value.matchId));
-
-                //    dsNotifNum++;
-                //};
+                lobbies[index].DSUpdated += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "DS Notif {0} for user {1}: {2}",
+                            index,
+                            this.users[index],
+                            result.Value.matchId));
+                    if (result.Value.status == "READY")
+                    {
+                        dsNotifNum++;
+                    }
+                };
             }
 
             Result<TokenData> accessTokenResult = null;
@@ -2286,12 +2290,12 @@ namespace Tests.IntegrationTests
 
             Assert.IsTrue(readyConsentNotifNum == (NumUsers - 1) * (NumUsers - 1));
 
-            //while (dsNotifNum < NumUsers - 1)
-            //{
-            //    yield return new WaitForSeconds(0.2f);
-            //}
+            while (dsNotifNum < NumUsers - 1)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
 
-            //Assert.IsTrue(dsNotifNum == 2);
+            Assert.IsTrue(dsNotifNum == 2);
 
             foreach (var lobby in lobbies)
             {

@@ -11,18 +11,18 @@ namespace AccelByte.Api
     {
         public static DeviceProvider GetFromSystemInfo()
         {
-            string identifier = "unity:" + SystemInfo.deviceType + ":" + Application.platform;
+            string identifier = "unity_" + SystemInfo.deviceType + "_" + Application.platform;
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId")){
                 PlayerPrefs.SetString("AccelByteDeviceUniqueId", System.Guid.NewGuid().ToString());
             }
             return new DeviceProvider(
                 "device",
-                identifier + ":" + PlayerPrefs.GetString("AccelByteDeviceUniqueId")); 
+                identifier + "_" + PlayerPrefs.GetString("AccelByteDeviceUniqueId")); 
 #else
             return new DeviceProvider(
                 "device",
-                identifier + ":" + SystemInfo.deviceUniqueIdentifier);
+                identifier + "_" + SystemInfo.deviceUniqueIdentifier);
 #endif
         }
 

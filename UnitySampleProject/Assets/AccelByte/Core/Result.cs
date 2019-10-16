@@ -49,8 +49,8 @@ namespace AccelByte.Core
         NamespaceNotFound = 2141,
         UserProfileNotFound = 2241,
         EmailAlreadyUsed = 2272,
-        CategoryNotFound = 30041,
-        ItemNotFound = 30042,
+        CategoryNotFound = 30241,
+        ItemNotFound = 30341,
         StoreNotFound = 3043,
         OrderPriceMismatch = 3221,
         OrderNotFound = 3241,
@@ -61,6 +61,7 @@ namespace AccelByte.Core
         WalletExceedMaxBalanceAmount = 3525,
         UserWalletDoesNotExist = 3543,
         WalletAlreadyExist = 3571,
+        PublisherStoreNotExist = 30142,
 
         //AccelByte Statistic error codes
         StatisticNotFound = 12241,

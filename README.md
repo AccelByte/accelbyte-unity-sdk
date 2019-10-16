@@ -1,4 +1,4 @@
-# AccelByte Unity SDK v2.0.0
+# AccelByte Unity SDK v2.1.0
 
 ## Dependencies
 
@@ -11,6 +11,9 @@ AccelByte SDK is compatible with these AccelByte backend services:
 | Basic                | v1.0                 |
 | cloudstorage-service | v0.3.4               |
 | lobby-server         | v1.0.13              |
+| telemetry-service    | v1.0.4               |
+| soc-profile-service  | v0.1.5               |
+| statistic-service    | v0.8.2               |
 
 ## Getting Started
 
@@ -24,10 +27,10 @@ AccelByte SDK is compatible with these AccelByte backend services:
     "ClientId":"<GAME_CLIENT_ID>",
     "ClientSecret":"<GAME_CLIENT_SECRET>",
     "UseSessionManagement": true,
-    "PublisherNamespace":"preview",
-    "Namespace":"abshooter",
-    "BaseUrl": "https://api-preview.accelbyte.io/",
-    "LoginServerUrl":"https://api-preview.accelbyte.io/",
+    "PublisherNamespace":"<PUBLISHER_NAMESPACE>",
+    "Namespace":"<GAME_CLIENT_NAMESPACE>",
+    "BaseUrl": "https://api-preview.accelbyte.io",
+    "LoginServerUrl":"https://api-preview.accelbyte.io",
     "IamServerUrl":"https://api-preview.accelbyte.io/iam",
     "PlatformServerUrl":"https://api-preview.accelbyte.io/platform",
     "BasicServerUrl":"https://api-preview.accelbyte.io/basic",
@@ -54,4 +57,4 @@ using AccelByte.Models;
 using AccelByte.Core;
 ```
 
-After that, you can freely uses AccelByte SDK. Please see [tutorial](tutorial.md) on how to use AccelByte SDK.
+After that, you can freely uses AccelByte SDK. Please see [tutorial](docs/tutorial.md) on how to use AccelByte SDK.

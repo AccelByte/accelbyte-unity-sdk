@@ -34,6 +34,7 @@ namespace Tests.IntegrationTests
 
         private string GetEmailVerificationCode(string email, string subject)
         {
+            string password = Environment.GetEnvironmentVariable("SDK_TEST_EMAIL_PASSWORD");
             Message message = null;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -47,7 +48,7 @@ namespace Tests.IntegrationTests
                     Thread.Sleep(100);
 
                     client.Connect("pop.gmail.com", 995, true, 60000, 60000, UserTest.ValidateServerCertificate);
-                    client.Authenticate("testeraccelbyte@gmail.com", "RoNINkETYpHOaDRo");
+                    client.Authenticate("testeraccelbyte@gmail.com", password);
 
                     int messageCount = client.GetMessageCount();
 
@@ -60,14 +61,14 @@ namespace Tests.IntegrationTests
                             Debug.Log("Get Email Message With Subject: " + header.Subject);
                             message = client.GetMessage(i + 1);
 
-                            if (subject.Equals("Forgot Password"))
-                            {
-                                regex = new Regex("[code=](\\d*)[&]");
-                            }
-                            else if (subject.Equals("Account Verification"))
-                            {
+                            //if (subject.Equals("Forgot Password"))
+                            //{
+                            //    regex = new Regex("[code=](\\d*)[&]");
+                            //}
+                            //else if (subject.Equals("Account Verification"))
+                            //{
                                 regex = new Regex("[^\\w\\d](\\d{6})[^\\w\\d]");
-                            }
+                            //}
                         }
                     }
 
@@ -614,110 +615,6 @@ namespace Tests.IntegrationTests
             TestHelper.Assert.That(!deleteResult.IsError);
             TestHelper.LogEndTest();
         }
-
-        //not implemented yet on api-gateway
-        //[UnityTest, Timeout(150000)]
-        //public IEnumerator UpgradeSteamAccountWithVerificationCode_ThenLoginWithEmail_Successful()
-        //{
-        //    var user = AccelBytePlugin.GetUser();
-        //    var stringBuilder = new StringBuilder();
-        //    var helper = new TestHelper();
-        //    var guid = Guid.NewGuid().ToString("N");
-        //    string email = string.Format("testeraccelbyte+sdk{0}@gmail.com", guid);
-        //    const string Password = "pass";
-        //    Result loginSteamResult = null;
-        //    Result<UserData> upgradeResult = null;
-        //    Result loginWithEmailResult = null;
-        //    Result deleteResult = null;
-
-        //    if (SteamManager.Initialized)
-        //    {
-        //        var ticket = new byte[1024];
-        //        uint actualTicketLength;
-        //        SteamUser.GetAuthSessionTicket(ticket, ticket.Length, out actualTicketLength);
-        //        Array.Resize(ref ticket, (int)actualTicketLength);
-
-        //        foreach (byte b in ticket)
-        //        {
-        //            stringBuilder.AppendFormat("{0:x2}", b);
-        //        }
-        //    }
-
-        //    user.Logout(null);
-        //    user.LoginWithOtherPlatform(
-        //        PlatformType.Steam,
-        //        stringBuilder.ToString(),
-        //        result => { loginSteamResult = result; });
-
-        //    while (loginSteamResult == null)
-        //    {
-        //        Thread.Sleep(100);
-
-        //        yield return null;
-        //    }
-
-        //    TestHelper.LogResult(loginSteamResult, "Login With Steam");
-        //    string steamUserId = user.Session.UserId;
-        //    string oldAccessToken = user.Session.SessionId;
-
-        //    Result sendCodeResult = null;
-
-        //    user.SendUpgradeVerificationCode(email, result => sendCodeResult = result);
-
-        //    while (sendCodeResult == null)
-        //    {
-        //        Thread.Sleep(100);
-
-        //        yield return null;
-        //    }
-
-        //    TestHelper.LogResult(sendCodeResult, "Send verification code to email");
-
-        //    Debug.Log("Getting email messages with POP client");
-        //    var verificationCode = GetEmailVerificationCode(email);
-
-        //    user.UpgradeAndVerify(email, Password, verificationCode, result => { upgradeResult = result; });
-
-        //    while (upgradeResult == null)
-        //    {
-        //        Thread.Sleep(100);
-
-        //        yield return null;
-        //    }
-
-        //    TestHelper.LogResult(upgradeResult, "Upgrade Headless Count");
-
-        //    user.Logout(null);
-
-        //    user.LoginWithUserName(email, Password, result => { loginWithEmailResult = result; });
-
-        //    while (loginWithEmailResult == null) { yield return new WaitForSeconds(0.1f); }
-
-        //    TestHelper.LogResult(loginWithEmailResult, "Login With Email");
-        //    string upgradedUserId = user.Session.UserId;
-        //    string refreshedAccessToken = user.Session.SessionId;
-
-        //    helper.DeleteUser(email, Password, result => { deleteResult = result; });
-
-        //    while (deleteResult == null)
-        //    {
-        //        Thread.Sleep(100);
-
-        //        yield return null;
-        //    }
-
-        //    TestHelper.LogResult(deleteResult, "Delete User");
-
-        //    user.Logout(null);
-
-        //    TestHelper.Assert.That(steamUserId == upgradedUserId && steamUserId.Length > 0);
-        //    TestHelper.Assert.That(
-        //            refreshedAccessToken,
-        //            Is.Not.EqualTo(oldAccessToken),
-        //            "Access token isn't refreshed after username and password added to the user's account.");
-        //    TestHelper.Assert.That(!deleteResult.IsError);
-        //    Debug.Log("============================================");
-        //}
 
         [UnityTest, Timeout(150000)]
         public IEnumerator UpgradeDeviceAccount_ThenLoginWithEmail_Successful()
