@@ -64,10 +64,10 @@ namespace AccelByte.Core
                     {
                         if (error.errorCode == 0)
                         {
-                            return Result.CreateError((ErrorCode)response.Code);
+                            return Result.CreateError((ErrorCode) response.Code);
                         }
 
-                        return Result.CreateError((ErrorCode)error.errorCode, error.errorMessage);
+                        return Result.CreateError((ErrorCode) error.errorCode, error.errorMessage);
                     }
 
                     return Result.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);
@@ -113,7 +113,6 @@ namespace AccelByte.Core
             }
 
             string message;
-            string responseText = System.Text.Encoding.UTF8.GetString(response.BodyBytes);
 
             switch (response.Code)
             {
@@ -122,7 +121,7 @@ namespace AccelByte.Core
 
                 try
                 {
-                    var createResponse = responseText.ToObject<T>();
+                    var createResponse = response.BodyBytes.ToObject<T>();
 
                     return Result<T>.CreateOk(createResponse);
                 }
@@ -166,22 +165,23 @@ namespace AccelByte.Core
             case (long) HttpStatusCode.RequestedRangeNotSatisfiable:
             case (long) HttpStatusCode.ExpectationFailed:
 
-                if (string.IsNullOrEmpty(responseText))
+                if (response.BodyBytes == null)
                 {
                     return Result<T>.CreateError((ErrorCode) response.Code);
                 }
 
                 try
                 {
-                    var error = responseText.ToObject<ServiceError>();
+                    var error = response.BodyBytes.ToObject<ServiceError>();
 
                     if (error.numericErrorCode == 0)
                     {
                         if (error.errorCode == 0)
                         {
-                            return Result<T>.CreateError((ErrorCode)response.Code);
+                            return Result<T>.CreateError((ErrorCode) response.Code);
                         }
-                        return Result<T>.CreateError((ErrorCode)error.errorCode, error.errorMessage);
+
+                        return Result<T>.CreateError((ErrorCode) error.errorCode, error.errorMessage);
                     }
 
                     return Result<T>.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);
@@ -193,7 +193,7 @@ namespace AccelByte.Core
 
                 try
                 {
-                    var err = responseText.ToObject<OAuthError>();
+                    var err = response.BodyBytes.ToObject<OAuthError>();
                     message = err.error + ": " + err.error_description;
 
                     return Result<T>.CreateError((ErrorCode) response.Code, message);
@@ -206,14 +206,17 @@ namespace AccelByte.Core
                 return Result<T>.CreateError((ErrorCode) response.Code);
 
             default:
+                string body = System.Text.Encoding.UTF8.GetString(response.BodyBytes);
 
-                if (!string.IsNullOrEmpty(responseText))
+                if (response.BodyBytes != null)
                 {
-                    return Result<T>.CreateError((ErrorCode) response.Code, "Unknown Service Error: " + responseText);
+                    return Result<T>.CreateError((ErrorCode) response.Code, "Unknown Service Error: " + body);
                 }
                 else
                 {
-                    return Result<T>.CreateError((ErrorCode) response.Code);
+                    return Result<T>.CreateError(
+                        (ErrorCode) response.Code,
+                        "Unknown Service Error With Code: " + response.Code);
                 }
             }
         }

@@ -90,6 +90,10 @@ namespace AccelByte.Api
                 {
                     queries.Add("size", Convert.ToString(criteria.Size));
                 }
+                if(criteria.SortBy != null)
+                {
+                    queries.Add("sortBy", criteria.SortBy);
+                }
             }
 
             var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/byCriteria")

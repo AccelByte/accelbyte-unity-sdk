@@ -44,11 +44,9 @@ namespace AccelByte.Core
         //AccelByte Launcher error codes (20 - 99)
 
         //AccelByte E-Commerce error codes (1000 - 5000)
-        ValidationError = 2002,
         OptimisticLock = 2006,
         NamespaceNotFound = 2141,
         UserProfileNotFound = 2241,
-        EmailAlreadyUsed = 2272,
         CategoryNotFound = 30241,
         ItemNotFound = 30341,
         StoreNotFound = 3043,
@@ -88,6 +86,18 @@ namespace AccelByte.Core
         MessageFieldConversionFailed = 14018,
         MessageCannotBeSent = 14019,
         MessageTypeNotSupported = 14020,
+        
+        UserUnderage = 10130,
+        EmailAlreadyUsed = 10133,
+        CountryNotFound = 10154,
+        
+        UnauthorizedAccess = 20001,
+        ValidationError = 20002,
+        TooManyRequests = 20001,
+        UserNotFound = 20008,
+        TokenIsNotUserToken = 20022,
+        UnableToParseRequestBody = 20019,
+        
     }
 
     public class Error

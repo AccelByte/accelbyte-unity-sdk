@@ -85,7 +85,7 @@ namespace AccelByte.Api
                     yield break;
                 }
 
-                this.sessionAdapter.UserId = this.userDataCache.UserId;
+                this.sessionAdapter.UserId = this.userDataCache.userId;
             }
             else
             {
@@ -172,21 +172,21 @@ namespace AccelByte.Api
         /// <summary>
         /// Register a user by giving username, password, and displayName 
         /// </summary>
-        /// <param name="userName">Username to identify (and verify) user with (email or phone)</param>
+        /// <param name="emailAddress">Email address of the user</param>
         /// <param name="password">Password to login</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Usernam</param>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void Register(string userName, string password, string displayName, string country, DateTime dateOfBirth,
-            ResultCallback<UserData> callback)
+        public void Register(string emailAddress, string password, string displayName, string country, DateTime dateOfBirth,
+            ResultCallback<RegisterUserResponse> callback)
         {
             var registerUserRequest = new RegisterUserRequest
             {
-                AuthType = AuthenticationType.EMAILPASSWD, //Right now, it's hardcoded to email
-                Username = userName,
-                Password = password,
-                DisplayName = displayName,
-                Country = country,
-                DateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
+                authType = AuthenticationType.EMAILPASSWD,
+                emailAddress = emailAddress,
+                password = password,
+                displayName = displayName,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
             this.coroutineRunner.Run(this.userAccount.Register(registerUserRequest, callback));
@@ -319,7 +319,7 @@ namespace AccelByte.Api
 
             yield return this.userAccount.SendVerificationCode(
                 VerificationContext.UserAccountRegistration,
-                this.userDataCache.LoginId,
+                this.userDataCache.emailAddress,
                 callback);
         }
 
@@ -330,15 +330,6 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void Verify(string verificationCode, ResultCallback callback)
         {
-            if (!this.sessionAdapter.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-
-                return;
-            }
-
-            //TODO: Hard-coded contact type, if phone is activated in the future, we should add UserName to User
-            //class and determine whether it's email or phone by regex.
             this.coroutineRunner.Run(this.userAccount.Verify(verificationCode, "email", callback));
         }
 
@@ -407,7 +398,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="callback">Returns a Result that contains PlatformLink array via callback when
         /// completed.</param>
-        public void GetPlatformLinks(ResultCallback<PlatformLink[]> callback)
+        public void GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback)
         {
             if (!this.sessionAdapter.IsValid())
             {
@@ -426,11 +417,11 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by login id or email
+        /// Get user data from another user by email
         /// </summary>
-        /// <param name="loginId"> email or login id that needed to get user data</param>
+        /// <param name="emailAddress"> email or login id that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void GetUserByLoginId(string loginId, ResultCallback<UserData> callback)
+        public void GetUserByEmailAddress(string emailAddress, ResultCallback<PagedPublicUsersInfo> callback)
         {
             if (!this.sessionAdapter.IsValid())
             {
@@ -439,7 +430,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetUserByLoginId(loginId, callback));
+            this.coroutineRunner.Run(this.userAccount.GetUserByEmailAddress(emailAddress, callback));
         }
 
         /// <summary>

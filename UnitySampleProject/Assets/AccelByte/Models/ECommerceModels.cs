@@ -7,16 +7,6 @@ using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
-    #region General
-
-    [DataContract]
-    public class Paging
-    {
-        [DataMember] public string previous { get; set; }
-        [DataMember] public string next { get; set; }
-    }
-
-    #endregion
 
     #region Wallet
 
@@ -181,6 +171,7 @@ namespace AccelByte.Models
         [DataMember] public ItemStatus ItemStatus { get; set; }
         [DataMember] public int? Page { get; set; }
         [DataMember] public int? Size { get; set; }
+        [DataMember] public string SortBy { get; set; }
     }
 
     [DataContract]

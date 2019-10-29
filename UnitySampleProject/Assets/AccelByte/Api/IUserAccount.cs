@@ -8,7 +8,7 @@ using AccelByte.Models;
 
 namespace AccelByte.Api {
     internal interface IUserAccount {
-        IEnumerator Register(RegisterUserRequest registerUserRequest, ResultCallback<UserData> callback);
+        IEnumerator Register(RegisterUserRequest registerUserRequest, ResultCallback<RegisterUserResponse> callback);
         IEnumerator GetData(ResultCallback<UserData> callback);
 
         IEnumerator Update(UpdateUserRequest updateUserRequest,
@@ -30,9 +30,9 @@ namespace AccelByte.Api {
             ResultCallback callback);
 
         IEnumerator UnlinkOtherPlatform(string platformId, ResultCallback callback);
-        IEnumerator GetPlatformLinks(ResultCallback<PlatformLink[]> callback);
+        IEnumerator GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback);
 
-        IEnumerator GetUserByLoginId(string loginId, ResultCallback<UserData> callback);
+        IEnumerator GetUserByEmailAddress(string emailAdress, ResultCallback<PagedPublicUsersInfo> callback);
 
         IEnumerator GetUserByUserId(string userId, ResultCallback<UserData> callback);
     }

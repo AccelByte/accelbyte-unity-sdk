@@ -21,7 +21,7 @@ namespace AccelByte.Core {
         {
             return JsonSerializer.Deserialize<T>(data);
         }
-
+        
         public static T ToObject<T>(this byte[] data)
         {
             return JsonSerializer.Deserialize<T>(data);
