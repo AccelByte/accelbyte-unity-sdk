@@ -1,3 +1,12 @@
+# Release [v2.3.0]
+**[2019-10-15]**
+
+## What's new in this release?
+* IAM API breaking change. Now, when you call these functions, it will be compile error and needs to be fixed manually:
+  * AccelBytePlugin.GetUser().Register()
+  * AccelBytePlugin.GetUser().GetPlatformLinks()
+  * AccelBytePlugin.GetUser().GetUserByLoginId() -> renamed to AccelBytePlugin.GetUser().GetUserByEmailAddress()
+
 # Release [v2.0.0]
 **[2019-08-19]**
 

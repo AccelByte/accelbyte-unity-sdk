@@ -30,55 +30,28 @@ namespace AccelByte.Api
             this.httpWorker = httpWorker;
         }
 
-        public IEnumerator Register(RegisterUserRequest registerUserRequest, ResultCallback<UserData> callback)
+        public IEnumerator Register(RegisterUserRequest registerUserRequest,
+            ResultCallback<RegisterUserResponse> callback)
         {
-            Assert.IsNotNull(registerUserRequest, "Can't create user! Info parameter is null!");
-
-            string jsonInfo = string.Format(
-                "{{" +
-                "\"AuthType\": \"{0}\"," +
-                "\"DisplayName\": \"{1}\"," +
-                "\"LoginId\": \"{2}\"," +
-                "\"Password\": \"{3}\"," +
-                "\"Country\": \"{4}\"," +
-                "\"DateOfBirth\": \"{5}\"" +
-                "}}",
-                registerUserRequest.AuthType,
-                registerUserRequest.DisplayName,
-                registerUserRequest.Username,
-                registerUserRequest.Password,
-                registerUserRequest.Country,
-                registerUserRequest.DateOfBirth);
+            Assert.IsNotNull(registerUserRequest, "Register failed. registerUserRequest is null!");
 
             var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", this.@namespace)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(jsonInfo)
+                .WithBody(registerUserRequest.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = response.TryParseJson<UserData>();
+            var result = response.TryParseJson<RegisterUserResponse>();
             callback.Try(result);
         }
 
         public IEnumerator GetData(ResultCallback<UserData> callback)
         {
-            string relativeUrl;
-
-            if (this.session.UserId == "me")
-            {
-                relativeUrl = "/v2/public/users/{userId}";
-            }
-            else
-            {
-                relativeUrl = "/v2/public/namespaces/{namespace}/users/{userId}";
-            }
-        
-            var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + relativeUrl)
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v3/public/users/me")
                 .WithPathParam("namespace", this.@namespace)
                 .WithPathParam("userId", this.session.UserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
@@ -95,23 +68,10 @@ namespace AccelByte.Api
 
         public IEnumerator Update(UpdateUserRequest updateUserRequest, ResultCallback<UserData> callback)
         {
-            Assert.IsNotNull(updateUserRequest, "Can't update user! Request parameter is null!");
+            Assert.IsNotNull(updateUserRequest, "Update failed. updateUserRequest is null!");
 
-            string relativeUrl;
-
-            if (this.session.UserId == "me")
-            {
-                relativeUrl = "/v2/public/users/{userId}";
-            }
-            else
-            {
-                relativeUrl = "/v2/public/namespaces/{namespace}/users/{userId}";
-            }
-
-            var request = HttpRequestBuilder
-                .CreatePatch(this.baseUrl + relativeUrl)
+            var request = HttpRequestBuilder.CreatePatch(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(updateUserRequest.ToUtf8Json())
@@ -132,12 +92,11 @@ namespace AccelByte.Api
             Assert.IsNotNull(password, "Can't upgrade headless account! Password parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/headless/verify")
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/headless/verify")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"LoginID\": \"{0}\", \"Password\": \"{1}\"}}", username, password))
+                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"password\": \"{1}\"}}", username, password))
                 .GetResult();
 
             IHttpResponse response = null;
@@ -148,17 +107,16 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator SendVerificationCode(VerificationContext context, string username, ResultCallback callback)
+        public IEnumerator SendVerificationCode(VerificationContext context, string emailAddress,
+            ResultCallback callback)
         {
-            Assert.IsNotNull(username, "Can't send verification code! Username parameter is null!");
+            Assert.IsNotNull(emailAddress, "Can't send verification code! Username parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/code/request")
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/code/request")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
-                .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"LoginID\": \"{0}\", \"Context\": \"{1:G}\"}}", username, context))
+                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"context\": \"{1:G}\"}}", emailAddress, context))
                 .GetResult();
 
             IHttpResponse response = null;
@@ -175,14 +133,13 @@ namespace AccelByte.Api
             Assert.IsNotNull(contactType, "Can't post verification code! ContactType parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/code/verify")
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/code/verify")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(
                     string.Format(
-                        "{{" + "\"Code\": \"{0}\", " + "\"ContactType\": \"{1}\"" + "}}",
+                        "{{" + "\"code\": \"{0}\", " + "\"contactType\": \"{1}\"" + "}}",
                         verificationCode,
                         contactType))
                 .GetResult();
@@ -195,15 +152,14 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator SendPasswordResetCode(string username, ResultCallback callback)
+        public IEnumerator SendPasswordResetCode(string emailAddress, ResultCallback callback)
         {
-            Assert.IsNotNull(username, "Can't request reset password code! LoginId parameter is null!");
+            Assert.IsNotNull(emailAddress, "Can't request reset password code! emailAddress parameter is null!");
 
-            var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v2/public/namespaces/{namespace}/users/forgotPassword")
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/forgot")
                 .WithPathParam("namespace", this.@namespace)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"LoginID\": \"{0}\"}}", username))
+                .WithBody(string.Format("{{\"emailAddress\": \"{0}\"}}", emailAddress))
                 .GetResult();
 
             IHttpResponse response = null;
@@ -214,16 +170,16 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator ResetPassword(string resetCode, string userName, string newPassword, ResultCallback callback)
+        public IEnumerator ResetPassword(string resetCode, string emailAddress, string newPassword,
+            ResultCallback callback)
         {
             string jsonResetRequest = string.Format(
-                "{{" + "\"Code\": \"{0}\"," + "\"LoginID\": \"{1}\"," + "\"NewPassword\": \"{2}\"" + "}}",
+                "{{" + "\"code\": \"{0}\"," + "\"emailAddress\": \"{1}\"," + "\"newPassword\": \"{2}\"" + "}}",
                 resetCode,
-                userName,
+                emailAddress,
                 newPassword);
 
-            var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v2/public/namespaces/{namespace}/users/resetPassword")
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/reset")
                 .WithPathParam("namespace", this.@namespace)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(jsonResetRequest)
@@ -243,10 +199,8 @@ namespace AccelByte.Api
             Assert.IsNotNull(ticket, "Can't link platform account! Password parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(
-                    this.baseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/platforms/{platformId}/link")
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithPathParam("platformId", platformId)
                 .WithFormParam("ticket", ticket)
                 .WithBearerAuth(this.session.AuthorizationToken)
@@ -267,10 +221,8 @@ namespace AccelByte.Api
             Assert.IsNotNull(platformId, "Can't unlink platfrom account! Email parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateDelete(
-                    this.baseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/platforms/{platformId}/link")
+                .CreateDelete(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithPathParam("platformId", platformId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.TextPlain)
@@ -284,7 +236,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetPlatformLinks(ResultCallback<PlatformLink[]> callback)
+        public IEnumerator GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback)
         {
             var request = HttpRequestBuilder
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/platforms")
@@ -299,28 +251,27 @@ namespace AccelByte.Api
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = response.TryParseJson<PlatformLink[]>();
+            var result = response.TryParseJson<PagedPlatformLinks>();
             callback.Try(result);
         }
 
-        public IEnumerator GetUserByLoginId(string loginId, ResultCallback<UserData> callback)
+        public IEnumerator GetUserByEmailAddress(string emailAdress, ResultCallback<PagedPublicUsersInfo> callback)
         {
-            Assert.IsNotNull(loginId, "Can't get user data! loginId parameter is null!");
+            Assert.IsNotNull(emailAdress, "Can't get user data! loginId parameter is null!");
 
-            var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/namespaces/{namespace}/users/byLoginId")
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", this.@namespace)
+                .WithQueryParam("query", emailAdress)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithQueryParam("loginId", loginId)
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<UserData> result = response.TryParseJson<UserData>();
+            Result<PagedPublicUsersInfo> result = response.TryParseJson<PagedPublicUsersInfo>();
             callback.Try(result);
         }
 
@@ -329,7 +280,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(userId, "Can't get user data! userId parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/namespaces/{namespace}/users/{userId}")
+                .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}")
                 .WithPathParam("namespace", this.@namespace)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(this.session.AuthorizationToken)

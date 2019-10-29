@@ -1,4 +1,4 @@
-# AccelByte Unity SDK v2.1.0
+# AccelByte Unity SDK v2.0.0
 
 ## Dependencies
 
