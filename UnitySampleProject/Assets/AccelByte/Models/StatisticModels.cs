@@ -44,6 +44,7 @@ namespace AccelByte.Models
         [DataMember] public string profileId { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public string statName { get; set; }
+        [DataMember] public string[] tags { get; set; }
         [DataMember] public string updatedAt { get; set; }
         [DataMember] public float value { get; set; }
     }

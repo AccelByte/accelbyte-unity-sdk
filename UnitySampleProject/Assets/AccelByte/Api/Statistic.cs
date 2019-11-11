@@ -30,11 +30,10 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get All StatItems of specified profile
+        /// Get All StatItems of specified user
         /// </summary>
-        /// <param name="profileId">User's profileId that about to get</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
-        public void GetAllStatItems(string profileId, ResultCallback<StatItemPagingSlicedResult> callback)
+        public void GetAllUserStatItems(ResultCallback<StatItemPagingSlicedResult> callback)
         {
             if (!this.session.IsValid())
             {
@@ -44,16 +43,15 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.GetAllStatItems(this.@namespace, this.session.UserId, profileId, this.session.AuthorizationToken, callback));
+                this.api.GetUserStatItems(this.@namespace, this.session.UserId, this.session.AuthorizationToken, null, null, callback));
         }
 
         /// <summary>
-        /// Get All StatItems of specified profile search by statCode(s)
+        /// Get All StatItems of specified user search by statCode(s)
         /// </summary>
-        /// <param name="profileId">ProfileId that about to get</param>
         /// <param name="statCodes">One or more statCode(s) that about to get</param>
         /// <param name="callback">Returns an array of statItemInfo via callback when completed</param>
-        public void GetStatItemsByStatCodes(string profileId, ICollection<string> statCodes, ResultCallback<StatItemInfo[]> callback)
+        public void GetUserStatItemsByStatCodes(ICollection<string> statCodes, ResultCallback<StatItemPagingSlicedResult> callback)
         {
             if (!this.session.IsValid())
             {
@@ -63,7 +61,25 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.GetStatItemsByStatCodes(this.@namespace, this.session.UserId, profileId, this.session.AuthorizationToken, statCodes, callback));
+                this.api.GetUserStatItems(this.@namespace, this.session.UserId, this.session.AuthorizationToken, statCodes, null, callback));
+        }
+
+        /// <summary>
+        /// Get All StatItems of specified user search by tag(s)
+        /// </summary>
+        /// <param name="tag">One or more tag(s) that about to get</param>
+        /// <param name="callback">Returns an array of statItemInfo via callback when completed</param>
+        public void GetUserStatItemsByTags(ICollection<string> tags, ResultCallback<StatItemPagingSlicedResult> callback)
+        {
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserStatItems(this.@namespace, this.session.UserId, this.session.AuthorizationToken, null, tags, callback));
         }
 
         /// <summary>
@@ -85,12 +101,11 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Bulk update statItem(s) by userId, profileId, and statCode
+        /// Bulk update statItem(s) by userId, and statCode
         /// </summary>
-        /// <param name="profileId">ProfileId to update</param>
         /// <param name="data">Consist of one or more statCode and value to update</param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void BulkAddUserStatItemValue(string profileId, BulkStatItemInc[] data, ResultCallback<BulkStatItemOperationResult[]> callback)
+        public void BulkAddUserStatItemValue(BulkStatItemInc[] data, ResultCallback<BulkStatItemOperationResult[]> callback)
         {
             if (!this.session.IsValid())
             {
@@ -100,17 +115,16 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.BulkAddUserStatItemValue(this.@namespace, this.session.UserId, profileId, data, this.session.AuthorizationToken, callback));
+                this.api.BulkAddUserStatItemValue(this.@namespace, this.session.UserId, data, this.session.AuthorizationToken, callback));
         }
 
         /// <summary>
-        /// Update a statItem from specific userId, profileId, and statCode
+        /// Update a statItem from specific userId and statCode
         /// </summary>
-        /// <param name="profileId">ProfileId to update</param>
         /// <param name="statCode">StatCode to update</param>
         /// <param name="inc">Value to be added to the statItem</param>
         /// <param name="callback">Returns an array of StatItemIncResult via callback when completed</param>
-        public void AddUserStatItemValue(string profileId, string statCode, float inc, ResultCallback<StatItemIncResult> callback)
+        public void AddUserStatItemValue(string statCode, float inc, ResultCallback<StatItemIncResult> callback)
         {
             if (!this.session.IsValid())
             {
@@ -120,7 +134,7 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.AddUserStatItemValue(this.@namespace, this.session.UserId, profileId, statCode, inc, this.session.AuthorizationToken, callback));
+                this.api.AddUserStatItemValue(this.@namespace, this.session.UserId, statCode, inc, this.session.AuthorizationToken, callback));
         }
     }
 }

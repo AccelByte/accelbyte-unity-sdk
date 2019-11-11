@@ -1,19 +1,4 @@
-# AccelByte Unity SDK v2.3.0
-
-## Dependencies
-
-AccelByte SDK is compatible with these AccelByte backend services:
-
-| Service              | Version              |
-|----------------------|----------------------|
-| IAM                  | v3.1                 |
-| Platform/E-Commerce  | v1.8                 |
-| Basic                | v1.0                 |
-| cloudstorage-service | v0.3.4               |
-| lobby-server         | v1.0.13              |
-| telemetry-service    | v1.0.4               |
-| soc-profile-service  | v0.1.5               |
-| statistic-service    | v0.8.2               |
+# AccelByte Unity SDK
 
 ## Getting Started
 

@@ -30,7 +30,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(userAccessToken, "Can't get user profile! UserAccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/profiles")
+                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(userAccessToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -56,7 +56,7 @@ namespace AccelByte.Api
                 "Can't create user profile! CreateRequest.language parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/me/profiles")
+                .CreatePost(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(userAccessToken)
                 .WithContentType(MediaType.ApplicationJson)
@@ -81,7 +81,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(updateRequest, "Can't update user profile! ProfileRequest parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/me/profiles")
+                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(userAccessToken)
                 .WithContentType(MediaType.ApplicationJson)
@@ -105,7 +105,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(userAccessToken, "Can't get user profile public info! UserAccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{user_id}/profiles/public")
+                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{user_id}/profiles/public")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("user_id", userId)
                 .WithBearerAuth(userAccessToken)
@@ -130,7 +130,7 @@ namespace AccelByte.Api
 
             Assert.IsNotNull(userIds, "Can't get user profile info by ids! userIds parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/profiles/public")
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/profiles/public")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(userAccessToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -151,7 +151,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(@namespace, "Can't get time zones! Namespace parameter is null!");
             Assert.IsNotNull(userAccessToken, "Can't get time zones! UserAccessToken parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/misc/timezones")
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/misc/timezones")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(userAccessToken)
                 .Accepts(MediaType.ApplicationJson)

@@ -23,24 +23,33 @@ namespace AccelByte.Api
             this.httpWorker = httpWorker;
         }
 
-        public IEnumerator GetAllStatItems(string @namespace, string userId, string profileId, string accessToken,
-            ResultCallback<StatItemPagingSlicedResult> callback)
+        public IEnumerator GetUserStatItems(string @namespace, string userId,
+            string accessToken, ICollection<string> statCodes, ICollection<string> tags, ResultCallback<StatItemPagingSlicedResult> callback)
         {
-            Assert.IsNotNull(@namespace, "Can't get all stat items! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get all stat items! userIds parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get all stat items! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't get all stat items! profileId parameter is null!");
+            Assert.IsNotNull(@namespace, "Can't get stat items! namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't get stat items! userIds parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't get stat items! accessToken parameter is null!");
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreateGet(
-                    this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/statitems")
+                    this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
-                .WithPathParam("profileId", profileId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
+
+            if (statCodes != null)
+            {
+                builder.WithQueryParam("statCodes", statCodes);
+            }
+
+            if (tags != null)
+            {
+                builder.WithQueryParam("tags", tags);
+            }
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 
@@ -51,43 +60,13 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetStatItemsByStatCodes(string @namespace, string userId, string profileId,
-            string accessToken, ICollection<string> statCodes, ResultCallback<StatItemInfo[]> callback)
-        {
-            Assert.IsNotNull(@namespace, "Can't get stat items! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get stat items! userIds parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get stat items! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't get stat items! profileId parameter is null!");
-
-            var request = HttpRequestBuilder
-                .CreateGet(
-                    this.baseUrl +
-                    "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/statitems/byStatCodes")
-                .WithPathParam("namespace", @namespace)
-                .WithPathParam("userId", userId)
-                .WithPathParam("profileId", profileId)
-                .WithQueryParam("statCodes", statCodes)
-                .WithBearerAuth(accessToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParseJson<StatItemInfo[]>();
-
-            callback.Try(result);
-        }
-
         public IEnumerator BulkAddStatItemValue(string @namespace, BulkUserStatItemInc[] data, string accessToken, ResultCallback<BulkStatItemOperationResult[]> callback)
         {
             Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/statitems/bulk/inc")
+                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/statitems/value/bulk")
                 .WithPathParam("namespace", @namespace)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
@@ -104,18 +83,16 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator BulkAddUserStatItemValue(string @namespace, string userId, string profileId, BulkStatItemInc[] data, string accessToken, ResultCallback<BulkStatItemOperationResult[]> callback)
+        public IEnumerator BulkAddUserStatItemValue(string @namespace, string userId, BulkStatItemInc[] data, string accessToken, ResultCallback<BulkStatItemOperationResult[]> callback)
         {
             Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
-            Assert.IsNotNull(profileId, "Can't add stat item value! profileId parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/statitems/bulk/inc")
+                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
-                .WithPathParam("profileId", profileId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
@@ -131,12 +108,11 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator AddUserStatItemValue(string @namespace, string userId, string profileId, string statCode, float inc, string accessToken, ResultCallback<StatItemIncResult> callback)
+        public IEnumerator AddUserStatItemValue(string @namespace, string userId, string statCode, float inc, string accessToken, ResultCallback<StatItemIncResult> callback)
         {
             Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
-            Assert.IsNotNull(profileId, "Can't add stat item value! profileId parameter is null!");
             Assert.IsNotNull(statCode, "Can't add stat item value! statCode parameter is null!");
 
             string jsonInfo = string.Format(
@@ -146,10 +122,9 @@ namespace AccelByte.Api
                 inc);
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/stats/{statCode}/statitems/inc")
+                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems/value")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
-                .WithPathParam("profileId", profileId)
                 .WithPathParam("statCode", statCode)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)

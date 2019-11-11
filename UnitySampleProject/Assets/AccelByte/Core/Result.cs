@@ -41,6 +41,14 @@ namespace AccelByte.Core
         GatewayTimeout = 504,
         HttpVersionNotSupported = 505,
 
+        //AccelByte Global Service error codes (20000 - 20022)
+        UnauthorizedAccess = 20001,
+        ValidationError = 20002,
+        TooManyRequests = 20001,
+        UserNotFound = 20008,
+        TokenIsNotUserToken = 20022,
+        UnableToParseRequestBody = 20019,
+
         //AccelByte Launcher error codes (20 - 99)
 
         //AccelByte E-Commerce error codes (1000 - 5000)
@@ -62,7 +70,12 @@ namespace AccelByte.Core
         PublisherStoreNotExist = 30142,
 
         //AccelByte Statistic error codes
-        StatisticNotFound = 12241,
+        StatisticNotFound = 70131,
+        InvalidStatOperator = 70330,
+        StatNotDecreasable = 70334,
+        UserStatsNotFound = 70335,
+        UserStatAlreadyExist = 70336,
+        StatValueOutOfRange = 70337,
 
         //Client side error codes
         GeneralClientError = 14000,
@@ -90,13 +103,6 @@ namespace AccelByte.Core
         UserUnderage = 10130,
         EmailAlreadyUsed = 10133,
         CountryNotFound = 10154,
-        
-        UnauthorizedAccess = 20001,
-        ValidationError = 20002,
-        TooManyRequests = 20001,
-        UserNotFound = 20008,
-        TokenIsNotUserToken = 20022,
-        UnableToParseRequestBody = 20019,
         
     }
 

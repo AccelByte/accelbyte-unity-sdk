@@ -1,3 +1,10 @@
+# Release [v2.4.0]
+**[2019-11-11]**
+
+## What's new in this release?
+* UserProfiles API standardization
+* Statistic API standardization
+
 # Release [v2.3.0]
 **[2019-10-15]**
 
