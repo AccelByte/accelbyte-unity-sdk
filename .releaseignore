@@ -1,0 +1,8 @@
+archive.ps1
+build.log
+build.ps1
+jenkinsfile
+package.ps1
+testResult.xml
+upload.ps1
+UnitySampleProject/Assets/Tests
