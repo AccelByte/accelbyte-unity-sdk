@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,7 +10,8 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 using Debug = UnityEngine.Debug;
 using System.Threading;
-using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Tests.IntegrationTests
 {
@@ -18,9 +19,16 @@ namespace Tests.IntegrationTests
     public class StatisticTest
     {
         private Statistic statistic = null;
-        private TestHelper helper = new TestHelper();
-        private string accessToken = null;
+        private readonly TestHelper helper = new TestHelper();
+        private string helperAccessToken = null;
         private User user;
+
+        private readonly string[] statCodes =
+        {
+            "client-unity-1", "client-unity-2", "client-unity-3", "client-unity-4", "client-unity-5", "client-unity-6"
+        };
+
+        private readonly string[] tags = { "client_tag_1", "client_tag_1", "client_tag_2", "client_tag_2", "client_tag_3", "client_tag_3" };
 
         [UnityTest, Order(0)]
         public IEnumerator Setup()
@@ -38,13 +46,11 @@ namespace Tests.IntegrationTests
             }
 
             Debug.Log(this.user.Session.UserId);
-            Assert.That(!loginWithDevice.IsError);
-
-            statistic = AccelBytePlugin.GetStatistic();
+            this.statistic = AccelBytePlugin.GetStatistic();
 
             //Get AccessToken
             Result<TokenData> GetAccessToken = null;
-            helper.GetAccessToken(result => { GetAccessToken = result; });
+            this.helper.GetAccessToken(result => { GetAccessToken = result; });
 
             while (GetAccessToken == null)
             {
@@ -53,231 +59,410 @@ namespace Tests.IntegrationTests
                 yield return null;
             }
 
-            accessToken = GetAccessToken.Value.access_token;
+            this.helperAccessToken = GetAccessToken.Value.access_token;
 
-            //Get Stat
-            bool StatIsExist = false;
-            Result<StatInfo> GetStatResult = null;
-            helper.GetStatByStatCode("SDKTEST", accessToken, result => { GetStatResult = result; });
-
-            while(GetStatResult == null)
+            for (int i = 0; i < this.statCodes.Length - 1; i++)
             {
-                Thread.Sleep(100);
-                yield return null;
-            }
-
-            TestHelper.LogResult(GetStatResult, "Get Stat.");
-            if (GetStatResult.IsError)
-            {
-                Debug.Log("Fail to get Stat!");
-                if (GetStatResult.Error.Code == ErrorCode.StatisticNotFound)
+                Debug.Log("Start to create stat! " + this.statCodes[i]);
+                Result<StatConfig> createStatResult = null;
+                TestHelper.StatCreateModel createStat = new TestHelper.StatCreateModel
                 {
-                    Debug.Log("Start to create stat!");
-                    Result<StatInfo> CreateStatResult = null;
-                    TestHelper.StatCreateModel createStat = new TestHelper.StatCreateModel
-                    {
-                        defaultValue = 0,
-                        description = "Stat for SDK Test",
-                        incrementOnly = true,
-                        maximum = 999999,
-                        minimum = 0,
-                        name = "SDKTEST",
-                        setAsGlobal = true,
-                        setBy = StatisticSetBy.CLIENT,
-                        statCode = "SDKTEST",
-                        tags = new string[] {"SDKTEST"}
-                    };
-                    helper.createStat(accessToken, createStat, result => { CreateStatResult = result; });
+                    defaultValue = 0,
+                    description = "Stat for SDK Test",
+                    incrementOnly = true,
+                    maximum = 999999,
+                    minimum = 0,
+                    name = this.statCodes[i],
+                    setAsGlobal = false,
+                    setBy = StatisticSetBy.CLIENT,
+                    statCode = this.statCodes[i],
+                    tags = new[] {this.tags[i]}
+                };
 
-                    while (CreateStatResult == null)
-                    {
-                        Thread.Sleep(100);
-                        yield return null;
-                    }
-                    if (!CreateStatResult.IsError)
-                    {
-                        Debug.Log("Stat Created!");
-                        StatIsExist = true;
-                    }
-                    TestHelper.LogResult(CreateStatResult, "Stat Creation.");
+                this.helper.CreateStatConfig(
+                    this.helperAccessToken,
+                    createStat,
+                    result => { createStatResult = result; });
+
+                while (createStatResult == null)
+                {
+                    yield return new WaitForSeconds(0.1f);
                 }
             }
-            else {
-                StatIsExist = true;
-            }
-            Assert.IsTrue(StatIsExist);
 
-            bool UserStatItemIsExist = false;
-            Result<StatItemPagingSlicedResult> GetStatItemResult = null;
-            statistic.GetUserStatItemsByStatCodes(new string[] { "SDKTEST" }, result => { GetStatItemResult = result; });
-            while (GetStatItemResult == null)
+            Debug.Log("Start to create stat! " + this.statCodes[5]);
+            Result<StatConfig> createStat6Result = null;
+            TestHelper.StatCreateModel createStat6 = new TestHelper.StatCreateModel
             {
-                Thread.Sleep(100);
-                yield return null;
-            }
-            if (GetStatItemResult.Value.data.Length == 0)
+                defaultValue = 0,
+                description = "Stat for SDK Test",
+                incrementOnly = false,
+                maximum = 999999,
+                minimum = 0,
+                name = this.statCodes[5],
+                setAsGlobal = false,
+                setBy = StatisticSetBy.CLIENT,
+                statCode = this.statCodes[5],
+                tags = new[] { this.tags[5] }
+            };
+
+            this.helper.CreateStatConfig(
+                this.helperAccessToken,
+                createStat6,
+                result => { createStat6Result = result; });
+
+            while (createStat6Result == null)
             {
-                Result<BulkStatItemOperationResult[]> CreateStatItemResult = null;
-                helper.BulkCreateUserStatItem(user.Session.UserId, new string[] { "SDKTEST" }, accessToken, result => { CreateStatItemResult = result; });
-                while (CreateStatItemResult == null)
-                {
-                    Thread.Sleep(100);
-                    yield return null;
-                }
-                if (!CreateStatItemResult.IsError)
-                {
-                    UserStatItemIsExist = true;
-                }
+                yield return new WaitForSeconds(0.1f);
             }
-            else
-            {
-                UserStatItemIsExist = true;
-            }
-            Assert.IsTrue(UserStatItemIsExist);
         }
 
-        [UnityTest, Order(1)]
-        public IEnumerator GetAllUserStatItems()
+        [UnityTest, Order(1), Timeout(10000)]
+        public IEnumerator CreateUserStatItems_ValidStatConfig_StatItemCreated()
         {
-            Result<StatItemPagingSlicedResult> getAllStatItemsResult = null;
-            statistic.GetAllUserStatItems(result => { getAllStatItemsResult = result; });
+            //Arrange
+            foreach (string statCode in this.statCodes)
+            {
+                Result deleteResult = null;
+                this.helper.DeleteStatItem(
+                    this.helperAccessToken,
+                    this.user.Session.UserId,
+                    statCode,
+                    result => deleteResult = result);
+
+                while (deleteResult == null)
+                {
+                    yield return new WaitForSeconds(0.1f);
+                }
+
+                TestHelper.LogResult(deleteResult, "Delete StatItem");
+            }
+
+            //Act
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() {statCode = statCode})
+                .ToArray();
+
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            TestHelper.LogResult(createStatItemResult, "Create StatItem");
+            
+            //Assert
+            Assert.IsFalse(createStatItemResult.IsError);
+            Assert.That(createStatItemResult.Value.All(result => result.success));
+        }
+
+        [UnityTest, Order(2)]
+        public IEnumerator GetAllUserStatItems_ReturnsAllCreatedUserStatItems()
+        {
+            //Arrange
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() {statCode = statCode})
+                .ToArray();
+
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            Result<PagedStatItems> getAllStatItemsResult = null;
+            this.statistic.GetAllUserStatItems(result => { getAllStatItemsResult = result; });
+
             while (getAllStatItemsResult == null)
             {
-                Thread.Sleep(100);
-                yield return null;
+                yield return new WaitForSeconds(0.1f);
             }
+
             TestHelper.LogResult(getAllStatItemsResult, "Get All StatItems");
-            Assert.That(!getAllStatItemsResult.IsError);
-            Assert.That(getAllStatItemsResult.Value.data.Length > 0);
+            
+            //Assert
+            Assert.IsFalse(getAllStatItemsResult.IsError);
+            Assert.That(getAllStatItemsResult.Value.data.Length, Is.GreaterThanOrEqualTo(this.statCodes.Length));
+            Assert.That(
+                getAllStatItemsResult.Value.data.Select(statItem => statItem.statCode)
+                    .Join(this.statCodes, s => s, s => s, (left, right) => left == right)
+                    .All(found => found));
         }
 
-        [UnityTest, Order(1)]
-        public IEnumerator GetUserStatItemsByStatCodes()
+        [UnityTest, Order(2)]
+        public IEnumerator GetUserStatItems_ByStatCodes_FoundExactMatches()
         {
-            Result<StatItemPagingSlicedResult> getStatItemsResult = null;
-            string[] statCodes = new string[] { "SDKTEST", "TOTAL_ASSISTS" };
-            statistic.GetUserStatItemsByStatCodes(statCodes, result => { getStatItemsResult = result; });
+            //Arrange
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() {statCode = statCode})
+                .ToArray();
+
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            Result<PagedStatItems> getStatItemsResult = null;
+            string[] filterStatCodes = {this.statCodes[3], this.statCodes[4]};
+            this.statistic.GetUserStatItems(filterStatCodes, null, result => { getStatItemsResult = result; });
+
             while (getStatItemsResult == null)
             {
                 Thread.Sleep(100);
+
                 yield return null;
             }
+
             TestHelper.LogResult(getStatItemsResult, "Get StatItems by StatCodes");
-            Assert.That(!getStatItemsResult.IsError);
-            Assert.That(getStatItemsResult.Value.data.Length > 0);
-            Assert.That(getStatItemsResult.Value.data[0].statCode == statCodes[0]);
+            
+            //Assert
+            Assert.IsFalse(getStatItemsResult.IsError);
+            Assert.That(getStatItemsResult.Value.data.Length, Is.EqualTo(2));
+            Assert.That(getStatItemsResult.Value.data.Count(x => x.statCode == this.statCodes[3]), Is.EqualTo(1));
+            Assert.That(getStatItemsResult.Value.data.Count(x => x.statCode == this.statCodes[4]), Is.EqualTo(1));
         }
 
-        [UnityTest, Order(1)]
-        public IEnumerator GetUserStatItemsByTags()
+        [UnityTest, Order(2)]
+        public IEnumerator GetUserStatItems_ByTags_FoundAllStatItemInTags()
         {
-            Result<StatItemPagingSlicedResult> getStatItemsResult = null;
-            string[] Tags = new string[] { "SDKTEST" };
-            statistic.GetUserStatItemsByTags(Tags, result => { getStatItemsResult = result; });
+            //Arrange
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() {statCode = statCode})
+                .ToArray();
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            Result<PagedStatItems> getStatItemsResult = null;
+            string[] filterTags = {this.tags[0]};
+            this.statistic.GetUserStatItems(null, filterTags, result => { getStatItemsResult = result; });
+
             while (getStatItemsResult == null)
             {
                 Thread.Sleep(100);
+
                 yield return null;
             }
+
             TestHelper.LogResult(getStatItemsResult, "Get StatItems by Tags");
-            Assert.That(!getStatItemsResult.IsError);
-            Assert.That(getStatItemsResult.Value.data.Length > 0);
-            Assert.That(getStatItemsResult.Value.data[0].tags[0] == Tags[0]);
+            
+            //Assert
+            Assert.IsFalse(getStatItemsResult.IsError);
+            Assert.That(
+                getStatItemsResult.Value.data.Length,
+                Is.EqualTo(this.tags.Count(tag => tag == this.tags[0])));
+            Assert.That(
+                getStatItemsResult.Value.data.Count(x => x.tags.Any(tag => tag == this.tags[0])),
+                Is.GreaterThan(1));
         }
 
-        [UnityTest, Order(1)]
-        public IEnumerator BulkAddStatItemValue()
+        [UnityTest, Order(3)]
+        public IEnumerator IncrementUserStatItems_By777_StatItemsIncreased()
         {
-            Result<BulkStatItemOperationResult[]> BulkAddStatItemValueResult = null;
-            BulkUserStatItemInc SDKTEST = new BulkUserStatItemInc
-            {
-                inc = 1,
-                userId = user.Session.UserId,
-                statCode = "SDKTEST"
-            };
-           
-            BulkUserStatItemInc[] data = new BulkUserStatItemInc[] { SDKTEST};
+            //Arrange
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() {statCode = statCode})
+                .ToArray();
 
-            statistic.BulkAddStatItemValue(data, result => { BulkAddStatItemValueResult = result; });
-            while(BulkAddStatItemValueResult == null)
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            Result<StatItemOperationResult[]> incrementResult = null;
+            StatItemIncrement sdktest = new StatItemIncrement {inc = 777, statCode = this.statCodes[0]};
+            StatItemIncrement[] data = {sdktest};
+            this.statistic.IncrementUserStatItems(data, result => { incrementResult = result; });
+
+            while (incrementResult == null)
             {
                 Thread.Sleep(100);
+
                 yield return null;
             }
-            TestHelper.LogResult(BulkAddStatItemValueResult, "Bulk Add StatItem Value");
-            Assert.IsTrue(!BulkAddStatItemValueResult.IsError);
-            Assert.IsTrue(BulkAddStatItemValueResult.Value[0].success);
-            Assert.That(BulkAddStatItemValueResult.Value[0].statCode == SDKTEST.statCode);
-        }
 
-        [UnityTest, Order(1)]
-        public IEnumerator BulkAddUserStatItemValue()
-        {
-            Result<BulkStatItemOperationResult[]> BulkAddStatItemValueResult = null;
-            BulkStatItemInc SDKTEST = new BulkStatItemInc
-            {
-                inc = 1,
-                statCode = "SDKTEST"
-            };
+            //Assert
+            Result<PagedStatItems> getStatItemsResult = null;
+            this.statistic.GetUserStatItems(
+                new[] {this.statCodes[0]},
+                null,
+                result => { getStatItemsResult = result; });
 
-            BulkStatItemInc[] data = new BulkStatItemInc[] { SDKTEST };
-
-            statistic.BulkAddUserStatItemValue(data, result => { BulkAddStatItemValueResult = result; });
-            while (BulkAddStatItemValueResult == null)
-            {
-                Thread.Sleep(100);
-                yield return null;
-            }
-            TestHelper.LogResult(BulkAddStatItemValueResult, "Bulk Add StatItem Value");
-            Assert.IsTrue(!BulkAddStatItemValueResult.IsError);
-            Assert.IsTrue(BulkAddStatItemValueResult.Value[0].success);
-            Assert.That(BulkAddStatItemValueResult.Value[0].statCode == SDKTEST.statCode);
-        }
-
-        [UnityTest, Order(1)]
-        public IEnumerator AddUserStatItemValue()
-        {
-            Result<StatItemPagingSlicedResult> getStatItemsResult = null;
-            string statCode = "SDKTEST";
-            statistic.GetUserStatItemsByStatCodes(new string[] { statCode }, result => { getStatItemsResult = result; });
             while (getStatItemsResult == null)
             {
                 Thread.Sleep(100);
+
                 yield return null;
             }
 
-            Result<StatItemIncResult> statItemIncResult = null;
-            float increasedValue = 1;
+            TestHelper.LogResult(incrementResult, "Increment User StatItems");
+            Assert.IsFalse(incrementResult.IsError);
+            Assert.That(incrementResult.Value[0].statCode, Is.EqualTo(sdktest.statCode));
+            Assert.IsTrue(incrementResult.Value[0].success);
+            Assert.That(getStatItemsResult.Value.data[0].value, Is.EqualTo(777));
+        }
 
+        [UnityTest, Order(4)]
+        public IEnumerator IncrementUserStatItems_ByNegative_Failed()
+        {
+            //Arrange
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() { statCode = statCode })
+                .ToArray();
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
 
-            statistic.AddUserStatItemValue(statCode, increasedValue, result => { statItemIncResult = result; });
-            while (statItemIncResult == null)
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            StatItemIncrement sdktest = new StatItemIncrement { inc = -777, statCode = this.statCodes[0] };
+            StatItemIncrement[] data = { sdktest };
+            Result<StatItemOperationResult[]> incrementResult = null;
+            this.statistic.IncrementUserStatItems(data, result => { incrementResult = result; });
+
+            while (incrementResult == null)
             {
                 Thread.Sleep(100);
+
                 yield return null;
             }
-            TestHelper.LogResult(statItemIncResult, "Add StatItem Value");
-            Assert.IsTrue(!statItemIncResult.IsError);
-            Assert.IsTrue(statItemIncResult.Value.currentValue == (getStatItemsResult.Value.data[0].value + increasedValue));
+
+            //Assert
+            Result<PagedStatItems> getStatItemsResult = null;
+            this.statistic.GetUserStatItems(
+                new[] { this.statCodes[0] },
+                null,
+                result => { getStatItemsResult = result; });
+
+            while (getStatItemsResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.LogResult(incrementResult, "Increment User StatItems");
+            Assert.IsFalse(incrementResult.IsError);
+            Assert.That(incrementResult.Value[0].statCode, Is.EqualTo(sdktest.statCode));
+            Assert.IsFalse(incrementResult.Value[0].success);
+            Assert.That(getStatItemsResult.Value.data[0].value, Is.EqualTo(777));
+        }
+
+        [UnityTest, Order(5)]
+        public IEnumerator DecrementUserStatItems_By777_StatItemsDecreased()
+        {
+            //Arrange
+            CreateStatItemRequest[] request = this.statCodes
+                .Select(statCode => new CreateStatItemRequest() { statCode = statCode })
+                .ToArray();
+            Result<StatItemOperationResult[]> createStatItemResult = null;
+            this.statistic.CreateUserStatItems(request, result => { createStatItemResult = result; });
+
+            while (createStatItemResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            StatItemIncrement sdktestIncrement = new StatItemIncrement { inc = 777, statCode = this.statCodes[5] };
+            StatItemIncrement[] dataIncrement = { sdktestIncrement };
+            Result<StatItemOperationResult[]> incrementResult = null;
+            this.statistic.IncrementUserStatItems(dataIncrement, result => { incrementResult = result; });
+
+            while (incrementResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            //Act
+            StatItemIncrement sdktestDecrement = new StatItemIncrement { inc = -777, statCode = this.statCodes[5] };
+            StatItemIncrement[] dataDecrement = { sdktestDecrement };
+            Result<StatItemOperationResult[]> decrementResult = null;
+            this.statistic.IncrementUserStatItems(dataDecrement, result => { decrementResult = result; });
+
+            while (decrementResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            //Assert
+            Result<PagedStatItems> getStatItemsResult = null;
+            this.statistic.GetUserStatItems(
+                new[] { this.statCodes[5] },
+                null,
+                result => { getStatItemsResult = result; });
+
+            while (getStatItemsResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.LogResult(incrementResult, "Increment User StatItems");
+            Assert.IsFalse(incrementResult.IsError);
+            Assert.That(incrementResult.Value[0].statCode, Is.EqualTo(sdktestIncrement.statCode));
+            Assert.IsTrue(incrementResult.Value[0].success);
+            TestHelper.LogResult(incrementResult, "Decrement User StatItems");
+            Assert.IsFalse(decrementResult.IsError);
+            Assert.That(decrementResult.Value[0].statCode, Is.EqualTo(sdktestDecrement.statCode));
+            Assert.IsTrue(decrementResult.Value[0].success);
+            Assert.That(getStatItemsResult.Value.data[0].value, Is.EqualTo(0));
         }
 
         [UnityTest, Order(999)]
         public IEnumerator Teardown()
         {
-            if (this.user.Session.IsValid())
+            foreach (string statCode in this.statCodes)
             {
-                Result logoutResult = null;
-                
-                this.user.Logout(r => logoutResult = r);
+                Result deleteResult = null;
 
-                while (logoutResult == null)
+                this.helper.DeleteStatItem(
+                    this.helperAccessToken,
+                    this.user.Session.UserId,
+                    statCode,
+                    result => deleteResult = result);
+
+                while (deleteResult == null)
                 {
-                    Thread.Sleep(100);
-
-                    yield return null;
+                    yield return new WaitForSeconds(0.1f);
                 }
             }
+
+            Result logoutResult = null;
+
+            this.user.Logout(r => logoutResult = r);
+
+            while (logoutResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
         }
-        
     }
 }

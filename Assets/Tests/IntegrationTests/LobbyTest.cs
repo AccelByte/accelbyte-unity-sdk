@@ -1,11 +1,14 @@
-// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using AccelByte.Models;
 using AccelByte.Api;
 using AccelByte.Core;
@@ -14,6 +17,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using Debug = UnityEngine.Debug;
 using System.Threading;
+using AccelByte.Server;
 using HybridWebSocket;
 
 namespace Tests.IntegrationTests
@@ -21,13 +25,13 @@ namespace Tests.IntegrationTests
     [TestFixture]
     public class LobbyTest
     {
+        private int NumSetUp;
+        private int NumTearDown;
+
         private TestHelper helper;
         private User[] users;
-        private int setupCount;
         private UnityHttpWorker httpWorker;
         private CoroutineRunner coroutineRunner;
-        private bool canConstruct;
-        private bool canDestroy;
         private UserData[] usersData;
 
         Lobby CreateLobby(ISession session)
@@ -42,17 +46,30 @@ namespace Tests.IntegrationTests
             return new Lobby(AccelBytePlugin.Config.LobbyServerUrl, webSocket, session, this.coroutineRunner);
         }
 
-        [UnityTest, Order(0), Timeout(300000)]
-        public IEnumerator TestSetup()
+        [UnitySetUp]
+        private IEnumerator TestSetup()
         {
-            this.httpWorker = new UnityHttpWorker();
-            this.coroutineRunner = new CoroutineRunner();
-            this.helper = new TestHelper();
+            if (this.httpWorker == null)
+            {
+                this.httpWorker = new UnityHttpWorker();
+            }
 
-            this.users = new User[5];
+            if (this.coroutineRunner == null)
+            {
+                this.coroutineRunner = new CoroutineRunner();
+            }
+
+            if (this.helper == null)
+            {
+                this.helper = new TestHelper();
+            }
+
+            if (this.users != null) yield break;
+
+            var newUsers = new User[5];
             this.usersData = new UserData[5];
 
-            for (int i = 0; i < this.users.Length; i++)
+            for (int i = 0; i < newUsers.Length; i++)
             {
                 Result<RegisterUserResponse> registerResult = null;
                 ILoginSession loginSession;
@@ -85,13 +102,13 @@ namespace Tests.IntegrationTests
                     loginSession,
                     this.httpWorker);
 
-                this.users[i] = new User(
+                newUsers[i] = new User(
                     loginSession,
                     userAccount,
                     this.coroutineRunner,
                     AccelBytePlugin.Config.UseSessionManagement);
 
-                this.users[i]
+                newUsers[i]
                     .Register(
                         string.Format("lobbyuser{0}+accelbyteunitysdk@example.com", i + 1),
                         "Password123",
@@ -110,11 +127,11 @@ namespace Tests.IntegrationTests
                 TestHelper.LogResult(registerResult, "Setup: Registered lobbyuser" + (i + 1));
             }
 
-            for (int i = 0; i < this.users.Length; i++)
+            for (int i = 0; i < newUsers.Length; i++)
             {
                 Result loginResult = null;
 
-                this.users[i]
+                newUsers[i]
                     .LoginWithUsername(
                         string.Format("lobbyuser{0}+accelbyteunitysdk@example.com", i + 1),
                         "Password123",
@@ -128,7 +145,7 @@ namespace Tests.IntegrationTests
                 }
 
                 Result<UserData> userResult = null;
-                this.users[i].GetData(r => userResult = r);
+                newUsers[i].GetData(r => userResult = r);
 
                 while (userResult == null)
                 {
@@ -141,6 +158,10 @@ namespace Tests.IntegrationTests
 
                 TestHelper.LogResult(loginResult, "Setup: Logged in " + userResult.Value.displayName);
             }
+
+            yield return new WaitForSeconds(0.1f);
+            
+            this.users = newUsers;
         }
 
         [UnityTest, Order(99), Timeout(300000)]
@@ -162,11 +183,14 @@ namespace Tests.IntegrationTests
                 TestHelper.LogResult(deleteResult, "Setup: Deleted lobbyuser" + (i + 1));
                 Assert.True(!deleteResult.IsError);
             }
+
+            this.users = null;
         }
 
         [UnityTest, Order(2), Timeout(100000)]
         public IEnumerator SendPrivateChat_FromMultipleUsers_ChatReceived()
         {
+            //Arrange
             var lobbies = new Lobby[this.users.Length];
 
             for (int i = 0; i < lobbies.Length; i++)
@@ -184,6 +208,7 @@ namespace Tests.IntegrationTests
                 Debug.Log(result.Value.payload);
             };
 
+            //Act
             for (int i = 0; i < lobbies.Length; i++)
             {
                 var userId = this.users[0].Session.UserId;
@@ -199,12 +224,13 @@ namespace Tests.IntegrationTests
 
             yield return new WaitUntil(() => receivedChatCount >= this.users.Length);
 
-            Assert.IsTrue(true);
-
             foreach (var lobby in lobbies)
             {
                 lobby.Disconnect();
             }
+
+            //Assert
+            Assert.That(receivedChatCount, Is.GreaterThanOrEqualTo(lobbies.Length - 1));
         }
 
         [UnityTest, Order(2), Timeout(100000)]
@@ -949,10 +975,11 @@ namespace Tests.IntegrationTests
 
                 incomingNotification = null;
 
-                Assert.That(getNotifSuccess[i]);
             }
 
             lobby.Disconnect();
+            
+            Assert.IsTrue(getNotifSuccess.All(notif => notif));
         }
 
         [UnityTest, Order(2), Timeout(100000)]
@@ -1153,8 +1180,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusBeforeRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusBeforeRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1163,15 +1190,15 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestFriend = null;
             lobbyA.GetFriendshipStatus(idB, result => { getFriendshipStatusAfterRequestFriend = result; });
 
             while (getFriendshipStatusAfterRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Outgoing));
 
@@ -1180,16 +1207,16 @@ namespace Tests.IntegrationTests
 
             while (listOutgoingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
+            Assert.That(!listOutgoingFriendRequestResult.IsError);
+            Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestSentFromAnother = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRequestSentFromAnother = result; });
 
             while (getFriendshipStatusAfterRequestSentFromAnother == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestSentFromAnother.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Incoming));
 
@@ -1198,38 +1225,38 @@ namespace Tests.IntegrationTests
 
             while (listIncomingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestResult.IsError);
+            Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
 
             Result acceptFriendRequestResult = null;
             lobbyB.AcceptFriend(idA, result => { acceptFriendRequestResult = result; });
 
             while (acceptFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!acceptFriendRequestResult.IsError);
+            Assert.That(!acceptFriendRequestResult.IsError);
 
             Result<Friends> loadFriendListResult = null;
             lobbyA.LoadFriendsList(result => { loadFriendListResult = result; });
 
             while (loadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListResult.IsError);
-            TestHelper.Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
+            Assert.That(!loadFriendListResult.IsError);
+            Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
 
             Result<Friends> anotherLoadFriendListResult = null;
             lobbyB.LoadFriendsList(result => { anotherLoadFriendListResult = result; });
 
             while (anotherLoadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!anotherLoadFriendListResult.IsError);
-            TestHelper.Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
+            Assert.That(!anotherLoadFriendListResult.IsError);
+            Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
 
             Result unfriendResult = null;
             lobbyA.Unfriend(idB, result => { unfriendResult = result; });
 
             while (unfriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!unfriendResult.IsError);
+            Assert.That(!unfriendResult.IsError);
 
             lobbyA.Disconnect();
             lobbyB.Disconnect();
@@ -1239,7 +1266,6 @@ namespace Tests.IntegrationTests
         public IEnumerator Friends_Notification_Request_Accept()
         {
             var lobbyA = CreateLobby(this.users[0].Session);
-
             var lobbyB = CreateLobby(this.users[1].Session);
 
             string idA = this.users[0].Session.UserId, idB = this.users[1].Session.UserId;
@@ -1263,47 +1289,47 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             while (incomingNotificationFromAResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!incomingNotificationFromAResult.IsError);
-            TestHelper.Assert.That(incomingNotificationFromAResult.Value.friendId == idA);
+            Assert.That(!incomingNotificationFromAResult.IsError);
+            Assert.That(incomingNotificationFromAResult.Value.friendId == idA);
 
             Result acceptFriendRequestResult = null;
             lobbyB.AcceptFriend(idA, result => { acceptFriendRequestResult = result; });
 
             while (acceptFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!acceptFriendRequestResult.IsError);
+            Assert.That(!acceptFriendRequestResult.IsError);
 
             while (friendRequestAcceptedResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!friendRequestAcceptedResult.IsError);
-            TestHelper.Assert.That(friendRequestAcceptedResult.Value.friendId == idB);
+            Assert.That(!friendRequestAcceptedResult.IsError);
+            Assert.That(friendRequestAcceptedResult.Value.friendId == idB);
 
             Result<Friends> loadFriendListResult = null;
             lobbyA.LoadFriendsList(result => { loadFriendListResult = result; });
 
             while (loadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListResult.IsError);
-            TestHelper.Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
+            Assert.That(!loadFriendListResult.IsError);
+            Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
 
             Result<Friends> anotherLoadFriendListResult = null;
             lobbyB.LoadFriendsList(result => { anotherLoadFriendListResult = result; });
 
             while (anotherLoadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!anotherLoadFriendListResult.IsError);
-            TestHelper.Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
+            Assert.That(!anotherLoadFriendListResult.IsError);
+            Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
 
             Result unfriendResult = null;
             lobbyA.Unfriend(idB, result => { unfriendResult = result; });
 
             while (unfriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!unfriendResult.IsError);
+            Assert.That(!unfriendResult.IsError);
 
             lobbyA.Disconnect();
             lobbyB.Disconnect();
@@ -1329,8 +1355,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusBeforeRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusBeforeRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1339,15 +1365,15 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestFriend = null;
             lobbyA.GetFriendshipStatus(idB, result => { getFriendshipStatusAfterRequestFriend = result; });
 
             while (getFriendshipStatusAfterRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Outgoing));
 
@@ -1356,16 +1382,16 @@ namespace Tests.IntegrationTests
 
             while (listOutgoingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
+            Assert.That(!listOutgoingFriendRequestResult.IsError);
+            Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestSentFromAnother = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRequestSentFromAnother = result; });
 
             while (getFriendshipStatusAfterRequestSentFromAnother == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestSentFromAnother.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Incoming));
 
@@ -1374,49 +1400,49 @@ namespace Tests.IntegrationTests
 
             while (listIncomingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestResult.IsError);
+            Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
 
             Result acceptFriendRequestResult = null;
             lobbyB.AcceptFriend(idA, result => { acceptFriendRequestResult = result; });
 
             while (acceptFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!acceptFriendRequestResult.IsError);
+            Assert.That(!acceptFriendRequestResult.IsError);
 
             Result<Friends> loadFriendListResult = null;
             lobbyA.LoadFriendsList(result => { loadFriendListResult = result; });
 
             while (loadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListResult.IsError);
-            TestHelper.Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
+            Assert.That(!loadFriendListResult.IsError);
+            Assert.That(loadFriendListResult.Value.friendsId.Contains(idB));
 
             Result<Friends> anotherLoadFriendListResult = null;
             lobbyB.LoadFriendsList(result => { anotherLoadFriendListResult = result; });
 
             while (anotherLoadFriendListResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!anotherLoadFriendListResult.IsError);
-            TestHelper.Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
+            Assert.That(!anotherLoadFriendListResult.IsError);
+            Assert.That(anotherLoadFriendListResult.Value.friendsId.Contains(idA));
 
             Result unfriendResult = null;
             lobbyA.Unfriend(idB, result => { unfriendResult = result; });
 
             while (unfriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!unfriendResult.IsError);
+            Assert.That(!unfriendResult.IsError);
 
             Result<Friends> loadFriendListAfterUnfriend = null;
             lobbyA.LoadFriendsList(result => { loadFriendListAfterUnfriend = result; });
 
             while (loadFriendListAfterUnfriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterUnfriend.IsError);
+            Assert.That(!loadFriendListAfterUnfriend.IsError);
 
             if (loadFriendListAfterUnfriend.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(!loadFriendListAfterUnfriend.Value.friendsId.Contains(idB));
+                Assert.That(!loadFriendListAfterUnfriend.Value.friendsId.Contains(idB));
             }
 
             Result<Friends> loadFriendListAfterGotUnfriend = null;
@@ -1424,11 +1450,11 @@ namespace Tests.IntegrationTests
 
             while (loadFriendListAfterGotUnfriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterGotUnfriend.IsError);
+            Assert.That(!loadFriendListAfterGotUnfriend.IsError);
 
             if (loadFriendListAfterGotUnfriend.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(!loadFriendListAfterGotUnfriend.Value.friendsId.Contains(idA));
+                Assert.That(!loadFriendListAfterGotUnfriend.Value.friendsId.Contains(idA));
             }
 
             lobbyA.Disconnect();
@@ -1455,8 +1481,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusBeforeRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusBeforeRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1465,15 +1491,15 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestFriend = null;
             lobbyA.GetFriendshipStatus(idB, result => { getFriendshipStatusAfterRequestFriend = result; });
 
             while (getFriendshipStatusAfterRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Outgoing));
 
@@ -1482,16 +1508,16 @@ namespace Tests.IntegrationTests
 
             while (listOutgoingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
+            Assert.That(!listOutgoingFriendRequestResult.IsError);
+            Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestSentFromAnother = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRequestSentFromAnother = result; });
 
             while (getFriendshipStatusAfterRequestSentFromAnother == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestSentFromAnother.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Incoming));
 
@@ -1500,23 +1526,23 @@ namespace Tests.IntegrationTests
 
             while (listIncomingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestResult.IsError);
+            Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
 
             Result rejectFriendRequestResult = null;
             lobbyB.RejectFriend(idA, result => { rejectFriendRequestResult = result; });
 
             while (rejectFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!rejectFriendRequestResult.IsError);
+            Assert.That(!rejectFriendRequestResult.IsError);
 
             Result<FriendshipStatus> getFriendshipStatusAfterRejecting = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRejecting = result; });
 
             while (getFriendshipStatusAfterRejecting == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRejecting.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRejecting.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRejecting.Value.friendshipStatus == RelationshipStatusCode.NotFriend);
 
             Result<Friends> listIncomingFriendsAfterRejecting = null;
@@ -1524,16 +1550,16 @@ namespace Tests.IntegrationTests
 
             while (listIncomingFriendsAfterRejecting == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendsAfterRejecting.IsError);
-            TestHelper.Assert.That(!listIncomingFriendsAfterRejecting.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendsAfterRejecting.IsError);
+            Assert.That(!listIncomingFriendsAfterRejecting.Value.friendsId.Contains(idA));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRejected = null;
             lobbyA.GetFriendshipStatus(idB, result => { getFriendshipStatusAfterRejected = result; });
 
             while (getFriendshipStatusAfterRejected == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRejected.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRejected.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRejected.Value.friendshipStatus == RelationshipStatusCode.NotFriend);
 
             Result<Friends> listOutgoingFriendsAfterRejected = null;
@@ -1541,8 +1567,8 @@ namespace Tests.IntegrationTests
 
             while (listOutgoingFriendsAfterRejected == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendsAfterRejected.IsError);
-            TestHelper.Assert.That(!listOutgoingFriendsAfterRejected.Value.friendsId.Contains(idB));
+            Assert.That(!listOutgoingFriendsAfterRejected.IsError);
+            Assert.That(!listOutgoingFriendsAfterRejected.Value.friendsId.Contains(idB));
 
             lobbyA.Disconnect();
             lobbyB.Disconnect();
@@ -1568,8 +1594,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusBeforeRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusBeforeRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1578,15 +1604,15 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestFriend = null;
             lobbyA.GetFriendshipStatus(idB, result => { getFriendshipStatusAfterRequestFriend = result; });
 
             while (getFriendshipStatusAfterRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Outgoing));
 
@@ -1595,16 +1621,16 @@ namespace Tests.IntegrationTests
 
             while (listOutgoingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
+            Assert.That(!listOutgoingFriendRequestResult.IsError);
+            Assert.That(listOutgoingFriendRequestResult.Value.friendsId.Contains(idB));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestSentFromAnother = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRequestSentFromAnother = result; });
 
             while (getFriendshipStatusAfterRequestSentFromAnother == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestSentFromAnother.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Incoming));
 
@@ -1613,34 +1639,34 @@ namespace Tests.IntegrationTests
 
             while (listIncomingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestResult.IsError);
+            Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
 
             Result cancelFriendRequestResult = null;
             lobbyA.CancelFriendRequest(idB, result => { cancelFriendRequestResult = result; });
 
             while (cancelFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!cancelFriendRequestResult.IsError);
+            Assert.That(!cancelFriendRequestResult.IsError);
 
             Result<Friends> listIncomingFriendRequestAfterCanceled = null;
             lobbyB.ListIncomingFriends(result => { listIncomingFriendRequestAfterCanceled = result; });
 
             while (listIncomingFriendRequestAfterCanceled == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestAfterCanceled.IsError);
-            TestHelper.Assert.That(!listIncomingFriendRequestAfterCanceled.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestAfterCanceled.IsError);
+            Assert.That(!listIncomingFriendRequestAfterCanceled.Value.friendsId.Contains(idA));
 
             Result<Friends> loadFriendListAfterCanceled = null;
             lobbyB.LoadFriendsList(result => { loadFriendListAfterCanceled = result; });
 
             while (loadFriendListAfterCanceled == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterCanceled.IsError);
+            Assert.That(!loadFriendListAfterCanceled.IsError);
 
             if (loadFriendListAfterCanceled.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(!loadFriendListAfterCanceled.Value.friendsId.Contains(idA));
+                Assert.That(!loadFriendListAfterCanceled.Value.friendsId.Contains(idA));
             }
 
             Result<Friends> loadFriendListAfterCanceling = null;
@@ -1648,11 +1674,11 @@ namespace Tests.IntegrationTests
 
             while (loadFriendListAfterCanceling == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterCanceling.IsError);
+            Assert.That(!loadFriendListAfterCanceling.IsError);
 
             if (loadFriendListAfterCanceling.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(!loadFriendListAfterCanceling.Value.friendsId.Contains(idB));
+                Assert.That(!loadFriendListAfterCanceling.Value.friendsId.Contains(idB));
             }
 
             lobbyA.Disconnect();
@@ -1687,8 +1713,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusBeforeRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusBeforeRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusBeforeRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1697,15 +1723,15 @@ namespace Tests.IntegrationTests
 
             while (requestFriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendResult.IsError);
+            Assert.That(!requestFriendResult.IsError);
 
             Result<Friends> listOutgoingFriendRequestResult = null;
             lobbyA.ListOutgoingFriends(result => { listOutgoingFriendRequestResult = result; });
 
             while (listOutgoingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendRequestResult.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!listOutgoingFriendRequestResult.IsError);
+            Assert.That(
                 listOutgoingFriendRequestResult.Value.friendsId.Contains(this.users[1].Session.UserId));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestFriend = null;
@@ -1715,8 +1741,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusAfterRequestFriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestFriend.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestFriend.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Outgoing));
 
@@ -1725,18 +1751,18 @@ namespace Tests.IntegrationTests
 
             while (cancelFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!cancelFriendRequestResult.IsError);
+            Assert.That(!cancelFriendRequestResult.IsError);
 
             Result<Friends> listOutgoingFriendAfterCanceling = null;
             lobbyA.ListOutgoingFriends(result => { listOutgoingFriendAfterCanceling = result; });
 
             while (listOutgoingFriendAfterCanceling == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listOutgoingFriendAfterCanceling.IsError);
+            Assert.That(!listOutgoingFriendAfterCanceling.IsError);
 
             if (listOutgoingFriendAfterCanceling.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(
+                Assert.That(
                     !listOutgoingFriendAfterCanceling.Value.friendsId.Contains(this.users[1].Session.UserId));
             }
 
@@ -1745,23 +1771,23 @@ namespace Tests.IntegrationTests
 
             while (requestFriendAfterCanceling == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendAfterCanceling.IsError);
+            Assert.That(!requestFriendAfterCanceling.IsError);
 
             Result<Friends> listIncomingFriendRequestResult = null;
             lobbyB.ListIncomingFriends(result => { listIncomingFriendRequestResult = result; });
 
             while (listIncomingFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestResult.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestResult.IsError);
+            Assert.That(listIncomingFriendRequestResult.Value.friendsId.Contains(idA));
 
             Result<FriendshipStatus> getFriendshipStatusAfterRequestSentFromAnother = null;
             lobbyB.GetFriendshipStatus(idA, result => { getFriendshipStatusAfterRequestSentFromAnother = result; });
 
             while (getFriendshipStatusAfterRequestSentFromAnother == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterRequestSentFromAnother.IsError);
+            Assert.That(
                 getFriendshipStatusAfterRequestSentFromAnother.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Incoming));
 
@@ -1770,47 +1796,47 @@ namespace Tests.IntegrationTests
 
             while (rejectFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!rejectFriendRequestResult.IsError);
+            Assert.That(!rejectFriendRequestResult.IsError);
 
             Result requestFriendAfterRejected = null;
             lobbyA.RequestFriend(this.users[1].Session.UserId, result => { requestFriendAfterRejected = result; });
 
             while (requestFriendAfterRejected == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!requestFriendAfterRejected.IsError);
+            Assert.That(!requestFriendAfterRejected.IsError);
 
             while (incomingNotificationFromAResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!incomingNotificationFromAResult.IsError);
-            TestHelper.Assert.That(incomingNotificationFromAResult.Value.friendId == idA);
+            Assert.That(!incomingNotificationFromAResult.IsError);
+            Assert.That(incomingNotificationFromAResult.Value.friendId == idA);
 
             Result<Friends> listIncomingFriendRequestAfterRejecting = null;
             lobbyB.ListIncomingFriends(result => { listIncomingFriendRequestAfterRejecting = result; });
 
             while (listIncomingFriendRequestAfterRejecting == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!listIncomingFriendRequestAfterRejecting.IsError);
-            TestHelper.Assert.That(listIncomingFriendRequestAfterRejecting.Value.friendsId.Contains(idA));
+            Assert.That(!listIncomingFriendRequestAfterRejecting.IsError);
+            Assert.That(listIncomingFriendRequestAfterRejecting.Value.friendsId.Contains(idA));
 
             Result acceptFriendRequestResult = null;
             lobbyB.AcceptFriend(idA, result => { acceptFriendRequestResult = result; });
 
             while (acceptFriendRequestResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!acceptFriendRequestResult.IsError);
+            Assert.That(!acceptFriendRequestResult.IsError);
 
             while (friendRequestAcceptedResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!friendRequestAcceptedResult.IsError);
-            TestHelper.Assert.That(friendRequestAcceptedResult.Value.friendId == idB);
+            Assert.That(!friendRequestAcceptedResult.IsError);
+            Assert.That(friendRequestAcceptedResult.Value.friendId == idB);
 
             Result<Friends> loadFriendListAfterAccepted = null;
             lobbyA.LoadFriendsList(result => { loadFriendListAfterAccepted = result; });
 
             while (loadFriendListAfterAccepted == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterAccepted.IsError);
-            TestHelper.Assert.That(loadFriendListAfterAccepted.Value.friendsId.Contains(this.users[1].Session.UserId));
+            Assert.That(!loadFriendListAfterAccepted.IsError);
+            Assert.That(loadFriendListAfterAccepted.Value.friendsId.Contains(this.users[1].Session.UserId));
 
             Result<FriendshipStatus> getFriendshipStatusAfterAccepted = null;
             lobbyA.GetFriendshipStatus(
@@ -1819,8 +1845,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusAfterAccepted == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterAccepted.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterAccepted.IsError);
+            Assert.That(
                 getFriendshipStatusAfterAccepted.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Friend));
 
@@ -1829,8 +1855,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusAfterAccepting == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterAccepting.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterAccepting.IsError);
+            Assert.That(
                 getFriendshipStatusAfterAccepting.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.Friend));
 
@@ -1839,18 +1865,18 @@ namespace Tests.IntegrationTests
 
             while (unfriendResult == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!unfriendResult.IsError);
+            Assert.That(!unfriendResult.IsError);
 
             Result<Friends> loadFriendListAfterUnfriend = null;
             lobbyA.LoadFriendsList(result => { loadFriendListAfterUnfriend = result; });
 
             while (loadFriendListAfterUnfriend == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!loadFriendListAfterUnfriend.IsError);
+            Assert.That(!loadFriendListAfterUnfriend.IsError);
 
             if (loadFriendListAfterUnfriend.Value.friendsId.Length != 0)
             {
-                TestHelper.Assert.That(
+                Assert.That(
                     !loadFriendListAfterUnfriend.Value.friendsId.Contains(this.users[1].Session.UserId));
             }
 
@@ -1859,8 +1885,8 @@ namespace Tests.IntegrationTests
 
             while (getFriendshipStatusAfterUnfriended == null) yield return new WaitForSeconds(.2f);
 
-            TestHelper.Assert.That(!getFriendshipStatusAfterUnfriended.IsError);
-            TestHelper.Assert.That(
+            Assert.That(!getFriendshipStatusAfterUnfriended.IsError);
+            Assert.That(
                 getFriendshipStatusAfterUnfriended.Value.friendshipStatus,
                 Is.EqualTo(RelationshipStatusCode.NotFriend));
 
@@ -1956,6 +1982,7 @@ namespace Tests.IntegrationTests
                             index,
                             this.users[index],
                             result.Value.matchId));
+
                     if (result.Value.status == "READY")
                     {
                         dsNotifNum++;
@@ -2010,19 +2037,6 @@ namespace Tests.IntegrationTests
                 yield return new WaitForSeconds(0.2f);
             }
 
-            foreach (var lobby in lobbies)
-            {
-                Result<MatchmakingCode> result = null;
-                lobby.CancelMatchmaking(channelName, r => result = r);
-
-                while (result == null)
-                {
-                    yield return new WaitForSeconds(0.2f);
-                }
-
-                lobby.Disconnect();
-            }
-
             Result deleteChannelResult = null;
 
             this.helper.DeleteMatchmakingChannel(clientAccessToken, channelName, r => deleteChannelResult = r);
@@ -2034,20 +2048,26 @@ namespace Tests.IntegrationTests
 
             TestHelper.LogResult(deleteChannelResult, "Delete matchmaking channel");
 
+            foreach (Lobby lobby in lobbies)
+            {
+                lobby.Disconnect();
+            }
+
             foreach (var response in startMatchmakingResponses)
             {
-                TestHelper.Assert.That(response.IsError, Is.False);
-                TestHelper.Assert.That(response.Value, Is.Not.Null);
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
             }
 
             foreach (var response in matchMakingNotifs)
             {
-                TestHelper.Assert.That(response.IsError, Is.False);
-                TestHelper.Assert.That(response.Value, Is.Not.Null);
-                TestHelper.Assert.That(response.Value.matchId, Is.Not.Null);
-                TestHelper.Assert.That(response.Value.status, Is.Not.Null);
-                TestHelper.Assert.That("done", Is.EqualTo(response.Value.status));
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+                Assert.That(response.Value.matchId, Is.Not.Null);
+                Assert.That(response.Value.status, Is.Not.Null);
+                Assert.That("done", Is.EqualTo(response.Value.status));
             }
+
         }
 
         [UnityTest, Order(2), Timeout(100000)]
@@ -2055,6 +2075,7 @@ namespace Tests.IntegrationTests
         {
             const int NumUsers = 3;
             Lobby[] lobbies = new Lobby[NumUsers];
+            ResultCallback<MatchmakingNotif>[] mmNotifHandlers = new ResultCallback<MatchmakingNotif>[NumUsers];
             Result<MatchmakingCode>[] startMatchmakingResponses = new Result<MatchmakingCode>[NumUsers];
             Result<MatchmakingNotif>[] matchMakingNotifs = new Result<MatchmakingNotif>[NumUsers];
             int responseNum = 0;
@@ -2083,7 +2104,7 @@ namespace Tests.IntegrationTests
                 Debug.Log(string.Format("User{0} Party created", i));
 
                 int index = i;
-                lobbies[i].MatchmakingCompleted += delegate(Result<MatchmakingNotif> result)
+                mmNotifHandlers[i] = delegate(Result<MatchmakingNotif> result)
                 {
                     matchMakingNotifs[index] = result;
                     Debug.Log(
@@ -2095,6 +2116,8 @@ namespace Tests.IntegrationTests
 
                     Interlocked.Increment(ref matchMakingNotifNum);
                 };
+
+                lobbies[i].MatchmakingCompleted += mmNotifHandlers[i];
 
                 lobbies[i].ReadyForMatchConfirmed += result =>
                 {
@@ -2123,6 +2146,7 @@ namespace Tests.IntegrationTests
                             index,
                             this.users[index],
                             result.Value.matchId));
+
                     if (result.Value.status == "READY")
                     {
                         dsNotifNum++;
@@ -2239,6 +2263,7 @@ namespace Tests.IntegrationTests
                 if (matchMakingNotifs[i] != null)
                 {
                     int index = i;
+                    lobbies[i].MatchmakingCompleted -= mmNotifHandlers[i];
 
                     lobbies[i]
                         .ConfirmReadyForMatch(
@@ -2367,15 +2392,909 @@ namespace Tests.IntegrationTests
 
             lobby.Disconnect();
 
-            TestHelper.Assert.IsFalse(startMatchmakingResponse.IsError);
-            TestHelper.Assert.That(startMatchmakingResponse.Value, Is.Not.Null);
+            Assert.IsFalse(startMatchmakingResponse.IsError);
+            Assert.That(startMatchmakingResponse.Value, Is.Not.Null);
 
-            TestHelper.Assert.IsFalse(cancelMatchmakingResponse.IsError);
-            TestHelper.Assert.That(cancelMatchmakingResponse.Value, Is.Not.Null);
+            Assert.IsFalse(cancelMatchmakingResponse.IsError);
+            Assert.That(cancelMatchmakingResponse.Value, Is.Not.Null);
 
-            //TestHelper.Assert.IsFalse(matchMakingNotif.IsError);
-            //TestHelper.Assert.That(matchMakingNotif.Value, Is.Not.Null);
-            //TestHelper.Assert.That(matchMakingNotif.Value.status, Is.EqualTo("cancel"));
+            //Assert.IsFalse(matchMakingNotif.IsError);
+            //Assert.That(matchMakingNotif.Value, Is.Not.Null);
+            //Assert.That(matchMakingNotif.Value.status, Is.EqualTo("cancel"));
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator StartMatchmakingWithLocalDS_ManualPollHeartBeat_ReturnOk()
+        {
+            const int NumUsers = 2;
+            Lobby[] lobbies = new Lobby[NumUsers];
+            Result<MatchmakingCode>[] startMatchmakingResponses = new Result<MatchmakingCode>[NumUsers];
+            Result<MatchmakingNotif>[] matchMakingNotifs = new Result<MatchmakingNotif>[NumUsers];
+
+            Result<TokenData> accessTokenResult = null;
+
+            this.helper.GetAccessToken(r => accessTokenResult = r);
+
+            while (accessTokenResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            string clientAccessToken = accessTokenResult.Value.access_token;
+            string channelName = "unitysdktest" + Guid.NewGuid();
+
+            Result createChannelResult = null;
+
+            this.helper.CreateMatchmakingChannel(clientAccessToken, channelName, r => createChannelResult = r);
+
+            while (createChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(createChannelResult, "Create Matchmaking Channel");
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                var lobby = lobbies[i] = CreateLobby(this.users[i].Session);
+
+                lobby.Connect();
+
+                while (!lobby.IsConnected) yield return new WaitForSeconds(0.2f);
+
+                Debug.Log(string.Format("User{0} Connected to lobby", i));
+
+                Result<PartyInfo> createPartyResult = null;
+                lobbies[i].CreateParty(result => createPartyResult = result);
+
+                while (createPartyResult == null)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                }
+
+                Debug.Log(string.Format("User{0} Party created", i));
+            }
+
+            Result clientLoginResult = null;
+            AccelByteServerPlugin.GetDedicatedServer().LoginWithClientCredentials(result => clientLoginResult = result);
+
+            while (clientLoginResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            string localIP;
+
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                localIP = endPoint.Address.ToString();
+            }
+
+            string serverName = "unitylocalds_" + Guid.NewGuid();
+            DedicatedServerManager dsm = AccelByteServerPlugin.GetDedicatedServerManager();
+            Result registerLocalDsResult = null;
+            dsm.RegisterLocalServer(localIP, 7777, serverName, result => registerLocalDsResult = result);
+
+            while (registerLocalDsResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            MatchRequest matchRequest = null;
+
+            dsm.OnMatchRequest += mr => matchRequest = mr;
+
+            int responseNum = 0;
+            int matchMakingNotifNum = 0;
+            int readyConsentNotifNum = 0;
+            int dsNotifNum = 0;
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+                Debug.Log(string.Format("Start matchmaking {0}", index));
+
+                lobbies[index].MatchmakingCompleted += delegate(Result<MatchmakingNotif> result)
+                {
+                    matchMakingNotifs[index] = result;
+                    Debug.Log(string.Format("Notif matchmaking {0} response {1}", index, result.Value.status));
+                    Interlocked.Increment(ref matchMakingNotifNum);
+                };
+
+                lobbies[index].ReadyForMatchConfirmed += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "User {0} received: User {1} confirmed ready for match.",
+                            this.users[index].Session.UserId,
+                            result.Value.userId));
+
+                    readyConsentNotifNum++;
+                };
+
+                lobbies[index].DSUpdated += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "DS Notif {0} for user {1}: {2}",
+                            index,
+                            this.users[index],
+                            result.Value.matchId));
+
+                    if (result.Value.status == "READY" || result.Value.status == "BUSY")
+                    {
+                        dsNotifNum++;
+                    }
+                };
+
+                lobbies[index]
+                    .StartMatchmaking(
+                        channelName,
+                        serverName,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Start matchmaking {0} response {1}", index, result.Value));
+                            startMatchmakingResponses[index] = result;
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers || matchMakingNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            responseNum = 0;
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+
+                string matchId = matchMakingNotifs[index].Value.matchId;
+                lobbies[i]
+                    .ConfirmReadyForMatch(
+                        matchId,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Ready Consent {0}", index));
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (readyConsentNotifNum < NumUsers * NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            dsm.PollHeartBeat();
+
+            while (dsNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (matchRequest == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            Result deregisterResult = null;
+            dsm.DeregisterLocalServer(result => deregisterResult = result);
+
+            while (deregisterResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            Result deleteChannelResult = null;
+
+            this.helper.DeleteMatchmakingChannel(clientAccessToken, channelName, r => deleteChannelResult = r);
+
+            while (deleteChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(deleteChannelResult, "Delete matchmaking channel");
+
+            foreach (var lobby in lobbies)
+            {
+                lobby.Disconnect();
+            }
+
+            foreach (var response in startMatchmakingResponses)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+            }
+
+            foreach (var response in matchMakingNotifs)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+                Assert.That(response.Value.matchId, Is.Not.Null);
+                Assert.That(response.Value.status, Is.Not.Null);
+                Assert.That("done", Is.EqualTo(response.Value.status));
+                Assert.That(dsNotifNum, Is.EqualTo(NumUsers));
+            }
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator StartMatchmakingWithLocalDS_AutomaticHeartBeat_ReturnOk()
+        {
+            const int NumUsers = 2;
+            Lobby[] lobbies = new Lobby[NumUsers];
+            Result<MatchmakingCode>[] startMatchmakingResponses = new Result<MatchmakingCode>[NumUsers];
+            Result<MatchmakingNotif>[] matchMakingNotifs = new Result<MatchmakingNotif>[NumUsers];
+
+            Result<TokenData> accessTokenResult = null;
+
+            this.helper.GetAccessToken(r => accessTokenResult = r);
+
+            while (accessTokenResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            string clientAccessToken = accessTokenResult.Value.access_token;
+            string channelName = "unitysdktest" + Guid.NewGuid();
+
+            Result createChannelResult = null;
+
+            this.helper.CreateMatchmakingChannel(clientAccessToken, channelName, r => createChannelResult = r);
+
+            while (createChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(createChannelResult, "Create Matchmaking Channel");
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                var lobby = lobbies[i] = CreateLobby(this.users[i].Session);
+
+                lobby.Connect();
+
+                while (!lobby.IsConnected) yield return new WaitForSeconds(0.2f);
+
+                Debug.Log(string.Format("User{0} Connected to lobby", i));
+
+                Result<PartyInfo> createPartyResult = null;
+                lobbies[i].CreateParty(result => createPartyResult = result);
+
+                while (createPartyResult == null)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                }
+
+                Debug.Log(string.Format("User{0} Party created", i));
+            }
+
+            Result clientLoginResult = null;
+            AccelByteServerPlugin.GetDedicatedServer().LoginWithClientCredentials(result => clientLoginResult = result);
+
+            while (clientLoginResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            string localIP;
+
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                localIP = endPoint.Address.ToString();
+            }
+
+            string serverName = "unitylocalds_" + Guid.NewGuid();
+            DedicatedServerManager dsm = AccelByteServerPlugin.GetDedicatedServerManager();
+            Result registerLocalDsResult = null;
+            dsm.ConfigureHeartBeat();
+            dsm.RegisterLocalServer(localIP, 7777, serverName, result => registerLocalDsResult = result);
+
+            while (registerLocalDsResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            MatchRequest matchRequest = null;
+
+            dsm.OnMatchRequest += mr => matchRequest = mr;
+
+            int responseNum = 0;
+            int matchMakingNotifNum = 0;
+            int readyConsentNotifNum = 0;
+            int dsNotifNum = 0;
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+                Debug.Log(string.Format("Start matchmaking {0}", index));
+
+                lobbies[index].MatchmakingCompleted += delegate(Result<MatchmakingNotif> result)
+                {
+                    matchMakingNotifs[index] = result;
+                    Debug.Log(string.Format("Notif matchmaking {0} response {1}", index, result.Value.status));
+                    Interlocked.Increment(ref matchMakingNotifNum);
+                };
+
+                lobbies[index].ReadyForMatchConfirmed += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "User {0} received: User {1} confirmed ready for match.",
+                            this.users[index].Session.UserId,
+                            result.Value.userId));
+
+                    readyConsentNotifNum++;
+                };
+
+                lobbies[index].DSUpdated += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "DS Notif {0} for user {1}: {2}",
+                            index,
+                            this.users[index],
+                            result.Value.matchId));
+
+                    if (result.Value.status == "READY" || result.Value.status == "BUSY")
+                    {
+                        dsNotifNum++;
+                    }
+                };
+
+                lobbies[index]
+                    .StartMatchmaking(
+                        channelName,
+                        serverName,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Start matchmaking {0} response {1}", index, result.Value));
+                            startMatchmakingResponses[index] = result;
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers || matchMakingNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            responseNum = 0;
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+
+                string matchId = matchMakingNotifs[index].Value.matchId;
+                lobbies[i]
+                    .ConfirmReadyForMatch(
+                        matchId,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Ready Consent {0}", index));
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (readyConsentNotifNum < NumUsers * NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (dsNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (matchRequest == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            Result deregisterResult = null;
+            dsm.DeregisterLocalServer(result => deregisterResult = result);
+
+            while (deregisterResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            Result deleteChannelResult = null;
+
+            this.helper.DeleteMatchmakingChannel(clientAccessToken, channelName, r => deleteChannelResult = r);
+
+            while (deleteChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(deleteChannelResult, "Delete matchmaking channel");
+
+            foreach (Lobby lobby in lobbies)
+            {
+                lobby.Disconnect();
+            }
+
+            foreach (var response in startMatchmakingResponses)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+            }
+
+            foreach (var response in matchMakingNotifs)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+                Assert.That(response.Value.matchId, Is.Not.Null);
+                Assert.That(response.Value.status, Is.Not.Null);
+                Assert.That("done", Is.EqualTo(response.Value.status));
+                Assert.That(dsNotifNum, Is.EqualTo(NumUsers));
+            }
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator StartMatchmaking_WithLatencies_MatchFoundWithSameIP()
+        {
+            const int NumUsers = 2;
+            Lobby[] lobbies = new Lobby[NumUsers];
+            Result<MatchmakingCode>[] startMatchmakingResponses = new Result<MatchmakingCode>[NumUsers];
+            Result<MatchmakingNotif>[] matchMakingNotifs = new Result<MatchmakingNotif>[NumUsers];
+
+            Result<TokenData> accessTokenResult = null;
+
+            this.helper.GetAccessToken(r => accessTokenResult = r);
+
+            while (accessTokenResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            string clientAccessToken = accessTokenResult.Value.access_token;
+            string channelName = "unitysdktest" + Guid.NewGuid();
+
+            Result createChannelResult = null;
+
+            this.helper.CreateMatchmakingChannel(clientAccessToken, channelName, r => createChannelResult = r);
+
+            while (createChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(createChannelResult, "Create Matchmaking Channel");
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                var lobby = lobbies[i] = CreateLobby(this.users[i].Session);
+
+                lobby.Connect();
+
+                while (!lobby.IsConnected) yield return new WaitForSeconds(0.2f);
+
+                Debug.Log(string.Format("User{0} Connected to lobby", i));
+
+                Result<PartyInfo> createPartyResult = null;
+                lobbies[i].CreateParty(result => createPartyResult = result);
+
+                while (createPartyResult == null)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                }
+
+                Debug.Log(string.Format("User{0} Party created", i));
+            }
+
+            int responseNum = 0;
+            int matchMakingNotifNum = 0;
+            int readyConsentNotifNum = 0;
+            int dsNotifNum = 0;
+            var dsNotifs = new DsNotif[NumUsers];
+
+            var qos = AccelBytePlugin.GetQos();
+            Result<Dictionary<string, int>> getLatenciesResult = null;
+            qos.GetServerLatencies(result => getLatenciesResult = result);
+
+            while (getLatenciesResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+                Debug.Log(string.Format("Start matchmaking {0}", index));
+
+                lobbies[index].MatchmakingCompleted += delegate(Result<MatchmakingNotif> result)
+                {
+                    matchMakingNotifs[index] = result;
+                    Debug.Log(string.Format("Notif matchmaking {0} response {1}", index, result.Value.status));
+                    Interlocked.Increment(ref matchMakingNotifNum);
+                };
+
+                lobbies[index].ReadyForMatchConfirmed += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "User {0} received: User {1} confirmed ready for match.",
+                            this.users[index].Session.UserId,
+                            result.Value.userId));
+
+                    readyConsentNotifNum++;
+                };
+
+                lobbies[index].DSUpdated += result =>
+                {
+                    Debug.Log(
+                        string.Format(
+                            "DS Notif {0} for user {1}: {2}",
+                            index,
+                            this.users[index],
+                            result.Value.matchId));
+
+                    if (result.Value.status == "READY" || result.Value.status == "BUSY")
+                    {
+                        dsNotifs[index] = result.Value;
+                        dsNotifNum++;
+                    }
+                };
+
+                lobbies[index]
+                    .StartMatchmaking(
+                        channelName,
+                        "",
+                        "",
+                        getLatenciesResult.Value,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Start matchmaking {0} response {1}", index, result.Value));
+                            startMatchmakingResponses[index] = result;
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers || matchMakingNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            responseNum = 0;
+
+            for (int i = 0; i < NumUsers; i++)
+            {
+                int index = i;
+
+                string matchId = matchMakingNotifs[index].Value.matchId;
+                lobbies[i]
+                    .ConfirmReadyForMatch(
+                        matchId,
+                        result =>
+                        {
+                            Debug.Log(string.Format("Ready Consent {0}", index));
+                            Interlocked.Increment(ref responseNum);
+                        });
+            }
+
+            while (responseNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (readyConsentNotifNum < NumUsers * NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            while (dsNotifNum < NumUsers)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            Result deleteChannelResult = null;
+
+            this.helper.DeleteMatchmakingChannel(clientAccessToken, channelName, r => deleteChannelResult = r);
+
+            while (deleteChannelResult == null)
+            {
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            TestHelper.LogResult(deleteChannelResult, "Delete matchmaking channel");
+
+            foreach (Lobby lobby in lobbies)
+            {
+                lobby.Disconnect();
+            }
+
+            foreach (var response in startMatchmakingResponses)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+            }
+
+            foreach (var response in matchMakingNotifs)
+            {
+                Assert.That(response.IsError, Is.False);
+                Assert.That(response.Value, Is.Not.Null);
+                Assert.That(response.Value.matchId, Is.Not.Null);
+                Assert.That(response.Value.status, Is.Not.Null);
+                Assert.That("done", Is.EqualTo(response.Value.status));
+                Assert.That(
+                    dsNotifs.All(
+                        dsNotif => dsNotif.ip == dsNotifs.First().ip && dsNotif.port == dsNotifs.First().port));
+            }
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator LobbyConnected_AuthTokenRevoked_Disconnected()
+        {
+            //Arrange
+            Result<TokenData> accessTokenResult = null;
+            this.helper.GetAccessToken(r => accessTokenResult = r);
+
+            while (accessTokenResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            var user = AccelBytePlugin.GetUser();
+            Result loginResult = null;
+            user.LoginWithDeviceId(result => loginResult = result);
+
+            while (loginResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+            
+            string userId = user.Session.UserId;
+            var lobby = AccelBytePlugin.GetLobby();
+            int numLobbyConnect = 0;
+            int numLobbyDisconnect = 0;
+            int numDisconnectNotif = 0;
+            void OnConnected() => numLobbyConnect++;
+            void OnDisconnected() => numLobbyDisconnect++;
+            void OnDisconnecting(Result<DisconnectNotif> _) => numDisconnectNotif++;
+            lobby.Connected += OnConnected;
+            lobby.Disconnected += OnDisconnected;
+            lobby.Disconnecting += OnDisconnecting;
+
+            lobby.Connect();
+
+            while (!lobby.IsConnected)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Act
+            Result logoutResult = null;
+            user.Logout(result => logoutResult = result);
+
+            while (logoutResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (stopwatch.Elapsed < TimeSpan.FromSeconds(10))
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            bool isLobbyConnected = lobby.IsConnected;
+
+            lobby.Connected -= OnConnected;
+            lobby.Disconnected -= OnDisconnected;
+            lobby.Disconnecting -= OnDisconnecting;
+            lobby.Disconnect();
+
+            Result deleteResult = null;
+            (new TestHelper()).DeleteUser(userId, result => deleteResult = result);
+
+            while (deleteResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Assert
+            Assert.That(logoutResult.IsError, Is.False);
+            Assert.That(numLobbyConnect, Is.GreaterThan(0));
+            Assert.That(numLobbyDisconnect, Is.GreaterThan(0));
+            Assert.That(isLobbyConnected, Is.False);
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator LobbyConnected_SameUserConnectWithDifferentToken_CurrentLobbyDisconnected()
+        {
+            //Arrange
+            var user = AccelBytePlugin.GetUser();
+            Result loginResult = null;
+            user.LoginWithDeviceId(result => loginResult = result);
+
+            while (loginResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            var lobby = AccelBytePlugin.GetLobby();
+            int numLobbyConnect = 0;
+            int numLobbyDisconnect = 0;
+            int numDisconnectNotif = 0;
+            lobby.Connected += () => numLobbyConnect++;
+            lobby.Disconnected += () => numLobbyDisconnect++;
+            lobby.Disconnecting += _ => numDisconnectNotif++;
+            lobby.Connect();
+
+            while (!lobby.IsConnected)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            ILoginSession loginSession;
+
+            if (AccelBytePlugin.Config.UseSessionManagement)
+            {
+                loginSession = new ManagedLoginSession(
+                    AccelBytePlugin.Config.LoginServerUrl,
+                    AccelBytePlugin.Config.Namespace,
+                    AccelBytePlugin.Config.ClientId,
+                    AccelBytePlugin.Config.ClientSecret,
+                    AccelBytePlugin.Config.RedirectUri,
+                    this.httpWorker);
+            }
+            else
+            {
+                loginSession = new OauthLoginSession(
+                    AccelBytePlugin.Config.LoginServerUrl,
+                    AccelBytePlugin.Config.Namespace,
+                    AccelBytePlugin.Config.ClientId,
+                    AccelBytePlugin.Config.ClientSecret,
+                    AccelBytePlugin.Config.RedirectUri,
+                    this.httpWorker,
+                    this.coroutineRunner);
+            }
+
+            var userAccount = new UserAccount(
+                AccelBytePlugin.Config.IamServerUrl,
+                AccelBytePlugin.Config.Namespace,
+                loginSession,
+                this.httpWorker);
+
+            User otherUser = new User(
+                loginSession,
+                userAccount,
+                this.coroutineRunner,
+                AccelBytePlugin.Config.UseSessionManagement);
+
+            Result otherUserLoginResult = null;
+            otherUser.LoginWithDeviceId(result => otherUserLoginResult = result);
+
+            while (otherUserLoginResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            var otherUserLobby = new Lobby(
+                AccelBytePlugin.Config.LobbyServerUrl,
+                new WebSocket(),
+                otherUser.Session,
+                this.coroutineRunner);
+
+            //Act
+            otherUserLobby.Connect();
+
+            while (!otherUserLobby.IsConnected)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            yield return new WaitForSeconds(5f);
+
+            bool isLobbyConnected = lobby.IsConnected;
+
+            otherUserLobby.Disconnect();
+            lobby.Disconnect();
+
+            Result deleteResult = null;
+            (new TestHelper()).DeleteUser(user, result => deleteResult = result);
+
+            while (deleteResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Assert
+            Debug.Log("lobby.IsConnected=" + isLobbyConnected);
+            Debug.Log("numLobbyConnect=" + numLobbyConnect);
+            Debug.Log("numLobbyDisconnect=" + numLobbyDisconnect);
+            Debug.Log("numDisconnectNotif=" + numDisconnectNotif);
+            Assert.That(isLobbyConnected, Is.False);
+            Assert.That(numLobbyConnect, Is.EqualTo(1));
+            Assert.That(numLobbyDisconnect, Is.GreaterThan(0));
+            Assert.That(numDisconnectNotif, Is.Zero);
+        }
+
+        [UnityTest, Order(2), Timeout(100000)]
+        public IEnumerator LobbyConnected_SameUserConnectWithSameToken_OtherLobbyRejected()
+        {
+            //Arrange
+            var user = AccelBytePlugin.GetUser();
+            Result loginResult = null;
+            user.LoginWithDeviceId( result => loginResult = result);
+
+            while (loginResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            var lobby = AccelBytePlugin.GetLobby();
+            int numLobbyConnect = 0;
+            int numLobbyDisconnect = 0;
+            int numDisconnectNotif = 0;
+            void OnConnected() => numLobbyConnect++;
+            void OnDisconnected() => numLobbyDisconnect++;
+            void OnDisconnecting(Result<DisconnectNotif> _) => numDisconnectNotif++;
+            lobby.Connected += OnConnected;
+            lobby.Disconnected += OnDisconnected;
+            lobby.Disconnecting += OnDisconnecting;
+            lobby.Connect();
+
+            yield return new WaitForSeconds(5.0f);
+
+            var otherLobby = new Lobby(
+                AccelBytePlugin.Config.LobbyServerUrl,
+                new WebSocket(),
+                user.Session,
+                this.coroutineRunner);
+
+            //Act
+            otherLobby.Connect();
+            
+            yield return new WaitForSeconds(2f);
+
+            bool isLobbyConnected = lobby.IsConnected;
+            lobby.Connected -= OnConnected;
+            lobby.Disconnected -= OnDisconnected;
+            lobby.Disconnecting -= OnDisconnecting;
+            
+            otherLobby.Disconnect();
+            lobby.Disconnect();
+            
+            Result deleteResult = null;
+            (new TestHelper()).DeleteUser(user, result => deleteResult = result);
+
+            while (deleteResult == null)
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            //Assert
+            Debug.Log("lobby.IsConnected=" + isLobbyConnected);
+            Debug.Log("numLobbyConnect=" + numLobbyConnect);
+            Debug.Log("numLobbyDisconnect=" + numLobbyDisconnect);
+            Debug.Log("numDisconnectNotif=" + numDisconnectNotif);
+
+            Assert.That(isLobbyConnected);
+            Assert.That(otherLobby.IsConnected, Is.False);
+            Assert.That(numLobbyConnect, Is.EqualTo(1));
+            Assert.That(numLobbyDisconnect, Is.Zero);
+            Assert.That(numDisconnectNotif, Is.Zero);
         }
     }
 }

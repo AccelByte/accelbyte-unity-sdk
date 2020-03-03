@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -23,8 +23,8 @@ namespace AccelByte.Api
             this.httpWorker = httpWorker;
         }
 
-        public IEnumerator GetUserEntitlements(string @namespace, string userId, string userAccessToken, int offset,
-            int limit, ResultCallback<EntitlementPagingSlicedResult> callback)
+        public IEnumerator QueryUserEntitlements(string @namespace, string userId, string userAccessToken, string entitlementName, string itemId, int offset,
+            int limit, EntitlementClazz entitlementClazz, EntitlementAppType entitlementAppType, ResultCallback<EntitlementPagingSlicedResult> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(@namespace, "Can't get user entitlements! Namespace parameter is null!");
@@ -35,8 +35,12 @@ namespace AccelByte.Api
                 .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("entitlementClazz", (entitlementClazz == EntitlementClazz.NONE) ? "" : entitlementClazz.ToString())
+                .WithQueryParam("entitlementAppType", (entitlementAppType == EntitlementAppType.NONE) ? "" : entitlementAppType.ToString())
+                .WithQueryParam("entitlementName", entitlementName)
+                .WithQueryParam("itemId", itemId)
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+                .WithQueryParam("limit", (limit >= 0)? limit.ToString() : "")
                 .WithBearerAuth(userAccessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
@@ -47,6 +51,66 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<EntitlementPagingSlicedResult>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserEntitlementById(string @namespace, string userId, string userAccessToken, string entitlementId,
+            ResultCallback<EntitlementInfo> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(@namespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't get user entitlements! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsNotNull(entitlementId, "Can't get user entitlements! entitlementId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/{entitlementId}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("entitlementId", entitlementId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<EntitlementInfo>();
+            callback.Try(result);
+        }
+
+        public IEnumerator ConsumeUserEntitlement(string @namespace, string userId, string userAccessToken, string entitlementId, int useCount,
+            ResultCallback<EntitlementInfo> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(@namespace, "Can't consume user entitlement! namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't consume user entitlement! userId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't consume user entitlement! userAccessToken parameter is null!");
+            Assert.IsNotNull(entitlementId, "Can't consume user entitlement! entitlementId parameter is null!");
+
+            ConsumeUserEntitlementRequest consumeUserEntitlement = new ConsumeUserEntitlementRequest
+            {
+                useCount = useCount
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/{entitlementId}/decrement")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("entitlementId", entitlementId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(consumeUserEntitlement.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<EntitlementInfo>();
             callback.Try(result);
         }
     }

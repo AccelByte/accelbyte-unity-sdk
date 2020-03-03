@@ -15,12 +15,6 @@ namespace AccelByte.Api
 #endif
     public sealed class AccelByteSettings : ScriptableObject
     {
-        public static string PublisherNamespace
-        {
-            get { return AccelByteSettings.Instance.config.PublisherNamespace; }
-            set { AccelByteSettings.Instance.config.PublisherNamespace = value; }
-        }
-
         public static bool UseSessionManagement
         {
             get { return AccelByteSettings.Instance.config.UseSessionManagement; }
@@ -155,6 +149,8 @@ namespace AccelByte.Api
         }
 
         public Config CopyConfig() { return this.config.ShallowCopy(); }
+        public void UpdateConfig(Config newConfig) { this.config = newConfig; }
+        public bool CompareConfig(Config newConfig) { return this.config.Compare(newConfig); }
 
         /// <summary>
         ///  Load configuration from AccelByteSDKConfig.json
@@ -179,8 +175,6 @@ namespace AccelByte.Api
         /// </summary>
         public void Save()
         {
-            IDictionary<string, string> dict = this.config as IDictionary<string, string>;
-            Debug.Log(dict);
             // Only in the editor should we save it to disk
             string properPath = System.IO.Path.Combine(Application.dataPath, "Resources");
 

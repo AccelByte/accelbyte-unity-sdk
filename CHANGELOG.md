@@ -1,3 +1,58 @@
+# 2.6.0 (2020-03-03)
+## Added
+- Statistic
+  - CreateUserStatItems
+  - GetUserStatItems
+  - IncrementUserStatItems
+- Entitlement
+    - Get user entitlement by its entitlement id.
+    - Consume user entitlement.
+- ServerEcommerce
+	- Credit user wallet.
+	- Grant user entitlement.
+    - Get user entitlement by its entitlement id.
+- Ecommerce Model:
+    - Enum CreditUserWalletSource
+    - ConsumeUserEntitlementRequest
+    - CreditUserWalletRequest
+    - GrantUserEntitlementRequest
+    - StackableEntitlementInfo
+- QosManager
+  - Get Qos Servers
+- Qos
+  - Get Server Latencies
+
+## Fixed
+- Lobby
+  - Stop reconnecting when lobby server disconnects client because token revoked, expired or another session for the same user connecting
+- Integration Test
+  - Fix user test
+
+## Changed
+- Statistic API Standardization
+  - Model:
+    - StatItemInfo into StatItem
+    - BulkUserStatItemInc into UserStatItemIncrement
+    - StatInfo into StatConfig
+    - StatItemIncResult into CreateStatItemRequest
+      - Data Member delete: currentValue
+      - Data Member add: statCode
+    - StatItemPagingSlicedResult into PagedStatItems
+    - BulkStatItemInc into StatItemIncrement
+    - BulkStatItemOperationResult into StatItemOperationResult
+      - Data Member change: detail -> details
+    - StatItemInfo
+      - Add member public string[] tags
+- User
+  - GetUserByEmailAddress into SearchUsers
+    - parameter: string emailadress -> string emailOrDisplayName
+  - UnlinkOtherPlatform
+    - parameter: string platformId -> PlatformType platformType
+  - LinkOtherPlatform
+    - parameter: string platformId -> PlatformType platformType
+- Entitlement
+  - Change class name from entitlements into entitlement
+
 # 2.5.0 (2019-11-25)
 ## Fixed
 - Platform

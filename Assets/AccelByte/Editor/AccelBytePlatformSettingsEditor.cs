@@ -6,274 +6,148 @@ using AccelByte.Models;
 
 namespace AccelByte.Api
 {
-    using System.Collections.Generic;
     using UnityEditor;
     using UnityEngine;
 
-    [CustomEditor(typeof(AccelByteSettings))]
-    public class AccelBytePlatformSettingsEditor : Editor
+    public class AccelBytePlatformSettingsEditor : EditorWindow
     {
-        private bool isAdditionalInfoExpanded;
-        private Config expandedConfig;
-
-        private void OnEnable() { this.isAdditionalInfoExpanded = false; }
+        private static AccelBytePlatformSettingsEditor _instance;
+        public static AccelBytePlatformSettingsEditor Instance { get { return _instance; } }
+        public Texture2D AccelByteLogo;
+        public Config TemporarySetting;
+        public Rect LogoRect;
 
         [MenuItem("AccelByte/Edit Settings")]
-        public static void Edit() { Selection.activeObject = AccelByteSettings.Instance; }
+        public static void Edit()
+        {
+            if (_instance == null)
+            {
+                // Get existing open window or if none, make a new one:
+                _instance = (AccelBytePlatformSettingsEditor)EditorWindow.GetWindow(typeof(AccelBytePlatformSettingsEditor));
+                _instance.Initialize();
+                _instance.Show();
+            }
+            else
+            {
+                _instance.CloseFinal();
+            }
+        }
 
-        public override void OnInspectorGUI()
+        public void Initialize()
+        {
+            titleContent = new GUIContent("AccelByte Configuration");
+            AccelByteLogo = Resources.Load<Texture2D>("ab-logo");
+            this.TemporarySetting = AccelByteSettings.Instance.CopyConfig();
+            LogoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
+        }
+
+        public void CloseFinal()
+        {
+            Close();
+            _instance = null;
+        }
+
+        private void OnGUI()
         {
 #if UNITY_EDITOR
-            // test
-            List<GUIHelper.Worker> workers = new List<GUIHelper.Worker>();
-            this.expandedConfig = AccelByteSettings.Instance.CopyConfig();
-            this.expandedConfig.Expand();
+            LogoRect.x = (this.position.width - 300) / 2;
+            GUI.DrawTexture(LogoRect, AccelByteLogo);
+            EditorGUILayout.BeginVertical();
+            GUILayout.Space(100);
 
-            GUIContent publisherNamespaceLabel = new GUIContent("Publisher Namespace");
-
-            if (AccelByteSettings.PublisherNamespace != null)
+            if(AccelByteSettings.Instance.CompareConfig(TemporarySetting))
             {
-                AccelByteSettings.PublisherNamespace =
-                    MakeTextBox(publisherNamespaceLabel, AccelByteSettings.PublisherNamespace);
-            }
-
-            GUIContent namespaceLabel = new GUIContent("Namespace");
-            AccelByteSettings.Namespace = MakeTextBox(namespaceLabel, AccelByteSettings.Namespace);
-
-            GUIContent useSessionManagementLabel = new GUIContent("Use Session Management");
-            AccelByteSettings.UseSessionManagement = MakeToggle(useSessionManagementLabel, AccelByteSettings.UseSessionManagement);
-
-            GUIContent baseUrlLabel = new GUIContent("Base Url");
-
-            if (AccelByteSettings.BaseUrl != null)
-            {
-                AccelByteSettings.BaseUrl = MakeTextBox(baseUrlLabel, AccelByteSettings.BaseUrl);
+                EditorGUILayout.HelpBox("All configs has been saved!", MessageType.Info, true);
             }
             else
             {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(baseUrlLabel, this.expandedConfig.BaseUrl);
-                });
+                EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
             }
 
-            GUIContent loginServerUrlLabel = new GUIContent("Login Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Namespace");
+            TemporarySetting.Namespace =  EditorGUILayout.TextField(TemporarySetting.Namespace);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.LoginServerUrl != null)
-            {
-                AccelByteSettings.LoginServerUrl = MakeTextBox(loginServerUrlLabel, AccelByteSettings.LoginServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(loginServerUrlLabel, this.expandedConfig.LoginServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Use Session Management");
+            TemporarySetting.UseSessionManagement = EditorGUILayout.Toggle(TemporarySetting.UseSessionManagement);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent iamServerUrlLabel = new GUIContent("IAM Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Base Url");
+            TemporarySetting.BaseUrl = EditorGUILayout.TextField(TemporarySetting.BaseUrl);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.IamServerUrl != null)
-            {
-                AccelByteSettings.IamServerUrl = MakeTextBox(iamServerUrlLabel, AccelByteSettings.IamServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(iamServerUrlLabel, this.expandedConfig.IamServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Login Server Url");
+            TemporarySetting.LoginServerUrl = EditorGUILayout.TextField(TemporarySetting.LoginServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent platformServerUrlLabel = new GUIContent("Platform Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("IAM Server Url");
+            TemporarySetting.IamServerUrl = EditorGUILayout.TextField(TemporarySetting.IamServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.PlatformServerUrl != null)
-            {
-                AccelByteSettings.PlatformServerUrl =
-                    MakeTextBox(platformServerUrlLabel, AccelByteSettings.PlatformServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(platformServerUrlLabel, this.expandedConfig.PlatformServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Platform Server Url");
+            TemporarySetting.PlatformServerUrl = EditorGUILayout.TextField(TemporarySetting.PlatformServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent basicServerUrlLabel = new GUIContent("Basic Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Basic Server Url");
+            TemporarySetting.BasicServerUrl = EditorGUILayout.TextField(TemporarySetting.BasicServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.BasicServerUrl != null)
-            {
-                AccelByteSettings.BasicServerUrl = MakeTextBox(basicServerUrlLabel, AccelByteSettings.BasicServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(basicServerUrlLabel, this.expandedConfig.BasicServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Lobby Server Url");
+            TemporarySetting.LobbyServerUrl = EditorGUILayout.TextField(TemporarySetting.LobbyServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent lobbyServerUrlLabel = new GUIContent("Lobby Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Cloud Storage Server Url");
+            TemporarySetting.CloudStorageServerUrl = EditorGUILayout.TextField(TemporarySetting.CloudStorageServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.LobbyServerUrl != null)
-            {
-                AccelByteSettings.LobbyServerUrl = MakeTextBox(lobbyServerUrlLabel, AccelByteSettings.LobbyServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(lobbyServerUrlLabel, this.expandedConfig.LobbyServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Telemetry Server Url");
+            TemporarySetting.TelemetryServerUrl = EditorGUILayout.TextField(TemporarySetting.TelemetryServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent cloudStorageServerUrlLabel = new GUIContent("Cloud Storage Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Profile Server Url");
+            TemporarySetting.GameProfileServerUrl = EditorGUILayout.TextField(TemporarySetting.GameProfileServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.CloudStorageServerUrl != null)
-            {
-                AccelByteSettings.CloudStorageServerUrl = MakeTextBox(cloudStorageServerUrlLabel,
-                    AccelByteSettings.CloudStorageServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(cloudStorageServerUrlLabel, this.expandedConfig.CloudStorageServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Statistic Server Url");
+            TemporarySetting.StatisticServerUrl = EditorGUILayout.TextField(TemporarySetting.StatisticServerUrl);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent telemetryServerUrlLabel = new GUIContent("Telemetry Server Url");
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Client Id");
+            TemporarySetting.ClientId = EditorGUILayout.TextField(TemporarySetting.ClientId);
+            EditorGUILayout.EndHorizontal();
 
-            if (AccelByteSettings.TelemetryServerUrl != null)
-            {
-                AccelByteSettings.TelemetryServerUrl =
-                    MakeTextBox(telemetryServerUrlLabel, AccelByteSettings.TelemetryServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(telemetryServerUrlLabel, this.expandedConfig.TelemetryServerUrl);
-                });
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Client Secret");
+            TemporarySetting.ClientSecret = EditorGUILayout.PasswordField(TemporarySetting.ClientSecret);
+            EditorGUILayout.EndHorizontal();
 
-            GUIContent gameProfileServerUrlLabel = new GUIContent("Game Profile Server Url");
-
-            if (AccelByteSettings.GameProfileServerUrl != null)
-            {
-                AccelByteSettings.GameProfileServerUrl =
-                    MakeTextBox(gameProfileServerUrlLabel, AccelByteSettings.GameProfileServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(gameProfileServerUrlLabel, this.expandedConfig.GameProfileServerUrl);
-                });
-            }
-
-            GUIContent statisticServerUrlLabel = new GUIContent("Statistic Server Url");
-
-            if (AccelByteSettings.StatisticServerUrl != null)
-            {
-                AccelByteSettings.StatisticServerUrl =
-                    MakeTextBox(statisticServerUrlLabel, AccelByteSettings.StatisticServerUrl);
-            }
-            else
-            {
-                workers.Add(() =>
-                {
-                    MakeSelectableLabel(statisticServerUrlLabel, this.expandedConfig.StatisticServerUrl);
-                });
-            }
-
-            GUIContent clientIdLabel = new GUIContent("Client Id");
-            AccelByteSettings.ClientId = MakeTextBox(clientIdLabel, AccelByteSettings.ClientId);
-
-            GUIContent clientSecretLabel = new GUIContent("Client Secret");
-            AccelByteSettings.ClientSecret = MakePasswordBox(clientSecretLabel, AccelByteSettings.ClientSecret);
-
-            GUIContent redirectUriLabel = new GUIContent("Redirect Uri");
-            AccelByteSettings.RedirectUri = MakeTextBox(redirectUriLabel, AccelByteSettings.RedirectUri);
-
-            this.isAdditionalInfoExpanded = EditorGUILayout.Foldout(this.isAdditionalInfoExpanded, "Additional Info");
-
-            if (this.isAdditionalInfoExpanded)
-            {
-                foreach (var worker in workers)
-                {
-                    worker();
-                }
-            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Redirect Uri");
+            TemporarySetting.RedirectUri = EditorGUILayout.TextField(TemporarySetting.RedirectUri);
+            EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("Save"))
-            {
+            {                
+                AccelByteSettings.Instance.UpdateConfig(TemporarySetting.ShallowCopy());            
                 AccelByteSettings.Instance.Save();
             }
 
-            if (GUILayout.Button("Reload"))
-            {
-                AccelByteSettings.Instance.Load();
-            }
+            EditorGUILayout.EndVertical();
 #endif
         }
-
-        private string MakeTextBox(GUIContent label, string variable)
-        {
-            return GUIHelper.MakeControlWithLabel(label, () =>
-            {
-                GUI.changed = false;
-                var result = EditorGUILayout.TextField(variable);
-                SetDirtyOnGUIChange();
-
-                return result;
-            });
-        }
-
-        private string MakePasswordBox(GUIContent label, string variable)
-        {
-            return GUIHelper.MakeControlWithLabel(label, () =>
-            {
-                GUI.changed = false;
-                var result = EditorGUILayout.PasswordField(variable);
-                SetDirtyOnGUIChange();
-
-                return result;
-            });
-        }
-
-        private bool MakeToggle(GUIContent label, bool variable)
-        {
-            return GUIHelper.MakeControlWithLabel(label, () =>
-            {
-                GUI.changed = false;
-                var result = EditorGUILayout.Toggle(variable);
-                SetDirtyOnGUIChange();
-
-                return result;
-            });
-        }
-
-        private string MakeSelectableLabel(GUIContent label, string variable)
-        {
-            return GUIHelper.MakeControlWithLabel(label, () =>
-            {
-                GUI.changed = false;
-                EditorGUILayout.SelectableLabel(variable);
-                SetDirtyOnGUIChange();
-
-                return variable;
-            });
-        }
-
-        private void SetDirtyOnGUIChange()
-        {
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(AccelByteSettings.Instance);
-                GUI.changed = false;
-            }
-        }
+        
     }
 }

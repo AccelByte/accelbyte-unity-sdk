@@ -13,6 +13,7 @@ namespace AccelByte.Models
     {
         unknown,
         connectNotif,
+        disconnectNotif,
         partyInfoRequest,
         partyInfoResponse,
         partyCreateRequest,
@@ -76,14 +77,12 @@ namespace AccelByte.Models
         rematchmakingNotif,
     }
 
-    public enum UserStatus
+    [DataContract]
+    public class DisconnectNotif
     {
-        Offline = 0,
-        Availabe = 1,
-        Busy = 2,
-        Invisible = 3
+        [DataMember] public string message;
     }
-    
+
     #endregion
 
     #region Notification
@@ -193,9 +192,12 @@ namespace AccelByte.Models
     #region Matchmaking
 
     [DataContract]
-    public class GameMode
+    public class StartMatchmakingRequest
     {
         [DataMember] public string gameMode;
+        [DataMember] public string serverName;
+        [DataMember] public string clientVersion;
+        [DataMember] public string latencies;
     }
 
     [DataContract]
@@ -286,6 +288,14 @@ namespace AccelByte.Models
 
     #region Presence
 
+    public enum UserStatus
+    {
+        Offline = 0,
+        Availabe = 1,
+        Busy = 2,
+        Invisible = 3
+    }
+    
     [DataContract]
     public class FriendsStatusNotif
     {

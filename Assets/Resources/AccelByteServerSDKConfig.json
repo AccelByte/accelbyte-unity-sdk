@@ -1,0 +1,11 @@
+{
+  "Namespace": "<YOUR-GAME-NAMESPACE>",
+  "BaseUrl": "https://demo.accelbyte.io",
+  "IamServerUrl": "https://demo.accelbyte.io/iam",
+  "DSMServerUrl": "https://demo.accelbyte.io/dsmcontroller",
+  "StatisticServerUrl": "https://demo.accelbyte.io/statistic",
+  "PlatformServerUrl": "https://demo.accelbyte.io/platform",
+  "ClientId": "<YOUR-DS-CLIENT-ID>",
+  "ClientSecret": "<YOUR-DS-CLIENT-SECRET>",
+  "RedirectUri": "http://127.0.0.1"
+}

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -120,6 +120,7 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/code/request")
                 .WithPathParam("namespace", this.@namespace)
+                .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"context\": \"{1:G}\"}}", emailAddress, context))
                 .GetResult();
@@ -201,16 +202,15 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator LinkOtherPlatform(string platformId, string ticket, ResultCallback callback)
+        public IEnumerator LinkOtherPlatform(PlatformType platformType, string ticket, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(platformId, "Can't link platform account! Email parameter is null!");
             Assert.IsNotNull(ticket, "Can't link platform account! Password parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("platformId", platformId)
+                .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithFormParam("ticket", ticket)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -225,15 +225,14 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator UnlinkOtherPlatform(string platformId, ResultCallback callback)
+        public IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(platformId, "Can't unlink platfrom account! Email parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreateDelete(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("platformId", platformId)
+                .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.TextPlain)
                 .GetResult();
@@ -266,24 +265,25 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetUserByEmailAddress(string emailAdress, ResultCallback<PagedPublicUsersInfo> callback)
+        public IEnumerator SearchUsers(string emailOrDisplayName, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(emailAdress, "Can't get user data! loginId parameter is null!");
+            Assert.IsNotNull(emailOrDisplayName, nameof(emailOrDisplayName) + " cannot be null.");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", this.@namespace)
-                .WithQueryParam("query", emailAdress)
+                .WithQueryParam("query", emailOrDisplayName)
                 .WithBearerAuth(this.session.AuthorizationToken)
-                .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<PagedPublicUsersInfo> result = response.TryParseJson<PagedPublicUsersInfo>();
+            var result = response.TryParseJson<PagedPublicUsersInfo>();
             callback.Try(result);
         }
 
@@ -296,6 +296,29 @@ namespace AccelByte.Api
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}")
                 .WithPathParam("namespace", this.@namespace)
                 .WithPathParam("userId", userId)
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            Result<UserData> result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserByOtherPlatformUserId(PlatformType platformType, string otherPlatformUserId,
+            ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(otherPlatformUserId, nameof(otherPlatformUserId) + " cannot be null.");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/platforms/{platformId}/users/{platformUserId}")
+                .WithPathParam("namespace", this.@namespace)
+                .WithPathParam("platformId", platformType.ToString().ToLower())
+                .WithPathParam("platformUserId", otherPlatformUserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

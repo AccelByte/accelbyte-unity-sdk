@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -96,6 +96,18 @@ namespace AccelByte.Models
         OTHER
     }
 
+    public enum CreditUserWalletSource
+    {
+        PURCHASE,
+        IAP,
+        PROMOTION,
+        ACHIEVEMENT,
+        REFERRAL_BONUS,
+        REDEEM_CODE,
+        REFUND,
+        OTHER
+    }
+
     #endregion
 
     #region Wallet
@@ -131,7 +143,7 @@ namespace AccelByte.Models
         [DataMember] public string userId { get; set; }
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencySymbol { get; set; }
-        [DataMember] public double balance { get; set; }
+        [DataMember] public int balance { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public ItemStatus status { get; set; }
@@ -157,6 +169,14 @@ namespace AccelByte.Models
     {
         [DataMember] public WalletTransactionInfo[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
+    }
+
+    [DataContract]
+    public class CreditUserWalletRequest
+    {
+        [DataMember] public int amount { get; set; }
+        [DataMember] public CreditUserWalletSource source { get; set; }
+        [DataMember] public string reason { get; set; }
     }
 
     #endregion
@@ -488,6 +508,56 @@ namespace AccelByte.Models
     {
         [DataMember] public EntitlementInfo[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
+    }
+
+    [DataContract]
+    public class ConsumeUserEntitlementRequest
+    {
+        [DataMember] public int useCount { get; set; }
+    };
+
+    [DataContract]
+    public class GrantUserEntitlementRequest
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string grantedCode { get; set; }
+        [DataMember] public string itemNamespace { get; set; }
+        [DataMember] public int quantity { get; set; }
+        [DataMember] public EntitlementSource source { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string language { get; set; }
+    }
+
+    [DataContract]
+    public class StackableEntitlementInfo
+    {
+        [DataMember] public string id { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public EntitlementClazz clazz { get; set; } // ['APP', 'ENTITLEMENT', 'DISTRIBUTION', 'CODE']
+        [DataMember] public EntitlementType type { get; set; } //  ['DURABLE', 'CONSUMABLE']
+        [DataMember] public EntitlementStatus status { get; set; } // ['ACTIVE', 'INACTIVE', 'CONSUMED', 'DISTRIBUTED', 'REVOKED']
+        [DataMember] public string appId { get; set; }
+        [DataMember] public EntitlementAppType appType { get; set; } // ['GAME', 'SOFTWARE', 'DLC', 'DEMO']
+        [DataMember] public string sku { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string grantedCode { get; set; }
+        [DataMember] public string itemNamespace { get; set; }
+        [DataMember] public string name { get; set; }
+        [DataMember] public int useCount { get; set; }
+        [DataMember] public int quantity { get; set; }
+        [DataMember] public EntitlementSource source { get; set; } // ['PURCHASE', 'IAP', 'PROMOTION', 'ACHIEVEMENT', 'REFERRAL_BONUS', 'REDEEM_CODE', 'OTHER']
+        [DataMember] public int distributedQuantity { get; set; }
+        [DataMember] public string targetNamespace { get; set; }
+        [DataMember] public ItemSnapshot itemSnapshot { get; set; }
+        [DataMember] public DateTime startDate { get; set; }
+        [DataMember] public DateTime endDate { get; set; }
+        [DataMember] public bool stackable { get; set; }
+        [DataMember] public DateTime grantedAt { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public int stackedUseCount { get; set; }
+        [DataMember] public int stackedQuantity { get; set; }
     }
 
     #endregion

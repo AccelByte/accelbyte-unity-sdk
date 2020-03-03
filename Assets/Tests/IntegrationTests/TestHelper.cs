@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -61,7 +62,7 @@ namespace Tests
         {
             var stackFrame = new StackFrame(1, true);
             string methodName = Regex.Replace(stackFrame.GetMethod().DeclaringType.Name, @".*<([^)]+)>.*", "$1");
-            
+
             Debug.Log("=== START TEST: " + methodName + " ===");
         }
 
@@ -69,7 +70,7 @@ namespace Tests
         {
             var stackFrame = new StackFrame(1, true);
             string methodName = Regex.Replace(stackFrame.GetMethod().DeclaringType.Name, @".*<([^)]+)>.*", "$1");
-            
+
             Debug.Log("=== END TEST:  " + methodName + " ===");
         }
 
@@ -116,13 +117,17 @@ namespace Tests
             }
         }
 
+        public void DeleteUser(string userId, ResultCallback callback)
+        {
+            this.coroutineRunner.Run(DeleteAsync(userId, callback));
+        }
+
         public void DeleteUser(User user, ResultCallback callback)
         {
             this.coroutineRunner.Run(DeleteAsync(user, callback));
         }
 
-        public void DeleteUser(PlatformType platformType, string platformToken,
-            ResultCallback callback)
+        public void DeleteUser(PlatformType platformType, string platformToken, ResultCallback callback)
         {
             this.coroutineRunner.Run(DeleteAsync(platformType, platformToken, callback));
         }
@@ -219,27 +224,35 @@ namespace Tests
             this.coroutineRunner.Run(CreateMatchmakingChannelAsync(accessToken, channel, callback));
         }
 
-        public void GetStatByStatCode(string statCode, string accessToken, ResultCallback<StatInfo> callback)
+        public void GetStatConfigByStatCode(string statCode, string accessToken, ResultCallback<StatConfig> callback)
         {
-            this.coroutineRunner.Run(GetStatByStatCodeAsync(statCode, accessToken, callback));
+            this.coroutineRunner.Run(GetStatConfigByStatCodeAsync(statCode, accessToken, callback));
         }
 
-        public void createStat(string accessToken, StatCreateModel body, ResultCallback<StatInfo> callback)
+        public void CreateStatConfig(string accessToken, StatCreateModel body, ResultCallback<StatConfig> callback)
         {
-            this.coroutineRunner.Run(CreateStatAsync(accessToken, body, callback));
+            this.coroutineRunner.Run(CreateStatConfigAsync(accessToken, body, callback));
         }
 
-        public void BulkCreateUserStatItem(string userId, string[] statCode, string accessToken, ResultCallback<BulkStatItemOperationResult[]> callback)
+        public void CreateUserStatItems(string userId, string[] statCodes, string accessToken,
+            ResultCallback<StatItemOperationResult[]> callback)
         {
-            this.coroutineRunner.Run(BulkCreateUserStatItemAsync(userId, statCode, accessToken, callback));
+            this.coroutineRunner.Run(CreateUserStatItemsAsync(userId, statCodes, accessToken, callback));
         }
 
-        public void GetUserVerificationCode(string userId, string accessToken, ResultCallback<UserVerificationCode> callback)
+        public void DeleteStatItem(string accessToken, string userId, string statCode, ResultCallback callback)
+        {
+            this.coroutineRunner.Run(DeleteStatItemAsync(accessToken, userId, statCode, callback));
+        }
+
+        public void GetUserVerificationCode(string userId, string accessToken,
+            ResultCallback<UserVerificationCode> callback)
         {
             this.coroutineRunner.Run(GetUserVerificationCodeAsync(userId, accessToken, callback));
         }
 
-        private IEnumerator GetUserVerificationCodeAsync(string userId, string accessToken, ResultCallback<UserVerificationCode> callback)
+        private IEnumerator GetUserVerificationCodeAsync(string userId, string accessToken,
+            ResultCallback<UserVerificationCode> callback)
         {
             Result<TokenData> clientLoginResult = null;
 
@@ -247,11 +260,7 @@ namespace Tests
 
             Result<UserMapResponse> userMapResult = null;
 
-            yield return GetUserMapping(
-                userId,
-                clientLoginResult.Value.access_token,
-                result => userMapResult = result);
-
+            yield return GetUserMapping(userId, clientLoginResult.Value.access_token, result => userMapResult = result);
 
             yield return GetVerificationCodeAsync(
                 userMapResult.Value.Namespace,
@@ -262,27 +271,26 @@ namespace Tests
 
         private IEnumerator CreateMatchmakingChannelAsync(string accessToken, string channel, ResultCallback callback)
         {
-            string requestBody = string.Format(
-                @"{{
-                    ""description"": ""1v1 game mode for test"",
-                    ""game_mode"": ""{0}"",
-                    ""rule_set"": 
-                    {{
-                        ""alliance_number"": 2,
-                        ""flexing_rule"": null,
-                        ""matching_rule"": null,
-                        ""symmetric_match"": true,
-                        ""symmetric_party_number"": 1
-                    }}
-                }}",
-                channel);
+            var requestBody = new CreateChannelRequest
+            {
+                description = "1v1",
+                find_match_timeout_seconds = 60,
+                game_mode = channel,
+                rule_set = new RuleSet
+                {
+                    alliance = new AllianceRule
+                    {
+                        min_number = 2, max_number = 2, player_min_number = 1, player_max_number = 1
+                    }
+                }
+            };
 
             UnityWebRequest request = HttpRequestBuilder
                 .CreatePost(this.baseServerUrl + "/matchmaking/namespaces/{namespace}/channels")
                 .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(requestBody)
+                .WithBody(requestBody.ToUtf8Json())
                 .GetResult()
                 .GetUnityWebRequest();
 
@@ -347,7 +355,8 @@ namespace Tests
             callback.Try(result);
         }
 
-        private IEnumerator DeleteUserProfile(string @namespace, string userId, string clientAccessToken, ResultCallback callback)
+        private IEnumerator DeleteUserProfile(string @namespace, string userId, string clientAccessToken,
+            ResultCallback callback)
         {
             UnityWebRequest request = HttpRequestBuilder
                 .CreateDelete(this.baseServerUrl + "/basic/v1/admin/namespaces/{namespace}/users/{userId}/profiles")
@@ -387,6 +396,11 @@ namespace Tests
 
         private IEnumerator DeleteAsync(User user, ResultCallback callback)
         {
+            yield return DeleteAsync(user.Session.UserId, callback);
+        }
+
+        private IEnumerator DeleteAsync(string userId, ResultCallback callback)
+        {
             Result<TokenData> clientLoginResult = null;
 
             yield return ClientLogin(result => clientLoginResult = result);
@@ -394,24 +408,29 @@ namespace Tests
             Result<UserMapResponse> userMapResult = null;
 
             yield return GetUserMapping(
-                user.Session.UserId,
+                userId,
                 clientLoginResult.Value.access_token,
                 result => userMapResult = result);
 
-
-            yield return Delete(
-                userMapResult.Value.Namespace,
-                userMapResult.Value.UserId,
-                clientLoginResult.Value.access_token,
-                callback);
+            if (!userMapResult.IsError)
+            {
+                yield return Delete(
+                    userMapResult.Value.Namespace,
+                    userMapResult.Value.UserId,
+                    clientLoginResult.Value.access_token,
+                    callback);
+            }
+            else
+            {
+                callback.TryOk();
+            }
         }
 
         private IEnumerator DeleteAsync(PlatformType platformType, string platformToken, ResultCallback callback)
         {
             Result<TokenData> clientLoginResult = null;
 
-            yield return this.ClientLogin(
-                result => { clientLoginResult = result; });
+            yield return this.ClientLogin(result => { clientLoginResult = result; });
 
             Result loginResult = null;
 
@@ -467,8 +486,7 @@ namespace Tests
         {
             Result<TokenData> clientLoginResult = null;
 
-            yield return this.ClientLogin(
-                clientResult => clientLoginResult = clientResult);
+            yield return this.ClientLogin(clientResult => clientLoginResult = clientResult);
 
             string body = string.Format("{{\"message\": \"{0}\",\"topic\": \"none\" }}", message);
 
@@ -498,8 +516,7 @@ namespace Tests
         {
             Result<TokenData> clientLoginResult = null;
 
-            yield return this.ClientLogin(
-                clientResult => clientLoginResult = clientResult);
+            yield return this.ClientLogin(clientResult => clientLoginResult = clientResult);
 
             callback.Try(clientLoginResult);
         }
@@ -764,7 +781,8 @@ namespace Tests
             callback.Try(result);
         }
 
-        private IEnumerator GetStatByStatCodeAsync(string statCode, string accessToken, ResultCallback<StatInfo> callback)
+        private IEnumerator GetStatConfigByStatCodeAsync(string statCode, string accessToken,
+            ResultCallback<StatConfig> callback)
         {
             UnityWebRequest request = HttpRequestBuilder
                 .CreateGet(baseServerUrl + "/statistic/v1/admin/namespaces/{namespace}/stats/{statCode}")
@@ -777,15 +795,15 @@ namespace Tests
 
             yield return request.SendWebRequest();
 
-            Result<StatInfo> result = request.GetHttpResponse().TryParseJson<StatInfo>();
+            Result<StatConfig> result = request.GetHttpResponse().TryParseJson<StatConfig>();
             callback.Try(result);
         }
 
-        private IEnumerator CreateStatAsync(string accessToken, StatCreateModel body,
-            ResultCallback<StatInfo> callback)
+        private IEnumerator CreateStatConfigAsync(string accessToken, StatCreateModel body,
+            ResultCallback<StatConfig> callback)
         {
             UnityWebRequest request = HttpRequestBuilder
-                .CreatePost(baseServerUrl + "/statistic/v1/admin/namespaces/{namespace}/stats")
+                .CreatePost(this.baseServerUrl + "/statistic/v1/admin/namespaces/{namespace}/stats")
                 .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(JsonSerializer.Serialize(body))
@@ -796,19 +814,20 @@ namespace Tests
 
             yield return request.SendWebRequest();
 
-            Result<StatInfo> result = request.GetHttpResponse().TryParseJson<StatInfo>();
+            Result<StatConfig> result = request.GetHttpResponse().TryParseJson<StatConfig>();
             callback.Try(result);
         }
 
-        private IEnumerator BulkCreateUserStatItemAsync(string userId, string[] statCode, string accessToken,
-            ResultCallback<BulkStatItemOperationResult[]> callback)
+        private IEnumerator CreateUserStatItemsAsync(string userId, string[] statCodes, string accessToken,
+            ResultCallback<StatItemOperationResult[]> callback)
         {
-
             string body = "[";
-            for (int i = 0; i < statCode.Length; i++)
+
+            for (int i = 0; i < statCodes.Length; i++)
             {
-                body += string.Format(@"{{""statCode"":""{0}""}}", statCode[i]);
-                if (i < statCode.Length - 1)
+                body += string.Format(@"{{""statCode"":""{0}""}}", statCodes[i]);
+
+                if (i < statCodes.Length - 1)
                 {
                     body += ",";
                 }
@@ -817,6 +836,9 @@ namespace Tests
                     body += "]";
                 }
             }
+
+            statCodes.Aggregate("", (acc, curr) => acc + "," + string.Format(@"{{""statCode"":""{0}""}}", curr));
+
             UnityWebRequest request = HttpRequestBuilder
                 .CreatePost(baseServerUrl + "/statistic/v1/admin/namespaces/{namespace}/users/{userId}/statitems/bulk")
                 .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
@@ -830,11 +852,36 @@ namespace Tests
 
             yield return request.SendWebRequest();
 
-            Result<BulkStatItemOperationResult[]> result = request.GetHttpResponse().TryParseJson<BulkStatItemOperationResult[]>();
+            Result<StatItemOperationResult[]> result =
+                request.GetHttpResponse().TryParseJson<StatItemOperationResult[]>();
+
             callback.Try(result);
         }
 
-        private IEnumerator GetVerificationCodeAsync(string Namespace, string userId, string accessToken, ResultCallback<UserVerificationCode> callback)
+        private IEnumerator DeleteStatItemAsync(string accessToken, string userId, string statCode,
+            ResultCallback callback)
+        {
+            UnityWebRequest request = HttpRequestBuilder
+                .CreateDelete(
+                    baseServerUrl +
+                    "/statistic/v1/admin/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems")
+                .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("statCode", statCode)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(accessToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult()
+                .GetUnityWebRequest();
+
+            yield return request.SendWebRequest();
+
+            var result = request.GetHttpResponse().TryParse();
+            callback.Try(result);
+        }
+
+        private IEnumerator GetVerificationCodeAsync(string Namespace, string userId, string accessToken,
+            ResultCallback<UserVerificationCode> callback)
         {
             UnityWebRequest request = HttpRequestBuilder
                 .CreateGet(baseServerUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/codes")
@@ -890,7 +937,7 @@ namespace Tests
             }
             catch (AssertionException ex)
             {
-                Debug.Log("FAILED TEST " + methodName +  " LINE " + stackFrame.GetFileLineNumber() + ": " + ex.Message);
+                Debug.Log("FAILED TEST " + methodName + " LINE " + stackFrame.GetFileLineNumber() + ": " + ex.Message);
 #if UNITY_EDITOR
                 if (UnityEditorInternal.InternalEditorUtility.inBatchMode)
                 {
@@ -901,6 +948,49 @@ namespace Tests
 
                 throw;
             }
+        }
+
+        [DataContract]
+        public class AllianceRule
+        {
+            [DataMember] public int max_number { get; set; }
+            [DataMember] public int min_number { get; set; }
+            [DataMember] public int player_max_number { get; set; }
+            [DataMember] public int player_min_number { get; set; }
+        }
+
+        [DataContract]
+        public class FlexingRule
+        {
+            [DataMember] public string attribute { get; set; }
+            [DataMember] public string criteria { get; set; }
+            [DataMember] public int duration { get; set; }
+            [DataMember] public int reference { get; set; }
+        }
+
+        [DataContract]
+        public class MatchingRule
+        {
+            [DataMember] public string attribute { get; set; }
+            [DataMember] public string criteria { get; set; }
+            [DataMember] public int reference { get; set; }
+        }
+
+        [DataContract]
+        public class RuleSet
+        {
+            [DataMember] public AllianceRule alliance { get; set; }
+            [DataMember] public FlexingRule flexing_rule { get; set; }
+            [DataMember] public MatchingRule matching_rule { get; set; }
+        }
+
+        [DataContract]
+        public class CreateChannelRequest
+        {
+            [DataMember] public string description { get; set; }
+            [DataMember] public uint find_match_timeout_seconds { get; set; }
+            [DataMember] public string game_mode { get; set; }
+            [DataMember] public RuleSet rule_set { get; set; }
         }
 
         [DataContract]
@@ -1079,7 +1169,7 @@ namespace Tests
         }
 
         [DataContract]
-            public class StatCreateModel
+        public class StatCreateModel
         {
             [DataMember] public float defaultValue { get; set; }
             [DataMember] public string description { get; set; }

@@ -452,11 +452,6 @@ namespace HybridWebSocket
                     throw new WebSocketUnexpectedException("Websocket failed to connect.", e);
                 }
 
-                if (this.webSocket.ReadyState != WebSocketState.Open)
-                {
-                    throw new WebSocketUnexpectedException("Websocket failed to connect.");
-                }
-
                 break;
             }
         }

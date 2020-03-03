@@ -1,21 +1,15 @@
-// Copyright (c) 2018 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
 using System.Collections;
-using System.Diagnostics;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using AccelByte.Models;
 using AccelByte.Api;
 using AccelByte.Core;
 using NUnit.Framework;
-using OpenPop.Mime;
-using OpenPop.Pop3;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -1052,6 +1046,129 @@ namespace Tests.IntegrationTests
         }
 
         [UnityTest, Timeout(150000)]
+        public IEnumerator RegisterWithEmail_ResendVerificationCode_VerifiedWithLastSentCode()
+        {
+            TestHelper.LogStartTest();
+            var helper = new TestHelper();
+            var user = AccelBytePlugin.GetUser();
+            Result<RegisterUserResponse> registerResult = null;
+            var guid = Guid.NewGuid().ToString("N");
+            string email = string.Format("testeraccelbyte+sdk{0}@gmail.com", guid);
+            string password = "AccelbytE123";
+
+            Debug.Log(string.Format("Register With Email:{0}, {1}", email, password));
+            user.Register(
+                email,
+                password,
+                "testersdk",
+                "US",
+                DateTime.Now.AddYears(-22),
+                result => registerResult = result);
+
+            while (registerResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            Result loginResult = null;
+            user.LoginWithUsername(email, password, result => loginResult = result);
+
+            while (loginResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.LogResult(loginResult, "Login With Email");
+
+            Result sendCodeResult = null;
+            user.SendVerificationCode(result => sendCodeResult = result);
+
+            while (sendCodeResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            Result<TokenData> clientToken = null;
+            helper.GetAccessToken(result => { clientToken = result; });
+
+            while (clientToken == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            Result<TestHelper.UserVerificationCode> userVerificationCode = null;
+            helper.GetUserVerificationCode(
+                registerResult.Value.userId,
+                clientToken.Value.access_token,
+                result => userVerificationCode = result);
+
+            while (userVerificationCode == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            var verificationCode = userVerificationCode.Value.accountRegistration;
+
+            Debug.Log(
+                string.Format(
+                    "Verify Email: {0}, password: {1}, verificationCode: {2}",
+                    email,
+                    password,
+                    verificationCode));
+
+            Result verificationResult = null;
+            user.Verify(verificationCode, result => verificationResult = result);
+
+            while (verificationResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.LogResult(verificationResult, "Verify");
+
+            TestHelper.Assert.That(registerResult.Error, Is.Null);
+            TestHelper.Assert.That(loginResult.Error, Is.Null);
+            TestHelper.Assert.That(verificationResult.Error, Is.Null);
+
+            Result deleteResult = null;
+            helper.DeleteUser(user, result => deleteResult = result);
+
+            while (deleteResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            Result logoutResult = null;
+            user.Logout(r => logoutResult = r);
+
+            while (logoutResult == null)
+            {
+                Thread.Sleep(100);
+
+                yield return null;
+            }
+
+            TestHelper.LogResult(logoutResult, "Logout");
+
+            TestHelper.LogResult(deleteResult, "Delete");
+            TestHelper.LogEndTest();
+        }
+
+        [UnityTest, Timeout(150000)]
         public IEnumerator UpdateUser_WithCountry_ReturnsTokenResponseWithCountry()
         {
             TestHelper.LogStartTest();
@@ -1430,7 +1547,7 @@ namespace Tests.IntegrationTests
             TestHelper.LogResult(loginResult, "Login With Second Email");
 
             Result<PagedPublicUsersInfo> userData = null;
-            users[0].GetUserByEmailAddress(registerUserResponses[1].emailAddress, result => userData = result);
+            users[0].SearchUsers(registerUserResponses[1].emailAddress, result => userData = result);
 
             while (userData == null)
             {
@@ -1495,7 +1612,7 @@ namespace Tests.IntegrationTests
             TestHelper.LogResult(loginDeviceResult, "Login With Device ID");
 
             Result<PagedPublicUsersInfo> usersInfo = null;
-            user.GetUserByEmailAddress(email, result => usersInfo = result);
+            user.SearchUsers(email, result => usersInfo = result);
 
             while (usersInfo == null)
             {
@@ -1547,7 +1664,7 @@ namespace Tests.IntegrationTests
 
 
             Result<PagedPublicUsersInfo> userData = null;
-            user.GetUserByEmailAddress(email, result => userData = result);
+            user.SearchUsers(email, result => userData = result);
 
             while (userData == null)
             {

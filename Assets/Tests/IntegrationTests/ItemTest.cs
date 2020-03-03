@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -15,12 +15,12 @@ namespace Tests.IntegrationTests
     namespace EcommerceTest
     {
         [TestFixture]
-        public class GetItem
+        public class ItemTest
         {
             string expectedItemId = "";
             string expectedCategoryName = "";
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator SetUp_ExpectedEcommerceStuff()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -29,7 +29,7 @@ namespace Tests.IntegrationTests
                 Result<CategoryInfo[]> getChildCategoryResult = null;
                 ItemCriteria itemCriteria = new ItemCriteria
                 {
-                    categoryPath = TestVariables.childCategoryPath,
+                    categoryPath = TestVariables.expectedChildCategoryPath,
                     region = TestVariables.region,
                     language = TestVariables.language
                 };
@@ -50,7 +50,7 @@ namespace Tests.IntegrationTests
                 }
 
                 categories.GetChildCategories(
-                    TestVariables.childCategoryPath,
+                    TestVariables.expectedChildCategoryPath,
                     TestVariables.language,
                     result => { getChildCategoryResult = result; });
 
@@ -65,7 +65,7 @@ namespace Tests.IntegrationTests
                 Assert.That(!getChildCategoryResult.IsError);
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemValid_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -90,7 +90,7 @@ namespace Tests.IntegrationTests
                         "Get item failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemIdInvalid_ItemNotFound()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -116,7 +116,7 @@ namespace Tests.IntegrationTests
                         "Request error on get item failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemIdEmpty_ItemNotFound()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -141,7 +141,7 @@ namespace Tests.IntegrationTests
                         "Request error on get get item failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemRegionInvalid_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -165,7 +165,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.That(getItemResult.Value, Is.Not.Null, "Get item failed with invalid region failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemRegionEmpty_Fail()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -187,7 +187,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(getItemResult.IsError, "Get item with empty region not failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemLanguageInvalid_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -213,7 +213,7 @@ namespace Tests.IntegrationTests
                         "Get item with invalid language failed.");
             }
 
-            [UnityTest, Order(3)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItem_ItemLanguageEmpty_Fail()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -230,16 +230,12 @@ namespace Tests.IntegrationTests
 
                 TestHelper.Assert.IsTrue(getItemResult.IsError, "Get item with empty language not failed.");
             }
-        }
 
-        [TestFixture]
-        public class GetItemByCriteria
-        {
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_CategoryPathValid_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
-                ItemCriteria itemCriteria = new ItemCriteria {categoryPath = TestVariables.childCategoryPath};
+                ItemCriteria itemCriteria = new ItemCriteria {categoryPath = TestVariables.expectedChildCategoryPath };
                 Result<ItemPagingSlicedResult> getItemByCriteriaResult = null;
 
                 items.GetItemsByCriteria(
@@ -255,11 +251,11 @@ namespace Tests.IntegrationTests
 
                 TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by valid criteria failed.");
                 TestHelper.Assert.IsTrue(
-                        getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.childCategoryPath),
+                        getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.expectedChildCategoryPath),
                         "Get item by valid criteria failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_CategoryPathUnspecified_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -283,7 +279,7 @@ namespace Tests.IntegrationTests
                         "Get item by valid criteria failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_CategoryPathInvalid_SuccessButEmpty()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -308,7 +304,7 @@ namespace Tests.IntegrationTests
                         "Get item by invalid category path failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_ItemTypeCOINS_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -329,7 +325,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type COINS failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_ItemTypeINGAMEITEM_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -350,7 +346,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type INGAMEITEM failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_ItemTypeBUNDLE_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -371,13 +367,13 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by item type BUNDLE failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_LanguageInvalid_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
                 const string invalidCategoryLanguage = "id";
                 ItemCriteria itemCriteria = new ItemCriteria {
-                    categoryPath = TestVariables.childCategoryPath,
+                    categoryPath = TestVariables.expectedChildCategoryPath,
                     language = invalidCategoryLanguage
                 };
                 Result<ItemPagingSlicedResult> getItemByCriteriaResult = null;
@@ -395,16 +391,16 @@ namespace Tests.IntegrationTests
 
                 TestHelper.Assert.IsTrue(!getItemByCriteriaResult.IsError, "Get item by invalid language failed.");
                 TestHelper.Assert.IsTrue(
-                        getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.childCategoryPath),
+                        getItemByCriteriaResult.Value.data[0].categoryPath.Contains(TestVariables.expectedChildCategoryPath),
                         "Get item by invalid language failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_LanguageEmpty_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
                 ItemCriteria itemCriteria = new ItemCriteria {
-                    categoryPath = TestVariables.childCategoryPath,
+                    categoryPath = TestVariables.expectedChildCategoryPath,
                     language = ""
                 };
                 Result<ItemPagingSlicedResult> getItemByCriteriaResult = null;
@@ -423,7 +419,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(getItemByCriteriaResult.IsError, "Get item by empty language not failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_AppTypeGAME_Success()
             {
                 Items items = AccelBytePlugin.GetItems();
@@ -443,7 +439,7 @@ namespace Tests.IntegrationTests
                 }
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(1)]
             public IEnumerator GetItemByCriteria_byTags_Success()
             {
                 Items items = AccelBytePlugin.GetItems();

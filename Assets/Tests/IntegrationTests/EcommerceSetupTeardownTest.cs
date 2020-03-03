@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,6 +10,7 @@ using System.Threading;
 using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Server;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -20,17 +21,20 @@ namespace Tests.IntegrationTests
     {
         public static class TestVariables
         {
-            public static string rootCategoryPath;
-            public static string childCategoryPath;
-            public static string grandChildCategoryPath;
+            public static string expectedRootCategoryPath;
+            public static string expectedChildCategoryPath;
+            public static string expectedGrandChildCategoryPath;
             public static string currencyCode;
             public static string inGameItemTitle;
             public static string currencyItemTitle;
             public static string language;
             public static string region;
-            public static string SdkCloneStoreId;
-            public static string ArchiveOriStoreId;
+            public static string createdTemporaryStoreInfoId;
+            public static string createdArchiveStoreInfoId;
             public static string publishedStoreId;
+            public static string accessToken;
+            public static string userId;
+            public static TestHelper.FullItemInfo inGameItem;
             public static bool bPublishedStoreIsExist = true;
 
             [DataContract]
@@ -51,25 +55,11 @@ namespace Tests.IntegrationTests
         public class A_SetupEcommerce
         {
             [UnityTest, Order(1), Timeout(120000)]
-            public IEnumerator A2_PrepareDependencies()
+            public IEnumerator PrepareDependencies()
             {
                 TestVariables.language = "en";
                 TestVariables.region = "US";
                 TestHelper testHelper = new TestHelper();
-                var user = AccelBytePlugin.GetUser();
-
-                //Get AccessToken
-                Result<TokenData> GetAccessToken = null;
-                testHelper.GetAccessToken(result => { GetAccessToken = result; });
-
-                while (GetAccessToken == null)
-                {
-                    Thread.Sleep(100);
-
-                    yield return null;
-                }
-
-                string accessToken = GetAccessToken.Value.access_token;
 
                 TestHelper.CurrencyCreateModel createVtCurrency = new TestHelper.CurrencyCreateModel
                 {
@@ -95,7 +85,7 @@ namespace Tests.IntegrationTests
 
                 //Check Virtual currency isNotExist? makeNew : use Existing;
                 Result<TestHelper.CurrencySummaryModel> getVtResult = null;
-                testHelper.GetCurrencySummary(accessToken, createVtCurrency.currencyCode, result => { getVtResult = result; });
+                testHelper.GetCurrencySummary(TestVariables.accessToken, createVtCurrency.currencyCode, result => { getVtResult = result; });
 
                 while (getVtResult == null)
                 {
@@ -107,7 +97,7 @@ namespace Tests.IntegrationTests
                 if (getVtResult.IsError)
                 {
                     Result<TestHelper.CurrencyInfoModel> createVtResult = null;
-                    testHelper.CreateCurrency(accessToken, createVtCurrency, result => { createVtResult = result; });
+                    testHelper.CreateCurrency(TestVariables.accessToken, createVtCurrency, result => { createVtResult = result; });
 
                     while (createVtResult == null)
                     {
@@ -128,7 +118,7 @@ namespace Tests.IntegrationTests
 
                 //Check Real currency isNotExist? makeNew : use Existing;
                 Result<TestHelper.CurrencySummaryModel> getRealResult = null;
-                testHelper.GetCurrencySummary(accessToken, createRealCurrency.currencyCode, result => { getRealResult = result; });
+                testHelper.GetCurrencySummary(TestVariables.accessToken, createRealCurrency.currencyCode, result => { getRealResult = result; });
 
                 while (getRealResult == null)
                 {
@@ -140,7 +130,7 @@ namespace Tests.IntegrationTests
                 if (getRealResult.IsError)
                 {
                     Result<TestHelper.CurrencyInfoModel> createRealResult = null;
-                    testHelper.CreateCurrency(accessToken, createRealCurrency, result => { createRealResult = result; });
+                    testHelper.CreateCurrency(TestVariables.accessToken, createRealCurrency, result => { createRealResult = result; });
 
                     while (createRealResult == null)
                     {
@@ -153,179 +143,182 @@ namespace Tests.IntegrationTests
                 }
 
                 //Get published store
-                Result<TestHelper.StoreInfoModel> publishedStore = null;
-                testHelper.GetPublishedStore(accessToken, result => { publishedStore = result; });
+                Result<TestHelper.StoreInfoModel> publishedStoreInfo = null;
+                testHelper.GetPublishedStore(TestVariables.accessToken, result => { publishedStoreInfo = result; });
 
-                while (publishedStore == null)
+                while (publishedStoreInfo == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                if (publishedStore.IsError)
+                if (publishedStoreInfo.IsError)
                 {
-                    Debug.Log(publishedStore.Error.Code);
-                    TestHelper.Assert.That(publishedStore.Error.Code == ErrorCode.PublisherStoreNotExist);
+                    Debug.Log(publishedStoreInfo.Error.Code);
+                    TestHelper.Assert.That(publishedStoreInfo.Error.Code == ErrorCode.PublisherStoreNotExist);
                     TestVariables.bPublishedStoreIsExist = false;
                 }
                 else
                 {
-                    TestHelper.Assert.That(!publishedStore.IsError);
+                    TestHelper.Assert.That(!publishedStoreInfo.IsError);
                 }
 
-                if (TestVariables.bPublishedStoreIsExist) TestVariables.publishedStoreId = publishedStore.Value.storeId;
-
-                //Create temp store
-                TestHelper.StoreCreateModel SdkClone = new TestHelper.StoreCreateModel
-                {
-                    title = "SdkCloneTemporary",
-                    description = "SdkIntegrationTesting",
-                    supportedLanguages = new string[] { "en" },
-                    supportedRegions = new string[] { "US" },
-                    defaultLanguage = "en",
-                    defaultRegion = "US"
-                };
-
-                Result<TestHelper.StoreInfoModel> CreateStoreResult = null;
-                testHelper.CreateStore(accessToken, SdkClone, result => { CreateStoreResult = result; });
-
-                while (CreateStoreResult == null)
-                {
-                    Thread.Sleep(100);
-
-                    yield return null;
-                }
-
-                TestVariables.SdkCloneStoreId = CreateStoreResult.Value.storeId;
-                TestHelper.Assert.That(TestVariables.SdkCloneStoreId != null);
-
-                Result<TestHelper.StoreInfoModel> cloneResult = null;
+                if (TestVariables.bPublishedStoreIsExist) TestVariables.publishedStoreId = publishedStoreInfo.Value.storeId;
 
                 if (TestVariables.bPublishedStoreIsExist)
                 {
                     //Create archive publisher store
-                    TestHelper.StoreCreateModel ArchiveOri = new TestHelper.StoreCreateModel
+                    TestHelper.StoreCreateModel archiveStore = new TestHelper.StoreCreateModel
                     {
-                        title = "ArchiveOriginalStore",
-                        description = "PublisheStoreStateBeforeECommerceTest",
+                        title = "Unity-Store-Archive",
+                        description = "keep the original store",
                         supportedLanguages = new string[] { "en" },
                         supportedRegions = new string[] { "US" },
                         defaultLanguage = "en",
                         defaultRegion = "US"
                     };
 
-                    CreateStoreResult = null;
-                    testHelper.CreateStore(accessToken, ArchiveOri, result => { CreateStoreResult = result; });
+                    Result<TestHelper.StoreInfoModel> createdArchiveStoreInfo = null;
+                    testHelper.CreateStore(TestVariables.accessToken, archiveStore, result => { createdArchiveStoreInfo = result; });
 
-                    while (CreateStoreResult == null)
+                    while (createdArchiveStoreInfo == null)
                     {
                         Thread.Sleep(100);
 
                         yield return null;
                     }
 
-                    TestVariables.ArchiveOriStoreId = CreateStoreResult.Value.storeId;
-                    TestHelper.Assert.That(TestVariables.ArchiveOriStoreId != null);
+                    TestVariables.createdArchiveStoreInfoId = createdArchiveStoreInfo.Value.storeId;
+                    TestHelper.Assert.That(TestVariables.createdArchiveStoreInfoId != null);
 
+                    Result<TestHelper.StoreInfoModel> cloneArchiveStoreInfo = null;
                     testHelper.CloneStore(
-                        accessToken,
+                        TestVariables.accessToken,
                         TestVariables.publishedStoreId,
-                        TestVariables.ArchiveOriStoreId,
-                        result => { cloneResult = result; });
+                        TestVariables.createdArchiveStoreInfoId,
+                        result => { cloneArchiveStoreInfo = result; });
 
-                    while (cloneResult == null)
+                    while (cloneArchiveStoreInfo == null)
                     {
                         Thread.Sleep(100);
 
                         yield return null;
                     }
 
-                    TestHelper.Assert.That(!cloneResult.IsError);
+                    TestHelper.Assert.That(!cloneArchiveStoreInfo.IsError);
                 }
 
-                TestHelper.CategoryCreateModel SdkRootCategory = new TestHelper.CategoryCreateModel
+                //Create temp store
+                TestHelper.StoreCreateModel temporaryStore = new TestHelper.StoreCreateModel
                 {
-                    categoryPath = "/SdkRootCategory",
+                    title = "Unity-Store-Temporary",
+                    description = "for Unity SDK testing purpose",
+                    supportedLanguages = new string[] { "en" },
+                    supportedRegions = new string[] { "US" },
+                    defaultLanguage = "en",
+                    defaultRegion = "US"
+                };
+
+                Result<TestHelper.StoreInfoModel> createdTemporaryStoreInfo = null;
+                testHelper.CreateStore(TestVariables.accessToken, temporaryStore, result => { createdTemporaryStoreInfo = result; });
+
+                while (createdTemporaryStoreInfo == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                };
+
+                TestVariables.createdTemporaryStoreInfoId = createdTemporaryStoreInfo.Value.storeId;
+                TestHelper.Assert.That(TestVariables.createdTemporaryStoreInfoId != null);
+
+                TestHelper.CategoryCreateModel unityRootCategory = new TestHelper.CategoryCreateModel
+                {
+                    categoryPath = "/UnityRootCategory",
                     localizationDisplayNames = new Dictionary<string, string>()
                 };
-                SdkRootCategory.localizationDisplayNames.Add("en", "TestingRootCategory");
-                TestVariables.rootCategoryPath = SdkRootCategory.categoryPath;
+                unityRootCategory.localizationDisplayNames.Add("en", "Unity's ecommerce root category");
+                TestVariables.expectedRootCategoryPath = unityRootCategory.categoryPath;
 
-                TestHelper.CategoryCreateModel SdkChildCategory = new TestHelper.CategoryCreateModel
-                {
-                    categoryPath = "/SdkRootCategory/SdkChildCategory",
-                    localizationDisplayNames = new Dictionary<string, string>()
-                };
-                SdkChildCategory.localizationDisplayNames.Add("en", "TestingChildCategory");
-                TestVariables.childCategoryPath = SdkChildCategory.categoryPath;
-
-                TestHelper.CategoryCreateModel SdkGrandChildCategory = new TestHelper.CategoryCreateModel
-                {
-                    categoryPath = "/SdkRootCategory/SdkChildCategory/GrandChildCategory",
-                    localizationDisplayNames = new Dictionary<string, string>()
-                };
-                SdkGrandChildCategory.localizationDisplayNames.Add("en", "TestingGrandChildCategory");
-                TestVariables.grandChildCategoryPath = SdkGrandChildCategory.categoryPath;
-
-                Result<TestHelper.FullCategoryInfo> createCategoryResult = null;
+                Result<TestHelper.FullCategoryInfo> createRootCategoryResult = null;
                 testHelper.CreateCategory(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
-                    SdkRootCategory,
-                    result => { createCategoryResult = result; });
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
+                    unityRootCategory,
+                    result => { createRootCategoryResult = result; });
 
-                while (createCategoryResult == null)
+                while (createRootCategoryResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createCategoryResult.IsError);
+                TestHelper.Assert.That(!createRootCategoryResult.IsError);
 
-                createCategoryResult = null;
+                TestHelper.CategoryCreateModel unityChildCategory = new TestHelper.CategoryCreateModel
+                {
+                    categoryPath = "/UnityRootCategory/UnityChildCategory",
+                    localizationDisplayNames = new Dictionary<string, string>()
+                };
+                unityChildCategory.localizationDisplayNames.Add("en", "Unity's ecommerce child category");
+                TestVariables.expectedChildCategoryPath = unityChildCategory.categoryPath;
+
+                Result<TestHelper.FullCategoryInfo> createChildCategoryResult = null;
                 testHelper.CreateCategory(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
-                    SdkChildCategory,
-                    result => { createCategoryResult = result; });
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
+                    unityChildCategory,
+                    result => { createChildCategoryResult = result; });
 
-                while (createCategoryResult == null)
+                while (createChildCategoryResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createCategoryResult.IsError);
+                TestHelper.Assert.That(!createChildCategoryResult.IsError);
 
-                createCategoryResult = null;
+                TestHelper.CategoryCreateModel unityGrandChildCategory = new TestHelper.CategoryCreateModel
+                {
+                    categoryPath = "/UnityRootCategory/UnityChildCategory/UnityGrandChildCategory",
+                    localizationDisplayNames = new Dictionary<string, string>()
+                };
+                unityGrandChildCategory.localizationDisplayNames.Add("en", "Unity's ecommerce grand child category");
+                TestVariables.expectedGrandChildCategoryPath = unityGrandChildCategory.categoryPath;
+
+                Result<TestHelper.FullCategoryInfo> createGrandChildCategoryResult = null;
                 testHelper.CreateCategory(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
-                    SdkGrandChildCategory,
-                    result => { createCategoryResult = result; });
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
+                    unityGrandChildCategory,
+                    result => { createGrandChildCategoryResult = result; });
 
-                while (createCategoryResult == null)
+                while (createGrandChildCategoryResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createCategoryResult.IsError);
+                TestHelper.Assert.That(!createGrandChildCategoryResult.IsError);
 
-                TestHelper.ItemCreateModel.Localization localization =
-                    new TestHelper.ItemCreateModel.Localization { title = "RootItem", description = "testing item for SDK" };
-                TestHelper.ItemCreateModel.Localizations localizations = new TestHelper.ItemCreateModel.Localizations();
-                localizations.en = localization;
-                RegionDataItem[] regionData = new RegionDataItem[1];
-                regionData[0] = new RegionDataItem
+                TestHelper.ItemCreateModel.Localization rootLocalization = new TestHelper.ItemCreateModel.Localization
                 {
-                    price = 2,
+                    title = "UnityRootItem",
+                    description = "Root item, virtual currency, not free"
+                };
+                TestHelper.ItemCreateModel.Localizations rootLocalizations = new TestHelper.ItemCreateModel.Localizations();
+                rootLocalizations.en = rootLocalization;
+                RegionDataItem[] rootRegionData = new RegionDataItem[1];
+                rootRegionData[0] = new RegionDataItem
+                {
+                    price = 1,
                     discountPercentage = 0,
                     discountAmount = 0,
+                    discountedPrice = 1,
                     currencyCode = "SDKC",
                     currencyType = "VIRTUAL",
                     currencyNamespace = AccelBytePlugin.Config.Namespace,
@@ -334,56 +327,55 @@ namespace Tests.IntegrationTests
                     discountPurchaseAt = DateTime.UtcNow,
                     discountExpireAt = DateTime.UtcNow + TimeSpan.FromDays(1000)
                 };
-                TestHelper.ItemCreateModel rootItem = new TestHelper.ItemCreateModel
+                TestHelper.ItemCreateModel rootItemRequest = new TestHelper.ItemCreateModel
                 {
                     itemType = "INGAMEITEM",
-                    name = "RootItem",
-                    entitlementType = "DURABLE",
-                    useCount = 0,
-                    categoryPath = TestVariables.rootCategoryPath,
+                    name = "UnityRootItem",
+                    entitlementType = "CONSUMABLE",
+                    useCount = 1,
+                    categoryPath = TestVariables.expectedRootCategoryPath,
+                    localizations = rootLocalizations,
                     status = "ACTIVE",
                     sku = "skuRootItem",
-                    localizations = localizations,
                     regionData = new TestHelper.ItemCreateModel.RegionDatas(),
                     maxCount = -1,
                     maxCountPerUser = -1
                 };
-                rootItem.regionData.US = regionData;
-                TestVariables.inGameItemTitle = rootItem.localizations.en.title;
+                rootItemRequest.regionData.US = rootRegionData;
+                TestVariables.inGameItemTitle = rootItemRequest.localizations.en.title;
 
-                Result<TestHelper.FullItemInfo> createItemResult = null;
+                Result<TestHelper.FullItemInfo> createRootItemResult = null;
                 testHelper.CreateItem(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
-                    rootItem,
-                    result => { createItemResult = result; });
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
+                    rootItemRequest,
+                    result => { createRootItemResult = result; });
 
-                while (createItemResult == null)
+                while (createRootItemResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createItemResult.IsError);
+                TestHelper.Assert.That(!createRootItemResult.IsError);
 
-                createItemResult = null;
-                localization = null;
-                localization = new TestHelper.ItemCreateModel.Localization
+                TestVariables.inGameItem = createRootItemResult.Value;
+
+                TestHelper.ItemCreateModel.Localization childLocalization = new TestHelper.ItemCreateModel.Localization
                 {
-                    title = "ChildItem",
-                    description = "testing item for SDK"
+                    title = "UnityChildItem",
+                    description = "Child item, real currency, free, USD"
                 };
-                localizations = null;
-                localizations = new TestHelper.ItemCreateModel.Localizations();
-                localizations.en = localization;
-                regionData = null;
-                regionData = new RegionDataItem[1];
-                regionData[0] = new RegionDataItem
+                TestHelper.ItemCreateModel.Localizations childLocalizations = new TestHelper.ItemCreateModel.Localizations();
+                childLocalizations.en = childLocalization;
+                RegionDataItem[] childRegionData = new RegionDataItem[1];
+                childRegionData[0] = new RegionDataItem
                 {
                     price = 0,
                     discountPercentage = 0,
                     discountAmount = 0,
+                    discountedPrice = 0,
                     currencyCode = "USD",
                     currencyType = "REAL",
                     currencyNamespace = AccelBytePlugin.Config.Namespace,
@@ -395,54 +387,51 @@ namespace Tests.IntegrationTests
                 TestHelper.ItemCreateModel childItem = new TestHelper.ItemCreateModel
                 {
                     itemType = "COINS",
-                    name = "ChildItem",
+                    name = "UnityChildItem",
                     entitlementType = "CONSUMABLE",
                     useCount = 20,
                     targetCurrencyCode = "SDKC",
-                    categoryPath = TestVariables.childCategoryPath,
+                    categoryPath = TestVariables.expectedChildCategoryPath,
                     status = "ACTIVE",
                     sku = "skuChildItem",
-                    localizations = localizations,
+                    localizations = childLocalizations,
                     regionData = new TestHelper.ItemCreateModel.RegionDatas(),
                     maxCount = -1,
                     maxCountPerUser = -1
                 };
-                childItem.regionData.US = regionData;
+                childItem.regionData.US = childRegionData;
                 TestVariables.currencyItemTitle = childItem.localizations.en.title;
 
-                createItemResult = null;
+                Result<TestHelper.FullItemInfo> createChildItemResult = null;
                 testHelper.CreateItem(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
                     childItem,
-                    result => { createItemResult = result; });
+                    result => { createChildItemResult = result; });
 
-                while (createItemResult == null)
+                while (createChildItemResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createItemResult.IsError);
+                TestHelper.Assert.That(!createChildItemResult.IsError);
 
-                createItemResult = null;
-                localization = null;
-                localization = new TestHelper.ItemCreateModel.Localization
+                TestHelper.ItemCreateModel.Localization grandChildLocalization = new TestHelper.ItemCreateModel.Localization
                 {
-                    title = "GrandChildItem",
-                    description = "testing item for SDK"
+                    title = "Unity_GrandChildItem",
+                    description = "Grandchild item, real currency, free, USD"
                 };
-                localizations = null;
-                localizations = new TestHelper.ItemCreateModel.Localizations();
-                localizations.en = localization;
-                regionData = null;
-                regionData = new RegionDataItem[1];
-                regionData[0] = new RegionDataItem
+                TestHelper.ItemCreateModel.Localizations grandChildLocalizations = new TestHelper.ItemCreateModel.Localizations();
+                grandChildLocalizations.en = grandChildLocalization;
+                RegionDataItem[] grandChildRegionData = new RegionDataItem[1];
+                grandChildRegionData[0] = new RegionDataItem
                 {
                     price = 0,
                     discountPercentage = 0,
                     discountAmount = 0,
+                    discountedPrice = 0,
                     currencyCode = "USD",
                     currencyType = "REAL",
                     currencyNamespace = AccelBytePlugin.Config.Namespace,
@@ -456,100 +445,77 @@ namespace Tests.IntegrationTests
                     itemType = "COINS",
                     name = "GrandChildItem",
                     entitlementType = "CONSUMABLE",
-                    useCount = 20,
+                    useCount = 10,
                     targetCurrencyCode = "SDKC",
-                    categoryPath = TestVariables.grandChildCategoryPath,
+                    categoryPath = TestVariables.expectedGrandChildCategoryPath,
                     status = "ACTIVE",
                     sku = "skuGrandChildItem",
-                    localizations = localizations,
+                    localizations = grandChildLocalizations,
                     regionData = new TestHelper.ItemCreateModel.RegionDatas(),
                     maxCount = -1,
                     maxCountPerUser = -1
                 };
-                grandChildItem.regionData.US = regionData;
+                grandChildItem.regionData.US = grandChildRegionData;
 
-                createItemResult = null;
+                Result<TestHelper.FullItemInfo> createGrandChildItemResult = null;
                 testHelper.CreateItem(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
                     grandChildItem,
-                    result => { createItemResult = result; });
+                    result => { createGrandChildItemResult = result; });
 
-                while (createItemResult == null)
+                while (createGrandChildItemResult == null)
                 {
                     Thread.Sleep(100);
 
                     yield return null;
                 }
 
-                TestHelper.Assert.That(!createItemResult.IsError);
+                TestHelper.Assert.That(!createGrandChildItemResult.IsError);
 
                 if (TestVariables.bPublishedStoreIsExist)
                 {
-                    cloneResult = null;
+                    Result<TestHelper.StoreInfoModel> cloneTemporaryStoreInfo = null;
                     testHelper.CloneStore(
-                        accessToken,
-                        TestVariables.SdkCloneStoreId,
+                        TestVariables.accessToken,
+                        TestVariables.createdTemporaryStoreInfoId,
                         TestVariables.publishedStoreId,
-                        result => { cloneResult = result; });
+                        result => { cloneTemporaryStoreInfo = result; });
 
-                    while (cloneResult == null)
+                    while (cloneTemporaryStoreInfo == null)
                     {
                         Thread.Sleep(100);
 
                         yield return null;
                     }
 
-                    TestHelper.Assert.That(!cloneResult.IsError);
-                    TestVariables.publishedStoreId = cloneResult.Value.storeId;
+                    TestHelper.Assert.That(!cloneTemporaryStoreInfo.IsError);
+                    TestVariables.publishedStoreId = cloneTemporaryStoreInfo.Value.storeId;
                 }
                 else
                 {
-                    cloneResult = null;
+                    Result<TestHelper.StoreInfoModel> clonePublishStoreInfo = null;
                     testHelper.PublishStore(
-                        accessToken,
-                        TestVariables.SdkCloneStoreId,
-                        result => { cloneResult = result; });
+                        TestVariables.accessToken,
+                        TestVariables.createdTemporaryStoreInfoId,
+                        result => { clonePublishStoreInfo = result; });
 
-                    while (cloneResult == null)
+                    while (clonePublishStoreInfo == null)
                     {
                         Thread.Sleep(100);
 
                         yield return null;
                     }
 
-                    TestHelper.Assert.That(!cloneResult.IsError);
+                    TestHelper.Assert.That(!clonePublishStoreInfo.IsError);
                 }
-
-                TestHelper.CreditRequestModel creditRequest = new TestHelper.CreditRequestModel
-                {
-                    amount = 10,
-                    source = "OTHER",
-                    reason = "testing"
-                };
-                Result<WalletInfo> creditWalletResult = null;
-                testHelper.CreditWallet(
-                    accessToken,
-                    user.Session.UserId,
-                    TestVariables.currencyCode,
-                    creditRequest,
-                    result => { creditWalletResult = result; });
-
-                while (creditWalletResult == null)
-                {
-                    Thread.Sleep(100);
-
-                    yield return null;
-                }
-
-                TestHelper.Assert.That(!creditWalletResult.IsError);
             }
 
             [UnityTest, Order(0)]
-            public IEnumerator A1_LoginTestUser()
+            public IEnumerator LoginTestUser()
             {
-                Result userLoginResult = null;
                 var user = AccelBytePlugin.GetUser();
+                Result userLoginResult = null;
                 user.LoginWithDeviceId(result => { userLoginResult = result; });
 
                 while (userLoginResult == null)
@@ -557,16 +523,37 @@ namespace Tests.IntegrationTests
                     yield return new WaitForSeconds(0.1f);
                 }
 
-                //Result<UserData> updateResult = null;
-                //user.Update(new UpdateUserRequest {Country = "US"}, result => updateResult = result);
+                TestHelper.Assert.IsTrue(!userLoginResult.IsError, "User cannot login.");
 
-                //while (updateResult == null)
-                //{
-                //    yield return new WaitForSeconds(0.1f);
-                //}
+                TestVariables.userId = user.Session.UserId;
 
-                //TestHelper.Assert.That(!updateResult.IsError);
-                //TestHelper.Assert.That(!userLoginResult.IsError);
+                TestHelper testHelper = new TestHelper();
+                Result<TokenData> getAccessToken = null;
+                testHelper.GetAccessToken(result => { getAccessToken = result; });
+
+                while (getAccessToken == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!getAccessToken.IsError, "Cannot get access token.");
+
+                TestVariables.accessToken = getAccessToken.Value.access_token;
+
+                DedicatedServer server = AccelByteServerPlugin.GetDedicatedServer();
+                Result loginResult = null;
+                server.LoginWithClientCredentials(result => loginResult = result);
+
+                while (loginResult == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                TestHelper.Assert.IsTrue(!loginResult.IsError, "Server cannot login.");
             }
         }
 
@@ -578,27 +565,6 @@ namespace Tests.IntegrationTests
             {
                 TestHelper testHelper = new TestHelper();
                 var user = AccelBytePlugin.GetUser();
-                Result loginResult = null;
-                user.LoginWithDeviceId(result => { loginResult = result; });
-
-                while (loginResult == null)
-                {
-                    Thread.Sleep(100);
-
-                    yield return null;
-                }
-
-                Result<TokenData> GetAccessToken = null;
-                testHelper.GetAccessToken(result => { GetAccessToken = result; });
-
-                while (GetAccessToken == null)
-                {
-                    Thread.Sleep(100);
-
-                    yield return null;
-                }
-
-                string accessToken = GetAccessToken.Value.access_token;
 
                 Result deleteResult = null;
                 testHelper.DeleteUser(user, result => { deleteResult = result; });
@@ -615,8 +581,8 @@ namespace Tests.IntegrationTests
 
                 Result<TestHelper.StoreInfoModel> storeDeleteResult = null;
                 testHelper.DeleteStore(
-                    accessToken,
-                    TestVariables.SdkCloneStoreId,
+                    TestVariables.accessToken,
+                    TestVariables.createdTemporaryStoreInfoId,
                     result => { storeDeleteResult = result; });
 
                 while (storeDeleteResult == null)
@@ -632,8 +598,8 @@ namespace Tests.IntegrationTests
                 {
                     Result<TestHelper.StoreInfoModel> cloneResult = null;
                     testHelper.CloneStore(
-                        accessToken,
-                        TestVariables.ArchiveOriStoreId,
+                        TestVariables.accessToken,
+                        TestVariables.createdArchiveStoreInfoId,
                         TestVariables.publishedStoreId,
                         result => { cloneResult = result; });
 
@@ -648,8 +614,8 @@ namespace Tests.IntegrationTests
 
                     storeDeleteResult = null;
                     testHelper.DeleteStore(
-                        accessToken,
-                        TestVariables.ArchiveOriStoreId,
+                        TestVariables.accessToken,
+                        TestVariables.createdArchiveStoreInfoId,
                         result => { storeDeleteResult = result; });
 
                     while (storeDeleteResult == null)
@@ -664,7 +630,7 @@ namespace Tests.IntegrationTests
                 else
                 {
                     storeDeleteResult = null;
-                    testHelper.DeletePublishedStore(accessToken, result => { storeDeleteResult = result; });
+                    testHelper.DeletePublishedStore(TestVariables.accessToken, result => { storeDeleteResult = result; });
 
                     while (storeDeleteResult == null)
                     {
@@ -678,7 +644,7 @@ namespace Tests.IntegrationTests
 
                 Result<TestHelper.CurrencyInfoModel> deleteCurrencyResult = null;
                 testHelper.DeleteCurrency(
-                    accessToken,
+                    TestVariables.accessToken,
                     TestVariables.currencyCode,
                     result => { deleteCurrencyResult = result; });
 

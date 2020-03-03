@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -181,8 +181,8 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Usernam</param>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void Register(string emailAddress, string password, string displayName, string country, DateTime dateOfBirth,
-            ResultCallback<RegisterUserResponse> callback)
+        public void Register(string emailAddress, string password, string displayName, string country,
+            DateTime dateOfBirth, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             var registerUserRequest = new RegisterUserRequest
@@ -211,6 +211,7 @@ namespace AccelByte.Api
         private IEnumerator GetDataAsync(ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (this.userDataCache != null)
             {
                 callback.TryOk(this.userDataCache);
@@ -379,6 +380,7 @@ namespace AccelByte.Api
         public void LinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -386,8 +388,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.userAccount.LinkOtherPlatform(platformType.ToString().ToLower(), platformTicket, callback));
+            this.coroutineRunner.Run(this.userAccount.LinkOtherPlatform(platformType, platformTicket, callback));
         }
 
         /// <summary>
@@ -400,6 +401,7 @@ namespace AccelByte.Api
         public void UnlinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -407,7 +409,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.UnlinkOtherPlatform(platformType.ToString(), callback));
+            this.coroutineRunner.Run(this.userAccount.UnlinkOtherPlatform(platformType, callback));
         }
 
         /// <summary>
@@ -418,6 +420,7 @@ namespace AccelByte.Api
         public void GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -437,11 +440,12 @@ namespace AccelByte.Api
         /// <summary>
         /// Get user data from another user by email
         /// </summary>
-        /// <param name="emailAddress"> email or login id that needed to get user data</param>
+        /// <param name="emailOrDisplayName"> email or display name that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void GetUserByEmailAddress(string emailAddress, ResultCallback<PagedPublicUsersInfo> callback)
+        public void SearchUsers(string emailOrDisplayName, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -449,7 +453,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetUserByEmailAddress(emailAddress, callback));
+            this.coroutineRunner.Run(this.userAccount.SearchUsers(emailOrDisplayName, callback));
         }
 
         /// <summary>
@@ -460,6 +464,7 @@ namespace AccelByte.Api
         public void GetUserByUserId(string userId, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -468,6 +473,28 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(this.userAccount.GetUserByUserId(userId, callback));
+        }
+
+        /// <summary>
+        /// Get other user data by other platform userId (such as SteamID, for example)
+        /// </summary>
+        /// <param name="platformType"></param>
+        /// <param name="otherPlatformUserId"></param>
+        /// <param name="callback"></param>
+        public void GetUserByOtherPlatformUserId(PlatformType platformType, string otherPlatformUserId,
+            ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.sessionAdapter.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.userAccount.GetUserByOtherPlatformUserId(platformType, otherPlatformUserId, callback));
         }
     }
 }

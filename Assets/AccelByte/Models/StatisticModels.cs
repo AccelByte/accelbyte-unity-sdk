@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -19,7 +19,7 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class StatInfo
+    public class StatConfig
     {
         [DataMember] public string createdAt { get; set; }
         [DataMember] public float defaultValue { get; set; }
@@ -37,7 +37,7 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class StatItemInfo
+    public class StatItem
     {
         [DataMember] public string createdAt { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
@@ -50,20 +50,20 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class StatItemIncResult
+    public class CreateStatItemRequest
     {
-        [DataMember] public float currentValue { get; set; }
+        [DataMember] public string statCode { get; set; }
     }
 
     [DataContract]
-    public class StatItemPagingSlicedResult
+    public class PagedStatItems
     {
-        [DataMember] public StatItemInfo[] data { get; set; }
+        [DataMember] public StatItem[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
 
     [DataContract]
-    public class BulkUserStatItemInc
+    public class UserStatItemIncrement
     {
         [DataMember] public float inc { get; set; }
         [DataMember] public string userId { get; set; }
@@ -71,16 +71,16 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class BulkStatItemInc
+    public class StatItemIncrement
     {
         [DataMember] public float inc { get; set; }
         [DataMember] public string statCode { get; set; }
     }
 
     [DataContract]
-    public class BulkStatItemOperationResult
+    public class StatItemOperationResult
     {
-        [DataMember] public StatItemIncResult detail { get; set; }
+        [DataMember] public object details { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public bool success { get; set; }
     }

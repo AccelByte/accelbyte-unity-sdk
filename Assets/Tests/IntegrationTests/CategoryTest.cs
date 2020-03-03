@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -15,16 +15,16 @@ namespace Tests.IntegrationTests
     namespace EcommerceTest
     {
         [TestFixture]
-        public class GetCategory
+        public class CategoryTest
         {
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetCategory_CategoryValid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
                 Result<CategoryInfo> getCategoryResult = null;
 
                 categories.GetCategory(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     TestVariables.language,
                     result => { getCategoryResult = result; });
 
@@ -38,7 +38,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(!getCategoryResult.IsError, "Get category failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetCategory_CategoryInvalid_NotFound()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -63,7 +63,7 @@ namespace Tests.IntegrationTests
                         "Get invalid category failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetCategory_CategoryEmpty_InvalidRequest()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -87,7 +87,7 @@ namespace Tests.IntegrationTests
                         "Get invalid category failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetCategory_LanguageInvalid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -95,7 +95,7 @@ namespace Tests.IntegrationTests
                 Result<CategoryInfo> getCategoryResult = null;
 
                 categories.GetCategory(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     invalidLanguage,
                     result => { getCategoryResult = result; });
 
@@ -109,13 +109,13 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(!getCategoryResult.IsError, "Get category with invalid language failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetCategory_LanguageEmpty_Fail()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
                 Result<CategoryInfo> getCategoryResult = null;
 
-                categories.GetCategory(TestVariables.rootCategoryPath, "", result => { getCategoryResult = result; });
+                categories.GetCategory(TestVariables.expectedRootCategoryPath, "", result => { getCategoryResult = result; });
 
                 while (getCategoryResult == null)
                 {
@@ -128,12 +128,8 @@ namespace Tests.IntegrationTests
                         getCategoryResult.IsError,
                         "Get category with invalid language should be failed.");
             }
-        }
 
-        [TestFixture]
-        public class GetRootCategory
-        {
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetRootCategory_LanguageValid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -154,7 +150,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.That(getRootCategoryResult.Value, Is.Not.Null, "Get root category return empty.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetRootCategory_LanguageInvalid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -179,7 +175,7 @@ namespace Tests.IntegrationTests
                         "Get root category with invalid language return empty.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetRootCategory_LanguageEmpty_Fail()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -199,12 +195,8 @@ namespace Tests.IntegrationTests
                         getRootCategoryResult.IsError,
                         "Get root category with empty language not failed.");
             }
-        }
 
-        [TestFixture]
-        public class GetChildCategory
-        {
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetChildCategory_CategoryValid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -212,7 +204,7 @@ namespace Tests.IntegrationTests
                 bool containDogeCoin = false;
 
                 categories.GetChildCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     TestVariables.language,
                     result => { getChildCategoryResult = result; });
 
@@ -225,7 +217,7 @@ namespace Tests.IntegrationTests
 
                 foreach (CategoryInfo child in getChildCategoryResult.Value)
                 {
-                    if (child.categoryPath.Contains(TestVariables.childCategoryPath))
+                    if (child.categoryPath.Contains(TestVariables.expectedChildCategoryPath))
                     {
                         containDogeCoin = true;
                     }
@@ -235,7 +227,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(containDogeCoin, "Get child category failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetChildCategory_CategoryInvalid_ReturnAnEmptyArray()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -262,7 +254,7 @@ namespace Tests.IntegrationTests
                         "Get child category with invalid path not return an empty array.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetChildCategory_CategoryEmpty_Error()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -290,7 +282,7 @@ namespace Tests.IntegrationTests
                         "Get child category with empty path return a data.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetChildCategory_CategoryValid_LanguageInvalid_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -299,7 +291,7 @@ namespace Tests.IntegrationTests
                 bool containDogeCoin = false;
 
                 categories.GetChildCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     invalidLanguage,
                     result => { getChildCategoryResult = result; });
 
@@ -312,7 +304,7 @@ namespace Tests.IntegrationTests
 
                 foreach (CategoryInfo child in getChildCategoryResult.Value)
                 {
-                    if (child.categoryPath.Contains(TestVariables.childCategoryPath))
+                    if (child.categoryPath.Contains(TestVariables.expectedChildCategoryPath))
                     {
                         containDogeCoin = true;
                     }
@@ -324,7 +316,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(containDogeCoin, "Get child category with invalid language failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetChildCategory_CategoryValid_LanguageEmpty_Success()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -332,7 +324,7 @@ namespace Tests.IntegrationTests
                 Result<CategoryInfo[]> getChildCategoryResult = null;
 
                 categories.GetChildCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     emptyLanguage,
                     result => { getChildCategoryResult = result; });
 
@@ -347,12 +339,8 @@ namespace Tests.IntegrationTests
                         getChildCategoryResult.IsError,
                         "Get child category with empty language not failed.");
             }
-        }
 
-        [TestFixture]
-        public class GetDescendantCategory
-        {
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetDescendantCategory_CategoryValid_Success()
             {
                 var user = AccelBytePlugin.GetUser();
@@ -371,7 +359,7 @@ namespace Tests.IntegrationTests
                 bool containDogeCoin = false;
 
                 categories.GetDescendantCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     TestVariables.language,
                     result => { getDescendantCategoryResult = result; });
 
@@ -384,7 +372,7 @@ namespace Tests.IntegrationTests
 
                 foreach (CategoryInfo child in getDescendantCategoryResult.Value)
                 {
-                    if (child.categoryPath.Contains(TestVariables.grandChildCategoryPath))
+                    if (child.categoryPath.Contains(TestVariables.expectedGrandChildCategoryPath))
                     {
                         containDogeCoin = true;
                     }
@@ -394,7 +382,7 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(containDogeCoin, "Get descendant category failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetDescendantCategory_CategoryInvalid_ReturnAnEmptyArray()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -421,7 +409,7 @@ namespace Tests.IntegrationTests
                         "Get descendant category with invalid category not return an empty array.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetDescendantCategory_CategoryEmpty_Error()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
@@ -448,7 +436,7 @@ namespace Tests.IntegrationTests
                         "Get descendant category with empty category not return a data.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetDescendantCategory_CategoryValid_LanguageInvalid_Success()
             {
                 var user = AccelBytePlugin.GetUser();
@@ -467,7 +455,7 @@ namespace Tests.IntegrationTests
                 bool containDogeCoin = false;
 
                 categories.GetDescendantCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     "unknown",
                     result => { getDescendantCategoryResult = result; });
 
@@ -480,7 +468,7 @@ namespace Tests.IntegrationTests
 
                 foreach (CategoryInfo child in getDescendantCategoryResult.Value)
                 {
-                    if (child.categoryPath.Contains(TestVariables.grandChildCategoryPath))
+                    if (child.categoryPath.Contains(TestVariables.expectedGrandChildCategoryPath))
                     {
                         containDogeCoin = true;
                     }
@@ -492,14 +480,14 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(containDogeCoin, "Get descendant category with invalid language failed.");
             }
 
-            [UnityTest, Order(2)]
+            [UnityTest, Order(0)]
             public IEnumerator GetDescendantCategory_CategoryValid_LanguageEmpty_Fail()
             {
                 Categories categories = AccelBytePlugin.GetCategories();
                 Result<CategoryInfo[]> getDescendantCategoryResult = null;
 
                 categories.GetDescendantCategories(
-                    TestVariables.rootCategoryPath,
+                    TestVariables.expectedRootCategoryPath,
                     "",
                     result => { getDescendantCategoryResult = result; });
 

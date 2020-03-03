@@ -279,23 +279,6 @@ pipeline {
     }
   }
 
-  stage('publishapidocs') {
-    steps {
-      bat '''
-        doxygen Doxyfile        
-        aws s3 cp "%WORKSPACE%\\apidocs\\html" s3://docs.accelbyte.net/sdk/unity/ --recursive      
-      '''
-    }
-
-    post {
-      failure {
-        script{
-          FAILED_STAGE = "publishapidocs";
-        }
-      }
-    }
-  }
-
   stage('archive') {
     steps {        
       powershell '''

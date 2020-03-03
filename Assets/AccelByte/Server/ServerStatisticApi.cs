@@ -1,22 +1,22 @@
-﻿// Copyright (c) 2019-2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using AccelByte.Core;
 using AccelByte.Models;
+using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace AccelByte.Api
+namespace AccelByte.Server
 {
-    public class StatisticApi
+    internal class ServerStatisticApi
     {
-        private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private string baseUrl;
+        private IHttpWorker httpWorker;
 
-        internal StatisticApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerStatisticApi(string baseUrl, IHttpWorker httpWorker)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
             Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
@@ -33,7 +33,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(statItems, nameof(statItems) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/bulk")
+                .CreatePost(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/bulk")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(accessToken)
@@ -51,16 +51,16 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetUserStatItems(string @namespace, string userId,
-            string accessToken, ICollection<string> statCodes, ICollection<string> tags, ResultCallback<PagedStatItems> callback)
+        public IEnumerator GetUserStatItems(string @namespace, string userId, string accessToken,
+            ICollection<string> statCodes, ICollection<string> tags,
+            ResultCallback<PagedStatItems> callback)
         {
-            Assert.IsNotNull(@namespace, "Can't get stat items! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get stat items! userIds parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get stat items! accessToken parameter is null!");
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
 
             var builder = HttpRequestBuilder
-                .CreateGet(
-                    this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems")
+                .CreateGet(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(accessToken)
@@ -78,6 +78,7 @@ namespace AccelByte.Api
             }
 
             var request = builder.GetResult();
+
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
@@ -87,19 +88,46 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator IncrementUserStatItems(string @namespace, string userId, StatItemIncrement[] increments, string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator IncrementUserStatItems(string @namespace, string userId, StatItemIncrement[] data,
+            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
+                .CreatePatch(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(increments.ToUtf8Json())
+                .WithBody(data.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<StatItemOperationResult[]>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator IncrementManyUsersStatItems(string @namespace, UserStatItemIncrement[] data,
+            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePatch(this.baseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/bulk")
+                .WithPathParam("namespace", @namespace)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 

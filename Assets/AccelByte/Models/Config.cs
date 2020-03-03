@@ -9,7 +9,6 @@ namespace AccelByte.Models
     [DataContract]
     public class Config
     {
-        [DataMember] public string PublisherNamespace { get; set; }
         [DataMember] public string Namespace { get; set; }
         [DataMember] public bool UseSessionManagement { get; set; }
         [DataMember] public string BaseUrl { get; set; }
@@ -22,6 +21,7 @@ namespace AccelByte.Models
         [DataMember] public string TelemetryServerUrl { get; set; }
         [DataMember] public string GameProfileServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
+        [DataMember] public string QosManagerServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -32,6 +32,31 @@ namespace AccelByte.Models
         public Config ShallowCopy()
         {
             return (Config) MemberwiseClone();
+        }
+
+        public bool Compare(Config anotherConfig)
+        {
+            if (this.Namespace == anotherConfig.Namespace &&
+                this.UseSessionManagement == anotherConfig.UseSessionManagement &&
+                this.BaseUrl == anotherConfig.BaseUrl &&
+                this.LoginServerUrl == anotherConfig.LoginServerUrl &&
+                this.IamServerUrl == anotherConfig.IamServerUrl &&
+                this.PlatformServerUrl == anotherConfig.PlatformServerUrl &&
+                this.BasicServerUrl == anotherConfig.BasicServerUrl &&
+                this.LobbyServerUrl == anotherConfig.LobbyServerUrl &&
+                this.CloudStorageServerUrl == anotherConfig.CloudStorageServerUrl &&
+                this.TelemetryServerUrl == anotherConfig.TelemetryServerUrl &&
+                this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
+                this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
+                this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
+                this.ClientId == anotherConfig.ClientId &&
+                this.ClientSecret == anotherConfig.ClientSecret &&
+                this.RedirectUri == anotherConfig.RedirectUri)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -65,9 +90,9 @@ namespace AccelByte.Models
                 if (this.GameProfileServerUrl == null) this.GameProfileServerUrl = httpsBaseUrl + "/soc-profile";
 
                 if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpsBaseUrl + "/statistic";
-            }
 
-            if (this.PublisherNamespace == null) this.PublisherNamespace = this.Namespace;
+                if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpsBaseUrl + "/qosm";
+            }
         }
 
         /// <summary>
@@ -99,9 +124,9 @@ namespace AccelByte.Models
                 if (this.GameProfileServerUrl == httpsBaseUrl + "/soc-profile") this.GameProfileServerUrl = null;
 
                 if (this.StatisticServerUrl == httpsBaseUrl + "/statistic") this.StatisticServerUrl = null;
-            }
 
-            if (this.PublisherNamespace == this.Namespace) this.PublisherNamespace = null;
+                if (this.QosManagerServerUrl == httpsBaseUrl + "/qosm") this.QosManagerServerUrl = null;
+            }
         }
     }
 }
