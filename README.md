@@ -42,4 +42,4 @@ using AccelByte.Models;
 using AccelByte.Core;
 ```
 
-After that, you can freely uses AccelByte SDK. Please see [tutorial](docs/tutorial.md) on how to use AccelByte SDK.
+After that, you can freely uses AccelByte SDK. Please see [tutorial](https://docs.accelbyte.io/docs/sdk/getting-started-unity/) on how to use AccelByte SDK.
