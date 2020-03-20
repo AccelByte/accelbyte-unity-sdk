@@ -27,6 +27,8 @@
   - Stop reconnecting when lobby server disconnects client because token revoked, expired or another session for the same user connecting
 - Integration Test
   - Fix user test
+- Readme
+   - Fix accelbyte documentation link 
 
 ## Changed
 - Statistic API Standardization
