@@ -1,7 +1,8 @@
-// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -35,6 +36,7 @@ namespace AccelByte.Api
         public void GetUserProfile(ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -42,7 +44,8 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.api.GetUserProfile(this.@namespace, this.session.AuthorizationToken, callback));
+            this.coroutineRunner.Run(
+                this.api.GetUserProfile(this.@namespace, this.session.AuthorizationToken, callback));
         }
 
         /// <summary>
@@ -53,6 +56,7 @@ namespace AccelByte.Api
         public void CreateUserProfile(CreateUserProfileRequest createRequest, ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -60,11 +64,8 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.api.CreateUserProfile(
-                        this.@namespace,
-                        this.session.AuthorizationToken,
-                        createRequest,
-                        callback));
+            this.coroutineRunner.Run(
+                this.api.CreateUserProfile(this.@namespace, this.session.AuthorizationToken, createRequest, callback));
         }
 
         /// <summary>
@@ -75,6 +76,7 @@ namespace AccelByte.Api
         public void UpdateUserProfile(UpdateUserProfileRequest updateRequest, ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
             if (!this.session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -82,11 +84,48 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.api.UpdateUserProfile(
-                        this.@namespace,
-                        this.session.AuthorizationToken,
-                        updateRequest,
-                        callback));
+            this.coroutineRunner.Run(
+                this.api.UpdateUserProfile(this.@namespace, this.session.AuthorizationToken, updateRequest, callback));
+        }
+
+        public void GetCustomAttributes(ResultCallback<Dictionary<string, object>> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetCustomAttributes(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        public void UpdateCustomAttributes(Dictionary<string, object> updates,
+            ResultCallback<Dictionary<string, object>> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            
+            this.coroutineRunner.Run(
+                this.api.UpdateCustomAttributes(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    updates,
+                    callback));
         }
     }
 }

@@ -1,3 +1,9 @@
+# 2.9.0 (2020-04-14)
+## Added
+- UserProfile Api
+    - GetCustomAttributes
+    - UpdateCustomAttributes
+
 # 2.8.0 (2020-04-09)
 ## Added
 - Session Management
