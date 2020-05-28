@@ -66,29 +66,14 @@ namespace AccelByte.Api
             AccelBytePlugin.config.Expand();
             AccelBytePlugin.coroutineRunner = new CoroutineRunner();
             AccelBytePlugin.httpWorker = new UnityHttpWorker();
-            ILoginSession loginSession;
-
-            if (AccelBytePlugin.config.UseSessionManagement)
-            {
-                loginSession = new ManagedLoginSession(
-                    AccelBytePlugin.config.LoginServerUrl,
-                    AccelBytePlugin.config.Namespace,
-                    AccelBytePlugin.config.ClientId,
-                    AccelBytePlugin.config.ClientSecret,
-                    AccelBytePlugin.config.RedirectUri,
-                    AccelBytePlugin.httpWorker);
-            }
-            else
-            {
-                loginSession = new OauthLoginSession(
+            ILoginSession loginSession = new LoginSession(
                     AccelBytePlugin.config.LoginServerUrl,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.config.ClientId,
                     AccelBytePlugin.config.ClientSecret,
                     AccelBytePlugin.config.RedirectUri,
                     AccelBytePlugin.httpWorker,
-                    AccelBytePlugin.coroutineRunner);
-            }
+                    AccelBytePlugin.coroutineRunner, AccelBytePlugin.config.UseSessionManagement);
 
 
             AccelBytePlugin.user = new User(

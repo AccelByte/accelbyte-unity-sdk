@@ -26,6 +26,8 @@ namespace AccelByte.Models
     public class SessionData
     {
         [DataMember] public string session_id { get; set; }
+        [DataMember] public int expires_in { get; set; }
+        [DataMember] public string refresh_id { get; set; }
     }
 
     [DataContract]

@@ -1,3 +1,8 @@
+# 2.7.0 (2020-03-26)
+## Added
+- Session Management
+    - Add automatic refresh session coroutine
+
 # 2.6.0 (2020-03-03)
 ## Added
 - Statistic
@@ -27,8 +32,6 @@
   - Stop reconnecting when lobby server disconnects client because token revoked, expired or another session for the same user connecting
 - Integration Test
   - Fix user test
-- Readme
-   - Fix accelbyte documentation link 
 
 ## Changed
 - Statistic API Standardization
