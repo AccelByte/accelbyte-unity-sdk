@@ -36,5 +36,8 @@ namespace AccelByte.Api
 
         IEnumerator GetUserByOtherPlatformUserId(PlatformType platformType, string otherPlatformUserId,
             ResultCallback<UserData> callback);
+
+        IEnumerator BulkGetUserByOtherPlatformUserIds(PlatformType platformType, BulkPlatformUserIdRequest otherPlatformUserId,
+            ResultCallback<BulkPlatformUserIdResponse> callback);
     }
 }

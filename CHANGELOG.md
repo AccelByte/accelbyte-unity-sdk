@@ -1,3 +1,11 @@
+# 2.10.0 (2020-05-26)
+## Added
+- User
+    - Bulk Get User Id by Third Party Platform
+- Lobby
+    - Add LobbyApi
+    - Add Bulk Friend Request
+
 # 2.9.0 (2020-04-14)
 ## Added
 - UserProfile Api

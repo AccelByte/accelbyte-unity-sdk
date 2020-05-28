@@ -215,7 +215,9 @@ namespace AccelByte.Api
                 AccelBytePlugin.lobby = new Lobby(
                     AccelBytePlugin.config.LobbyServerUrl,
                     new WebSocket(),
+                    new LobbyApi(AccelBytePlugin.config.BaseUrl, AccelBytePlugin.httpWorker),
                     AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
             }
 

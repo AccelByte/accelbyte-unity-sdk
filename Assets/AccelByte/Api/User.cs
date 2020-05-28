@@ -171,6 +171,7 @@ namespace AccelByte.Api
             }
 
             this.sessionAdapter.UserId = null;
+            this.sessionAdapter.AuthorizationToken = null;
 
             this.coroutineRunner.Run(this.loginSession.Logout(callback));
         }
@@ -496,6 +497,28 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.userAccount.GetUserByOtherPlatformUserId(platformType, otherPlatformUserId, callback));
+        }
+
+        /// <summary>
+        /// Get other user data by other platform userId(s) (such as SteamID, for example)
+        /// </summary>
+        /// <param name="platformType"></param>
+        /// <param name="otherPlatformUserIds"></param>
+        /// <param name="callback"></param>
+        public void BulkGetUserByOtherPlatformUserIds(PlatformType platformType, string[] otherPlatformUserId,
+            ResultCallback<BulkPlatformUserIdResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.sessionAdapter.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            BulkPlatformUserIdRequest platformUserIds = new BulkPlatformUserIdRequest { platformUserIDs = otherPlatformUserId };
+            this.coroutineRunner.Run(
+                this.userAccount.BulkGetUserByOtherPlatformUserIds(platformType, platformUserIds, callback));
         }
     }
 }

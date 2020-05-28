@@ -67,11 +67,12 @@ namespace AccelByte.Models
             if (this.BaseUrl != null)
             {
                 int index;
-                // remove protocol 
-                if ((index = this.BaseUrl.IndexOf("://")) > 0) this.BaseUrl = this.BaseUrl.Substring(index + 3);
+                // remove protocol
+                string baseUrl = this.BaseUrl;
+                if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
 
-                string httpsBaseUrl = "https://" + this.BaseUrl;
-                string wssBaseUrl = "wss://" + this.BaseUrl;
+                string httpsBaseUrl = "https://" + baseUrl;
+                string wssBaseUrl = "wss://" + baseUrl;
 
                 if (this.LoginServerUrl == null) this.LoginServerUrl = httpsBaseUrl;
 
@@ -102,12 +103,13 @@ namespace AccelByte.Models
         {
             int index;
             // remove protocol
-            if ((index = this.BaseUrl.IndexOf("://")) > 0) this.BaseUrl = this.BaseUrl.Substring(index + 3);
+            string baseUrl = this.BaseUrl;
+            if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
 
-            if (this.BaseUrl != null)
+            if (baseUrl != null)
             {
-                string httpsBaseUrl = "https://" + this.BaseUrl;
-                string wssBaseUrl = "wss://" + this.BaseUrl;
+                string httpsBaseUrl = "https://" + baseUrl;
+                string wssBaseUrl = "wss://" + baseUrl;
 
                 if (this.IamServerUrl == httpsBaseUrl + "/iam") this.IamServerUrl = null;
 

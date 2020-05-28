@@ -320,6 +320,7 @@ namespace AccelByte.Api
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithPathParam("platformUserId", otherPlatformUserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
@@ -328,6 +329,30 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             Result<UserData> result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
+        public IEnumerator BulkGetUserByOtherPlatformUserIds(PlatformType platformType, BulkPlatformUserIdRequest otherPlatformUserId,
+            ResultCallback<BulkPlatformUserIdResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(otherPlatformUserId, nameof(otherPlatformUserId) + " cannot be null.");
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/platforms/{platformId}/users")
+                .WithPathParam("namespace", this.@namespace)
+                .WithPathParam("platformId", platformType.ToString().ToLower())
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(otherPlatformUserId.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            Result<BulkPlatformUserIdResponse> result = response.TryParseJson<BulkPlatformUserIdResponse>();
             callback.Try(result);
         }
     }

@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using NUnit.Framework;
 
@@ -149,5 +150,23 @@ namespace AccelByte.Models
     {
         [DataMember] public PlatformLink[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
+    }
+
+    [DataContract]
+    public class BulkPlatformUserIdRequest
+    {
+        [DataMember] public  string[] platformUserIDs { get; set; }
+    }
+
+    [DataContract]
+    public class PlatformUserIdMap
+    {
+        [DataMember] public string userId { get; set; }
+    }
+
+    [DataContract]
+    public class BulkPlatformUserIdResponse
+    {
+        [DataMember] public PlatformUserIdMap[] userIdPlatforms { get; set; }
     }
 }

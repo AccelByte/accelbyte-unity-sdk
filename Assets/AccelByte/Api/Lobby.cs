@@ -105,7 +105,9 @@ namespace AccelByte.Api
 
         private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks =
             new Dictionary<long, Action<ErrorCode, string>>();
-        
+
+        private readonly LobbyApi api;
+        private readonly string @namespace;
         private readonly string websocketUrl;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
@@ -117,7 +119,7 @@ namespace AccelByte.Api
 
         public event EventHandler OnRetryAttemptFailed;
 
-        internal Lobby(string websocketUrl, IWebSocket webSocket, ISession session, CoroutineRunner coroutineRunner,
+        internal Lobby(string websocketUrl, IWebSocket webSocket, LobbyApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner,
             int pingDelay = 4000, int backoffDelay = 1000, int maxDelay = 30000, int totalTimeout = 60000)
         {
             Assert.IsNotNull(webSocket);
@@ -125,7 +127,9 @@ namespace AccelByte.Api
 
             this.websocketUrl = websocketUrl;
             this.webSocket = webSocket;
+            this.api = api;
             this.session = session;
+            this.@namespace = @namespace;
             this.coroutineRunner = coroutineRunner;
             this.pingDelay = pingDelay;
             this.backoffDelay = backoffDelay;
@@ -400,6 +404,31 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(MessageType.requestFriendsRequest, new Friend {friendId = userId}, callback);
+        }
+
+        /// <summary>
+        /// Send request friend request in bulk.
+        /// </summary>
+        /// <param name="userIds">Targeted user ID.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void BulkRequestFriend(string[] userIds, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            BulkFriendsRequest otherUserIds= new BulkFriendsRequest{ friendIds = userIds };
+            this.coroutineRunner.Run(
+                this.api.BulkFriendRequest(
+                    this.@namespace,
+                    this.session.UserId,
+                    otherUserIds,
+                    this.session.AuthorizationToken,
+                    callback));
         }
 
         /// <summary>

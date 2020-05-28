@@ -283,7 +283,13 @@ namespace AccelByte.Models
         [DataMember] public string[] activity;
         [DataMember] public DateTime[] lastSeenAt;
     }
-    
+
+    [DataContract]
+    public class BulkFriendsRequest
+    {
+        [DataMember] public string[] friendIds { get; set; }
+    }
+
     #endregion
 
     #region Presence
