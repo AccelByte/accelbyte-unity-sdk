@@ -11,9 +11,10 @@ namespace AccelByte.Models {
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
-        [DataMember] public string DSMServerUrl { get; set; }
-        [DataMember] public string PlatformServerUrl { get; set; }
+        [DataMember] public string DSMControllerServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
+        [DataMember] public string PlatformServerUrl { get; set; }
+        [DataMember] public string QosManagerServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -41,11 +42,13 @@ namespace AccelByte.Models {
 
                 if (this.IamServerUrl == null) this.IamServerUrl = httpBaseUrl + "/iam";
 
-                if (this.DSMServerUrl == null) this.DSMServerUrl = httpBaseUrl + "/dsm";
+                if (this.DSMControllerServerUrl == null) this.DSMControllerServerUrl = httpBaseUrl + "/dsmcontroller";
 
                 if (this.PlatformServerUrl == null) this.PlatformServerUrl = httpBaseUrl + "/platform";
 
                 if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpBaseUrl + "/statistic";
+
+                if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpBaseUrl + "/qosm";
             }
         }
 
@@ -64,11 +67,13 @@ namespace AccelByte.Models {
 
                 if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
 
-                if (this.DSMServerUrl == httpBaseUrl + "/dsm") this.DSMServerUrl = null;
+                if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
 
                 if (this.PlatformServerUrl == httpBaseUrl + "/platform") this.PlatformServerUrl = null;
 
                 if (this.StatisticServerUrl == httpBaseUrl + "/statistic") this.StatisticServerUrl = null;
+
+                if (this.QosManagerServerUrl == httpBaseUrl + "/qosm") this.QosManagerServerUrl = null;
             }
         }
     }

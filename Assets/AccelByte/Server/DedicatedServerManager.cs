@@ -7,6 +7,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 using UnityEngine;
+using System;
 
 //TODO: Do authentication using server creadentials
 
@@ -15,11 +16,17 @@ namespace AccelByte.Server
     public class DedicatedServerManager
     {
         public delegate void MatchRequestCallback(MatchRequest request);
+        public delegate void HeartBeatErrorCallback(ServiceError error);
 
         /// <summary>
         /// This event will be raised if there is match request coming from heartbeat
         /// </summary>
         public event MatchRequestCallback OnMatchRequest;
+
+        /// <summary>
+        /// This event will be raised if heartbeat get error in sequence for several times.
+        /// </summary>
+        public event HeartBeatErrorCallback OnHeartBeatError;
 
         //Readonly members
         private readonly CoroutineRunner coroutineRunner;
@@ -31,7 +38,9 @@ namespace AccelByte.Server
         private string matchSessionId = "";
         private bool isHeartBeatAutomatic;
         private float heartbeatTimeoutSeconds;
+        private uint heartbeatErrorRetry;
         private Coroutine heartBeatCoroutine;
+        private uint heartbeatRetryCount = 0;
 
         internal DedicatedServerManager(DedicatedServerManagerApi api, IServerSession serverSession, CoroutineRunner coroutineRunner)
         {
@@ -52,12 +61,14 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="isAutomatic">Heartbeat will automatically called periodically</param>
         /// <param name="timeoutSeconds">Timeout period the next heartbeat will be triggered</param>
-        public void ConfigureHeartBeat(bool isAutomatic = true, uint timeoutSeconds = 5)
+        /// <param name="errorRetry"> Max consecutive heartbeat error, will stop send heartbeat when reach the number</param>
+        public void ConfigureHeartBeat(bool isAutomatic = true, uint timeoutSeconds = 5, uint errorRetry = 5)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
             this.isHeartBeatAutomatic = isAutomatic;
             this.heartbeatTimeoutSeconds = timeoutSeconds;
+            this.heartbeatErrorRetry = errorRetry;
 
             if (this.heartBeatCoroutine != null && !this.isHeartBeatAutomatic)
             {
@@ -98,6 +109,30 @@ namespace AccelByte.Server
                         if (!result.IsError && result.Value != null)
                         {
                             this.OnMatchRequest?.Invoke(result.Value);
+                        }else if(result.IsError)
+                        {
+                            if ((int)result.Error.Code >= 400 && (int)result.Error.Code < 500)
+                            {
+                                if (heartbeatRetryCount <= heartbeatErrorRetry)
+                                {
+                                    heartbeatRetryCount++;
+                                }
+                                else
+                                {
+                                    if (this.heartBeatCoroutine != null)
+                                    {
+                                        this.isHeartBeatAutomatic = false;
+                                        this.coroutineRunner.Stop(this.heartBeatCoroutine);
+                                        this.heartBeatCoroutine = null;
+                                    }
+                                    ServiceError error = new ServiceError { errorCode = (long)result.Error.Code, errorMessage = result.Error.Message };
+                                    this.OnHeartBeatError?.Invoke(error);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            heartbeatRetryCount = 0;
                         }
                     });
 
@@ -108,14 +143,11 @@ namespace AccelByte.Server
         /// <summary>
         /// Register server to DSM and mark this machine as ready
         /// </summary>
-        /// <param name="podName">Should be taken from "POD_NAME" environment variable</param>
         /// <param name="port">Exposed port number to connect to</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void RegisterServer(string podName, int portNumber, ResultCallback callback)
+        public void RegisterServer(int portNumber, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-
-            Assert.IsNotNull(podName, "Can't Register server; podName is null!");
 
             if (!this.serverSession.IsValid())
             {
@@ -125,7 +157,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            this.name = podName;
+            this.name = Environment.GetEnvironmentVariable("POD_NAME");
             var request = new RegisterServerRequest {pod_name = this.name, port = portNumber};
             this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, callback));
 

@@ -1,3 +1,28 @@
+# 2.8.0 (2020-04-09)
+## Added
+- Session Management
+    - Add automatic refresh session coroutine
+- DedicatedServerManager
+    - Implement register static ds
+    - implement get regional dsm url
+    - Add errorRetry param on ConfigureHeartBeat
+    - Will stop sending heartbeat after errorRetry number reached
+- ServerQos
+    - Get latencies from game server
+
+### Changed
+- Cloudstorage model dateAccessed, dateCreated, dateModified type from float to DateTime
+
+### Fixed
+- Lobby
+    - Latencies format when startmatchmaking
+- ServerModels
+    - MatchingAlly
+        - string partyId
+        - string[] partyMember -> MatchParty[] matching_parties
+- Jenkins pipeline
+    - Fix tests
+
 # 2.7.0 (2020-03-26)
 ## Added
 - Session Management

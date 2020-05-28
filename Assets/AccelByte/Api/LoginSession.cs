@@ -123,7 +123,7 @@ namespace AccelByte.Api
             public string LoginWithOtherPlatformPath => "/v1/login/platforms/{platformId}";
             public string LoginWithAuthorizationCodePath => "/v1/login/code";
             public string LogoutPath => "/v1/logout";
-            public string RefreshTokenPath => "/oauth/revoke/token";
+            public string RefreshTokenPath => "/v1/sessions/refresh";
 
             public Result TryToParse(IHttpResponse response)
             {
@@ -348,9 +348,8 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             this.loginData.Clear();
-            var result = this.loginData.TryToParse(response);
             this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
-            callback.Try(result);
+            callback.Try(Result.CreateOk());
         }
 
         private IEnumerator RefreshToken(ResultCallback callback)
@@ -367,6 +366,7 @@ namespace AccelByte.Api
 
         private IEnumerator MaintainAccessToken()
         {
+            this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.loginData.ExpireIn);
             TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);
             var rand = new Random();
 
@@ -403,7 +403,7 @@ namespace AccelByte.Api
 
         private static DateTime ScheduleNormalRefresh(int expiresIn)
         {
-            return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn + 1) * 0.8);
+            return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn - 1) * 0.8);
         }
 
         private static TimeSpan CalculateBackoffInterval(TimeSpan previousRefreshBackoff, int randomNum)

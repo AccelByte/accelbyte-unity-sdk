@@ -162,14 +162,15 @@ namespace AccelByte.Api
         public void Logout(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            this.sessionAdapter.UserId = null;
-
+            
             if (!this.sessionAdapter.IsValid())
             {
                 callback.TryOk();
 
                 return;
             }
+
+            this.sessionAdapter.UserId = null;
 
             this.coroutineRunner.Run(this.loginSession.Logout(callback));
         }

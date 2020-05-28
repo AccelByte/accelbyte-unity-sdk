@@ -25,6 +25,7 @@ namespace AccelByte.Server
         private static DedicatedServerManager dedicatedServerManager;
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
+        private static ServerQos qos;
 
         public static ServerConfig Config { get { return AccelByteServerPlugin.config; } }
 
@@ -82,7 +83,7 @@ namespace AccelByte.Server
             {
                 AccelByteServerPlugin.dedicatedServerManager = new DedicatedServerManager(
                     new DedicatedServerManagerApi(
-                        AccelByteServerPlugin.config.DSMServerUrl,
+                        AccelByteServerPlugin.config.DSMControllerServerUrl,
                         AccelByteServerPlugin.config.Namespace,
                         AccelByteServerPlugin.httpWorker),
                     AccelByteServerPlugin.session,
@@ -122,6 +123,20 @@ namespace AccelByte.Server
             }
 
             return AccelByteServerPlugin.statistic;
+        }
+
+        public static ServerQos GetQos()
+        {
+            if (AccelByteServerPlugin.qos == null)
+            {
+                AccelByteServerPlugin.qos = new ServerQos(
+                    new ServerQosManagerApi(
+                        AccelByteServerPlugin.config.QosManagerServerUrl,
+                        AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.coroutineRunner);
+            }
+
+            return AccelByteServerPlugin.qos;
         }
     }
 }

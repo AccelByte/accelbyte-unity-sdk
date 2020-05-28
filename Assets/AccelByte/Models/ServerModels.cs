@@ -9,8 +9,11 @@ namespace AccelByte.Models
     [DataContract]
     public class RegisterServerRequest
     {
+        [DataMember] public string game_version { get; set; }
+        [DataMember] public string ip { get; set; }
         [DataMember] public string pod_name { get; set; }
         [DataMember] public int port { get; set; }
+        [DataMember]public string provider { get; set; }
     }
 
     [DataContract]
@@ -45,8 +48,7 @@ namespace AccelByte.Models
     [DataContract]
     public class MatchingAlly
     {
-        [DataMember] public string partyId { get; set; }
-        [DataMember] public string[] partyMember { get; set; }
+        [DataMember] public MatchParty[] matching_parties { get; set; }
     }
 
     [DataContract]
@@ -56,5 +58,34 @@ namespace AccelByte.Models
         [DataMember] public MatchingAlly[] matching_allies { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string session_id { get; set; }
+    }
+
+    [DataContract]
+    public class DSMClient
+    {
+        [DataMember] public string host_address { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string status { get; set; }
+    }
+
+    [DataContract]
+    public class PubIp
+    {
+        [DataMember] public string ip { get; set; }
+    }
+
+    [DataContract]
+    public class ServerInfo
+    {
+        [DataMember] public string pod_name { get; set; }
+        [DataMember] public string image_version { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string ip { get; set; }
+        [DataMember] public string[] alternate_ips { get; set; }
+        [DataMember] public int port { get; set; }
+        [DataMember] public string provider { get; set; }
+        [DataMember] public string game_version { get; set; }
+        [DataMember] public string status { get; set; }
+        [DataMember] public string last_update { get; set; }
     }
 }

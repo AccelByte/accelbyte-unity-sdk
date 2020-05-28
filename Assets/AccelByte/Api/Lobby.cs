@@ -549,7 +549,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             string strLatencies = "{" +
-                string.Join(",", latencies.Select(pair => $@"{{""{pair.Key}"":{pair.Value}}}").ToArray()) +
+                string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
                 "}";
 
             SendRequest(
