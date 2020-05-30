@@ -38,7 +38,7 @@ namespace AccelByte.Api
 
         static AccelBytePlugin()
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH) && !UNITY_EDITOR
             Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
                 new [] {
                     Utf8Json.Formatters.PrimitiveObjectFormatter.Default

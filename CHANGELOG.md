@@ -1,3 +1,10 @@
+## 2.10.1 (2020-05-28)
+### Added
+- User
+    - add `ps4` and xbox `live` enum for 3rd party login
+- Plugin
+    - add `UNITY_PS4`, `UNITY_XBOXONE` and `UNITY_SWITCH` macro to support development on 3rd platform
+
 # 2.10.0 (2020-05-26)
 ## Added
 - User

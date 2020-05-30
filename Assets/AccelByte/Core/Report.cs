@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
@@ -12,11 +13,22 @@ namespace AccelByte.Core
     {
         public static void GetFunctionLog(string className, [CallerMemberName] string functName = "")
         {
+            string functionCaller = "";
+#if DEBUG
+            try
+            {
+                StackFrame callStack = new StackFrame(2, true);
+                functionCaller = "File: " + callStack.GetFileName() + ", Line: " + callStack.GetFileLineNumber() + "\n";
+            }
+            catch (System.Exception){}
+#endif
+
             Debug.Log("Current Function Called: \n" +
                 "---\n" + 
                 "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
                 "Class : " + className + "\n" +
-                "Function : " + functName + 
+                functionCaller +
+                "Function : " + functName +
                 "\n---\n");
         }
 
