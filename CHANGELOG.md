@@ -1,3 +1,8 @@
+# 2.10.2 (2020-06-03)
+## Changed
+- Entitlement
+    - GetEntitlements() -> GetEntitlement()
+    
 ## 2.10.1 (2020-05-28)
 ### Added
 - User

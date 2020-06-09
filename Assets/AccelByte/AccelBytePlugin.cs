@@ -30,7 +30,7 @@ namespace AccelByte.Api
         private static Lobby lobby;
         private static CloudStorage cloudStorage;
         private static GameProfiles gameProfiles;
-        private static Entitlement entitlements;
+        private static Entitlement entitlement;
         private static Statistic statistic;
         private static Qos qos;
 
@@ -251,19 +251,18 @@ namespace AccelByte.Api
 
             return AccelBytePlugin.gameProfiles;
         }
-
-        public static Entitlement GetEntitlements()
+        public static Entitlement GetEntitlement()
         {
-            if (AccelBytePlugin.entitlements == null)
+            if (AccelBytePlugin.entitlement == null)
             {
-                AccelBytePlugin.entitlements = new Entitlement(
+                AccelBytePlugin.entitlement = new Entitlement(
                     new EntitlementApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
             }
 
-            return AccelBytePlugin.entitlements;
+            return AccelBytePlugin.entitlement;
         }
 
         public static Statistic GetStatistic()

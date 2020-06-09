@@ -54,8 +54,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v3/public/users/me")
-                .WithPathParam("namespace", this.@namespace)
-                .WithPathParam("userId", this.session.UserId)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
