@@ -9,6 +9,7 @@ using AccelByte.Core;
 using UnityEngine.Assertions;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Utf8Json;
 #if ENABLE_AGONES_PLUGIN
@@ -105,27 +106,25 @@ namespace AccelByte.Server
                 qos.GetServerLatencies(reqResult => latenciesResult = reqResult);
                 yield return new WaitUntil(() => latenciesResult != null);
 
-                KeyValuePair<string, int> minLatency = new KeyValuePair<string, int>("", 10000);
-                foreach (KeyValuePair<string, int> latency in latenciesResult.Value)
+                foreach (KeyValuePair<string, int> latency in latenciesResult.Value.OrderBy(item => item.Value))
                 {
-                    if(latency.Value < minLatency.Value)
+                    var getUrlRequest = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/dsm?region=" + latency.Key)
+                        .WithBearerAuth(accessToken)
+                        .WithContentType(MediaType.ApplicationJson)
+                        .Accepts(MediaType.ApplicationJson)
+                        .GetResult();
+
+                    IHttpResponse getUrlResponse = null;
+
+                    yield return this.httpWorker.SendRequest(getUrlRequest, rsp => getUrlResponse = rsp);
+
+                    var getUrlResult = getUrlResponse.TryParseJson<DSMClient>();
+                    if (getUrlResult.Value.status == "HEALTHY")
                     {
-                        minLatency = latency;
+                        dsmServerUrl = getUrlResult.Value.host_address;
+                        break;
                     }
                 }
-
-                var getUrlRequest = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/dsm?region=" + minLatency.Key)
-                .WithBearerAuth(accessToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-                IHttpResponse getUrlResponse = null;
-
-                yield return this.httpWorker.SendRequest(getUrlRequest, rsp => getUrlResponse = rsp);
-
-                var getUrlResult = getUrlResponse.TryParseJson<DSMClient>();
-                dsmServerUrl = getUrlResult.Value.host_address;
             }
             if(serverSetup.ip.Length == 0)
             {

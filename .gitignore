@@ -42,6 +42,8 @@ sysinfo.txt
 *.log
 *.meta
 
+# Generated test files
+Assets/InitTestScene*.unity
 
 # pre commit hook
 node_modules

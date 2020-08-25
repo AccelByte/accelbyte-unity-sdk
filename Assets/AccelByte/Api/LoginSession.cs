@@ -336,6 +336,14 @@ namespace AccelByte.Api
         public IEnumerator Logout(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
+
+            // user already logout
+            if (this.AuthorizationToken == null)
+            {
+                callback.TryOk();
+                yield break;
+            }
+
             var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LogoutPath)
                 .WithBearerAuth(this.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationForm)

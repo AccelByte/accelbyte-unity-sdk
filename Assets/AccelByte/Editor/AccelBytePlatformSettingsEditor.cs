@@ -118,11 +118,6 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Telemetry Server Url");
-            TemporarySetting.TelemetryServerUrl = EditorGUILayout.TextField(TemporarySetting.TelemetryServerUrl);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Game Profile Server Url");
             TemporarySetting.GameProfileServerUrl = EditorGUILayout.TextField(TemporarySetting.GameProfileServerUrl);
             EditorGUILayout.EndHorizontal();
@@ -145,6 +140,11 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Leaderboard Server Url");
             TemporarySetting.LeaderboardServerUrl = EditorGUILayout.TextField(TemporarySetting.LeaderboardServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Telemetry Server Url");
+            TemporarySetting.GameTelemetryServerUrl = EditorGUILayout.TextField(TemporarySetting.GameTelemetryServerUrl);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

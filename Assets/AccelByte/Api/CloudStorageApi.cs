@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -182,8 +182,12 @@ namespace AccelByte.Api
             Assert.IsNotNull(accessToken, "Can't update a slot! accessToken parameter is null!");
             Assert.IsNotNull(slotId, "Can't update a slot! slotId parameter is null!");
 
-            FormDataContent customAttribute = new FormDataContent();
-            customAttribute.Add("customAttribute", customMetadata);
+            UpdateMedataRequest updateMedataRequest = new UpdateMedataRequest();
+            {
+                updateMedataRequest.tags = tags;
+                updateMedataRequest.label = label;
+                updateMedataRequest.customAttribute = customMetadata;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/slots/{slotId}/metadata")
@@ -193,9 +197,9 @@ namespace AccelByte.Api
                 .WithQueryParam("tags", tags)
                 .WithQueryParam("label", label)
                 .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(updateMedataRequest.ToUtf8Json())
                 .WithBearerAuth(accessToken)
-                .WithContentType(customAttribute.GetMediaType())
-                .WithBody(customAttribute)
                 .GetResult();
 
             IHttpResponse response = null;

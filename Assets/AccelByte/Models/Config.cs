@@ -20,13 +20,13 @@ namespace AccelByte.Models
         [DataMember] public string BasicServerUrl { get; set; }
         [DataMember] public string LobbyServerUrl { get; set; }
         [DataMember] public string CloudStorageServerUrl { get; set; }
-        [DataMember] public string TelemetryServerUrl { get; set; }
         [DataMember] public string GameProfileServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
         [DataMember] public string QosManagerServerUrl { get; set; }
         [DataMember] public string AgreementServerUrl { get; set; }
         [DataMember] public string LeaderboardServerUrl { get; set; }
         [DataMember] public string CloudSaveServerUrl { get; set; }
+        [DataMember] public string GameTelemetryServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -52,13 +52,13 @@ namespace AccelByte.Models
                 this.BasicServerUrl == anotherConfig.BasicServerUrl &&
                 this.LobbyServerUrl == anotherConfig.LobbyServerUrl &&
                 this.CloudStorageServerUrl == anotherConfig.CloudStorageServerUrl &&
-                this.TelemetryServerUrl == anotherConfig.TelemetryServerUrl &&
                 this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
                 this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
                 this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
                 this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
                 this.LeaderboardServerUrl == anotherConfig.LeaderboardServerUrl &&
                 this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
+                this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
                 this.ClientId == anotherConfig.ClientId &&
                 this.ClientSecret == anotherConfig.ClientSecret &&
                 this.RedirectUri == anotherConfig.RedirectUri)
@@ -98,8 +98,6 @@ namespace AccelByte.Models
 
                 if (this.CloudStorageServerUrl == null) this.CloudStorageServerUrl = httpsBaseUrl + "/binary-store";
 
-                if (this.TelemetryServerUrl == null) this.TelemetryServerUrl = httpsBaseUrl + "/telemetry";
-
                 if (this.GameProfileServerUrl == null) this.GameProfileServerUrl = httpsBaseUrl + "/soc-profile";
 
                 if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpsBaseUrl + "/statistic";
@@ -111,6 +109,8 @@ namespace AccelByte.Models
                 if (this.LeaderboardServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/leaderboard";
                 
                 if (this.CloudSaveServerUrl == null) this.CloudSaveServerUrl = httpsBaseUrl + "/cloudsave";
+
+                if (this.GameTelemetryServerUrl == null) this.GameTelemetryServerUrl = httpsBaseUrl + "/game-telemetry";
             }
         }
 
@@ -141,8 +141,6 @@ namespace AccelByte.Models
 
                 if (this.CloudStorageServerUrl == httpsBaseUrl + "/binary-store") this.CloudStorageServerUrl = null;
 
-                if (this.TelemetryServerUrl == httpsBaseUrl + "/telemetry") this.TelemetryServerUrl = null;
-
                 if (this.GameProfileServerUrl == httpsBaseUrl + "/soc-profile") this.GameProfileServerUrl = null;
 
                 if (this.StatisticServerUrl == httpsBaseUrl + "/statistic") this.StatisticServerUrl = null;
@@ -154,6 +152,8 @@ namespace AccelByte.Models
                 if (this.LeaderboardServerUrl == httpsBaseUrl + "/leaderboard") this.LeaderboardServerUrl = null;
                 
                 if (this.CloudSaveServerUrl == httpsBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
+
+                if (this.GameTelemetryServerUrl == httpsBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
             }
         }
     }

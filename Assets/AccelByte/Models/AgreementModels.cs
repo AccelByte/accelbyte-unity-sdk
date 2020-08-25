@@ -92,4 +92,21 @@ namespace AccelByte.Models
     {
         [DataMember] public bool proceed { get; set; }
     }
+
+    [DataContract]
+    public class RetrieveUserEligibilitiesResponse
+    {
+        [DataMember] public string readableId { get; set; }
+        [DataMember] public string policyName { get; set; }
+        [DataMember] public string policyType { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string countryCode { get; set; }
+        [DataMember] public string countryGroupCode { get; set; }
+        [DataMember] public string[] baseUrls { get; set; }
+        [DataMember] public PolicyVersionWithLocalizedVersionObject[] policyVersions { get; set; }
+        [DataMember] public string description { get; set; }
+        [DataMember] public string policyId { get; set; }
+        [DataMember] public bool isMandatory { get; set; }
+        [DataMember] public bool isAccepted { get; set; }
+    }
 }

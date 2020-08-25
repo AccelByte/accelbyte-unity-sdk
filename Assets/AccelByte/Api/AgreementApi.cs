@@ -6,6 +6,7 @@ using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
+using UnityEngine.Networking;
 
 namespace AccelByte.Api
 {
@@ -23,17 +24,17 @@ namespace AccelByte.Api
             this.httpWorker = httpWorker;
         }
 
-        public IEnumerator GetLegalPolicies(string @namespace, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
+        public IEnumerator GetLegalPolicies(string namespace_, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
             ResultCallback<PublicPolicy[]> callback)
         {
             string functionName = "GetLegalPolicies";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(@namespace, "Can't " + functionName + "! Namespace parameter is null!");
+            Assert.IsNotNull(namespace_, "Can't " + functionName + "! Namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't " + functionName + "! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreateGet(baseUrl + "/public/policies/namespaces/{namespace}")
-                .WithPathParam("namespace", @namespace)
+                .WithPathParam("namespace", namespace_)
                 .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
                 .WithQueryParam("tags", string.Join(",",tags))
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
@@ -119,6 +120,48 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
             callback.Try(result);
+        }
+
+        public IEnumerator QueryLegalEligibilities(string namespace_, string accessToken, ResultCallback<RetrieveUserEligibilitiesResponse[]> callback)
+        {
+            string functionName = "CheckLegalEligibilities";
+            Report.GetFunctionLog(GetType().Name, functionName);
+            Assert.IsNotNull(namespace_, "Can't " + functionName + "! namespace parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't " + functionName + "! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(baseUrl + "/public/eligibilities/namespaces/{namespace}")
+                .WithPathParam("namespace", namespace_)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<RetrieveUserEligibilitiesResponse[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetLegalDocument(string url, ResultCallback<string> callback)
+        {
+            string functionName = "GetLegalDocument";
+            Report.GetFunctionLog(GetType().Name, functionName);
+            UnityWebRequest webRequest = UnityWebRequest.Get(url);
+            yield return webRequest.SendWebRequest();
+
+            Result<string> result;
+            if (!webRequest.isNetworkError && !webRequest.isHttpError)
+            {
+                result = Result<string>.CreateOk(webRequest.downloadHandler.text);
+            }
+            else
+            {
+                result = Result<string>.CreateError((ErrorCode) webRequest.responseCode);
+            }
+            callback(result);
         }
     }
 }

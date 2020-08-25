@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.16.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.16.0%0D2.15.3) (2020-08-05)
+
+
+### Features
+
+* **editor:** AccelBytePlugin static class need to be forcefully initialize on Unity Editor entering the play mode ([afa43bf](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/afa43bfa70b8376511b36c34b6d2973a1db3cfa1))
+* **gameTelemetry:** APIs are added for both client & server ([fc03e03](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fc03e036cd79f51a270aec7c52bf1581ca253151))
+
+
+### Bug Fixes
+
+* **cloudstorage:** Fix UpdateSlotMetadata function ([bdf465a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bdf465ac5b0dc714b0875648113f1c0799ed9b1a))
+* **dsm:** only select healthy DSM url ([5cf6118](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5cf6118b12cedee60510f95aa5a42b069e74f16e))
+* **statistic:** Fix statistic error codes. ([035ff92](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/035ff92b60f44ad8df74934bf7110b17bd264aab))
+
+
+### CI
+
+* **jenkins:** archive test log file ([e42fbb1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e42fbb117495c2faa5fcf6fa99f27746afbb7302))
+* **jenkins:** temporary social service env flag ([a746962](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a746962bfc07c6a2088b6c4020cb6addcf57b7a5))
+
+
+### Tests
+
+* add leaderboard log result ([abbb461](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/abbb4614cb8d0c1d3b46d29a9a6d59185873f809))
+* log the test name at beginning test run ([160246b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/160246b3ad4fc811d8acd8f5657cdeb3ebe56adf))
+
+
+### Refactors
+
+* **Agremeent:** add missing function from bring back ([c7c5d7e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c7c5d7eb8fa4fd34132f1daa024fe71f44427154))
+
 ### [2.15.3](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.15.3%0D2.15.2) (2020-07-08)
 
 

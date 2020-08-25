@@ -82,12 +82,6 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.CloudStorageServerUrl = value; }
         }
 
-        public static string TelemetryServerUrl
-        {
-            get { return AccelByteSettings.Instance.config.TelemetryServerUrl; }
-            set { AccelByteSettings.Instance.config.TelemetryServerUrl = value; }
-        }
-
         public static string GameProfileServerUrl
         {
             get { return AccelByteSettings.Instance.config.GameProfileServerUrl; }
@@ -116,6 +110,12 @@ namespace AccelByte.Api
         {
             get { return AccelByteSettings.Instance.config.LeaderboardServerUrl; }
             set { AccelByteSettings.Instance.config.LeaderboardServerUrl = value; }
+        }
+
+        public static string GameTelemetryServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.GameTelemetryServerUrl; }
+            set { AccelByteSettings.Instance.config.GameTelemetryServerUrl = value; }
         }
 
         public static string ClientId

@@ -26,6 +26,7 @@ namespace AccelByte.Server
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
         private static ServerQos qos;
+        private static ServerGameTelemetry gameTelemetry;
 
         public static ServerConfig Config { get { return AccelByteServerPlugin.config; } }
 
@@ -137,6 +138,21 @@ namespace AccelByte.Server
             }
 
             return AccelByteServerPlugin.qos;
+        }
+
+        public static ServerGameTelemetry GetGameTelemetry()
+        {
+            if (AccelByteServerPlugin.gameTelemetry == null)
+            {
+                AccelByteServerPlugin.gameTelemetry = new ServerGameTelemetry(
+                    new ServerGameTelemetryApi(
+                        AccelByteServerPlugin.config.GameTelemetryServerUrl,
+                        AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.session,
+                    AccelByteServerPlugin.coroutineRunner);
+            }
+
+            return AccelByteServerPlugin.gameTelemetry;
         }
     }
 }

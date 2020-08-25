@@ -10,22 +10,33 @@ using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server;
 using HybridWebSocket;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace AccelByte.Api
 {
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
     public static class AccelBytePlugin
     {
+#if UNITY_EDITOR
+        private static Config config;
+        private static CoroutineRunner coroutineRunner;
+        private static UnityHttpWorker httpWorker;
+        private static User user; 
+#else
         private static readonly Config config;
         private static readonly CoroutineRunner coroutineRunner;
         private static readonly UnityHttpWorker httpWorker;
         private static readonly User user;
-
+#endif
         private static Categories categories;
         private static Items items;
         private static Orders orders;
         private static Wallet wallet;
-        private static Telemetry telemetry;
         private static UserProfiles userProfiles;
         private static Lobby lobby;
         private static CloudStorage cloudStorage;
@@ -36,11 +47,25 @@ namespace AccelByte.Api
         private static Agreement agreement;
         private static Leaderboard leaderboard;
         private static CloudSave cloudSave;
+        private static GameTelemetry gameTelemetry;
 
         public static Config Config { get { return AccelBytePlugin.config; } }
 
         static AccelBytePlugin()
         {
+#if UNITY_EDITOR // Handle an unexpected behaviour if Domain Reload (experimental) is disabled
+            EditorApplication.playModeStateChanged += state =>
+            {
+                if (state == PlayModeStateChange.EnteredPlayMode)
+                {
+                    Init();
+                }
+            };
+        }
+
+        private static void Init()
+        {
+#endif
 #if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH) && !UNITY_EDITOR
             Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
                 new [] {
@@ -55,6 +80,22 @@ namespace AccelByte.Api
                 }
             );
 #endif
+
+            categories = null;
+            items = null;
+            orders = null;
+            wallet = null;
+            userProfiles = null;
+            lobby = null;
+            cloudStorage = null;
+            gameProfiles = null;
+            entitlement = null;
+            statistic = null;
+            qos = null;
+            agreement = null;
+            leaderboard = null;
+            cloudSave = null;
+            gameTelemetry = null;
 
             var configFile = Resources.Load("AccelByteSDKConfig");
 
@@ -196,21 +237,6 @@ namespace AccelByte.Api
             return AccelBytePlugin.wallet;
         }
 
-        public static Telemetry GetTelemetry()
-        {
-            if (AccelBytePlugin.telemetry == null)
-            {
-                AccelBytePlugin.telemetry = new Telemetry(
-                    new TelemetryApi(AccelBytePlugin.config.TelemetryServerUrl, AccelBytePlugin.httpWorker),
-                    AccelBytePlugin.user.Session,
-                    AccelBytePlugin.config.Namespace,
-                    AccelBytePlugin.config.ClientId,
-                    AccelBytePlugin.coroutineRunner);
-            }
-
-            return AccelBytePlugin.telemetry;
-        }
-
         public static Lobby GetLobby()
         {
             if (AccelBytePlugin.lobby == null)
@@ -334,6 +360,19 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.cloudSave;
+        }
+        
+        public static GameTelemetry GetGameTelemetry()
+        {
+            if (AccelBytePlugin.gameTelemetry == null)
+            {
+                AccelBytePlugin.gameTelemetry = new GameTelemetry(
+                    new GameTelemetryApi(AccelBytePlugin.config.GameTelemetryServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.gameTelemetry;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -135,7 +135,7 @@ namespace AccelByte.Api
             this.coroutineRunner.Run(
                 this.api.UpdateSlotMetadata(
                     this.@namespace,
-                    this.session.AuthorizationToken,
+                    this.session.UserId,
                     this.session.AuthorizationToken,
                     slotId,
                     tags,
