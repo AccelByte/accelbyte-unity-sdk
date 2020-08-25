@@ -3,9 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using NUnit.Framework;
 
 namespace AccelByte.Models
 {
@@ -75,6 +73,7 @@ namespace AccelByte.Models
         [DataMember] public string[] roles { get; set; }
         [DataMember] public string userId { get; set; }
         [DataMember] public string userName { get; set; }
+        [DataMember] public bool eligible { get; set; } = true;
     }
 
     [DataContract]

@@ -1,5 +1,13 @@
+## 2.12.0 (2020-06-18)
+### Added
+- Agreement
+    - Add GetLegalPolicies
+    - Add GetLegalPoliciesByCountry
+    - Add BulkAcceptPolicyVersions
+    - Add AcceptPolicyVersion
+
 ## 2.11.0 (2020-06-08)
-## Added
+### Added
 - User Account
     - Add UpgradeWithPlayerPortal 
     - Add GetCountryFromIP
@@ -19,8 +27,8 @@
     - Add Attributes
     - Add Distribution Receiver
 
-# 2.10.2 (2020-06-03)
-## Changed
+## 2.10.2 (2020-06-03)
+### Changed
 - Entitlement
     - GetEntitlements() -> GetEntitlement()
     
@@ -31,22 +39,22 @@
 - Plugin
     - add `UNITY_PS4`, `UNITY_XBOXONE` and `UNITY_SWITCH` macro to support development on 3rd platform
 
-# 2.10.0 (2020-05-26)
-## Added
+## 2.10.0 (2020-05-26)
+### Added
 - User
     - Bulk Get User Id by Third Party Platform
 - Lobby
     - Add LobbyApi
     - Add Bulk Friend Request
 
-# 2.9.0 (2020-04-14)
-## Added
+## 2.9.0 (2020-04-14)
+### Added
 - UserProfile Api
     - GetCustomAttributes
     - UpdateCustomAttributes
 
-# 2.8.0 (2020-04-09)
-## Added
+## 2.8.0 (2020-04-09)
+### Added
 - Session Management
     - Add automatic refresh session coroutine
 - DedicatedServerManager
@@ -70,13 +78,13 @@
 - Jenkins pipeline
     - Fix tests
 
-# 2.7.0 (2020-03-26)
-## Added
+## 2.7.0 (2020-03-26)
+### Added
 - Session Management
     - Add automatic refresh session coroutine
 
-# 2.6.0 (2020-03-03)
-## Added
+## 2.6.0 (2020-03-03)
+### Added
 - Statistic
   - CreateUserStatItems
   - GetUserStatItems
@@ -99,13 +107,13 @@
 - Qos
   - Get Server Latencies
 
-## Fixed
+### Fixed
 - Lobby
   - Stop reconnecting when lobby server disconnects client because token revoked, expired or another session for the same user connecting
 - Integration Test
   - Fix user test
 
-## Changed
+### Changed
 - Statistic API Standardization
   - Model:
     - StatItemInfo into StatItem
@@ -130,8 +138,8 @@
 - Entitlement
   - Change class name from entitlements into entitlement
 
-# 2.5.0 (2019-11-25)
-## Fixed
+## 2.5.0 (2019-11-25)
+### Fixed
 - Platform
   - Models
     - Change sealed class to enum
@@ -213,7 +221,7 @@
         - string language -> Added
     - Added class:
       - PopulatedItemInfo
-## Changed
+### Changed
 - Rearrange Folder
   - UnitySampleProject folder removed
   - All files and folders in UnitySampleProject has been moved to root folder
@@ -224,15 +232,15 @@
     - BulkUserStatItemInc
       - Data Member change: profileId -> userId
 - Delete Jenkinsfile function to create doxygen document
-## Added
+### Added
 - Log
   - Add HTTP Request/Response Log
   - Add Current Function Log
 - Release
   - Add Release folder for Unity SDK Package (in GitHub)
 
-# 2.4.0 (2019-11-11)
-## Changed
+## 2.4.0 (2019-11-11)
+### Changed
 - Statistic API Standardization
   - API:
     - GetAllStatItems() & GetStatItemsByStatCodes() -> GetUserStatItems()
@@ -263,12 +271,12 @@
         - UserProfilesApi.GetTimeZones "/basic/public/namespaces/{namespace}/misc/timezones" -> "/basic/v1/public/namespaces/{namespace}/misc/timezones"
   - Cleanup user profile on integration test
 
-# 2.3.0 (2019-10-15)
-## Added
+## 2.3.0 (2019-10-15)
+### Added
 
 - Enum members for IAM error handling
 
-## Fixed
+### Fixed
 
 - Jenkins Automation
   - Adding Order param on Ecommerce Test
@@ -279,11 +287,11 @@
   - Adding "sortBy" param for GetItemByCriteria endpoint
   - Adding set proxy on Lobby WebSocket test
 
-## Changed
+### Changed
 
 - Remove intermediate conversion from UTF8 to .NET string before converting to object
 
-## Breaking changes
+### Breaking changes
 
 - IAM API Standardization
   - UserAccount.Register():
@@ -317,13 +325,13 @@
   - UserAccount.GetUserByUserId()
     - URL change: `GET /namespaces/{namespace}/users/{userId}` -> `GET /v3/public/namespaces/{namespace}/users/{userId}`
 
-# v2.3.0 (2019-10-15)
+## v2.3.0 (2019-10-15)
 
-## Added
+### Added
 
 - Enum members for IAM error handling
 
-## Fixed
+### Fixed
 
 - Jenkins Automation
   - Adding Order param on Ecommerce Test
@@ -334,11 +342,11 @@
   - Adding "sortBy" param for GetItemByCriteria endpoint
   - Adding set proxy on Lobby WebSocket test
 
-## Changed
+### Changed
 
 - Remove intermediate conversion from UTF8 to .NET string before converting to object
 
-## Breaking changes
+### Breaking changes
 
 - IAM API Standardization
   - UserAccount.Register():
@@ -372,8 +380,8 @@
   - UserAccount.GetUserByUserId()
     - URL change: `GET /namespaces/{namespace}/users/{userId}` -> `GET /v3/public/namespaces/{namespace}/users/{userId}`
 
-# v2.0.0 (2019-08-19)
-## Added
+## v2.0.0 (2019-08-19)
+### Added
 - Session Management
   - Implementing API Gateway
   - Add Switchable Session Management
@@ -389,13 +397,13 @@
   - Ready Consent
   - DS Notif 
 
-## Changed
+### Changed
 - Coroutine
   - Change from Custom Coroutine to Unity Coroutine
 - Updated to v2.0.0 for Justice release v2.0.0
 
-# v1.0.0-beta.1 (2019-03-13)
-## Added
+## v1.0.0-beta.1 (2019-03-13)
+### Added
 - Supported IAM Service Features:
   - Login With Username and Password
   - Login With Other Platforms (Google, Facebook, and Steam)

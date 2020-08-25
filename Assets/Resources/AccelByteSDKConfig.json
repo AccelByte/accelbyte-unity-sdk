@@ -13,6 +13,7 @@
   "TelemetryServerUrl": "https://api.demo.accelbyte.io/telemetry",
   "StatisticServerUrl": "https://api.demo.accelbyte.io/statistic",
   "QosManagerServerUrl": "https://api.demo.accelbyte.io/qosm",
+  "AgreementServerUrl": "https://api.demo.accelbyte.io/agreement",
   "ClientId": "<YOUR-GAME-CLIENT-ID>",
   "ClientSecret": "<YOUR-GAME-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1"

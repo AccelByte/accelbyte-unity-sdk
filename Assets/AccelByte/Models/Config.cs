@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -24,6 +24,7 @@ namespace AccelByte.Models
         [DataMember] public string GameProfileServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
         [DataMember] public string QosManagerServerUrl { get; set; }
+        [DataMember] public string AgreementServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -53,6 +54,7 @@ namespace AccelByte.Models
                 this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
                 this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
                 this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
+                this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
                 this.ClientId == anotherConfig.ClientId &&
                 this.ClientSecret == anotherConfig.ClientSecret &&
                 this.RedirectUri == anotherConfig.RedirectUri)
@@ -99,6 +101,8 @@ namespace AccelByte.Models
                 if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpsBaseUrl + "/statistic";
 
                 if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpsBaseUrl + "/qosm";
+
+                if (this.AgreementServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/agreement";
             }
         }
 
