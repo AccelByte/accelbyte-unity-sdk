@@ -1,3 +1,9 @@
+## 2.15.2 (2020-07-01)
+### Changed
+- ServerDSM
+    - ENABLE_AGONES_PLUGIN definition added
+    - Required to compile Agones by AccelByte SDK
+
 ## 2.15.1 (2020-06-26)
 ### Changed
 - Agreement

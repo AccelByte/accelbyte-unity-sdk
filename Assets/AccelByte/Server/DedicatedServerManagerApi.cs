@@ -11,8 +11,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utf8Json;
+#if ENABLE_AGONES_PLUGIN
 using Agones;
 using Agones.Model;
+#endif
 
 namespace AccelByte.Server
 {
@@ -33,6 +35,7 @@ namespace AccelByte.Server
        DEFAULT
     }
 
+#if ENABLE_AGONES_PLUGIN
     internal class Agones
     {
         private AgonesSdk component = null;
@@ -48,6 +51,7 @@ namespace AccelByte.Server
         public readonly TimeSpan REGISTRATION_TIMEOUT = new TimeSpan(0,0,30);
         public readonly TimeSpan INITIAL_HEALTH_CHECK_TIMEOUT = new TimeSpan(0,0,30);
     }
+#endif
     
     internal class DedicatedServerManagerApi
     {
@@ -57,7 +61,9 @@ namespace AccelByte.Server
         private string dsmServerUrl = "";
         private RegisterServerRequest serverSetup;
         private ServerType serverType = ServerType.NONE;
+#if ENABLE_AGONES_PLUGIN
         private Agones agones = new Agones();
+#endif
 
         internal DedicatedServerManagerApi(string baseUrl, string namespace_, IHttpWorker httpWorker)
         {
@@ -138,35 +144,12 @@ namespace AccelByte.Server
 
             if (IsCurrentProvider(Provider.AGONES))
             {
-                InitiateAgones();
-
-                if (agones.IsReady())
-                {
-                    callback.TryOk();
-                    serverType = ServerType.CLOUDSERVER;
-                }
-                else
-                {
-                    DateTime startWaitingRegistrationTime = DateTime.Now;
-                    while (startWaitingRegistrationTime.Add(agones.REGISTRATION_TIMEOUT) > DateTime.Now)
-                    {
-                        if (agones.IsReady())
-                        {
-                            break;
-                        }
-                        yield return new WaitForSeconds(1.0f);
-                    }
-
-                    if (agones.IsReady())
-                    {
-                        callback.TryOk();
-                        serverType = ServerType.CLOUDSERVER;
-                    }
-                    else
-                    {
-                        callback.TryError(ErrorCode.ServiceUnavailable, "Agones GameServer is not ready.");
-                    }
-                }
+#if ENABLE_AGONES_PLUGIN
+                InitiateAgones(callback);
+#else
+                callback.TryError(ErrorCode.NotFound, 
+                    "Can't request register server. Agones provider arguments is passed but Agones plugin is not found.");
+#endif
             }
             else
             {
@@ -201,21 +184,12 @@ namespace AccelByte.Server
         {
             if (IsCurrentProvider(Provider.AGONES) && serverType != ServerType.LOCALSERVER)
             {
-                async Task NewFunction()
-                {
-                    if (await agones.GetSDK().Shutdown())
-                    {
-                        Debug.Log("Successfully shutting down Agones GameServer.");
-                        agones.SetReady(false);
-                        callback.TryOk();
-                    }
-                    else
-                    {
-                        callback.TryError(ErrorCode.UnknownError, "Failed to shutdown Agones GameServer.");
-                    }
-                    serverType = ServerType.NONE;
-                }
-                yield return NewFunction();
+#if ENABLE_AGONES_PLUGIN
+                yield return ShutdownAgones(callback);
+#else
+                callback.TryError(ErrorCode.NotFound, 
+                    "Can't request shutdown server. Agones provider arguments is passed but Agones plugin is not found.");
+#endif
                 yield break;
             }
             Assert.IsNotNull(shutdownServerRequest, "Register failed. shutdownServerNotif is null!");
@@ -249,7 +223,12 @@ namespace AccelByte.Server
         {
             if (IsCurrentProvider(Provider.AGONES) && serverType == ServerType.CLOUDSERVER)
             {
+#if ENABLE_AGONES_PLUGIN
                 SendAgonesHeartBeat(callback);
+#else
+                callback.Try(Result<MatchRequest>.CreateError(ErrorCode.NotFound, 
+                    "Can't send Agones health. Agones provider arguments is passed but Agones plugin is not found."));
+#endif
             }
             else
             {
@@ -290,28 +269,6 @@ namespace AccelByte.Server
             else
             {
                 var result = response.TryParseJson<MatchRequest>();
-                callback.Try(result);
-            }
-        }
-
-        private async void SendAgonesHeartBeat(ResultCallback<MatchRequest> callback)
-        {
-            if (!agones.IsReady())
-            {
-                return;
-            }
-            
-            string matchDetails;
-            GameServer gameServer = await agones.GetSDK().GameServer();
-
-            if (!gameServer.ObjectMeta.Annotations.TryGetValue(agones.MATCH_DETAILS_ANNOTATION, out matchDetails) || gameServer == null)
-            {
-                callback.Try(null);
-            }
-            else 
-            {
-                var matchRequest = JsonSerializer.Deserialize<MatchRequest>(matchDetails);
-                var result = Result<MatchRequest>.CreateOk(matchRequest);
                 callback.Try(result);
             }
         }
@@ -418,7 +375,8 @@ namespace AccelByte.Server
             return serverSetup.provider.Equals(provider.ToString().ToLower());
         }
 
-        private async void InitiateAgones()
+#if ENABLE_AGONES_PLUGIN
+        private async void InitiateAgones(ResultCallback callback)
         {
             GameObject dummyGameObject = GameObject.Find("AccelByteDummyGameObject");
             if (dummyGameObject == null)
@@ -459,6 +417,73 @@ namespace AccelByte.Server
             {
                 Debug.Log("[Agones] Failed to establish a connection to GameServer.");
             }
+            
+            if (agones.IsReady())
+            {
+                callback.TryOk();
+                serverType = ServerType.CLOUDSERVER;
+            }
+            else
+            {
+                DateTime startWaitingRegistrationTime = DateTime.Now;
+                while (startWaitingRegistrationTime.Add(agones.REGISTRATION_TIMEOUT) > DateTime.Now)
+                {
+                    if (agones.IsReady())
+                    {
+                        break;
+                    }
+
+                    await Task.Delay(1000);
+                }
+
+                if (agones.IsReady())
+                {
+                    callback.TryOk();
+                    serverType = ServerType.CLOUDSERVER;
+                }
+                else
+                {
+                    callback.TryError(ErrorCode.ServiceUnavailable, "Agones GameServer is not ready.");
+                }
+            }
         }
+
+        private async Task ShutdownAgones(ResultCallback callback)
+        {
+            if (await agones.GetSDK().Shutdown())
+            {
+                Debug.Log("Successfully shutting down Agones GameServer.");
+                agones.SetReady(false);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(ErrorCode.UnknownError, "Failed to shutdown Agones GameServer.");
+            }
+            serverType = ServerType.NONE;
+        }
+        
+        private async void SendAgonesHeartBeat(ResultCallback<MatchRequest> callback)
+        {
+            if (!agones.IsReady())
+            {
+                return;
+            }
+            
+            string matchDetails;
+            GameServer gameServer = await agones.GetSDK().GameServer();
+
+            if (!gameServer.ObjectMeta.Annotations.TryGetValue(agones.MATCH_DETAILS_ANNOTATION, out matchDetails) || gameServer == null)
+            {
+                callback.Try(null);
+            }
+            else 
+            {
+                var matchRequest = JsonSerializer.Deserialize<MatchRequest>(matchDetails);
+                var result = Result<MatchRequest>.CreateOk(matchRequest);
+                callback.Try(result);
+            }
+        }
+#endif
     }
 }
