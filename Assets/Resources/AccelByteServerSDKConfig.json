@@ -6,6 +6,7 @@
   "StatisticServerUrl": "https://demo.accelbyte.io/social",
   "PlatformServerUrl": "https://demo.accelbyte.io/platform",
   "GameTelemetryServerUrl": "https://demo.accelbyte.io/game-telemetry",
+  "AchievementServerUrl": "https://demo.accelbyte.io/achievement",
   "ClientId": "<YOUR-DS-CLIENT-ID>",
   "ClientSecret": "<YOUR-DS-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1"

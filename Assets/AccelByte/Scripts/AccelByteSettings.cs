@@ -100,6 +100,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.CloudSaveServerUrl = value; }
         }
 
+        public static string AchievementServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.AchievementServerUrl; }
+            set { AccelByteSettings.Instance.config.AchievementServerUrl = value; }
+        }
+
         public static string AgreementServerUrl
         {
             get { return AccelByteSettings.Instance.config.AgreementServerUrl; }

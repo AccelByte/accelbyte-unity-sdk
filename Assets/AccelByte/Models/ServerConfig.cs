@@ -16,6 +16,7 @@ namespace AccelByte.Models {
         [DataMember] public string PlatformServerUrl { get; set; }
         [DataMember] public string QosManagerServerUrl { get; set; }
         [DataMember] public string GameTelemetryServerUrl { get; set; }
+        [DataMember] public string AchievementServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -52,6 +53,8 @@ namespace AccelByte.Models {
                 if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpBaseUrl + "/qosm";
 
                 if (this.GameTelemetryServerUrl == null) this.GameTelemetryServerUrl = httpBaseUrl + "/game-telemetry";
+
+                if (this.AchievementServerUrl == null) this.AchievementServerUrl = httpBaseUrl + "/achievement";
             }
         }
 
@@ -79,6 +82,8 @@ namespace AccelByte.Models {
                 if (this.QosManagerServerUrl == httpBaseUrl + "/qosm") this.QosManagerServerUrl = null;
 
                 if (this.GameTelemetryServerUrl == httpBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
+
+                if (this.AchievementServerUrl == httpBaseUrl + "/achievement") this.AchievementServerUrl = null;
             }
         }
     }

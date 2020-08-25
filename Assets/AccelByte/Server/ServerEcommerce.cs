@@ -21,7 +21,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(api, "Can not construct Ecommerce manager; api is null!");
             Assert.IsNotNull(session, "Can not construct Ecommerce manager; session parameter can not be null");
             Assert.IsFalse(string.IsNullOrEmpty(namespace_), "Can not construct Ecommerce manager; ns paramater couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "Can not construct Statistic manager; coroutineRunner is null!");
+            Assert.IsNotNull(coroutineRunner, "Can not construct Ecommerce manager; coroutineRunner is null!");
 
             this.api = api;
             this.session = session;

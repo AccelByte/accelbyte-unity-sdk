@@ -48,6 +48,7 @@ namespace AccelByte.Api
         private static Leaderboard leaderboard;
         private static CloudSave cloudSave;
         private static GameTelemetry gameTelemetry;
+        private static Achievement achievement;
 
         public static Config Config { get { return AccelBytePlugin.config; } }
 
@@ -373,6 +374,20 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.gameTelemetry;
+        }
+
+        public static Achievement GetAchievement()
+        {
+            if (AccelBytePlugin.achievement == null)
+            {
+                AccelBytePlugin.achievement = new Achievement(
+                    new AchievementApi(AccelBytePlugin.config.AchievementServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.achievement;
         }
     }
 }

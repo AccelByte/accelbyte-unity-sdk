@@ -128,6 +128,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Achievement Server Url");
+            TemporarySetting.AchievementServerUrl = EditorGUILayout.TextField(TemporarySetting.AchievementServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("CloudSave Server Url");
             TemporarySetting.CloudSaveServerUrl = EditorGUILayout.TextField(TemporarySetting.CloudSaveServerUrl);
             EditorGUILayout.EndHorizontal();

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.17.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.17.0%0D2.16.0) (2020-08-19)
+
+
+### Features
+
+* **Achievement:** bring this API back from customer Versus Evil Unity SDK repository. ([fcd5ed6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fcd5ed6371c0bd80452e3b58d6178e23c8ad2403))
+
+
+### Bug Fixes
+
+* **test:** additional incremental Achievement test ([2809e5a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2809e5a624c6e814b662d194e4c3c0182bfc3138))
+
 ## [2.16.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.16.0%0D2.15.3) (2020-08-05)
 
 

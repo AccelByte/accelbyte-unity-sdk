@@ -12,6 +12,7 @@
   "CloudStorageServerUrl": "https://api.demo.accelbyte.io/binary-store",
   "StatisticServerUrl": "https://api.demo.accelbyte.io/statistic",
   "QosManagerServerUrl": "https://api.demo.accelbyte.io/qosm",
+  "AchievementServerUrl": "https://api.demo.accelbyte.io/achievement",
   "AgreementServerUrl": "https://api.demo.accelbyte.io/agreement",
   "LeaderboardServerUrl": "https://api.demo.accelbyte.io/leaderboard",
   "CloudSaveServerUrl": "https://api.demo.accelbyte.io/cloudsave",

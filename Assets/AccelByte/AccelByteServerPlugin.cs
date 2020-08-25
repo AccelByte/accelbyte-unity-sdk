@@ -27,6 +27,7 @@ namespace AccelByte.Server
         private static ServerStatistic statistic;
         private static ServerQos qos;
         private static ServerGameTelemetry gameTelemetry;
+        private static ServerAchievement achievement;
 
         public static ServerConfig Config { get { return AccelByteServerPlugin.config; } }
 
@@ -153,6 +154,22 @@ namespace AccelByte.Server
             }
 
             return AccelByteServerPlugin.gameTelemetry;
+        }
+
+        public static ServerAchievement GetAchievement()
+        {
+            if (AccelByteServerPlugin.achievement == null)
+            {
+                AccelByteServerPlugin.achievement = new ServerAchievement(
+                    new ServerAchievementApi(
+                        AccelByteServerPlugin.config.AchievementServerUrl,
+                        AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.session,
+                    AccelByteServerPlugin.config.Namespace,
+                    AccelByteServerPlugin.coroutineRunner);
+            }
+
+            return AccelByteServerPlugin.achievement;
         }
     }
 }

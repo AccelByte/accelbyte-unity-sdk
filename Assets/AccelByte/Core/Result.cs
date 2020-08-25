@@ -108,6 +108,7 @@ namespace AccelByte.Core
         NetworkError = 14005,
         IsNotLoggedIn = 14006,
         UserProfileIsNotCreated = 14007,
+        UserProfileConflict = 11441,
         GenerateTokenFailed = 14008,
         AccountIsNotUpgraded = 14009,
         VerificationCodeIsNotRequested = 14010,
@@ -125,7 +126,157 @@ namespace AccelByte.Core
         UserUnderage = 10130,
         EmailAlreadyUsed = 10133,
         CountryNotFound = 10154,
-        
+
+        //AccelByte Lobby error codes
+        //Connection
+        LobbyConnectionUnableToUpgrade = 11211,
+        LobbyConnectionUnableToRegisterUser = 11212,
+        LobbyConnectionMultipleLoginAttempt = 11215,
+        LobbyConnectionUnableCheckConnectedUser = 11216,
+        LobbyConnectionUnableToValidateSession = 11217,
+        LobbyConnectionInvalidSession = 11218,
+        //Party Info
+        PartyInfoUnableGetUserRegistry = 11221,
+        PartyInfoUnableGetUserPartyInfo = 11222,
+        PartyInfoSuccessGetUserPartyInfoEmpty = 11223,
+        //Party Creation
+        PartyCreationUnableGetUserRegistry = 11231,
+        PartyCreationAlreadyInParty = 11232,
+        PartyCreationUnableCreateParty = 11233,
+        //Party Leave
+        PartyLeaveUnableGetUserRegistry = 11241,
+        PartyLeavePartyIsNil = 11242,
+        PartyLeavePartyNotFound = 11243,
+        PartyLeaveUserNotInParty = 11244,
+        PartyLeaveUnableToLeaveParty = 11245,
+        // Party Invite
+        PartyInviteUnableGetUserRegistry = 11251,
+        PartyInviteInviteeNotFound = 11252,
+        PartyInviteNotInParty = 11253,
+        PartyInviteInviteeInParty = 11254,
+        PartyInviteUnableInviteToParty = 11255,
+        //Party Join
+        PartyJoinUnableGetUserRegistry = 11261,
+        PartyJoinPartyNotFound = 11262,
+        PartyJoinInvalidInvitationToken = 11263,
+        PartyJoinNotInvited = 11264,
+        PartyJoinAlreadyInParty = 11265,
+        PartyJoinPartyFull = 11266,
+        PartyJoinUnableJoinParty = 11267,
+        //Party Kick
+        PartyKickUnableGetUserRegistry = 11271,
+        PartyKickNotInParty = 11272,
+        PartyKickNotLeader = 11273,
+        PartyKickKickeeNotInParty = 11274,
+        PartyKickUnableKickUser = 11275,
+        PartyKickKickOwnSelf = 11277,
+        //Personal Chat
+        PersonalChatUnableGetUserRegistry = 11281,
+        PersonalChatSenderBanned = 11282,
+        PersonalChatReceiverBanned = 11283,
+        PersonalChatReceiverNotFound = 11284,
+        PersonalChatUnableSaveChat = 11285,
+        //Party Chat
+        PartyChatUnableGetUserRegistry = 11291,
+        PartyChatSenderBanned = 11292,
+        PartyChatPartyNotFound = 11293,
+        PartyChatUnableSaveChat = 11294,
+        PartyChatReceiverBanned = 11295,
+        PartyChatReceiverNotFound = 11296,
+        //List Friends
+        ListFriendsUnableGetUserRegistry = 11301,
+        ListFriendsUnableGetOnlineFiends = 11303,
+        ListFriendsUnableGetAllOnlineUsers = 11305,
+        //Get All Notification
+        ListNotificationUnableGetUserRegistry = 11311,
+        ListNotificationUnableGetUserNotification = 11312,
+        ListNotificationUnableDeleteUserNotification = 11314,
+        //Set User Status
+        SetUserStatusUnableSetStatus = 11331,
+        SetUserStatusUnableGetUserRegistry = 11332,
+        SetUserStatusUnableGetFriendsList = 11333,
+        ResetUserStatusUnableGetFriendsList = 11334,
+        ResetUserStatusUnableResetStatus = 11335,
+        //List Friends Presence
+        ListFriendsPresenceUnableGetUserRegistry = 11341,
+        ListFriendsPresenceUnableGetOnlineFiends = 11343,
+        ListFriendsPresenceUnableGetFriendsPresence = 11344,
+        //Start Matchmaking
+        StartMatchmakingUnableToPush = 11601,
+        StartMatchmakingUnableToFindUserRegistry = 11602,
+        StartMatchmakingUserNotInParty = 11603,
+        StartMatchmakingUnableToFindUserParty = 11604,
+        StartMatchmakingNotPartyLeader = 11605,
+        StartMatchmakingUnableToStoreMMStatus = 11606,
+        //Cancel Matchmaking
+        CancelMatchmakingUnableToFindUserParty = 11611,
+        CancelMatchmakingUnableToGetPartyInfo = 11612,
+        CancelMatchmakingNotPartyLeader = 11613,
+        CancelMatchmakingUnableToPushCancelRequest = 11614,
+        CancelMatchmakingNotInParty = 11615,
+        //Listen Matchmaking Result
+        MatchmakingUnableToFindParty = 11623,
+        MatchmakingPartyNotFound = 11624,
+        MatchmakingUnablePrepareReadyConsent = 11627,
+        MatchmakingUnableSaveMMResult = 11629,
+        //Set Ready Consent
+        SetReadyConsentUnableGetUserRegistry = 11631,
+        SetReadyConsentNotFound = 11632,
+        SetReadyConsentUnableSetReadyConsent = 11633,
+        SetReadyConsentUnableGetMMResult = 11634,
+        //Friend Request
+        FriendRequestUnableRequestFriends = 11701,
+        FriendRequestInvalidRequestBody = 11702,
+        FriendRequestConflictFriendship = 11703,
+        FriendRequestUnableGetUserRegistry = 11704,
+        FriendRequestFriendRegistryNotFound = 11705,
+        FriendRequestUnableGetFriendRegistry = 11706,
+        //List Incoming Friends
+        ListIncomingFriendsUnableGetListIncoming = 11711,
+        ListIncomingFriendsUnableToWriteResponse = 11712,
+        ListIncomingFriendsUnableGetUserRegistry = 11713,
+        ListIncomingFriendsDataNotFound = 11714,
+        ListIncomingFriendsInvalidRequestBody = 11715,
+        //List Outgoing Friends
+        ListOutgoingFriendsUnableGetListOutgoing = 11721,
+        ListOutgoingFriendsUnableToWriteResponse = 11722,
+        ListOutgoingFriendsUnableGetUserRegistry = 11723,
+        ListOutgoingFriendsDataNotFound = 11724,
+        ListOutgoingFriendsInvalidRequestBody = 11725,
+        //Accept Friend
+        AcceptFriendUnableAcceptFriends = 11731,
+        AcceptFriendInvalidRequestBody = 11732,
+        AcceptFriendDataNotFound = 11733,
+        AcceptFriendUnableGetUserRegistry = 11734,
+        AcceptFriendRequestorNotFound = 11735,
+        AcceptFriendUnableGetRequestorRegistry = 11736,
+        //Reject Friend
+        RejectFriendUnableRejectFriends = 11741,
+        RejectFriendInvalidRequestBody = 11742,
+        RejectFriendDataNotFound = 11743,
+        RejectFriendUnableGetUserRegistry = 11744,
+        //Cancel Friend Request
+        CancelFriendUnableCancelFriends = 11751,
+        CancelFriendInvalidRequestBody = 11752,
+        CancelFriendDataNotFound = 11753,
+        CancelFriendUnableGetUserRegistry = 11754,
+        //Unfriend
+        UnfriendUnableUnfriend = 11761,
+        UnfriendInvalidRequestBody = 11762,
+        UnfriendDataNotFound = 11763,
+        UnfriendUnableGetUserRegistry = 11764,
+        //List of Friends
+        ListOfFriendsUnableGetListOfFriends = 11771,
+        ListOfFriendsUnableGetUserRegistry = 11773,
+        //Get Friendship Status
+        GetFriendshipStatusUnableGetFriendshipStatus = 11781,
+        GetFriendshipStatusUnableGetUserRegistry = 11783,
+        GetFriendshipStatusInvalidRequestBody = 11784,
+        //Get Friends
+        GetFriendsInvalidRequestBody = 11791,
+        GetFriendsDataNotFound = 11792,
+        GetFriendsUnableGetListOfFriends = 11793,
+        GetFriendsUnableToWriteResponse = 11794,
     }
 
     public class Error
