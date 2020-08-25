@@ -2,6 +2,8 @@
   "Namespace": "<YOUR-GAME-NAMESPACE>",
   "UseSessionManagement": true,
   "BaseUrl": "https://api.demo.accelbyte.io",
+  "ApiBaseUrl": "https://api.demo.accelbyte.io",
+  "NonApiBaseUrl": "https://demo.accelbyte.io",
   "LoginServerUrl": "https://api.demo.accelbyte.io",
   "IamServerUrl": "https://api.demo.accelbyte.io/iam",
   "PlatformServerUrl": "https://api.demo.accelbyte.io/platform",

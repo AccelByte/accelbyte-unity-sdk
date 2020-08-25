@@ -1,3 +1,24 @@
+## 2.11.0 (2020-06-08)
+## Added
+- User Account
+    - Add UpgradeWithPlayerPortal 
+    - Add GetCountryFromIP
+- Entitlement
+    - Add CreateDistributionReceiver
+    - Add GetDistributionReceiver
+    - Add DeleteDistributionReceiver
+    - Add UpdateDistributionReceiver
+- Config
+    - Add ApiBaseUrl for GetCountryFromIP feature
+    - Add NonApiBaseUrl for UpgradeWithPlayerPortal feature
+- User Models
+    - Add CountryInfo
+    - Add UpgradeUserRequest 
+- Ecommerce Models
+    - Add DistributesAttributes
+    - Add Attributes
+    - Add Distribution Receiver
+
 # 2.10.2 (2020-06-03)
 ## Changed
 - Entitlement

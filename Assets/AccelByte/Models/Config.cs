@@ -12,6 +12,8 @@ namespace AccelByte.Models
         [DataMember] public string Namespace { get; set; }
         [DataMember] public bool UseSessionManagement { get; set; }
         [DataMember] public string BaseUrl { get; set; }
+        [DataMember] public string ApiBaseUrl { get; set; }
+        [DataMember] public string NonApiBaseUrl { get; set; }
         [DataMember] public string LoginServerUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
         [DataMember] public string PlatformServerUrl { get; set; }
@@ -39,6 +41,8 @@ namespace AccelByte.Models
             if (this.Namespace == anotherConfig.Namespace &&
                 this.UseSessionManagement == anotherConfig.UseSessionManagement &&
                 this.BaseUrl == anotherConfig.BaseUrl &&
+                this.ApiBaseUrl == anotherConfig.ApiBaseUrl &&
+                this.NonApiBaseUrl == anotherConfig.NonApiBaseUrl &&
                 this.LoginServerUrl == anotherConfig.LoginServerUrl &&
                 this.IamServerUrl == anotherConfig.IamServerUrl &&
                 this.PlatformServerUrl == anotherConfig.PlatformServerUrl &&
@@ -70,6 +74,8 @@ namespace AccelByte.Models
                 // remove protocol
                 string baseUrl = this.BaseUrl;
                 if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
+                if ((index = this.NonApiBaseUrl.IndexOf("://")) > 0) this.NonApiBaseUrl = this.NonApiBaseUrl.Substring(index + 3);
+                if ((index = this.ApiBaseUrl.IndexOf("://")) > 0) this.ApiBaseUrl = this.ApiBaseUrl.Substring(index + 3);
 
                 string httpsBaseUrl = "https://" + baseUrl;
                 string wssBaseUrl = "wss://" + baseUrl;
@@ -105,6 +111,8 @@ namespace AccelByte.Models
             // remove protocol
             string baseUrl = this.BaseUrl;
             if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
+            if ((index = this.NonApiBaseUrl.IndexOf("://")) > 0) this.NonApiBaseUrl = this.NonApiBaseUrl.Substring(index + 3);
+            if ((index = this.ApiBaseUrl.IndexOf("://")) > 0) this.ApiBaseUrl = this.ApiBaseUrl.Substring(index + 3);
 
             if (baseUrl != null)
             {

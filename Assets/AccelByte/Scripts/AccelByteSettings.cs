@@ -33,6 +33,18 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.BaseUrl = value; }
         }
 
+        public static string ApiBaseUrl
+        {
+            get { return AccelByteSettings.Instance.config.ApiBaseUrl; }
+            set { AccelByteSettings.Instance.config.ApiBaseUrl = value; }
+        }
+
+        public static string NonApiBaseUrl
+        {
+            get { return AccelByteSettings.Instance.config.NonApiBaseUrl; }
+            set { AccelByteSettings.Instance.config.NonApiBaseUrl = value; }
+        }
+
         public static string LoginServerUrl
         {
             get { return AccelByteSettings.Instance.config.LoginServerUrl; }

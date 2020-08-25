@@ -113,5 +113,115 @@ namespace AccelByte.Api
             var result = response.TryParseJson<EntitlementInfo>();
             callback.Try(result);
         }
+
+        public IEnumerator CreateDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
+            Attributes currentAttributes, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't create distribution receiver! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't create distribution receiver! UserId parameter is null!");
+            Assert.IsNotNull(extUserId, "Can't create distribution receiver! extUserId parameter is null!");
+            Assert.IsNotNull(currentAttributes, "Can't create distribution receiver! distributionAttributes parameter is null!");
+
+            DistributionAttributes distributionAttributes = new DistributionAttributes
+            {
+                attributes = currentAttributes
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/receivers/{extUserId}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("extUserId", extUserId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(distributionAttributes.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
+            ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't delete distribution receiver! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't delete distribution receiver! UserId parameter is null!");
+            Assert.IsNotNull(extUserId, "Can't delete distribution receiver! extUserId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateDelete(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/receivers/{extUserId}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("extUserId", extUserId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetDistributionReceiver(string publisherNamespace, string publisherUserId, string targetNamespace, string userAccessToken,
+            ResultCallback<DistributionReceiver[]> callback)
+        {
+            Assert.IsNotNull(publisherNamespace, "Can't get distribution receiver! PublisherNamespace parameter is null!");
+            Assert.IsNotNull(publisherUserId, "Can't get distribution receiver! PublisherUserId parameter is null!");
+            Assert.IsNotNull(targetNamespace, "Can't get distribution receiver! TargetNamespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/receivers")
+                .WithPathParam("namespace", publisherNamespace)
+                .WithPathParam("userId", publisherUserId)
+                .WithQueryParam("targetNamespace", targetNamespace)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<DistributionReceiver[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
+            Attributes currentAttributes, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't update distribution receiver! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't update distribution receiver! UserId parameter is null!");
+            Assert.IsNotNull(extUserId, "Can't update distribution receiver! extUserId parameter is null!");
+            Assert.IsNotNull(currentAttributes, "Can't update distribution receiver! distributionAttributes parameter is null!");
+
+            DistributionAttributes distributionAttributes = new DistributionAttributes
+            {
+                attributes = currentAttributes
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/receivers/{extUserId}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("extUserId", extUserId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(distributionAttributes.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
     }
 }

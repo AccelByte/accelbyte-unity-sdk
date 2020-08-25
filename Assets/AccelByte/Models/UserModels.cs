@@ -169,4 +169,18 @@ namespace AccelByte.Models
     {
         [DataMember] public PlatformUserIdMap[] userIdPlatforms { get; set; }
     }
+
+    public class CountryInfo
+    {
+        [DataMember] public string CountryCode { get; set; }
+        [DataMember] public string CountryName { get; set; }
+        [DataMember] public string State { get; set; }
+        [DataMember] public string City { get; set; }
+    }
+
+    [DataContract]
+    public class UpgradeUserRequest
+    {
+        [DataMember] public string temporary_session_id { get; set; }
+    }
 }

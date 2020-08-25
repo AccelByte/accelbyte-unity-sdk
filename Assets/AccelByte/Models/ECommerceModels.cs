@@ -560,5 +560,29 @@ namespace AccelByte.Models
         [DataMember] public int stackedQuantity { get; set; }
     }
 
+    [DataContract]
+    public class DistributionAttributes
+    {
+        [DataMember] public Attributes attributes { get; set; }
+    }
+
+    [DataContract]
+    public class Attributes
+    {
+        [DataMember] public string serverId { get; set; }
+        [DataMember] public string serverName { get; set; }
+        [DataMember] public string characterId { get; set; }
+        [DataMember] public string characterName { get; set; }
+    }
+
+    [DataContract]
+    public class DistributionReceiver
+    {
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string namespace_ { get; set; }
+        [DataMember] public string extUserId { get; set; }
+        [DataMember] public Attributes attributes { get; set; }
+    }
+
     #endregion
 }

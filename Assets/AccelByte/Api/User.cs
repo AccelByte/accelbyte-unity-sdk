@@ -15,8 +15,14 @@ namespace AccelByte.Api
     /// </summary>
     public class User
     {
+        /// <summary>
+        /// Raised when upgrade from Player Portal is finished
+        /// </summary>
+        public event Action Upgraded;
+
         //Constants
         private const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
+        private const int ttl = 60;
 
         //Readonly members
         private readonly ILoginSession loginSession;
@@ -306,6 +312,56 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Upgrade a headless account using external browser. User must be logged in before this method can be
+        /// used.
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains UpgradeUserRequest via callback when completed</param>
+        public void UpgradeWithPlayerPortal(ResultCallback<UpgradeUserRequest> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(
+                UpgradeWithPlayerPortalAsync(HttpListenerExtension.GetAvailableLocalUrl(), callback));
+        }
+
+        private IEnumerator UpgradeWithPlayerPortalAsync(string returnUrl, ResultCallback<UpgradeUserRequest> callback)
+        {
+            Result<UpgradeUserRequest> result = null;
+
+            yield return this.userAccount.UpgradeWithPlayerPortal(returnUrl, ttl, r => result = r);
+
+            callback.Try(result);
+
+            while (result == null)
+            {
+                System.Threading.Thread.Sleep(100);
+                yield return null;
+            }
+
+            HttpListenerExtension.StartHttpListener(result.Value.temporary_session_id);
+
+            while (HttpListenerExtension.listenerResult == null)
+            {
+                System.Threading.Thread.Sleep(100);
+                yield return null;
+
+                if (HttpListenerExtension.availableLocalUrl != returnUrl)
+                    break;
+            }
+
+            if (HttpListenerExtension.listenerResult != null)
+            {
+                if (!HttpListenerExtension.listenerResult.IsError)
+                {
+                    Action handler = Upgraded;
+                    if (handler != null)
+                    {
+                        handler();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Trigger an email that contains verification code to be sent to user's email. User must be logged in.
         /// </summary>
         /// <param name="callback">Returns a Result via callback when completed</param>
@@ -519,6 +575,16 @@ namespace AccelByte.Api
             BulkPlatformUserIdRequest platformUserIds = new BulkPlatformUserIdRequest { platformUserIDs = otherPlatformUserId };
             this.coroutineRunner.Run(
                 this.userAccount.BulkGetUserByOtherPlatformUserIds(platformType, platformUserIds, callback));
+        }
+        
+        /// <summary>
+        /// Get spesific country from user IP
+        /// </summary>
+        /// <param name="callback"> Returns a Result that contains country information via callback when completed</param>
+        public void GetCountryFromIP(ResultCallback<CountryInfo> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(this.userAccount.GetCountryFromIP(callback));
         }
     }
 }
