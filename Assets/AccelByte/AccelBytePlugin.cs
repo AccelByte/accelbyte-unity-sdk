@@ -35,6 +35,7 @@ namespace AccelByte.Api
         private static Qos qos;
         private static Agreement agreement;
         private static Leaderboard leaderboard;
+        private static CloudSave cloudSave;
 
         public static Config Config { get { return AccelBytePlugin.config; } }
 
@@ -319,6 +320,20 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.leaderboard;
+        }
+        
+        public static CloudSave GetCloudSave()
+        {
+            if (AccelBytePlugin.cloudSave == null)
+            {
+                AccelBytePlugin.cloudSave = new CloudSave(
+                    new CloudSaveApi(AccelBytePlugin.config.CloudSaveServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.cloudSave;
         }
     }
 }

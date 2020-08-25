@@ -100,6 +100,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.StatisticServerUrl = value; }
         }
 
+        public static string CloudSaveServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.CloudSaveServerUrl; }
+            set { AccelByteSettings.Instance.config.CloudSaveServerUrl = value; }
+        }
+
         public static string ClientId
         {
             get { return AccelByteSettings.Instance.config.ClientId; }

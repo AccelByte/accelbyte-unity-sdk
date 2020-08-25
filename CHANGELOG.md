@@ -1,3 +1,19 @@
+## 2.15.0 (2020-06-25)
+### Added
+- CloudSave
+    - Add SaveUserRecord
+    - Add ReplaceUserRecord
+    - Add GetUserRecord
+    - Add GetPublicUserRecord
+    - Add DeleteUserRecord
+    - Add SaveGameRecord
+    - Add ReplaceGameRecord
+    - Add GetGameRecord
+    - Add DeleteGameRecord
+- CloudSaveModels
+    - Add UserRecord
+    - Add GameRecord
+
 ## 2.14.0 (2020-06-24)
 ### Added
 - Leaderboard

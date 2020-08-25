@@ -26,6 +26,7 @@ namespace AccelByte.Models
         [DataMember] public string QosManagerServerUrl { get; set; }
         [DataMember] public string AgreementServerUrl { get; set; }
         [DataMember] public string LeaderboardServerUrl { get; set; }
+        [DataMember] public string CloudSaveServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
@@ -57,6 +58,7 @@ namespace AccelByte.Models
                 this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
                 this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
                 this.LeaderboardServerUrl == anotherConfig.LeaderboardServerUrl &&
+                this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
                 this.ClientId == anotherConfig.ClientId &&
                 this.ClientSecret == anotherConfig.ClientSecret &&
                 this.RedirectUri == anotherConfig.RedirectUri)
@@ -107,6 +109,8 @@ namespace AccelByte.Models
                 if (this.AgreementServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/agreement";
 
                 if (this.LeaderboardServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/leaderboard";
+                
+                if (this.CloudSaveServerUrl == null) this.CloudSaveServerUrl = httpsBaseUrl + "/cloudsave";
             }
         }
 
@@ -148,6 +152,8 @@ namespace AccelByte.Models
                 if (this.AgreementServerUrl == httpsBaseUrl + "/agreement") this.AgreementServerUrl = null;
 
                 if (this.LeaderboardServerUrl == httpsBaseUrl + "/leaderboard") this.LeaderboardServerUrl = null;
+                
+                if (this.CloudSaveServerUrl == httpsBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
             }
         }
     }

@@ -125,6 +125,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("CloudSave Server Url");
+            TemporarySetting.CloudSaveServerUrl = EditorGUILayout.TextField(TemporarySetting.CloudSaveServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Client Id");
             TemporarySetting.ClientId = EditorGUILayout.TextField(TemporarySetting.ClientId);
             EditorGUILayout.EndHorizontal();

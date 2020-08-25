@@ -15,6 +15,7 @@
   "QosManagerServerUrl": "https://api.demo.accelbyte.io/qosm",
   "AgreementServerUrl": "https://api.demo.accelbyte.io/agreement",
   "LeaderboardServerUrl": "https://api.demo.accelbyte.io/leaderboard",
+  "CloudSaveServerUrl": "https://api.demo.accelbyte.io/cloudsave",
   "ClientId": "<YOUR-GAME-CLIENT-ID>",
   "ClientSecret": "<YOUR-GAME-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1"
