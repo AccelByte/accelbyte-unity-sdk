@@ -23,7 +23,8 @@ namespace AccelByte.Api
             this.httpWorker = httpWorker;
         }
 
-        public IEnumerator GetLegalPolicies(string @namespace, bool defaultOnEmpty, string accessToken, ResultCallback<PublicPolicy[]> callback)
+        public IEnumerator GetLegalPolicies(string @namespace, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
+            ResultCallback<PublicPolicy[]> callback)
         {
             string functionName = "GetLegalPolicies";
             Report.GetFunctionLog(GetType().Name, functionName);
@@ -33,6 +34,8 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreateGet(baseUrl + "/public/policies/namespaces/{namespace}")
                 .WithPathParam("namespace", @namespace)
+                .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
+                .WithQueryParam("tags", string.Join(",",tags))
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -46,7 +49,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetLegalPoliciesByCountry(string countryCode, bool defaultOnEmpty, string accessToken, ResultCallback<PublicPolicy[]> callback)
+        public IEnumerator GetLegalPoliciesByCountry(string countryCode, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
+            ResultCallback<PublicPolicy[]> callback)
         {
             string functionName = "GetLegalPoliciesByCountry";
             Report.GetFunctionLog(GetType().Name, functionName);
@@ -56,6 +60,8 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreateGet(baseUrl + "/public/policies/countries/{countryCode}")
                 .WithPathParam("countryCode", countryCode)
+                .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
+                .WithQueryParam("tags", string.Join(",", tags))
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -69,8 +75,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator BulkAcceptPolicyVersions(string accessToken, 
-            AcceptAgreementRequest[] acceptAgreementRequests, ResultCallback<AcceptAgreementResponse> callback)
+        public IEnumerator BulkAcceptPolicyVersions(string accessToken, AcceptAgreementRequest[] acceptAgreementRequests, 
+            ResultCallback<AcceptAgreementResponse> callback)
         {
             string functionName = "BulkAcceptPolicyVersions";
             Report.GetFunctionLog(GetType().Name, functionName);
@@ -92,8 +98,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator AcceptPolicyVersion(string accessToken,
-            string localizedPolicyVersionId, ResultCallback callback)
+        public IEnumerator AcceptPolicyVersion(string accessToken, string localizedPolicyVersionId, 
+            ResultCallback callback)
         {
             string functionName = "AcceptPolicyVersion";
             Report.GetFunctionLog(GetType().Name, functionName);

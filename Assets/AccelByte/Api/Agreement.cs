@@ -32,9 +32,33 @@ namespace AccelByte.Api
         /// Retrieve all active latest policies based on a namespace and country.
         /// The country will be read from user token.
         /// </summary>
+        /// <param name="agreementPolicyType">Filter the responded policy by policy type. Choose the AgreementPolicyType.EMPTY if you want to be responded with all policy type.</param>
         /// <param name="defaultOnEmpty">Specify with true if you want to be responded with default country-specific policy if your requested country is not exist.</param>
         /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
-        public void GetLegalPolicies(bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
+        public void GetLegalPolicies(AgreementPolicyType agreementPolicyType, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            string[] tags = new string[1];
+
+            if (session == null || session.AuthorizationToken == null)
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetLegalPolicies(@namespace, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
+        }
+
+        /// <summary>
+        /// Retrieve all active latest policies based on a namespace and country.
+        /// The country will be read from user token.
+        /// </summary>
+        /// <param name="agreementPolicyType">Filter the responded policy by policy type. Choose the AgreementPolicyType.EMPTY if you want to be responded with all policy type.</param>
+        /// <param name="tags">Filter the responded policy by tags.</param>
+        /// <param name="defaultOnEmpty">Specify with true if you want to be responded with default country-specific policy if your requested country is not exist.</param>
+        /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
+        public void GetLegalPolicies(AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -45,7 +69,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetLegalPolicies(@namespace, defaultOnEmpty, session.AuthorizationToken, callback));
+                api.GetLegalPolicies(@namespace, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
         }
 
         /// <summary>
@@ -53,8 +77,32 @@ namespace AccelByte.Api
         /// The country will be read from user token.
         /// </summary>
         /// <param name="defaultOnEmpty">Specify with true if you want to be responded with default country-specific policy if your requested country is not exist.</param>
+        /// <param name="agreementPolicyType">Filter the responded policy by policy type. Choose the AgreementPolicyType.EMPTY if you want to be responded with all policy type.</param>
         /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
-        public void GetLegalPoliciesByCountry(string countryCode, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
+        public void GetLegalPoliciesByCountry(string countryCode, AgreementPolicyType agreementPolicyType, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            string[] tags = new string[1];
+
+            if (session == null || session.AuthorizationToken == null)
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
+        }
+
+        /// <summary>
+        /// Retrieve all active latest policies based on a namespace and country.
+        /// The country will be read from user token.
+        /// </summary>
+        /// <param name="defaultOnEmpty">Specify with true if you want to be responded with default country-specific policy if your requested country is not exist.</param>
+        /// <param name="agreementPolicyType">Filter the responded policy by policy type. Choose the AgreementPolicyType.EMPTY if you want to be responded with all policy type.</param>
+        /// <param name="tags">Filter the responded policy by tags.</param>
+        /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
+        public void GetLegalPoliciesByCountry(string countryCode, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -65,7 +113,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetLegalPoliciesByCountry(countryCode, defaultOnEmpty, session.AuthorizationToken, callback));
+                api.GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
         }
 
         /// <summary>

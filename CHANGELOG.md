@@ -1,3 +1,11 @@
+## 2.15.1 (2020-06-26)
+### Changed
+- Agreement
+    - GetLegalPolicies
+        - Add policyType and tags param
+    - GetLegalPoliciesByCountry
+        - Add policyType and tags param
+
 ## 2.15.0 (2020-06-25)
 ### Added
 - CloudSave

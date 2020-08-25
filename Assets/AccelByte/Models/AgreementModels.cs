@@ -6,6 +6,15 @@ using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
+    #region enum
+    public enum AgreementPolicyType
+    {
+        EMPTY,
+        LEGAL_DOCUMENT_TYPE,
+        MARKETING_PREFERENCE_TYPE
+    }
+    #endregion enum
+
     [DataContract]
     public class IneligibleUser
     {
