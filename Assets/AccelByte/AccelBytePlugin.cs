@@ -34,6 +34,7 @@ namespace AccelByte.Api
         private static Statistic statistic;
         private static Qos qos;
         private static Agreement agreement;
+        private static Leaderboard leaderboard;
 
         public static Config Config { get { return AccelBytePlugin.config; } }
 
@@ -304,6 +305,20 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.agreement;
+        }
+
+        public static Leaderboard GetLeaderboard()
+        {
+            if (AccelBytePlugin.leaderboard == null)
+            {
+                AccelBytePlugin.leaderboard = new Leaderboard(
+                    new LeaderboardApi(AccelBytePlugin.Config.LeaderboardServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.leaderboard;
         }
     }
 }

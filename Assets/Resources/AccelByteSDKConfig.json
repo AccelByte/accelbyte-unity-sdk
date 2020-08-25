@@ -14,6 +14,7 @@
   "StatisticServerUrl": "https://api.demo.accelbyte.io/statistic",
   "QosManagerServerUrl": "https://api.demo.accelbyte.io/qosm",
   "AgreementServerUrl": "https://api.demo.accelbyte.io/agreement",
+  "LeaderboardServerUrl": "https://api.demo.accelbyte.io/leaderboard",
   "ClientId": "<YOUR-GAME-CLIENT-ID>",
   "ClientSecret": "<YOUR-GAME-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1"

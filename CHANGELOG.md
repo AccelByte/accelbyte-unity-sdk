@@ -1,3 +1,9 @@
+## 2.14.0 (2020-06-24)
+### Added
+- Leaderboard
+    - Add GetRankings
+    - Add GetUserRanking
+
 ## 2.13.0 (2020-06-23)
 ### Added
 - Agones SDK
