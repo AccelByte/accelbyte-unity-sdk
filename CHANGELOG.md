@@ -1,3 +1,11 @@
+## 2.13.0 (2020-06-23)
+### Added
+- Agones SDK
+- Dedicated Server Manager Api
+    - Agones provider support
+### Fixed
+- Pretty print AccelByteConfig.json
+
 ## 2.12.0 (2020-06-18)
 ### Added
 - Agreement

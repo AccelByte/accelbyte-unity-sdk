@@ -1,7 +1,8 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Text;
 using Utf8Json;
 using AccelByte.Models;
 
@@ -200,7 +201,9 @@ namespace AccelByte.Api
             string fullPath =
                 System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKConfig.json");
 
-            System.IO.File.WriteAllBytes(fullPath, JsonSerializer.Serialize(this.config));
+            byte[] notPrettyConfig = JsonSerializer.Serialize(this.config);
+            string prettyConfig = JsonSerializer.PrettyPrint(notPrettyConfig);
+            System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(prettyConfig));
         }
     }
 }
