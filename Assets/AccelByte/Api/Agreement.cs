@@ -37,17 +37,9 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
         public void GetLegalPolicies(AgreementPolicyType agreementPolicyType, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
             string[] tags = new string[1];
 
-            if (session == null || session.AuthorizationToken == null)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                api.GetLegalPolicies(@namespace, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
+            this.GetLegalPolicies(agreementPolicyType, tags, defaultOnEmpty, callback);
         }
 
         /// <summary>
@@ -81,17 +73,9 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains an array of public policy via callback when completed</param>
         public void GetLegalPoliciesByCountry(string countryCode, AgreementPolicyType agreementPolicyType, bool defaultOnEmpty, ResultCallback<PublicPolicy[]> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
             string[] tags = new string[1];
 
-            if (session == null || session.AuthorizationToken == null)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                api.GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
+            this.GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, callback);
         }
 
         /// <summary>

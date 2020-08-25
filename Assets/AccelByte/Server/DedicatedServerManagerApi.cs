@@ -475,7 +475,7 @@ namespace AccelByte.Server
 
             if (!gameServer.ObjectMeta.Annotations.TryGetValue(agones.MATCH_DETAILS_ANNOTATION, out matchDetails) || gameServer == null)
             {
-                callback.Try(null);
+                return;
             }
             else 
             {

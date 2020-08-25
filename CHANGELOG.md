@@ -1,3 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [2.15.3](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.15.3%0D2.15.2) (2020-07-08)
+
+
+### Bug Fixes
+
+* **serverDSM:** agones heartbeat delegate return should not be null ([4026c5c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4026c5c1718440f677f651c89ba2c300483ea76f))
+
 ## 2.15.2 (2020-07-01)
 ### Changed
 - ServerDSM

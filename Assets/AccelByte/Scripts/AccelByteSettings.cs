@@ -106,6 +106,18 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.CloudSaveServerUrl = value; }
         }
 
+        public static string AgreementServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.AgreementServerUrl; }
+            set { AccelByteSettings.Instance.config.AgreementServerUrl = value; }
+        }
+
+        public static string LeaderboardServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.LeaderboardServerUrl; }
+            set { AccelByteSettings.Instance.config.LeaderboardServerUrl = value; }
+        }
+
         public static string ClientId
         {
             get { return AccelByteSettings.Instance.config.ClientId; }
