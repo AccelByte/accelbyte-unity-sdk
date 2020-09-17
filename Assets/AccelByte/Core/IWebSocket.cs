@@ -31,7 +31,11 @@ namespace AccelByte.Core {
         TooBig = 1009,
         MandatoryExtension = 1010,
         ServerError = 1011,
-        TlsHandshakeFailure = 1015
+        ServiceRestart = 1012,
+        TryAgainLater = 1013,
+        BadGateway = 1014,
+        TlsHandshakeFailure = 1015,
+        ClosedByServer = 4000
     }
 
     public abstract class WebSocketException : Exception
@@ -54,7 +58,7 @@ namespace AccelByte.Core {
 
     public interface IWebSocket
     {
-        void Connect(string url, string protocols);
+        void Connect(string url, string protocols, string sessionId);
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);
 

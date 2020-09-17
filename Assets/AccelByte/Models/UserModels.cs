@@ -182,4 +182,34 @@ namespace AccelByte.Models
     {
         [DataMember] public string temporary_session_id { get; set; }
     }
+
+    [DataContract]
+    public class AccountLinkedPlatform
+    {
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public string platformUserId { get; set; }
+    }
+
+    [DataContract]
+    public class AccountLinkPublisherAccount
+    {
+        [DataMember] public string userId { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public AccountLinkedPlatform[] linkedPlatforms { get; set; }
+
+    }
+
+    [DataContract]
+    public class AccountLinkConfictMessageVariables
+    {
+        [DataMember] public string platformUserID { get; set; }
+        [DataMember] public AccountLinkPublisherAccount[] publisherAccounts { get; set; }
+    }
+
+    [DataContract]
+    public class LinkPlatformAccountRequest
+    {
+        [DataMember] public string platformId { get; set; }
+        [DataMember] public string platformUserId { get; set; }
+    }
 }

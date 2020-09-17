@@ -126,6 +126,8 @@ namespace AccelByte.Core
         UserUnderage = 10130,
         EmailAlreadyUsed = 10133,
         CountryNotFound = 10154,
+        PlatformAlreadyLinked = 10173,
+        FriendListIsEmpty = 11732,
 
         //AccelByte Lobby error codes
         //Connection
@@ -283,16 +285,18 @@ namespace AccelByte.Core
     {
         public readonly ErrorCode Code;
         public readonly string Message;
+        public readonly object messageVariables;
         public readonly Error InnerError;
 
-        public Error(ErrorCode code, string message = null, Error innerError = null)
+        public Error(ErrorCode code, string message = null, object messageVariables = null, Error innerError = null)
         {
             this.Code = code;
             this.Message = string.IsNullOrEmpty(message) ? GetDefaultErrorMessage() : message;
             this.InnerError = innerError;
+            this.messageVariables = messageVariables;
         }
 
-        public Error WrapWith(ErrorCode code, string message = null) { return new Error(code, message, this); }
+        public Error WrapWith(ErrorCode code, string message = null, object messageVariables = null) { return new Error(code, message, messageVariables, this); }
 
         private string GetDefaultErrorMessage()
         {
@@ -431,9 +435,9 @@ namespace AccelByte.Core
 
         public static Result<T> CreateOk(T value) { return new Result<T>(null, value); }
 
-        public static Result<T> CreateError(ErrorCode errorCode, string errorMessage = null)
+        public static Result<T> CreateError(ErrorCode errorCode, string errorMessage = null, object messageVariables = null)
         {
-            return new Result<T>(new Error(errorCode, errorMessage), default(T));
+            return new Result<T>(new Error(errorCode, errorMessage, messageVariables), default(T));
         }
 
         public static Result<T> CreateError(Error error) { return new Result<T>(error, default(T)); }
@@ -453,9 +457,9 @@ namespace AccelByte.Core
 
         public static Result CreateOk() { return new Result(null); }
 
-        public static Result CreateError(ErrorCode errorCode, string errorMessage = null)
+        public static Result CreateError(ErrorCode errorCode, string errorMessage = null, object messageVariables = null)
         {
-            return new Result(new Error(errorCode, errorMessage));
+            return new Result(new Error(errorCode, errorMessage, messageVariables));
         }
 
         public static Result CreateError(Error error) { return new Result(error); }

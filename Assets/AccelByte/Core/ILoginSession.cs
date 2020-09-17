@@ -10,6 +10,8 @@ namespace AccelByte.Api
 {
     internal interface ILoginSession : ISession
     {
+        string AuthorizationToken { get; set; }
+        string UserId { get; set; }
 
         IEnumerator LoginWithUsername(string username, string password, ResultCallback callback);
 

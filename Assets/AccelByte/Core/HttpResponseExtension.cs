@@ -67,10 +67,20 @@ namespace AccelByte.Core
                             return Result.CreateError((ErrorCode) response.Code);
                         }
 
-                        return Result.CreateError((ErrorCode) error.errorCode, error.errorMessage);
+                        if (error.messageVariables == null)
+                        {
+                            return Result.CreateError((ErrorCode)error.errorCode, error.errorMessage);
+                        }
+
+                        return Result.CreateError((ErrorCode)error.errorCode, error.errorMessage, error.messageVariables);
                     }
 
-                    return Result.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);
+                    if (error.messageVariables == null)
+                    {
+                        return Result.CreateError((ErrorCode)error.numericErrorCode, error.errorMessage);
+                    }
+
+                    return Result.CreateError((ErrorCode)error.numericErrorCode, error.errorMessage, error.messageVariables);
                 }
                 catch (Exception)
                 {
@@ -181,10 +191,20 @@ namespace AccelByte.Core
                             return Result<T>.CreateError((ErrorCode) response.Code);
                         }
 
-                        return Result<T>.CreateError((ErrorCode) error.errorCode, error.errorMessage);
+                        if (error.messageVariables == null)
+                        {
+                            return Result<T>.CreateError((ErrorCode)error.errorCode, error.errorMessage);
+                        }
+
+                        return Result<T>.CreateError((ErrorCode)error.errorCode, error.errorMessage, error.messageVariables);
                     }
 
-                    return Result<T>.CreateError((ErrorCode) error.numericErrorCode, error.errorMessage);
+                    if (error.messageVariables == null)
+                    {
+                        return Result<T>.CreateError((ErrorCode)error.numericErrorCode, error.errorMessage);
+                    }
+
+                    return Result<T>.CreateError((ErrorCode)error.numericErrorCode, error.errorMessage, error.messageVariables);
                 }
                 catch (Exception)
                 {

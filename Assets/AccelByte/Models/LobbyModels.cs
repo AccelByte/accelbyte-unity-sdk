@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
@@ -81,6 +82,12 @@ namespace AccelByte.Models
     public class DisconnectNotif
     {
         [DataMember] public string message;
+    }
+
+    [DataContract]
+    public class LobbySessionId
+    {
+        [DataMember] public string lobbySessionID;
     }
 
     #endregion
@@ -198,6 +205,7 @@ namespace AccelByte.Models
         [DataMember] public string serverName;
         [DataMember] public string clientVersion;
         [DataMember] public string latencies;
+        [DataMember] public string partyAttributes;
     }
 
     [DataContract]

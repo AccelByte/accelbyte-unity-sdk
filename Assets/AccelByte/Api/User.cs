@@ -29,9 +29,8 @@ namespace AccelByte.Api
         private readonly IUserAccount userAccount;
         private readonly CoroutineRunner coroutineRunner;
         private readonly bool needsUserId;
-        private readonly AccelByteSession sessionAdapter;
 
-        public ISession Session { get { return this.sessionAdapter; } }
+        public ISession Session { get { return this.loginSession; } }
 
         private UserData userDataCache;
 
@@ -42,7 +41,6 @@ namespace AccelByte.Api
             this.userAccount = userAccount;
             this.coroutineRunner = coroutineRunner;
             this.needsUserId = needsUserId;
-            this.sessionAdapter = new AccelByteSession();
         }
 
         /// <summary>
@@ -59,7 +57,7 @@ namespace AccelByte.Api
 
         private IEnumerator LoginAsync(Func<ResultCallback, IEnumerator> loginMethod, ResultCallback callback)
         {
-            if (this.sessionAdapter.IsValid())
+            if (this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.InvalidRequest, "User is already logged in.");
 
@@ -77,8 +75,6 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            this.sessionAdapter.AuthorizationToken = this.loginSession.AuthorizationToken;
-
             if (this.needsUserId)
             {
                 Result<UserData> userDataResult = null;
@@ -92,11 +88,7 @@ namespace AccelByte.Api
                     yield break;
                 }
 
-                this.sessionAdapter.UserId = this.userDataCache.userId;
-            }
-            else
-            {
-                this.sessionAdapter.UserId = this.loginSession.UserId;
+                this.loginSession.UserId = this.userDataCache.userId;
             }
 
             callback.TryOk();
@@ -168,17 +160,15 @@ namespace AccelByte.Api
         public void Logout(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            
-            if (!this.sessionAdapter.IsValid())
+
+            if (!this.loginSession.IsValid())
             {
                 callback.TryOk();
 
                 return;
             }
 
-            this.sessionAdapter.UserId = null;
-            this.sessionAdapter.AuthorizationToken = null;
-
+            this.loginSession.UserId = null;
             this.coroutineRunner.Run(this.loginSession.Logout(callback));
         }
 
@@ -383,6 +373,7 @@ namespace AccelByte.Api
                     new Error(
                         ErrorCode.GeneralClientError,
                         "Failed when trying to get username",
+                        "",
                         userDataResult.Error));
 
                 yield break;
@@ -430,7 +421,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Link other platform to the currently logged in user. 
+        /// Link other platform's account to the currently logged in user. 
         /// </summary>
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformTicket">Ticket / token from other platform to be linked to </param>
@@ -439,7 +430,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -447,6 +438,26 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(this.userAccount.LinkOtherPlatform(platformType, platformTicket, callback));
+        }
+
+        /// <summary>
+        /// Force to Link other platform's account to the currently logged in user. 
+        /// </summary>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="platformUserId"> UserId from other platform to be linked to </param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ForcedLinkOtherPlatform(PlatformType platformType, string platformUserId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(this.userAccount.ForcedLinkOtherPlatform(platformType, platformUserId, callback));
         }
 
         /// <summary>
@@ -460,7 +471,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -479,7 +490,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -487,12 +498,6 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(this.userAccount.GetPlatformLinks(callback));
-        }
-
-        private class AccelByteSession : ISession
-        {
-            public string AuthorizationToken { get; set; }
-            public string UserId { get; set; }
         }
 
         /// <summary>
@@ -504,7 +509,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -523,7 +528,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -544,7 +549,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -566,7 +571,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.sessionAdapter.IsValid())
+            if (!this.loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 

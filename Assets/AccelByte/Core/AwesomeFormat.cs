@@ -202,7 +202,14 @@ namespace AccelByte.Core
                             for (int i = 0; i < array.Length; i++)
                             {
                                 var parsedValue = Convert.ChangeType(strItems[i], fieldInfo.FieldType.GetElementType());
-                                array.SetValue(parsedValue, i);
+                                if (fieldInfo.FieldType.GetElementType() == typeof(string))
+                                {
+                                    array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
+                                }
+                                else
+                                {
+                                    array.SetValue(parsedValue, i);
+                                }
                             }
 
                             fieldInfo.SetValue(payload, array);
@@ -215,7 +222,7 @@ namespace AccelByte.Core
                 }
                 else if (fieldInfo.FieldType == typeof(string))
                 {
-                    fieldInfo.SetValue(payload, fieldValue);
+                    fieldInfo.SetValue(payload, Uri.UnescapeDataString(fieldValue));
                 }
                 else if (fieldInfo.FieldType.IsPrimitive)
                 {

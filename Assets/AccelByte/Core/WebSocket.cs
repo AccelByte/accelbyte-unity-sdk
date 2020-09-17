@@ -4,6 +4,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using AccelByte.Core;
 #if !UNITY_WEBGL || UNITY_EDITOR
 using WebSocketSharp;
@@ -223,7 +224,7 @@ namespace HybridWebSocket
             }
         }
 
-        public void Connect(string url, string protocols)
+        public void Connect(string url, string protocols, string sessionId)
         {
             this.objectId = JslibInterop.WsCreate(url, protocols);
             JslibInterop.WsOpen(this.objectId.Value);
@@ -379,11 +380,15 @@ namespace HybridWebSocket
             this.IsProxySet = true;
         }
 
-        public void Connect(string url, string protocols)
+        public void Connect(string url, string protocols, string sessionId)
         {
             try
             {
                 this.webSocket = new WebSocketSharp.WebSocket(url, protocols);
+                this.webSocket.CustomHeaders = new Dictionary<string, string>
+                {
+                    { "X-Ab-LobbySessionID" , sessionId}
+                };
                 if (IsProxySet)
                 {
                     this.webSocket.SetProxy(this.ProxyUrl, this.ProxyUsername, this.ProxyPassword);

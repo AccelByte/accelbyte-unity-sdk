@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
@@ -43,6 +44,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string party_id { get; set; }
         [DataMember] public PartyMember[] party_members { get; set; }
+        [DataMember] public Dictionary<string, object> party_attributes { get; set; }
     }
 
     [DataContract]

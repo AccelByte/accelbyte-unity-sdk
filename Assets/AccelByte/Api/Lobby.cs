@@ -29,7 +29,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Raised when lobby is disconnected
         /// </summary>
-        public event Action Disconnected;
+        public event Action<WsCloseCode> Disconnected;
 
         /// <summary>
         /// Raised when a user is invited to party
@@ -115,6 +115,7 @@ namespace AccelByte.Api
         private readonly IWebSocket webSocket;
         private bool reconnectsOnClose;
         private long id;
+        private LobbySessionId lobbySessionId;
         private Coroutine maintainConnectionCoroutine;
 
         public event EventHandler OnRetryAttemptFailed;
@@ -136,6 +137,7 @@ namespace AccelByte.Api
             this.maxDelay = maxDelay;
             this.totalTimeout = totalTimeout;
             this.reconnectsOnClose = false;
+            this.lobbySessionId = new LobbySessionId();
 
             this.webSocket.OnOpen += HandleOnOpen;
             this.webSocket.OnMessage += HandleOnMessage;
@@ -159,7 +161,7 @@ namespace AccelByte.Api
                 throw new Exception("Cannot connect to websocket because user is not logged in.");
             }
 
-            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken);
+            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
             StartMaintainConnection();
         }
 
@@ -222,7 +224,7 @@ namespace AccelByte.Api
                         this.webSocket.ReadyState == WsState.Closed &&
                         DateTime.Now - firstClosedTime < TimeSpan.FromSeconds(totalTimeout))
                     {
-                        this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken);
+                        this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
                         float randomizedDelay = (float) (nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
 
                         yield return new WaitForSeconds(randomizedDelay / 1000f);
@@ -371,7 +373,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(
                 MessageType.setUserStatusRequest,
-                new SetUserStatusRequest {availability = (uint) status, activity = activity},
+                new SetUserStatusRequest {availability = (uint) status, activity = Uri.EscapeDataString(activity)},//Escape the string first for customizable string
                 callback);
         }
 
@@ -569,11 +571,10 @@ namespace AccelByte.Api
         /// Send matchmaking start request.
         /// </summary>
         /// <param name="gameMode">Target matchmaking game mode</param>
-        /// <param name="serverName">Server name to do match in Local DS</param>
         /// <param name="clientVersion">Game client version to ensure match with the same version</param>
         /// <param name="latencies">Server latencies based on regions</param>
         /// <param name="callback">Result of the function with a start matchmaking status code.</param>
-        public void StartMatchmaking(string gameMode, string serverName, string clientVersion,
+        public void StartMatchmaking(string gameMode, string clientVersion,
             Dictionary<string, int> latencies, ResultCallback<MatchmakingCode> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -586,9 +587,63 @@ namespace AccelByte.Api
                 new StartMatchmakingRequest
                 {
                     gameMode = gameMode,
-                    serverName = serverName,
                     clientVersion = clientVersion,
                     latencies = strLatencies
+                },
+                callback);
+        }
+
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="clientVersion">Game client version to ensure match with the same version</param>
+        /// <param name="latencies">Server latencies based on regions</param>
+        /// <param name="partyAttributes"></param>
+        /// <param name="callback">Result of the function with a start matchmaking status code.</param>
+        public void StartMatchmaking(string gameMode, string clientVersion,
+            Dictionary<string, int> latencies, Dictionary<string, object> partyAttributes, ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            string strLatencies = "{" +
+                string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
+                "}";
+            var jsonAttributeString = partyAttributes.ToJsonString();
+
+            SendRequest(
+                MessageType.startMatchmakingRequest,
+                new StartMatchmakingRequest
+                {
+                    gameMode = gameMode,
+                    clientVersion = clientVersion,
+                    latencies = strLatencies,
+                    partyAttributes = jsonAttributeString
+                },
+                callback);
+        }
+
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="serverName">Server name to do match in Local DS</param>
+        /// <param name="clientVersion">Game client version to ensure match with the same version</param>
+        /// <param name="partyAttributes"></param>
+        /// <param name="callback">Result of the function with a start matchmaking status code.</param>
+        public void StartMatchmaking(string gameMode, string serverName, string clientVersion, Dictionary<string, object> partyAttributes, ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            var jsonAttributeString = partyAttributes.ToJsonString();
+
+            SendRequest(
+                MessageType.startMatchmakingRequest,
+                new StartMatchmakingRequest
+                {
+                    gameMode = gameMode,
+                    serverName = serverName,
+                    clientVersion = clientVersion,
+                    partyAttributes = jsonAttributeString
                 },
                 callback);
         }
@@ -750,13 +805,21 @@ namespace AccelByte.Api
             this.coroutineRunner.Run(
                 () =>
                 {
-                    StopMaintainConnection();
+                    var code = (WsCloseCode)closecode;
+                    if (code != WsCloseCode.Abnormal || 
+                        code != WsCloseCode.ServerError ||
+                        code != WsCloseCode.ServiceRestart ||
+                        code != WsCloseCode.TryAgainLater ||
+                        code != WsCloseCode.TlsHandshakeFailure)
+                    {
+                        StopMaintainConnection();
+                    }
 
-                    Action handler = this.Disconnected;
+                    Action<WsCloseCode> handler = this.Disconnected;
 
                     if (handler != null)
                     {
-                        handler();
+                        handler(code);
                     }
 
                     ;
@@ -829,7 +892,9 @@ namespace AccelByte.Api
                 Lobby.HandleNotification(message, this.RematchmakingNotif);
 
                 break;
-            case MessageType.connectNotif: break;
+            case MessageType.connectNotif:
+                AwesomeFormat.ReadPayload(message, out lobbySessionId);
+                break;
             case MessageType.disconnectNotif:
                 Lobby.HandleNotification(message, this.Disconnecting);
 

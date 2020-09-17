@@ -16,11 +16,11 @@ namespace AccelByte.Api
     {
         interface ILoginData
         {
-            string AuthorizationToken { get; }
+            string AuthorizationToken { get; set; }
             string RefreshToken { get; }
             int ExpireIn { get; }
 
-            string UserId { get; }
+            string UserId { get; set; }
 
             string LoginWithUsernamePath { get; }
             string LoginWithDeviceIdPath { get; }
@@ -49,6 +49,7 @@ namespace AccelByte.Api
                         return tokenData?.access_token;
                     }
                 }
+                set { tokenData.access_token = value; }
             }
 
             public string RefreshToken
@@ -61,17 +62,17 @@ namespace AccelByte.Api
                     }
                 }
             }
-            
+
             public int ExpireIn => tokenData?.expires_in ?? 0;
 
-            public string UserId => tokenData?.user_id;
+            public string UserId { get => tokenData?.user_id; set => tokenData.user_id = value; }
 
             public string LoginWithUsernamePath => "/oauth/token";
             public string LoginWithDeviceIdPath => "/oauth/platforms/{platformId}/token";
             public string LoginWithOtherPlatformPath => "/oauth/platforms/{platformId}/token";
             public string LoginWithAuthorizationCodePath => "/oauth/token";
             public string LogoutPath => "/oauth/revoke/token";
-            public string RefreshTokenPath => "/oauth/revoke/token";
+            public string RefreshTokenPath => "/v3/oauth/token";
 
             public Result TryToParse(IHttpResponse response)
             {
@@ -111,12 +112,13 @@ namespace AccelByte.Api
             private readonly object syncObject = new object();
 
             private SessionData sessionData;
+            private string userId;
 
-            public string AuthorizationToken => sessionData?.session_id;
+            public string AuthorizationToken { get => sessionData?.session_id; set => sessionData.session_id = value; }
             public string RefreshToken => sessionData?.refresh_id;
             public int ExpireIn => sessionData?.expires_in ?? 0;
 
-            public string UserId => "me";
+            public string UserId { get => this.userId ; set => this.userId = value; }
 
             public string LoginWithUsernamePath => "/v1/login/password";
             public string LoginWithDeviceIdPath => "/v1/login/platforms/{platformId}";
@@ -202,9 +204,17 @@ namespace AccelByte.Api
             }
         }
 
-        public string AuthorizationToken { get { return this.loginData.AuthorizationToken; } }
+        public string AuthorizationToken
+        {
+            get { return this.loginData.AuthorizationToken; }
+            set { this.loginData.AuthorizationToken = value; }
+        }
 
-        public string UserId { get { return this.loginData.UserId; } }
+        public string UserId
+        {
+            get { return this.loginData.UserId; }
+            set { this.loginData.UserId = value; }
+        }
 
         public IEnumerator LoginWithUsername(string username, string password, ResultCallback callback)
         {

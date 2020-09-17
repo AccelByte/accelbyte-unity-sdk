@@ -246,6 +246,41 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator ForcedLinkOtherPlatform(PlatformType platformType, string platformUserId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(platformUserId, "Can't link platform account! platformUserId parameter is null!");
+
+            LinkPlatformAccountRequest linkedPlatformRequest = new LinkPlatformAccountRequest
+            {
+                platformId = platformType.ToString().ToLower(),
+                platformUserId = platformUserId
+            };
+
+            Result<UserData> userDataResult = null;
+            yield return this.GetData(r =>
+            {
+                userDataResult = r;
+            });
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/platforms/link")
+                .WithPathParam("namespace", this.@namespace)
+                .WithPathParam("userId", userDataResult.Value.userId)
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(linkedPlatformRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            Result result = response.TryParse();
+            callback.Try(result);
+        }
+
         public IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);

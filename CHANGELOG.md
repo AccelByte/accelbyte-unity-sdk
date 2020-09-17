@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.18.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.18.0%0D2.17.0) (2020-09-02)
+
+
+### Features
+
+* **Lobby:** add partyAttributes for matchmaking ([68a1603](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/68a16039a78ba947fe07f9dc70e51e51a9a09efd))
+* **User:** add ForcedLinkOtherPlatform function ([08ebe3a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/08ebe3a8f1c9af9c8219c8a56bc30e7c6910fac2))
+* **User:** fix refreshed token not distributed correctly to other services ([009e1b6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/009e1b6a341725eb1a1232c11c78ee0a53721595))
+
 ## [2.17.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.17.0%0D2.16.0) (2020-08-19)
 
 

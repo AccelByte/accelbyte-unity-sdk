@@ -29,6 +29,8 @@ namespace AccelByte.Api
 
         IEnumerator LinkOtherPlatform(PlatformType platformType, string ticket, ResultCallback callback);
 
+        IEnumerator ForcedLinkOtherPlatform(PlatformType platformType, string platformUserId, ResultCallback callback);
+
         IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback);
 
         IEnumerator GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback);
