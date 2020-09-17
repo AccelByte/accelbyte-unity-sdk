@@ -87,6 +87,7 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_ { get; set; }
         [DataMember] public string phoneNumber { get; set; }
         [DataMember] public string userId { get; set; }
+        [DataMember] public string userName { get; set; }
     }
 
     [DataContract]
@@ -108,6 +109,18 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class RegisterUserRequestv2
+    {
+        [DataMember] public AuthenticationType authType { get; set; }
+        [DataMember] public string country { get; set; }
+        [DataMember] public string dateOfBirth { get; set; }
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public string emailAddress { get; set; }
+        [DataMember] public string password { get; set; }
+        [DataMember] public string username { get; set; }
+    }
+
+    [DataContract]
     public class RegisterUserResponse
     {
         [DataMember] public AuthenticationType authType { get; set; }
@@ -117,6 +130,7 @@ namespace AccelByte.Models
         [DataMember] public string emailAddress { get; set; }
         [DataMember(Name = "namespace")] public string namespace_ { get; set; }
         [DataMember] public string userId { get; set; }
+        [DataMember] public string username { get; set; }
     }
 
     [DataContract]
@@ -127,6 +141,7 @@ namespace AccelByte.Models
         [DataMember] public string displayName { get; set; }
         [DataMember] public string emailAddress { get; set; }
         [DataMember] public string languageTag { get; set; }
+        [DataMember] public string username { get; set; }
     }
 
     public enum PlatformType { Steam, PS4, Live, Google, Facebook, Twitch, Oculus, Twitter, Device }

@@ -81,6 +81,90 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator GetUserEntitlementOwnershipByAppId(string publisherNamespace, string userId, string userAccessToken, string appId, 
+            ResultCallback<Ownership> callback)
+        {
+            Assert.IsNotNull(publisherNamespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't get user entitlements! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsNotNull(appId, "Can't get user entitlements! appId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/entitlements/ownership/byAppId")
+                .WithPathParam("namespace", publisherNamespace)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("appId", appId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<Ownership>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserEntitlementOwnershipBySku(string publisherNamespace, string userId, string userAccessToken, string sku, 
+            ResultCallback<Ownership> callback)
+        {
+            Assert.IsNotNull(publisherNamespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't get user entitlements! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsNotNull(sku, "Can't get user entitlements! sku parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/entitlements/ownership/bySku")
+                .WithPathParam("namespace", publisherNamespace)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("sku", sku)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<Ownership>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserEntitlementOwnershipAny(string publisherNamespace, string userId, string userAccessToken,
+            string[] itemIds, string[] appIds, string[] skus, ResultCallback<Ownership> callback)
+        {
+            Assert.IsNotNull(publisherNamespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't get user entitlements! all itemIds, appIds and skus parameter are null");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/entitlements/ownership/any")
+                .WithPathParam("namespace", publisherNamespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (itemIds != null)
+                builder.WithQueryParam("itemIds", itemIds);
+            if (appIds != null)
+                builder.WithQueryParam("appIds", appIds);
+            if (skus != null)
+                builder.WithQueryParam("skus", skus);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<Ownership>();
+            callback.Try(result);
+        }
+
         public IEnumerator ConsumeUserEntitlement(string @namespace, string userId, string userAccessToken, string entitlementId, int useCount,
             ResultCallback<EntitlementInfo> callback)
         {

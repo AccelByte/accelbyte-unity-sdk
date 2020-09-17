@@ -166,5 +166,138 @@ namespace AccelByte.Server
                     this.session.AuthorizationToken,
                     callback));
         }
+
+         /// <summary>
+        /// Reset stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="resets">Consist of one or more statCode</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void ResetUserStatItems(string userId, StatItemReset[] resets,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.ResetUserStatItems(
+                    this.namespace_,
+                    userId,
+                    resets,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
+        /// Reset stat items for many users
+        /// </summary>
+        /// <param name="resets">Consist of one or more userId and statCode to reset</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void ResetManyUsersStatItems(UserStatItemReset[] resets,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.ResetManyUsersStatItems(
+                    this.namespace_,
+                    resets,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
+        /// Update stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void UpdateUserStatItems(string userId, StatItemUpdate[] updates,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            UpdateUserStatItems(userId, "", updates, callback);
+        }
+
+        /// <summary>
+        /// Update stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="additionalKey">To identify multi level user statItem, such as character</param>
+        /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void UpdateUserStatItems(string userId, string additionalKey, StatItemUpdate[] updates,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.UpdateUserStatItems(
+                    this.namespace_,
+                    userId,
+                    additionalKey,
+                    updates,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
+        /// Update stat items for many users
+        /// </summary>
+        /// <param name="updates">Consist of one or more userId and statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void UpdateManyUsersStatItems(UserStatItemUpdate[] updates,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.UpdateManyUsersStatItems(
+                    this.namespace_,
+                    updates,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
     }
 }

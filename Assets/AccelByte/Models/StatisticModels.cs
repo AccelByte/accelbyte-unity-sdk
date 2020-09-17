@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
@@ -16,6 +17,14 @@ namespace AccelByte.Models
     {
         INIT,
         TIED
+    }
+
+    public enum StatisticUpdateStrategy
+    {
+        OVERRIDE,
+        INCREMENT,
+        MIN,
+        MAX
     }
 
     [DataContract]
@@ -83,5 +92,38 @@ namespace AccelByte.Models
         [DataMember] public object details { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public bool success { get; set; }
+    }
+
+    [DataContract]
+    public class UserStatItemReset
+    {
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string statCode { get; set; }
+    }
+
+    [DataContract]
+    public class StatItemReset
+    {
+        [DataMember] public string statCode { get; set; }
+    }
+
+    [DataContract]
+    public class UserStatItemUpdate
+    {
+        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string additionalKey {get; set;}
+        [DataMember] public Dictionary<string, object> additionalData { get; set; }
+    }
+
+    [DataContract]
+    public class StatItemUpdate
+    {
+        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
 }

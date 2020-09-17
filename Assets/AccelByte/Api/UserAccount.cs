@@ -53,6 +53,26 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator Registerv2(RegisterUserRequestv2 registerUserRequest,
+            ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(registerUserRequest, "Register failed. registerUserRequest is null!");
+
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users")
+                .WithPathParam("namespace", this.@namespace)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(registerUserRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<RegisterUserResponse>();
+            callback.Try(result);
+        }
+
         public IEnumerator GetData(ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -102,6 +122,29 @@ namespace AccelByte.Api
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"password\": \"{1}\"}}", username, password))
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
+        public IEnumerator Upgradev2(string emailAddress, string username, string password, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(emailAddress, "Can't upgrade headless account! EmailAddress parameter is null!");
+            Assert.IsNotNull(username, "Can't upgrade headless account! UserName parameter is null!");
+            Assert.IsNotNull(password, "Can't upgrade headless account! Password parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/headless/verify")
+                .WithPathParam("namespace", this.@namespace)
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"password\": \"{1}\", \"username\": \"{2}\"}}", emailAddress, password, username))
                 .GetResult();
 
             IHttpResponse response = null;
@@ -321,15 +364,15 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator SearchUsers(string emailOrDisplayName, ResultCallback<PagedPublicUsersInfo> callback)
+        public IEnumerator SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(emailOrDisplayName, nameof(emailOrDisplayName) + " cannot be null.");
+            Assert.IsNotNull(query, nameof(query) + " cannot be null.");
 
             var request = HttpRequestBuilder
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", this.@namespace)
-                .WithQueryParam("query", emailOrDisplayName)
+                .WithQueryParam("query", query)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)

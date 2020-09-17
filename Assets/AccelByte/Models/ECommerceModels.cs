@@ -253,6 +253,7 @@ namespace AccelByte.Models
         [DataMember] public string categoryPath { get; set; }
         [DataMember] public string baseAppId { get; set; }
         [DataMember] public string[] tags { get; set; }
+        [DataMember] public string[] features { get; set; }
         [DataMember] public int? offset { get; set; }
         [DataMember] public int? limit { get; set; }
         [DataMember] public string sortBy { get; set; }
@@ -296,6 +297,7 @@ namespace AccelByte.Models
         [DataMember] public RegionDataItem[] regionData { get; set; }
         [DataMember] public string[] itemIds { get; set; }
         [DataMember] public string[] tags { get; set; }
+        [DataMember] public string[] features { get; set; }
         [DataMember] public int maxCountPerUser { get; set; }
         [DataMember] public int maxCount { get; set; }
         [DataMember] public string clazz { get; set; }
@@ -337,6 +339,7 @@ namespace AccelByte.Models
         [DataMember] public RegionDataItem[] regionData { get; set; }
         [DataMember] public string[] itemIds { get; set; }
         [DataMember] public string[] tags { get; set; }
+        [DataMember] public string[] features { get; set; }
         [DataMember] public int maxCountPerUser { get; set; }
         [DataMember] public int maxCount { get; set; }
         [DataMember] public string clazz { get; set; }
@@ -511,6 +514,24 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class EntitlementSummary
+    {
+        [DataMember] public string id { get; set; }
+        [DataMember(Name ="namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public EntitlementClazz clazz { get; set;}
+        [DataMember] public EntitlementType type { get; set; }
+        [DataMember] public bool stackable { get; set; }
+        [DataMember] public int stackedUseCount { get; set; }
+        [DataMember] public int stackedQuantity { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public string grantedCode { get; set; }
+        [DataMember] public DateTime startDate { get; set; }
+        [DataMember] public DateTime endDate { get; set; }
+    }
+
+    [DataContract]
     public class ConsumeUserEntitlementRequest
     {
         [DataMember] public int useCount { get; set; }
@@ -582,6 +603,12 @@ namespace AccelByte.Models
         [DataMember] public string namespace_ { get; set; }
         [DataMember] public string extUserId { get; set; }
         [DataMember] public Attributes attributes { get; set; }
+    }
+
+    [DataContract]
+    public class Ownership
+    {
+        [DataMember] public bool owned { get; set; }
     }
 
     #endregion

@@ -82,5 +82,34 @@ namespace AccelByte.Api
                     criteria,
                     callback));
         }
+
+        /// <summary>
+        /// Get item info by AppId.
+        /// </summary>
+        /// <param name="appId">AppId of an item</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        public void GetItemByAppId(string appId, ResultCallback<ItemInfo> callback, string language = null, string region = null)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(appId, "Can't get item by App ID; appId parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetItemByAppId(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.AuthorizationToken,
+                    appId,
+                    callback,
+                    language,
+                    region));
+        }
     }
 }

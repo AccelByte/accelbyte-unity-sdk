@@ -31,6 +31,8 @@ namespace AccelByte.Models
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
+        [DataMember] public string AppId { get; set; }
+        [DataMember] public string PublisherNamespace { get; set; }
 
         /// <summary>
         ///  Copy member values
@@ -63,7 +65,9 @@ namespace AccelByte.Models
                 this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
                 this.ClientId == anotherConfig.ClientId &&
                 this.ClientSecret == anotherConfig.ClientSecret &&
-                this.RedirectUri == anotherConfig.RedirectUri)
+                this.RedirectUri == anotherConfig.RedirectUri &&
+                this.AppId == anotherConfig.AppId &&
+                this.PublisherNamespace == anotherConfig.PublisherNamespace)
             {
                 return true;
             }

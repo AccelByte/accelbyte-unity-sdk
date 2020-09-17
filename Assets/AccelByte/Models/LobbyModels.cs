@@ -76,6 +76,12 @@ namespace AccelByte.Models
         setReadyConsentResponse,
         setReadyConsentNotif,
         rematchmakingNotif,
+        joinDefaultChannelRequest,
+        joinDefaultChannelResponse,
+        sendChannelChatRequest,
+        sendChannelChatResponse,
+        channelChatNotif,
+        systemComponentsStatus
     }
 
     [DataContract]
@@ -125,7 +131,33 @@ namespace AccelByte.Models
         [DataMember] public string to;
         [DataMember] public string payload;
     }
-    
+
+    #endregion
+
+    #region Global Chat
+
+    [DataContract]
+    public class ChatChannelSlug
+    {
+        [DataMember] public string channelSlug;
+    }
+
+    [DataContract]
+    public class ChannelChatRequest
+    {
+        [DataMember] public string channelSlug;
+        [DataMember] public string payload;
+    }
+
+    [DataContract]
+    public class ChannelChatMessage
+    {
+        [DataMember] public string from;
+        [DataMember] public string channelSlug;
+        [DataMember] public string payload;
+        [DataMember] public DateTime sentAt;
+    }
+
     #endregion
 
     #region Party

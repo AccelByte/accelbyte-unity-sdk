@@ -142,6 +142,18 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.RedirectUri = value; }
         }
 
+        public static string AppId
+        {
+            get { return AccelByteSettings.Instance.config.AppId; }
+            set { AccelByteSettings.Instance.config.AppId = value; }
+        }
+
+        public static string PublisherNamespace
+        {
+            get { return AccelByteSettings.instance.config.AppId; }
+            set { AccelByteSettings.instance.config.AppId = value; }
+        }
+
         private Config config;
 
         private static AccelByteSettings instance;

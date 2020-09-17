@@ -68,6 +68,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Publisher Namespace");
+            TemporarySetting.Namespace = EditorGUILayout.TextField(TemporarySetting.PublisherNamespace);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use Session Management");
             TemporarySetting.UseSessionManagement = EditorGUILayout.Toggle(TemporarySetting.UseSessionManagement);
             EditorGUILayout.EndHorizontal();
@@ -166,6 +171,13 @@ namespace AccelByte.Api
             EditorGUILayout.LabelField("Redirect Uri");
             TemporarySetting.RedirectUri = EditorGUILayout.TextField(TemporarySetting.RedirectUri);
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("App Id");
+            TemporarySetting.AppId = EditorGUILayout.TextField(TemporarySetting.AppId);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
 
             if (GUILayout.Button("Save"))
             {                

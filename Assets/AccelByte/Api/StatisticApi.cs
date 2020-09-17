@@ -111,5 +111,56 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+
+        public IEnumerator ResetUserStatItems(string @namespace, string userId, StatItemReset[] resets, string accessToken, ResultCallback<StatItemOperationResult[]> callback) 
+        {
+            Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(resets.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<StatItemOperationResult[]>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateUserStatItems(string @namespace, string userId, string additionalKey, StatItemUpdate[] updates, string accessToken, ResultCallback<StatItemOperationResult[]> callback) 
+        {
+            Assert.IsNotNull(@namespace, "Can't add stat item value! namespace parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("additionalKey", additionalKey)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(updates.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<StatItemOperationResult[]>();
+
+            callback.Try(result);
+        }
     }
 }

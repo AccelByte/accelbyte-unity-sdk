@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.19.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.19.0%0D2.18.0) (2020-09-16)
+
+
+### Features
+
+* **lobby:** add global chat implementation ([e9fe2fc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e9fe2fc331fcb57ecf5a8946335ab9041f16df96))
+* **statistic:** add additionalKey and additionalData to update statItem endpoint ([0e86053](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0e860539fb41c165b2b95d95974bf2eadcde25c7))
+* **statistic:** add reset and update statistic ([c09c301](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c09c30132205d14c32cffeb7873dfa88284f8942))
+* **subscription:** check subscription in SKD changed flow to not check sub endpoints. ([bb84530](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bb845304b40af4be7bcf67b74d108639be7dc5bf))
+* **Subscription:** update using the new flow & API endpoint ([95af021](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/95af02132b8122b4ef65957b2e3e05bb6b84ce12))
+* **subscriptionTest:** integration test ([b3475b0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b3475b0c75feca18ff4495427ea8f1d5bc7ef344))
+* **user:** register and upgrade with username param ([38d3ddd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/38d3ddde989545e8bc1f71adb19e4009bc0b7ea7))
+
+
+### Bug Fixes
+
+* **subscription:** added flag when final result is found before the end to make it more consistent ([5b7bb0d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5b7bb0d7f3ad84e081b1b7457250d8a57b0f0ab2))
+* **subscription:** changed API endpoint so it can check publisher namespace using game namespace token ([2c97d5c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2c97d5ce5f75a610e3209002af7d995904eb23f8))
+* **Subscription:** added Publisher Namespace and Changed label "Store App ID" to "App Id" in accelbytePlatrofmSettingEditor ([6f83873](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6f838734a6091052da05b2121463a8f9792fa0ac))
+* **Subscription:** added publisher namespace in AccelbyteSettings ([b29392f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b29392f76fb11823aab9b46e4d83b0d0060124b4))
+* **Subscription:** changed accessing config from AccelbyteSettings to AccelbytePlugin.Config ([0a60df3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0a60df3c0230cf313637f856d00abd984ee5cd7a))
+* **Subscription:** changed sub test name to SubscriptionTest ([fb69c30](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fb69c30b07af2f0b4aa732e778f57196f8a47bf7))
+* **Subscription:** some endpoints need to be accessed with publisher namespace (get entitlements by appId, sku and getItems by appid) ([7677110](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7677110e43deaf4e37216de3e1825f02ccb28217))
+
+
+### Code Style Fixes
+
+* **Subscription:** added newline before callback parameter to keep style inline with other functions. ([4c697da](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4c697da9312a9ea50b19bea8c90ea59921523948))
+
+
+### Tests
+
+* **subcription:** changed appId to static to comply to Jenkins Test ([375153f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/375153fadd6d2a950259d2177bf21dedca07eefb))
+
 ## [2.18.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.18.0%0D2.17.0) (2020-09-02)
 
 

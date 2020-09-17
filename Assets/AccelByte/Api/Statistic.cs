@@ -138,5 +138,80 @@ namespace AccelByte.Api
                     this.session.AuthorizationToken,
                     callback));
         }
+
+        /// <summary>
+        /// Reset stat items for a user
+        /// </summary>
+        /// <param name="resets">Consist of one or more statCode.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void ResetUserStatItems(StatItemReset[] resets,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.ResetUserStatItems(
+                    this.@namespace,
+                    this.session.UserId,
+                    resets,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
+        /// Update stat items with the specified update strategy for a user
+        /// </summary>
+        /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void UpdateUserStatItems(StatItemUpdate[] updates,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            UpdateUserStatItems("", updates, callback);
+        }
+
+        /// <summary>
+        /// Update stat items with the specified update strategy for a user
+        /// </summary>
+        /// <param name="additionalKey">To identify multi level user statItem, such as character</param>
+        /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        public void UpdateUserStatItems(string additionalKey, StatItemUpdate[] updates,
+            ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.UpdateUserStatItems(
+                    this.@namespace,
+                    this.session.UserId,
+                    additionalKey,
+                    updates,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
     }
 }

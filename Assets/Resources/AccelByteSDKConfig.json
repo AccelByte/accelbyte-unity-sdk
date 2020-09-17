@@ -1,5 +1,6 @@
 {
   "Namespace": "<YOUR-GAME-NAMESPACE>",
+  "PublisherNamespace" : "<YOUR-PUBLISHER-NAMESPACE>",
   "UseSessionManagement": true,
   "BaseUrl": "https://api.demo.accelbyte.io",
   "ApiBaseUrl": "https://api.demo.accelbyte.io",
@@ -19,5 +20,6 @@
   "GameTelemetryServerUrl": "https://api.demo.accelbyte.io/game-telemetry",
   "ClientId": "<YOUR-GAME-CLIENT-ID>",
   "ClientSecret": "<YOUR-GAME-CLIENT-SECRET>",
-  "RedirectUri": "http://127.0.0.1"
+  "RedirectUri": "http://127.0.0.1",
+  "AppId": "<Your-appID>"
 }

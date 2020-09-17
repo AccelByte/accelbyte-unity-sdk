@@ -96,6 +96,88 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get user entitlement ownership by app id.
+        /// </summary>
+        /// <param name="appId">The game's app id</param>
+        /// <param name="callback">Returns a result that contains user ownership info via callback when completed</param>
+        public void GetUserEntitlementOwnershipByAppId(string appId, ResultCallback<Ownership> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(appId, "Can't get user entitlement ownership by appId! appId parameter is null!");
+
+            if(!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlementOwnershipByAppId(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    appId,
+                    callback));
+        }
+
+        /// <summary>
+        /// Get user entitlement ownership by SKU
+        /// </summary>
+        /// <param name="sku">the item's SKU</param>
+        /// <param name="callback">Returns user's entitlement ownership result via callback when completed</param>
+        public void GetUserEntitlementOwnershipBySku(string sku, ResultCallback<Ownership> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(sku, "Can't get user entitlement ownership by SKU! SKU parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlementOwnershipBySku(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    sku,
+                    callback));
+        }
+
+        /// <summary>
+        /// Get user entitlement ownership if any of item IDs, app IDs, or SKUs are true
+        /// </summary>
+        /// <param name="itemIds">the item Ids</param>
+        /// <param name="appIds">the app Ids</param>
+        /// <param name="skus">the skus</param>
+        /// <param name="callback">Returns user's entitlement ownership result if any parameters are true via callback when completed</param>
+        public void GetUserEntitlementOwnershipAny(string[] itemIds, string[] appIds, string[] skus, ResultCallback<Ownership> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlementOwnershipAny(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    itemIds,
+                    appIds,
+                    skus,
+                    callback));
+        }
+
+        /// <summary>
         /// Consume a user entitlement.
         /// </summary>
         /// <param name="entitlementId">The id of the user entitlement.</param>

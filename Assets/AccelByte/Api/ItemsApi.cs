@@ -61,6 +61,40 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator GetItemByAppId(string publisherNamespace, string accessToken, string appId, ResultCallback<ItemInfo> callback, string language = null, string region = null)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(publisherNamespace, "Can't get items by appId! publisherNamespace parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't get items by appId! AccessToken parameter is null!");
+            Assert.IsNotNull(appId, "Can't get items by appId! appId parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/byAppId")
+                .WithPathParam("namespace", publisherNamespace)
+                .WithQueryParam("appId", appId)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (region != null)
+            {
+                builder.WithQueryParam("region", region);
+            }
+
+            if (language != null)
+            {
+                builder.WithQueryParam("language", language);
+            }
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<ItemInfo>();
+
+            callback.Try(result);
+        }
+
         public IEnumerator GetItemsByCriteria(string @namespace, string accessToken,
             ItemCriteria criteria, ResultCallback<ItemPagingSlicedResult> callback)
         {
@@ -105,6 +139,16 @@ namespace AccelByte.Api
                         tags += (i < criteria.tags.Length - 1 ? criteria.tags[i] + "," : criteria.tags[i]);
                     }
                     queries.Add("tags", tags);
+                }
+
+                if(criteria.features != null)
+                {
+                    string feats = "";
+                    for (int i = 0; i < criteria.features.Length; i++)
+                    {
+                        feats += (i < criteria.features.Length - 1 ? criteria.features[i] + "," : criteria.features[i]);
+                    }
+                    queries.Add("features", feats);
                 }
 
                 if (criteria.offset != null)

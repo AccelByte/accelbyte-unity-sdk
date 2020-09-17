@@ -197,6 +197,34 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback</param>
+        public void Registerv2(string emailAddress, string username, string password, string displayName, string country,
+            DateTime dateOfBirth, ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            var registerUserRequest = new RegisterUserRequestv2
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                emailAddress = emailAddress,
+                username = username,
+                password = password,
+                displayName = displayName,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
+            };
+
+            this.coroutineRunner.Run(this.userAccount.Registerv2(registerUserRequest, callback));
+        }
+
+        /// <summary>
         /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
@@ -292,6 +320,34 @@ namespace AccelByte.Api
             Result<UserData> result = null;
 
             yield return this.userAccount.Upgrade(username, password, r => result = r);
+
+            if (!result.IsError)
+            {
+                this.userDataCache = result.Value;
+            }
+
+            callback.Try(result);
+        }
+
+        /// <summary>
+        /// Upgrade a headless account with username and password. User must be logged in before this method can be
+        /// used.
+        /// </summary>
+        /// <param name="emailAddress">Email Address the user is upgraded to</param>
+        /// <param name="userName">Username the user is upgraded to</param>
+        /// <param name="password">Password to login with username</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
+        public void Upgradev2(string emailAddress, string userName, string password, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(Upgradev2Async(emailAddress, userName, password, callback));
+        }
+
+        private IEnumerator Upgradev2Async(string emailAddress, string username, string password, ResultCallback<UserData> callback)
+        {
+            Result<UserData> result = null;
+
+            yield return this.userAccount.Upgradev2(emailAddress, username, password, r => result = r);
 
             if (!result.IsError)
             {
@@ -501,11 +557,11 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by email
+        /// Get user data from another user by email, displayName, or username
         /// </summary>
-        /// <param name="emailOrDisplayName"> email or display name that needed to get user data</param>
+        /// <param name="query"> email, display name, or username that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void SearchUsers(string emailOrDisplayName, ResultCallback<PagedPublicUsersInfo> callback)
+        public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -516,7 +572,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.SearchUsers(emailOrDisplayName, callback));
+            this.coroutineRunner.Run(this.userAccount.SearchUsers(query, callback));
         }
 
         /// <summary>
@@ -590,6 +646,40 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             this.coroutineRunner.Run(this.userAccount.GetCountryFromIP(callback));
+        }
+
+        /// <summary>
+        /// Check if user has purchased the subscription and eligible to play
+        /// </summary>
+        /// <param name="callback"> Returns the boolean result whether the user is subscribed and eligible to play the game via callback when the operation is completed</param>
+        public void GetUserEligibleToPlay(ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            ResultCallback<ItemInfo> onGotItemInfo = (itemInfoResult) =>
+                {
+                    if(itemInfoResult.IsError)
+                    {
+                        callback.TryError(itemInfoResult.Error.Code);
+                        return;
+                    }
+
+                    string[] skus = itemInfoResult.Value.features;
+                    string[] appIds = new string[] { AccelBytePlugin.Config.AppId };
+
+                    AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, (ownershipResult) =>
+                    {
+                        if (ownershipResult.IsError)
+                        {
+                            callback.TryError(ownershipResult.Error.Code);
+                            return;
+                        }
+
+                        callback.TryOk(ownershipResult.Value.owned);
+                    });
+                };
+
+            AccelBytePlugin.GetItems().GetItemByAppId(AccelBytePlugin.Config.AppId, onGotItemInfo);
         }
     }
 }

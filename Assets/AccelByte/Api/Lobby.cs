@@ -98,6 +98,11 @@ namespace AccelByte.Api
 
         public event ResultCallback<RematchmakingNotification> RematchmakingNotif;
 
+        /// <summary>
+        /// Raised when channel chat message received.
+        /// </summary>
+        public event ResultCallback<ChannelChatMessage> ChannelChatReceived;
+
         private readonly int pingDelay;
         private readonly int backoffDelay;
         private readonly int maxDelay;
@@ -117,6 +122,7 @@ namespace AccelByte.Api
         private long id;
         private LobbySessionId lobbySessionId;
         private Coroutine maintainConnectionCoroutine;
+        private string channelSlug = null;
 
         public event EventHandler OnRetryAttemptFailed;
 
@@ -180,6 +186,7 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Stop(this.maintainConnectionCoroutine);
             this.maintainConnectionCoroutine = null;
+            this.channelSlug = null;
         }
 
         /// <summary>
@@ -673,6 +680,49 @@ namespace AccelByte.Api
                 callback);
         }
 
+        /// <summary>
+        /// Send Join default global chat channel request.
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains ChatChannelSlug via callback when completed.</param>
+        public void JoinDefaultChatChannel(ResultCallback<ChatChannelSlug> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest<ChatChannelSlug>(MessageType.joinDefaultChannelRequest, result => 
+            {
+                if (result.IsError)
+                {
+                    callback.TryError(result.Error);
+                }
+                else
+                {
+                    channelSlug = result.Value.channelSlug;
+                    callback.Try(result);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Send a Chat Message to a Global Chat Channel.
+        /// </summary>
+        /// <param name="chatMessage">Message to send to the channel</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SendChannelChat(string chatMessage, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (string.IsNullOrEmpty(channelSlug))
+            {
+                callback.TryError(ErrorCode.InvalidRequest, "You're not in any chat channel.");
+            }
+            else
+            {
+                SendRequest(MessageType.sendChannelChatRequest, new ChannelChatRequest
+                {
+                    channelSlug = channelSlug,
+                    payload = chatMessage
+                }, callback);
+            }
+        }
+
         private long GenerateId()
         {
             lock (this.syncToken)
@@ -806,11 +856,7 @@ namespace AccelByte.Api
                 () =>
                 {
                     var code = (WsCloseCode)closecode;
-                    if (code != WsCloseCode.Abnormal || 
-                        code != WsCloseCode.ServerError ||
-                        code != WsCloseCode.ServiceRestart ||
-                        code != WsCloseCode.TryAgainLater ||
-                        code != WsCloseCode.TlsHandshakeFailure)
+                    if (!isReconnectable(code))
                     {
                         StopMaintainConnection();
                     }
@@ -892,6 +938,10 @@ namespace AccelByte.Api
                 Lobby.HandleNotification(message, this.RematchmakingNotif);
 
                 break;
+            case MessageType.channelChatNotif:
+                Lobby.HandleNotification(message, this.ChannelChatReceived);
+
+                break;
             case MessageType.connectNotif:
                 AwesomeFormat.ReadPayload(message, out lobbySessionId);
                 break;
@@ -931,6 +981,19 @@ namespace AccelByte.Api
             else
             {
                 handler(Result<T>.CreateOk(payload));
+            }
+        }
+
+        private bool isReconnectable(WsCloseCode code)
+        {
+            switch (code)
+            {
+                case WsCloseCode.Abnormal:
+                case WsCloseCode.ServerError:
+                case WsCloseCode.ServiceRestart:
+                case WsCloseCode.TryAgainLater:
+                case WsCloseCode.TlsHandshakeFailure: return true;
+                default: return false;
             }
         }
     }
