@@ -7,6 +7,8 @@
   "PlatformServerUrl": "https://demo.accelbyte.io/platform",
   "GameTelemetryServerUrl": "https://demo.accelbyte.io/game-telemetry",
   "AchievementServerUrl": "https://demo.accelbyte.io/achievement",
+  "LobbyServerUrl": "https://demo.accelbyte.io/lobby",
+  "CloudSaveServerUrl": "https://demo.accelbyte.io/cloudsave",
   "ClientId": "<YOUR-DS-CLIENT-ID>",
   "ClientSecret": "<YOUR-DS-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1"

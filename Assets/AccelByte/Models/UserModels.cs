@@ -9,6 +9,8 @@ namespace AccelByte.Models
 {
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
+    public enum SearchType { ALL, EMAILADDRESS, DISPLAYNAME, USERNAME }
+
     [DataContract]
     public class TokenData
     {

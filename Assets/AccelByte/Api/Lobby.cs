@@ -97,6 +97,11 @@ namespace AccelByte.Api
         public event ResultCallback<DsNotif> DSUpdated;
 
         public event ResultCallback<RematchmakingNotification> RematchmakingNotif;
+        
+        /// <summary>
+        /// Raised when there's an update in the party's storage.
+        /// </summary>
+        public event ResultCallback<PartyDataUpdateNotif> PartyDataUpdateNotif;
 
         /// <summary>
         /// Raised when channel chat message received.
@@ -723,6 +728,31 @@ namespace AccelByte.Api
             }
         }
 
+        /// <summary>
+        /// Get party storage by party ID.
+        /// </summary>
+        /// <param name="partyId">Targeted party ID.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void GetPartyStorage(string partyId, ResultCallback<PartyDataUpdateNotif> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(partyId), "Party ID should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            this.coroutineRunner.Run(
+                this.api.GetPartyStorage(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    partyId,
+                    callback));
+        }
+        
         private long GenerateId()
         {
             lock (this.syncToken)
@@ -947,7 +977,9 @@ namespace AccelByte.Api
                 break;
             case MessageType.disconnectNotif:
                 Lobby.HandleNotification(message, this.Disconnecting);
-
+                break;
+            case MessageType.partyDataUpdateNotif:
+                Lobby.HandleNotification(message, this.PartyDataUpdateNotif);
                 break;
             default:
                 Action<ErrorCode, string> handler;

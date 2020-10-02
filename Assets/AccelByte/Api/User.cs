@@ -560,8 +560,9 @@ namespace AccelByte.Api
         /// Get user data from another user by email, displayName, or username
         /// </summary>
         /// <param name="query"> email, display name, or username that needed to get user data</param>
+        /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
+        public void SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -572,7 +573,17 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.SearchUsers(query, callback));
+            this.coroutineRunner.Run(this.userAccount.SearchUsers(query, by, callback));
+        }
+
+        /// <summary>
+        /// Get user data from another user by email, displayName, and username
+        /// </summary>
+        /// <param name="query"> email, display name, or username that needed to get user data</param>
+        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+        public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
+        {
+            this.SearchUsers(query, SearchType.ALL, callback);
         }
 
         /// <summary>

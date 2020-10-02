@@ -201,7 +201,7 @@ namespace AccelByte.Core
                         {
                             for (int i = 0; i < array.Length; i++)
                             {
-                                var parsedValue = Convert.ChangeType(strItems[i], fieldInfo.FieldType.GetElementType());
+                                var parsedValue = Convert.ChangeType(strItems[i].Trim(' '), fieldInfo.FieldType.GetElementType());
                                 if (fieldInfo.FieldType.GetElementType() == typeof(string))
                                 {
                                     array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
@@ -260,6 +260,18 @@ namespace AccelByte.Core
                         var obj = Activator.CreateInstance(fieldInfo.FieldType);
                         obj = Enum.Parse(fieldInfo.FieldType, fieldValue);
                         fieldInfo.SetValue(payload, obj);
+                    }
+                    catch (Exception)
+                    {
+                        return ErrorCode.MessageFieldConversionFailed;
+                    }
+                }
+                else if (fieldInfo.FieldType == typeof(Dictionary<string, object>)) // Used by party storage
+                {
+                    try
+                    {
+                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, object>>(fieldValue);
+                        fieldInfo.SetValue(payload, convertedValue);
                     }
                     catch (Exception)
                     {

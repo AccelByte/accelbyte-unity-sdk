@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -81,7 +81,8 @@ namespace AccelByte.Models
         sendChannelChatRequest,
         sendChannelChatResponse,
         channelChatNotif,
-        systemComponentsStatus
+        systemComponentsStatus,
+        partyDataUpdateNotif,
     }
 
     [DataContract]
@@ -170,6 +171,31 @@ namespace AccelByte.Models
         [DataMember] public string[] members;
         [DataMember] public string[] invitees;
         [DataMember] public string invitationToken;
+    }
+
+    [DataContract]
+    public class PartyDataUpdateNotif
+    {
+        [DataMember] public long updatedAt;
+        [DataMember] public string partyId;
+        [DataMember] public string leader;
+        [DataMember] public string[] members;
+        [DataMember] public string[] invitees;
+        [DataMember] public Dictionary<string, object> custom_attribute;
+    }
+
+    [DataContract]
+    public class PartyDataUpdateRequest
+    {
+        [DataMember] public long updatedAt;
+        [DataMember] public Dictionary<string, object> custom_attribute;
+    }
+    
+    [DataContract]
+    public class ActivePartiesData
+    {
+        [DataMember] public PartyDataUpdateNotif[] data;
+        [DataMember] public Paging paging;
     }
 
     [DataContract]

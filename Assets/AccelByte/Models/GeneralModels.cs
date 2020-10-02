@@ -14,4 +14,11 @@ namespace AccelByte.Models
         [DataMember] public string next { get; set; }
         [DataMember] public string previous { get; set; }
     }
+
+    public enum PaginationType
+    {
+        FIRST,
+        NEXT,
+        PREVIOUS
+    }
 }

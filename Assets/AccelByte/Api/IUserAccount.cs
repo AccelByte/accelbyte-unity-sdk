@@ -40,7 +40,7 @@ namespace AccelByte.Api
 
         IEnumerator GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback);
 
-        IEnumerator SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback);
+        IEnumerator SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback);
 
         IEnumerator GetUserByUserId(string userId, ResultCallback<UserData> callback);
 

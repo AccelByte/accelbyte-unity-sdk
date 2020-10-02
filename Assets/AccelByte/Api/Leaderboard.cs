@@ -86,5 +86,36 @@ namespace AccelByte.Api
                     userId,
                     callback));
         }
+
+        /// <summary>
+        /// Get user's ranking from leaderboard with additional key.
+        /// The additional key will be suffixed to the userId to access multi level user ranking, such as character ranking.
+        /// </summary>
+        /// <param name="userId"> The id of the user </param>
+        /// <param name="additionalKey">To identify multi level user ranking, such as character ranking</param>
+        /// <param name="leaderboardCode"> The id of the leaderboard </param>
+        /// <param name="callback"> Returns a Result that contains UserRankingData via callback when completed </param>
+        public void GetUserRanking(string userId, string additionalKey, string leaderboardCode, ResultCallback<UserRankingData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(leaderboardCode, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
+            Assert.IsNotNull(userId, "Can't query all time leaderboard ranking data! userId parameter is null!");
+            Assert.IsFalse(string.IsNullOrEmpty(additionalKey), "Can't query all time leaderboard ranking data! additionalKey paramater couldn't be empty");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserRanking(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    leaderboardCode,
+                    string.Format("{0}_{1}", userId, additionalKey),
+                    callback));
+        }
     }
 }

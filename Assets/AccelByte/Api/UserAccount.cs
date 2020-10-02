@@ -364,19 +364,24 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
+        public IEnumerator SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(query, nameof(query) + " cannot be null.");
 
-            var request = HttpRequestBuilder
+            string[] filter = new string[] { "", "emailAddress", "displayName", "username" };
+
+            var builder = HttpRequestBuilder
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", this.@namespace)
                 .WithQueryParam("query", query)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
+
+            if (by != SearchType.ALL) builder.WithQueryParam("by", filter[(int)by]);
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 

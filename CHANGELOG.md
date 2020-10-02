@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.20.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.20.0%0D2.19.0) (2020-10-01)
+
+
+### Features
+
+* add cloudsave API to Server SDK ([739b2c9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/739b2c97d6d2e88c82a4d9588a2d94b935a599e4))
+* **leaderboard:** add additionalKey and additionalData for character leaderboard ([7a25033](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7a25033b70dc74c8560c82682a488739c01e4ac2))
+* **lobby:** party update notif & its REST APIs ([defdd4b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/defdd4b81b983e39386c613ab1ddd330a5bde3cc))
+* **serverLobby:** change WritePartyStorage signature to prevent overwrite ([fae5501](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fae550184a89ff28bbde5b65a869c8be362063be))
+
+
+### Bug Fixes
+
+* **plugin:** hotifx add CheckPlugin() on GetConfig() and set the order of bool setter in the CheckPlugin ([f496158](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f49615833140a45f324280015f1e2c1bc818663e))
+* **plugin:** plugin failure on Unity Editor disable domain/scene reload ([d18bb42](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d18bb426b4e334728ebb83ae3b03e7c1cd195d3f))
+
+
+### Tests
+
+* **sub:** fixed sub test by changing user ([59eb188](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/59eb18818c74c85db59da9f292e2c2fe431d47d0))
+
+
+### Refactors
+
+* **search:** add filter param in search users ([72bd941](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/72bd941945f8a40f73739bee37ef2d24caf9073f))
+
 ## [2.19.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.19.0%0D2.18.0) (2020-09-16)
 
 

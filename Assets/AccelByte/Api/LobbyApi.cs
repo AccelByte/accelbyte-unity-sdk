@@ -50,5 +50,29 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+        
+        public IEnumerator GetPartyStorage(string @namespace, string accessToken, string partyID, ResultCallback<PartyDataUpdateNotif> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(partyID, nameof(partyID) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("partyId", partyID)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<PartyDataUpdateNotif>();
+
+            callback.Try(result);
+        }
     }
 }

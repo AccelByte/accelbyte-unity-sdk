@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
@@ -24,6 +25,7 @@ namespace AccelByte.Models
     {
         [DataMember] public float point { get; set; }
         [DataMember] public string userId { get; set; }
+        [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
 
     [DataContract]
@@ -31,6 +33,7 @@ namespace AccelByte.Models
     {
         [DataMember] public float point { get; set; }
         [DataMember] public int rank { get; set; }
+        [DataMember] public Dictionary<string, object> additionalData {get; set;}
     }
 
     [DataContract]
