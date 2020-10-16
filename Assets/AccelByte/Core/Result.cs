@@ -279,6 +279,15 @@ namespace AccelByte.Core
         GetFriendsDataNotFound = 11792,
         GetFriendsUnableGetListOfFriends = 11793,
         GetFriendsUnableToWriteResponse = 11794,
+        //Block/Unblock User
+        PlayerBlockRequestInvalidRequestBody      = 11801,
+        PlayerBlockRequestUnableGetUserRegistry   = 11802,
+        PlayerBlockRequestUnableBlockPlayer       = 11803,
+        PlayerUnblockRequestInvalidRequestBody    = 11804,
+        PlayerUnblockRequestUnableGetUserRegistry = 11805,
+        PlayerUnblockRequestUnableBlockPlayer     = 11806,
+        PlayerBlocked                             = 11807,
+        PlayerBlockedUnableGet                    = 11808,
     }
 
     public class Error

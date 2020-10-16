@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
-using MessageType = AccelByte.Models.MessageType;
+using AccelByte.Models;
 
 namespace AccelByte.Core
 {
@@ -43,9 +44,15 @@ namespace AccelByte.Core
             {
                 writer.WriteLine();
 
+                string fieldName = ((DataMemberAttribute) fieldInfo.GetCustomAttribute(typeof(DataMemberAttribute))).Name; 
+                if (string.IsNullOrEmpty(fieldName))
+                {
+                    fieldName = fieldInfo.Name;
+                }
+
                 if (fieldInfo.FieldType.IsArray)
                 {
-                    writer.Write("{0}: [", fieldInfo.Name);
+                    writer.Write("{0}: [", fieldName);
 
                     Array items = (Array) fieldInfo.GetValue(inputPayload);
 
@@ -59,16 +66,16 @@ namespace AccelByte.Core
                 }
                 else if (fieldInfo.FieldType.IsPrimitive || fieldInfo.FieldType == typeof(string))
                 {
-                    writer.Write("{0}: {1}", fieldInfo.Name, fieldInfo.GetValue(inputPayload));
+                    writer.Write("{0}: {1}", fieldName, fieldInfo.GetValue(inputPayload));
                 }
                 else if (fieldInfo.FieldType == typeof(DateTime))
                 {
                     DateTime inputValue = ((DateTime) fieldInfo.GetValue(inputPayload)).ToUniversalTime();
-                    writer.Write("{0}: {1:O}", fieldInfo.Name, inputValue);
+                    writer.Write("{0}: {1:O}", fieldName, inputValue);
                 }
                 else
                 {
-                    writer.Write("{0}: {1:G}", fieldInfo.Name, fieldInfo.GetValue(inputPayload));
+                    writer.Write("{0}: {1:G}", fieldName, fieldInfo.GetValue(inputPayload));
                 }
             }
         }
@@ -181,7 +188,7 @@ namespace AccelByte.Core
 
                 if (!fields.TryGetValue(fieldInfo.Name, out fieldValue))
                 {
-                    return ErrorCode.MessageFieldDoesNotExist;
+                    continue;
                 }
 
                 if (fieldInfo.FieldType.IsArray)

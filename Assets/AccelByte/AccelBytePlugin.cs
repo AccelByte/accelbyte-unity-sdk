@@ -8,12 +8,11 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using AccelByte.Core;
 using AccelByte.Models;
-using AccelByte.Server;
 using HybridWebSocket;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 namespace AccelByte.Api
 {

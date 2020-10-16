@@ -13,7 +13,6 @@ using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Debug = UnityEngine.Debug;
 
 namespace AccelByte.Server
 {

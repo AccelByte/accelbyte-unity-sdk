@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using AccelByte.Api;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Core
 {
@@ -51,6 +52,8 @@ namespace AccelByte.Core
 
         public HttpRequestBuilder WithPathParam(string key, string value)
         {
+            Assert.IsNotNull(key, "path key is null");
+            Assert.IsNotNull(value, $"path value is null for key {key}");
             this.result.UrlBuilder.Replace("{" + key + "}", Uri.EscapeDataString(value));
             this.result.BaseUrlLength = this.result.UrlBuilder.Length;
 
@@ -59,6 +62,9 @@ namespace AccelByte.Core
 
         public HttpRequestBuilder WithQueryParam(string key, string value)
         {
+            Assert.IsNotNull(key, "query key is null");
+            Assert.IsNotNull(value, $"query value is null for key {key}");
+            
             string formatString = this.result.BaseUrlLength == this.result.UrlBuilder.Length ? "?{0}={1}" : "&{0}={1}";
             this.result.UrlBuilder.AppendFormat(formatString, Uri.EscapeDataString(key), Uri.EscapeDataString(value));
 
@@ -123,6 +129,9 @@ namespace AccelByte.Core
 
         public HttpRequestBuilder WithFormParam(string key, string value)
         {
+            Assert.IsNotNull(key, "form key is null");
+            Assert.IsNotNull(value, $"form value is null for key {key}");
+            
             if (this.formBuilder.Length > 0)
             {
                 this.formBuilder.Append("&");

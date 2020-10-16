@@ -52,6 +52,11 @@ namespace AccelByte.Api
         public event ResultCallback<LeaveNotification> LeaveFromParty;
 
         /// <summary>
+        /// Raised when a user reject party invitation
+        /// </summary>
+        public event ResultCallback<PartyRejectNotif> RejectedPartyInvitation;
+
+        /// <summary>
         /// Raised when personal chat message received.
         /// </summary>
         public event ResultCallback<ChatMesssage> PersonalChatReceived;
@@ -107,6 +112,16 @@ namespace AccelByte.Api
         /// Raised when channel chat message received.
         /// </summary>
         public event ResultCallback<ChannelChatMessage> ChannelChatReceived;
+
+        /// <summary>
+        /// Raised when player is blocked.
+        /// </summary>
+        public event ResultCallback<PlayerBlockedNotif> PlayerBlockedNotif;
+        
+        /// <summary>
+        /// Raised when player is unblocked.
+        /// </summary>
+        public event ResultCallback<PlayerUnblockedNotif> PlayerUnblockedNotif;
 
         private readonly int pingDelay;
         private readonly int backoffDelay;
@@ -346,6 +361,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(MessageType.partyKickRequest, new PartyKickRequest {memberID = userId}, callback);
+        }
+
+        /// <summary>
+        /// Reject a party invitation.
+        /// </summary>
+        /// <param name="partyId">Party ID of an incoming party invitation that will be declined.</param>
+        /// <param name="invitationToken">Invitation token of an incoming party invitation that will be declined.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void RejectPartyInvitation(string partyId, string invitationToken, ResultCallback<PartyRejectResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.partyRejectRequest, new PartyRejectRequest{invitationToken = invitationToken, partyID =  partyId}, callback);
         }
 
         /// <summary>
@@ -752,7 +779,101 @@ namespace AccelByte.Api
                     partyId,
                     callback));
         }
+
+        /// <summary>
+        /// Block the specified player from doing some action against current user.
+        /// The specified player will be removed from current user's friend list too.
+        /// 
+        /// Actions that prevented to do each other:
+        /// * add friend
+        /// * direct chat
+        /// * invite to party 
+        /// * invite to group
+        /// * matchmaking result as one alliance 
+        ///
+        /// Additional limitation:
+        /// * blocked player cannot access blocker/current user's UserProfile.
+        /// 
+        /// </summary>
+        /// <param name="userId">Blocked user's user ID</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void BlockPlayer(string userId, ResultCallback<BlockPlayerResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.blockPlayerRequest, new BlockPlayerRequest
+            {
+                userId = this.session.UserId,
+                blockedUserId = userId,
+                Namespace = @namespace
+            }, callback);
+        }
+
+
+        /// <summary>
+        /// Unblock the specified player and allow it to some action against current user again.
+        /// 
+        /// Allow each other to:
+        /// * add friend
+        /// * direct chat
+        /// * invite to party 
+        /// * invite to group
+        /// * matchmaking result as one alliance 
+        ///
+        /// Additional limitation:
+        /// * unblocked player can access blocker/current user's UserProfile.
+        /// 
+        /// </summary>
+        /// <param name="userId">Unblocked user's user ID</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void UnblockPlayer(string userId, ResultCallback<UnblockPlayerResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.unblockPlayerRequest, new UnblockPlayerRequest
+            {
+                userId = this.session.UserId,
+                unblockedUserId = userId,
+                Namespace = @namespace
+            }, callback);
+        }
+
         
+        public void GetListOfBlockedUser(ResultCallback<BlockedList> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            this.coroutineRunner.Run(
+                this.api.GetListOfBlockedUser(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    this.session.UserId,
+                    callback));
+        }
+
+        
+        public void GetListOfBlocker(ResultCallback<BlockerList> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            this.coroutineRunner.Run(
+                this.api.GetListOfBlocker(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    this.session.UserId,
+                    callback));
+        }
+
         private long GenerateId()
         {
             lock (this.syncToken)
@@ -980,6 +1101,15 @@ namespace AccelByte.Api
                 break;
             case MessageType.partyDataUpdateNotif:
                 Lobby.HandleNotification(message, this.PartyDataUpdateNotif);
+                break;
+            case MessageType.partyRejectNotif:
+                Lobby.HandleNotification(message, this.RejectedPartyInvitation);
+                break;
+            case MessageType.blockPlayerNotif:
+                Lobby.HandleNotification(message, this.PlayerBlockedNotif);
+                break;
+            case MessageType.unblockPlayerNotif:
+                Lobby.HandleNotification(message, this.PlayerUnblockedNotif);
                 break;
             default:
                 Action<ErrorCode, string> handler;

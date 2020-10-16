@@ -3,14 +3,12 @@
 // and restrictions contact your company contract manager.
 
 using System.Text;
-using Utf8Json;
 using AccelByte.Models;
+using UnityEngine;
+using Utf8Json;
 
 namespace AccelByte.Api
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
 #endif

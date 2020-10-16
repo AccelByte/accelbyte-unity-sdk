@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.21.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.21.0%0D2.20.0) (2020-10-14)
+
+
+### Features
+
+* **lobby:** block and unblock player functions ([1be94dc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1be94dc8d1b4e278f64d38a1fb4c8a6ac5cfd3cb))
+* **lobby:** reject party invitation ([c4c9bae](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c4c9bae3ec9eb09f9283ad6b60aaec9b2df0f313))
+
 ## [2.20.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.20.0%0D2.19.0) (2020-10-01)
 
 

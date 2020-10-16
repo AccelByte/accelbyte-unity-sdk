@@ -2,7 +2,6 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 

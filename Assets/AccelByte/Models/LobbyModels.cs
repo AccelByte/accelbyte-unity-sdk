@@ -32,6 +32,9 @@ namespace AccelByte.Models
         partyKickRequest,
         partyKickResponse,
         partyKickNotif,
+        partyRejectRequest,
+        partyRejectResponse,
+        partyRejectNotif,
         personalChatRequest,
         personalChatResponse,
         personalChatNotif,
@@ -83,6 +86,12 @@ namespace AccelByte.Models
         channelChatNotif,
         systemComponentsStatus,
         partyDataUpdateNotif,
+        blockPlayerRequest,
+        blockPlayerResponse,
+        unblockPlayerRequest,
+        unblockPlayerResponse,
+        blockPlayerNotif,
+        unblockPlayerNotif,
     }
 
     [DataContract]
@@ -252,6 +261,27 @@ namespace AccelByte.Models
         [DataMember] public string userID;
     }
 
+    [DataContract]
+    public class PartyRejectRequest
+    {
+        [DataMember] public string partyID;
+        [DataMember] public string invitationToken;
+    }
+
+    [DataContract]
+    public class PartyRejectResponse
+    {
+        [DataMember] public string partyID;
+    }
+
+    [DataContract]
+    public class PartyRejectNotif
+    {
+        [DataMember] public string partyID;
+        [DataMember] public string leaderID;
+        [DataMember] public string userID;
+    }
+    
     #endregion
 
     #region Matchmaking
@@ -390,5 +420,77 @@ namespace AccelByte.Models
         [DataMember] public string[] onlineFriendsId;
     }
     
+    #endregion
+
+    #region Block/Unblock
+
+    [DataContract]
+    public class BlockPlayerRequest
+    {
+        [DataMember] public string userId;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string blockedUserId;
+    }
+    
+    [DataContract]
+    public class BlockPlayerResponse
+    {
+        [DataMember] public string blockedUserId;
+    }
+    
+    [DataContract]
+    public class UnblockPlayerRequest
+    {
+        [DataMember] public string userId;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string unblockedUserId;
+    }
+    
+    [DataContract]
+    public class UnblockPlayerResponse
+    {
+        [DataMember] public string unblockedUserId;
+    }
+    
+    [DataContract]
+    public class PlayerBlockedNotif
+    {
+        [DataMember] public string userId; //ID of the blocker
+        [DataMember] public string blockedUserId; //ID of the blocked user
+    }
+    
+    [DataContract]
+    public class PlayerUnblockedNotif
+    {
+        [DataMember] public string userId; //ID of user that lift the block
+        [DataMember] public string unblockedUserId; // ID of the unblocked user
+    }
+
+    [DataContract]
+    public class BlockedData
+    {
+        [DataMember] public string blockedUserId;
+        [DataMember] public DateTime blockedAt;
+    }
+
+    [DataContract]
+    public class BlockedList
+    {
+        [DataMember] public BlockedData[] data;
+    }
+
+    [DataContract]
+    public class BlockerData
+    {
+        [DataMember] public string userId;
+        [DataMember] public DateTime blockedAt;
+    }
+
+    [DataContract]
+    public class BlockerList
+    {
+        [DataMember] public BlockerData[] data;
+    }
+
     #endregion
 }

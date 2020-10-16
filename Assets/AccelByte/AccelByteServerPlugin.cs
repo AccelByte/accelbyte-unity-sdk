@@ -3,13 +3,8 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using AccelByte.Core;
-using AccelByte.Api;
 using AccelByte.Models;
-using HybridWebSocket;
 using UnityEditor;
 using UnityEngine;
 

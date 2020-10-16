@@ -3,8 +3,6 @@
 // and restrictions contact your company contract manager.
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -71,6 +69,52 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListOfBlockedUser(string @namespace, string accessToken, string userId, ResultCallback<BlockedList> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<BlockedList>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListOfBlocker(string @namespace, string accessToken, string userId, ResultCallback<BlockerList> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked-by")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<BlockerList>();
 
             callback.Try(result);
         }

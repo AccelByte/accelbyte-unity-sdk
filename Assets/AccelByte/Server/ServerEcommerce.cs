@@ -2,7 +2,6 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
