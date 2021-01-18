@@ -100,6 +100,8 @@ namespace AccelByte.Models
                 string httpsBaseUrl = "https://" + baseUrl;
                 string wssBaseUrl = "wss://" + baseUrl;
 
+                if (this.ClientSecret == null) this.ClientSecret = "";
+
                 if (this.LoginServerUrl == null) this.LoginServerUrl = httpsBaseUrl;
 
                 if (this.IamServerUrl == null) this.IamServerUrl = httpsBaseUrl + "/iam";

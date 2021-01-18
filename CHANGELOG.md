@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.27.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.27.0%0D2.26.0) (2021-01-06)
+
+
+### Features
+
+* **lobby:** add client update party storage. ([7e143a2](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7e143a24c84610563a89e8a9a11baf222e2ff119))
+* **lobby:** add client update partyStorage. ([8e1323b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8e1323b40dd6bb1a8edccbc66675beee21dfb05a))
+* **server:** implement joinable session ([e2577b4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e2577b47c8e9f2a6e69d2582eef397435d6dfcd8))
+* **server:** implement joinable session ([926ceb8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/926ceb8d4da0e0ab28aec91539eef40b983b302f))
+
+
+### Bug Fixes
+
+* **config:** assign default value when ClientSecret is null ([a63843f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a63843fed55b7d472a2fe3e65a482c47551d2b47))
+* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field ([31a47b1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/31a47b10b437acadad61f968d73dd32ff3ef814b))
+* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field ([bc440a1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bc440a16f58a979d41b83505102812bd53d7aff0))
+
 ## [2.26.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.26.0%0D2.25.0) (2020-12-23)
 
 

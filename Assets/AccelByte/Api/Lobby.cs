@@ -926,6 +926,68 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Write party storage data to the targeted party ID.
+        /// Beware:
+        /// Object will not be write immediately, please take care of the original object until it written.
+        /// </summary>
+        /// <param name="partyId">Targeted party ID.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        /// <param name="payloadModifier">Function to modify the latest party data with your customized modifier.</param>
+        /// <param name="retryAttempt">the number of retry to do when there is an error in writing to party storage (likely due to write conflicts)</param>
+        public void WritePartyStorage(string partyId, ResultCallback<PartyDataUpdateNotif> callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier, int retryAttempt = 1)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(partyId), "Party ID should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            WritePartyStorageRecursive(retryAttempt, partyId, callback, payloadModifier);
+        }
+
+        private void WritePartyStorageRecursive(int remainingAttempt, string partyId, ResultCallback<PartyDataUpdateNotif> callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        {
+            if (remainingAttempt <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.PreconditionFailed, "Exhaust all retry attempt to modify party storage. Please try again."));
+                return;
+            }
+
+            GetPartyStorage(partyId, getPartyStorageResult =>
+            {
+                if (getPartyStorageResult.IsError)
+                {
+                    callback.TryError(getPartyStorageResult.Error);
+                }
+                else
+                {
+                    getPartyStorageResult.Value.custom_attribute = payloadModifier(getPartyStorageResult.Value.custom_attribute);
+
+                    var updateRequest = new PartyDataUpdateRequest();
+                    updateRequest.custom_attribute = getPartyStorageResult.Value.custom_attribute;
+                    updateRequest.updatedAt = getPartyStorageResult.Value.updatedAt;
+
+                    this.coroutineRunner.Run(
+                        this.api.WritePartyStorage(
+                            this.@namespace,
+                            this.session.AuthorizationToken,
+                            updateRequest,
+                            partyId,
+                            callback,
+                            () =>
+                            {
+                                WritePartyStorageRecursive(remainingAttempt - 1, partyId, callback, payloadModifier);
+                            }));
+                }
+            });
+        }
+
+        /// <summary>
         /// Block the specified player from doing some action against current user.
         /// The specified player will be removed from current user's friend list too.
         /// 

@@ -75,7 +75,7 @@ namespace AccelByte.Api
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Publisher Namespace");
-            TemporarySetting.Namespace = EditorGUILayout.TextField(TemporarySetting.PublisherNamespace);
+            TemporarySetting.PublisherNamespace = EditorGUILayout.TextField(TemporarySetting.PublisherNamespace);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

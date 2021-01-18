@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -72,6 +73,40 @@ namespace AccelByte.Api
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
             callback.Try(result);
+        }
+
+        public IEnumerator WritePartyStorage(string @namespace, string accessToken, PartyDataUpdateRequest data,
+            string partyId, ResultCallback<PartyDataUpdateNotif> callback, Action callbackOnConflictedData = null)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}/attributes")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("partyId", partyId)
+                .WithBearerAuth(accessToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<PartyDataUpdateNotif>();
+
+            if (result.IsError && result.Error.Code == ErrorCode.PreconditionFailed)
+            {
+                callbackOnConflictedData?.Invoke();
+            }
+            else
+            {
+                callback.Try(result);
+            }
         }
 
         public IEnumerator GetListOfBlockedUser(string @namespace, string accessToken, string userId, ResultCallback<BlockedList> callback)

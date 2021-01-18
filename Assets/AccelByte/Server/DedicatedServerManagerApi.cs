@@ -60,6 +60,7 @@ namespace AccelByte.Server
         private readonly IHttpWorker httpWorker;
         private readonly string namespace_;
         private string dsmServerUrl = "";
+        private string region = "";
         private RegisterServerRequest serverSetup;
         private ServerType serverType = ServerType.NONE;
 #if ENABLE_AGONES_PLUGIN
@@ -101,31 +102,44 @@ namespace AccelByte.Server
             }
             if (dsmServerUrl.Length == 0)
             {
-                ServerQos qos = AccelByteServerPlugin.GetQos();
-                Result<Dictionary<string, int>> latenciesResult = null;
-                qos.GetServerLatencies(reqResult => latenciesResult = reqResult);
-                yield return new WaitUntil(() => latenciesResult != null);
-
-                foreach (KeyValuePair<string, int> latency in latenciesResult.Value.OrderBy(item => item.Value))
-                {
-                    var getUrlRequest = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/dsm?region=" + latency.Key)
+                var getUrlRequest = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/dsm?region=" + region)
                         .WithBearerAuth(accessToken)
                         .WithContentType(MediaType.ApplicationJson)
                         .Accepts(MediaType.ApplicationJson)
                         .GetResult();
 
-                    IHttpResponse getUrlResponse = null;
+                IHttpResponse getUrlResponse = null;
 
-                    yield return this.httpWorker.SendRequest(getUrlRequest, rsp => getUrlResponse = rsp);
+                yield return this.httpWorker.SendRequest(getUrlRequest, rsp => getUrlResponse = rsp);
 
-                    var getUrlResult = getUrlResponse.TryParseJson<DSMClient>();
-                    if (getUrlResult.Value.status == "HEALTHY")
+                var getUrlResults = getUrlResponse.TryParseJson<DSMClient[]>();
+                if(!getUrlResults.IsError)
+                {
+                    foreach(var r in getUrlResults.Value)
                     {
-                        dsmServerUrl = getUrlResult.Value.host_address;
-                        break;
+                        if (r.provider == serverSetup.provider && r.status == "HEALTHY")
+                            dsmServerUrl = r.host_address;
                     }
                 }
+                else
+                {
+                    if(getUrlResults.Error.Code == ErrorCode.ErrorFromException)
+                    {
+                        var getUrlResult = getUrlResponse.TryParseJson<DSMClient>();
+                        if(getUrlResult.Value.status == "HEALTHY")
+                        {
+                            dsmServerUrl = getUrlResult.Value.host_address;
+                        }
+                    }
+                }
+
+                if(string.IsNullOrEmpty(dsmServerUrl))
+                {
+                    callback.TryError(ErrorCode.InvalidResponse, string.Format("Cannot found healthy DSM for provider {0}", serverSetup.provider));
+                    yield break;
+                }
             }
+
             if(serverSetup.ip.Length == 0)
             {
                 var getPubIpRequest = HttpRequestBuilder.CreateGet("https://api.ipify.org?format=json")
@@ -338,6 +352,7 @@ namespace AccelByte.Server
             string[] args = System.Environment.GetCommandLineArgs();
             bool isProviderFound = false;
             bool isGameVersionFound = false;
+            bool isRegionFound = false;
             foreach (string arg in args)
             {
                 AccelByteDebug.Log("arg: " + arg);
@@ -362,7 +377,14 @@ namespace AccelByte.Server
                     isGameVersionFound = true;
                 }
 
-                if (isProviderFound && isGameVersionFound)
+                if(arg.Contains("region"))
+                {
+                    string[] split = arg.Split('=');
+                    region = split[1];
+                    isRegionFound = true;
+                }
+
+                if (isProviderFound && isGameVersionFound && isRegionFound)
                 {
                     break;
                 }
@@ -371,7 +393,7 @@ namespace AccelByte.Server
         
         private bool IsCurrentProvider(Provider provider)
         {
-            return serverSetup.provider.Equals(provider.ToString().ToLower());
+            return serverSetup.provider != null && serverSetup.provider.Equals(provider.ToString().ToLower());
         }
 
 #if ENABLE_AGONES_PLUGIN
