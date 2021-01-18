@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.22.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.22.0%0D2.21.0) (2020-10-28)
+
+
+### Features
+
+* **leaderboard:** get leaderboard list ([384495f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/384495f666fa22dde2be1e8f8367b9cec42a6714))
+
+
+### Bug Fixes
+
+* **dsm:** temporary disabling dsm-related test ([99485e6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/99485e668558e876e6e11e65fee6bc1558048faa))
+
+
+### Tests
+
+* **Daily Test:** SDET-1166 Run SDK Automation Test Daily and Send report to slack channel ([acb8033](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/acb80338e38dd0961af50f5d6240a8835d83d1ec))
+
 ## [2.21.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.21.0%0D2.20.0) (2020-10-14)
 
 

@@ -11,6 +11,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string Namespace { get; set; }
         [DataMember] public bool UseSessionManagement { get; set; }
+        [DataMember] public bool UsePlayerPrefs { get; set; }
         [DataMember] public string BaseUrl { get; set; }
         [DataMember] public string ApiBaseUrl { get; set; }
         [DataMember] public string NonApiBaseUrl { get; set; }
@@ -46,6 +47,7 @@ namespace AccelByte.Models
         {
             if (this.Namespace == anotherConfig.Namespace &&
                 this.UseSessionManagement == anotherConfig.UseSessionManagement &&
+                this.UsePlayerPrefs == anotherConfig.UsePlayerPrefs &&
                 this.BaseUrl == anotherConfig.BaseUrl &&
                 this.ApiBaseUrl == anotherConfig.ApiBaseUrl &&
                 this.NonApiBaseUrl == anotherConfig.NonApiBaseUrl &&

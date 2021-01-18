@@ -117,5 +117,24 @@ namespace AccelByte.Api
                     string.Format("{0}_{1}", userId, additionalKey),
                     callback));
         }
+
+        public void GetLeaderboardList(ResultCallback<LeaderboardPagedList> callback, int offset = 0, int limit = 0)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetLeaderboardList(
+                    this.@namespace,
+                    this.session.AuthorizationToken,
+                    offset,
+                    limit,
+                    callback));
+        }
     }
 }

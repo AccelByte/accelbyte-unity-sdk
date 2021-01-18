@@ -52,4 +52,20 @@ namespace AccelByte.Models
         [DataMember] public UserPoint[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
+
+    [DataContract]
+    public class LeaderboardData
+    {
+        [DataMember] public string iconURL { get; set; }
+        [DataMember] public string leaderboardCode { get; set; }
+        [DataMember] public string name { get; set; }
+        [DataMember] public string statCode { get; set; }
+    }
+
+    [DataContract]
+    public class LeaderboardPagedList
+    {
+        [DataMember] public LeaderboardData[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
+    }
 }

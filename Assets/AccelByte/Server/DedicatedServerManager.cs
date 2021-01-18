@@ -2,12 +2,12 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
 using UnityEngine;
-using System;
+using UnityEngine.Assertions;
 
 //TODO: Do authentication using server creadentials
 
@@ -159,12 +159,18 @@ namespace AccelByte.Server
 
             this.name = Environment.GetEnvironmentVariable("POD_NAME");
             var request = new RegisterServerRequest {pod_name = this.name, port = portNumber};
-            this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, callback));
-
-            if (this.isHeartBeatAutomatic)
+            this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, (Result result) =>
             {
-                this.heartBeatCoroutine = this.coroutineRunner.Run(RunPeriodicHeartBeat());
-            }
+                if (!result.IsError)
+                {
+                    if (this.isHeartBeatAutomatic && this.heartBeatCoroutine == null)
+                    {
+                        this.heartBeatCoroutine = this.coroutineRunner.Run(RunPeriodicHeartBeat());
+                    }
+                }
+
+                callback.Try(result);
+            }));
         }
 
         /// <summary>
@@ -176,17 +182,17 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name);
 
+            if (this.heartBeatCoroutine != null)
+            {
+                this.coroutineRunner.Stop(this.heartBeatCoroutine);
+                this.heartBeatCoroutine = null;
+            }
+            
             if (!this.serverSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
-            }
-
-            if (this.heartBeatCoroutine != null)
-            {
-                this.coroutineRunner.Stop(this.heartBeatCoroutine);
-                this.heartBeatCoroutine = null;
             }
 
             var request = new ShutdownServerRequest
@@ -220,12 +226,18 @@ namespace AccelByte.Server
             this.name = name;
             var request = new RegisterLocalServerRequest {ip = ip, port = port, name = name};
             string authToken = this.serverSession.AuthorizationToken;
-            this.coroutineRunner.Run(this.api.RegisterLocalServer(request, authToken, callback));
-            
-            if (this.isHeartBeatAutomatic)
+            this.coroutineRunner.Run(this.api.RegisterLocalServer(request, authToken, (Result result) =>
             {
-                this.heartBeatCoroutine = this.coroutineRunner.Run(RunPeriodicHeartBeat());
-            }
+                if (!result.IsError)
+                {
+                    if (this.isHeartBeatAutomatic && this.heartBeatCoroutine == null)
+                    {
+                        this.heartBeatCoroutine = this.coroutineRunner.Run(RunPeriodicHeartBeat());
+                    }
+                }
+
+                callback.Try(result);
+            }));
         }
 
         /// <summary>
@@ -236,17 +248,17 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name);
 
+            if (this.heartBeatCoroutine != null)
+            {
+                this.coroutineRunner.Stop(this.heartBeatCoroutine);
+                this.heartBeatCoroutine = null;
+            }
+
             if (!this.serverSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
-            }
-
-            if (this.heartBeatCoroutine != null)
-            {
-                this.coroutineRunner.Stop(this.heartBeatCoroutine);
-                this.heartBeatCoroutine = null;
             }
             
             string authToken = this.serverSession.AuthorizationToken;

@@ -101,5 +101,29 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+
+        public IEnumerator GetLeaderboardList(string @namespace, string accessToken, int offset, int limit, ResultCallback<LeaderboardPagedList> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(@namespace, "Can't get leaderboard! Namespace parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/leaderboards")
+                .WithPathParam("namespace", @namespace)
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+                .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
+                .WithBearerAuth(accessToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<LeaderboardPagedList>();
+
+            callback.Try(result);
+        }
     }
 }

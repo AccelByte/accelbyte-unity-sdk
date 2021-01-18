@@ -78,6 +78,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Use PlayerPrefs");
+            TemporarySetting.UsePlayerPrefs = EditorGUILayout.Toggle(TemporarySetting.UsePlayerPrefs);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Base Url");
             TemporarySetting.BaseUrl = EditorGUILayout.TextField(TemporarySetting.BaseUrl);
             EditorGUILayout.EndHorizontal();

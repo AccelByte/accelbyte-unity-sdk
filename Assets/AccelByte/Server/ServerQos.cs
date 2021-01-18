@@ -9,10 +9,11 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
+using Debug = UnityEngine.Debug;
 
 namespace AccelByte.Server
 {
@@ -59,13 +60,17 @@ namespace AccelByte.Server
                     stopwatch.Restart();
                     IAsyncResult asyncResult = udpClient.BeginSend(sendBytes, sendBytes.Length, null, null);
 
-                    yield return new WaitUntil(() => asyncResult.IsCompleted);
+                    yield return WaitUntil(() => asyncResult.IsCompleted, 15*1000);
 
                     udpClient.EndSend(asyncResult);
                     var remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
                     asyncResult = udpClient.BeginReceive(null, null);
 
-                    yield return new WaitUntil(() => asyncResult.IsCompleted);
+                    yield return WaitUntil(() => asyncResult.IsCompleted, 15*1000);
+                    if (!asyncResult.IsCompleted)
+                    {
+                        Debug.Log($"[QOS] timeout to PING {server.ip}");
+                    }
 
                     udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
                     latencies[server.region] = stopwatch.Elapsed.Milliseconds;
@@ -73,6 +78,16 @@ namespace AccelByte.Server
             }
 
             callback.TryOk(latencies);
+        }
+        
+        private static IEnumerator WaitUntil(Func<bool> condition, int timeoutMs)
+        {
+            while (!condition.Invoke() && timeoutMs > 0)
+            {
+                Thread.Sleep(100);
+                timeoutMs -= 100;
+                yield return null;
+            }
         }
     }
 }

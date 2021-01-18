@@ -2,6 +2,7 @@
   "Namespace": "<YOUR-GAME-NAMESPACE>",
   "PublisherNamespace" : "<YOUR-PUBLISHER-NAMESPACE>",
   "UseSessionManagement": true,
+  "UsePlayerPrefs": false,
   "BaseUrl": "https://api.demo.accelbyte.io",
   "ApiBaseUrl": "https://api.demo.accelbyte.io",
   "NonApiBaseUrl": "https://demo.accelbyte.io",

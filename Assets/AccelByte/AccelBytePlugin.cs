@@ -126,7 +126,9 @@ namespace AccelByte.Api
                     AccelBytePlugin.config.ClientSecret,
                     AccelBytePlugin.config.RedirectUri,
                     AccelBytePlugin.httpWorker,
-                    AccelBytePlugin.coroutineRunner, AccelBytePlugin.config.UseSessionManagement);
+                    AccelBytePlugin.coroutineRunner,
+                    AccelBytePlugin.config.UseSessionManagement,
+                    AccelBytePlugin.config.UsePlayerPrefs);
 
 
             AccelBytePlugin.user = new User(

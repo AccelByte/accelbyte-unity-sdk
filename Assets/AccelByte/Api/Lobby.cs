@@ -139,6 +139,7 @@ namespace AccelByte.Api
         private readonly object syncToken = new object();
         private readonly IWebSocket webSocket;
         private bool reconnectsOnClose;
+        private WsCloseCode wsCloseCode = WsCloseCode.NotSet;
         private long id;
         private LobbySessionId lobbySessionId;
         private Coroutine maintainConnectionCoroutine;
@@ -187,12 +188,33 @@ namespace AccelByte.Api
                 throw new Exception("Cannot connect to websocket because user is not logged in.");
             }
 
+            if (this.IsConnected)
+            {
+                Debug.LogWarning("[Lobby] already connected");
+                return;
+            }
+            
+            if (this.webSocket.ReadyState == WsState.Connecting)
+            {
+                Debug.LogWarning("[Lobby] lobby is connecting");
+                return;
+            }
+
+            this.wsCloseCode = WsCloseCode.NotSet;
             this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
-            StartMaintainConnection();
+
+            // check status after connect, only maintain connection when close code is reconnectable
+            if (this.wsCloseCode == WsCloseCode.NotSet || isReconnectable(this.wsCloseCode))
+            {
+                StartMaintainConnection();
+            }
         }
 
         private void StartMaintainConnection()
         {
+#if DEBUG
+            Debug.Log("[Lobby] Start Maintaining connection: " + wsCloseCode);
+#endif
             this.reconnectsOnClose = true;
             this.maintainConnectionCoroutine = this.coroutineRunner.Run(
                 MaintainConnection(this.backoffDelay, this.maxDelay, this.totalTimeout));
@@ -200,6 +222,9 @@ namespace AccelByte.Api
 
         private void StopMaintainConnection()
         {
+#if DEBUG
+            Debug.Log("[Lobby] Stop Maintaining connection: " + wsCloseCode);
+#endif
             this.reconnectsOnClose = false;
 
             if (this.maintainConnectionCoroutine == null) return;
@@ -246,14 +271,21 @@ namespace AccelByte.Api
                     System.Random rand = new System.Random();
                     int nextDelay = backoffDelay;
                     var firstClosedTime = DateTime.Now;
+                    var timeout = TimeSpan.FromSeconds(totalTimeout / 1000f);
 
                     while (this.reconnectsOnClose &&
                         this.webSocket.ReadyState == WsState.Closed &&
-                        DateTime.Now - firstClosedTime < TimeSpan.FromSeconds(totalTimeout))
+                        DateTime.Now - firstClosedTime < timeout)
                     {
+                        // debug ws connection
+#if DEBUG
+                        Debug.Log("[WS] Re-Connecting");
+#endif
                         this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
                         float randomizedDelay = (float) (nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
-
+#if DEBUG
+                        Debug.Log("[WS] Next reconnection in: " + randomizedDelay);
+#endif
                         yield return new WaitForSeconds(randomizedDelay / 1000f);
 
                         nextDelay *= 2;
@@ -989,6 +1021,10 @@ namespace AccelByte.Api
 
         private void HandleOnOpen()
         {
+            // debug ws connection
+#if DEBUG
+            Debug.Log("[WS] Connection open");
+#endif
             this.coroutineRunner.Run(
                 () =>
                 {
@@ -1003,23 +1039,26 @@ namespace AccelByte.Api
 
         private void HandleOnClose(ushort closecode)
         {
+            // debug ws connection
+#if DEBUG
+            Debug.Log("[WS] Connection close: " + closecode);
+#endif
+            var code = (WsCloseCode)closecode;
+            this.wsCloseCode = code;
             this.coroutineRunner.Run(
                 () =>
                 {
-                    var code = (WsCloseCode)closecode;
                     if (!isReconnectable(code))
                     {
                         StopMaintainConnection();
                     }
-
+                    
                     Action<WsCloseCode> handler = this.Disconnected;
 
                     if (handler != null)
                     {
                         handler(code);
                     }
-
-                    ;
                 });
         }
 

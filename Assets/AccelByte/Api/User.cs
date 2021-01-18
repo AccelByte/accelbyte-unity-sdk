@@ -49,10 +49,11 @@ namespace AccelByte.Api
         /// <param name="username">Could be email or phone (right now, only email supported)</param>
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithUsername(string username, string password, ResultCallback callback)
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        public void LoginWithUsername(string username, string password, ResultCallback callback, bool rememberMe = false)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback));
+            this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback, rememberMe));
         }
 
         private IEnumerator LoginAsync(Func<ResultCallback, IEnumerator> loginMethod, ResultCallback callback)
@@ -94,9 +95,9 @@ namespace AccelByte.Api
             callback.TryOk();
         }
 
-        private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback callback)
+        private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback callback, bool rememberMe = false)
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb), callback);
+            yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb, rememberMe), callback);
         }
 
         /// <summary>
@@ -152,6 +153,33 @@ namespace AccelByte.Api
         private IEnumerator LoginWithDeviceIdAsync(ResultCallback callback)
         {
             yield return LoginAsync(this.loginSession.LoginWithDeviceId, callback);
+        }
+
+        /// <summary>
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
+        /// </summary>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void LoginWithLatestRefreshToken(ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
+        }
+
+        /// <summary>
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
+        /// </summary>
+        /// <param name="refreshToken">The latest user's refresh token</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void LoginWithLatestRefreshToken(string refreshToken, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
+        }
+
+        private IEnumerator LoginWithLatestRefreshTokenAsync(string refreshToken, ResultCallback callback)
+        {
+            
+            yield return LoginAsync(cb => this.loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
         }
 
         /// <summary>
@@ -691,6 +719,11 @@ namespace AccelByte.Api
                 };
 
             AccelBytePlugin.GetItems().GetItemByAppId(AccelBytePlugin.Config.AppId, onGotItemInfo);
+        }
+
+        public void RefreshTokenCallback(Action<string> refreshTokenCallback)
+        {
+            this.loginSession.RefreshTokenCallback += refreshTokenCallback;
         }
     }
 }

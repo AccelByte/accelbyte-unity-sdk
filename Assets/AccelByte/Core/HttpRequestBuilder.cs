@@ -66,7 +66,10 @@ namespace AccelByte.Core
             Assert.IsNotNull(value, $"query value is null for key {key}");
             
             string formatString = this.result.BaseUrlLength == this.result.UrlBuilder.Length ? "?{0}={1}" : "&{0}={1}";
-            this.result.UrlBuilder.AppendFormat(formatString, Uri.EscapeDataString(key), Uri.EscapeDataString(value));
+            if (!string.IsNullOrEmpty(value))
+            {
+                this.result.UrlBuilder.AppendFormat(formatString, Uri.EscapeDataString(key), Uri.EscapeDataString(value));
+            }
 
             return this;
         }
