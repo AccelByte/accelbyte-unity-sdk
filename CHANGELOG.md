@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.23.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.23.0%0D2.22.0) (2020-11-11)
+
+
+### Features
+
+* **Lobby:** bulk user presence ([57a6b2a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/57a6b2a558b5d1363ea31ecee41a40e4aaf67b87))
+* **user:** stadia login and account link ([800a558](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/800a558c1a10c9af30a122879bdef6f2fff5ec49))
+
 ## [2.22.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.22.0%0D2.21.0) (2020-10-28)
 
 

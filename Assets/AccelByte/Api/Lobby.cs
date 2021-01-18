@@ -59,12 +59,12 @@ namespace AccelByte.Api
         /// <summary>
         /// Raised when personal chat message received.
         /// </summary>
-        public event ResultCallback<ChatMesssage> PersonalChatReceived;
+        public event ResultCallback<ChatMessage> PersonalChatReceived;
 
         /// <summary>
         /// Raised when party chat message received.
         /// </summary>
-        public event ResultCallback<ChatMesssage> PartyChatReceived;
+        public event ResultCallback<ChatMessage> PartyChatReceived;
 
         /// <summary>
         /// Raised when a notification (usually from the system or admin) is received.
@@ -587,6 +587,30 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(MessageType.getFriendshipStatusRequest, new Friend {friendId = userId}, callback);
+        }
+
+        /// <summary>
+        /// Send request get user presence in bulk.
+        /// </summary>
+        /// <param name="userIds">requested userIds</param>
+        /// <param name="callback">Returns a Result that contains BulkUserStatusNotif via callback when completed.</param>
+        public void BulkGetUserPresence(string[] userIds, ResultCallback<BulkUserStatusNotif> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.BulkGetUserPresence(
+                    this.@namespace,
+                    userIds,
+                    this.session.AuthorizationToken,
+                    callback));
         }
 
         /// <summary>

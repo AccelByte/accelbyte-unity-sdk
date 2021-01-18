@@ -320,6 +320,11 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
 
+            if (platformType == PlatformType.Stadia)
+            {
+                platformToken = platformToken.TrimEnd('=');
+            }
+
             var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LoginWithOtherPlatformPath)
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBasicAuth(this.clientId, this.clientSecret)

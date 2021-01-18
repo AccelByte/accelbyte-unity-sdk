@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -115,6 +116,30 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<BlockerList>();
+
+            callback.Try(result);
+        }
+        
+        public IEnumerator BulkGetUserPresence(string @namespace, ICollection<string> userIds, string accessToken, ResultCallback<BulkUserStatusNotif> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/lobby/v1/public/presence/namespaces/{namespace}/users/presence")
+                .WithPathParam("namespace", @namespace)
+                .WithQueryParam("userIds", string.Join(",", userIds))
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<BulkUserStatusNotif>();
 
             callback.Try(result);
         }

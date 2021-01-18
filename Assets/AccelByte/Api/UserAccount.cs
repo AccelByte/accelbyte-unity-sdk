@@ -271,6 +271,11 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(ticket, "Can't link platform account! Password parameter is null!");
 
+            if (platformType == PlatformType.Stadia)
+            {
+                ticket = ticket.TrimEnd('=');
+            }
+
             var request = HttpRequestBuilder
                 .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)

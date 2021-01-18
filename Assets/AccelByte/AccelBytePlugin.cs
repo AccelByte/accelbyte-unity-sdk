@@ -91,13 +91,14 @@ namespace AccelByte.Api
         private static void Init()
         {
 #endif
-#if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH) && !UNITY_EDITOR
+#if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH || UNITY_STADIA || ENABLE_IL2CPP) && !UNITY_EDITOR
             Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
                 new [] {
-                    Utf8Json.Formatters.PrimitiveObjectFormatter.Default
+                    Utf8Json.Formatters.CustomPrimitiveObjectFormatter.Default
                 },
                 new[] {
                     Utf8Json.Resolvers.GeneratedResolver.Instance,
+                    Utf8Json.Resolvers.DynamicGenericResolver.Instance,
                     Utf8Json.Resolvers.BuiltinResolver.Instance,
                     Utf8Json.Resolvers.EnumResolver.Default,
                     // for unity

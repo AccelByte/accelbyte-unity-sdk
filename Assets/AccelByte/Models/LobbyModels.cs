@@ -126,7 +126,7 @@ namespace AccelByte.Models
     #region Personal Chat
 
     [DataContract]
-    public class ChatMesssage
+    public class ChatMessage
     {
         [DataMember] public string id;
         [DataMember] public string from;
@@ -397,6 +397,14 @@ namespace AccelByte.Models
         Busy = 2,
         Invisible = 3
     }
+
+    public enum GeneralUserStatus
+    {
+        offline,
+        online,
+        busy,
+        invisible
+    }
     
     [DataContract]
     public class FriendsStatusNotif
@@ -420,6 +428,21 @@ namespace AccelByte.Models
         [DataMember] public string[] onlineFriendsId;
     }
     
+    [DataContract]
+    public class UserStatusNotif
+    {
+        [DataMember] public string userID;
+        [DataMember] public GeneralUserStatus availability;
+        [DataMember] public string activity;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public DateTime lastSeenAt;
+    }
+
+    [DataContract]
+    public class BulkUserStatusNotif
+    {
+        [DataMember] public UserStatusNotif[] data;
+    }
     #endregion
 
     #region Block/Unblock
