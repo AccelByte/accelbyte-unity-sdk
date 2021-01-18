@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine.Networking;
-using Debug = UnityEngine.Debug;
 
 namespace AccelByte.Core
 {
@@ -23,7 +22,7 @@ namespace AccelByte.Core
             catch (System.Exception){}
 #endif
 
-            Debug.Log("Current Function Called: \n" +
+            AccelByteDebug.Log("Current Function Called: \n" +
                 "---\n" + 
                 "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
                 "Class : " + className + "\n" +
@@ -54,12 +53,12 @@ namespace AccelByte.Core
                 requestBody +
                 "\n---\n";
 
-            Debug.Log(tempLog);
+            AccelByteDebug.Log(tempLog);
         }
 
         public static void GetHttpResponse(UnityWebRequest unityWebRequest)
         {
-            Debug.Log("HTTP Response: \n" +
+            AccelByteDebug.Log("HTTP Response: \n" +
                 "---\n" +
                 "HTTP/1.1 " + unityWebRequest.responseCode + "\n" +
                 "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
@@ -70,7 +69,7 @@ namespace AccelByte.Core
 
         public static void GetWebSocketRequest(string message)
         {
-            Debug.Log("WebSocket Send Message: \n" +
+            AccelByteDebug.Log("WebSocket Send Message: \n" +
                 "---\n" +
                 message +
                 "\n---\n");
@@ -78,7 +77,7 @@ namespace AccelByte.Core
 
         public static void GetWebSocketResponse(string message)
         {
-            Debug.Log("WebSocket Receive Message: \n" +
+            AccelByteDebug.Log("WebSocket Receive Message: \n" +
                 "---\n" +
                 message +
                 "\n---\n");
@@ -86,7 +85,7 @@ namespace AccelByte.Core
 
         public static void GetWebSocketNotification(string message)
         {
-            Debug.Log("WebSocket Receive Notification: \n" +
+            AccelByteDebug.Log("WebSocket Receive Notification: \n" +
                 "---\n" +
                 message +
                 "\n---\n");

@@ -4136,29 +4136,31 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("Namespace"), 0},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("UseSessionManagement"), 1},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("UsePlayerPrefs"), 2},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BaseUrl"), 3},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ApiBaseUrl"), 4},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("NonApiBaseUrl"), 5},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LoginServerUrl"), 6},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 7},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 8},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BasicServerUrl"), 9},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 10},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudStorageServerUrl"), 11},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameProfileServerUrl"), 12},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 13},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 14},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AgreementServerUrl"), 15},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LeaderboardServerUrl"), 16},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 17},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 18},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 19},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 20},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 21},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GroupServerUrl"), 22},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 23},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 24},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 25},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("EnableDebugLog"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("DebugLogFilter"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BaseUrl"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ApiBaseUrl"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("NonApiBaseUrl"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LoginServerUrl"), 8},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 9},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 10},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BasicServerUrl"), 11},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 12},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudStorageServerUrl"), 13},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameProfileServerUrl"), 14},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 15},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 16},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AgreementServerUrl"), 17},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LeaderboardServerUrl"), 18},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 19},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 20},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 21},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 22},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 23},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GroupServerUrl"), 24},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 25},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 26},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 27},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -4166,6 +4168,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("Namespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("UseSessionManagement"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("UsePlayerPrefs"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("EnableDebugLog"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("DebugLogFilter"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("BaseUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ApiBaseUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("NonApiBaseUrl"),
@@ -4209,50 +4213,54 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[2]);
             writer.WriteBoolean(value.UsePlayerPrefs);
             writer.WriteRaw(this.____stringByteKeys[3]);
-            writer.WriteString(value.BaseUrl);
+            writer.WriteBoolean(value.EnableDebugLog);
             writer.WriteRaw(this.____stringByteKeys[4]);
-            writer.WriteString(value.ApiBaseUrl);
+            writer.WriteString(value.DebugLogFilter);
             writer.WriteRaw(this.____stringByteKeys[5]);
-            writer.WriteString(value.NonApiBaseUrl);
+            writer.WriteString(value.BaseUrl);
             writer.WriteRaw(this.____stringByteKeys[6]);
-            writer.WriteString(value.LoginServerUrl);
+            writer.WriteString(value.ApiBaseUrl);
             writer.WriteRaw(this.____stringByteKeys[7]);
-            writer.WriteString(value.IamServerUrl);
+            writer.WriteString(value.NonApiBaseUrl);
             writer.WriteRaw(this.____stringByteKeys[8]);
-            writer.WriteString(value.PlatformServerUrl);
+            writer.WriteString(value.LoginServerUrl);
             writer.WriteRaw(this.____stringByteKeys[9]);
-            writer.WriteString(value.BasicServerUrl);
+            writer.WriteString(value.IamServerUrl);
             writer.WriteRaw(this.____stringByteKeys[10]);
-            writer.WriteString(value.LobbyServerUrl);
+            writer.WriteString(value.PlatformServerUrl);
             writer.WriteRaw(this.____stringByteKeys[11]);
-            writer.WriteString(value.CloudStorageServerUrl);
+            writer.WriteString(value.BasicServerUrl);
             writer.WriteRaw(this.____stringByteKeys[12]);
-            writer.WriteString(value.GameProfileServerUrl);
+            writer.WriteString(value.LobbyServerUrl);
             writer.WriteRaw(this.____stringByteKeys[13]);
-            writer.WriteString(value.StatisticServerUrl);
+            writer.WriteString(value.CloudStorageServerUrl);
             writer.WriteRaw(this.____stringByteKeys[14]);
-            writer.WriteString(value.QosManagerServerUrl);
+            writer.WriteString(value.GameProfileServerUrl);
             writer.WriteRaw(this.____stringByteKeys[15]);
-            writer.WriteString(value.AgreementServerUrl);
+            writer.WriteString(value.StatisticServerUrl);
             writer.WriteRaw(this.____stringByteKeys[16]);
-            writer.WriteString(value.LeaderboardServerUrl);
+            writer.WriteString(value.QosManagerServerUrl);
             writer.WriteRaw(this.____stringByteKeys[17]);
-            writer.WriteString(value.CloudSaveServerUrl);
+            writer.WriteString(value.AgreementServerUrl);
             writer.WriteRaw(this.____stringByteKeys[18]);
-            writer.WriteString(value.GameTelemetryServerUrl);
+            writer.WriteString(value.LeaderboardServerUrl);
             writer.WriteRaw(this.____stringByteKeys[19]);
-            writer.WriteString(value.AchievementServerUrl);
+            writer.WriteString(value.CloudSaveServerUrl);
             writer.WriteRaw(this.____stringByteKeys[20]);
-            writer.WriteString(value.ClientId);
+            writer.WriteString(value.GameTelemetryServerUrl);
             writer.WriteRaw(this.____stringByteKeys[21]);
-            writer.WriteString(value.ClientSecret);
+            writer.WriteString(value.AchievementServerUrl);
             writer.WriteRaw(this.____stringByteKeys[22]);
-            writer.WriteString(value.GroupServerUrl);
+            writer.WriteString(value.ClientId);
             writer.WriteRaw(this.____stringByteKeys[23]);
-            writer.WriteString(value.RedirectUri);
+            writer.WriteString(value.ClientSecret);
             writer.WriteRaw(this.____stringByteKeys[24]);
-            writer.WriteString(value.AppId);
+            writer.WriteString(value.GroupServerUrl);
             writer.WriteRaw(this.____stringByteKeys[25]);
+            writer.WriteString(value.RedirectUri);
+            writer.WriteRaw(this.____stringByteKeys[26]);
+            writer.WriteString(value.AppId);
+            writer.WriteRaw(this.____stringByteKeys[27]);
             writer.WriteString(value.PublisherNamespace);
             
             writer.WriteEndObject();
@@ -4272,6 +4280,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __UseSessionManagement__b__ = false;
             var __UsePlayerPrefs__ = default(bool);
             var __UsePlayerPrefs__b__ = false;
+            var __EnableDebugLog__ = default(bool);
+            var __EnableDebugLog__b__ = false;
+            var __DebugLogFilter__ = default(string);
+            var __DebugLogFilter__b__ = false;
             var __BaseUrl__ = default(string);
             var __BaseUrl__b__ = false;
             var __ApiBaseUrl__ = default(string);
@@ -4346,94 +4358,102 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __UsePlayerPrefs__b__ = true;
                         break;
                     case 3:
+                        __EnableDebugLog__ = reader.ReadBoolean();
+                        __EnableDebugLog__b__ = true;
+                        break;
+                    case 4:
+                        __DebugLogFilter__ = reader.ReadString();
+                        __DebugLogFilter__b__ = true;
+                        break;
+                    case 5:
                         __BaseUrl__ = reader.ReadString();
                         __BaseUrl__b__ = true;
                         break;
-                    case 4:
+                    case 6:
                         __ApiBaseUrl__ = reader.ReadString();
                         __ApiBaseUrl__b__ = true;
                         break;
-                    case 5:
+                    case 7:
                         __NonApiBaseUrl__ = reader.ReadString();
                         __NonApiBaseUrl__b__ = true;
                         break;
-                    case 6:
+                    case 8:
                         __LoginServerUrl__ = reader.ReadString();
                         __LoginServerUrl__b__ = true;
                         break;
-                    case 7:
+                    case 9:
                         __IamServerUrl__ = reader.ReadString();
                         __IamServerUrl__b__ = true;
                         break;
-                    case 8:
+                    case 10:
                         __PlatformServerUrl__ = reader.ReadString();
                         __PlatformServerUrl__b__ = true;
                         break;
-                    case 9:
+                    case 11:
                         __BasicServerUrl__ = reader.ReadString();
                         __BasicServerUrl__b__ = true;
                         break;
-                    case 10:
+                    case 12:
                         __LobbyServerUrl__ = reader.ReadString();
                         __LobbyServerUrl__b__ = true;
                         break;
-                    case 11:
+                    case 13:
                         __CloudStorageServerUrl__ = reader.ReadString();
                         __CloudStorageServerUrl__b__ = true;
                         break;
-                    case 12:
+                    case 14:
                         __GameProfileServerUrl__ = reader.ReadString();
                         __GameProfileServerUrl__b__ = true;
                         break;
-                    case 13:
+                    case 15:
                         __StatisticServerUrl__ = reader.ReadString();
                         __StatisticServerUrl__b__ = true;
                         break;
-                    case 14:
+                    case 16:
                         __QosManagerServerUrl__ = reader.ReadString();
                         __QosManagerServerUrl__b__ = true;
                         break;
-                    case 15:
+                    case 17:
                         __AgreementServerUrl__ = reader.ReadString();
                         __AgreementServerUrl__b__ = true;
                         break;
-                    case 16:
+                    case 18:
                         __LeaderboardServerUrl__ = reader.ReadString();
                         __LeaderboardServerUrl__b__ = true;
                         break;
-                    case 17:
+                    case 19:
                         __CloudSaveServerUrl__ = reader.ReadString();
                         __CloudSaveServerUrl__b__ = true;
                         break;
-                    case 18:
+                    case 20:
                         __GameTelemetryServerUrl__ = reader.ReadString();
                         __GameTelemetryServerUrl__b__ = true;
                         break;
-                    case 19:
+                    case 21:
                         __AchievementServerUrl__ = reader.ReadString();
                         __AchievementServerUrl__b__ = true;
                         break;
-                    case 20:
+                    case 22:
                         __ClientId__ = reader.ReadString();
                         __ClientId__b__ = true;
                         break;
-                    case 21:
+                    case 23:
                         __ClientSecret__ = reader.ReadString();
                         __ClientSecret__b__ = true;
                         break;
-                    case 22:
+                    case 24:
                         __GroupServerUrl__ = reader.ReadString();
                         __GroupServerUrl__b__ = true;
                         break;
-                    case 23:
+                    case 25:
                         __RedirectUri__ = reader.ReadString();
                         __RedirectUri__b__ = true;
                         break;
-                    case 24:
+                    case 26:
                         __AppId__ = reader.ReadString();
                         __AppId__b__ = true;
                         break;
-                    case 25:
+                    case 27:
                         __PublisherNamespace__ = reader.ReadString();
                         __PublisherNamespace__b__ = true;
                         break;
@@ -4450,6 +4470,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
             if(__UseSessionManagement__b__) ____result.UseSessionManagement = __UseSessionManagement__;
             if(__UsePlayerPrefs__b__) ____result.UsePlayerPrefs = __UsePlayerPrefs__;
+            if(__EnableDebugLog__b__) ____result.EnableDebugLog = __EnableDebugLog__;
+            if(__DebugLogFilter__b__) ____result.DebugLogFilter = __DebugLogFilter__;
             if(__BaseUrl__b__) ____result.BaseUrl = __BaseUrl__;
             if(__ApiBaseUrl__b__) ____result.ApiBaseUrl = __ApiBaseUrl__;
             if(__NonApiBaseUrl__b__) ____result.NonApiBaseUrl = __NonApiBaseUrl__;
@@ -16473,6 +16495,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("clientVersion"), 2},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("latencies"), 3},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("partyAttributes"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("tempParty"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("isTempParty"), 6},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -16482,6 +16506,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("clientVersion"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("latencies"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("partyAttributes"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("tempParty"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("isTempParty"),
                 
             };
         }
@@ -16505,6 +16531,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.latencies);
             writer.WriteRaw(this.____stringByteKeys[4]);
             writer.WriteString(value.partyAttributes);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteString(value.tempParty);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            writer.WriteBoolean(value.isTempParty);
             
             writer.WriteEndObject();
         }
@@ -16527,6 +16557,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __latencies__b__ = false;
             var __partyAttributes__ = default(string);
             var __partyAttributes__b__ = false;
+            var __tempParty__ = default(string);
+            var __tempParty__b__ = false;
+            var __isTempParty__ = default(bool);
+            var __isTempParty__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -16562,6 +16596,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __partyAttributes__ = reader.ReadString();
                         __partyAttributes__b__ = true;
                         break;
+                    case 5:
+                        __tempParty__ = reader.ReadString();
+                        __tempParty__b__ = true;
+                        break;
+                    case 6:
+                        __isTempParty__ = reader.ReadBoolean();
+                        __isTempParty__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -16577,6 +16619,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__clientVersion__b__) ____result.clientVersion = __clientVersion__;
             if(__latencies__b__) ____result.latencies = __latencies__;
             if(__partyAttributes__b__) ____result.partyAttributes = __partyAttributes__;
+            if(__tempParty__b__) ____result.tempParty = __tempParty__;
+            if(__isTempParty__b__) ____result.isTempParty = __isTempParty__;
 
             return ____result;
         }

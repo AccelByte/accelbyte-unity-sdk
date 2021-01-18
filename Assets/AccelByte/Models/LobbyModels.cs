@@ -296,6 +296,8 @@ namespace AccelByte.Models
         [DataMember] public string clientVersion;
         [DataMember] public string latencies;
         [DataMember] public string partyAttributes;
+        [DataMember] public string tempParty;           // used to store userIds to form temp party with (please include the matchmaking starter's userIds)
+        [DataMember] public bool isTempParty;           // used for cancel matchmaking when using temp party
     }
 
     [DataContract]

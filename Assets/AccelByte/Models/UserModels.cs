@@ -146,7 +146,7 @@ namespace AccelByte.Models
         [DataMember] public string username { get; set; }
     }
 
-    public enum PlatformType { Steam, PS4, Live, Stadia, Google, Facebook, Twitch, Oculus, Twitter, Device }
+    public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Facebook, Twitch, Oculus, Twitter, Device }
 
     [DataContract]
     public class PlatformLink

@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using AccelByte.Models;
 
 namespace AccelByte.Api
@@ -16,6 +17,7 @@ namespace AccelByte.Api
         public Texture2D AccelByteLogo;
         public Config TemporarySetting;
         public Rect LogoRect;
+        public LogType SelectedLogFilter;
 
         [MenuItem("AccelByte/Edit Settings")]
         public static void Edit()
@@ -37,6 +39,10 @@ namespace AccelByte.Api
             AccelByteLogo = Resources.Load<Texture2D>("ab-logo");
             this.TemporarySetting = AccelByteSettings.Instance.CopyConfig();
             LogoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
+            if( !Enum.TryParse( this.TemporarySetting.DebugLogFilter, out SelectedLogFilter ) )
+            {
+                SelectedLogFilter = LogType.Log;
+            }
         }
 
         public void CloseFinal()
@@ -80,6 +86,17 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use PlayerPrefs");
             TemporarySetting.UsePlayerPrefs = EditorGUILayout.Toggle(TemporarySetting.UsePlayerPrefs);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Enable Debug Log");
+            TemporarySetting.EnableDebugLog = EditorGUILayout.Toggle(TemporarySetting.EnableDebugLog);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField( "Log Type Filter" );
+            SelectedLogFilter = (LogType) EditorGUILayout.EnumPopup( SelectedLogFilter );
+            TemporarySetting.DebugLogFilter = SelectedLogFilter.ToString();
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

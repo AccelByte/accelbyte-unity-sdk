@@ -20,6 +20,24 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.UseSessionManagement = value; }
         }
 
+        public static bool UsePlayerPrefs
+        {
+            get { return AccelByteSettings.Instance.config.UsePlayerPrefs; }
+            set { AccelByteSettings.Instance.config.UsePlayerPrefs = value; }
+        }
+
+        public static bool EnableDebugLog
+        {
+            get { return AccelByteSettings.Instance.config.EnableDebugLog; }
+            set { AccelByteSettings.Instance.config.EnableDebugLog = value; }
+        }
+
+        public static string DebugLogFilter
+        {
+            get { return AccelByteSettings.Instance.config.DebugLogFilter; }
+            set { AccelByteSettings.Instance.config.DebugLogFilter = value; }
+        }
+
         public static string Namespace
         {
             get { return AccelByteSettings.Instance.config.Namespace; }

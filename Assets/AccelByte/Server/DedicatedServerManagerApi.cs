@@ -68,7 +68,7 @@ namespace AccelByte.Server
 
         internal DedicatedServerManagerApi(string baseUrl, string namespace_, IHttpWorker httpWorker)
         {
-            Debug.Log("ServerApi init serverapi start");
+            AccelByteDebug.Log("ServerApi init serverapi start");
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
             Assert.IsFalse(
                 string.IsNullOrEmpty(namespace_),
@@ -340,7 +340,7 @@ namespace AccelByte.Server
             bool isGameVersionFound = false;
             foreach (string arg in args)
             {
-                Debug.Log("arg: " + arg);
+                AccelByteDebug.Log("arg: " + arg);
                 if (arg.Contains("provider"))
                 {
                     string[] split = arg.Split('=');
@@ -398,23 +398,23 @@ namespace AccelByte.Server
                     if (gameServer == null && 
                         DateTime.Now.Subtract(healthCheckStarted) > agones.INITIAL_HEALTH_CHECK_TIMEOUT)
                     {
-                        Debug.Log("[Agones] GameServer is not healthy. Shutting down.");
+                        AccelByteDebug.Log("[Agones] GameServer is not healthy. Shutting down.");
                         agones.GetSDK().Shutdown();
                     }
                     else
                     {
-                        Debug.Log("[Agones] GameServer is healthy.");
+                        AccelByteDebug.Log("[Agones] GameServer is healthy.");
                         agones.SetReady(true);
                     }
                 }
                 else
                 {
-                    Debug.Log("[Agones] GameServer is not ready.");
+                    AccelByteDebug.Log("[Agones] GameServer is not ready.");
                 }
             }
             else
             {
-                Debug.Log("[Agones] Failed to establish a connection to GameServer.");
+                AccelByteDebug.Log("[Agones] Failed to establish a connection to GameServer.");
             }
             
             if (agones.IsReady())
@@ -451,7 +451,7 @@ namespace AccelByte.Server
         {
             if (await agones.GetSDK().Shutdown())
             {
-                Debug.Log("Successfully shutting down Agones GameServer.");
+                AccelByteDebug.Log("Successfully shutting down Agones GameServer.");
                 agones.SetReady(false);
                 callback.TryOk();
             }

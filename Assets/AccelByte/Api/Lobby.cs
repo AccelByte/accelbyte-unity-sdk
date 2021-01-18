@@ -190,13 +190,13 @@ namespace AccelByte.Api
 
             if (this.IsConnected)
             {
-                Debug.LogWarning("[Lobby] already connected");
+                AccelByteDebug.LogWarning("[Lobby] already connected");
                 return;
             }
             
             if (this.webSocket.ReadyState == WsState.Connecting)
             {
-                Debug.LogWarning("[Lobby] lobby is connecting");
+                AccelByteDebug.LogWarning("[Lobby] lobby is connecting");
                 return;
             }
 
@@ -213,7 +213,7 @@ namespace AccelByte.Api
         private void StartMaintainConnection()
         {
 #if DEBUG
-            Debug.Log("[Lobby] Start Maintaining connection: " + wsCloseCode);
+            AccelByteDebug.Log("[Lobby] Start Maintaining connection: " + wsCloseCode);
 #endif
             this.reconnectsOnClose = true;
             this.maintainConnectionCoroutine = this.coroutineRunner.Run(
@@ -223,7 +223,7 @@ namespace AccelByte.Api
         private void StopMaintainConnection()
         {
 #if DEBUG
-            Debug.Log("[Lobby] Stop Maintaining connection: " + wsCloseCode);
+            AccelByteDebug.Log("[Lobby] Stop Maintaining connection: " + wsCloseCode);
 #endif
             this.reconnectsOnClose = false;
 
@@ -279,12 +279,12 @@ namespace AccelByte.Api
                     {
                         // debug ws connection
 #if DEBUG
-                        Debug.Log("[WS] Re-Connecting");
+                        AccelByteDebug.Log("[WS] Re-Connecting");
 #endif
                         this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
                         float randomizedDelay = (float) (nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
 #if DEBUG
-                        Debug.Log("[WS] Next reconnection in: " + randomizedDelay);
+                        AccelByteDebug.Log("[WS] Next reconnection in: " + randomizedDelay);
 #endif
                         yield return new WaitForSeconds(randomizedDelay / 1000f);
 
@@ -722,6 +722,45 @@ namespace AccelByte.Api
         /// Send matchmaking start request.
         /// </summary>
         /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="clientVersion">Game client version to ensure match with the same version</param>
+        /// <param name="latencies">Server latencies based on regions</param>
+        /// <param name="partyAttributes"></param>
+        /// <param name="tempPartyUserIds">UserIDs to form a temporary party with (include user who started the matchmaking). Temporary party will disband when matchmaking finishes.</param>
+        /// <param name="callback">Result of the function with a start matchmaking status code.</param>
+        public void StartMatchmaking(string gameMode, string clientVersion, Dictionary<string, int> latencies,
+            Dictionary<string, object> partyAttributes, string[] tempPartyUserIds,
+            ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            string strLatencies = "";
+            if(latencies != null && latencies.Count > 0)
+            {
+                strLatencies = "{" +
+                    string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
+                    "}";
+            }
+
+            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
+            string userIdsCSV = String.Join(",", tempPartyUserIds);
+
+            SendRequest(
+                MessageType.startMatchmakingRequest,
+                new StartMatchmakingRequest
+                {
+                    gameMode = gameMode,
+                    clientVersion = clientVersion,
+                    latencies = strLatencies,
+                    partyAttributes = jsonAttributeString,
+                    tempParty = userIdsCSV
+                },
+                callback); ;
+        }
+
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
         /// <param name="serverName">Server name to do match in Local DS</param>
         /// <param name="clientVersion">Game client version to ensure match with the same version</param>
         /// <param name="partyAttributes"></param>
@@ -729,7 +768,6 @@ namespace AccelByte.Api
         public void StartMatchmaking(string gameMode, string serverName, string clientVersion, Dictionary<string, object> partyAttributes, ResultCallback<MatchmakingCode> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-
             var jsonAttributeString = partyAttributes.ToJsonString();
 
             SendRequest(
@@ -743,6 +781,37 @@ namespace AccelByte.Api
                 },
                 callback);
         }
+
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="serverName">Server name to do match in Local DS</param>
+        /// <param name="clientVersion">Game client version to ensure match with the same version</param>
+        /// <param name="partyAttributes"></param>
+        /// <param name="tempPartyUserIds">UserIDs to form a temporary party with (include user who started the matchmaking). Temporary party will disband when matchmaking finishes.</param>
+        /// <param name="callback">Result of the function with a start matchmaking status code.</param>
+        public void StartMatchmaking(string gameMode, string serverName, string clientVersion, 
+            Dictionary<string, object> partyAttributes, string[] tempPartyUserIds, 
+            ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            var jsonAttributeString = partyAttributes.ToJsonString();
+            string userIdsCSV = String.Join(",", tempPartyUserIds);
+
+            SendRequest(
+                MessageType.startMatchmakingRequest,
+                new StartMatchmakingRequest
+                {
+                    gameMode = gameMode,
+                    serverName = serverName,
+                    clientVersion = clientVersion,
+                    partyAttributes = jsonAttributeString,
+                    tempParty = userIdsCSV
+                },
+                callback);
+        }
+
 
         /// <summary>
         /// Send a message to matchmaking service to indicate the user is ready for match
@@ -766,6 +835,25 @@ namespace AccelByte.Api
             SendRequest(
                 MessageType.cancelMatchmakingRequest,
                 new StartMatchmakingRequest {gameMode = gameMode},
+                callback);
+        }
+
+        /// <summary>
+        /// Send matchmaking cancel request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="isTempParty">Is using temp party when starting matchmaking</param>
+        /// <param name="callback">Result of the function with a cancel matchmaking status code.</param>
+        public void CancelMatchmaking(string gameMode, bool isTempParty, 
+            ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(
+                MessageType.cancelMatchmakingRequest,
+                new StartMatchmakingRequest { 
+                    gameMode = gameMode,
+                    isTempParty = isTempParty
+                },
                 callback);
         }
 
@@ -1059,7 +1147,7 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            Debug.Log("[WS] Connection open");
+            AccelByteDebug.Log("[WS] Connection open");
 #endif
             this.coroutineRunner.Run(
                 () =>
@@ -1077,7 +1165,7 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            Debug.Log("[WS] Connection close: " + closecode);
+            AccelByteDebug.Log("[WS] Connection close: " + closecode);
 #endif
             var code = (WsCloseCode)closecode;
             this.wsCloseCode = code;

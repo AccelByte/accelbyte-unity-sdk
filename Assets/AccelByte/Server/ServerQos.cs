@@ -69,7 +69,7 @@ namespace AccelByte.Server
                     yield return WaitUntil(() => asyncResult.IsCompleted, 15*1000);
                     if (!asyncResult.IsCompleted)
                     {
-                        Debug.Log($"[QOS] timeout to PING {server.ip}");
+                        AccelByteDebug.Log($"[QOS] timeout to PING {server.ip}");
                     }
 
                     udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);

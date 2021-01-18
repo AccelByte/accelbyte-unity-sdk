@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.26.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.26.0%0D2.25.0) (2020-12-23)
+
+
+### Features
+
+* **lobby:** add matchmaking with temporary party ([71e23f7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/71e23f7aa54de1a5f0a0337d5bef58085bc4486a))
+* **lobby:** add matchmaking with temporary party ([28e804d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/28e804d61cb3cb5ec1311009d9ec08e2e4f78fee))
+* **log:** make toggle config to enable/disable debug log in editor ([954a715](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/954a715dbd0ae882043ebe49c0269e770eac58ae))
+* **userLogin:** add EpicGames enum ([852aa9c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/852aa9c76faf00c3db2be5c4f3377c9913c2018c))
+
 ## [2.25.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.25.0%0D2.24.0) (2020-12-10)
 
 

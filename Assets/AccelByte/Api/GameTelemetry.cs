@@ -54,7 +54,7 @@ namespace AccelByte.Api
             }
             else
             {
-                Debug.LogWarning($"Telemetry schedule interval is too small! Set to {MINIMUM_INTERVAL_TELEMETRY.TotalSeconds} seconds.");
+                AccelByteDebug.LogWarning($"Telemetry schedule interval is too small! Set to {MINIMUM_INTERVAL_TELEMETRY.TotalSeconds} seconds.");
                 telemetryInterval = MINIMUM_INTERVAL_TELEMETRY;
             }
         }

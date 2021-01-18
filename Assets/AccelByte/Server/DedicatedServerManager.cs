@@ -52,8 +52,8 @@ namespace AccelByte.Server
             this.serverSession = serverSession;
             this.api = api;
 
-            Debug.Log("Server init sessionAdapter: " + this.serverSession.AuthorizationToken);
-            Debug.Log("Server init podName: " + this.name);
+            AccelByteDebug.Log("Server init sessionAdapter: " + this.serverSession.AuthorizationToken);
+            AccelByteDebug.Log("Server init podName: " + this.name);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace AccelByte.Server
 
             if (!this.serverSession.IsValid())
             {
-                Debug.Log("Server RegisterServer session is not valid");
+                AccelByteDebug.Log("Server RegisterServer session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
