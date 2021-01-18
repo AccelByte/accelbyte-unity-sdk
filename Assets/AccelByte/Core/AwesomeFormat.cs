@@ -285,6 +285,18 @@ namespace AccelByte.Core
                         return ErrorCode.MessageFieldConversionFailed;
                     }
                 }
+                else if (fieldValue.StartsWith("{"))
+                {
+                    try
+                    {
+                        var convertedValue = Utf8Json.JsonSerializer.NonGeneric.Deserialize(fieldInfo.FieldType, fieldValue);
+                        fieldInfo.SetValue(payload, convertedValue);
+                    }
+                    catch (Exception)
+                    {
+                        return ErrorCode.MessageFieldConversionFailed;
+                    }
+                }
                 else
                 {
                     return ErrorCode.MessageFieldTypeNotSupported;

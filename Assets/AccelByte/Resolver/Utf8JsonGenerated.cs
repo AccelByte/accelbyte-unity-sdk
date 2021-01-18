@@ -17911,11 +17911,19 @@ namespace Utf8Json.Formatters.AccelByte.Models
             this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
             {
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("online"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("busy"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("invisible"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("offline"), 4},
             };
 
             this.____stringByteKeys = new byte[][]
             {
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("online"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("busy"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("invisible"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("offline"),
                 
             };
         }
@@ -17931,6 +17939,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             writer.WriteRaw(this.____stringByteKeys[0]);
             formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.UserStatusNotif[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteInt32(value.online);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteInt32(value.busy);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteInt32(value.invisible);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteInt32(value.offline);
             
             writer.WriteEndObject();
         }
@@ -17945,6 +17961,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var __data__ = default(global::AccelByte.Models.UserStatusNotif[]);
             var __data__b__ = false;
+            var __online__ = default(int);
+            var __online__b__ = false;
+            var __busy__ = default(int);
+            var __busy__b__ = false;
+            var __invisible__ = default(int);
+            var __invisible__b__ = false;
+            var __offline__ = default(int);
+            var __offline__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -17964,6 +17988,22 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __data__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.UserStatusNotif[]>().Deserialize(ref reader, formatterResolver);
                         __data__b__ = true;
                         break;
+                    case 1:
+                        __online__ = reader.ReadInt32();
+                        __online__b__ = true;
+                        break;
+                    case 2:
+                        __busy__ = reader.ReadInt32();
+                        __busy__b__ = true;
+                        break;
+                    case 3:
+                        __invisible__ = reader.ReadInt32();
+                        __invisible__b__ = true;
+                        break;
+                    case 4:
+                        __offline__ = reader.ReadInt32();
+                        __offline__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -17975,6 +18015,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var ____result = new global::AccelByte.Models.BulkUserStatusNotif();
             if(__data__b__) ____result.data = __data__;
+            if(__online__b__) ____result.online = __online__;
+            if(__busy__b__) ____result.busy = __busy__;
+            if(__invisible__b__) ____result.invisible = __invisible__;
+            if(__offline__b__) ____result.offline = __offline__;
 
             return ____result;
         }

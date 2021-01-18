@@ -120,7 +120,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
         
-        public IEnumerator BulkGetUserPresence(string @namespace, ICollection<string> userIds, string accessToken, ResultCallback<BulkUserStatusNotif> callback)
+        public IEnumerator BulkGetUserPresence(string @namespace, ICollection<string> userIds, string accessToken, ResultCallback<BulkUserStatusNotif> callback, bool countOnly = false)
         {
             Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
             Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
@@ -130,6 +130,7 @@ namespace AccelByte.Api
                 .CreateGet(this.baseUrl + "/lobby/v1/public/presence/namespaces/{namespace}/users/presence")
                 .WithPathParam("namespace", @namespace)
                 .WithQueryParam("userIds", string.Join(",", userIds))
+                .WithQueryParam("countOnly", countOnly ? "true" : "false")
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)

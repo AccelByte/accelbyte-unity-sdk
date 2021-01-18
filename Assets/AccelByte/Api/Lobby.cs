@@ -594,7 +594,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userIds">requested userIds</param>
         /// <param name="callback">Returns a Result that contains BulkUserStatusNotif via callback when completed.</param>
-        public void BulkGetUserPresence(string[] userIds, ResultCallback<BulkUserStatusNotif> callback)
+        public void BulkGetUserPresence(string[] userIds, ResultCallback<BulkUserStatusNotif> callback, bool countOnly = false)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -610,7 +610,8 @@ namespace AccelByte.Api
                     this.@namespace,
                     userIds,
                     this.session.AuthorizationToken,
-                    callback));
+                    callback,
+                    countOnly));
         }
 
         /// <summary>

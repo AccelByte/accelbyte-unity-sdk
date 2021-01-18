@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.25.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.25.0%0D2.24.0) (2020-12-10)
+
+
+### Features
+
+* **lobby:** bulk presence count ([04320e8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/04320e8f3de3eb7f022b3dfbac5fedc2cb60a662))
+* **lobby:** support parse lobby message object value ([b974900](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b9749005649db5784c42de57772e6f2a3fd147a9))
+
+
+### Bug Fixes
+
+* login with launcher, calls error callback when the game is not launched from launcher instead of throw assertion ([cdc8c31](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/cdc8c31f0481cdb87acacacd53603879e044f5cc))
+
 ## [2.24.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.24.0%0D2.23.0) (2020-11-25)
 
 

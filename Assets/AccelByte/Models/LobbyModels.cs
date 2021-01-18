@@ -444,6 +444,10 @@ namespace AccelByte.Models
     public class BulkUserStatusNotif
     {
         [DataMember] public UserStatusNotif[] data;
+        [DataMember] public int online;
+        [DataMember] public int busy;
+        [DataMember] public int invisible;
+        [DataMember] public int offline;
     }
     #endregion
 

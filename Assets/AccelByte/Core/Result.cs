@@ -306,6 +306,7 @@ namespace AccelByte.Core
         //AccelByte CloudSave error codes
         GameRecordNotFound = 18003,
         PlayerRecordNotFound = 18022,
+        PlayerPublicRecordNotFound = 18081,
         GameRecordPreconditionFailed = 18056,
         PlayerRecordPreconditionFailed = 18103,
         

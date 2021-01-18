@@ -129,6 +129,15 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             string authCode = Environment.GetEnvironmentVariable(User.AuthorizationCodeEnvironmentVariable);
 
+            if (string.IsNullOrEmpty(authCode))
+            {
+                this.coroutineRunner.Run(() =>
+                {
+                    callback.TryError(ErrorCode.InvalidArgument, "The application was not executed from launcher");
+                });
+                return;
+            }
+
             this.coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
         }
 
