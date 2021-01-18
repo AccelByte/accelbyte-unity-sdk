@@ -930,6 +930,17 @@ namespace AccelByte.Api
                     callback));
         }
 
+        public void SetProfanityFilterLevel(ProfanityFilterLevel level, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.setSessionAttributeRequest, new SetSessionAttributeRequest()
+            {
+                Namespace = this.@namespace,
+                key = SessionAttributeName.profanity_filtering_level.ToString(),
+                value = level.ToString()
+            }, callback);
+        }
+
         private long GenerateId()
         {
             lock (this.syncToken)

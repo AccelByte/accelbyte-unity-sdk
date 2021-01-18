@@ -43,7 +43,7 @@ namespace Utf8Json.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(203)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(238)
             {
                 {typeof(global::AccelByte.Models.AchievementIcon[]), 0 },
                 {typeof(global::AccelByte.Models.PublicAchievement[]), 1 },
@@ -59,195 +59,230 @@ namespace Utf8Json.Resolvers
                 {typeof(global::AccelByte.Models.OrderInfo[]), 11 },
                 {typeof(global::AccelByte.Models.EntitlementInfo[]), 12 },
                 {typeof(global::AccelByte.Models.GameProfilePublicInfo[]), 13 },
-                {typeof(global::AccelByte.Models.UserPoint[]), 14 },
-                {typeof(global::AccelByte.Models.LeaderboardData[]), 15 },
-                {typeof(global::AccelByte.Models.PartyDataUpdateNotif[]), 16 },
-                {typeof(global::AccelByte.Models.UserStatusNotif[]), 17 },
-                {typeof(global::AccelByte.Models.BlockedData[]), 18 },
-                {typeof(global::AccelByte.Models.BlockerData[]), 19 },
-                {typeof(global::AccelByte.Models.Slot[]), 20 },
-                {typeof(global::AccelByte.Models.UserGameProfiles[]), 21 },
-                {typeof(global::AccelByte.Models.GameProfile[]), 22 },
-                {typeof(global::AccelByte.Models.OrderHistoryInfo[]), 23 },
-                {typeof(global::AccelByte.Models.PlatformLink[]), 24 },
-                {typeof(global::AccelByte.Models.PublicUserProfile[]), 25 },
-                {typeof(global::AccelByte.Models.QosServer[]), 26 },
-                {typeof(global::AccelByte.Models.PartyMember[]), 27 },
-                {typeof(global::AccelByte.Models.MatchParty[]), 28 },
-                {typeof(global::AccelByte.Models.MatchingAlly[]), 29 },
-                {typeof(global::AccelByte.Models.StatItem[]), 30 },
-                {typeof(global::AccelByte.Models.Ban[]), 31 },
-                {typeof(global::AccelByte.Models.Permission[]), 32 },
-                {typeof(global::AccelByte.Models.PublicUserInfo[]), 33 },
-                {typeof(global::AccelByte.Models.PlatformUserIdMap[]), 34 },
-                {typeof(global::AccelByte.Models.AccountLinkedPlatform[]), 35 },
-                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount[]), 36 },
-                {typeof(global::AccelByte.Models.AchievementIcon), 37 },
-                {typeof(global::AccelByte.Models.PublicAchievement), 38 },
-                {typeof(global::AccelByte.Models.Paging), 39 },
-                {typeof(global::AccelByte.Models.PaginatedPublicAchievement), 40 },
-                {typeof(global::AccelByte.Models.MultiLanguageAchievement), 41 },
-                {typeof(global::AccelByte.Models.CountInfo), 42 },
-                {typeof(global::AccelByte.Models.UserAchievement), 43 },
-                {typeof(global::AccelByte.Models.PaginatedUserAchievement), 44 },
-                {typeof(global::AccelByte.Models.IneligibleUser), 45 },
-                {typeof(global::AccelByte.Models.LocalizedPolicyVersionObject), 46 },
-                {typeof(global::AccelByte.Models.PolicyVersionWithLocalizedVersionObject), 47 },
-                {typeof(global::AccelByte.Models.PublicPolicy), 48 },
-                {typeof(global::AccelByte.Models.AcceptAgreementRequest), 49 },
-                {typeof(global::AccelByte.Models.AcceptAgreementResponse), 50 },
-                {typeof(global::AccelByte.Models.RetrieveUserEligibilitiesResponse), 51 },
-                {typeof(global::AccelByte.Models.UserProfile), 52 },
-                {typeof(global::AccelByte.Models.PublicUserProfile), 53 },
-                {typeof(global::AccelByte.Models.CreateUserProfileRequest), 54 },
-                {typeof(global::AccelByte.Models.UpdateUserProfileRequest), 55 },
-                {typeof(global::AccelByte.Models.UserRecord), 56 },
-                {typeof(global::AccelByte.Models.GameRecord), 57 },
-                {typeof(global::AccelByte.Models.Slot), 58 },
-                {typeof(global::AccelByte.Models.UpdateMedataRequest), 59 },
-                {typeof(global::AccelByte.Models.Config), 60 },
-                {typeof(global::AccelByte.Models.CurrencySummary), 61 },
-                {typeof(global::AccelByte.Models.BalanceInfo), 62 },
-                {typeof(global::AccelByte.Models.WalletInfo), 63 },
-                {typeof(global::AccelByte.Models.WalletTransactionInfo), 64 },
-                {typeof(global::AccelByte.Models.WalletTransactionPagingSlicedResult), 65 },
-                {typeof(global::AccelByte.Models.CreditUserWalletRequest), 66 },
-                {typeof(global::AccelByte.Models.CategoryInfo), 67 },
-                {typeof(global::AccelByte.Models.RegionDataItem), 68 },
-                {typeof(global::AccelByte.Models.ItemSnapshot), 69 },
-                {typeof(global::AccelByte.Models.ItemCriteria), 70 },
-                {typeof(global::AccelByte.Models.Image), 71 },
-                {typeof(global::AccelByte.Models.ItemInfo), 72 },
-                {typeof(global::AccelByte.Models.PopulatedItemInfo), 73 },
-                {typeof(global::AccelByte.Models.ItemPagingSlicedResult), 74 },
-                {typeof(global::AccelByte.Models.PaymentUrl), 75 },
-                {typeof(global::AccelByte.Models.Price), 76 },
-                {typeof(global::AccelByte.Models.OrderHistoryInfo), 77 },
-                {typeof(global::AccelByte.Models.OrderInfo), 78 },
-                {typeof(global::AccelByte.Models.OrderPagingSlicedResult), 79 },
-                {typeof(global::AccelByte.Models.OrderRequest), 80 },
-                {typeof(global::AccelByte.Models.OrderTransaction), 81 },
-                {typeof(global::AccelByte.Models.EntitlementInfo), 82 },
-                {typeof(global::AccelByte.Models.EntitlementPagingSlicedResult), 83 },
-                {typeof(global::AccelByte.Models.EntitlementSummary), 84 },
-                {typeof(global::AccelByte.Models.ConsumeUserEntitlementRequest), 85 },
-                {typeof(global::AccelByte.Models.GrantUserEntitlementRequest), 86 },
-                {typeof(global::AccelByte.Models.StackableEntitlementInfo), 87 },
-                {typeof(global::AccelByte.Models.Attributes), 88 },
-                {typeof(global::AccelByte.Models.DistributionAttributes), 89 },
-                {typeof(global::AccelByte.Models.DistributionReceiver), 90 },
-                {typeof(global::AccelByte.Models.Ownership), 91 },
-                {typeof(global::AccelByte.Models.ServiceError), 92 },
-                {typeof(global::AccelByte.Models.OAuthError), 93 },
-                {typeof(global::AccelByte.Models.GameProfile), 94 },
-                {typeof(global::AccelByte.Models.GameProfileRequest), 95 },
-                {typeof(global::AccelByte.Models.GameProfileAttribute), 96 },
-                {typeof(global::AccelByte.Models.GameProfilePublicInfo), 97 },
-                {typeof(global::AccelByte.Models.UserGameProfiles), 98 },
-                {typeof(global::AccelByte.Models.TelemetryBody), 99 },
-                {typeof(global::AccelByte.Models.UserPoint), 100 },
-                {typeof(global::AccelByte.Models.UserRanking), 101 },
-                {typeof(global::AccelByte.Models.UserRankingData), 102 },
-                {typeof(global::AccelByte.Models.LeaderboardRankingResult), 103 },
-                {typeof(global::AccelByte.Models.LeaderboardData), 104 },
-                {typeof(global::AccelByte.Models.LeaderboardPagedList), 105 },
-                {typeof(global::AccelByte.Models.DisconnectNotif), 106 },
-                {typeof(global::AccelByte.Models.LobbySessionId), 107 },
-                {typeof(global::AccelByte.Models.Notification), 108 },
-                {typeof(global::AccelByte.Models.ChatMessage), 109 },
-                {typeof(global::AccelByte.Models.PersonalChatRequest), 110 },
-                {typeof(global::AccelByte.Models.ChatChannelSlug), 111 },
-                {typeof(global::AccelByte.Models.ChannelChatRequest), 112 },
-                {typeof(global::AccelByte.Models.ChannelChatMessage), 113 },
-                {typeof(global::AccelByte.Models.PartyInfo), 114 },
-                {typeof(global::AccelByte.Models.PartyDataUpdateNotif), 115 },
-                {typeof(global::AccelByte.Models.PartyDataUpdateRequest), 116 },
-                {typeof(global::AccelByte.Models.ActivePartiesData), 117 },
-                {typeof(global::AccelByte.Models.PartyInviteRequest), 118 },
-                {typeof(global::AccelByte.Models.PartyInvitation), 119 },
-                {typeof(global::AccelByte.Models.PartyChatRequest), 120 },
-                {typeof(global::AccelByte.Models.PartyJoinRequest), 121 },
-                {typeof(global::AccelByte.Models.PartyKickRequest), 122 },
-                {typeof(global::AccelByte.Models.JoinNotification), 123 },
-                {typeof(global::AccelByte.Models.KickNotification), 124 },
-                {typeof(global::AccelByte.Models.LeaveNotification), 125 },
-                {typeof(global::AccelByte.Models.PartyRejectRequest), 126 },
-                {typeof(global::AccelByte.Models.PartyRejectResponse), 127 },
-                {typeof(global::AccelByte.Models.PartyRejectNotif), 128 },
-                {typeof(global::AccelByte.Models.StartMatchmakingRequest), 129 },
-                {typeof(global::AccelByte.Models.MatchmakingNotif), 130 },
-                {typeof(global::AccelByte.Models.DsNotif), 131 },
-                {typeof(global::AccelByte.Models.MatchmakingCode), 132 },
-                {typeof(global::AccelByte.Models.ReadyConsentRequest), 133 },
-                {typeof(global::AccelByte.Models.ReadyForMatchConfirmation), 134 },
-                {typeof(global::AccelByte.Models.RematchmakingNotification), 135 },
-                {typeof(global::AccelByte.Models.FriendshipStatus), 136 },
-                {typeof(global::AccelByte.Models.Friends), 137 },
-                {typeof(global::AccelByte.Models.Friend), 138 },
-                {typeof(global::AccelByte.Models.FriendsStatus), 139 },
-                {typeof(global::AccelByte.Models.BulkFriendsRequest), 140 },
-                {typeof(global::AccelByte.Models.FriendsStatusNotif), 141 },
-                {typeof(global::AccelByte.Models.OnlineFriends), 142 },
-                {typeof(global::AccelByte.Models.UserStatusNotif), 143 },
-                {typeof(global::AccelByte.Models.BulkUserStatusNotif), 144 },
-                {typeof(global::AccelByte.Models.BlockPlayerRequest), 145 },
-                {typeof(global::AccelByte.Models.BlockPlayerResponse), 146 },
-                {typeof(global::AccelByte.Models.UnblockPlayerRequest), 147 },
-                {typeof(global::AccelByte.Models.UnblockPlayerResponse), 148 },
-                {typeof(global::AccelByte.Models.PlayerBlockedNotif), 149 },
-                {typeof(global::AccelByte.Models.PlayerUnblockedNotif), 150 },
-                {typeof(global::AccelByte.Models.BlockedData), 151 },
-                {typeof(global::AccelByte.Models.BlockedList), 152 },
-                {typeof(global::AccelByte.Models.BlockerData), 153 },
-                {typeof(global::AccelByte.Models.BlockerList), 154 },
-                {typeof(global::AccelByte.Models.PlatformLink), 155 },
-                {typeof(global::AccelByte.Models.Collection), 156 },
-                {typeof(global::AccelByte.Models.QosServer), 157 },
-                {typeof(global::AccelByte.Models.QosServerList), 158 },
-                {typeof(global::AccelByte.Models.ServerConfig), 159 },
-                {typeof(global::AccelByte.Models.RegisterServerRequest), 160 },
-                {typeof(global::AccelByte.Models.ShutdownServerRequest), 161 },
-                {typeof(global::AccelByte.Models.RegisterLocalServerRequest), 162 },
-                {typeof(global::AccelByte.Models.PartyMember), 163 },
-                {typeof(global::AccelByte.Models.MatchParty), 164 },
-                {typeof(global::AccelByte.Models.MatchingAlly), 165 },
-                {typeof(global::AccelByte.Models.MatchRequest), 166 },
-                {typeof(global::AccelByte.Models.DSMClient), 167 },
-                {typeof(global::AccelByte.Models.PubIp), 168 },
-                {typeof(global::AccelByte.Models.ServerInfo), 169 },
-                {typeof(global::AccelByte.Models.StatConfig), 170 },
-                {typeof(global::AccelByte.Models.StatItem), 171 },
-                {typeof(global::AccelByte.Models.CreateStatItemRequest), 172 },
-                {typeof(global::AccelByte.Models.PagedStatItems), 173 },
-                {typeof(global::AccelByte.Models.UserStatItemIncrement), 174 },
-                {typeof(global::AccelByte.Models.StatItemIncrement), 175 },
-                {typeof(global::AccelByte.Models.StatItemOperationResult), 176 },
-                {typeof(global::AccelByte.Models.UserStatItemReset), 177 },
-                {typeof(global::AccelByte.Models.StatItemReset), 178 },
-                {typeof(global::AccelByte.Models.UserStatItemUpdate), 179 },
-                {typeof(global::AccelByte.Models.StatItemUpdate), 180 },
-                {typeof(global::AccelByte.Models.TelemetryEventTag), 181 },
-                {typeof(global::AccelByte.Models.TokenData), 182 },
-                {typeof(global::AccelByte.Models.SessionData), 183 },
-                {typeof(global::AccelByte.Models.Ban), 184 },
-                {typeof(global::AccelByte.Models.Permission), 185 },
-                {typeof(global::AccelByte.Models.UserData), 186 },
-                {typeof(global::AccelByte.Models.PublicUserInfo), 187 },
-                {typeof(global::AccelByte.Models.PagedPublicUsersInfo), 188 },
-                {typeof(global::AccelByte.Models.RegisterUserRequest), 189 },
-                {typeof(global::AccelByte.Models.RegisterUserRequestv2), 190 },
-                {typeof(global::AccelByte.Models.RegisterUserResponse), 191 },
-                {typeof(global::AccelByte.Models.UpdateUserRequest), 192 },
-                {typeof(global::AccelByte.Models.PagedPlatformLinks), 193 },
-                {typeof(global::AccelByte.Models.BulkPlatformUserIdRequest), 194 },
-                {typeof(global::AccelByte.Models.PlatformUserIdMap), 195 },
-                {typeof(global::AccelByte.Models.BulkPlatformUserIdResponse), 196 },
-                {typeof(global::AccelByte.Models.CountryInfo), 197 },
-                {typeof(global::AccelByte.Models.UpgradeUserRequest), 198 },
-                {typeof(global::AccelByte.Models.AccountLinkedPlatform), 199 },
-                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount), 200 },
-                {typeof(global::AccelByte.Models.AccountLinkConfictMessageVariables), 201 },
-                {typeof(global::AccelByte.Models.LinkPlatformAccountRequest), 202 },
+                {typeof(global::AccelByte.Models.RuleInformation[]), 14 },
+                {typeof(global::AccelByte.Models.Rules[]), 15 },
+                {typeof(global::AccelByte.Models.GroupMember[]), 16 },
+                {typeof(global::AccelByte.Models.GroupInformation[]), 17 },
+                {typeof(global::System.Collections.Generic.List<global::AccelByte.Models.RuleInformation>), 18 },
+                {typeof(global::AccelByte.Models.GroupMemberInformation[]), 19 },
+                {typeof(global::AccelByte.Models.GroupRequest[]), 20 },
+                {typeof(global::AccelByte.Models.MemberRolePermission[]), 21 },
+                {typeof(global::AccelByte.Models.MemberRole[]), 22 },
+                {typeof(global::AccelByte.Models.UserPoint[]), 23 },
+                {typeof(global::AccelByte.Models.LeaderboardData[]), 24 },
+                {typeof(global::AccelByte.Models.PartyDataUpdateNotif[]), 25 },
+                {typeof(global::AccelByte.Models.UserStatusNotif[]), 26 },
+                {typeof(global::AccelByte.Models.BlockedData[]), 27 },
+                {typeof(global::AccelByte.Models.BlockerData[]), 28 },
+                {typeof(global::AccelByte.Models.Slot[]), 29 },
+                {typeof(global::AccelByte.Models.UserGameProfiles[]), 30 },
+                {typeof(global::AccelByte.Models.GameProfile[]), 31 },
+                {typeof(global::AccelByte.Models.OrderHistoryInfo[]), 32 },
+                {typeof(global::AccelByte.Models.PlatformLink[]), 33 },
+                {typeof(global::AccelByte.Models.PublicUserProfile[]), 34 },
+                {typeof(global::AccelByte.Models.QosServer[]), 35 },
+                {typeof(global::AccelByte.Models.PartyMember[]), 36 },
+                {typeof(global::AccelByte.Models.MatchParty[]), 37 },
+                {typeof(global::AccelByte.Models.MatchingAlly[]), 38 },
+                {typeof(global::AccelByte.Models.StatItem[]), 39 },
+                {typeof(global::AccelByte.Models.Ban[]), 40 },
+                {typeof(global::AccelByte.Models.Permission[]), 41 },
+                {typeof(global::AccelByte.Models.PublicUserInfo[]), 42 },
+                {typeof(global::AccelByte.Models.PlatformUserIdMap[]), 43 },
+                {typeof(global::AccelByte.Models.AccountLinkedPlatform[]), 44 },
+                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount[]), 45 },
+                {typeof(global::AccelByte.Models.AchievementIcon), 46 },
+                {typeof(global::AccelByte.Models.PublicAchievement), 47 },
+                {typeof(global::AccelByte.Models.Paging), 48 },
+                {typeof(global::AccelByte.Models.PaginatedPublicAchievement), 49 },
+                {typeof(global::AccelByte.Models.MultiLanguageAchievement), 50 },
+                {typeof(global::AccelByte.Models.CountInfo), 51 },
+                {typeof(global::AccelByte.Models.UserAchievement), 52 },
+                {typeof(global::AccelByte.Models.PaginatedUserAchievement), 53 },
+                {typeof(global::AccelByte.Models.IneligibleUser), 54 },
+                {typeof(global::AccelByte.Models.LocalizedPolicyVersionObject), 55 },
+                {typeof(global::AccelByte.Models.PolicyVersionWithLocalizedVersionObject), 56 },
+                {typeof(global::AccelByte.Models.PublicPolicy), 57 },
+                {typeof(global::AccelByte.Models.AcceptAgreementRequest), 58 },
+                {typeof(global::AccelByte.Models.AcceptAgreementResponse), 59 },
+                {typeof(global::AccelByte.Models.RetrieveUserEligibilitiesResponse), 60 },
+                {typeof(global::AccelByte.Models.UserProfile), 61 },
+                {typeof(global::AccelByte.Models.PublicUserProfile), 62 },
+                {typeof(global::AccelByte.Models.CreateUserProfileRequest), 63 },
+                {typeof(global::AccelByte.Models.UpdateUserProfileRequest), 64 },
+                {typeof(global::AccelByte.Models.UserRecord), 65 },
+                {typeof(global::AccelByte.Models.GameRecord), 66 },
+                {typeof(global::AccelByte.Models.ConcurrentReplaceRequest), 67 },
+                {typeof(global::AccelByte.Models.Slot), 68 },
+                {typeof(global::AccelByte.Models.UpdateMedataRequest), 69 },
+                {typeof(global::AccelByte.Models.Config), 70 },
+                {typeof(global::AccelByte.Models.CurrencySummary), 71 },
+                {typeof(global::AccelByte.Models.BalanceInfo), 72 },
+                {typeof(global::AccelByte.Models.WalletInfo), 73 },
+                {typeof(global::AccelByte.Models.WalletTransactionInfo), 74 },
+                {typeof(global::AccelByte.Models.WalletTransactionPagingSlicedResult), 75 },
+                {typeof(global::AccelByte.Models.CreditUserWalletRequest), 76 },
+                {typeof(global::AccelByte.Models.CategoryInfo), 77 },
+                {typeof(global::AccelByte.Models.RegionDataItem), 78 },
+                {typeof(global::AccelByte.Models.ItemSnapshot), 79 },
+                {typeof(global::AccelByte.Models.ItemCriteria), 80 },
+                {typeof(global::AccelByte.Models.Image), 81 },
+                {typeof(global::AccelByte.Models.ItemInfo), 82 },
+                {typeof(global::AccelByte.Models.PopulatedItemInfo), 83 },
+                {typeof(global::AccelByte.Models.ItemPagingSlicedResult), 84 },
+                {typeof(global::AccelByte.Models.PaymentUrl), 85 },
+                {typeof(global::AccelByte.Models.Price), 86 },
+                {typeof(global::AccelByte.Models.OrderHistoryInfo), 87 },
+                {typeof(global::AccelByte.Models.OrderInfo), 88 },
+                {typeof(global::AccelByte.Models.OrderPagingSlicedResult), 89 },
+                {typeof(global::AccelByte.Models.OrderRequest), 90 },
+                {typeof(global::AccelByte.Models.OrderTransaction), 91 },
+                {typeof(global::AccelByte.Models.EntitlementInfo), 92 },
+                {typeof(global::AccelByte.Models.EntitlementPagingSlicedResult), 93 },
+                {typeof(global::AccelByte.Models.EntitlementSummary), 94 },
+                {typeof(global::AccelByte.Models.ConsumeUserEntitlementRequest), 95 },
+                {typeof(global::AccelByte.Models.GrantUserEntitlementRequest), 96 },
+                {typeof(global::AccelByte.Models.StackableEntitlementInfo), 97 },
+                {typeof(global::AccelByte.Models.Attributes), 98 },
+                {typeof(global::AccelByte.Models.DistributionAttributes), 99 },
+                {typeof(global::AccelByte.Models.DistributionReceiver), 100 },
+                {typeof(global::AccelByte.Models.Ownership), 101 },
+                {typeof(global::AccelByte.Models.ServiceError), 102 },
+                {typeof(global::AccelByte.Models.OAuthError), 103 },
+                {typeof(global::AccelByte.Models.GameProfile), 104 },
+                {typeof(global::AccelByte.Models.GameProfileRequest), 105 },
+                {typeof(global::AccelByte.Models.GameProfileAttribute), 106 },
+                {typeof(global::AccelByte.Models.GameProfilePublicInfo), 107 },
+                {typeof(global::AccelByte.Models.UserGameProfiles), 108 },
+                {typeof(global::AccelByte.Models.TelemetryBody), 109 },
+                {typeof(global::AccelByte.Models.RuleInformation), 110 },
+                {typeof(global::AccelByte.Models.Rules), 111 },
+                {typeof(global::AccelByte.Models.GroupRules), 112 },
+                {typeof(global::AccelByte.Models.CreateGroupRequest), 113 },
+                {typeof(global::AccelByte.Models.GroupMember), 114 },
+                {typeof(global::AccelByte.Models.GroupMemberInformation), 115 },
+                {typeof(global::AccelByte.Models.GroupInformation), 116 },
+                {typeof(global::AccelByte.Models.PaginatedGroupListResponse), 117 },
+                {typeof(global::AccelByte.Models.UpdateGroupRequest), 118 },
+                {typeof(global::AccelByte.Models.UpdateGroupNoTypeRequest), 119 },
+                {typeof(global::AccelByte.Models.UserInvitationResponse), 120 },
+                {typeof(global::AccelByte.Models.JoinGroupResponse), 121 },
+                {typeof(global::AccelByte.Models.KickMemberResponse), 122 },
+                {typeof(global::AccelByte.Models.RejectOtherJoinResponse), 123 },
+                {typeof(global::AccelByte.Models.UpdateGroupCustomRuleRequest), 124 },
+                {typeof(global::AccelByte.Models.UpdateGroupPredefinedRuleRequest), 125 },
+                {typeof(global::AccelByte.Models.GroupGeneralResponse), 126 },
+                {typeof(global::AccelByte.Models.PaginatedGroupMemberList), 127 },
+                {typeof(global::AccelByte.Models.GroupRequest), 128 },
+                {typeof(global::AccelByte.Models.PaginatedGroupRequestList), 129 },
+                {typeof(global::AccelByte.Models.AssignRoleRequest), 130 },
+                {typeof(global::AccelByte.Models.MemberRolePermission), 131 },
+                {typeof(global::AccelByte.Models.MemberRole), 132 },
+                {typeof(global::AccelByte.Models.PaginatedMemberRoles), 133 },
+                {typeof(global::AccelByte.Models.UserPoint), 134 },
+                {typeof(global::AccelByte.Models.UserRanking), 135 },
+                {typeof(global::AccelByte.Models.UserRankingData), 136 },
+                {typeof(global::AccelByte.Models.LeaderboardRankingResult), 137 },
+                {typeof(global::AccelByte.Models.LeaderboardData), 138 },
+                {typeof(global::AccelByte.Models.LeaderboardPagedList), 139 },
+                {typeof(global::AccelByte.Models.DisconnectNotif), 140 },
+                {typeof(global::AccelByte.Models.LobbySessionId), 141 },
+                {typeof(global::AccelByte.Models.Notification), 142 },
+                {typeof(global::AccelByte.Models.ChatMessage), 143 },
+                {typeof(global::AccelByte.Models.PersonalChatRequest), 144 },
+                {typeof(global::AccelByte.Models.ChatChannelSlug), 145 },
+                {typeof(global::AccelByte.Models.ChannelChatRequest), 146 },
+                {typeof(global::AccelByte.Models.ChannelChatMessage), 147 },
+                {typeof(global::AccelByte.Models.PartyInfo), 148 },
+                {typeof(global::AccelByte.Models.PartyDataUpdateNotif), 149 },
+                {typeof(global::AccelByte.Models.PartyDataUpdateRequest), 150 },
+                {typeof(global::AccelByte.Models.ActivePartiesData), 151 },
+                {typeof(global::AccelByte.Models.PartyInviteRequest), 152 },
+                {typeof(global::AccelByte.Models.PartyInvitation), 153 },
+                {typeof(global::AccelByte.Models.PartyChatRequest), 154 },
+                {typeof(global::AccelByte.Models.PartyJoinRequest), 155 },
+                {typeof(global::AccelByte.Models.PartyKickRequest), 156 },
+                {typeof(global::AccelByte.Models.JoinNotification), 157 },
+                {typeof(global::AccelByte.Models.KickNotification), 158 },
+                {typeof(global::AccelByte.Models.LeaveNotification), 159 },
+                {typeof(global::AccelByte.Models.PartyRejectRequest), 160 },
+                {typeof(global::AccelByte.Models.PartyRejectResponse), 161 },
+                {typeof(global::AccelByte.Models.PartyRejectNotif), 162 },
+                {typeof(global::AccelByte.Models.StartMatchmakingRequest), 163 },
+                {typeof(global::AccelByte.Models.MatchmakingNotif), 164 },
+                {typeof(global::AccelByte.Models.DsNotif), 165 },
+                {typeof(global::AccelByte.Models.MatchmakingCode), 166 },
+                {typeof(global::AccelByte.Models.ReadyConsentRequest), 167 },
+                {typeof(global::AccelByte.Models.ReadyForMatchConfirmation), 168 },
+                {typeof(global::AccelByte.Models.RematchmakingNotification), 169 },
+                {typeof(global::AccelByte.Models.FriendshipStatus), 170 },
+                {typeof(global::AccelByte.Models.Friends), 171 },
+                {typeof(global::AccelByte.Models.Friend), 172 },
+                {typeof(global::AccelByte.Models.FriendsStatus), 173 },
+                {typeof(global::AccelByte.Models.BulkFriendsRequest), 174 },
+                {typeof(global::AccelByte.Models.FriendsStatusNotif), 175 },
+                {typeof(global::AccelByte.Models.OnlineFriends), 176 },
+                {typeof(global::AccelByte.Models.UserStatusNotif), 177 },
+                {typeof(global::AccelByte.Models.BulkUserStatusNotif), 178 },
+                {typeof(global::AccelByte.Models.BlockPlayerRequest), 179 },
+                {typeof(global::AccelByte.Models.BlockPlayerResponse), 180 },
+                {typeof(global::AccelByte.Models.UnblockPlayerRequest), 181 },
+                {typeof(global::AccelByte.Models.UnblockPlayerResponse), 182 },
+                {typeof(global::AccelByte.Models.PlayerBlockedNotif), 183 },
+                {typeof(global::AccelByte.Models.PlayerUnblockedNotif), 184 },
+                {typeof(global::AccelByte.Models.BlockedData), 185 },
+                {typeof(global::AccelByte.Models.BlockedList), 186 },
+                {typeof(global::AccelByte.Models.BlockerData), 187 },
+                {typeof(global::AccelByte.Models.BlockerList), 188 },
+                {typeof(global::AccelByte.Models.SetSessionAttributeRequest), 189 },
+                {typeof(global::AccelByte.Models.PlatformLink), 190 },
+                {typeof(global::AccelByte.Models.Collection), 191 },
+                {typeof(global::AccelByte.Models.QosServer), 192 },
+                {typeof(global::AccelByte.Models.QosServerList), 193 },
+                {typeof(global::AccelByte.Models.ServerConfig), 194 },
+                {typeof(global::AccelByte.Models.RegisterServerRequest), 195 },
+                {typeof(global::AccelByte.Models.ShutdownServerRequest), 196 },
+                {typeof(global::AccelByte.Models.RegisterLocalServerRequest), 197 },
+                {typeof(global::AccelByte.Models.PartyMember), 198 },
+                {typeof(global::AccelByte.Models.MatchParty), 199 },
+                {typeof(global::AccelByte.Models.MatchingAlly), 200 },
+                {typeof(global::AccelByte.Models.MatchRequest), 201 },
+                {typeof(global::AccelByte.Models.DSMClient), 202 },
+                {typeof(global::AccelByte.Models.PubIp), 203 },
+                {typeof(global::AccelByte.Models.ServerInfo), 204 },
+                {typeof(global::AccelByte.Models.StatConfig), 205 },
+                {typeof(global::AccelByte.Models.StatItem), 206 },
+                {typeof(global::AccelByte.Models.CreateStatItemRequest), 207 },
+                {typeof(global::AccelByte.Models.PagedStatItems), 208 },
+                {typeof(global::AccelByte.Models.UserStatItemIncrement), 209 },
+                {typeof(global::AccelByte.Models.StatItemIncrement), 210 },
+                {typeof(global::AccelByte.Models.StatItemOperationResult), 211 },
+                {typeof(global::AccelByte.Models.UserStatItemReset), 212 },
+                {typeof(global::AccelByte.Models.StatItemReset), 213 },
+                {typeof(global::AccelByte.Models.UserStatItemUpdate), 214 },
+                {typeof(global::AccelByte.Models.StatItemUpdate), 215 },
+                {typeof(global::AccelByte.Models.TelemetryEventTag), 216 },
+                {typeof(global::AccelByte.Models.TokenData), 217 },
+                {typeof(global::AccelByte.Models.SessionData), 218 },
+                {typeof(global::AccelByte.Models.Ban), 219 },
+                {typeof(global::AccelByte.Models.Permission), 220 },
+                {typeof(global::AccelByte.Models.UserData), 221 },
+                {typeof(global::AccelByte.Models.PublicUserInfo), 222 },
+                {typeof(global::AccelByte.Models.PagedPublicUsersInfo), 223 },
+                {typeof(global::AccelByte.Models.RegisterUserRequest), 224 },
+                {typeof(global::AccelByte.Models.RegisterUserRequestv2), 225 },
+                {typeof(global::AccelByte.Models.RegisterUserResponse), 226 },
+                {typeof(global::AccelByte.Models.UpdateUserRequest), 227 },
+                {typeof(global::AccelByte.Models.PagedPlatformLinks), 228 },
+                {typeof(global::AccelByte.Models.BulkPlatformUserIdRequest), 229 },
+                {typeof(global::AccelByte.Models.PlatformUserIdMap), 230 },
+                {typeof(global::AccelByte.Models.BulkPlatformUserIdResponse), 231 },
+                {typeof(global::AccelByte.Models.CountryInfo), 232 },
+                {typeof(global::AccelByte.Models.UpgradeUserRequest), 233 },
+                {typeof(global::AccelByte.Models.AccountLinkedPlatform), 234 },
+                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount), 235 },
+                {typeof(global::AccelByte.Models.AccountLinkConfictMessageVariables), 236 },
+                {typeof(global::AccelByte.Models.LinkPlatformAccountRequest), 237 },
             };
         }
 
@@ -272,195 +307,230 @@ namespace Utf8Json.Resolvers
                 case 11: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.OrderInfo>();
                 case 12: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.EntitlementInfo>();
                 case 13: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GameProfilePublicInfo>();
-                case 14: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserPoint>();
-                case 15: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.LeaderboardData>();
-                case 16: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PartyDataUpdateNotif>();
-                case 17: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserStatusNotif>();
-                case 18: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.BlockedData>();
-                case 19: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.BlockerData>();
-                case 20: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Slot>();
-                case 21: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserGameProfiles>();
-                case 22: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GameProfile>();
-                case 23: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.OrderHistoryInfo>();
-                case 24: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformLink>();
-                case 25: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PublicUserProfile>();
-                case 26: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.QosServer>();
-                case 27: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PartyMember>();
-                case 28: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchParty>();
-                case 29: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchingAlly>();
-                case 30: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.StatItem>();
-                case 31: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Ban>();
-                case 32: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Permission>();
-                case 33: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PublicUserInfo>();
-                case 34: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformUserIdMap>();
-                case 35: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkedPlatform>();
-                case 36: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkPublisherAccount>();
-                case 37: return new Utf8Json.Formatters.AccelByte.Models.AchievementIconFormatter();
-                case 38: return new Utf8Json.Formatters.AccelByte.Models.PublicAchievementFormatter();
-                case 39: return new Utf8Json.Formatters.AccelByte.Models.PagingFormatter();
-                case 40: return new Utf8Json.Formatters.AccelByte.Models.PaginatedPublicAchievementFormatter();
-                case 41: return new Utf8Json.Formatters.AccelByte.Models.MultiLanguageAchievementFormatter();
-                case 42: return new Utf8Json.Formatters.AccelByte.Models.CountInfoFormatter();
-                case 43: return new Utf8Json.Formatters.AccelByte.Models.UserAchievementFormatter();
-                case 44: return new Utf8Json.Formatters.AccelByte.Models.PaginatedUserAchievementFormatter();
-                case 45: return new Utf8Json.Formatters.AccelByte.Models.IneligibleUserFormatter();
-                case 46: return new Utf8Json.Formatters.AccelByte.Models.LocalizedPolicyVersionObjectFormatter();
-                case 47: return new Utf8Json.Formatters.AccelByte.Models.PolicyVersionWithLocalizedVersionObjectFormatter();
-                case 48: return new Utf8Json.Formatters.AccelByte.Models.PublicPolicyFormatter();
-                case 49: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementRequestFormatter();
-                case 50: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementResponseFormatter();
-                case 51: return new Utf8Json.Formatters.AccelByte.Models.RetrieveUserEligibilitiesResponseFormatter();
-                case 52: return new Utf8Json.Formatters.AccelByte.Models.UserProfileFormatter();
-                case 53: return new Utf8Json.Formatters.AccelByte.Models.PublicUserProfileFormatter();
-                case 54: return new Utf8Json.Formatters.AccelByte.Models.CreateUserProfileRequestFormatter();
-                case 55: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserProfileRequestFormatter();
-                case 56: return new Utf8Json.Formatters.AccelByte.Models.UserRecordFormatter();
-                case 57: return new Utf8Json.Formatters.AccelByte.Models.GameRecordFormatter();
-                case 58: return new Utf8Json.Formatters.AccelByte.Models.SlotFormatter();
-                case 59: return new Utf8Json.Formatters.AccelByte.Models.UpdateMedataRequestFormatter();
-                case 60: return new Utf8Json.Formatters.AccelByte.Models.ConfigFormatter();
-                case 61: return new Utf8Json.Formatters.AccelByte.Models.CurrencySummaryFormatter();
-                case 62: return new Utf8Json.Formatters.AccelByte.Models.BalanceInfoFormatter();
-                case 63: return new Utf8Json.Formatters.AccelByte.Models.WalletInfoFormatter();
-                case 64: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionInfoFormatter();
-                case 65: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionPagingSlicedResultFormatter();
-                case 66: return new Utf8Json.Formatters.AccelByte.Models.CreditUserWalletRequestFormatter();
-                case 67: return new Utf8Json.Formatters.AccelByte.Models.CategoryInfoFormatter();
-                case 68: return new Utf8Json.Formatters.AccelByte.Models.RegionDataItemFormatter();
-                case 69: return new Utf8Json.Formatters.AccelByte.Models.ItemSnapshotFormatter();
-                case 70: return new Utf8Json.Formatters.AccelByte.Models.ItemCriteriaFormatter();
-                case 71: return new Utf8Json.Formatters.AccelByte.Models.ImageFormatter();
-                case 72: return new Utf8Json.Formatters.AccelByte.Models.ItemInfoFormatter();
-                case 73: return new Utf8Json.Formatters.AccelByte.Models.PopulatedItemInfoFormatter();
-                case 74: return new Utf8Json.Formatters.AccelByte.Models.ItemPagingSlicedResultFormatter();
-                case 75: return new Utf8Json.Formatters.AccelByte.Models.PaymentUrlFormatter();
-                case 76: return new Utf8Json.Formatters.AccelByte.Models.PriceFormatter();
-                case 77: return new Utf8Json.Formatters.AccelByte.Models.OrderHistoryInfoFormatter();
-                case 78: return new Utf8Json.Formatters.AccelByte.Models.OrderInfoFormatter();
-                case 79: return new Utf8Json.Formatters.AccelByte.Models.OrderPagingSlicedResultFormatter();
-                case 80: return new Utf8Json.Formatters.AccelByte.Models.OrderRequestFormatter();
-                case 81: return new Utf8Json.Formatters.AccelByte.Models.OrderTransactionFormatter();
-                case 82: return new Utf8Json.Formatters.AccelByte.Models.EntitlementInfoFormatter();
-                case 83: return new Utf8Json.Formatters.AccelByte.Models.EntitlementPagingSlicedResultFormatter();
-                case 84: return new Utf8Json.Formatters.AccelByte.Models.EntitlementSummaryFormatter();
-                case 85: return new Utf8Json.Formatters.AccelByte.Models.ConsumeUserEntitlementRequestFormatter();
-                case 86: return new Utf8Json.Formatters.AccelByte.Models.GrantUserEntitlementRequestFormatter();
-                case 87: return new Utf8Json.Formatters.AccelByte.Models.StackableEntitlementInfoFormatter();
-                case 88: return new Utf8Json.Formatters.AccelByte.Models.AttributesFormatter();
-                case 89: return new Utf8Json.Formatters.AccelByte.Models.DistributionAttributesFormatter();
-                case 90: return new Utf8Json.Formatters.AccelByte.Models.DistributionReceiverFormatter();
-                case 91: return new Utf8Json.Formatters.AccelByte.Models.OwnershipFormatter();
-                case 92: return new Utf8Json.Formatters.AccelByte.Models.ServiceErrorFormatter();
-                case 93: return new Utf8Json.Formatters.AccelByte.Models.OAuthErrorFormatter();
-                case 94: return new Utf8Json.Formatters.AccelByte.Models.GameProfileFormatter();
-                case 95: return new Utf8Json.Formatters.AccelByte.Models.GameProfileRequestFormatter();
-                case 96: return new Utf8Json.Formatters.AccelByte.Models.GameProfileAttributeFormatter();
-                case 97: return new Utf8Json.Formatters.AccelByte.Models.GameProfilePublicInfoFormatter();
-                case 98: return new Utf8Json.Formatters.AccelByte.Models.UserGameProfilesFormatter();
-                case 99: return new Utf8Json.Formatters.AccelByte.Models.TelemetryBodyFormatter();
-                case 100: return new Utf8Json.Formatters.AccelByte.Models.UserPointFormatter();
-                case 101: return new Utf8Json.Formatters.AccelByte.Models.UserRankingFormatter();
-                case 102: return new Utf8Json.Formatters.AccelByte.Models.UserRankingDataFormatter();
-                case 103: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardRankingResultFormatter();
-                case 104: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardDataFormatter();
-                case 105: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagedListFormatter();
-                case 106: return new Utf8Json.Formatters.AccelByte.Models.DisconnectNotifFormatter();
-                case 107: return new Utf8Json.Formatters.AccelByte.Models.LobbySessionIdFormatter();
-                case 108: return new Utf8Json.Formatters.AccelByte.Models.NotificationFormatter();
-                case 109: return new Utf8Json.Formatters.AccelByte.Models.ChatMessageFormatter();
-                case 110: return new Utf8Json.Formatters.AccelByte.Models.PersonalChatRequestFormatter();
-                case 111: return new Utf8Json.Formatters.AccelByte.Models.ChatChannelSlugFormatter();
-                case 112: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatRequestFormatter();
-                case 113: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatMessageFormatter();
-                case 114: return new Utf8Json.Formatters.AccelByte.Models.PartyInfoFormatter();
-                case 115: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateNotifFormatter();
-                case 116: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateRequestFormatter();
-                case 117: return new Utf8Json.Formatters.AccelByte.Models.ActivePartiesDataFormatter();
-                case 118: return new Utf8Json.Formatters.AccelByte.Models.PartyInviteRequestFormatter();
-                case 119: return new Utf8Json.Formatters.AccelByte.Models.PartyInvitationFormatter();
-                case 120: return new Utf8Json.Formatters.AccelByte.Models.PartyChatRequestFormatter();
-                case 121: return new Utf8Json.Formatters.AccelByte.Models.PartyJoinRequestFormatter();
-                case 122: return new Utf8Json.Formatters.AccelByte.Models.PartyKickRequestFormatter();
-                case 123: return new Utf8Json.Formatters.AccelByte.Models.JoinNotificationFormatter();
-                case 124: return new Utf8Json.Formatters.AccelByte.Models.KickNotificationFormatter();
-                case 125: return new Utf8Json.Formatters.AccelByte.Models.LeaveNotificationFormatter();
-                case 126: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectRequestFormatter();
-                case 127: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectResponseFormatter();
-                case 128: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectNotifFormatter();
-                case 129: return new Utf8Json.Formatters.AccelByte.Models.StartMatchmakingRequestFormatter();
-                case 130: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingNotifFormatter();
-                case 131: return new Utf8Json.Formatters.AccelByte.Models.DsNotifFormatter();
-                case 132: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingCodeFormatter();
-                case 133: return new Utf8Json.Formatters.AccelByte.Models.ReadyConsentRequestFormatter();
-                case 134: return new Utf8Json.Formatters.AccelByte.Models.ReadyForMatchConfirmationFormatter();
-                case 135: return new Utf8Json.Formatters.AccelByte.Models.RematchmakingNotificationFormatter();
-                case 136: return new Utf8Json.Formatters.AccelByte.Models.FriendshipStatusFormatter();
-                case 137: return new Utf8Json.Formatters.AccelByte.Models.FriendsFormatter();
-                case 138: return new Utf8Json.Formatters.AccelByte.Models.FriendFormatter();
-                case 139: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusFormatter();
-                case 140: return new Utf8Json.Formatters.AccelByte.Models.BulkFriendsRequestFormatter();
-                case 141: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusNotifFormatter();
-                case 142: return new Utf8Json.Formatters.AccelByte.Models.OnlineFriendsFormatter();
-                case 143: return new Utf8Json.Formatters.AccelByte.Models.UserStatusNotifFormatter();
-                case 144: return new Utf8Json.Formatters.AccelByte.Models.BulkUserStatusNotifFormatter();
-                case 145: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerRequestFormatter();
-                case 146: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerResponseFormatter();
-                case 147: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerRequestFormatter();
-                case 148: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerResponseFormatter();
-                case 149: return new Utf8Json.Formatters.AccelByte.Models.PlayerBlockedNotifFormatter();
-                case 150: return new Utf8Json.Formatters.AccelByte.Models.PlayerUnblockedNotifFormatter();
-                case 151: return new Utf8Json.Formatters.AccelByte.Models.BlockedDataFormatter();
-                case 152: return new Utf8Json.Formatters.AccelByte.Models.BlockedListFormatter();
-                case 153: return new Utf8Json.Formatters.AccelByte.Models.BlockerDataFormatter();
-                case 154: return new Utf8Json.Formatters.AccelByte.Models.BlockerListFormatter();
-                case 155: return new Utf8Json.Formatters.AccelByte.Models.PlatformLinkFormatter();
-                case 156: return new Utf8Json.Formatters.AccelByte.Models.CollectionFormatter();
-                case 157: return new Utf8Json.Formatters.AccelByte.Models.QosServerFormatter();
-                case 158: return new Utf8Json.Formatters.AccelByte.Models.QosServerListFormatter();
-                case 159: return new Utf8Json.Formatters.AccelByte.Models.ServerConfigFormatter();
-                case 160: return new Utf8Json.Formatters.AccelByte.Models.RegisterServerRequestFormatter();
-                case 161: return new Utf8Json.Formatters.AccelByte.Models.ShutdownServerRequestFormatter();
-                case 162: return new Utf8Json.Formatters.AccelByte.Models.RegisterLocalServerRequestFormatter();
-                case 163: return new Utf8Json.Formatters.AccelByte.Models.PartyMemberFormatter();
-                case 164: return new Utf8Json.Formatters.AccelByte.Models.MatchPartyFormatter();
-                case 165: return new Utf8Json.Formatters.AccelByte.Models.MatchingAllyFormatter();
-                case 166: return new Utf8Json.Formatters.AccelByte.Models.MatchRequestFormatter();
-                case 167: return new Utf8Json.Formatters.AccelByte.Models.DSMClientFormatter();
-                case 168: return new Utf8Json.Formatters.AccelByte.Models.PubIpFormatter();
-                case 169: return new Utf8Json.Formatters.AccelByte.Models.ServerInfoFormatter();
-                case 170: return new Utf8Json.Formatters.AccelByte.Models.StatConfigFormatter();
-                case 171: return new Utf8Json.Formatters.AccelByte.Models.StatItemFormatter();
-                case 172: return new Utf8Json.Formatters.AccelByte.Models.CreateStatItemRequestFormatter();
-                case 173: return new Utf8Json.Formatters.AccelByte.Models.PagedStatItemsFormatter();
-                case 174: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemIncrementFormatter();
-                case 175: return new Utf8Json.Formatters.AccelByte.Models.StatItemIncrementFormatter();
-                case 176: return new Utf8Json.Formatters.AccelByte.Models.StatItemOperationResultFormatter();
-                case 177: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemResetFormatter();
-                case 178: return new Utf8Json.Formatters.AccelByte.Models.StatItemResetFormatter();
-                case 179: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemUpdateFormatter();
-                case 180: return new Utf8Json.Formatters.AccelByte.Models.StatItemUpdateFormatter();
-                case 181: return new Utf8Json.Formatters.AccelByte.Models.TelemetryEventTagFormatter();
-                case 182: return new Utf8Json.Formatters.AccelByte.Models.TokenDataFormatter();
-                case 183: return new Utf8Json.Formatters.AccelByte.Models.SessionDataFormatter();
-                case 184: return new Utf8Json.Formatters.AccelByte.Models.BanFormatter();
-                case 185: return new Utf8Json.Formatters.AccelByte.Models.PermissionFormatter();
-                case 186: return new Utf8Json.Formatters.AccelByte.Models.UserDataFormatter();
-                case 187: return new Utf8Json.Formatters.AccelByte.Models.PublicUserInfoFormatter();
-                case 188: return new Utf8Json.Formatters.AccelByte.Models.PagedPublicUsersInfoFormatter();
-                case 189: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestFormatter();
-                case 190: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestv2Formatter();
-                case 191: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserResponseFormatter();
-                case 192: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserRequestFormatter();
-                case 193: return new Utf8Json.Formatters.AccelByte.Models.PagedPlatformLinksFormatter();
-                case 194: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdRequestFormatter();
-                case 195: return new Utf8Json.Formatters.AccelByte.Models.PlatformUserIdMapFormatter();
-                case 196: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdResponseFormatter();
-                case 197: return new Utf8Json.Formatters.AccelByte.Models.CountryInfoFormatter();
-                case 198: return new Utf8Json.Formatters.AccelByte.Models.UpgradeUserRequestFormatter();
-                case 199: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkedPlatformFormatter();
-                case 200: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkPublisherAccountFormatter();
-                case 201: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkConfictMessageVariablesFormatter();
-                case 202: return new Utf8Json.Formatters.AccelByte.Models.LinkPlatformAccountRequestFormatter();
+                case 14: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.RuleInformation>();
+                case 15: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Rules>();
+                case 16: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GroupMember>();
+                case 17: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GroupInformation>();
+                case 18: return new global::Utf8Json.Formatters.ListFormatter<global::AccelByte.Models.RuleInformation>();
+                case 19: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GroupMemberInformation>();
+                case 20: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GroupRequest>();
+                case 21: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MemberRolePermission>();
+                case 22: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MemberRole>();
+                case 23: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserPoint>();
+                case 24: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.LeaderboardData>();
+                case 25: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PartyDataUpdateNotif>();
+                case 26: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserStatusNotif>();
+                case 27: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.BlockedData>();
+                case 28: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.BlockerData>();
+                case 29: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Slot>();
+                case 30: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.UserGameProfiles>();
+                case 31: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.GameProfile>();
+                case 32: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.OrderHistoryInfo>();
+                case 33: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformLink>();
+                case 34: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PublicUserProfile>();
+                case 35: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.QosServer>();
+                case 36: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PartyMember>();
+                case 37: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchParty>();
+                case 38: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchingAlly>();
+                case 39: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.StatItem>();
+                case 40: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Ban>();
+                case 41: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Permission>();
+                case 42: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PublicUserInfo>();
+                case 43: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformUserIdMap>();
+                case 44: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkedPlatform>();
+                case 45: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkPublisherAccount>();
+                case 46: return new Utf8Json.Formatters.AccelByte.Models.AchievementIconFormatter();
+                case 47: return new Utf8Json.Formatters.AccelByte.Models.PublicAchievementFormatter();
+                case 48: return new Utf8Json.Formatters.AccelByte.Models.PagingFormatter();
+                case 49: return new Utf8Json.Formatters.AccelByte.Models.PaginatedPublicAchievementFormatter();
+                case 50: return new Utf8Json.Formatters.AccelByte.Models.MultiLanguageAchievementFormatter();
+                case 51: return new Utf8Json.Formatters.AccelByte.Models.CountInfoFormatter();
+                case 52: return new Utf8Json.Formatters.AccelByte.Models.UserAchievementFormatter();
+                case 53: return new Utf8Json.Formatters.AccelByte.Models.PaginatedUserAchievementFormatter();
+                case 54: return new Utf8Json.Formatters.AccelByte.Models.IneligibleUserFormatter();
+                case 55: return new Utf8Json.Formatters.AccelByte.Models.LocalizedPolicyVersionObjectFormatter();
+                case 56: return new Utf8Json.Formatters.AccelByte.Models.PolicyVersionWithLocalizedVersionObjectFormatter();
+                case 57: return new Utf8Json.Formatters.AccelByte.Models.PublicPolicyFormatter();
+                case 58: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementRequestFormatter();
+                case 59: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementResponseFormatter();
+                case 60: return new Utf8Json.Formatters.AccelByte.Models.RetrieveUserEligibilitiesResponseFormatter();
+                case 61: return new Utf8Json.Formatters.AccelByte.Models.UserProfileFormatter();
+                case 62: return new Utf8Json.Formatters.AccelByte.Models.PublicUserProfileFormatter();
+                case 63: return new Utf8Json.Formatters.AccelByte.Models.CreateUserProfileRequestFormatter();
+                case 64: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserProfileRequestFormatter();
+                case 65: return new Utf8Json.Formatters.AccelByte.Models.UserRecordFormatter();
+                case 66: return new Utf8Json.Formatters.AccelByte.Models.GameRecordFormatter();
+                case 67: return new Utf8Json.Formatters.AccelByte.Models.ConcurrentReplaceRequestFormatter();
+                case 68: return new Utf8Json.Formatters.AccelByte.Models.SlotFormatter();
+                case 69: return new Utf8Json.Formatters.AccelByte.Models.UpdateMedataRequestFormatter();
+                case 70: return new Utf8Json.Formatters.AccelByte.Models.ConfigFormatter();
+                case 71: return new Utf8Json.Formatters.AccelByte.Models.CurrencySummaryFormatter();
+                case 72: return new Utf8Json.Formatters.AccelByte.Models.BalanceInfoFormatter();
+                case 73: return new Utf8Json.Formatters.AccelByte.Models.WalletInfoFormatter();
+                case 74: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionInfoFormatter();
+                case 75: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionPagingSlicedResultFormatter();
+                case 76: return new Utf8Json.Formatters.AccelByte.Models.CreditUserWalletRequestFormatter();
+                case 77: return new Utf8Json.Formatters.AccelByte.Models.CategoryInfoFormatter();
+                case 78: return new Utf8Json.Formatters.AccelByte.Models.RegionDataItemFormatter();
+                case 79: return new Utf8Json.Formatters.AccelByte.Models.ItemSnapshotFormatter();
+                case 80: return new Utf8Json.Formatters.AccelByte.Models.ItemCriteriaFormatter();
+                case 81: return new Utf8Json.Formatters.AccelByte.Models.ImageFormatter();
+                case 82: return new Utf8Json.Formatters.AccelByte.Models.ItemInfoFormatter();
+                case 83: return new Utf8Json.Formatters.AccelByte.Models.PopulatedItemInfoFormatter();
+                case 84: return new Utf8Json.Formatters.AccelByte.Models.ItemPagingSlicedResultFormatter();
+                case 85: return new Utf8Json.Formatters.AccelByte.Models.PaymentUrlFormatter();
+                case 86: return new Utf8Json.Formatters.AccelByte.Models.PriceFormatter();
+                case 87: return new Utf8Json.Formatters.AccelByte.Models.OrderHistoryInfoFormatter();
+                case 88: return new Utf8Json.Formatters.AccelByte.Models.OrderInfoFormatter();
+                case 89: return new Utf8Json.Formatters.AccelByte.Models.OrderPagingSlicedResultFormatter();
+                case 90: return new Utf8Json.Formatters.AccelByte.Models.OrderRequestFormatter();
+                case 91: return new Utf8Json.Formatters.AccelByte.Models.OrderTransactionFormatter();
+                case 92: return new Utf8Json.Formatters.AccelByte.Models.EntitlementInfoFormatter();
+                case 93: return new Utf8Json.Formatters.AccelByte.Models.EntitlementPagingSlicedResultFormatter();
+                case 94: return new Utf8Json.Formatters.AccelByte.Models.EntitlementSummaryFormatter();
+                case 95: return new Utf8Json.Formatters.AccelByte.Models.ConsumeUserEntitlementRequestFormatter();
+                case 96: return new Utf8Json.Formatters.AccelByte.Models.GrantUserEntitlementRequestFormatter();
+                case 97: return new Utf8Json.Formatters.AccelByte.Models.StackableEntitlementInfoFormatter();
+                case 98: return new Utf8Json.Formatters.AccelByte.Models.AttributesFormatter();
+                case 99: return new Utf8Json.Formatters.AccelByte.Models.DistributionAttributesFormatter();
+                case 100: return new Utf8Json.Formatters.AccelByte.Models.DistributionReceiverFormatter();
+                case 101: return new Utf8Json.Formatters.AccelByte.Models.OwnershipFormatter();
+                case 102: return new Utf8Json.Formatters.AccelByte.Models.ServiceErrorFormatter();
+                case 103: return new Utf8Json.Formatters.AccelByte.Models.OAuthErrorFormatter();
+                case 104: return new Utf8Json.Formatters.AccelByte.Models.GameProfileFormatter();
+                case 105: return new Utf8Json.Formatters.AccelByte.Models.GameProfileRequestFormatter();
+                case 106: return new Utf8Json.Formatters.AccelByte.Models.GameProfileAttributeFormatter();
+                case 107: return new Utf8Json.Formatters.AccelByte.Models.GameProfilePublicInfoFormatter();
+                case 108: return new Utf8Json.Formatters.AccelByte.Models.UserGameProfilesFormatter();
+                case 109: return new Utf8Json.Formatters.AccelByte.Models.TelemetryBodyFormatter();
+                case 110: return new Utf8Json.Formatters.AccelByte.Models.RuleInformationFormatter();
+                case 111: return new Utf8Json.Formatters.AccelByte.Models.RulesFormatter();
+                case 112: return new Utf8Json.Formatters.AccelByte.Models.GroupRulesFormatter();
+                case 113: return new Utf8Json.Formatters.AccelByte.Models.CreateGroupRequestFormatter();
+                case 114: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberFormatter();
+                case 115: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberInformationFormatter();
+                case 116: return new Utf8Json.Formatters.AccelByte.Models.GroupInformationFormatter();
+                case 117: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupListResponseFormatter();
+                case 118: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupRequestFormatter();
+                case 119: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupNoTypeRequestFormatter();
+                case 120: return new Utf8Json.Formatters.AccelByte.Models.UserInvitationResponseFormatter();
+                case 121: return new Utf8Json.Formatters.AccelByte.Models.JoinGroupResponseFormatter();
+                case 122: return new Utf8Json.Formatters.AccelByte.Models.KickMemberResponseFormatter();
+                case 123: return new Utf8Json.Formatters.AccelByte.Models.RejectOtherJoinResponseFormatter();
+                case 124: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupCustomRuleRequestFormatter();
+                case 125: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupPredefinedRuleRequestFormatter();
+                case 126: return new Utf8Json.Formatters.AccelByte.Models.GroupGeneralResponseFormatter();
+                case 127: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupMemberListFormatter();
+                case 128: return new Utf8Json.Formatters.AccelByte.Models.GroupRequestFormatter();
+                case 129: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupRequestListFormatter();
+                case 130: return new Utf8Json.Formatters.AccelByte.Models.AssignRoleRequestFormatter();
+                case 131: return new Utf8Json.Formatters.AccelByte.Models.MemberRolePermissionFormatter();
+                case 132: return new Utf8Json.Formatters.AccelByte.Models.MemberRoleFormatter();
+                case 133: return new Utf8Json.Formatters.AccelByte.Models.PaginatedMemberRolesFormatter();
+                case 134: return new Utf8Json.Formatters.AccelByte.Models.UserPointFormatter();
+                case 135: return new Utf8Json.Formatters.AccelByte.Models.UserRankingFormatter();
+                case 136: return new Utf8Json.Formatters.AccelByte.Models.UserRankingDataFormatter();
+                case 137: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardRankingResultFormatter();
+                case 138: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardDataFormatter();
+                case 139: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagedListFormatter();
+                case 140: return new Utf8Json.Formatters.AccelByte.Models.DisconnectNotifFormatter();
+                case 141: return new Utf8Json.Formatters.AccelByte.Models.LobbySessionIdFormatter();
+                case 142: return new Utf8Json.Formatters.AccelByte.Models.NotificationFormatter();
+                case 143: return new Utf8Json.Formatters.AccelByte.Models.ChatMessageFormatter();
+                case 144: return new Utf8Json.Formatters.AccelByte.Models.PersonalChatRequestFormatter();
+                case 145: return new Utf8Json.Formatters.AccelByte.Models.ChatChannelSlugFormatter();
+                case 146: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatRequestFormatter();
+                case 147: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatMessageFormatter();
+                case 148: return new Utf8Json.Formatters.AccelByte.Models.PartyInfoFormatter();
+                case 149: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateNotifFormatter();
+                case 150: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateRequestFormatter();
+                case 151: return new Utf8Json.Formatters.AccelByte.Models.ActivePartiesDataFormatter();
+                case 152: return new Utf8Json.Formatters.AccelByte.Models.PartyInviteRequestFormatter();
+                case 153: return new Utf8Json.Formatters.AccelByte.Models.PartyInvitationFormatter();
+                case 154: return new Utf8Json.Formatters.AccelByte.Models.PartyChatRequestFormatter();
+                case 155: return new Utf8Json.Formatters.AccelByte.Models.PartyJoinRequestFormatter();
+                case 156: return new Utf8Json.Formatters.AccelByte.Models.PartyKickRequestFormatter();
+                case 157: return new Utf8Json.Formatters.AccelByte.Models.JoinNotificationFormatter();
+                case 158: return new Utf8Json.Formatters.AccelByte.Models.KickNotificationFormatter();
+                case 159: return new Utf8Json.Formatters.AccelByte.Models.LeaveNotificationFormatter();
+                case 160: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectRequestFormatter();
+                case 161: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectResponseFormatter();
+                case 162: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectNotifFormatter();
+                case 163: return new Utf8Json.Formatters.AccelByte.Models.StartMatchmakingRequestFormatter();
+                case 164: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingNotifFormatter();
+                case 165: return new Utf8Json.Formatters.AccelByte.Models.DsNotifFormatter();
+                case 166: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingCodeFormatter();
+                case 167: return new Utf8Json.Formatters.AccelByte.Models.ReadyConsentRequestFormatter();
+                case 168: return new Utf8Json.Formatters.AccelByte.Models.ReadyForMatchConfirmationFormatter();
+                case 169: return new Utf8Json.Formatters.AccelByte.Models.RematchmakingNotificationFormatter();
+                case 170: return new Utf8Json.Formatters.AccelByte.Models.FriendshipStatusFormatter();
+                case 171: return new Utf8Json.Formatters.AccelByte.Models.FriendsFormatter();
+                case 172: return new Utf8Json.Formatters.AccelByte.Models.FriendFormatter();
+                case 173: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusFormatter();
+                case 174: return new Utf8Json.Formatters.AccelByte.Models.BulkFriendsRequestFormatter();
+                case 175: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusNotifFormatter();
+                case 176: return new Utf8Json.Formatters.AccelByte.Models.OnlineFriendsFormatter();
+                case 177: return new Utf8Json.Formatters.AccelByte.Models.UserStatusNotifFormatter();
+                case 178: return new Utf8Json.Formatters.AccelByte.Models.BulkUserStatusNotifFormatter();
+                case 179: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerRequestFormatter();
+                case 180: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerResponseFormatter();
+                case 181: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerRequestFormatter();
+                case 182: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerResponseFormatter();
+                case 183: return new Utf8Json.Formatters.AccelByte.Models.PlayerBlockedNotifFormatter();
+                case 184: return new Utf8Json.Formatters.AccelByte.Models.PlayerUnblockedNotifFormatter();
+                case 185: return new Utf8Json.Formatters.AccelByte.Models.BlockedDataFormatter();
+                case 186: return new Utf8Json.Formatters.AccelByte.Models.BlockedListFormatter();
+                case 187: return new Utf8Json.Formatters.AccelByte.Models.BlockerDataFormatter();
+                case 188: return new Utf8Json.Formatters.AccelByte.Models.BlockerListFormatter();
+                case 189: return new Utf8Json.Formatters.AccelByte.Models.SetSessionAttributeRequestFormatter();
+                case 190: return new Utf8Json.Formatters.AccelByte.Models.PlatformLinkFormatter();
+                case 191: return new Utf8Json.Formatters.AccelByte.Models.CollectionFormatter();
+                case 192: return new Utf8Json.Formatters.AccelByte.Models.QosServerFormatter();
+                case 193: return new Utf8Json.Formatters.AccelByte.Models.QosServerListFormatter();
+                case 194: return new Utf8Json.Formatters.AccelByte.Models.ServerConfigFormatter();
+                case 195: return new Utf8Json.Formatters.AccelByte.Models.RegisterServerRequestFormatter();
+                case 196: return new Utf8Json.Formatters.AccelByte.Models.ShutdownServerRequestFormatter();
+                case 197: return new Utf8Json.Formatters.AccelByte.Models.RegisterLocalServerRequestFormatter();
+                case 198: return new Utf8Json.Formatters.AccelByte.Models.PartyMemberFormatter();
+                case 199: return new Utf8Json.Formatters.AccelByte.Models.MatchPartyFormatter();
+                case 200: return new Utf8Json.Formatters.AccelByte.Models.MatchingAllyFormatter();
+                case 201: return new Utf8Json.Formatters.AccelByte.Models.MatchRequestFormatter();
+                case 202: return new Utf8Json.Formatters.AccelByte.Models.DSMClientFormatter();
+                case 203: return new Utf8Json.Formatters.AccelByte.Models.PubIpFormatter();
+                case 204: return new Utf8Json.Formatters.AccelByte.Models.ServerInfoFormatter();
+                case 205: return new Utf8Json.Formatters.AccelByte.Models.StatConfigFormatter();
+                case 206: return new Utf8Json.Formatters.AccelByte.Models.StatItemFormatter();
+                case 207: return new Utf8Json.Formatters.AccelByte.Models.CreateStatItemRequestFormatter();
+                case 208: return new Utf8Json.Formatters.AccelByte.Models.PagedStatItemsFormatter();
+                case 209: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemIncrementFormatter();
+                case 210: return new Utf8Json.Formatters.AccelByte.Models.StatItemIncrementFormatter();
+                case 211: return new Utf8Json.Formatters.AccelByte.Models.StatItemOperationResultFormatter();
+                case 212: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemResetFormatter();
+                case 213: return new Utf8Json.Formatters.AccelByte.Models.StatItemResetFormatter();
+                case 214: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemUpdateFormatter();
+                case 215: return new Utf8Json.Formatters.AccelByte.Models.StatItemUpdateFormatter();
+                case 216: return new Utf8Json.Formatters.AccelByte.Models.TelemetryEventTagFormatter();
+                case 217: return new Utf8Json.Formatters.AccelByte.Models.TokenDataFormatter();
+                case 218: return new Utf8Json.Formatters.AccelByte.Models.SessionDataFormatter();
+                case 219: return new Utf8Json.Formatters.AccelByte.Models.BanFormatter();
+                case 220: return new Utf8Json.Formatters.AccelByte.Models.PermissionFormatter();
+                case 221: return new Utf8Json.Formatters.AccelByte.Models.UserDataFormatter();
+                case 222: return new Utf8Json.Formatters.AccelByte.Models.PublicUserInfoFormatter();
+                case 223: return new Utf8Json.Formatters.AccelByte.Models.PagedPublicUsersInfoFormatter();
+                case 224: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestFormatter();
+                case 225: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestv2Formatter();
+                case 226: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserResponseFormatter();
+                case 227: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserRequestFormatter();
+                case 228: return new Utf8Json.Formatters.AccelByte.Models.PagedPlatformLinksFormatter();
+                case 229: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdRequestFormatter();
+                case 230: return new Utf8Json.Formatters.AccelByte.Models.PlatformUserIdMapFormatter();
+                case 231: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdResponseFormatter();
+                case 232: return new Utf8Json.Formatters.AccelByte.Models.CountryInfoFormatter();
+                case 233: return new Utf8Json.Formatters.AccelByte.Models.UpgradeUserRequestFormatter();
+                case 234: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkedPlatformFormatter();
+                case 235: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkPublisherAccountFormatter();
+                case 236: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkConfictMessageVariablesFormatter();
+                case 237: return new Utf8Json.Formatters.AccelByte.Models.LinkPlatformAccountRequestFormatter();
                 default: return null;
             }
         }
@@ -3392,6 +3462,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("namespace"), 1},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("user_id"), 2},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("value"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("created_at"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updated_at"), 5},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -3400,6 +3472,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("namespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("user_id"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("value"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("created_at"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("updated_at"),
                 
             };
         }
@@ -3421,6 +3495,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.user_id);
             writer.WriteRaw(this.____stringByteKeys[3]);
             formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.value, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.created_at, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.updated_at, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -3441,6 +3519,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __user_id__b__ = false;
             var __value__ = default(global::System.Collections.Generic.Dictionary<string, object>);
             var __value__b__ = false;
+            var __created_at__ = default(global::System.DateTime);
+            var __created_at__b__ = false;
+            var __updated_at__ = default(global::System.DateTime);
+            var __updated_at__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -3472,6 +3554,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __value__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
                         __value__b__ = true;
                         break;
+                    case 4:
+                        __created_at__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __created_at__b__ = true;
+                        break;
+                    case 5:
+                        __updated_at__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __updated_at__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -3486,6 +3576,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
             if(__user_id__b__) ____result.user_id = __user_id__;
             if(__value__b__) ____result.value = __value__;
+            if(__created_at__b__) ____result.created_at = __created_at__;
+            if(__updated_at__b__) ____result.updated_at = __updated_at__;
 
             return ____result;
         }
@@ -3504,6 +3596,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("key"), 0},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("namespace"), 1},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("value"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("created_at"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updated_at"), 4},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -3511,6 +3605,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("key"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("namespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("value"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("created_at"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("updated_at"),
                 
             };
         }
@@ -3530,6 +3626,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.Namespace);
             writer.WriteRaw(this.____stringByteKeys[2]);
             formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.value, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.created_at, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.updated_at, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -3548,6 +3648,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __Namespace__b__ = false;
             var __value__ = default(global::System.Collections.Generic.Dictionary<string, object>);
             var __value__b__ = false;
+            var __created_at__ = default(global::System.DateTime);
+            var __created_at__b__ = false;
+            var __updated_at__ = default(global::System.DateTime);
+            var __updated_at__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -3575,6 +3679,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __value__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
                         __value__b__ = true;
                         break;
+                    case 3:
+                        __created_at__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __created_at__b__ = true;
+                        break;
+                    case 4:
+                        __updated_at__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __updated_at__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -3587,6 +3699,99 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var ____result = new global::AccelByte.Models.GameRecord();
             if(__key__b__) ____result.key = __key__;
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
+            if(__value__b__) ____result.value = __value__;
+            if(__created_at__b__) ____result.created_at = __created_at__;
+            if(__updated_at__b__) ____result.updated_at = __updated_at__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class ConcurrentReplaceRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.ConcurrentReplaceRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public ConcurrentReplaceRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updatedAt"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("value"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("updatedAt"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("value"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.ConcurrentReplaceRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.updatedAt, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.value, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.ConcurrentReplaceRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __updatedAt__ = default(global::System.DateTime);
+            var __updatedAt__b__ = false;
+            var __value__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+            var __value__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __updatedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __updatedAt__b__ = true;
+                        break;
+                    case 1:
+                        __value__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
+                        __value__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.ConcurrentReplaceRequest();
+            if(__updatedAt__b__) ____result.updatedAt = __updatedAt__;
             if(__value__b__) ____result.value = __value__;
 
             return ____result;
@@ -3950,9 +4155,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 19},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 20},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 21},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 22},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 23},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 24},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GroupServerUrl"), 22},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 23},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 24},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 25},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -3979,6 +4185,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("AchievementServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ClientId"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ClientSecret"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("GroupServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("RedirectUri"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("AppId"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("PublisherNamespace"),
@@ -4040,10 +4247,12 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[21]);
             writer.WriteString(value.ClientSecret);
             writer.WriteRaw(this.____stringByteKeys[22]);
-            writer.WriteString(value.RedirectUri);
+            writer.WriteString(value.GroupServerUrl);
             writer.WriteRaw(this.____stringByteKeys[23]);
-            writer.WriteString(value.AppId);
+            writer.WriteString(value.RedirectUri);
             writer.WriteRaw(this.____stringByteKeys[24]);
+            writer.WriteString(value.AppId);
+            writer.WriteRaw(this.____stringByteKeys[25]);
             writer.WriteString(value.PublisherNamespace);
             
             writer.WriteEndObject();
@@ -4101,6 +4310,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __ClientId__b__ = false;
             var __ClientSecret__ = default(string);
             var __ClientSecret__b__ = false;
+            var __GroupServerUrl__ = default(string);
+            var __GroupServerUrl__b__ = false;
             var __RedirectUri__ = default(string);
             var __RedirectUri__b__ = false;
             var __AppId__ = default(string);
@@ -4211,14 +4422,18 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __ClientSecret__b__ = true;
                         break;
                     case 22:
+                        __GroupServerUrl__ = reader.ReadString();
+                        __GroupServerUrl__b__ = true;
+                        break;
+                    case 23:
                         __RedirectUri__ = reader.ReadString();
                         __RedirectUri__b__ = true;
                         break;
-                    case 23:
+                    case 24:
                         __AppId__ = reader.ReadString();
                         __AppId__b__ = true;
                         break;
-                    case 24:
+                    case 25:
                         __PublisherNamespace__ = reader.ReadString();
                         __PublisherNamespace__b__ = true;
                         break;
@@ -4254,6 +4469,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__AchievementServerUrl__b__) ____result.AchievementServerUrl = __AchievementServerUrl__;
             if(__ClientId__b__) ____result.ClientId = __ClientId__;
             if(__ClientSecret__b__) ____result.ClientSecret = __ClientSecret__;
+            if(__GroupServerUrl__b__) ____result.GroupServerUrl = __GroupServerUrl__;
             if(__RedirectUri__b__) ____result.RedirectUri = __RedirectUri__;
             if(__AppId__b__) ____result.AppId = __AppId__;
             if(__PublisherNamespace__b__) ____result.PublisherNamespace = __PublisherNamespace__;
@@ -10019,17 +10235,21 @@ namespace Utf8Json.Formatters.AccelByte.Models
         {
             this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
             {
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("errorCode"), 0},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("numericErrorCode"), 1},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("errorMessage"), 2},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("messageVariables"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("code"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("errorCode"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("numericErrorCode"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("errorMessage"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("message"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("messageVariables"), 5},
             };
 
             this.____stringByteKeys = new byte[][]
             {
-                JsonWriter.GetEncodedPropertyNameWithBeginObject("errorCode"),
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("code"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("errorCode"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("numericErrorCode"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("errorMessage"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("message"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("messageVariables"),
                 
             };
@@ -10045,12 +10265,16 @@ namespace Utf8Json.Formatters.AccelByte.Models
             
 
             writer.WriteRaw(this.____stringByteKeys[0]);
-            writer.WriteInt64(value.errorCode);
+            writer.WriteInt64(value.code);
             writer.WriteRaw(this.____stringByteKeys[1]);
-            writer.WriteInt32(value.numericErrorCode);
+            writer.WriteInt64(value.errorCode);
             writer.WriteRaw(this.____stringByteKeys[2]);
-            writer.WriteString(value.errorMessage);
+            writer.WriteInt32(value.numericErrorCode);
             writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.errorMessage);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteString(value.message);
+            writer.WriteRaw(this.____stringByteKeys[5]);
             formatterResolver.GetFormatterWithVerify<object>().Serialize(ref writer, value.messageVariables, formatterResolver);
             
             writer.WriteEndObject();
@@ -10064,12 +10288,16 @@ namespace Utf8Json.Formatters.AccelByte.Models
             }
             
 
+            var __code__ = default(long);
+            var __code__b__ = false;
             var __errorCode__ = default(long);
             var __errorCode__b__ = false;
             var __numericErrorCode__ = default(int);
             var __numericErrorCode__b__ = false;
             var __errorMessage__ = default(string);
             var __errorMessage__b__ = false;
+            var __message__ = default(string);
+            var __message__b__ = false;
             var __messageVariables__ = default(object);
             var __messageVariables__b__ = false;
 
@@ -10088,18 +10316,26 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 switch (key)
                 {
                     case 0:
+                        __code__ = reader.ReadInt64();
+                        __code__b__ = true;
+                        break;
+                    case 1:
                         __errorCode__ = reader.ReadInt64();
                         __errorCode__b__ = true;
                         break;
-                    case 1:
+                    case 2:
                         __numericErrorCode__ = reader.ReadInt32();
                         __numericErrorCode__b__ = true;
                         break;
-                    case 2:
+                    case 3:
                         __errorMessage__ = reader.ReadString();
                         __errorMessage__b__ = true;
                         break;
-                    case 3:
+                    case 4:
+                        __message__ = reader.ReadString();
+                        __message__b__ = true;
+                        break;
+                    case 5:
                         __messageVariables__ = formatterResolver.GetFormatterWithVerify<object>().Deserialize(ref reader, formatterResolver);
                         __messageVariables__b__ = true;
                         break;
@@ -10113,9 +10349,11 @@ namespace Utf8Json.Formatters.AccelByte.Models
             }
 
             var ____result = new global::AccelByte.Models.ServiceError();
+            if(__code__b__) ____result.code = __code__;
             if(__errorCode__b__) ____result.errorCode = __errorCode__;
             if(__numericErrorCode__b__) ____result.numericErrorCode = __numericErrorCode__;
             if(__errorMessage__b__) ____result.errorMessage = __errorMessage__;
+            if(__message__b__) ____result.message = __message__;
             if(__messageVariables__b__) ____result.messageVariables = __messageVariables__;
 
             return ____result;
@@ -10897,6 +11135,2476 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__EventName__b__) ____result.EventName = __EventName__;
             if(__EventNamespace__b__) ____result.EventNamespace = __EventNamespace__;
             if(__Payload__b__) ____result.Payload = __Payload__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class RuleInformationFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.RuleInformation>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public RuleInformationFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ruleAttribute"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ruleCriteria"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ruleValue"), 2},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("ruleAttribute"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ruleCriteria"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ruleValue"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.RuleInformation value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.ruleAttribute);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RuleCriteria>().Serialize(ref writer, value.ruleCriteria, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteSingle(value.ruleValue);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.RuleInformation Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __ruleAttribute__ = default(string);
+            var __ruleAttribute__b__ = false;
+            var __ruleCriteria__ = default(global::AccelByte.Models.RuleCriteria);
+            var __ruleCriteria__b__ = false;
+            var __ruleValue__ = default(float);
+            var __ruleValue__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __ruleAttribute__ = reader.ReadString();
+                        __ruleAttribute__b__ = true;
+                        break;
+                    case 1:
+                        __ruleCriteria__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RuleCriteria>().Deserialize(ref reader, formatterResolver);
+                        __ruleCriteria__b__ = true;
+                        break;
+                    case 2:
+                        __ruleValue__ = reader.ReadSingle();
+                        __ruleValue__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.RuleInformation();
+            if(__ruleAttribute__b__) ____result.ruleAttribute = __ruleAttribute__;
+            if(__ruleCriteria__b__) ____result.ruleCriteria = __ruleCriteria__;
+            if(__ruleValue__b__) ____result.ruleValue = __ruleValue__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class RulesFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.Rules>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public RulesFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("allowedAction"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ruleDetail"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("allowedAction"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ruleDetail"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.Rules value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.AllowedAction>().Serialize(ref writer, value.allowedAction, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RuleInformation[]>().Serialize(ref writer, value.ruleDetail, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.Rules Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __allowedAction__ = default(global::AccelByte.Models.AllowedAction);
+            var __allowedAction__b__ = false;
+            var __ruleDetail__ = default(global::AccelByte.Models.RuleInformation[]);
+            var __ruleDetail__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __allowedAction__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.AllowedAction>().Deserialize(ref reader, formatterResolver);
+                        __allowedAction__b__ = true;
+                        break;
+                    case 1:
+                        __ruleDetail__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RuleInformation[]>().Deserialize(ref reader, formatterResolver);
+                        __ruleDetail__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.Rules();
+            if(__allowedAction__b__) ____result.allowedAction = __allowedAction__;
+            if(__ruleDetail__b__) ____result.ruleDetail = __ruleDetail__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupRulesFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupRules>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupRulesFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupCustomRule"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupPredefinedRules"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("groupCustomRule"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupPredefinedRules"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupRules value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<object>().Serialize(ref writer, value.groupCustomRule, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Rules[]>().Serialize(ref writer, value.groupPredefinedRules, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupRules Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __groupCustomRule__ = default(object);
+            var __groupCustomRule__b__ = false;
+            var __groupPredefinedRules__ = default(global::AccelByte.Models.Rules[]);
+            var __groupPredefinedRules__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __groupCustomRule__ = formatterResolver.GetFormatterWithVerify<object>().Deserialize(ref reader, formatterResolver);
+                        __groupCustomRule__b__ = true;
+                        break;
+                    case 1:
+                        __groupPredefinedRules__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Rules[]>().Deserialize(ref reader, formatterResolver);
+                        __groupPredefinedRules__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupRules();
+            if(__groupCustomRule__b__) ____result.groupCustomRule = __groupCustomRule__;
+            if(__groupPredefinedRules__b__) ____result.groupPredefinedRules = __groupPredefinedRules__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class CreateGroupRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.CreateGroupRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public CreateGroupRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("configurationCode"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("customAttributes"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupDescription"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupIcon"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupMaxMember"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupName"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRegion"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRules"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupType"), 8},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("configurationCode"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("customAttributes"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupDescription"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupIcon"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupMaxMember"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRegion"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRules"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupType"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.CreateGroupRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.configurationCode);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.customAttributes, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.groupDescription);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.groupIcon);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteInt32(value.groupMaxMember);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteString(value.groupName);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            writer.WriteString(value.groupRegion);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRules>().Serialize(ref writer, value.groupRules, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[8]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Serialize(ref writer, value.groupType, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.CreateGroupRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __configurationCode__ = default(string);
+            var __configurationCode__b__ = false;
+            var __customAttributes__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+            var __customAttributes__b__ = false;
+            var __groupDescription__ = default(string);
+            var __groupDescription__b__ = false;
+            var __groupIcon__ = default(string);
+            var __groupIcon__b__ = false;
+            var __groupMaxMember__ = default(int);
+            var __groupMaxMember__b__ = false;
+            var __groupName__ = default(string);
+            var __groupName__b__ = false;
+            var __groupRegion__ = default(string);
+            var __groupRegion__b__ = false;
+            var __groupRules__ = default(global::AccelByte.Models.GroupRules);
+            var __groupRules__b__ = false;
+            var __groupType__ = default(global::AccelByte.Models.GroupType);
+            var __groupType__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __configurationCode__ = reader.ReadString();
+                        __configurationCode__b__ = true;
+                        break;
+                    case 1:
+                        __customAttributes__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
+                        __customAttributes__b__ = true;
+                        break;
+                    case 2:
+                        __groupDescription__ = reader.ReadString();
+                        __groupDescription__b__ = true;
+                        break;
+                    case 3:
+                        __groupIcon__ = reader.ReadString();
+                        __groupIcon__b__ = true;
+                        break;
+                    case 4:
+                        __groupMaxMember__ = reader.ReadInt32();
+                        __groupMaxMember__b__ = true;
+                        break;
+                    case 5:
+                        __groupName__ = reader.ReadString();
+                        __groupName__b__ = true;
+                        break;
+                    case 6:
+                        __groupRegion__ = reader.ReadString();
+                        __groupRegion__b__ = true;
+                        break;
+                    case 7:
+                        __groupRules__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRules>().Deserialize(ref reader, formatterResolver);
+                        __groupRules__b__ = true;
+                        break;
+                    case 8:
+                        __groupType__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Deserialize(ref reader, formatterResolver);
+                        __groupType__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.CreateGroupRequest();
+            if(__configurationCode__b__) ____result.configurationCode = __configurationCode__;
+            if(__customAttributes__b__) ____result.customAttributes = __customAttributes__;
+            if(__groupDescription__b__) ____result.groupDescription = __groupDescription__;
+            if(__groupIcon__b__) ____result.groupIcon = __groupIcon__;
+            if(__groupMaxMember__b__) ____result.groupMaxMember = __groupMaxMember__;
+            if(__groupName__b__) ____result.groupName = __groupName__;
+            if(__groupRegion__b__) ____result.groupRegion = __groupRegion__;
+            if(__groupRules__b__) ____result.groupRules = __groupRules__;
+            if(__groupType__b__) ____result.groupType = __groupType__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupMemberFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupMember>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupMemberFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("memberRoleId"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("memberRoleId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupMember value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<string[]>().Serialize(ref writer, value.memberRoleId, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupMember Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+            var __memberRoleId__ = default(string[]);
+            var __memberRoleId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    case 1:
+                        __memberRoleId__ = formatterResolver.GetFormatterWithVerify<string[]>().Deserialize(ref reader, formatterResolver);
+                        __memberRoleId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupMember();
+            if(__userId__b__) ____result.userId = __userId__;
+            if(__memberRoleId__b__) ____result.memberRoleId = __memberRoleId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupMemberInformationFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupMemberInformation>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupMemberInformationFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("memberRoleId"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("status"), 3},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("memberRoleId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("status"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupMemberInformation value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<string[]>().Serialize(ref writer, value.memberRoleId, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.groupId);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberStatus>().Serialize(ref writer, value.status, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupMemberInformation Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+            var __memberRoleId__ = default(string[]);
+            var __memberRoleId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+            var __status__ = default(global::AccelByte.Models.MemberStatus);
+            var __status__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    case 1:
+                        __memberRoleId__ = formatterResolver.GetFormatterWithVerify<string[]>().Deserialize(ref reader, formatterResolver);
+                        __memberRoleId__b__ = true;
+                        break;
+                    case 2:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    case 3:
+                        __status__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberStatus>().Deserialize(ref reader, formatterResolver);
+                        __status__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupMemberInformation();
+            if(__userId__b__) ____result.userId = __userId__;
+            if(__memberRoleId__b__) ____result.memberRoleId = __memberRoleId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+            if(__status__b__) ____result.status = __status__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupInformationFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupInformation>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupInformationFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("configurationCode"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("customAttributes"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupDescription"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupIcon"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupMaxMember"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupMembers"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupName"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRegion"), 8},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRules"), 9},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupType"), 10},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("configurationCode"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("customAttributes"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupDescription"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupIcon"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupMaxMember"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupMembers"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRegion"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRules"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupType"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupInformation value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.configurationCode);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.customAttributes, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.groupDescription);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.groupIcon);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteString(value.groupId);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteInt32(value.groupMaxMember);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupMember[]>().Serialize(ref writer, value.groupMembers, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteString(value.groupName);
+            writer.WriteRaw(this.____stringByteKeys[8]);
+            writer.WriteString(value.groupRegion);
+            writer.WriteRaw(this.____stringByteKeys[9]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRules>().Serialize(ref writer, value.groupRules, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[10]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Serialize(ref writer, value.groupType, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupInformation Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __configurationCode__ = default(string);
+            var __configurationCode__b__ = false;
+            var __customAttributes__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+            var __customAttributes__b__ = false;
+            var __groupDescription__ = default(string);
+            var __groupDescription__b__ = false;
+            var __groupIcon__ = default(string);
+            var __groupIcon__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+            var __groupMaxMember__ = default(int);
+            var __groupMaxMember__b__ = false;
+            var __groupMembers__ = default(global::AccelByte.Models.GroupMember[]);
+            var __groupMembers__b__ = false;
+            var __groupName__ = default(string);
+            var __groupName__b__ = false;
+            var __groupRegion__ = default(string);
+            var __groupRegion__b__ = false;
+            var __groupRules__ = default(global::AccelByte.Models.GroupRules);
+            var __groupRules__b__ = false;
+            var __groupType__ = default(global::AccelByte.Models.GroupType);
+            var __groupType__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __configurationCode__ = reader.ReadString();
+                        __configurationCode__b__ = true;
+                        break;
+                    case 1:
+                        __customAttributes__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
+                        __customAttributes__b__ = true;
+                        break;
+                    case 2:
+                        __groupDescription__ = reader.ReadString();
+                        __groupDescription__b__ = true;
+                        break;
+                    case 3:
+                        __groupIcon__ = reader.ReadString();
+                        __groupIcon__b__ = true;
+                        break;
+                    case 4:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    case 5:
+                        __groupMaxMember__ = reader.ReadInt32();
+                        __groupMaxMember__b__ = true;
+                        break;
+                    case 6:
+                        __groupMembers__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupMember[]>().Deserialize(ref reader, formatterResolver);
+                        __groupMembers__b__ = true;
+                        break;
+                    case 7:
+                        __groupName__ = reader.ReadString();
+                        __groupName__b__ = true;
+                        break;
+                    case 8:
+                        __groupRegion__ = reader.ReadString();
+                        __groupRegion__b__ = true;
+                        break;
+                    case 9:
+                        __groupRules__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRules>().Deserialize(ref reader, formatterResolver);
+                        __groupRules__b__ = true;
+                        break;
+                    case 10:
+                        __groupType__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Deserialize(ref reader, formatterResolver);
+                        __groupType__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupInformation();
+            if(__configurationCode__b__) ____result.configurationCode = __configurationCode__;
+            if(__customAttributes__b__) ____result.customAttributes = __customAttributes__;
+            if(__groupDescription__b__) ____result.groupDescription = __groupDescription__;
+            if(__groupIcon__b__) ____result.groupIcon = __groupIcon__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+            if(__groupMaxMember__b__) ____result.groupMaxMember = __groupMaxMember__;
+            if(__groupMembers__b__) ____result.groupMembers = __groupMembers__;
+            if(__groupName__b__) ____result.groupName = __groupName__;
+            if(__groupRegion__b__) ____result.groupRegion = __groupRegion__;
+            if(__groupRules__b__) ____result.groupRules = __groupRules__;
+            if(__groupType__b__) ____result.groupType = __groupType__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class PaginatedGroupListResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PaginatedGroupListResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PaginatedGroupListResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("paging"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("paging"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PaginatedGroupListResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupInformation[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Serialize(ref writer, value.paging, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PaginatedGroupListResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __data__ = default(global::AccelByte.Models.GroupInformation[]);
+            var __data__b__ = false;
+            var __paging__ = default(global::AccelByte.Models.Paging);
+            var __paging__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __data__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupInformation[]>().Deserialize(ref reader, formatterResolver);
+                        __data__b__ = true;
+                        break;
+                    case 1:
+                        __paging__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Deserialize(ref reader, formatterResolver);
+                        __paging__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PaginatedGroupListResponse();
+            if(__data__b__) ____result.data = __data__;
+            if(__paging__b__) ____result.paging = __paging__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class UpdateGroupRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.UpdateGroupRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public UpdateGroupRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("customAttributes"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupDescription"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupIcon"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupName"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRegion"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupType"), 5},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("customAttributes"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupDescription"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupIcon"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRegion"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupType"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.UpdateGroupRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.customAttributes, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupDescription);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.groupIcon);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.groupName);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteString(value.groupRegion);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Serialize(ref writer, value.groupType, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.UpdateGroupRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __customAttributes__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+            var __customAttributes__b__ = false;
+            var __groupDescription__ = default(string);
+            var __groupDescription__b__ = false;
+            var __groupIcon__ = default(string);
+            var __groupIcon__b__ = false;
+            var __groupName__ = default(string);
+            var __groupName__b__ = false;
+            var __groupRegion__ = default(string);
+            var __groupRegion__b__ = false;
+            var __groupType__ = default(global::AccelByte.Models.GroupType);
+            var __groupType__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __customAttributes__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
+                        __customAttributes__b__ = true;
+                        break;
+                    case 1:
+                        __groupDescription__ = reader.ReadString();
+                        __groupDescription__b__ = true;
+                        break;
+                    case 2:
+                        __groupIcon__ = reader.ReadString();
+                        __groupIcon__b__ = true;
+                        break;
+                    case 3:
+                        __groupName__ = reader.ReadString();
+                        __groupName__b__ = true;
+                        break;
+                    case 4:
+                        __groupRegion__ = reader.ReadString();
+                        __groupRegion__b__ = true;
+                        break;
+                    case 5:
+                        __groupType__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupType>().Deserialize(ref reader, formatterResolver);
+                        __groupType__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.UpdateGroupRequest();
+            if(__customAttributes__b__) ____result.customAttributes = __customAttributes__;
+            if(__groupDescription__b__) ____result.groupDescription = __groupDescription__;
+            if(__groupIcon__b__) ____result.groupIcon = __groupIcon__;
+            if(__groupName__b__) ____result.groupName = __groupName__;
+            if(__groupRegion__b__) ____result.groupRegion = __groupRegion__;
+            if(__groupType__b__) ____result.groupType = __groupType__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class UpdateGroupNoTypeRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.UpdateGroupNoTypeRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public UpdateGroupNoTypeRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("customAttributes"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupDescription"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupIcon"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupName"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupRegion"), 4},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("customAttributes"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupDescription"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupIcon"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupRegion"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.UpdateGroupNoTypeRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Serialize(ref writer, value.customAttributes, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupDescription);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.groupIcon);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.groupName);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteString(value.groupRegion);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.UpdateGroupNoTypeRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __customAttributes__ = default(global::System.Collections.Generic.Dictionary<string, object>);
+            var __customAttributes__b__ = false;
+            var __groupDescription__ = default(string);
+            var __groupDescription__b__ = false;
+            var __groupIcon__ = default(string);
+            var __groupIcon__b__ = false;
+            var __groupName__ = default(string);
+            var __groupName__b__ = false;
+            var __groupRegion__ = default(string);
+            var __groupRegion__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __customAttributes__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, object>>().Deserialize(ref reader, formatterResolver);
+                        __customAttributes__b__ = true;
+                        break;
+                    case 1:
+                        __groupDescription__ = reader.ReadString();
+                        __groupDescription__b__ = true;
+                        break;
+                    case 2:
+                        __groupIcon__ = reader.ReadString();
+                        __groupIcon__b__ = true;
+                        break;
+                    case 3:
+                        __groupName__ = reader.ReadString();
+                        __groupName__b__ = true;
+                        break;
+                    case 4:
+                        __groupRegion__ = reader.ReadString();
+                        __groupRegion__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.UpdateGroupNoTypeRequest();
+            if(__customAttributes__b__) ____result.customAttributes = __customAttributes__;
+            if(__groupDescription__b__) ____result.groupDescription = __groupDescription__;
+            if(__groupIcon__b__) ____result.groupIcon = __groupIcon__;
+            if(__groupName__b__) ____result.groupName = __groupName__;
+            if(__groupRegion__b__) ____result.groupRegion = __groupRegion__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class UserInvitationResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.UserInvitationResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public UserInvitationResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.UserInvitationResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.UserInvitationResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    case 1:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.UserInvitationResponse();
+            if(__userId__b__) ____result.userId = __userId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class JoinGroupResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.JoinGroupResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public JoinGroupResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("status"), 2},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("status"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.JoinGroupResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupId);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.JoinGroupStatus>().Serialize(ref writer, value.status, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.JoinGroupResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+            var __status__ = default(global::AccelByte.Models.JoinGroupStatus);
+            var __status__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    case 1:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    case 2:
+                        __status__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.JoinGroupStatus>().Deserialize(ref reader, formatterResolver);
+                        __status__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.JoinGroupResponse();
+            if(__userId__b__) ____result.userId = __userId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+            if(__status__b__) ____result.status = __status__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class KickMemberResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.KickMemberResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public KickMemberResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("kickedUserId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("kickedUserId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.KickMemberResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.kickedUserId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.KickMemberResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __kickedUserId__ = default(string);
+            var __kickedUserId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __kickedUserId__ = reader.ReadString();
+                        __kickedUserId__b__ = true;
+                        break;
+                    case 1:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.KickMemberResponse();
+            if(__kickedUserId__b__) ____result.kickedUserId = __kickedUserId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class RejectOtherJoinResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.RejectOtherJoinResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public RejectOtherJoinResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rejectedUserId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("rejectedUserId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.RejectOtherJoinResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.rejectedUserId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.RejectOtherJoinResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __rejectedUserId__ = default(string);
+            var __rejectedUserId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __rejectedUserId__ = reader.ReadString();
+                        __rejectedUserId__b__ = true;
+                        break;
+                    case 1:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.RejectOtherJoinResponse();
+            if(__rejectedUserId__b__) ____result.rejectedUserId = __rejectedUserId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class UpdateGroupCustomRuleRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.UpdateGroupCustomRuleRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public UpdateGroupCustomRuleRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupCustomRule"), 0},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("groupCustomRule"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.UpdateGroupCustomRuleRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<object>().Serialize(ref writer, value.groupCustomRule, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.UpdateGroupCustomRuleRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __groupCustomRule__ = default(object);
+            var __groupCustomRule__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __groupCustomRule__ = formatterResolver.GetFormatterWithVerify<object>().Deserialize(ref reader, formatterResolver);
+                        __groupCustomRule__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.UpdateGroupCustomRuleRequest();
+            if(__groupCustomRule__b__) ____result.groupCustomRule = __groupCustomRule__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class UpdateGroupPredefinedRuleRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.UpdateGroupPredefinedRuleRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public UpdateGroupPredefinedRuleRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ruleDetail"), 0},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("ruleDetail"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.UpdateGroupPredefinedRuleRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.RuleInformation>>().Serialize(ref writer, value.ruleDetail, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.UpdateGroupPredefinedRuleRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __ruleDetail__ = default(global::System.Collections.Generic.List<global::AccelByte.Models.RuleInformation>);
+            var __ruleDetail__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __ruleDetail__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.RuleInformation>>().Deserialize(ref reader, formatterResolver);
+                        __ruleDetail__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.UpdateGroupPredefinedRuleRequest();
+            if(__ruleDetail__b__) ____result.ruleDetail = __ruleDetail__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupGeneralResponseFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupGeneralResponse>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupGeneralResponseFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("groupId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("userId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupGeneralResponse value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.groupId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.userId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupGeneralResponse Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    case 1:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupGeneralResponse();
+            if(__groupId__b__) ____result.groupId = __groupId__;
+            if(__userId__b__) ____result.userId = __userId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class PaginatedGroupMemberListFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PaginatedGroupMemberList>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PaginatedGroupMemberListFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("paging"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("paging"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PaginatedGroupMemberList value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupMemberInformation[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Serialize(ref writer, value.paging, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PaginatedGroupMemberList Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __data__ = default(global::AccelByte.Models.GroupMemberInformation[]);
+            var __data__b__ = false;
+            var __paging__ = default(global::AccelByte.Models.Paging);
+            var __paging__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __data__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupMemberInformation[]>().Deserialize(ref reader, formatterResolver);
+                        __data__b__ = true;
+                        break;
+                    case 1:
+                        __paging__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Deserialize(ref reader, formatterResolver);
+                        __paging__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PaginatedGroupMemberList();
+            if(__data__b__) ____result.data = __data__;
+            if(__paging__b__) ____result.paging = __paging__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class GroupRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.GroupRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public GroupRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("groupId"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("requestType"), 2},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("groupId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("requestType"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.GroupRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.groupId);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RequestType>().Serialize(ref writer, value.requestType, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.GroupRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+            var __groupId__ = default(string);
+            var __groupId__b__ = false;
+            var __requestType__ = default(global::AccelByte.Models.RequestType);
+            var __requestType__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    case 1:
+                        __groupId__ = reader.ReadString();
+                        __groupId__b__ = true;
+                        break;
+                    case 2:
+                        __requestType__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.RequestType>().Deserialize(ref reader, formatterResolver);
+                        __requestType__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.GroupRequest();
+            if(__userId__b__) ____result.userId = __userId__;
+            if(__groupId__b__) ____result.groupId = __groupId__;
+            if(__requestType__b__) ____result.requestType = __requestType__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class PaginatedGroupRequestListFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PaginatedGroupRequestList>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PaginatedGroupRequestListFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("paging"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("paging"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PaginatedGroupRequestList value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRequest[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Serialize(ref writer, value.paging, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PaginatedGroupRequestList Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __data__ = default(global::AccelByte.Models.GroupRequest[]);
+            var __data__b__ = false;
+            var __paging__ = default(global::AccelByte.Models.Paging);
+            var __paging__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __data__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.GroupRequest[]>().Deserialize(ref reader, formatterResolver);
+                        __data__b__ = true;
+                        break;
+                    case 1:
+                        __paging__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Deserialize(ref reader, formatterResolver);
+                        __paging__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PaginatedGroupRequestList();
+            if(__data__b__) ____result.data = __data__;
+            if(__paging__b__) ____result.paging = __paging__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class AssignRoleRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.AssignRoleRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public AssignRoleRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("userId"), 0},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("userId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.AssignRoleRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.userId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.AssignRoleRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __userId__ = default(string);
+            var __userId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __userId__ = reader.ReadString();
+                        __userId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.AssignRoleRequest();
+            if(__userId__b__) ____result.userId = __userId__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class MemberRolePermissionFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.MemberRolePermission>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public MemberRolePermissionFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("action"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("resourceName"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("action"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("resourceName"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.MemberRolePermission value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteInt32(value.action);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.resourceName);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.MemberRolePermission Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __action__ = default(int);
+            var __action__b__ = false;
+            var __resourceName__ = default(string);
+            var __resourceName__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __action__ = reader.ReadInt32();
+                        __action__b__ = true;
+                        break;
+                    case 1:
+                        __resourceName__ = reader.ReadString();
+                        __resourceName__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.MemberRolePermission();
+            if(__action__b__) ____result.action = __action__;
+            if(__resourceName__b__) ____result.resourceName = __resourceName__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class MemberRoleFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.MemberRole>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public MemberRoleFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("memberRoleId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("memberRoleName"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("memberRolePermissions"), 2},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("memberRoleId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("memberRoleName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("memberRolePermissions"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.MemberRole value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.memberRoleId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.memberRoleName);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberRolePermission[]>().Serialize(ref writer, value.memberRolePermissions, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.MemberRole Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __memberRoleId__ = default(string);
+            var __memberRoleId__b__ = false;
+            var __memberRoleName__ = default(string);
+            var __memberRoleName__b__ = false;
+            var __memberRolePermissions__ = default(global::AccelByte.Models.MemberRolePermission[]);
+            var __memberRolePermissions__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __memberRoleId__ = reader.ReadString();
+                        __memberRoleId__b__ = true;
+                        break;
+                    case 1:
+                        __memberRoleName__ = reader.ReadString();
+                        __memberRoleName__b__ = true;
+                        break;
+                    case 2:
+                        __memberRolePermissions__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberRolePermission[]>().Deserialize(ref reader, formatterResolver);
+                        __memberRolePermissions__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.MemberRole();
+            if(__memberRoleId__b__) ____result.memberRoleId = __memberRoleId__;
+            if(__memberRoleName__b__) ____result.memberRoleName = __memberRoleName__;
+            if(__memberRolePermissions__b__) ____result.memberRolePermissions = __memberRolePermissions__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class PaginatedMemberRolesFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PaginatedMemberRoles>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PaginatedMemberRolesFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("paging"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("paging"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PaginatedMemberRoles value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberRole[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Serialize(ref writer, value.paging, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PaginatedMemberRoles Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __data__ = default(global::AccelByte.Models.MemberRole[]);
+            var __data__b__ = false;
+            var __paging__ = default(global::AccelByte.Models.Paging);
+            var __paging__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __data__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.MemberRole[]>().Deserialize(ref reader, formatterResolver);
+                        __data__b__ = true;
+                        break;
+                    case 1:
+                        __paging__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.Paging>().Deserialize(ref reader, formatterResolver);
+                        __paging__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PaginatedMemberRoles();
+            if(__data__b__) ____result.data = __data__;
+            if(__paging__b__) ____result.paging = __paging__;
 
             return ____result;
         }
@@ -16155,6 +18863,108 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var ____result = new global::AccelByte.Models.BlockerList();
             if(__data__b__) ____result.data = __data__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class SetSessionAttributeRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.SetSessionAttributeRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public SetSessionAttributeRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("namespace"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("key"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("value"), 2},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("namespace"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("key"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("value"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.SetSessionAttributeRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.Namespace);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.key);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.value);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.SetSessionAttributeRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __Namespace__ = default(string);
+            var __Namespace__b__ = false;
+            var __key__ = default(string);
+            var __key__b__ = false;
+            var __value__ = default(string);
+            var __value__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __Namespace__ = reader.ReadString();
+                        __Namespace__b__ = true;
+                        break;
+                    case 1:
+                        __key__ = reader.ReadString();
+                        __key__b__ = true;
+                        break;
+                    case 2:
+                        __value__ = reader.ReadString();
+                        __value__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.SetSessionAttributeRequest();
+            if(__Namespace__b__) ____result.Namespace = __Namespace__;
+            if(__key__b__) ____result.key = __key__;
+            if(__value__b__) ____result.value = __value__;
 
             return ____result;
         }

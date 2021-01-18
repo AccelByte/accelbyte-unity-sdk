@@ -99,6 +99,19 @@ namespace AccelByte.Core
         UserStatAlreadyExist = 12274,
         StatValueOutOfRange = 12275,
 
+        //AccelByte Group error codes
+        UserNotBelongToAnyGroup = 73034,
+        InsufficientMemberRolePermission = 73036,
+        UserAccessDifferentGroup = 73037,
+        GroupNotFound = 73333,
+        UserAlreadyJoinedGroup = 73342,
+        UserAlreadyInvited = 73437,
+        UserAlreadyRequestedToJoin = 73438,
+        GroupAdminCannotLeaveGroup = 73440,
+        PrivateGroupIsNotJoinable = 73441,
+        UserAlreadyJoinedInAnotherGroup = 73442,
+        MemberRequestNotFound = 73443,
+
         //Client side error codes
         GeneralClientError = 14000,
         ErrorFromException = 14001,
@@ -127,6 +140,7 @@ namespace AccelByte.Core
         EmailAlreadyUsed = 10133,
         CountryNotFound = 10154,
         PlatformAlreadyLinked = 10173,
+        UserAlreadyExist = 10180,
         FriendListIsEmpty = 11732,
 
         //AccelByte Lobby error codes
@@ -288,6 +302,15 @@ namespace AccelByte.Core
         PlayerUnblockRequestUnableBlockPlayer     = 11806,
         PlayerBlocked                             = 11807,
         PlayerBlockedUnableGet                    = 11808,
+
+        //AccelByte CloudSave error codes
+        GameRecordNotFound = 18003,
+        PlayerRecordNotFound = 18022,
+        GameRecordPreconditionFailed = 18056,
+        PlayerRecordPreconditionFailed = 18103,
+        
+        //AccelByte DSM error codes
+        DedicatedServerNotFound = 9014183
     }
 
     public class Error

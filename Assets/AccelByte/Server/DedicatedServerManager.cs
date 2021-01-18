@@ -111,7 +111,7 @@ namespace AccelByte.Server
                             this.OnMatchRequest?.Invoke(result.Value);
                         }else if(result.IsError)
                         {
-                            if ((int)result.Error.Code >= 400 && (int)result.Error.Code < 500)
+                            if (((int)result.Error.Code >= 400 && (int)result.Error.Code < 500) || result.Error.Code == ErrorCode.DedicatedServerNotFound)
                             {
                                 if (heartbeatRetryCount <= heartbeatErrorRetry)
                                 {

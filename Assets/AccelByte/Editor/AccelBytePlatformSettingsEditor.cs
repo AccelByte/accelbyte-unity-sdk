@@ -163,6 +163,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Group Server Url");
+            TemporarySetting.GroupServerUrl = EditorGUILayout.TextField(TemporarySetting.GroupServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Client Id");
             TemporarySetting.ClientId = EditorGUILayout.TextField(TemporarySetting.ClientId);
             EditorGUILayout.EndHorizontal();

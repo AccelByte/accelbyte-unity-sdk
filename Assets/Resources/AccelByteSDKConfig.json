@@ -19,6 +19,7 @@
   "LeaderboardServerUrl": "https://api.demo.accelbyte.io/leaderboard",
   "CloudSaveServerUrl": "https://api.demo.accelbyte.io/cloudsave",
   "GameTelemetryServerUrl": "https://api.demo.accelbyte.io/game-telemetry",
+  "GroupServerUrl":  "https://api.demo.accelbyte.io/group",
   "ClientId": "<YOUR-GAME-CLIENT-ID>",
   "ClientSecret": "<YOUR-GAME-CLIENT-SECRET>",
   "RedirectUri": "http://127.0.0.1",

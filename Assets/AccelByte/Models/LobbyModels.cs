@@ -92,6 +92,8 @@ namespace AccelByte.Models
         unblockPlayerResponse,
         blockPlayerNotif,
         unblockPlayerNotif,
+        setSessionAttributeRequest,
+        setSessionAttributeResponse
     }
 
     [DataContract]
@@ -513,6 +515,30 @@ namespace AccelByte.Models
     public class BlockerList
     {
         [DataMember] public BlockerData[] data;
+    }
+
+    #endregion
+
+    #region Session Attribute
+
+    public enum SessionAttributeName
+    {
+        profanity_filtering_level
+    }
+
+    public enum ProfanityFilterLevel
+    {
+        all,
+        mandatory,
+        none
+    }
+
+    [DataContract]
+    public class SetSessionAttributeRequest
+    {
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string key;
+        [DataMember] public string value;
     }
 
     #endregion

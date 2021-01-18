@@ -31,6 +31,7 @@ namespace AccelByte.Models
         [DataMember] public string AchievementServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
+        [DataMember] public string GroupServerUrl { get; set; }
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string AppId { get; set; }
         [DataMember] public string PublisherNamespace { get; set; }
@@ -65,6 +66,7 @@ namespace AccelByte.Models
                 this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
                 this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
                 this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
+                this.GroupServerUrl == anotherConfig.GroupServerUrl &&
                 this.ClientId == anotherConfig.ClientId &&
                 this.ClientSecret == anotherConfig.ClientSecret &&
                 this.RedirectUri == anotherConfig.RedirectUri &&
@@ -121,6 +123,8 @@ namespace AccelByte.Models
                 if (this.GameTelemetryServerUrl == null) this.GameTelemetryServerUrl = httpsBaseUrl + "/game-telemetry";
 
                 if (this.AchievementServerUrl == null) this.AchievementServerUrl = httpsBaseUrl + "/achievement";
+                
+                if (this.GroupServerUrl == null) this.GroupServerUrl = httpsBaseUrl + "/group";
             }
         }
 
@@ -166,6 +170,8 @@ namespace AccelByte.Models
                 if (this.GameTelemetryServerUrl == httpsBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
 
                 if (this.AchievementServerUrl == httpsBaseUrl + "/achievement") this.AchievementServerUrl = null;
+                
+                if (this.GroupServerUrl == httpsBaseUrl + "/group") this.GroupServerUrl = null;
             }
         }
     }

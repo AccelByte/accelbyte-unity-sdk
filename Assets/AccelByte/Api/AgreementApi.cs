@@ -99,6 +99,29 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator BulkAcceptPolicyVersionsIndirect(string accessToken, AcceptAgreementRequest[] acceptAgreementRequests,
+            ResultCallback callback)
+        {
+            string functionName = "BulkAcceptPolicyVersions";
+            Report.GetFunctionLog(GetType().Name, functionName);
+            Assert.IsNotNull(accessToken, "Can't " + functionName + "! AccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(baseUrl + "/public/agreements/policies/users/me")
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(acceptAgreementRequests.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
         public IEnumerator AcceptPolicyVersion(string accessToken, string localizedPolicyVersionId, 
             ResultCallback callback)
         {

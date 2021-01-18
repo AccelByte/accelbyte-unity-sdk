@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -123,6 +124,42 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key,
+            ConcurrentReplaceRequest data, ResultCallback callback, Action callbackOnConflictedData = null)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(key, nameof(key) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/namespaces/{namespace}/users/{userID}/concurrent/records/{key}/public")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userID", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+
+            if (result.IsError && result.Error.Code == ErrorCode.PlayerRecordPreconditionFailed && callbackOnConflictedData != null)
+            {
+                callbackOnConflictedData?.Invoke();
+            }
+            else
+            {
+                callback.Try(result);
+            }
+        }
+
         public IEnumerator DeleteUserRecord(string @namespace, string userId, string accessToken, string key,
             ResultCallback callback)
         {
@@ -221,6 +258,40 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
             callback.Try(result);
+        }
+
+        public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key,
+            ConcurrentReplaceRequest data, ResultCallback callback, Action callbackOnConflictedData = null)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(key, nameof(key) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/namespaces/{namespace}/concurrent/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+
+            if (result.IsError && result.Error.Code == ErrorCode.GameRecordPreconditionFailed && callbackOnConflictedData != null)
+            {
+                callbackOnConflictedData?.Invoke();
+            }
+            else
+            {
+                callback.Try(result);
+            }
         }
 
         public IEnumerator DeleteGameRecord(string @namespace, string accessToken, string key,

@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -124,6 +125,121 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Replace a record in user-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one, but will failed if lastUpdated is not up-to-date.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="lastUpdated">last time the record is updated. Retrieve it from GetGameRecord.</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceUserRecordCheckLatest(string key, DateTime lastUpdated, Dictionary<string, object> recordRequest, ResultCallback callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
+            Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            ConcurrentReplaceRequest request = new ConcurrentReplaceRequest
+            {
+                updatedAt = lastUpdated,
+                value = recordRequest
+            };
+
+            this.coroutineRunner.Run(this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, request, callback));
+        }
+
+        /// <summary>
+        /// Replace a record in user-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one.
+        /// Beware:
+        /// Function will try to get the latest value, put it in the custom modifier and request to replace the record. will retry it again when the record is updated by other user, until exhaust all the attempt.
+        /// </summary>
+        /// <param name="tryAttempt"> Attempt to try to replace the game record.</param>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="payloadModifier">Function to modify the latest record value with your customized modifier.</param>
+        public void ReplaceUserRecordCheckLatest(int tryAttempt, string key, Dictionary<string, object> recordRequest, ResultCallback callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            ReplaceUserRecordRecursive(tryAttempt, key, recordRequest, callback, payloadModifier);
+        }
+
+        private void ReplaceUserRecordRecursive(int remainingAttempt, string key, Dictionary<string, object> recordRequest, ResultCallback callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        {
+            if (remainingAttempt <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.PreconditionFailed, "Exhaust all retry attempt to modify game record. Please try again."));
+                return;
+            }
+
+            GetUserRecord(key, getUserRecordResult =>
+            {
+                var updateRequest = new ConcurrentReplaceRequest();
+                if (getUserRecordResult.IsError)
+                {
+                    if (getUserRecordResult.Error.Code == ErrorCode.PlayerRecordNotFound)
+                    {
+                        updateRequest.value = recordRequest;
+                        updateRequest.updatedAt = DateTime.Now;
+
+                        this.coroutineRunner.Run(
+                            this.api.ReplaceUserRecord(
+                                this.@namespace,
+                                this.session.UserId,
+                                this.session.AuthorizationToken,
+                                key,
+                                updateRequest,
+                                callback,
+                                () =>
+                                {
+                                    ReplaceUserRecordRecursive(remainingAttempt - 1, key, recordRequest, callback, payloadModifier);
+                                }));
+                    }
+                    else
+                    {
+                        callback.TryError(getUserRecordResult.Error);
+                    }
+                }
+                else
+                {
+                    getUserRecordResult.Value.value = payloadModifier(getUserRecordResult.Value.value);
+
+                    updateRequest.value = getUserRecordResult.Value.value;
+                    updateRequest.updatedAt = getUserRecordResult.Value.updated_at;
+
+                    this.coroutineRunner.Run(
+                        this.api.ReplaceUserRecord(
+                            this.@namespace,
+                            this.session.UserId,
+                            this.session.AuthorizationToken,
+                            key,
+                            updateRequest,
+                            callback,
+                            () =>
+                            {
+                                ReplaceUserRecordRecursive(remainingAttempt - 1, key, recordRequest, callback, payloadModifier);
+                            }));
+                }
+            });
+        }
+
+        /// <summary>
         /// Delete a record under the given key in user-level.
         /// </summary>
         /// <param name="key">Key of record</param>
@@ -209,6 +325,119 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.api.ReplaceGameRecord(this.@namespace, this.session.AuthorizationToken, key, recordRequest, callback));
+        }
+
+        /// <summary>
+        /// Replace a record in namespace-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one, but will failed if lastUpdated is not up-to-date.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="lastUpdated">last time the record is updated. Retrieve it from GetGameRecord.</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceGameRecordCheckLatest(string key, DateTime lastUpdated, Dictionary<string, object> recordRequest, ResultCallback callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
+            Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            ConcurrentReplaceRequest request = new ConcurrentReplaceRequest
+            {
+                updatedAt = lastUpdated,
+                value = recordRequest
+            };
+
+            this.coroutineRunner.Run(this.api.ReplaceGameRecord(this.@namespace, this.session.AuthorizationToken, key, request, callback));
+        }
+
+        /// <summary>
+        /// Replace a record in namespace-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one.
+        /// Beware:
+        /// Function will try to get the latest value, put it in the custom modifier and request to replace the record. will retry it again when the record is updated by other user, until exhaust all the attempt.
+        /// </summary>
+        /// <param name="tryAttempt"> Attempt to try to replace the game record.</param>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="payloadModifier">Function to modify the latest record value with your customized modifier.</param>
+        public void ReplaceGameRecordCheckLatest(int tryAttempt, string key, Dictionary<string, object> recordRequest, ResultCallback callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
+
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            ReplaceGameRecordRecursive(tryAttempt, key, recordRequest, callback, payloadModifier);
+        }
+
+        private void ReplaceGameRecordRecursive(int remainingAttempt, string key, Dictionary<string, object> recordRequest, ResultCallback callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        {
+            if (remainingAttempt <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.PreconditionFailed, "Exhaust all retry attempt to modify game record. Please try again."));
+                return;
+            }
+
+            GetGameRecord(key, getGameRecordResult =>
+            {
+                var updateRequest = new ConcurrentReplaceRequest();
+                if (getGameRecordResult.IsError)
+                {
+                    if (getGameRecordResult.Error.Code == ErrorCode.GameRecordNotFound)
+                    {
+                        updateRequest.value = recordRequest;
+                        updateRequest.updatedAt = DateTime.Now;
+
+                        this.coroutineRunner.Run(
+                            this.api.ReplaceGameRecord(
+                                this.@namespace,
+                                this.session.AuthorizationToken,
+                                key,
+                                updateRequest,
+                                callback,
+                                () =>
+                                {
+                                    ReplaceGameRecordRecursive(remainingAttempt - 1, key, recordRequest, callback, payloadModifier);
+                                }));
+                    }
+                    else
+                    {
+                        callback.TryError(getGameRecordResult.Error);
+                    }
+                }
+                else
+                {
+                    getGameRecordResult.Value.value = payloadModifier(getGameRecordResult.Value.value);
+
+                    updateRequest.value = getGameRecordResult.Value.value;
+                    updateRequest.updatedAt = getGameRecordResult.Value.updated_at;
+
+                    this.coroutineRunner.Run(
+                        this.api.ReplaceGameRecord(
+                            this.@namespace,
+                            this.session.AuthorizationToken,
+                            key,
+                            updateRequest,
+                            callback,
+                            () =>
+                            {
+                                ReplaceGameRecordRecursive(remainingAttempt - 1, key, recordRequest, callback, payloadModifier);
+                            }));
+                }
+            });
         }
 
         /// <summary>

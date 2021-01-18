@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.24.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.24.0%0D2.23.0) (2020-11-25)
+
+
+### Features
+
+* **cloudsave:** replace record concurrently ([c5b788c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c5b788cb77572dd5b8456776b443512c067340a9))
+* **group:** bringback group api from VE ([1084f09](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1084f09a709afedbac303e0fe21abea113681ded))
+* **profanityFilter:** add new WS command setSessionAttribute in lobby, add profanity filter test ([7fbdbf9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7fbdbf9a4e39ca67157d372292eea0144bf36102))
+
+
+### Refactors
+
+* **agreement:** add bulk accept legal to support ismandatory in apigateway ([c453047](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c4530477cc33a70eb2e482e5d07c4d7e43fba3b8))
+* **userId:** get user id by calling refresh data ([e9071af](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e9071af26be6b60d8cbe2f8ce686bd1659ed3b62))
+
 ## [2.23.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.23.0%0D2.22.0) (2020-11-11)
 
 

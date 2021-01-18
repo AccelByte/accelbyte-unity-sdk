@@ -48,6 +48,7 @@ namespace AccelByte.Api
         private static CloudSave cloudSave;
         private static GameTelemetry gameTelemetry;
         private static Achievement achievement;
+        private static Group group;
 
         private static bool hasBeenInitialized = false;
 
@@ -431,6 +432,19 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.achievement;
+        }
+        
+        public static Group GetGroup()
+        {
+            if (AccelBytePlugin.group == null)
+            {
+                AccelBytePlugin.group = new Group(
+                    new GroupApi(AccelBytePlugin.config.GroupServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+            return AccelBytePlugin.group;
         }
     }
 }

@@ -64,7 +64,11 @@ namespace AccelByte.Core
                     {
                         if (error.errorCode == 0)
                         {
-                            return Result.CreateError((ErrorCode) response.Code);
+                            if (error.code == 0)
+                            {
+                                return Result.CreateError((ErrorCode)response.Code);
+                            }
+                            return Result.CreateError((ErrorCode)error.code, error.message);
                         }
 
                         if (error.messageVariables == null)
@@ -188,7 +192,11 @@ namespace AccelByte.Core
                     {
                         if (error.errorCode == 0)
                         {
-                            return Result<T>.CreateError((ErrorCode) response.Code);
+                            if (error.code == 0)
+                            {
+                                return Result<T>.CreateError((ErrorCode)response.Code);
+                            }
+                            return Result<T>.CreateError((ErrorCode)error.code, error.message);
                         }
 
                         if (error.messageVariables == null)

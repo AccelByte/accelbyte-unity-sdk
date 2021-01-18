@@ -385,6 +385,10 @@ namespace HybridWebSocket
             try
             {
                 this.webSocket = new WebSocketSharp.WebSocket(url, protocols);
+                this.webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default 
+                    | System.Security.Authentication.SslProtocols.Tls11 
+                    | System.Security.Authentication.SslProtocols.Tls12;
+
                 this.webSocket.CustomHeaders = new Dictionary<string, string>
                 {
                     { "X-Ab-LobbySessionID" , sessionId}

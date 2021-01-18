@@ -88,8 +88,6 @@ namespace AccelByte.Api
 
                     yield break;
                 }
-
-                this.loginSession.UserId = this.userDataCache.userId;
             }
 
             callback.TryOk();
@@ -297,6 +295,8 @@ namespace AccelByte.Api
             if (!result.IsError)
             {
                 this.userDataCache = result.Value;
+                this.loginSession.UserId = this.userDataCache.userId;
+
                 callback.TryOk(this.userDataCache);
 
                 yield break;

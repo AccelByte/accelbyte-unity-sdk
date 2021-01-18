@@ -104,6 +104,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.AchievementServerUrl = value; }
         }
 
+        public static string GroupServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.GroupServerUrl; }
+            set { AccelByteSettings.Instance.config.GroupServerUrl = value; }
+        }
+        
         public static string AgreementServerUrl
         {
             get { return AccelByteSettings.Instance.config.AgreementServerUrl; }
@@ -148,8 +154,8 @@ namespace AccelByte.Api
 
         public static string PublisherNamespace
         {
-            get { return AccelByteSettings.instance.config.AppId; }
-            set { AccelByteSettings.instance.config.AppId = value; }
+            get { return AccelByteSettings.instance.config.PublisherNamespace; }
+            set { AccelByteSettings.instance.config.PublisherNamespace = value; }
         }
 
         private Config config;
