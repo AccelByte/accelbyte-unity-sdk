@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.28.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.0%0D2.27.0) (2021-01-20)
+
+
+### Features
+
+* **Automation Metric:** SDET-1300 Integrate SDK Test Result to Automation Metrics ([731e761](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/731e7617cdeb34d968f3c0808a240a1bae476c48)), closes [#235](https://accelbyte.atlassian.net/browse/235)
+* **lobby:** add matchmaking with extra attribute parameter ([f8e3c9b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f8e3c9b30267f11df4388663d226c2acc537606e)), closes [#236](https://accelbyte.atlassian.net/browse/236)
+* **server:** add GetPartyDataByUserId in server ([739a76d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/739a76d53525079a06601355d1810b8dbcb102e2)), closes [#238](https://accelbyte.atlassian.net/browse/238)
+
+
+### Bug Fixes
+
+* **age:** update age to comply new requisite ([f084a73](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f084a7366df578ac6c85603510cb25c3fa8aa025))
+* **config:** check required field on init ([ad9be26](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ad9be2607c7e80404328e1964ff90e45cae7a829))
+
 ## [2.27.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.27.0%0D2.26.0) (2021-01-06)
 
 

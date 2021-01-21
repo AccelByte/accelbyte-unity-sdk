@@ -302,6 +302,9 @@ namespace AccelByte.Core
         PlayerUnblockRequestUnableBlockPlayer     = 11806,
         PlayerBlocked                             = 11807,
         PlayerBlockedUnableGet                    = 11808,
+        //PartyStorage
+        PartyStorageOutdatedUpdateData            = 11903,
+        PartyNotFound                             = 11901,
 
         //AccelByte CloudSave error codes
         GameRecordNotFound = 18003,

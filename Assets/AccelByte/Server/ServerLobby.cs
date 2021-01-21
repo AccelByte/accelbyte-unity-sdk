@@ -217,5 +217,30 @@ namespace AccelByte.Server
                     offset,
                     callback));
         }
+
+        /// <summary>
+        /// Get active party info by user Id
+        /// </summary>
+        /// <param name="userId">The user ID to be searched</param>
+        /// <param name="callback">Returns PartyDataUpdateNotif via callback when party is found</param>
+        public void GetPartyDataByUserId(string userId, ResultCallback<PartyDataUpdateNotif> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            Assert.IsFalse(string.IsNullOrEmpty(userId), "Parameter userId cannot be null or empty string");
+
+            if(!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetPartyDataByUserId(
+                    this.namespace_,
+                    this.session.AuthorizationToken,
+                    userId,
+                    callback));
+        }
     }
 }

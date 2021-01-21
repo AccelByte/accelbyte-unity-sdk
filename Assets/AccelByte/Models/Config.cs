@@ -102,35 +102,35 @@ namespace AccelByte.Models
 
                 if (this.ClientSecret == null) this.ClientSecret = "";
 
-                if (this.LoginServerUrl == null) this.LoginServerUrl = httpsBaseUrl;
+                if (string.IsNullOrEmpty(this.LoginServerUrl)) this.LoginServerUrl = httpsBaseUrl;
 
-                if (this.IamServerUrl == null) this.IamServerUrl = httpsBaseUrl + "/iam";
+                if (string.IsNullOrEmpty(this.IamServerUrl)) this.IamServerUrl = httpsBaseUrl + "/iam";
 
-                if (this.PlatformServerUrl == null) this.PlatformServerUrl = httpsBaseUrl + "/platform";
+                if (string.IsNullOrEmpty(this.PlatformServerUrl)) this.PlatformServerUrl = httpsBaseUrl + "/platform";
 
-                if (this.BasicServerUrl == null) this.BasicServerUrl = httpsBaseUrl + "/basic";
+                if (string.IsNullOrEmpty(this.BasicServerUrl)) this.BasicServerUrl = httpsBaseUrl + "/basic";
 
-                if (this.LobbyServerUrl == null) this.LobbyServerUrl = wssBaseUrl + "/lobby/";
+                if (string.IsNullOrEmpty(this.LobbyServerUrl)) this.LobbyServerUrl = wssBaseUrl + "/lobby/";
 
-                if (this.CloudStorageServerUrl == null) this.CloudStorageServerUrl = httpsBaseUrl + "/binary-store";
+                if (string.IsNullOrEmpty(this.CloudStorageServerUrl)) this.CloudStorageServerUrl = httpsBaseUrl + "/binary-store";
 
-                if (this.GameProfileServerUrl == null) this.GameProfileServerUrl = httpsBaseUrl + "/soc-profile";
+                if (string.IsNullOrEmpty(this.GameProfileServerUrl)) this.GameProfileServerUrl = httpsBaseUrl + "/soc-profile";
 
-                if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpsBaseUrl + "/statistic";
+                if (string.IsNullOrEmpty(this.StatisticServerUrl)) this.StatisticServerUrl = httpsBaseUrl + "/statistic";
 
-                if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpsBaseUrl + "/qosm";
+                if (string.IsNullOrEmpty(this.QosManagerServerUrl)) this.QosManagerServerUrl = httpsBaseUrl + "/qosm";
 
-                if (this.AgreementServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/agreement";
+                if (string.IsNullOrEmpty(this.AgreementServerUrl)) this.AgreementServerUrl = httpsBaseUrl + "/agreement";
 
-                if (this.LeaderboardServerUrl == null) this.AgreementServerUrl = httpsBaseUrl + "/leaderboard";
+                if (string.IsNullOrEmpty(this.LeaderboardServerUrl)) this.LeaderboardServerUrl = httpsBaseUrl + "/leaderboard";
                 
-                if (this.CloudSaveServerUrl == null) this.CloudSaveServerUrl = httpsBaseUrl + "/cloudsave";
+                if (string.IsNullOrEmpty(this.CloudSaveServerUrl)) this.CloudSaveServerUrl = httpsBaseUrl + "/cloudsave";
 
-                if (this.GameTelemetryServerUrl == null) this.GameTelemetryServerUrl = httpsBaseUrl + "/game-telemetry";
+                if (string.IsNullOrEmpty(this.GameTelemetryServerUrl)) this.GameTelemetryServerUrl = httpsBaseUrl + "/game-telemetry";
 
-                if (this.AchievementServerUrl == null) this.AchievementServerUrl = httpsBaseUrl + "/achievement";
+                if (string.IsNullOrEmpty(this.AchievementServerUrl)) this.AchievementServerUrl = httpsBaseUrl + "/achievement";
                 
-                if (this.GroupServerUrl == null) this.GroupServerUrl = httpsBaseUrl + "/group";
+                if (string.IsNullOrEmpty(this.GroupServerUrl)) this.GroupServerUrl = httpsBaseUrl + "/group";
             }
         }
 
@@ -179,6 +179,22 @@ namespace AccelByte.Models
                 
                 if (this.GroupServerUrl == httpsBaseUrl + "/group") this.GroupServerUrl = null;
             }
+        }
+
+        /// <summary>
+        /// Check required config field.
+        /// </summary>
+        public void CheckRequiredField()
+        {
+            if (string.IsNullOrEmpty(this.Namespace)) throw new System.Exception("Init AccelByte SDK failed, Namespace must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.ApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, API Base URL must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.NonApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Non-API URL must not null or empty.");
         }
     }
 }

@@ -48,7 +48,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            if (result.IsError && result.Error.Code == ErrorCode.PreconditionFailed)
+            if (result.IsError && (result.Error.Code == ErrorCode.PreconditionFailed || result.Error.Code == ErrorCode.PartyStorageOutdatedUpdateData))
             {
                 callbackOnConflictedData?.Invoke();
             }
@@ -102,6 +102,30 @@ namespace AccelByte.Server
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<ActivePartiesData>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetPartyDataByUserId(string @namespace, string accessToken, string userId, ResultCallback<PartyDataUpdateNotif> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "namespace cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "accessToken cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(userId), "userId cannot be null or empty");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v1/admin/party/namespaces/{namespace}/users/{userId}/party")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<PartyDataUpdateNotif>();
 
             callback.Try(result);
         }

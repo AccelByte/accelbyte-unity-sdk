@@ -59,7 +59,13 @@ namespace AccelByte.Api
             EditorGUILayout.BeginVertical();
             GUILayout.Space(100);
 
-            if(AccelByteSettings.Instance.CompareConfig(TemporarySetting))
+            if (EditorApplication.isPlaying)
+            {
+                CloseFinal();
+                return;
+            }
+
+            if (AccelByteSettings.Instance.CompareConfig(TemporarySetting))
             {
                 EditorGUILayout.HelpBox("All configs has been saved!", MessageType.Info, true);
             }

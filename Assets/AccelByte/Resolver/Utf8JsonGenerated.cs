@@ -16503,6 +16503,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("partyAttributes"), 4},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("tempParty"), 5},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("isTempParty"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("extraAttributes"), 7},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -16514,6 +16515,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("partyAttributes"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("tempParty"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("isTempParty"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("extraAttributes"),
                 
             };
         }
@@ -16541,6 +16543,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.tempParty);
             writer.WriteRaw(this.____stringByteKeys[6]);
             writer.WriteBoolean(value.isTempParty);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteString(value.extraAttributes);
             
             writer.WriteEndObject();
         }
@@ -16567,6 +16571,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __tempParty__b__ = false;
             var __isTempParty__ = default(bool);
             var __isTempParty__b__ = false;
+            var __extraAttributes__ = default(string);
+            var __extraAttributes__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -16610,6 +16616,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __isTempParty__ = reader.ReadBoolean();
                         __isTempParty__b__ = true;
                         break;
+                    case 7:
+                        __extraAttributes__ = reader.ReadString();
+                        __extraAttributes__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -16627,6 +16637,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__partyAttributes__b__) ____result.partyAttributes = __partyAttributes__;
             if(__tempParty__b__) ____result.tempParty = __tempParty__;
             if(__isTempParty__b__) ____result.isTempParty = __isTempParty__;
+            if(__extraAttributes__b__) ____result.extraAttributes = __extraAttributes__;
 
             return ____result;
         }
