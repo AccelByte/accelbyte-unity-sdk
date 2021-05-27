@@ -37,6 +37,7 @@ namespace AccelByte.Server
         private static ServerLobby lobby;
         private static ServerCloudSave cloudSave;
         private static ServerMatchmaking matchmaking;
+        private static ServerUserAccount userAccount;
 
         private static bool hasBeenInitialized = false;
 
@@ -75,7 +76,7 @@ namespace AccelByte.Server
         private static void Init()
         {
 #endif
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if (UNITY_WEBGL || ENABLE_IL2CPP) && !UNITY_EDITOR
             Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
                 new [] {
                     Utf8Json.Formatters.PrimitiveObjectFormatter.Default
@@ -101,6 +102,7 @@ namespace AccelByte.Server
             string wholeJsonText = ((TextAsset) configFile).text;
 
             AccelByteServerPlugin.config = wholeJsonText.ToObject<ServerConfig>();
+            AccelByteServerPlugin.config.CheckRequiredField();
             AccelByteServerPlugin.config.Expand();
             AccelByteServerPlugin.coroutineRunner = new CoroutineRunner();
             AccelByteServerPlugin.httpWorker = new UnityHttpWorker();
@@ -285,6 +287,23 @@ namespace AccelByte.Server
             }
 
             return AccelByteServerPlugin.matchmaking;
+        }
+
+        public static ServerUserAccount GetUserAccount()
+        {
+            CheckPlugin();
+
+            if (AccelByteServerPlugin.userAccount == null)
+            {
+                AccelByteServerPlugin.userAccount = new ServerUserAccount(
+                    new ServerUserAccountApi(
+                        AccelByteServerPlugin.config.BaseUrl,
+                        AccelByteServerPlugin.config.ApiBaseUrl,
+                        AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.coroutineRunner);
+            }
+
+            return AccelByteServerPlugin.userAccount;
         }
     }
 }

@@ -18,6 +18,8 @@ namespace AccelByte.Api
 
         IEnumerator Update(UpdateUserRequest updateUserRequest, ResultCallback<UserData> callback);
 
+        IEnumerator UpdateEmail(UpdateEmailRequest updateUserRequest, ResultCallback callback);
+
         IEnumerator Upgrade(string username, string password, ResultCallback<UserData> callback);
 
         IEnumerator Upgradev2(string emailAddress, string username, string password, ResultCallback<UserData> callback);
@@ -36,7 +38,7 @@ namespace AccelByte.Api
 
         IEnumerator ForcedLinkOtherPlatform(PlatformType platformType, string platformUserId, ResultCallback callback);
 
-        IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback);
+        IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback, string namespace_ = "");
 
         IEnumerator GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback);
 

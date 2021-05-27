@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -437,6 +437,13 @@ namespace HybridWebSocket
                     if (handler != null)
                     {
                         handler(ev.Code);
+                    }
+
+                    OnMessageHandler messageHandler = this.OnMessage;
+
+                    if (messageHandler != null)
+                    {
+                        messageHandler(ev.Reason);
                     }
                 };
             }

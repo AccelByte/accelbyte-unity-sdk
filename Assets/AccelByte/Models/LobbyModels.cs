@@ -35,6 +35,8 @@ namespace AccelByte.Models
         partyRejectRequest,
         partyRejectResponse,
         partyRejectNotif,
+        partyPromoteLeaderRequest,
+        partyPromoteLeaderResponse,
         personalChatRequest,
         personalChatResponse,
         personalChatNotif,
@@ -283,7 +285,23 @@ namespace AccelByte.Models
         [DataMember] public string leaderID;
         [DataMember] public string userID;
     }
-    
+
+    [DataContract]
+    public class PartyPromoteLeaderRequest
+    {
+        [DataMember] public string newLeaderUserId;
+    }
+
+    [DataContract]
+    public class PartyPromoteLeaderResponse
+    {
+        [DataMember] public string partyID;
+        [DataMember] public string leaderID;
+        [DataMember] public string members;
+        [DataMember] public string invitees;
+        [DataMember] public string invitationToken;
+    }
+
     #endregion
 
     #region Matchmaking
@@ -316,6 +334,7 @@ namespace AccelByte.Models
         [DataMember] public string podName;
         [DataMember] public string ip;
         [DataMember] public int port;
+        [DataMember] public Dictionary<string, int> ports;
         [DataMember] public string message;
         [DataMember] public string isOK;
     }

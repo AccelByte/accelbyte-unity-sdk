@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.32.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.32.0%0D2.31.0) (2021-05-25)
+
+
+### Features
+
+* **dsm:** add RegisterLocalServer with public ip address & moved GetPublicIp to AccelByteNetUtilites ([539566f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/539566ff2b910f8f2d4ee0b455cbc154013cfee4)), closes [#263](https://accelbyte.atlassian.net/browse/263)
+
+## [2.31.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.31.0%0D2.30.0) (2021-04-28)
+
+
+### Features
+
+* **lobby:** add custom ports field in DSNotif ([eb5b329](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/eb5b329815326b1da50c55189c62c0be91c0cebd)), closes [#258](https://accelbyte.atlassian.net/browse/258)
+
+## [2.30.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.30.0%0D2.29.0) (2021-04-14)
+
+
+### Features
+
+* **server:** remove agones ([2aec3b6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2aec3b6e60a1d43b2bb585a721b35974a94c99a0))
+
+## [2.29.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.29.0%0D2.28.3) (2021-03-17)
+
+
+### Features
+
+* **config:** make config url optional ([3c716e0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3c716e062e0cd27a05d178ad7e4e262ede6894ec))
+* **config:** make config url optional ([6e5bc2e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6e5bc2e3e909904b87dc95d3a81dd90e644d66cf))
+* **config:** remove protocol remover ([47eaf86](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/47eaf86eb5f525c9c465d0f692b92e9a66874893))
+* **config:** revert field place ([5caa94a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5caa94a2a5084ea69ca0aeba1919afee51fb11b0))
+* **jsonParser:** add resolver settings to exclude null value ([7cab47a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7cab47acf11b48bf48af23a87798f8b223d2de4b))
+* **jsonParser:** add resolver settings to exclude null value ([33293cb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/33293cbdd3898ddde64680713a3aefbb6b49da5d))
+
+
+### Bug Fixes
+
+* **config:** fix client lobby url ([7ebaaac](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7ebaaac9b5075f0b12945be23b4620cc54e0bb7d))
+* **config:** fix config JSON ([b8ccf72](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b8ccf7206f331b286fed338db223783ac6a6a7ca))
+* **config:** fix statistic url ([4184744](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4184744aa5dc920da30ffd774c1fe179f9ae356f))
+* **config:** incorrect url ([396e3c4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/396e3c4d1290f6409dd24290bef3fa7d089e9475))
+* **user:** fix UnlinkOtherPlatform got 406 ([b0e451e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b0e451ecd8090289c1602173f9191f9b67f7875c))
+* **user:** fix UnlinkOtherPlatform got 406 ([97bfd42](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/97bfd4261bf44bb3d1d0452cba96b04631479fd8))
+
+### [2.28.3](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.3%0D2.28.2) (2021-03-03)
+
+
+### Bug Fixes
+
+* **dsm:** refactor parse function ([68a1add](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/68a1addaa19d0c73497f7877d2dc89710dd3c1b4))
+* **dsm:** replace Provider enum with string ([848fdde](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/848fdde60164e5379cf95f6ac4a84a8ba922ee11))
+* **dsm:** replace Provider enum with string ([602a2e7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/602a2e78764b12a966f3c2c42f459ef593694a8c))
+* **dsm:** set variable from parse result ([366a078](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/366a078354917ff36e048bfd44df6e1b814f418a))
+
+### [2.28.2](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.2%0D2.28.1) (2021-02-17)
+
+### [2.28.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.1%0D2.28.0) (2021-02-03)
+
+
+### Bug Fixes
+
+* **lobby:** increase timeout and rename function ([44a21e3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/44a21e3c875366affed3499c46a43830a97e30de))
+* **plugin:** fix error AccelByteSettings.Save() called in game build. ([c08f8a9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c08f8a9591cd506ea957ffe783a83c5229d5d554)), closes [#240](https://accelbyte.atlassian.net/browse/240)
+
 ## [2.28.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.0%0D2.27.0) (2021-01-20)
 
 

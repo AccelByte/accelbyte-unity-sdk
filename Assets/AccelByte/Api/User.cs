@@ -340,6 +340,17 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Update user email address
+        /// </summary>
+        /// <param name="updateEmailRequest">Set verify code and user new email on the body</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
+        public void UpdateEmail(UpdateEmailRequest updateEmailRequest, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(this.userAccount.UpdateEmail(updateEmailRequest, callback));
+        }
+
+        /// <summary>
         /// Upgrade a headless account with username and password. User must be logged in before this method can be
         /// used.
         /// </summary>
@@ -446,15 +457,27 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Trigger an email that contains verification code to be sent to user's email. User must be logged in.
+        /// This function context is "UserAccountRegistration". If you want to set your own context, please use the other overload function.
         /// </summary>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendVerificationCode(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(SendVerificationCodeAsync(callback));
+            this.coroutineRunner.Run(SendVerificationCodeAsync(VerificationContext.UserAccountRegistration, callback));
         }
 
-        private IEnumerator SendVerificationCodeAsync(ResultCallback callback)
+        /// <summary>
+        /// Trigger an email that contains verification code to be sent to user's email. User must be logged in.
+        /// </summary>
+        /// <param name="verifyContext">The context of what verification request</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SendVerificationCode(VerificationContext verificationContext, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(SendVerificationCodeAsync(verificationContext, callback));
+        }
+
+        private IEnumerator SendVerificationCodeAsync(VerificationContext verificationContext, ResultCallback callback)
         {
             Result<UserData> userDataResult = null;
 
@@ -473,7 +496,7 @@ namespace AccelByte.Api
             }
 
             yield return this.userAccount.SendVerificationCode(
-                VerificationContext.UserAccountRegistration,
+                verificationContext,
                 this.userDataCache.emailAddress,
                 callback);
         }
@@ -558,9 +581,8 @@ namespace AccelByte.Api
         /// after user has been re-login.
         /// </summary>
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
-        /// <param name="platformTicket">Ticket / token from other platform to unlink from this user</param>
         /// <param name="callback">Returns a result via callback when completed</param>
-        public void UnlinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
+        public void UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 

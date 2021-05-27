@@ -547,6 +547,8 @@ namespace AccelByte.Models
         [DataMember] public EntitlementSource source { get; set; }
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
+        [DataMember] public DateTime? startDate { get; set; }
+        [DataMember] public DateTime? endDate { get; set; }
     }
 
     [DataContract]

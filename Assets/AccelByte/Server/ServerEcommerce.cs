@@ -80,6 +80,34 @@ namespace AccelByte.Server
         }
 
         /// <summary>
+        /// Granting Entitlement(s) to a user.
+        /// </summary>
+        /// <param name="namespace_">Item namespace, might be game namespace or publisher namespace</param>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="grantUserEntitlementsRequest"> Consist of the entitlement(s) that will be granted</param>
+        /// <param name="callback">Returns all StackableEntitlements Info via callback when completed</param>
+        public void GrantUserEntitlement(string namespace_, string userId, GrantUserEntitlementRequest[] grantUserEntitlementsRequest,
+            ResultCallback<StackableEntitlementInfo[]> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GrantUserEntitlement(
+                    namespace_,
+                    userId,
+                    this.session.AuthorizationToken,
+                    grantUserEntitlementsRequest,
+                    callback));
+        }
+
+        /// <summary>
         /// Credit a user wallet by currency code, if the wallet does not exist, it will create a new wallet.
         /// </summary>
         /// <param name="userId">UserId of a user</param>

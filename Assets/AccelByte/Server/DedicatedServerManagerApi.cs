@@ -4,18 +4,9 @@
 
 using System;
 using System.Collections;
-using AccelByte.Models;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine.Assertions;
-using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Utf8Json;
-#if ENABLE_AGONES_PLUGIN
-using Agones;
-using Agones.Model;
-#endif
 
 namespace AccelByte.Server
 {
@@ -26,46 +17,21 @@ namespace AccelByte.Server
         CLOUDSERVER
     }
 
-    internal enum Provider
+    internal struct ServerSetupData
     {
-       AGONES,
-       AMPD,
-       AWS,
-       BAREMETAL,
-       I3D,
-       DEFAULT
+        public string region;
+        public string provider;
+        public string gameVersion;
     }
 
-#if ENABLE_AGONES_PLUGIN
-    internal class Agones
-    {
-        private AgonesSdk component = null;
-        public void SetComponentSDK(AgonesSdk component_) { component = component_; }
-        public AgonesSdk GetSDK() { return component; }
-
-        private bool isReady = false;
-        public void SetReady(bool ready) { isReady = ready; }
-        public bool IsReady() { return isReady; }
-        
-        public readonly string MATCH_DETAILS_ANNOTATION = "match-details";
-        // Agones.Ready() has 30 seconds limit 
-        public readonly TimeSpan REGISTRATION_TIMEOUT = new TimeSpan(0,0,30);
-        public readonly TimeSpan INITIAL_HEALTH_CHECK_TIMEOUT = new TimeSpan(0,0,30);
-    }
-#endif
-    
     internal class DedicatedServerManagerApi
     {
         private readonly string baseUrl;
         private readonly IHttpWorker httpWorker;
         private readonly string namespace_;
-        private string dsmServerUrl = "";
         private string region = "";
         private RegisterServerRequest serverSetup;
         private ServerType serverType = ServerType.NONE;
-#if ENABLE_AGONES_PLUGIN
-        private Agones agones = new Agones();
-#endif
 
         internal DedicatedServerManagerApi(string baseUrl, string namespace_, IHttpWorker httpWorker)
         {
@@ -85,7 +51,7 @@ namespace AccelByte.Server
                 pod_name = "",
                 provider = ""
             };
-            
+
             ParseArgsAndServerSetup();
         }
 
@@ -94,117 +60,48 @@ namespace AccelByte.Server
         {
             Assert.IsNotNull(registerRequest, "Register failed. registerserverRequest is null!");
             Assert.IsNotNull(accessToken, "Can't update a slot! accessToken parameter is null!");
-            if (this.serverType != ServerType.NONE)
-            {
-                callback.TryError(ErrorCode.Conflict, "Server is already registered.");
-
-                yield break;
-            }
-            if (dsmServerUrl.Length == 0)
-            {
-                var getUrlRequest = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/dsm?region=" + region)
-                        .WithBearerAuth(accessToken)
-                        .WithContentType(MediaType.ApplicationJson)
-                        .Accepts(MediaType.ApplicationJson)
-                        .GetResult();
-
-                IHttpResponse getUrlResponse = null;
-
-                yield return this.httpWorker.SendRequest(getUrlRequest, rsp => getUrlResponse = rsp);
-
-                var getUrlResults = getUrlResponse.TryParseJson<DSMClient[]>();
-                if(!getUrlResults.IsError)
-                {
-                    foreach(var r in getUrlResults.Value)
-                    {
-                        if (r.provider == serverSetup.provider && r.status == "HEALTHY")
-                            dsmServerUrl = r.host_address;
-                    }
-                }
-                else
-                {
-                    if(getUrlResults.Error.Code == ErrorCode.ErrorFromException)
-                    {
-                        var getUrlResult = getUrlResponse.TryParseJson<DSMClient>();
-                        if(getUrlResult.Value.status == "HEALTHY")
-                        {
-                            dsmServerUrl = getUrlResult.Value.host_address;
-                        }
-                    }
-                }
-
-                if(string.IsNullOrEmpty(dsmServerUrl))
-                {
-                    callback.TryError(ErrorCode.InvalidResponse, string.Format("Cannot found healthy DSM for provider {0}", serverSetup.provider));
-                    yield break;
-                }
-            }
 
             if(serverSetup.ip.Length == 0)
             {
-                var getPubIpRequest = HttpRequestBuilder.CreateGet("https://api.ipify.org?format=json")
+                AccelByteNetUtilities.GetPublicIp(getPublicIpResult =>
+                {
+                    serverSetup.ip = getPublicIpResult.Value.ip;
+                });
+
+                while(serverSetup.ip.Length == 0)
+                {
+                    yield return null;
+                }
+            }
+
+            registerRequest.ip = serverSetup.ip;
+            registerRequest.provider = serverSetup.provider;
+            registerRequest.game_version = serverSetup.game_version;
+    
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/namespaces/{namespace}/servers/register")
+                .WithPathParam("namespace", this.namespace_)
+                .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
+                .WithBody(registerRequest.ToUtf8Json())
                 .GetResult();
 
-                IHttpResponse getPubIpResponse = null;
+            IHttpResponse response = null;
 
-                yield return this.httpWorker.SendRequest(getPubIpRequest, rsp => getPubIpResponse = rsp);
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-                var getPubIpResult = getPubIpResponse.TryParseJson<PubIp>();
-                serverSetup.ip = getPubIpResult.Value.ip;
-            }
-
-            if (IsCurrentProvider(Provider.AGONES))
+            var result = response.TryParseJson<ServerInfo>();
+            if (!result.IsError)
             {
-#if ENABLE_AGONES_PLUGIN
-                InitiateAgones(callback);
-#else
-                callback.TryError(ErrorCode.NotFound, 
-                    "Can't request register server. Agones provider arguments is passed but Agones plugin is not found.");
-#endif
-            }
-            else
-            {
-                registerRequest.ip = serverSetup.ip;
-                registerRequest.provider = serverSetup.provider;
-                registerRequest.game_version = serverSetup.game_version;
-    
-                var request = HttpRequestBuilder.CreatePost(this.dsmServerUrl + "/dsm/namespaces/{namespace}/servers/register")
-                    .WithPathParam("namespace", this.namespace_)
-                    .WithBearerAuth(accessToken)
-                    .WithContentType(MediaType.ApplicationJson)
-                    .Accepts(MediaType.ApplicationJson)
-                    .WithBody(registerRequest.ToUtf8Json())
-                    .GetResult();
-    
-                IHttpResponse response = null;
-    
-                yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
-    
-                var result = response.TryParseJson<ServerInfo>();
-                if (!result.IsError)
-                {
-                    serverSetup.pod_name = result.Value.pod_name;
-                    serverType = ServerType.CLOUDSERVER;
-                }   
-                callback.Try(response.TryParse());
-            }
+                serverSetup.pod_name = result.Value.pod_name;
+                serverType = ServerType.CLOUDSERVER;
+            }   
+            callback.Try(response.TryParse());
         }
 
         public IEnumerator ShutdownServer(ShutdownServerRequest shutdownServerRequest, string accessToken,
             ResultCallback callback)
         {
-            if (IsCurrentProvider(Provider.AGONES) && serverType != ServerType.LOCALSERVER)
-            {
-#if ENABLE_AGONES_PLUGIN
-                yield return ShutdownAgones(callback);
-#else
-                callback.TryError(ErrorCode.NotFound, 
-                    "Can't request shutdown server. Agones provider arguments is passed but Agones plugin is not found.");
-#endif
-                yield break;
-            }
             Assert.IsNotNull(shutdownServerRequest, "Register failed. shutdownServerNotif is null!");
             Assert.IsNotNull(accessToken, "Can't update a slot! accessToken parameter is null!");
             if (this.serverType != ServerType.CLOUDSERVER)
@@ -215,7 +112,7 @@ namespace AccelByte.Server
             }
 
             shutdownServerRequest.pod_name = serverSetup.pod_name;
-            var request = HttpRequestBuilder.CreatePost(this.dsmServerUrl + "/dsm/namespaces/{namespace}/servers/shutdown")
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/namespaces/{namespace}/servers/shutdown")
                 .WithPathParam("namespace", this.namespace_)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
@@ -232,60 +129,6 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
-        public IEnumerator SendHeartBeat(string name, string accessToken, ResultCallback<MatchRequest> callback)
-        {
-            if (IsCurrentProvider(Provider.AGONES) && serverType == ServerType.CLOUDSERVER)
-            {
-#if ENABLE_AGONES_PLUGIN
-                SendAgonesHeartBeat(callback);
-#else
-                callback.Try(Result<MatchRequest>.CreateError(ErrorCode.NotFound, 
-                    "Can't send Agones health. Agones provider arguments is passed but Agones plugin is not found."));
-#endif
-            }
-            else
-            {
-                yield return SendDefaultHeartBeat(name, accessToken, callback);
-            }
-        }
-
-        private IEnumerator SendDefaultHeartBeat(string name, string accessToken, ResultCallback<MatchRequest> callback)
-        {
-            if (serverType == ServerType.CLOUDSERVER)
-            {
-                name = serverSetup.pod_name;
-            }
-            Assert.IsNotNull(accessToken, "Can't send heartbeat! accessToken parameter is null!");
-            string reqUrl;
-            switch (serverType)
-            {
-                case ServerType.CLOUDSERVER: reqUrl = dsmServerUrl + "/dsm"; break;
-                case ServerType.LOCALSERVER:
-                default: reqUrl = this.baseUrl; break; 
-            }
-            var request = HttpRequestBuilder.CreatePost(reqUrl + "/namespaces/{namespace}/servers/heartbeat")
-                .WithPathParam("namespace", this.namespace_)
-                .WithBearerAuth(accessToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"name\": \"{0}\"}}", name))
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
-
-            if (response.BodyBytes == null || response.BodyBytes.Length == 0)
-            {
-                callback.Try(null);
-            }
-            else
-            {
-                var result = response.TryParseJson<MatchRequest>();
-                callback.Try(result);
-            }
-        }
-        
         public IEnumerator RegisterLocalServer(RegisterLocalServerRequest registerRequest, string accessToken,
             ResultCallback callback)
         {
@@ -312,9 +155,36 @@ namespace AccelByte.Server
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
-            serverType = ServerType.LOCALSERVER;
+            if(!result.IsError)
+            {
+                serverType = ServerType.LOCALSERVER;
+                serverSetup.pod_name = registerRequest.name;
+            }
 
             callback.Try(result);
+        }
+
+        public IEnumerator RegisterLocalServer(uint port, string name, string accessToken,
+            ResultCallback callback)
+        {
+            string ip = "";
+            AccelByteNetUtilities.GetPublicIp(getPublicIpResult =>
+            {
+                ip = getPublicIpResult.Value.ip;
+            });
+
+            while(string.IsNullOrEmpty(ip))
+            {
+                yield return null;
+            }
+
+            RegisterLocalServerRequest request = new RegisterLocalServerRequest()
+            {
+                ip = ip,
+                port = port,
+                name = name
+            };
+            yield return RegisterLocalServer(request, accessToken, callback);
         }
         
         public IEnumerator DeregisterLocalServer(string name, string accessToken, ResultCallback callback)
@@ -346,34 +216,71 @@ namespace AccelByte.Server
 
             callback.Try(result);
         }
-        
+
+        public IEnumerator GetSessionId(string accessToken, ResultCallback<ServerSessionResponse> callback)
+        {
+            Assert.IsNotNull(accessToken, "Can't check session ID! accessToken parameter is null!");
+
+            if(this.serverType == ServerType.NONE)
+            {
+                callback.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/namespaces/{namespace}/servers/{server}/session")
+                .WithPathParam("namespace", this.namespace_)
+                .WithPathParam("server", serverSetup.pod_name)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<ServerSessionResponse>();
+
+            callback.Try(result);
+        }
+
         private void ParseArgsAndServerSetup()
         {
             string[] args = System.Environment.GetCommandLineArgs();
+            ServerSetupData serverSetupData = ParseCommandLine(args);
+            region = serverSetupData.region;
+            serverSetup.provider = serverSetupData.provider;
+            serverSetup.game_version = serverSetupData.gameVersion;
+        }
+
+        private bool IsCurrentProvider(string provider)
+        {
+            return serverSetup.provider != null && serverSetup.provider.Equals(provider.ToLower());
+        }
+
+        public static ServerSetupData ParseCommandLine(string[] args)
+        {
             bool isProviderFound = false;
             bool isGameVersionFound = false;
             bool isRegionFound = false;
+            string region = "";
+            string provider = "";
+            string game_version = "";
+            ServerSetupData serverSetupData = new ServerSetupData();
             foreach (string arg in args)
             {
                 AccelByteDebug.Log("arg: " + arg);
                 if (arg.Contains("provider"))
                 {
                     string[] split = arg.Split('=');
-                    string providerArgValue = split[1];
-                    foreach (var _enum in Enum.GetNames(typeof(Provider)))
-                    {
-                        if (providerArgValue.Equals(_enum.ToLower()))
-                        {
-                            serverSetup.provider = providerArgValue.ToLower();
-                            isProviderFound = true;
-                        }
-                    }
+                    provider = split[1];
+                    isProviderFound = true;
                 }
 
                 if (arg.Contains("game_version"))
                 {
                     string[] split = arg.Split('=');
-                    serverSetup.game_version = split[1];
+                    game_version = split[1];
                     isGameVersionFound = true;
                 }
 
@@ -386,125 +293,16 @@ namespace AccelByte.Server
 
                 if (isProviderFound && isGameVersionFound && isRegionFound)
                 {
+                    serverSetupData = new ServerSetupData()
+                    {
+                        region = region,
+                        provider = provider,
+                        gameVersion = game_version
+                    };
                     break;
                 }
             }
+            return serverSetupData;
         }
-        
-        private bool IsCurrentProvider(Provider provider)
-        {
-            return serverSetup.provider != null && serverSetup.provider.Equals(provider.ToString().ToLower());
-        }
-
-#if ENABLE_AGONES_PLUGIN
-        private async void InitiateAgones(ResultCallback callback)
-        {
-            GameObject dummyGameObject = GameObject.Find("AccelByteDummyGameObject");
-            if (dummyGameObject == null)
-            {
-                dummyGameObject = new GameObject("AccelByteDummyGameObject");
-            }
-            agones.SetComponentSDK(dummyGameObject.AddComponent<AgonesSdk>());
-            UnityEngine.Object.DontDestroyOnLoad(dummyGameObject);
-
-            bool isAgonesConnectionEstablished = await agones.GetSDK().Connect();
-            if (isAgonesConnectionEstablished)
-            {
-                bool isAgonesGameServerIsReady = await agones.GetSDK().Ready();
-                if (isAgonesGameServerIsReady)
-                {
-                    //Check Agones GameServer's health 
-                    DateTime healthCheckStarted = DateTime.Now;
-                    var gameServer = await agones.GetSDK().GameServer();
-                    
-                    if (gameServer == null && 
-                        DateTime.Now.Subtract(healthCheckStarted) > agones.INITIAL_HEALTH_CHECK_TIMEOUT)
-                    {
-                        AccelByteDebug.Log("[Agones] GameServer is not healthy. Shutting down.");
-                        agones.GetSDK().Shutdown();
-                    }
-                    else
-                    {
-                        AccelByteDebug.Log("[Agones] GameServer is healthy.");
-                        agones.SetReady(true);
-                    }
-                }
-                else
-                {
-                    AccelByteDebug.Log("[Agones] GameServer is not ready.");
-                }
-            }
-            else
-            {
-                AccelByteDebug.Log("[Agones] Failed to establish a connection to GameServer.");
-            }
-            
-            if (agones.IsReady())
-            {
-                callback.TryOk();
-                serverType = ServerType.CLOUDSERVER;
-            }
-            else
-            {
-                DateTime startWaitingRegistrationTime = DateTime.Now;
-                while (startWaitingRegistrationTime.Add(agones.REGISTRATION_TIMEOUT) > DateTime.Now)
-                {
-                    if (agones.IsReady())
-                    {
-                        break;
-                    }
-
-                    await Task.Delay(1000);
-                }
-
-                if (agones.IsReady())
-                {
-                    callback.TryOk();
-                    serverType = ServerType.CLOUDSERVER;
-                }
-                else
-                {
-                    callback.TryError(ErrorCode.ServiceUnavailable, "Agones GameServer is not ready.");
-                }
-            }
-        }
-
-        private async Task ShutdownAgones(ResultCallback callback)
-        {
-            if (await agones.GetSDK().Shutdown())
-            {
-                AccelByteDebug.Log("Successfully shutting down Agones GameServer.");
-                agones.SetReady(false);
-                callback.TryOk();
-            }
-            else
-            {
-                callback.TryError(ErrorCode.UnknownError, "Failed to shutdown Agones GameServer.");
-            }
-            serverType = ServerType.NONE;
-        }
-        
-        private async void SendAgonesHeartBeat(ResultCallback<MatchRequest> callback)
-        {
-            if (!agones.IsReady())
-            {
-                return;
-            }
-            
-            string matchDetails;
-            GameServer gameServer = await agones.GetSDK().GameServer();
-
-            if (!gameServer.ObjectMeta.Annotations.TryGetValue(agones.MATCH_DETAILS_ANNOTATION, out matchDetails) || gameServer == null)
-            {
-                return;
-            }
-            else 
-            {
-                var matchRequest = JsonSerializer.Deserialize<MatchRequest>(matchDetails);
-                var result = Result<MatchRequest>.CreateOk(matchRequest);
-                callback.Try(result);
-            }
-        }
-#endif
     }
 }

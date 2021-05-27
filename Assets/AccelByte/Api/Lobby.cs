@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -124,9 +124,9 @@ namespace AccelByte.Api
         public event ResultCallback<PlayerUnblockedNotif> PlayerUnblockedNotif;
 
         private readonly int pingDelay;
-        private readonly int backoffDelay;
-        private readonly int maxDelay;
-        private readonly int totalTimeout;
+        private int backoffDelay;
+        private int maxDelay;
+        private int totalTimeout;
 
         private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks =
             new Dictionary<long, Action<ErrorCode, string>>();
@@ -208,6 +208,27 @@ namespace AccelByte.Api
             {
                 StartMaintainConnection();
             }
+        }
+
+        /// <summary>
+        /// Change the delay parameters to maintain connection in the lobby before lobby connected.
+        /// </summary>
+        /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
+        /// <param name="backoffDelay">Initial delay time</param>
+        /// <param name="maxDelay">Maximum delay time</param>
+        public void SetRetryParameters(int totalTimeout = 60000, int backoffDelay = 1000, int maxDelay = 30000)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (maintainConnectionCoroutine != null)
+            {
+                AccelByteDebug.LogWarning("Can't change retry parameters! Lobby is already connected.");
+                return;
+            }
+
+            this.totalTimeout = totalTimeout;
+            this.backoffDelay = backoffDelay;
+            this.maxDelay = maxDelay;
         }
 
         private void StartMaintainConnection()
@@ -405,6 +426,17 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(MessageType.partyRejectRequest, new PartyRejectRequest{invitationToken = invitationToken, partyID =  partyId}, callback);
+        }
+
+        /// <summary>
+        /// Promote member to be a party leader.
+        /// </summary>
+        /// <param name="userId">User ID that will be promoted as a party leader.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void PromotePartyLeader(string userId, ResultCallback<PartyPromoteLeaderResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.partyPromoteLeaderRequest, new PartyPromoteLeaderRequest { newLeaderUserId = userId }, callback);
         }
 
         /// <summary>

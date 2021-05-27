@@ -10,6 +10,7 @@ namespace AccelByte.Models {
     {
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
+        [DataMember] public string ApiBaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
         [DataMember] public string DSMControllerServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
@@ -40,31 +41,25 @@ namespace AccelByte.Models {
         {
             if (this.BaseUrl != null)
             {
-                int index;
-                // remove protocol 
-                if ((index = this.BaseUrl.IndexOf("://")) > 0) this.BaseUrl = this.BaseUrl.Substring(index + 3);
+                this.IamServerUrl = GetDefaultServerApiUrl(this.IamServerUrl, "/iam");
 
-                string httpBaseUrl = "https://" + this.BaseUrl;
+                this.DSMControllerServerUrl = GetDefaultServerApiUrl(this.DSMControllerServerUrl, "/dsmcontroller");
 
-                if (this.IamServerUrl == null) this.IamServerUrl = httpBaseUrl + "/iam";
+                this.PlatformServerUrl = GetDefaultServerApiUrl(this.PlatformServerUrl, "/platform");
 
-                if (this.DSMControllerServerUrl == null) this.DSMControllerServerUrl = httpBaseUrl + "/dsmcontroller";
+                this.StatisticServerUrl = GetDefaultServerApiUrl(this.StatisticServerUrl, "/social");
 
-                if (this.PlatformServerUrl == null) this.PlatformServerUrl = httpBaseUrl + "/platform";
+                this.QosManagerServerUrl = GetDefaultServerApiUrl(this.QosManagerServerUrl, "/qosm");
 
-                if (this.StatisticServerUrl == null) this.StatisticServerUrl = httpBaseUrl + "/statistic";
+                this.GameTelemetryServerUrl = GetDefaultServerApiUrl(this.GameTelemetryServerUrl, "/game-telemetry");
 
-                if (this.QosManagerServerUrl == null) this.QosManagerServerUrl = httpBaseUrl + "/qosm";
+                this.AchievementServerUrl = GetDefaultServerApiUrl(this.AchievementServerUrl, "/achievement");
 
-                if (this.GameTelemetryServerUrl == null) this.GameTelemetryServerUrl = httpBaseUrl + "/game-telemetry";
+                this.LobbyServerUrl = GetDefaultServerApiUrl(this.LobbyServerUrl, "/lobby");
 
-                if (this.AchievementServerUrl == null) this.AchievementServerUrl = httpBaseUrl + "/achievement";
+                this.CloudSaveServerUrl = GetDefaultServerApiUrl(this.CloudSaveServerUrl, "/cloudsave");
 
-                if (this.LobbyServerUrl == null) this.LobbyServerUrl = httpBaseUrl + "/lobby";
-
-                if (this.CloudSaveServerUrl == null) this.CloudSaveServerUrl = httpBaseUrl + "/cloudsave";
-                
-                if (this.MatchmakingServerUrl == null) this.MatchmakingServerUrl = httpBaseUrl + "/matchmaking";
+                this.MatchmakingServerUrl = GetDefaultServerApiUrl(this.MatchmakingServerUrl, "/matchmaking");
 
             }
         }
@@ -103,6 +98,36 @@ namespace AccelByte.Models {
                 if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
 
             }
+        }
+
+        /// <summary>
+        /// Check required config field.
+        /// </summary>
+        public void CheckRequiredField()
+        {
+            if (string.IsNullOrEmpty(this.Namespace)) throw new System.Exception("Init AccelByte SDK failed, Server Namespace must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Server Client ID must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server Base URL must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.ApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server API Base URL must not null or empty.");
+        }
+
+        /// <summary>
+        /// Set services URL.
+        /// </summary>
+        /// <param name="specificServerUrl">The specific URL, if empty will be replaced by baseUrl+defaultUrl.</param>
+        /// <param name="defaultServerUrl">The default URL, will be used if specific URL is empty.</param>
+        /// <returns></returns>
+        private string GetDefaultServerApiUrl(string specificServerUrl, string defaultServerUrl)
+        {
+            if (string.IsNullOrEmpty(specificServerUrl))
+            {
+                return string.Format("{0}{1}", BaseUrl, defaultServerUrl);
+            }
+
+            return specificServerUrl;
         }
     }
 }

@@ -217,6 +217,12 @@ namespace AccelByte.Core
         ListFriendsPresenceUnableGetUserRegistry = 11341,
         ListFriendsPresenceUnableGetOnlineFiends = 11343,
         ListFriendsPresenceUnableGetFriendsPresence = 11344,
+        //Promote Party Leader
+        PartyPromoteLeaderUnableToGetUserRegistry = 11371,
+        PartyPromoteLeaderUnableToGetPartyInfo = 11372,
+        PartyPromoteLeaderUserPartyNotFound = 11373,
+        PartyPromoteLeaderUserNotLeader = 11374,
+        PartyPromoteLeaderUnableToPromoteLeader = 11375,
         //Start Matchmaking
         StartMatchmakingUnableToPush = 11601,
         StartMatchmakingUnableToFindUserRegistry = 11602,
@@ -302,6 +308,8 @@ namespace AccelByte.Core
         PlayerUnblockRequestUnableBlockPlayer     = 11806,
         PlayerBlocked                             = 11807,
         PlayerBlockedUnableGet                    = 11808,
+        //Channel Chat
+        ChannelChatSenderBanned                   = 11880,
         //PartyStorage
         PartyStorageOutdatedUpdateData            = 11903,
         PartyNotFound                             = 11901,
@@ -314,7 +322,8 @@ namespace AccelByte.Core
         PlayerRecordPreconditionFailed = 18103,
         
         //AccelByte DSM error codes
-        DedicatedServerNotFound = 9014183
+        DedicatedServerNotFound = 9014183,
+        DedicatedServerConfigNotFound = 9014123
     }
 
     public class Error

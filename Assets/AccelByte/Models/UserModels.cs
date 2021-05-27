@@ -208,6 +208,12 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class UnlinkPlatformAccountRequest
+    {
+        [DataMember] public string platformNamespace { get; set; }
+    }
+
+    [DataContract]
     public class AccountLinkPublisherAccount
     {
         [DataMember] public string userId { get; set; }
@@ -228,5 +234,12 @@ namespace AccelByte.Models
     {
         [DataMember] public string platformId { get; set; }
         [DataMember] public string platformUserId { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateEmailRequest
+    {
+        [DataMember] public string code;
+        [DataMember] public string emailAddress;
     }
 }

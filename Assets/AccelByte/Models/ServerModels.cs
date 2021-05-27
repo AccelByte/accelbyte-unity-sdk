@@ -83,12 +83,6 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class PubIp
-    {
-        [DataMember] public string ip { get; set; }
-    }
-
-    [DataContract]
     public class ServerInfo
     {
         [DataMember] public string pod_name { get; set; }
@@ -132,5 +126,11 @@ namespace AccelByte.Models
     public class DequeueRequest
     {
         [DataMember] public string match_id { get; set; }
+    }
+
+    [DataContract]
+    public class ServerSessionResponse
+    {
+        [DataMember] public string session_id { get; set; }
     }
 }

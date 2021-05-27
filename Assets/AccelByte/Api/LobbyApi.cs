@@ -99,7 +99,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            if (result.IsError && result.Error.Code == ErrorCode.PreconditionFailed)
+            if (result.IsError && (result.Error.Code == ErrorCode.PreconditionFailed || result.Error.Code == ErrorCode.PartyStorageOutdatedUpdateData))
             {
                 callbackOnConflictedData?.Invoke();
             }

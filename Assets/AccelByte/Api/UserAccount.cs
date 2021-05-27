@@ -93,6 +93,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(updateUserRequest, "Update failed. updateUserRequest is null!");
+            if (!string.IsNullOrEmpty(updateUserRequest.emailAddress))
+            {
+                Error error = new Error(ErrorCode.BadRequest, "Cannot update user email using this function. Use UpdateEmail instead.");
+                callback.TryError(error);
+            }
 
             var request = HttpRequestBuilder.CreatePatch(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me")
                 .WithPathParam("namespace", this.@namespace)
@@ -107,6 +112,27 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateEmail(UpdateEmailRequest updateEmailRequest, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(updateEmailRequest, "Update failed. updateEmailRequest is null!");
+
+            var request = HttpRequestBuilder.CreatePut(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/email")
+                .WithPathParam("namespace", this.@namespace)
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(updateEmailRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
             callback.Try(result);
         }
 
@@ -329,17 +355,27 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback)
+        public IEnumerator UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback, string namespace_ = "")
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreateDelete(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}")
                 .WithPathParam("namespace", this.@namespace)
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.TextPlain)
-                .GetResult();
+                .WithContentType(MediaType.ApplicationJson);
+
+            if(!string.IsNullOrEmpty(namespace_))
+            {
+                UnlinkPlatformAccountRequest unlinkPlatformAccountRequest = new UnlinkPlatformAccountRequest
+                {
+                    platformNamespace = namespace_
+                };
+                builder.WithBody(unlinkPlatformAccountRequest.ToUtf8Json());
+            }
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 
