@@ -87,6 +87,21 @@ namespace AccelByte.Api
         public event ResultCallback<Friend> OnIncomingFriendRequest;
 
         /// <summary>
+        /// Raised when friend remove user from friendlist
+        /// </summary>
+        public event ResultCallback<Friend> OnUnfriend;
+
+        /// <summary>
+        /// Raised when friend request canceled
+        /// </summary>
+        public event ResultCallback<Acquaintance> FriendRequestCanceled;
+
+        /// <summary>
+        /// Raised when friend request rejected
+        /// </summary>
+        public event ResultCallback<Acquaintance> FriendRequestRejected;
+
+        /// <summary>
         /// Raised when matchmaking process is completed.
         /// </summary>
         public event ResultCallback<MatchmakingNotif> MatchmakingCompleted;
@@ -1431,6 +1446,18 @@ namespace AccelByte.Api
                 break;
             case MessageType.requestFriendsNotif:
                 Lobby.HandleNotification(message, this.OnIncomingFriendRequest);
+
+                break;
+            case MessageType.unfriendNotif:
+                Lobby.HandleNotification(message, this.OnUnfriend);
+
+                break;
+            case MessageType.cancelFriendsNotif:
+                Lobby.HandleNotification(message, this.FriendRequestCanceled);
+
+                break;
+            case MessageType.rejectFriendsNotif:
+                Lobby.HandleNotification(message, this.FriendRequestRejected);
 
                 break;
             case MessageType.setReadyConsentNotif:

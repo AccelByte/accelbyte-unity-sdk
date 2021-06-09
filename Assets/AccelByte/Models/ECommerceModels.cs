@@ -613,5 +613,34 @@ namespace AccelByte.Models
         [DataMember] public bool owned { get; set; }
     }
 
+    [DataContract]
+    public class OwnershipToken
+    {
+        [DataMember] public string ownershipToken { get; set; }
+    }
+
+    [DataContract]
+    public class OwnershipTokenPayload
+    {
+        [DataMember] public string sub { get; set; }
+        [DataMember] public int iat { get; set; }
+        [DataMember] public int exp { get; set; }
+        [DataMember] public OwnershipEntitlement[] entitlements { get; set; }
+    }
+
+    [DataContract]
+    public class OwnershipEntitlement
+    {
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string appId { get; set; }
+        [DataMember] public string appType { get; set; }
+        [DataMember] public string sku { get; set; }
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string itemNamespace { get; set; }
+        [DataMember] public DateTime grantedAt { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
+    }
+
     #endregion
 }

@@ -114,8 +114,9 @@ namespace AccelByte.Server
                 AccelByteServerPlugin.httpWorker,
                 AccelByteServerPlugin.coroutineRunner);
 
-            AccelByteServerPlugin.server = new DedicatedServer(AccelByteServerPlugin.session, 
-            AccelByteServerPlugin.coroutineRunner);
+            AccelByteServerPlugin.server = new DedicatedServer(
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.coroutineRunner);
         }
 
         /// <summary>

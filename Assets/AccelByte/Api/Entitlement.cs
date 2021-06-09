@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Models;
 using AccelByte.Core;
 using UnityEngine.Assertions;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -175,6 +176,77 @@ namespace AccelByte.Api
                     appIds,
                     skus,
                     callback));
+        }
+
+        /// <summary>
+        /// Get user entitlement ownership if any of item IDs, app IDs, or SKUs are true
+        /// </summary>
+        /// <param name="key">the public key</param>
+        /// <param name="itemIds">the item Ids</param>
+        /// <param name="appIds">the app Ids</param>
+        /// <param name="skus">the skus</param>
+        /// <param name="callback">Returns user's entitlement ownership result if any parameters are true via callback when completed</param>
+        /// <param name="verifyPublicKey">Do verification on public key. Set False to skip this.</param>
+        /// <param name="verifyExpiration">Do verification on expiration. Set False to skip this.</param>
+        /// <param name="verifyUserId">Do verification on current user id and sub. Set False to skip this.</param>
+        public void GetUserEntitlementOwnershipToken(string key, string[] itemIds, string[] appIds, string[] skus, ResultCallback<OwnershipEntitlement[]> callback, 
+            bool verifyPublicKey = true, bool verifyExpiration = true, bool verifyUserId = true)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            Assert.IsFalse(string.IsNullOrEmpty(key), "Can't get user entitlement any ownership! public key is null!");
+            Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+
+            this.coroutineRunner.Run(
+                GetUserEntitlementOwnershipTokenAsync(
+                    key, 
+                    itemIds, 
+                    appIds, 
+                    skus, 
+                    verifyPublicKey, 
+                    verifyExpiration, 
+                    verifyUserId, 
+                    callback));
+        }
+
+        private IEnumerator GetUserEntitlementOwnershipTokenAsync(string key, string[] itemIds, string[] appIds, string[] skus, bool verifyPublicKey, bool verifyExpiration, bool verifyUserId, 
+            ResultCallback<OwnershipEntitlement[]> callback)
+        {
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                yield break;
+            }
+
+            Result<OwnershipToken> result = null;
+
+            yield return this.api.GetUserEntitlementOwnershipToken(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.AuthorizationToken,
+                    itemIds,
+                    appIds,
+                    skus,
+                    r => result = r);
+
+            if (result.IsError)
+            {
+                callback.TryError(result.Error.Code);
+                yield break;
+            }
+
+            if (!JsonWebToken.TryDecodeToken<OwnershipTokenPayload>(key, result.Value.ownershipToken, out var payloadResult, verifyPublicKey, verifyExpiration))
+            {
+                callback.TryError(ErrorCode.InvalidResponse);
+                yield break;
+            }
+
+            if (verifyUserId && this.session.UserId != payloadResult.sub)
+            {
+                callback.TryError(ErrorCode.InvalidResponse);
+                yield break;
+            }
+
+            callback.TryOk(payloadResult.entitlements);
         }
 
         /// <summary>

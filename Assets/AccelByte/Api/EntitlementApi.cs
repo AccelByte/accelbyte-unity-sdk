@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -162,6 +162,37 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<Ownership>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserEntitlementOwnershipToken(string Namespace, string userAccessToken,
+            string[] itemIds, string[] appIds, string[] skus, ResultCallback<OwnershipToken> callback)
+        {
+            Assert.IsNotNull(Namespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't get user entitlements! all itemIds, appIds and skus parameter are null");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/entitlements/ownershipToken")
+                .WithPathParam("namespace", Namespace)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (itemIds != null)
+                builder.WithQueryParam("itemIds", itemIds);
+            if (appIds != null)
+                builder.WithQueryParam("appIds", appIds);
+            if (skus != null)
+                builder.WithQueryParam("skus", skus);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<OwnershipToken>();
             callback.Try(result);
         }
 

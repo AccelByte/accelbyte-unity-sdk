@@ -410,7 +410,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(query, nameof(query) + " cannot be null.");
 
-            string[] filter = new string[] { "", "emailAddress", "displayName", "username" };
+            string[] filter = { "", "emailAddress", "displayName", "username" };
 
             var builder = HttpRequestBuilder
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
@@ -432,7 +432,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetUserByUserId(string userId, ResultCallback<UserData> callback)
+        public IEnumerator GetUserByUserId(string userId, ResultCallback<PublicUserData> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(userId, "Can't get user data! userId parameter is null!");
@@ -449,7 +449,7 @@ namespace AccelByte.Api
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            Result<UserData> result = response.TryParseJson<UserData>();
+            Result<PublicUserData> result = response.TryParseJson<PublicUserData>();
             callback.Try(result);
         }
 

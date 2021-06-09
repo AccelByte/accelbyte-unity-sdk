@@ -44,7 +44,7 @@ namespace AccelByte.Api
 
         IEnumerator SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback);
 
-        IEnumerator GetUserByUserId(string userId, ResultCallback<UserData> callback);
+        IEnumerator GetUserByUserId(string userId, ResultCallback<PublicUserData> callback);
 
         IEnumerator GetUserByOtherPlatformUserId(PlatformType platformType, string otherPlatformUserId,
             ResultCallback<UserData> callback);

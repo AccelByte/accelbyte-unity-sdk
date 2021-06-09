@@ -650,7 +650,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userId"> user id that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void GetUserByUserId(string userId, ResultCallback<UserData> callback)
+        public void GetUserByUserId(string userId, ResultCallback<PublicUserData> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 

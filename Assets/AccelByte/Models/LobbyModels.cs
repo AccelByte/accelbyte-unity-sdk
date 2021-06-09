@@ -71,6 +71,9 @@ namespace AccelByte.Models
         getFriendshipStatusResponse,
         acceptFriendsNotif,
         requestFriendsNotif,
+        unfriendNotif,
+        cancelFriendsNotif,
+        rejectFriendsNotif,
         startMatchmakingRequest,
         startMatchmakingResponse,
         cancelMatchmakingRequest,
@@ -393,6 +396,12 @@ namespace AccelByte.Models
     public class Friend
     {
         [DataMember] public string friendId;
+    }
+
+    [DataContract]
+    public class Acquaintance
+    {
+        [DataMember] public string userId;
     }
 
     [DataContract]

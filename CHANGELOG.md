@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/3.0.0%0D2.32.0) (2021-06-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **User:** remove sensitive user information
+
+### Features
+
+* **User:** remove sensitive user information ([1f47176](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1f47176ce5c45470765ee7cb7a8bc34bae3b729d))
+
+
+### Tests
+
+* **leaderboard:** rewrite leadearboard test to be more readable ([33547da](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/33547da673437335efff5e3e630f1d5439689865))
+
 ## [2.32.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.32.0%0D2.31.0) (2021-05-25)
 
 

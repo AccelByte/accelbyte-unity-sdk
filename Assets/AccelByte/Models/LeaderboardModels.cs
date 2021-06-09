@@ -63,9 +63,18 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class LeaderboardPaging
+    {
+        [DataMember] public string First { get; set; }
+        [DataMember] public string Last { get; set; }
+        [DataMember] public string Next { get; set; }
+        [DataMember] public string Previous { get; set; }
+    }
+
+    [DataContract]
     public class LeaderboardPagedList
     {
         [DataMember] public LeaderboardData[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public LeaderboardPaging paging { get; set; }
     }
 }

@@ -79,15 +79,34 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class PublicUserData
+    {
+        [DataMember] public string authType { get; set; }
+        [DataMember] public Ban[] bans { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public bool deletionStatus { get; set; }
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public bool emailVerified { get; set; }
+        [DataMember] public bool enabled { get; set; }
+        [DataMember] public DateTime lastDateOfBirthChangedTime { get; set; }
+        [DataMember] public DateTime lastEnabledChangedTime { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public Permission[] permissions { get; set; }
+        [DataMember] public bool phoneVerified { get; set; }
+        [DataMember] public string platformId { get; set; }
+        [DataMember] public string platformUserId { get; set; }
+        [DataMember] public string[] roles { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string userName { get; set; }
+        [DataMember] public bool eligible { get; set; } = true;
+    }
+
+    [DataContract]
     public class PublicUserInfo
     {
-        [DataMember] public string country { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
         [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string phoneNumber { get; set; }
         [DataMember] public string userId { get; set; }
         [DataMember] public string userName { get; set; }
     }
