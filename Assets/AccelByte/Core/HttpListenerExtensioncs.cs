@@ -77,7 +77,7 @@ namespace AccelByte.Core
         public static void StartHttpListener(string sessionId)
         {
             Process.Start(string.Format("https://{0}/upgrade-account-from-sdk?temporary_session_id={1}",
-                AccelBytePlugin.Config.NonApiBaseUrl,
+                AccelBytePlugin.Config.BaseUrl,
                 sessionId));
 
             if (httpListener != null)

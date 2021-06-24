@@ -13,166 +13,9 @@ using Random = System.Random;
 
 namespace AccelByte.Api
 {
-    internal class LoginSession : ILoginSession
+    internal class LoginSession : ISession
     {
-        interface ILoginData
-        {
-            string AuthorizationToken { get; set; }
-            string RefreshToken { get; set; }
-            int ExpireIn { get; }
-
-            string UserId { get; set; }
-
-            string LoginWithUsernamePath { get; }
-            string LoginWithDeviceIdPath { get; }
-            string LoginWithOtherPlatformPath { get; }
-            string LoginWithAuthorizationCodePath { get; }
-            string LogoutPath { get; }
-            string RefreshTokenPath { get; }
-            string RefreshTokenKey { get; }
-
-            Result TryToParse(IHttpResponse response);
-            IHttpRequest CreateRefreshTokenRequest(string baseUrl, string clientId, string clientSecret);
-            void Clear();
-        }
-
-        internal class OauthLoginData : ILoginData
-        {
-            private readonly object syncObject = new object();
-
-            private TokenData tokenData;
-            private string refreshToken;
-
-            public string AuthorizationToken
-            {
-                get
-                {
-                    lock (this.syncObject)
-                    {
-                        return tokenData?.access_token;
-                    }
-                }
-                set { tokenData.access_token = value; }
-            }
-
-            public string RefreshToken
-            {
-                get
-                {
-                    lock (this.syncObject)
-                    {
-                        return this.refreshToken;
-                    }
-                }
-                set { this.refreshToken = value; }
-            }
-
-            public int ExpireIn => tokenData?.expires_in ?? 0;
-
-            public string UserId { get => tokenData?.user_id; set => tokenData.user_id = value; }
-
-            public string LoginWithUsernamePath => "/oauth/token";
-            public string LoginWithDeviceIdPath => "/oauth/platforms/{platformId}/token";
-            public string LoginWithOtherPlatformPath => "/oauth/platforms/{platformId}/token";
-            public string LoginWithAuthorizationCodePath => "/oauth/token";
-            public string LogoutPath => "/oauth/revoke/token";
-            public string RefreshTokenPath => "/v3/oauth/token";
-
-            public string RefreshTokenKey => "accelbyte_refresh_token";
-
-            public Result TryToParse(IHttpResponse response)
-            {
-                Result<TokenData> result = response.TryParseJson<TokenData>();
-                lock (this.syncObject)
-                {
-                    this.tokenData = result.Value;
-                    this.refreshToken = tokenData.refresh_token;
-                }
-
-                if (result.IsError)
-                {
-                    return Result.CreateError(result.Error);
-                }
-
-                return Result.CreateOk();
-            }
-
-            public IHttpRequest CreateRefreshTokenRequest(string baseUrl, string clientId, string clientSecret)
-            {
-                return HttpRequestBuilder.CreatePost(baseUrl + RefreshTokenPath)
-                .WithBasicAuth(clientId, clientSecret)
-                .WithContentType(MediaType.ApplicationForm)
-                .Accepts(MediaType.ApplicationJson)
-                .WithFormParam("grant_type", "refresh_token")
-                .WithFormParam("refresh_token", RefreshToken)
-                .GetResult();
-            }
-
-            public void Clear()
-            {
-                this.tokenData = null;
-            }
-        }
-
-        internal class SessionLoginData : ILoginData
-        {
-            private readonly object syncObject = new object();
-
-            private SessionData sessionData;
-            private string userId;
-            private string refreshToken;
-
-            public string AuthorizationToken { get => sessionData?.session_id; set => sessionData.session_id = value; }
-            public string RefreshToken { get => this.refreshToken; set => this.refreshToken = value; }
-            public int ExpireIn => sessionData?.expires_in ?? 0;
-
-            public string UserId { get => this.userId ; set => this.userId = value; }
-
-            public string LoginWithUsernamePath => "/v1/login/password";
-            public string LoginWithDeviceIdPath => "/v1/login/platforms/{platformId}";
-            public string LoginWithOtherPlatformPath => "/v1/login/platforms/{platformId}";
-            public string LoginWithAuthorizationCodePath => "/v1/login/code";
-            public string LogoutPath => "/v1/logout";
-            public string RefreshTokenPath => "/v1/sessions/refresh";
-
-            public string RefreshTokenKey => "accelbyte_api_refresh_token";
-
-            public Result TryToParse(IHttpResponse response)
-            {
-                Result<SessionData> result = response.TryParseJson<SessionData>();
-                lock (this.syncObject)
-                {
-                    this.sessionData = result.Value;
-                    if (!result.IsError)
-                    {
-                        this.RefreshToken = sessionData.refresh_id;
-                    }
-                }
-
-                if (result.IsError)
-                {
-                    return Result.CreateError(result.Error);
-                }
-
-                return Result.CreateOk();
-            }
-
-            public IHttpRequest CreateRefreshTokenRequest(string baseUrl, string clientId, string clientSecret)
-            {
-                return HttpRequestBuilder.CreatePost(baseUrl + RefreshTokenPath)
-                .WithBasicAuth(clientId, clientSecret)
-                .WithContentType(MediaType.ApplicationForm)
-                .Accepts(MediaType.ApplicationJson)
-                .WithFormParam("refresh_id", RefreshToken)
-                .GetResult();
-            }
-
-            public void Clear()
-            {
-                this.sessionData = null;
-            }
-        }
-
+        const string RefreshTokenKey = "accelbyte_refresh_token";
         private const uint MaxWaitTokenRefresh = 60000;
         private const uint WaitExpiryDelay = 100;
         private static readonly TimeSpan MaxBackoffInterval = TimeSpan.FromDays(1);
@@ -181,65 +24,49 @@ namespace AccelByte.Api
         private readonly string @namespace;
         private readonly string clientId;
         private readonly string clientSecret;
-        private readonly string redirecUri;
+        private readonly string redirectUri;
         private readonly bool usePlayerPrefs;
         private readonly IHttpWorker httpWorker;
         private readonly CoroutineRunner coroutineRunner;
+        private TokenData tokenData;
 
         private Coroutine maintainAccessTokenCoroutine;
         private DateTime nextRefreshTime;
-        private ILoginData loginData;
 
         public event Action<string> RefreshTokenCallback;
 
         internal LoginSession(string baseUrl, string @namespace, string clientId, string clientSecret,
-            string redirecUri, IHttpWorker httpWorker, CoroutineRunner coroutineRunner, bool useSession = false, bool usePlayerPrefs = false)
+            string redirectUri, IHttpWorker httpWorker, CoroutineRunner coroutineRunner, bool usePlayerPrefs = false)
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(@namespace, "Creating " + GetType().Name + " failed. Namespace parameter is null!");
-            Assert.IsNotNull(clientId, "Creating " + GetType().Name + " failed. ClientId parameter is null!");
-            Assert.IsNotNull(clientSecret, "Creating " + GetType().Name + " failed. ClientSecret parameter is null!");
-            Assert.IsNotNull(redirecUri, "Creating " + GetType().Name + " failed. RedirectUri parameter is null!");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(baseUrl, "Creating " + this.GetType().Name + " failed. Parameter baseUrl is null");
+            Assert.IsNotNull(@namespace, "Creating " + this.GetType().Name + " failed. Namespace parameter is null!");
+            Assert.IsNotNull(clientId, "Creating " + this.GetType().Name + " failed. ClientId parameter is null!");
+            Assert.IsNotNull(clientSecret, "Creating " + this.GetType().Name + " failed. ClientSecret parameter is null!");
+            Assert.IsNotNull(redirectUri, "Creating " + this.GetType().Name + " failed. RedirectUri parameter is null!");
+            Assert.IsNotNull(httpWorker, "Creating " + this.GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
             this.@namespace = @namespace;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
-            this.redirecUri = redirecUri;
+            this.redirectUri = redirectUri;
             this.usePlayerPrefs = usePlayerPrefs;
             this.httpWorker = httpWorker;
             this.coroutineRunner = coroutineRunner;
-
-            if (useSession)
-            {
-                this.loginData = new SessionLoginData();
-            }
-            else
-            {
-                this.loginData = new OauthLoginData();
-            }
         }
 
-        public string AuthorizationToken
-        {
-            get { return this.loginData.AuthorizationToken; }
-            set { this.loginData.AuthorizationToken = value; }
-        }
+        public string AuthorizationToken => this.tokenData?.access_token;
 
-        public string UserId
-        {
-            get { return this.loginData.UserId; }
-            set { this.loginData.UserId = value; }
-        }
+        public string UserId => this.tokenData?.user_id;
 
-        public IEnumerator LoginWithUsername(string username, string password, ResultCallback callback, bool rememberMe = false)
+        public IEnumerator LoginWithUsername(string username, string password, ResultCallback callback,
+            bool rememberMe = false)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(username, "Username parameter is null.");
             Assert.IsNotNull(password, "Password parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LoginWithUsernamePath)
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
@@ -254,19 +81,11 @@ namespace AccelByte.Api
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = this.loginData.TryToParse(response);
+            var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                if (usePlayerPrefs)
-                {
-                    SaveRefreshToken();
-                }
-                if (RefreshTokenCallback != null)
-                {
-                    RefreshTokenCallback.Invoke(this.loginData.RefreshToken);
-                }
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(MaintainAccessToken());
+                this.UpdateSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -280,7 +99,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
 
-            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LoginWithDeviceIdPath)
+            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/device/token")
                 .WithPathParam("platformId", deviceProvider.DeviceType)
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
@@ -293,19 +112,11 @@ namespace AccelByte.Api
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = this.loginData.TryToParse(response);
+            var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                if (usePlayerPrefs)
-                {
-                    SaveRefreshToken();
-                }
-                if (RefreshTokenCallback != null)
-                {
-                    RefreshTokenCallback.Invoke(this.loginData.RefreshToken);
-                }
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(MaintainAccessToken());
+                this.UpdateSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -325,7 +136,7 @@ namespace AccelByte.Api
                 platformToken = platformToken.TrimEnd('=');
             }
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LoginWithOtherPlatformPath)
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/{platformId}/token")
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
@@ -338,19 +149,11 @@ namespace AccelByte.Api
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = this.loginData.TryToParse(response);
+            var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                if (usePlayerPrefs)
-                {
-                    SaveRefreshToken();
-                }
-                if (RefreshTokenCallback != null)
-                {
-                    RefreshTokenCallback.Invoke(this.loginData.RefreshToken);
-                }
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(MaintainAccessToken());
+                this.UpdateSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -364,32 +167,24 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(code, "Code parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LoginWithAuthorizationCodePath)
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "authorization_code")
                 .WithFormParam("code", code)
-                .WithFormParam("redirect_uri", this.redirecUri)
+                .WithFormParam("redirect_uri", this.redirectUri)
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            var result = this.loginData.TryToParse(response);
+            var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                if (usePlayerPrefs)
-                {
-                    SaveRefreshToken();
-                }
-                if (RefreshTokenCallback != null)
-                {
-                    RefreshTokenCallback.Invoke(this.loginData.RefreshToken);
-                }
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(MaintainAccessToken());
+                this.UpdateSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -401,17 +196,17 @@ namespace AccelByte.Api
         public IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
-            if(refreshToken != null)
+            if (refreshToken != null)
             {
-                this.loginData.RefreshToken = refreshToken;
-                yield return RefreshToken(callback);
+                this.tokenData = new TokenData {refresh_token = refreshToken};
+                yield return this.RefreshSession(callback);
             }
-            else if (usePlayerPrefs)
+            else if (this.usePlayerPrefs)
             {
-                if (PlayerPrefs.HasKey(this.loginData.RefreshTokenKey))
+                if (PlayerPrefs.HasKey(LoginSession.RefreshTokenKey))
                 {
-                    this.loginData.RefreshToken = LoadRefreshToken();
-                    yield return RefreshToken(callback);
+                    this.LoadRefreshToken();
+                    yield return this.RefreshSession(callback);
                 }
                 else
                 {
@@ -429,78 +224,66 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
 
             // user already logout
-            if (this.AuthorizationToken == null)
+            if (!this.IsValid())
             {
                 callback.TryOk();
                 yield break;
             }
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + this.loginData.LogoutPath)
-                .WithBearerAuth(this.AuthorizationToken)
+            //TODO: Revoking token is expensive operation for backend. Will revisit this later 
+            // var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/revoke")
+            //     .WithBearerAuth(this.AuthorizationToken)
+            //     .WithContentType(MediaType.ApplicationForm)
+            //     .Accepts(MediaType.ApplicationJson)
+            //     .WithFormParam("token", this.AuthorizationToken)
+            //     .GetResult();
+            //
+            // yield return this.httpWorker.SendRequest(request, rsp => { });
+
+            this.ClearSession();
+            callback.TryOk();
+        }
+
+        public IEnumerator RefreshSession(ResultCallback callback)
+        {
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+                .WithBasicAuth(clientId, clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
-                .WithFormParam("token", this.AuthorizationToken)
+                .WithFormParam("grant_type", "refresh_token")
+                .WithFormParam("refresh_token", this.tokenData.refresh_token)
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
-            this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
-            callback.Try(Result.CreateOk());
-            if (usePlayerPrefs)
-            {
-                if (PlayerPrefs.HasKey(this.loginData.RefreshTokenKey))
-                {
-                    PlayerPrefs.DeleteKey(this.loginData.RefreshTokenKey);
-                    PlayerPrefs.Save();
-                }
-            }
-            this.loginData.Clear();
-        }
-
-        private IEnumerator RefreshToken(ResultCallback callback)
-        {
-            var request = this.loginData.CreateRefreshTokenRequest(this.baseUrl, this.clientId, this.clientSecret);
-
-            IHttpResponse response = null;
-
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
-
-            var result = this.loginData.TryToParse(response);
+            var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                if (usePlayerPrefs)
-                {
-                    SaveRefreshToken();
-                }
-                if (RefreshTokenCallback != null)
-                {
-                    RefreshTokenCallback.Invoke(this.loginData.RefreshToken);
-                }
-                if (this.maintainAccessTokenCoroutine == null)
-                {
-                    this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(MaintainAccessToken());
-                }
+                this.UpdateSession(result.Value);
+                callback.TryOk();
+                yield break;
             }
-            callback.Try(result);
+
+            callback.TryError(result.Error);
         }
 
-        private IEnumerator MaintainAccessToken()
+        private IEnumerator MaintainSession()
         {
-            this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.loginData.ExpireIn);
+            this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);
             TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);
             var rand = new Random();
 
-            while (true)
+            while (this.tokenData != null)
             {
                 if (refreshBackoff >= LoginSession.MaxBackoffInterval)
                 {
                     yield break;
                 }
 
-                if (this.loginData.AuthorizationToken == null || DateTime.UtcNow < this.nextRefreshTime)
+                if (this.tokenData.access_token == null || DateTime.UtcNow < this.nextRefreshTime)
                 {
                     yield return new WaitForSeconds(LoginSession.WaitExpiryDelay / 1000f);
 
@@ -509,11 +292,11 @@ namespace AccelByte.Api
 
                 Result refreshResult = null;
 
-                yield return RefreshToken(result => refreshResult = result);
+                yield return this.RefreshSession(result => refreshResult = result);
 
                 if (!refreshResult.IsError)
                 {
-                    this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.loginData.ExpireIn);
+                    this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);
                 }
                 else
                 {
@@ -536,31 +319,60 @@ namespace AccelByte.Api
             return previousRefreshBackoff + TimeSpan.FromSeconds(randomNum);
         }
 
-        private string LoadRefreshToken()
+        private void LoadRefreshToken()
         {
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
-            string token = PlayerPrefs.GetString(this.loginData.RefreshTokenKey);
-            var bytes = Convert.FromBase64String(token);
-            token = bytes.ToObject<string>();
-            return xorIt(deviceProvider.DeviceId, token);
+            var deviceProvider = DeviceProvider.GetFromSystemInfo();
+            var refreshToken = PlayerPrefs.GetString(LoginSession.RefreshTokenKey);
+            refreshToken = Convert.FromBase64String(refreshToken).ToObject<string>();
+            refreshToken = LoginSession.XorString(deviceProvider.DeviceId, refreshToken);
+            this.tokenData = new TokenData {refresh_token = refreshToken};
         }
 
         private void SaveRefreshToken()
         {
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
-            string token = xorIt(deviceProvider.DeviceId, this.loginData.RefreshToken);
+            string token = LoginSession.XorString(deviceProvider.DeviceId, this.tokenData.refresh_token);
             token = Convert.ToBase64String(token.ToUtf8Json());
-            PlayerPrefs.SetString(this.loginData.RefreshTokenKey, token);
+            PlayerPrefs.SetString(LoginSession.RefreshTokenKey, token);
             PlayerPrefs.Save();
         }
 
-        private static string xorIt(string key, string input)
+        private static string XorString(string key, string input)
         {
-            string xor = "";
+            var resultBuilder = new StringBuilder();
             for (int i = 0; i < input.Length; i++)
-                xor += (char)(input[i] ^ key[(i % key.Length)]);
+            {
+                resultBuilder.Append((char) (input[i] ^ key[(i % key.Length)]));
+            }
 
-            return xor;
+            return resultBuilder.ToString();
+        }
+
+        private void UpdateSession(TokenData loginResponse)
+        {
+            Assert.IsNotNull(loginResponse);
+            this.tokenData = loginResponse;
+            if (this.usePlayerPrefs)
+            {
+                this.SaveRefreshToken();
+            }
+
+            this.RefreshTokenCallback?.Invoke(this.tokenData.refresh_token);
+            if (this.maintainAccessTokenCoroutine == null)
+            {
+                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(this.MaintainSession());
+            }
+        }
+
+        private void ClearSession()
+        {
+            this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
+            this.tokenData = null;
+            
+            if (!this.usePlayerPrefs) return;
+            
+            PlayerPrefs.DeleteKey(LoginSession.RefreshTokenKey);
+            PlayerPrefs.Save();
         }
     }
 }

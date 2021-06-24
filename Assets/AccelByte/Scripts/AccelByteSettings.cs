@@ -14,12 +14,6 @@ namespace AccelByte.Api
 #endif
     public sealed class AccelByteSettings : ScriptableObject
     {
-        public static bool UseSessionManagement
-        {
-            get { return AccelByteSettings.Instance.config.UseSessionManagement; }
-            set { AccelByteSettings.Instance.config.UseSessionManagement = value; }
-        }
-
         public static bool UsePlayerPrefs
         {
             get { return AccelByteSettings.Instance.config.UsePlayerPrefs; }
@@ -48,24 +42,6 @@ namespace AccelByte.Api
         {
             get { return AccelByteSettings.Instance.config.BaseUrl; }
             set { AccelByteSettings.Instance.config.BaseUrl = value; }
-        }
-
-        public static string ApiBaseUrl
-        {
-            get { return AccelByteSettings.Instance.config.ApiBaseUrl; }
-            set { AccelByteSettings.Instance.config.ApiBaseUrl = value; }
-        }
-
-        public static string NonApiBaseUrl
-        {
-            get { return AccelByteSettings.Instance.config.NonApiBaseUrl; }
-            set { AccelByteSettings.Instance.config.NonApiBaseUrl = value; }
-        }
-
-        public static string LoginServerUrl
-        {
-            get { return AccelByteSettings.Instance.config.LoginServerUrl; }
-            set { AccelByteSettings.Instance.config.LoginServerUrl = value; }
         }
 
         public static string IamServerUrl

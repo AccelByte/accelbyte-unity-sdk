@@ -116,11 +116,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (session == null || session.AuthorizationToken == null)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
+            // if (session == null || session.AuthorizationToken == null)
+            // {
+            //     callback.TryError(ErrorCode.IsNotLoggedIn);
+            //     return;
+            // }
 
             coroutineRunner.Run(
                 api.GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, session.AuthorizationToken, callback));
@@ -143,25 +143,6 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.BulkAcceptPolicyVersions(session.AuthorizationToken, acceptAgreementRequests, callback));
-        }
-
-        /// <summary>
-        /// Sign multiple user's legal eligibility documents. This endpoint used by apigateway during new user registration. (For apigateway implementation)
-        /// </summary>
-        /// <param name="acceptAgreementRequests">Signed agreements</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        public void BulkAcceptPolicyVersionsIndirect(AcceptAgreementRequest[] acceptAgreementRequests, ResultCallback callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            if (session == null || session.AuthorizationToken == null)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                api.BulkAcceptPolicyVersionsIndirect(session.AuthorizationToken, acceptAgreementRequests, callback));
         }
 
         /// <summary>

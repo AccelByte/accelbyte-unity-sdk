@@ -12,16 +12,14 @@ namespace AccelByte.Server
     public class ServerUserAccountApi
     {
         private readonly string baseUrl;
-        private readonly string apiBaseUrl;
         private readonly IHttpWorker httpWorker;
 
-        internal ServerUserAccountApi(string baseUrl, string apiBaseUrl, IHttpWorker httpWorker)
+        internal ServerUserAccountApi(string baseUrl, IHttpWorker httpWorker)
         {
             Assert.IsNotNull(baseUrl, nameof(baseUrl) + "is null");
             Assert.IsNotNull(httpWorker, nameof(httpWorker) + "is null");
 
             this.baseUrl = baseUrl;
-            this.apiBaseUrl = apiBaseUrl;
             this.httpWorker = httpWorker;
         }
 
@@ -35,10 +33,8 @@ namespace AccelByte.Server
         {
             Assert.IsFalse(string.IsNullOrEmpty(userAuthToken), "Parameter " + nameof(userAuthToken) + " is null or empty");
 
-            var url = userAuthToken.Length <= 36 ? apiBaseUrl : baseUrl;
-
             var request = HttpRequestBuilder
-                .CreateGet(url + "/iam/v3/public/users/me")
+                .CreateGet(this.baseUrl + "/iam/v3/public/users/me")
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBearerAuth(userAuthToken)

@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Text;
+using AccelByte.Api;
 using UnityEngine.Networking;
 
 namespace AccelByte.Core
@@ -31,6 +32,7 @@ namespace AccelByte.Core
             }
 
             unityWebRequest.downloadHandler = new DownloadHandlerBuffer();
+            UnityWebRequest.ClearCookieCache(new Uri(AccelBytePlugin.Config.BaseUrl));
 
             return unityWebRequest;
         }

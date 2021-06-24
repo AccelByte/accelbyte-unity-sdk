@@ -449,7 +449,7 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    class SetUserStatusRequest
+    public class SetUserStatusRequest
     {
         [DataMember] public uint availability;
         [DataMember] public string activity;

@@ -123,15 +123,14 @@ namespace AccelByte.Api
 
             AccelBytePlugin.coroutineRunner = new CoroutineRunner();
             AccelBytePlugin.httpWorker = new UnityHttpWorker();
-            ILoginSession loginSession = new LoginSession(
-                    AccelBytePlugin.config.LoginServerUrl,
+            var loginSession = new LoginSession(
+                    AccelBytePlugin.config.IamServerUrl,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.config.ClientId,
                     AccelBytePlugin.config.ClientSecret,
                     AccelBytePlugin.config.RedirectUri,
                     AccelBytePlugin.httpWorker,
                     AccelBytePlugin.coroutineRunner,
-                    AccelBytePlugin.config.UseSessionManagement,
                     AccelBytePlugin.config.UsePlayerPrefs);
 
 
@@ -142,8 +141,7 @@ namespace AccelByte.Api
                     AccelBytePlugin.config.Namespace,
                     loginSession,
                     AccelBytePlugin.httpWorker),
-                AccelBytePlugin.coroutineRunner,
-                AccelBytePlugin.config.UseSessionManagement);
+                AccelBytePlugin.coroutineRunner);
 
             ServicePointManager.ServerCertificateValidationCallback = AccelBytePlugin.OnCertificateValidated;
         }

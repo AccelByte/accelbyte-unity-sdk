@@ -4,8 +4,10 @@
 
 using System;
 using System.Collections;
+using System.Text.RegularExpressions;
 using AccelByte.Core;
 using AccelByte.Models;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -15,32 +17,24 @@ namespace AccelByte.Api
     /// </summary>
     public class User
     {
-        /// <summary>
-        /// Raised when upgrade from Player Portal is finished
-        /// </summary>
-        public event Action Upgraded;
-
         //Constants
         private const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
         private const int ttl = 60;
 
         //Readonly members
-        private readonly ILoginSession loginSession;
+        private readonly LoginSession loginSession;
         private readonly IUserAccount userAccount;
         private readonly CoroutineRunner coroutineRunner;
-        private readonly bool needsUserId;
 
-        public ISession Session { get { return this.loginSession; } }
+        public ISession Session => this.loginSession;
 
         private UserData userDataCache;
 
-        internal User(ILoginSession loginSession, IUserAccount userAccount, CoroutineRunner coroutineRunner,
-            bool needsUserId)
+        internal User(LoginSession loginSession, IUserAccount userAccount, CoroutineRunner coroutineRunner)
         {
             this.loginSession = loginSession;
             this.userAccount = userAccount;
             this.coroutineRunner = coroutineRunner;
-            this.needsUserId = needsUserId;
         }
 
         /// <summary>
@@ -74,20 +68,6 @@ namespace AccelByte.Api
                 callback.TryError(loginResult.Error);
 
                 yield break;
-            }
-
-            if (this.needsUserId)
-            {
-                Result<UserData> userDataResult = null;
-
-                yield return RefreshDataAsync(result => userDataResult = result);
-
-                if (userDataResult.IsError)
-                {
-                    callback.TryError(userDataResult.Error);
-
-                    yield break;
-                }
             }
 
             callback.TryOk();
@@ -189,6 +169,12 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => this.loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
         }
 
+        public void RefreshSession(ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(this.loginSession.RefreshSession(callback));
+        }
+
         /// <summary>
         /// Logout current user session
         /// </summary>
@@ -203,7 +189,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.loginSession.UserId = null;
+            this.userDataCache = null;
             this.coroutineRunner.Run(this.loginSession.Logout(callback));
         }
 
@@ -240,7 +226,7 @@ namespace AccelByte.Api
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
         /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
         /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
-        /// <param name="callback">Returns a Result that contains UserData via callback</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
         public void Registerv2(string emailAddress, string username, string password, string displayName, string country,
             DateTime dateOfBirth, ResultCallback<RegisterUserResponse> callback)
         {
@@ -259,6 +245,24 @@ namespace AccelByte.Api
             this.coroutineRunner.Run(this.userAccount.Registerv2(registerUserRequest, callback));
         }
 
+        /// <summary>
+        /// Register a user while optionally accepting legal policies, password, and displayName 
+        /// </summary>
+        /// <param name="request">To accept policies, fill acceptedPolicies field</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void RegisterAndAcceptPolicies(RegisterUserRequestv2 request, ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            
+            //authType other than EMAILPASSWD is not supported
+            request.authType = AuthenticationType.EMAILPASSWD;
+            Assert.IsTrue(
+                Regex.IsMatch(request.dateOfBirth, "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"),
+                "Date of birth format is yyyy-MM-dd");
+
+            this.coroutineRunner.Run(this.userAccount.Registerv2(request, callback));
+        }
+        
         /// <summary>
         /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
@@ -304,7 +308,6 @@ namespace AccelByte.Api
             if (!result.IsError)
             {
                 this.userDataCache = result.Value;
-                this.loginSession.UserId = this.userDataCache.userId;
 
                 callback.TryOk(this.userDataCache);
 
@@ -403,56 +406,6 @@ namespace AccelByte.Api
             }
 
             callback.Try(result);
-        }
-
-        /// <summary>
-        /// Upgrade a headless account using external browser. User must be logged in before this method can be
-        /// used.
-        /// </summary>
-        /// <param name="callback">Returns a Result that contains UpgradeUserRequest via callback when completed</param>
-        public void UpgradeWithPlayerPortal(ResultCallback<UpgradeUserRequest> callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(
-                UpgradeWithPlayerPortalAsync(HttpListenerExtension.GetAvailableLocalUrl(), callback));
-        }
-
-        private IEnumerator UpgradeWithPlayerPortalAsync(string returnUrl, ResultCallback<UpgradeUserRequest> callback)
-        {
-            Result<UpgradeUserRequest> result = null;
-
-            yield return this.userAccount.UpgradeWithPlayerPortal(returnUrl, ttl, r => result = r);
-
-            callback.Try(result);
-
-            while (result == null)
-            {
-                System.Threading.Thread.Sleep(100);
-                yield return null;
-            }
-
-            HttpListenerExtension.StartHttpListener(result.Value.temporary_session_id);
-
-            while (HttpListenerExtension.listenerResult == null)
-            {
-                System.Threading.Thread.Sleep(100);
-                yield return null;
-
-                if (HttpListenerExtension.availableLocalUrl != returnUrl)
-                    break;
-            }
-
-            if (HttpListenerExtension.listenerResult != null)
-            {
-                if (!HttpListenerExtension.listenerResult.IsError)
-                {
-                    Action handler = Upgraded;
-                    if (handler != null)
-                    {
-                        handler();
-                    }
-                }
-            }
         }
 
         /// <summary>

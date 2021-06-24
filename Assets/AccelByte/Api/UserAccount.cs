@@ -12,7 +12,6 @@ namespace AccelByte.Api
     internal class UserAccount : IUserAccount
     {
         private readonly string baseUrl;
-        private readonly string apiBaseUrl;
         private readonly string @namespace;
         private readonly ISession session;
         private readonly IHttpWorker httpWorker;
@@ -29,8 +28,6 @@ namespace AccelByte.Api
             this.session = session;
             this.baseUrl = baseUrl;
             this.httpWorker = httpWorker;
-
-            this.apiBaseUrl = "https://" + AccelBytePlugin.Config.ApiBaseUrl;
         }
 
         public IEnumerator Register(RegisterUserRequest registerUserRequest,
@@ -178,26 +175,6 @@ namespace AccelByte.Api
             yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<UserData>();
-            callback.Try(result);
-        }
-
-        public IEnumerator UpgradeWithPlayerPortal(string returnUrl, int ttl, ResultCallback<UpgradeUserRequest> callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(returnUrl, "Upgrade failed. return url is null!");
-
-            var request = HttpRequestBuilder
-                .CreatePost(this.apiBaseUrl + "/v1/public/temporarysessions")
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"return_url\": \"{0}\", \"ttl\": {1}}}", returnUrl, ttl))
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParseJson<UpgradeUserRequest>();
             callback.Try(result);
         }
 
@@ -506,7 +483,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
 
             var request = HttpRequestBuilder
-                .CreateGet(this.apiBaseUrl + "/location/country")
+                .CreateGet(this.baseUrl + "/v3/location/country")
                 .GetResult();
 
             IHttpResponse response = null;

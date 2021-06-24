@@ -3,7 +3,10 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Utf8Json;
+using Utf8Json.Formatters;
 
 namespace AccelByte.Models
 {
@@ -21,6 +24,7 @@ namespace AccelByte.Models
         [DataMember] public string user_id { get; set; }
         [DataMember] public string display_name { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public bool is_comply { get; set; }
     }
 
     [DataContract]
@@ -119,6 +123,15 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class PolicyAcceptance
+    {
+        [DataMember] public bool isAccepted { get; set; }
+        [DataMember] public string localizedPolicyVersionId { get; set; }
+        [DataMember] public string policyId { get; set; }
+        [DataMember] public string policyVersionId { get; set; }
+    }
+
+    [DataContract]
     public class RegisterUserRequest
     {
         [DataMember] public AuthenticationType authType { get; set; }
@@ -127,18 +140,20 @@ namespace AccelByte.Models
         [DataMember] public string displayName { get; set; }
         [DataMember] public string emailAddress { get; set; }
         [DataMember] public string password { get; set; }
+        [DataMember] public List<PolicyAcceptance> acceptedPolicies { get; set; }
     }
-
+    
     [DataContract]
     public class RegisterUserRequestv2
     {
-        [DataMember] public AuthenticationType authType { get; set; }
+        [DataMember] public AuthenticationType authType { get; set; } = AuthenticationType.EMAILPASSWD;
         [DataMember] public string country { get; set; }
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public string displayName { get; set; }
         [DataMember] public string emailAddress { get; set; }
         [DataMember] public string password { get; set; }
         [DataMember] public string username { get; set; }
+        [DataMember] public List<PolicyAcceptance> acceptedPolicies { get; set; }
     }
 
     [DataContract]

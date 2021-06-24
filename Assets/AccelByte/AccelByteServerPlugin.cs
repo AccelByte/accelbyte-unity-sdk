@@ -45,7 +45,7 @@ namespace AccelByte.Server
         {
             get
             {
-                CheckPlugin();
+                AccelByteServerPlugin.CheckPlugin();
                 return AccelByteServerPlugin.config;
             }
         }
@@ -55,21 +55,19 @@ namespace AccelByte.Server
 #if UNITY_EDITOR // Handle an unexpected behaviour if Domain Reload (experimental) is disabled
             EditorApplication.playModeStateChanged += state =>
             {
-                if (state == PlayModeStateChange.ExitingEditMode)
-                {
-                    hasBeenInitialized = false;
-            
-                    accessToken = null;
-                    server = null;
-                    dedicatedServerManager = null;
-                    ecommerce = null;
-                    statistic = null;
-                    qos = null;
-                    gameTelemetry = null;
-                    achievement = null;
-                    lobby = null;
-                    cloudSave = null;
-                }
+                if (state != PlayModeStateChange.ExitingEditMode) return;
+
+                AccelByteServerPlugin.hasBeenInitialized = false;
+                AccelByteServerPlugin.accessToken = null;
+                AccelByteServerPlugin.server = null;
+                AccelByteServerPlugin.dedicatedServerManager = null;
+                AccelByteServerPlugin.ecommerce = null;
+                AccelByteServerPlugin.statistic = null;
+                AccelByteServerPlugin.qos = null;
+                AccelByteServerPlugin.gameTelemetry = null;
+                AccelByteServerPlugin.achievement = null;
+                AccelByteServerPlugin.lobby = null;
+                AccelByteServerPlugin.cloudSave = null;
             };
         }
 
@@ -125,186 +123,169 @@ namespace AccelByte.Server
         private static void CheckPlugin()
         {
 #if UNITY_EDITOR
-            if (!hasBeenInitialized)
-            {
-                hasBeenInitialized = true;
-                Init();
-            }
+            if (AccelByteServerPlugin.hasBeenInitialized) return;
+            
+            AccelByteServerPlugin.hasBeenInitialized = true;
+            AccelByteServerPlugin.Init();
 #endif
         }
 
         public static DedicatedServer GetDedicatedServer()
         {
-            CheckPlugin();
+            AccelByteServerPlugin.CheckPlugin();
             return AccelByteServerPlugin.server;
         }
 
         public static DedicatedServerManager GetDedicatedServerManager()
         {
-            if (AccelByteServerPlugin.dedicatedServerManager == null)
+            if (AccelByteServerPlugin.dedicatedServerManager != null)
             {
-                CheckPlugin();
-                AccelByteServerPlugin.dedicatedServerManager = new DedicatedServerManager(
-                    new DedicatedServerManagerApi(
-                        AccelByteServerPlugin.config.DSMControllerServerUrl,
-                        AccelByteServerPlugin.config.Namespace,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.coroutineRunner);
+                return AccelByteServerPlugin.dedicatedServerManager;
             }
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.dedicatedServerManager = new DedicatedServerManager(
+                new DedicatedServerManagerApi(
+                    AccelByteServerPlugin.config.DSMControllerServerUrl,
+                    AccelByteServerPlugin.config.Namespace,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.dedicatedServerManager;
         }
         
         public static ServerEcommerce GetEcommerce()
         {
-            if (AccelByteServerPlugin.ecommerce == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.ecommerce = new ServerEcommerce(
-                    new ServerEcommerceApi(
-                        AccelByteServerPlugin.config.PlatformServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.ecommerce != null) return AccelByteServerPlugin.ecommerce;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.ecommerce = new ServerEcommerce(
+                new ServerEcommerceApi(
+                    AccelByteServerPlugin.config.PlatformServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.ecommerce;
         }
         
         public static ServerStatistic GetStatistic()
         {
-            if (AccelByteServerPlugin.statistic == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.statistic = new ServerStatistic(
-                    new ServerStatisticApi(
-                        AccelByteServerPlugin.config.StatisticServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.statistic != null) return AccelByteServerPlugin.statistic;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.statistic = new ServerStatistic(
+                new ServerStatisticApi(
+                    AccelByteServerPlugin.config.StatisticServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.statistic;
         }
 
         public static ServerQos GetQos()
         {
-            if (AccelByteServerPlugin.qos == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.qos = new ServerQos(
-                    new ServerQosManagerApi(
-                        AccelByteServerPlugin.config.QosManagerServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.qos != null) return AccelByteServerPlugin.qos;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.qos = new ServerQos(
+                new ServerQosManagerApi(
+                    AccelByteServerPlugin.config.QosManagerServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.qos;
         }
 
         public static ServerGameTelemetry GetGameTelemetry()
         {
-            if (AccelByteServerPlugin.gameTelemetry == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.gameTelemetry = new ServerGameTelemetry(
-                    new ServerGameTelemetryApi(
-                        AccelByteServerPlugin.config.GameTelemetryServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.gameTelemetry != null) return AccelByteServerPlugin.gameTelemetry;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.gameTelemetry = new ServerGameTelemetry(
+                new ServerGameTelemetryApi(
+                    AccelByteServerPlugin.config.GameTelemetryServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.gameTelemetry;
         }
 
         public static ServerAchievement GetAchievement()
         {
-            if (AccelByteServerPlugin.achievement == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.achievement = new ServerAchievement(
-                    new ServerAchievementApi(
-                        AccelByteServerPlugin.config.AchievementServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.achievement != null) return AccelByteServerPlugin.achievement;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.achievement = new ServerAchievement(
+                new ServerAchievementApi(
+                    AccelByteServerPlugin.config.AchievementServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.achievement;
         }
 
         public static ServerLobby GetLobby()
         {
-            if (AccelByteServerPlugin.lobby == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.lobby = new ServerLobby(
-                    new ServerLobbyApi(
-                        AccelByteServerPlugin.config.LobbyServerUrl,
-                        AccelByteServerPlugin.httpWorker), 
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.lobby != null) return AccelByteServerPlugin.lobby;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.lobby = new ServerLobby(
+                new ServerLobbyApi(
+                    AccelByteServerPlugin.config.LobbyServerUrl,
+                    AccelByteServerPlugin.httpWorker), 
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.lobby;
         }
 
         public static ServerCloudSave GetCloudSave()
         {
-            if (AccelByteServerPlugin.cloudSave == null)
-            {
-                CheckPlugin();
-                AccelByteServerPlugin.cloudSave = new ServerCloudSave(
-                    new ServerCloudSaveApi(
-                        AccelByteServerPlugin.config.CloudSaveServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
+            if (AccelByteServerPlugin.cloudSave != null) return AccelByteServerPlugin.cloudSave;
+            
+            AccelByteServerPlugin.CheckPlugin();
+            AccelByteServerPlugin.cloudSave = new ServerCloudSave(
+                new ServerCloudSaveApi(
+                    AccelByteServerPlugin.config.CloudSaveServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.cloudSave;
         }
 
         public static ServerMatchmaking GetMatchmaking()
         {
-            CheckPlugin();
+            AccelByteServerPlugin.CheckPlugin();
 
-            if (AccelByteServerPlugin.matchmaking == null)
-            {
-                AccelByteServerPlugin.matchmaking = new ServerMatchmaking(
-                    new ServerMatchmakingApi(
-                        AccelByteServerPlugin.config.MatchmakingServerUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.session,
-                    AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.coroutineRunner);
-            }
-
-            return AccelByteServerPlugin.matchmaking;
+            return AccelByteServerPlugin.matchmaking ?? (AccelByteServerPlugin.matchmaking = new ServerMatchmaking(
+                new ServerMatchmakingApi(
+                    AccelByteServerPlugin.config.MatchmakingServerUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
+                AccelByteServerPlugin.coroutineRunner));
         }
 
         public static ServerUserAccount GetUserAccount()
         {
-            CheckPlugin();
+            AccelByteServerPlugin.CheckPlugin();
 
-            if (AccelByteServerPlugin.userAccount == null)
-            {
-                AccelByteServerPlugin.userAccount = new ServerUserAccount(
-                    new ServerUserAccountApi(
-                        AccelByteServerPlugin.config.BaseUrl,
-                        AccelByteServerPlugin.config.ApiBaseUrl,
-                        AccelByteServerPlugin.httpWorker),
-                    AccelByteServerPlugin.coroutineRunner);
-            }
-
-            return AccelByteServerPlugin.userAccount;
+            return AccelByteServerPlugin.userAccount ?? (AccelByteServerPlugin.userAccount = new ServerUserAccount(
+                new ServerUserAccountApi(
+                    AccelByteServerPlugin.config.BaseUrl,
+                    AccelByteServerPlugin.httpWorker),
+                AccelByteServerPlugin.coroutineRunner));
         }
     }
 }

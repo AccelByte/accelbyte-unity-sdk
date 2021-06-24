@@ -847,7 +847,7 @@ namespace AccelByte.Api
                     tempParty = userIdsCSV,
                     extraAttributes = extraAttributesCSV
                 },
-                callback); ;
+                callback);
         }
 
 
@@ -942,7 +942,58 @@ namespace AccelByte.Api
                 callback);
         }
 
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode">Target matchmaking game mode</param>
+        /// <param name="serverName">Server name to do match in Local DS</param>
+        /// <param name="clientVersion">Game client version to ensure match with the same version</param>
+        /// <param name="latencies"></param> Preferred latencies
+        /// <param name="partyAttributes">Matchmaker will match party with the same party attributes</param>
+        /// <param name="tempPartyUserIds">UserIDs to form a temporary party with (include user who started the matchmaking). Temporary party will disband when matchmaking finishes.</param>
+        /// <param name="extraAttributes">Custom attributes defined in game mode's matching/flexing rule</param>
+        /// <param name="callback">Result of the function with a start matchmaking status code.</param>
+        public void StartMatchmaking(
+            string gameMode,
+            string serverName,
+            string clientVersion,
+            Dictionary<string, int> latencies,
+            Dictionary<string, object> partyAttributes,
+            string[] tempPartyUserIds,
+            string[] extraAttributes,
+            ResultCallback<MatchmakingCode> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
 
+            string strLatencies = "";
+            if (latencies != null && latencies.Count > 0)
+            {
+                strLatencies = "{" +
+                    string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
+                    "}";
+            }
+
+            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
+
+            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
+
+            string extraAttributesCSV = extraAttributes == null ? "" : string.Join(",", extraAttributes);
+
+            SendRequest(
+                MessageType.startMatchmakingRequest,
+                new StartMatchmakingRequest
+                {
+                    gameMode = gameMode,
+                    serverName = serverName,
+                    clientVersion = clientVersion,
+                    latencies = strLatencies,
+                    partyAttributes = jsonAttributeString,
+                    tempParty = userIdsCSV,
+                    extraAttributes = extraAttributesCSV
+                },
+                callback);
+        }
+        
         /// <summary>
         /// Send a message to matchmaking service to indicate the user is ready for match
         /// </summary>

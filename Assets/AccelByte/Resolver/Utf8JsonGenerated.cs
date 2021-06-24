@@ -43,7 +43,7 @@ namespace Utf8Json.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(255)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(259)
             {
                 {typeof(global::AccelByte.Models.AchievementIcon[]), 0 },
                 {typeof(global::AccelByte.Models.PublicAchievement[]), 1 },
@@ -90,216 +90,220 @@ namespace Utf8Json.Resolvers
                 {typeof(global::AccelByte.Models.Ban[]), 42 },
                 {typeof(global::AccelByte.Models.Permission[]), 43 },
                 {typeof(global::AccelByte.Models.PublicUserInfo[]), 44 },
-                {typeof(global::AccelByte.Models.PlatformUserIdMap[]), 45 },
-                {typeof(global::AccelByte.Models.AccountLinkedPlatform[]), 46 },
-                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount[]), 47 },
-                {typeof(global::AccelByte.Models.AchievementIcon), 48 },
-                {typeof(global::AccelByte.Models.PublicAchievement), 49 },
-                {typeof(global::AccelByte.Models.Paging), 50 },
-                {typeof(global::AccelByte.Models.PaginatedPublicAchievement), 51 },
-                {typeof(global::AccelByte.Models.MultiLanguageAchievement), 52 },
-                {typeof(global::AccelByte.Models.CountInfo), 53 },
-                {typeof(global::AccelByte.Models.UserAchievement), 54 },
-                {typeof(global::AccelByte.Models.PaginatedUserAchievement), 55 },
-                {typeof(global::AccelByte.Models.IneligibleUser), 56 },
-                {typeof(global::AccelByte.Models.LocalizedPolicyVersionObject), 57 },
-                {typeof(global::AccelByte.Models.PolicyVersionWithLocalizedVersionObject), 58 },
-                {typeof(global::AccelByte.Models.PublicPolicy), 59 },
-                {typeof(global::AccelByte.Models.AcceptAgreementRequest), 60 },
-                {typeof(global::AccelByte.Models.AcceptAgreementResponse), 61 },
-                {typeof(global::AccelByte.Models.RetrieveUserEligibilitiesResponse), 62 },
-                {typeof(global::AccelByte.Models.UserProfile), 63 },
-                {typeof(global::AccelByte.Models.PublicUserProfile), 64 },
-                {typeof(global::AccelByte.Models.CreateUserProfileRequest), 65 },
-                {typeof(global::AccelByte.Models.UpdateUserProfileRequest), 66 },
-                {typeof(global::AccelByte.Models.UserRecord), 67 },
-                {typeof(global::AccelByte.Models.GameRecord), 68 },
-                {typeof(global::AccelByte.Models.ConcurrentReplaceRequest), 69 },
-                {typeof(global::AccelByte.Models.Slot), 70 },
-                {typeof(global::AccelByte.Models.UpdateMedataRequest), 71 },
-                {typeof(global::AccelByte.Models.Config), 72 },
-                {typeof(global::AccelByte.Models.CurrencySummary), 73 },
-                {typeof(global::AccelByte.Models.BalanceInfo), 74 },
-                {typeof(global::AccelByte.Models.WalletInfo), 75 },
-                {typeof(global::AccelByte.Models.WalletTransactionInfo), 76 },
-                {typeof(global::AccelByte.Models.WalletTransactionPagingSlicedResult), 77 },
-                {typeof(global::AccelByte.Models.CreditUserWalletRequest), 78 },
-                {typeof(global::AccelByte.Models.CategoryInfo), 79 },
-                {typeof(global::AccelByte.Models.RegionDataItem), 80 },
-                {typeof(global::AccelByte.Models.ItemSnapshot), 81 },
-                {typeof(global::AccelByte.Models.ItemCriteria), 82 },
-                {typeof(global::AccelByte.Models.Image), 83 },
-                {typeof(global::AccelByte.Models.ItemInfo), 84 },
-                {typeof(global::AccelByte.Models.PopulatedItemInfo), 85 },
-                {typeof(global::AccelByte.Models.ItemPagingSlicedResult), 86 },
-                {typeof(global::AccelByte.Models.PaymentUrl), 87 },
-                {typeof(global::AccelByte.Models.Price), 88 },
-                {typeof(global::AccelByte.Models.OrderHistoryInfo), 89 },
-                {typeof(global::AccelByte.Models.OrderInfo), 90 },
-                {typeof(global::AccelByte.Models.OrderPagingSlicedResult), 91 },
-                {typeof(global::AccelByte.Models.OrderRequest), 92 },
-                {typeof(global::AccelByte.Models.OrderTransaction), 93 },
-                {typeof(global::AccelByte.Models.EntitlementInfo), 94 },
-                {typeof(global::AccelByte.Models.EntitlementPagingSlicedResult), 95 },
-                {typeof(global::AccelByte.Models.EntitlementSummary), 96 },
-                {typeof(global::AccelByte.Models.ConsumeUserEntitlementRequest), 97 },
-                {typeof(global::AccelByte.Models.GrantUserEntitlementRequest), 98 },
-                {typeof(global::AccelByte.Models.StackableEntitlementInfo), 99 },
-                {typeof(global::AccelByte.Models.Attributes), 100 },
-                {typeof(global::AccelByte.Models.DistributionAttributes), 101 },
-                {typeof(global::AccelByte.Models.DistributionReceiver), 102 },
-                {typeof(global::AccelByte.Models.Ownership), 103 },
-                {typeof(global::AccelByte.Models.OwnershipToken), 104 },
-                {typeof(global::AccelByte.Models.OwnershipEntitlement), 105 },
-                {typeof(global::AccelByte.Models.OwnershipTokenPayload), 106 },
-                {typeof(global::AccelByte.Models.ServiceError), 107 },
-                {typeof(global::AccelByte.Models.OAuthError), 108 },
-                {typeof(global::AccelByte.Models.GameProfile), 109 },
-                {typeof(global::AccelByte.Models.GameProfileRequest), 110 },
-                {typeof(global::AccelByte.Models.GameProfileAttribute), 111 },
-                {typeof(global::AccelByte.Models.GameProfilePublicInfo), 112 },
-                {typeof(global::AccelByte.Models.UserGameProfiles), 113 },
-                {typeof(global::AccelByte.Models.TelemetryBody), 114 },
-                {typeof(global::AccelByte.Models.RuleInformation), 115 },
-                {typeof(global::AccelByte.Models.Rules), 116 },
-                {typeof(global::AccelByte.Models.GroupRules), 117 },
-                {typeof(global::AccelByte.Models.CreateGroupRequest), 118 },
-                {typeof(global::AccelByte.Models.GroupMember), 119 },
-                {typeof(global::AccelByte.Models.GroupMemberInformation), 120 },
-                {typeof(global::AccelByte.Models.GroupInformation), 121 },
-                {typeof(global::AccelByte.Models.PaginatedGroupListResponse), 122 },
-                {typeof(global::AccelByte.Models.UpdateGroupRequest), 123 },
-                {typeof(global::AccelByte.Models.UpdateGroupNoTypeRequest), 124 },
-                {typeof(global::AccelByte.Models.UserInvitationResponse), 125 },
-                {typeof(global::AccelByte.Models.JoinGroupResponse), 126 },
-                {typeof(global::AccelByte.Models.KickMemberResponse), 127 },
-                {typeof(global::AccelByte.Models.RejectOtherJoinResponse), 128 },
-                {typeof(global::AccelByte.Models.UpdateGroupCustomRuleRequest), 129 },
-                {typeof(global::AccelByte.Models.UpdateGroupPredefinedRuleRequest), 130 },
-                {typeof(global::AccelByte.Models.GroupGeneralResponse), 131 },
-                {typeof(global::AccelByte.Models.PaginatedGroupMemberList), 132 },
-                {typeof(global::AccelByte.Models.GroupRequest), 133 },
-                {typeof(global::AccelByte.Models.PaginatedGroupRequestList), 134 },
-                {typeof(global::AccelByte.Models.AssignRoleRequest), 135 },
-                {typeof(global::AccelByte.Models.MemberRolePermission), 136 },
-                {typeof(global::AccelByte.Models.MemberRole), 137 },
-                {typeof(global::AccelByte.Models.PaginatedMemberRoles), 138 },
-                {typeof(global::AccelByte.Models.JsonWebTokenDefaultHeader), 139 },
-                {typeof(global::AccelByte.Models.UserPoint), 140 },
-                {typeof(global::AccelByte.Models.UserRanking), 141 },
-                {typeof(global::AccelByte.Models.UserRankingData), 142 },
-                {typeof(global::AccelByte.Models.LeaderboardRankingResult), 143 },
-                {typeof(global::AccelByte.Models.LeaderboardData), 144 },
-                {typeof(global::AccelByte.Models.LeaderboardPaging), 145 },
-                {typeof(global::AccelByte.Models.LeaderboardPagedList), 146 },
-                {typeof(global::AccelByte.Models.DisconnectNotif), 147 },
-                {typeof(global::AccelByte.Models.LobbySessionId), 148 },
-                {typeof(global::AccelByte.Models.Notification), 149 },
-                {typeof(global::AccelByte.Models.ChatMessage), 150 },
-                {typeof(global::AccelByte.Models.PersonalChatRequest), 151 },
-                {typeof(global::AccelByte.Models.ChatChannelSlug), 152 },
-                {typeof(global::AccelByte.Models.ChannelChatRequest), 153 },
-                {typeof(global::AccelByte.Models.ChannelChatMessage), 154 },
-                {typeof(global::AccelByte.Models.PartyInfo), 155 },
-                {typeof(global::AccelByte.Models.PartyDataUpdateNotif), 156 },
-                {typeof(global::AccelByte.Models.PartyDataUpdateRequest), 157 },
-                {typeof(global::AccelByte.Models.ActivePartiesData), 158 },
-                {typeof(global::AccelByte.Models.PartyInviteRequest), 159 },
-                {typeof(global::AccelByte.Models.PartyInvitation), 160 },
-                {typeof(global::AccelByte.Models.PartyChatRequest), 161 },
-                {typeof(global::AccelByte.Models.PartyJoinRequest), 162 },
-                {typeof(global::AccelByte.Models.PartyKickRequest), 163 },
-                {typeof(global::AccelByte.Models.JoinNotification), 164 },
-                {typeof(global::AccelByte.Models.KickNotification), 165 },
-                {typeof(global::AccelByte.Models.LeaveNotification), 166 },
-                {typeof(global::AccelByte.Models.PartyRejectRequest), 167 },
-                {typeof(global::AccelByte.Models.PartyRejectResponse), 168 },
-                {typeof(global::AccelByte.Models.PartyRejectNotif), 169 },
-                {typeof(global::AccelByte.Models.PartyPromoteLeaderRequest), 170 },
-                {typeof(global::AccelByte.Models.PartyPromoteLeaderResponse), 171 },
-                {typeof(global::AccelByte.Models.StartMatchmakingRequest), 172 },
-                {typeof(global::AccelByte.Models.MatchmakingNotif), 173 },
-                {typeof(global::AccelByte.Models.DsNotif), 174 },
-                {typeof(global::AccelByte.Models.MatchmakingCode), 175 },
-                {typeof(global::AccelByte.Models.ReadyConsentRequest), 176 },
-                {typeof(global::AccelByte.Models.ReadyForMatchConfirmation), 177 },
-                {typeof(global::AccelByte.Models.RematchmakingNotification), 178 },
-                {typeof(global::AccelByte.Models.FriendshipStatus), 179 },
-                {typeof(global::AccelByte.Models.Friends), 180 },
-                {typeof(global::AccelByte.Models.Friend), 181 },
-                {typeof(global::AccelByte.Models.Acquaintance), 182 },
-                {typeof(global::AccelByte.Models.FriendsStatus), 183 },
-                {typeof(global::AccelByte.Models.BulkFriendsRequest), 184 },
-                {typeof(global::AccelByte.Models.FriendsStatusNotif), 185 },
-                {typeof(global::AccelByte.Models.OnlineFriends), 186 },
-                {typeof(global::AccelByte.Models.UserStatusNotif), 187 },
-                {typeof(global::AccelByte.Models.BulkUserStatusNotif), 188 },
-                {typeof(global::AccelByte.Models.BlockPlayerRequest), 189 },
-                {typeof(global::AccelByte.Models.BlockPlayerResponse), 190 },
-                {typeof(global::AccelByte.Models.UnblockPlayerRequest), 191 },
-                {typeof(global::AccelByte.Models.UnblockPlayerResponse), 192 },
-                {typeof(global::AccelByte.Models.PlayerBlockedNotif), 193 },
-                {typeof(global::AccelByte.Models.PlayerUnblockedNotif), 194 },
-                {typeof(global::AccelByte.Models.BlockedData), 195 },
-                {typeof(global::AccelByte.Models.BlockedList), 196 },
-                {typeof(global::AccelByte.Models.BlockerData), 197 },
-                {typeof(global::AccelByte.Models.BlockerList), 198 },
-                {typeof(global::AccelByte.Models.SetSessionAttributeRequest), 199 },
-                {typeof(global::AccelByte.Models.PlatformLink), 200 },
-                {typeof(global::AccelByte.Models.Collection), 201 },
-                {typeof(global::AccelByte.Models.QosServer), 202 },
-                {typeof(global::AccelByte.Models.QosServerList), 203 },
-                {typeof(global::AccelByte.Models.ServerConfig), 204 },
-                {typeof(global::AccelByte.Models.RegisterServerRequest), 205 },
-                {typeof(global::AccelByte.Models.ShutdownServerRequest), 206 },
-                {typeof(global::AccelByte.Models.RegisterLocalServerRequest), 207 },
-                {typeof(global::AccelByte.Models.PartyMember), 208 },
-                {typeof(global::AccelByte.Models.MatchParty), 209 },
-                {typeof(global::AccelByte.Models.MatchingAlly), 210 },
-                {typeof(global::AccelByte.Models.MatchRequest), 211 },
-                {typeof(global::AccelByte.Models.DSMClient), 212 },
-                {typeof(global::AccelByte.Models.ServerInfo), 213 },
-                {typeof(global::AccelByte.Models.MatchmakingResult), 214 },
-                {typeof(global::AccelByte.Models.AddUserIntoSessionRequest), 215 },
-                {typeof(global::AccelByte.Models.DequeueRequest), 216 },
-                {typeof(global::AccelByte.Models.ServerSessionResponse), 217 },
-                {typeof(global::AccelByte.Models.StatConfig), 218 },
-                {typeof(global::AccelByte.Models.StatItem), 219 },
-                {typeof(global::AccelByte.Models.CreateStatItemRequest), 220 },
-                {typeof(global::AccelByte.Models.PagedStatItems), 221 },
-                {typeof(global::AccelByte.Models.UserStatItemIncrement), 222 },
-                {typeof(global::AccelByte.Models.StatItemIncrement), 223 },
-                {typeof(global::AccelByte.Models.StatItemOperationResult), 224 },
-                {typeof(global::AccelByte.Models.UserStatItemReset), 225 },
-                {typeof(global::AccelByte.Models.StatItemReset), 226 },
-                {typeof(global::AccelByte.Models.UserStatItemUpdate), 227 },
-                {typeof(global::AccelByte.Models.StatItemUpdate), 228 },
-                {typeof(global::AccelByte.Models.TelemetryEventTag), 229 },
-                {typeof(global::AccelByte.Models.TokenData), 230 },
-                {typeof(global::AccelByte.Models.SessionData), 231 },
-                {typeof(global::AccelByte.Models.Ban), 232 },
-                {typeof(global::AccelByte.Models.Permission), 233 },
-                {typeof(global::AccelByte.Models.UserData), 234 },
-                {typeof(global::AccelByte.Models.PublicUserData), 235 },
-                {typeof(global::AccelByte.Models.PublicUserInfo), 236 },
-                {typeof(global::AccelByte.Models.PagedPublicUsersInfo), 237 },
-                {typeof(global::AccelByte.Models.RegisterUserRequest), 238 },
-                {typeof(global::AccelByte.Models.RegisterUserRequestv2), 239 },
-                {typeof(global::AccelByte.Models.RegisterUserResponse), 240 },
-                {typeof(global::AccelByte.Models.UpdateUserRequest), 241 },
-                {typeof(global::AccelByte.Models.PagedPlatformLinks), 242 },
-                {typeof(global::AccelByte.Models.BulkPlatformUserIdRequest), 243 },
-                {typeof(global::AccelByte.Models.PlatformUserIdMap), 244 },
-                {typeof(global::AccelByte.Models.BulkPlatformUserIdResponse), 245 },
-                {typeof(global::AccelByte.Models.CountryInfo), 246 },
-                {typeof(global::AccelByte.Models.UpgradeUserRequest), 247 },
-                {typeof(global::AccelByte.Models.AccountLinkedPlatform), 248 },
-                {typeof(global::AccelByte.Models.UnlinkPlatformAccountRequest), 249 },
-                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount), 250 },
-                {typeof(global::AccelByte.Models.AccountLinkConfictMessageVariables), 251 },
-                {typeof(global::AccelByte.Models.LinkPlatformAccountRequest), 252 },
-                {typeof(global::AccelByte.Models.UpdateEmailRequest), 253 },
-                {typeof(global::AccelByte.Models.PublicIp), 254 },
+                {typeof(global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>), 45 },
+                {typeof(global::AccelByte.Models.PlatformUserIdMap[]), 46 },
+                {typeof(global::AccelByte.Models.AccountLinkedPlatform[]), 47 },
+                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount[]), 48 },
+                {typeof(global::AccelByte.Models.AchievementIcon), 49 },
+                {typeof(global::AccelByte.Models.PublicAchievement), 50 },
+                {typeof(global::AccelByte.Models.Paging), 51 },
+                {typeof(global::AccelByte.Models.PaginatedPublicAchievement), 52 },
+                {typeof(global::AccelByte.Models.MultiLanguageAchievement), 53 },
+                {typeof(global::AccelByte.Models.CountInfo), 54 },
+                {typeof(global::AccelByte.Models.UserAchievement), 55 },
+                {typeof(global::AccelByte.Models.PaginatedUserAchievement), 56 },
+                {typeof(global::AccelByte.Models.IneligibleUser), 57 },
+                {typeof(global::AccelByte.Models.LocalizedPolicyVersionObject), 58 },
+                {typeof(global::AccelByte.Models.PolicyVersionWithLocalizedVersionObject), 59 },
+                {typeof(global::AccelByte.Models.PublicPolicy), 60 },
+                {typeof(global::AccelByte.Models.AcceptAgreementRequest), 61 },
+                {typeof(global::AccelByte.Models.AcceptAgreementResponse), 62 },
+                {typeof(global::AccelByte.Models.RetrieveUserEligibilitiesResponse), 63 },
+                {typeof(global::AccelByte.Models.UserProfile), 64 },
+                {typeof(global::AccelByte.Models.PublicUserProfile), 65 },
+                {typeof(global::AccelByte.Models.CreateUserProfileRequest), 66 },
+                {typeof(global::AccelByte.Models.UpdateUserProfileRequest), 67 },
+                {typeof(global::AccelByte.Models.UserRecord), 68 },
+                {typeof(global::AccelByte.Models.GameRecord), 69 },
+                {typeof(global::AccelByte.Models.ConcurrentReplaceRequest), 70 },
+                {typeof(global::AccelByte.Models.Slot), 71 },
+                {typeof(global::AccelByte.Models.UpdateMedataRequest), 72 },
+                {typeof(global::AccelByte.Models.Config), 73 },
+                {typeof(global::AccelByte.Models.CurrencySummary), 74 },
+                {typeof(global::AccelByte.Models.BalanceInfo), 75 },
+                {typeof(global::AccelByte.Models.WalletInfo), 76 },
+                {typeof(global::AccelByte.Models.WalletTransactionInfo), 77 },
+                {typeof(global::AccelByte.Models.WalletTransactionPagingSlicedResult), 78 },
+                {typeof(global::AccelByte.Models.CreditUserWalletRequest), 79 },
+                {typeof(global::AccelByte.Models.CategoryInfo), 80 },
+                {typeof(global::AccelByte.Models.RegionDataItem), 81 },
+                {typeof(global::AccelByte.Models.ItemSnapshot), 82 },
+                {typeof(global::AccelByte.Models.ItemCriteria), 83 },
+                {typeof(global::AccelByte.Models.Image), 84 },
+                {typeof(global::AccelByte.Models.ItemInfo), 85 },
+                {typeof(global::AccelByte.Models.PopulatedItemInfo), 86 },
+                {typeof(global::AccelByte.Models.ItemPagingSlicedResult), 87 },
+                {typeof(global::AccelByte.Models.PaymentUrl), 88 },
+                {typeof(global::AccelByte.Models.Price), 89 },
+                {typeof(global::AccelByte.Models.OrderHistoryInfo), 90 },
+                {typeof(global::AccelByte.Models.OrderInfo), 91 },
+                {typeof(global::AccelByte.Models.OrderPagingSlicedResult), 92 },
+                {typeof(global::AccelByte.Models.OrderRequest), 93 },
+                {typeof(global::AccelByte.Models.OrderTransaction), 94 },
+                {typeof(global::AccelByte.Models.EntitlementInfo), 95 },
+                {typeof(global::AccelByte.Models.EntitlementPagingSlicedResult), 96 },
+                {typeof(global::AccelByte.Models.EntitlementSummary), 97 },
+                {typeof(global::AccelByte.Models.ConsumeUserEntitlementRequest), 98 },
+                {typeof(global::AccelByte.Models.GrantUserEntitlementRequest), 99 },
+                {typeof(global::AccelByte.Models.StackableEntitlementInfo), 100 },
+                {typeof(global::AccelByte.Models.Attributes), 101 },
+                {typeof(global::AccelByte.Models.DistributionAttributes), 102 },
+                {typeof(global::AccelByte.Models.DistributionReceiver), 103 },
+                {typeof(global::AccelByte.Models.Ownership), 104 },
+                {typeof(global::AccelByte.Models.OwnershipToken), 105 },
+                {typeof(global::AccelByte.Models.OwnershipEntitlement), 106 },
+                {typeof(global::AccelByte.Models.OwnershipTokenPayload), 107 },
+                {typeof(global::AccelByte.Models.ServiceError), 108 },
+                {typeof(global::AccelByte.Models.OAuthError), 109 },
+                {typeof(global::AccelByte.Models.GameProfile), 110 },
+                {typeof(global::AccelByte.Models.GameProfileRequest), 111 },
+                {typeof(global::AccelByte.Models.GameProfileAttribute), 112 },
+                {typeof(global::AccelByte.Models.GameProfilePublicInfo), 113 },
+                {typeof(global::AccelByte.Models.UserGameProfiles), 114 },
+                {typeof(global::AccelByte.Models.TelemetryBody), 115 },
+                {typeof(global::AccelByte.Models.RuleInformation), 116 },
+                {typeof(global::AccelByte.Models.Rules), 117 },
+                {typeof(global::AccelByte.Models.GroupRules), 118 },
+                {typeof(global::AccelByte.Models.CreateGroupRequest), 119 },
+                {typeof(global::AccelByte.Models.GroupMember), 120 },
+                {typeof(global::AccelByte.Models.GroupMemberInformation), 121 },
+                {typeof(global::AccelByte.Models.GroupInformation), 122 },
+                {typeof(global::AccelByte.Models.PaginatedGroupListResponse), 123 },
+                {typeof(global::AccelByte.Models.UpdateGroupRequest), 124 },
+                {typeof(global::AccelByte.Models.UpdateGroupNoTypeRequest), 125 },
+                {typeof(global::AccelByte.Models.UserInvitationResponse), 126 },
+                {typeof(global::AccelByte.Models.JoinGroupResponse), 127 },
+                {typeof(global::AccelByte.Models.KickMemberResponse), 128 },
+                {typeof(global::AccelByte.Models.RejectOtherJoinResponse), 129 },
+                {typeof(global::AccelByte.Models.UpdateGroupCustomRuleRequest), 130 },
+                {typeof(global::AccelByte.Models.UpdateGroupPredefinedRuleRequest), 131 },
+                {typeof(global::AccelByte.Models.GroupGeneralResponse), 132 },
+                {typeof(global::AccelByte.Models.PaginatedGroupMemberList), 133 },
+                {typeof(global::AccelByte.Models.GroupRequest), 134 },
+                {typeof(global::AccelByte.Models.PaginatedGroupRequestList), 135 },
+                {typeof(global::AccelByte.Models.AssignRoleRequest), 136 },
+                {typeof(global::AccelByte.Models.MemberRolePermission), 137 },
+                {typeof(global::AccelByte.Models.MemberRole), 138 },
+                {typeof(global::AccelByte.Models.PaginatedMemberRoles), 139 },
+                {typeof(global::AccelByte.Models.JsonWebTokenDefaultHeader), 140 },
+                {typeof(global::AccelByte.Models.UserPoint), 141 },
+                {typeof(global::AccelByte.Models.UserRanking), 142 },
+                {typeof(global::AccelByte.Models.UserRankingData), 143 },
+                {typeof(global::AccelByte.Models.LeaderboardRankingResult), 144 },
+                {typeof(global::AccelByte.Models.LeaderboardData), 145 },
+                {typeof(global::AccelByte.Models.LeaderboardPaging), 146 },
+                {typeof(global::AccelByte.Models.LeaderboardPagedList), 147 },
+                {typeof(global::AccelByte.Models.DisconnectNotif), 148 },
+                {typeof(global::AccelByte.Models.LobbySessionId), 149 },
+                {typeof(global::AccelByte.Models.Notification), 150 },
+                {typeof(global::AccelByte.Models.ChatMessage), 151 },
+                {typeof(global::AccelByte.Models.PersonalChatRequest), 152 },
+                {typeof(global::AccelByte.Models.ChatChannelSlug), 153 },
+                {typeof(global::AccelByte.Models.ChannelChatRequest), 154 },
+                {typeof(global::AccelByte.Models.ChannelChatMessage), 155 },
+                {typeof(global::AccelByte.Models.PartyInfo), 156 },
+                {typeof(global::AccelByte.Models.PartyDataUpdateNotif), 157 },
+                {typeof(global::AccelByte.Models.PartyDataUpdateRequest), 158 },
+                {typeof(global::AccelByte.Models.ActivePartiesData), 159 },
+                {typeof(global::AccelByte.Models.PartyInviteRequest), 160 },
+                {typeof(global::AccelByte.Models.PartyInvitation), 161 },
+                {typeof(global::AccelByte.Models.PartyChatRequest), 162 },
+                {typeof(global::AccelByte.Models.PartyJoinRequest), 163 },
+                {typeof(global::AccelByte.Models.PartyKickRequest), 164 },
+                {typeof(global::AccelByte.Models.JoinNotification), 165 },
+                {typeof(global::AccelByte.Models.KickNotification), 166 },
+                {typeof(global::AccelByte.Models.LeaveNotification), 167 },
+                {typeof(global::AccelByte.Models.PartyRejectRequest), 168 },
+                {typeof(global::AccelByte.Models.PartyRejectResponse), 169 },
+                {typeof(global::AccelByte.Models.PartyRejectNotif), 170 },
+                {typeof(global::AccelByte.Models.PartyPromoteLeaderRequest), 171 },
+                {typeof(global::AccelByte.Models.PartyPromoteLeaderResponse), 172 },
+                {typeof(global::AccelByte.Models.StartMatchmakingRequest), 173 },
+                {typeof(global::AccelByte.Models.MatchmakingNotif), 174 },
+                {typeof(global::AccelByte.Models.DsNotif), 175 },
+                {typeof(global::AccelByte.Models.MatchmakingCode), 176 },
+                {typeof(global::AccelByte.Models.ReadyConsentRequest), 177 },
+                {typeof(global::AccelByte.Models.ReadyForMatchConfirmation), 178 },
+                {typeof(global::AccelByte.Models.RematchmakingNotification), 179 },
+                {typeof(global::AccelByte.Models.FriendshipStatus), 180 },
+                {typeof(global::AccelByte.Models.Friends), 181 },
+                {typeof(global::AccelByte.Models.Friend), 182 },
+                {typeof(global::AccelByte.Models.Acquaintance), 183 },
+                {typeof(global::AccelByte.Models.FriendsStatus), 184 },
+                {typeof(global::AccelByte.Models.BulkFriendsRequest), 185 },
+                {typeof(global::AccelByte.Models.FriendsStatusNotif), 186 },
+                {typeof(global::AccelByte.Models.SetUserStatusRequest), 187 },
+                {typeof(global::AccelByte.Models.OnlineFriends), 188 },
+                {typeof(global::AccelByte.Models.UserStatusNotif), 189 },
+                {typeof(global::AccelByte.Models.BulkUserStatusNotif), 190 },
+                {typeof(global::AccelByte.Models.BlockPlayerRequest), 191 },
+                {typeof(global::AccelByte.Models.BlockPlayerResponse), 192 },
+                {typeof(global::AccelByte.Models.UnblockPlayerRequest), 193 },
+                {typeof(global::AccelByte.Models.UnblockPlayerResponse), 194 },
+                {typeof(global::AccelByte.Models.PlayerBlockedNotif), 195 },
+                {typeof(global::AccelByte.Models.PlayerUnblockedNotif), 196 },
+                {typeof(global::AccelByte.Models.BlockedData), 197 },
+                {typeof(global::AccelByte.Models.BlockedList), 198 },
+                {typeof(global::AccelByte.Models.BlockerData), 199 },
+                {typeof(global::AccelByte.Models.BlockerList), 200 },
+                {typeof(global::AccelByte.Models.SetSessionAttributeRequest), 201 },
+                {typeof(global::AccelByte.Models.PlatformLink), 202 },
+                {typeof(global::AccelByte.Models.Collection), 203 },
+                {typeof(global::AccelByte.Models.QosServer), 204 },
+                {typeof(global::AccelByte.Models.QosServerList), 205 },
+                {typeof(global::AccelByte.Models.ServerConfig), 206 },
+                {typeof(global::AccelByte.Models.RegisterServerRequest), 207 },
+                {typeof(global::AccelByte.Models.ShutdownServerRequest), 208 },
+                {typeof(global::AccelByte.Models.RegisterLocalServerRequest), 209 },
+                {typeof(global::AccelByte.Models.PartyMember), 210 },
+                {typeof(global::AccelByte.Models.MatchParty), 211 },
+                {typeof(global::AccelByte.Models.MatchingAlly), 212 },
+                {typeof(global::AccelByte.Models.MatchRequest), 213 },
+                {typeof(global::AccelByte.Models.DSMClient), 214 },
+                {typeof(global::AccelByte.Models.PubIp), 215 },
+                {typeof(global::AccelByte.Models.ServerInfo), 216 },
+                {typeof(global::AccelByte.Models.MatchmakingResult), 217 },
+                {typeof(global::AccelByte.Models.AddUserIntoSessionRequest), 218 },
+                {typeof(global::AccelByte.Models.DequeueRequest), 219 },
+                {typeof(global::AccelByte.Models.ServerSessionResponse), 220 },
+                {typeof(global::AccelByte.Models.StatConfig), 221 },
+                {typeof(global::AccelByte.Models.StatItem), 222 },
+                {typeof(global::AccelByte.Models.CreateStatItemRequest), 223 },
+                {typeof(global::AccelByte.Models.PagedStatItems), 224 },
+                {typeof(global::AccelByte.Models.UserStatItemIncrement), 225 },
+                {typeof(global::AccelByte.Models.StatItemIncrement), 226 },
+                {typeof(global::AccelByte.Models.StatItemOperationResult), 227 },
+                {typeof(global::AccelByte.Models.UserStatItemReset), 228 },
+                {typeof(global::AccelByte.Models.StatItemReset), 229 },
+                {typeof(global::AccelByte.Models.UserStatItemUpdate), 230 },
+                {typeof(global::AccelByte.Models.StatItemUpdate), 231 },
+                {typeof(global::AccelByte.Models.TelemetryEventTag), 232 },
+                {typeof(global::AccelByte.Models.TokenData), 233 },
+                {typeof(global::AccelByte.Models.SessionData), 234 },
+                {typeof(global::AccelByte.Models.Ban), 235 },
+                {typeof(global::AccelByte.Models.Permission), 236 },
+                {typeof(global::AccelByte.Models.UserData), 237 },
+                {typeof(global::AccelByte.Models.PublicUserData), 238 },
+                {typeof(global::AccelByte.Models.PublicUserInfo), 239 },
+                {typeof(global::AccelByte.Models.PagedPublicUsersInfo), 240 },
+                {typeof(global::AccelByte.Models.PolicyAcceptance), 241 },
+                {typeof(global::AccelByte.Models.RegisterUserRequest), 242 },
+                {typeof(global::AccelByte.Models.RegisterUserRequestv2), 243 },
+                {typeof(global::AccelByte.Models.RegisterUserResponse), 244 },
+                {typeof(global::AccelByte.Models.UpdateUserRequest), 245 },
+                {typeof(global::AccelByte.Models.PagedPlatformLinks), 246 },
+                {typeof(global::AccelByte.Models.BulkPlatformUserIdRequest), 247 },
+                {typeof(global::AccelByte.Models.PlatformUserIdMap), 248 },
+                {typeof(global::AccelByte.Models.BulkPlatformUserIdResponse), 249 },
+                {typeof(global::AccelByte.Models.CountryInfo), 250 },
+                {typeof(global::AccelByte.Models.UpgradeUserRequest), 251 },
+                {typeof(global::AccelByte.Models.AccountLinkedPlatform), 252 },
+                {typeof(global::AccelByte.Models.UnlinkPlatformAccountRequest), 253 },
+                {typeof(global::AccelByte.Models.AccountLinkPublisherAccount), 254 },
+                {typeof(global::AccelByte.Models.AccountLinkConfictMessageVariables), 255 },
+                {typeof(global::AccelByte.Models.LinkPlatformAccountRequest), 256 },
+                {typeof(global::AccelByte.Models.UpdateEmailRequest), 257 },
+                {typeof(global::AccelByte.Models.PublicIp), 258 },
             };
         }
 
@@ -355,216 +359,220 @@ namespace Utf8Json.Resolvers
                 case 42: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Ban>();
                 case 43: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.Permission>();
                 case 44: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PublicUserInfo>();
-                case 45: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformUserIdMap>();
-                case 46: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkedPlatform>();
-                case 47: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkPublisherAccount>();
-                case 48: return new Utf8Json.Formatters.AccelByte.Models.AchievementIconFormatter();
-                case 49: return new Utf8Json.Formatters.AccelByte.Models.PublicAchievementFormatter();
-                case 50: return new Utf8Json.Formatters.AccelByte.Models.PagingFormatter();
-                case 51: return new Utf8Json.Formatters.AccelByte.Models.PaginatedPublicAchievementFormatter();
-                case 52: return new Utf8Json.Formatters.AccelByte.Models.MultiLanguageAchievementFormatter();
-                case 53: return new Utf8Json.Formatters.AccelByte.Models.CountInfoFormatter();
-                case 54: return new Utf8Json.Formatters.AccelByte.Models.UserAchievementFormatter();
-                case 55: return new Utf8Json.Formatters.AccelByte.Models.PaginatedUserAchievementFormatter();
-                case 56: return new Utf8Json.Formatters.AccelByte.Models.IneligibleUserFormatter();
-                case 57: return new Utf8Json.Formatters.AccelByte.Models.LocalizedPolicyVersionObjectFormatter();
-                case 58: return new Utf8Json.Formatters.AccelByte.Models.PolicyVersionWithLocalizedVersionObjectFormatter();
-                case 59: return new Utf8Json.Formatters.AccelByte.Models.PublicPolicyFormatter();
-                case 60: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementRequestFormatter();
-                case 61: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementResponseFormatter();
-                case 62: return new Utf8Json.Formatters.AccelByte.Models.RetrieveUserEligibilitiesResponseFormatter();
-                case 63: return new Utf8Json.Formatters.AccelByte.Models.UserProfileFormatter();
-                case 64: return new Utf8Json.Formatters.AccelByte.Models.PublicUserProfileFormatter();
-                case 65: return new Utf8Json.Formatters.AccelByte.Models.CreateUserProfileRequestFormatter();
-                case 66: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserProfileRequestFormatter();
-                case 67: return new Utf8Json.Formatters.AccelByte.Models.UserRecordFormatter();
-                case 68: return new Utf8Json.Formatters.AccelByte.Models.GameRecordFormatter();
-                case 69: return new Utf8Json.Formatters.AccelByte.Models.ConcurrentReplaceRequestFormatter();
-                case 70: return new Utf8Json.Formatters.AccelByte.Models.SlotFormatter();
-                case 71: return new Utf8Json.Formatters.AccelByte.Models.UpdateMedataRequestFormatter();
-                case 72: return new Utf8Json.Formatters.AccelByte.Models.ConfigFormatter();
-                case 73: return new Utf8Json.Formatters.AccelByte.Models.CurrencySummaryFormatter();
-                case 74: return new Utf8Json.Formatters.AccelByte.Models.BalanceInfoFormatter();
-                case 75: return new Utf8Json.Formatters.AccelByte.Models.WalletInfoFormatter();
-                case 76: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionInfoFormatter();
-                case 77: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionPagingSlicedResultFormatter();
-                case 78: return new Utf8Json.Formatters.AccelByte.Models.CreditUserWalletRequestFormatter();
-                case 79: return new Utf8Json.Formatters.AccelByte.Models.CategoryInfoFormatter();
-                case 80: return new Utf8Json.Formatters.AccelByte.Models.RegionDataItemFormatter();
-                case 81: return new Utf8Json.Formatters.AccelByte.Models.ItemSnapshotFormatter();
-                case 82: return new Utf8Json.Formatters.AccelByte.Models.ItemCriteriaFormatter();
-                case 83: return new Utf8Json.Formatters.AccelByte.Models.ImageFormatter();
-                case 84: return new Utf8Json.Formatters.AccelByte.Models.ItemInfoFormatter();
-                case 85: return new Utf8Json.Formatters.AccelByte.Models.PopulatedItemInfoFormatter();
-                case 86: return new Utf8Json.Formatters.AccelByte.Models.ItemPagingSlicedResultFormatter();
-                case 87: return new Utf8Json.Formatters.AccelByte.Models.PaymentUrlFormatter();
-                case 88: return new Utf8Json.Formatters.AccelByte.Models.PriceFormatter();
-                case 89: return new Utf8Json.Formatters.AccelByte.Models.OrderHistoryInfoFormatter();
-                case 90: return new Utf8Json.Formatters.AccelByte.Models.OrderInfoFormatter();
-                case 91: return new Utf8Json.Formatters.AccelByte.Models.OrderPagingSlicedResultFormatter();
-                case 92: return new Utf8Json.Formatters.AccelByte.Models.OrderRequestFormatter();
-                case 93: return new Utf8Json.Formatters.AccelByte.Models.OrderTransactionFormatter();
-                case 94: return new Utf8Json.Formatters.AccelByte.Models.EntitlementInfoFormatter();
-                case 95: return new Utf8Json.Formatters.AccelByte.Models.EntitlementPagingSlicedResultFormatter();
-                case 96: return new Utf8Json.Formatters.AccelByte.Models.EntitlementSummaryFormatter();
-                case 97: return new Utf8Json.Formatters.AccelByte.Models.ConsumeUserEntitlementRequestFormatter();
-                case 98: return new Utf8Json.Formatters.AccelByte.Models.GrantUserEntitlementRequestFormatter();
-                case 99: return new Utf8Json.Formatters.AccelByte.Models.StackableEntitlementInfoFormatter();
-                case 100: return new Utf8Json.Formatters.AccelByte.Models.AttributesFormatter();
-                case 101: return new Utf8Json.Formatters.AccelByte.Models.DistributionAttributesFormatter();
-                case 102: return new Utf8Json.Formatters.AccelByte.Models.DistributionReceiverFormatter();
-                case 103: return new Utf8Json.Formatters.AccelByte.Models.OwnershipFormatter();
-                case 104: return new Utf8Json.Formatters.AccelByte.Models.OwnershipTokenFormatter();
-                case 105: return new Utf8Json.Formatters.AccelByte.Models.OwnershipEntitlementFormatter();
-                case 106: return new Utf8Json.Formatters.AccelByte.Models.OwnershipTokenPayloadFormatter();
-                case 107: return new Utf8Json.Formatters.AccelByte.Models.ServiceErrorFormatter();
-                case 108: return new Utf8Json.Formatters.AccelByte.Models.OAuthErrorFormatter();
-                case 109: return new Utf8Json.Formatters.AccelByte.Models.GameProfileFormatter();
-                case 110: return new Utf8Json.Formatters.AccelByte.Models.GameProfileRequestFormatter();
-                case 111: return new Utf8Json.Formatters.AccelByte.Models.GameProfileAttributeFormatter();
-                case 112: return new Utf8Json.Formatters.AccelByte.Models.GameProfilePublicInfoFormatter();
-                case 113: return new Utf8Json.Formatters.AccelByte.Models.UserGameProfilesFormatter();
-                case 114: return new Utf8Json.Formatters.AccelByte.Models.TelemetryBodyFormatter();
-                case 115: return new Utf8Json.Formatters.AccelByte.Models.RuleInformationFormatter();
-                case 116: return new Utf8Json.Formatters.AccelByte.Models.RulesFormatter();
-                case 117: return new Utf8Json.Formatters.AccelByte.Models.GroupRulesFormatter();
-                case 118: return new Utf8Json.Formatters.AccelByte.Models.CreateGroupRequestFormatter();
-                case 119: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberFormatter();
-                case 120: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberInformationFormatter();
-                case 121: return new Utf8Json.Formatters.AccelByte.Models.GroupInformationFormatter();
-                case 122: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupListResponseFormatter();
-                case 123: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupRequestFormatter();
-                case 124: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupNoTypeRequestFormatter();
-                case 125: return new Utf8Json.Formatters.AccelByte.Models.UserInvitationResponseFormatter();
-                case 126: return new Utf8Json.Formatters.AccelByte.Models.JoinGroupResponseFormatter();
-                case 127: return new Utf8Json.Formatters.AccelByte.Models.KickMemberResponseFormatter();
-                case 128: return new Utf8Json.Formatters.AccelByte.Models.RejectOtherJoinResponseFormatter();
-                case 129: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupCustomRuleRequestFormatter();
-                case 130: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupPredefinedRuleRequestFormatter();
-                case 131: return new Utf8Json.Formatters.AccelByte.Models.GroupGeneralResponseFormatter();
-                case 132: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupMemberListFormatter();
-                case 133: return new Utf8Json.Formatters.AccelByte.Models.GroupRequestFormatter();
-                case 134: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupRequestListFormatter();
-                case 135: return new Utf8Json.Formatters.AccelByte.Models.AssignRoleRequestFormatter();
-                case 136: return new Utf8Json.Formatters.AccelByte.Models.MemberRolePermissionFormatter();
-                case 137: return new Utf8Json.Formatters.AccelByte.Models.MemberRoleFormatter();
-                case 138: return new Utf8Json.Formatters.AccelByte.Models.PaginatedMemberRolesFormatter();
-                case 139: return new Utf8Json.Formatters.AccelByte.Models.JsonWebTokenDefaultHeaderFormatter();
-                case 140: return new Utf8Json.Formatters.AccelByte.Models.UserPointFormatter();
-                case 141: return new Utf8Json.Formatters.AccelByte.Models.UserRankingFormatter();
-                case 142: return new Utf8Json.Formatters.AccelByte.Models.UserRankingDataFormatter();
-                case 143: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardRankingResultFormatter();
-                case 144: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardDataFormatter();
-                case 145: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagingFormatter();
-                case 146: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagedListFormatter();
-                case 147: return new Utf8Json.Formatters.AccelByte.Models.DisconnectNotifFormatter();
-                case 148: return new Utf8Json.Formatters.AccelByte.Models.LobbySessionIdFormatter();
-                case 149: return new Utf8Json.Formatters.AccelByte.Models.NotificationFormatter();
-                case 150: return new Utf8Json.Formatters.AccelByte.Models.ChatMessageFormatter();
-                case 151: return new Utf8Json.Formatters.AccelByte.Models.PersonalChatRequestFormatter();
-                case 152: return new Utf8Json.Formatters.AccelByte.Models.ChatChannelSlugFormatter();
-                case 153: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatRequestFormatter();
-                case 154: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatMessageFormatter();
-                case 155: return new Utf8Json.Formatters.AccelByte.Models.PartyInfoFormatter();
-                case 156: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateNotifFormatter();
-                case 157: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateRequestFormatter();
-                case 158: return new Utf8Json.Formatters.AccelByte.Models.ActivePartiesDataFormatter();
-                case 159: return new Utf8Json.Formatters.AccelByte.Models.PartyInviteRequestFormatter();
-                case 160: return new Utf8Json.Formatters.AccelByte.Models.PartyInvitationFormatter();
-                case 161: return new Utf8Json.Formatters.AccelByte.Models.PartyChatRequestFormatter();
-                case 162: return new Utf8Json.Formatters.AccelByte.Models.PartyJoinRequestFormatter();
-                case 163: return new Utf8Json.Formatters.AccelByte.Models.PartyKickRequestFormatter();
-                case 164: return new Utf8Json.Formatters.AccelByte.Models.JoinNotificationFormatter();
-                case 165: return new Utf8Json.Formatters.AccelByte.Models.KickNotificationFormatter();
-                case 166: return new Utf8Json.Formatters.AccelByte.Models.LeaveNotificationFormatter();
-                case 167: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectRequestFormatter();
-                case 168: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectResponseFormatter();
-                case 169: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectNotifFormatter();
-                case 170: return new Utf8Json.Formatters.AccelByte.Models.PartyPromoteLeaderRequestFormatter();
-                case 171: return new Utf8Json.Formatters.AccelByte.Models.PartyPromoteLeaderResponseFormatter();
-                case 172: return new Utf8Json.Formatters.AccelByte.Models.StartMatchmakingRequestFormatter();
-                case 173: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingNotifFormatter();
-                case 174: return new Utf8Json.Formatters.AccelByte.Models.DsNotifFormatter();
-                case 175: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingCodeFormatter();
-                case 176: return new Utf8Json.Formatters.AccelByte.Models.ReadyConsentRequestFormatter();
-                case 177: return new Utf8Json.Formatters.AccelByte.Models.ReadyForMatchConfirmationFormatter();
-                case 178: return new Utf8Json.Formatters.AccelByte.Models.RematchmakingNotificationFormatter();
-                case 179: return new Utf8Json.Formatters.AccelByte.Models.FriendshipStatusFormatter();
-                case 180: return new Utf8Json.Formatters.AccelByte.Models.FriendsFormatter();
-                case 181: return new Utf8Json.Formatters.AccelByte.Models.FriendFormatter();
-                case 182: return new Utf8Json.Formatters.AccelByte.Models.AcquaintanceFormatter();
-                case 183: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusFormatter();
-                case 184: return new Utf8Json.Formatters.AccelByte.Models.BulkFriendsRequestFormatter();
-                case 185: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusNotifFormatter();
-                case 186: return new Utf8Json.Formatters.AccelByte.Models.OnlineFriendsFormatter();
-                case 187: return new Utf8Json.Formatters.AccelByte.Models.UserStatusNotifFormatter();
-                case 188: return new Utf8Json.Formatters.AccelByte.Models.BulkUserStatusNotifFormatter();
-                case 189: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerRequestFormatter();
-                case 190: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerResponseFormatter();
-                case 191: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerRequestFormatter();
-                case 192: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerResponseFormatter();
-                case 193: return new Utf8Json.Formatters.AccelByte.Models.PlayerBlockedNotifFormatter();
-                case 194: return new Utf8Json.Formatters.AccelByte.Models.PlayerUnblockedNotifFormatter();
-                case 195: return new Utf8Json.Formatters.AccelByte.Models.BlockedDataFormatter();
-                case 196: return new Utf8Json.Formatters.AccelByte.Models.BlockedListFormatter();
-                case 197: return new Utf8Json.Formatters.AccelByte.Models.BlockerDataFormatter();
-                case 198: return new Utf8Json.Formatters.AccelByte.Models.BlockerListFormatter();
-                case 199: return new Utf8Json.Formatters.AccelByte.Models.SetSessionAttributeRequestFormatter();
-                case 200: return new Utf8Json.Formatters.AccelByte.Models.PlatformLinkFormatter();
-                case 201: return new Utf8Json.Formatters.AccelByte.Models.CollectionFormatter();
-                case 202: return new Utf8Json.Formatters.AccelByte.Models.QosServerFormatter();
-                case 203: return new Utf8Json.Formatters.AccelByte.Models.QosServerListFormatter();
-                case 204: return new Utf8Json.Formatters.AccelByte.Models.ServerConfigFormatter();
-                case 205: return new Utf8Json.Formatters.AccelByte.Models.RegisterServerRequestFormatter();
-                case 206: return new Utf8Json.Formatters.AccelByte.Models.ShutdownServerRequestFormatter();
-                case 207: return new Utf8Json.Formatters.AccelByte.Models.RegisterLocalServerRequestFormatter();
-                case 208: return new Utf8Json.Formatters.AccelByte.Models.PartyMemberFormatter();
-                case 209: return new Utf8Json.Formatters.AccelByte.Models.MatchPartyFormatter();
-                case 210: return new Utf8Json.Formatters.AccelByte.Models.MatchingAllyFormatter();
-                case 211: return new Utf8Json.Formatters.AccelByte.Models.MatchRequestFormatter();
-                case 212: return new Utf8Json.Formatters.AccelByte.Models.DSMClientFormatter();
-                case 213: return new Utf8Json.Formatters.AccelByte.Models.ServerInfoFormatter();
-                case 214: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingResultFormatter();
-                case 215: return new Utf8Json.Formatters.AccelByte.Models.AddUserIntoSessionRequestFormatter();
-                case 216: return new Utf8Json.Formatters.AccelByte.Models.DequeueRequestFormatter();
-                case 217: return new Utf8Json.Formatters.AccelByte.Models.ServerSessionResponseFormatter();
-                case 218: return new Utf8Json.Formatters.AccelByte.Models.StatConfigFormatter();
-                case 219: return new Utf8Json.Formatters.AccelByte.Models.StatItemFormatter();
-                case 220: return new Utf8Json.Formatters.AccelByte.Models.CreateStatItemRequestFormatter();
-                case 221: return new Utf8Json.Formatters.AccelByte.Models.PagedStatItemsFormatter();
-                case 222: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemIncrementFormatter();
-                case 223: return new Utf8Json.Formatters.AccelByte.Models.StatItemIncrementFormatter();
-                case 224: return new Utf8Json.Formatters.AccelByte.Models.StatItemOperationResultFormatter();
-                case 225: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemResetFormatter();
-                case 226: return new Utf8Json.Formatters.AccelByte.Models.StatItemResetFormatter();
-                case 227: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemUpdateFormatter();
-                case 228: return new Utf8Json.Formatters.AccelByte.Models.StatItemUpdateFormatter();
-                case 229: return new Utf8Json.Formatters.AccelByte.Models.TelemetryEventTagFormatter();
-                case 230: return new Utf8Json.Formatters.AccelByte.Models.TokenDataFormatter();
-                case 231: return new Utf8Json.Formatters.AccelByte.Models.SessionDataFormatter();
-                case 232: return new Utf8Json.Formatters.AccelByte.Models.BanFormatter();
-                case 233: return new Utf8Json.Formatters.AccelByte.Models.PermissionFormatter();
-                case 234: return new Utf8Json.Formatters.AccelByte.Models.UserDataFormatter();
-                case 235: return new Utf8Json.Formatters.AccelByte.Models.PublicUserDataFormatter();
-                case 236: return new Utf8Json.Formatters.AccelByte.Models.PublicUserInfoFormatter();
-                case 237: return new Utf8Json.Formatters.AccelByte.Models.PagedPublicUsersInfoFormatter();
-                case 238: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestFormatter();
-                case 239: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestv2Formatter();
-                case 240: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserResponseFormatter();
-                case 241: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserRequestFormatter();
-                case 242: return new Utf8Json.Formatters.AccelByte.Models.PagedPlatformLinksFormatter();
-                case 243: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdRequestFormatter();
-                case 244: return new Utf8Json.Formatters.AccelByte.Models.PlatformUserIdMapFormatter();
-                case 245: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdResponseFormatter();
-                case 246: return new Utf8Json.Formatters.AccelByte.Models.CountryInfoFormatter();
-                case 247: return new Utf8Json.Formatters.AccelByte.Models.UpgradeUserRequestFormatter();
-                case 248: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkedPlatformFormatter();
-                case 249: return new Utf8Json.Formatters.AccelByte.Models.UnlinkPlatformAccountRequestFormatter();
-                case 250: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkPublisherAccountFormatter();
-                case 251: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkConfictMessageVariablesFormatter();
-                case 252: return new Utf8Json.Formatters.AccelByte.Models.LinkPlatformAccountRequestFormatter();
-                case 253: return new Utf8Json.Formatters.AccelByte.Models.UpdateEmailRequestFormatter();
-                case 254: return new Utf8Json.Formatters.AccelByte.Models.PublicIpFormatter();
+                case 45: return new global::Utf8Json.Formatters.ListFormatter<global::AccelByte.Models.PolicyAcceptance>();
+                case 46: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.PlatformUserIdMap>();
+                case 47: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkedPlatform>();
+                case 48: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.AccountLinkPublisherAccount>();
+                case 49: return new Utf8Json.Formatters.AccelByte.Models.AchievementIconFormatter();
+                case 50: return new Utf8Json.Formatters.AccelByte.Models.PublicAchievementFormatter();
+                case 51: return new Utf8Json.Formatters.AccelByte.Models.PagingFormatter();
+                case 52: return new Utf8Json.Formatters.AccelByte.Models.PaginatedPublicAchievementFormatter();
+                case 53: return new Utf8Json.Formatters.AccelByte.Models.MultiLanguageAchievementFormatter();
+                case 54: return new Utf8Json.Formatters.AccelByte.Models.CountInfoFormatter();
+                case 55: return new Utf8Json.Formatters.AccelByte.Models.UserAchievementFormatter();
+                case 56: return new Utf8Json.Formatters.AccelByte.Models.PaginatedUserAchievementFormatter();
+                case 57: return new Utf8Json.Formatters.AccelByte.Models.IneligibleUserFormatter();
+                case 58: return new Utf8Json.Formatters.AccelByte.Models.LocalizedPolicyVersionObjectFormatter();
+                case 59: return new Utf8Json.Formatters.AccelByte.Models.PolicyVersionWithLocalizedVersionObjectFormatter();
+                case 60: return new Utf8Json.Formatters.AccelByte.Models.PublicPolicyFormatter();
+                case 61: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementRequestFormatter();
+                case 62: return new Utf8Json.Formatters.AccelByte.Models.AcceptAgreementResponseFormatter();
+                case 63: return new Utf8Json.Formatters.AccelByte.Models.RetrieveUserEligibilitiesResponseFormatter();
+                case 64: return new Utf8Json.Formatters.AccelByte.Models.UserProfileFormatter();
+                case 65: return new Utf8Json.Formatters.AccelByte.Models.PublicUserProfileFormatter();
+                case 66: return new Utf8Json.Formatters.AccelByte.Models.CreateUserProfileRequestFormatter();
+                case 67: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserProfileRequestFormatter();
+                case 68: return new Utf8Json.Formatters.AccelByte.Models.UserRecordFormatter();
+                case 69: return new Utf8Json.Formatters.AccelByte.Models.GameRecordFormatter();
+                case 70: return new Utf8Json.Formatters.AccelByte.Models.ConcurrentReplaceRequestFormatter();
+                case 71: return new Utf8Json.Formatters.AccelByte.Models.SlotFormatter();
+                case 72: return new Utf8Json.Formatters.AccelByte.Models.UpdateMedataRequestFormatter();
+                case 73: return new Utf8Json.Formatters.AccelByte.Models.ConfigFormatter();
+                case 74: return new Utf8Json.Formatters.AccelByte.Models.CurrencySummaryFormatter();
+                case 75: return new Utf8Json.Formatters.AccelByte.Models.BalanceInfoFormatter();
+                case 76: return new Utf8Json.Formatters.AccelByte.Models.WalletInfoFormatter();
+                case 77: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionInfoFormatter();
+                case 78: return new Utf8Json.Formatters.AccelByte.Models.WalletTransactionPagingSlicedResultFormatter();
+                case 79: return new Utf8Json.Formatters.AccelByte.Models.CreditUserWalletRequestFormatter();
+                case 80: return new Utf8Json.Formatters.AccelByte.Models.CategoryInfoFormatter();
+                case 81: return new Utf8Json.Formatters.AccelByte.Models.RegionDataItemFormatter();
+                case 82: return new Utf8Json.Formatters.AccelByte.Models.ItemSnapshotFormatter();
+                case 83: return new Utf8Json.Formatters.AccelByte.Models.ItemCriteriaFormatter();
+                case 84: return new Utf8Json.Formatters.AccelByte.Models.ImageFormatter();
+                case 85: return new Utf8Json.Formatters.AccelByte.Models.ItemInfoFormatter();
+                case 86: return new Utf8Json.Formatters.AccelByte.Models.PopulatedItemInfoFormatter();
+                case 87: return new Utf8Json.Formatters.AccelByte.Models.ItemPagingSlicedResultFormatter();
+                case 88: return new Utf8Json.Formatters.AccelByte.Models.PaymentUrlFormatter();
+                case 89: return new Utf8Json.Formatters.AccelByte.Models.PriceFormatter();
+                case 90: return new Utf8Json.Formatters.AccelByte.Models.OrderHistoryInfoFormatter();
+                case 91: return new Utf8Json.Formatters.AccelByte.Models.OrderInfoFormatter();
+                case 92: return new Utf8Json.Formatters.AccelByte.Models.OrderPagingSlicedResultFormatter();
+                case 93: return new Utf8Json.Formatters.AccelByte.Models.OrderRequestFormatter();
+                case 94: return new Utf8Json.Formatters.AccelByte.Models.OrderTransactionFormatter();
+                case 95: return new Utf8Json.Formatters.AccelByte.Models.EntitlementInfoFormatter();
+                case 96: return new Utf8Json.Formatters.AccelByte.Models.EntitlementPagingSlicedResultFormatter();
+                case 97: return new Utf8Json.Formatters.AccelByte.Models.EntitlementSummaryFormatter();
+                case 98: return new Utf8Json.Formatters.AccelByte.Models.ConsumeUserEntitlementRequestFormatter();
+                case 99: return new Utf8Json.Formatters.AccelByte.Models.GrantUserEntitlementRequestFormatter();
+                case 100: return new Utf8Json.Formatters.AccelByte.Models.StackableEntitlementInfoFormatter();
+                case 101: return new Utf8Json.Formatters.AccelByte.Models.AttributesFormatter();
+                case 102: return new Utf8Json.Formatters.AccelByte.Models.DistributionAttributesFormatter();
+                case 103: return new Utf8Json.Formatters.AccelByte.Models.DistributionReceiverFormatter();
+                case 104: return new Utf8Json.Formatters.AccelByte.Models.OwnershipFormatter();
+                case 105: return new Utf8Json.Formatters.AccelByte.Models.OwnershipTokenFormatter();
+                case 106: return new Utf8Json.Formatters.AccelByte.Models.OwnershipEntitlementFormatter();
+                case 107: return new Utf8Json.Formatters.AccelByte.Models.OwnershipTokenPayloadFormatter();
+                case 108: return new Utf8Json.Formatters.AccelByte.Models.ServiceErrorFormatter();
+                case 109: return new Utf8Json.Formatters.AccelByte.Models.OAuthErrorFormatter();
+                case 110: return new Utf8Json.Formatters.AccelByte.Models.GameProfileFormatter();
+                case 111: return new Utf8Json.Formatters.AccelByte.Models.GameProfileRequestFormatter();
+                case 112: return new Utf8Json.Formatters.AccelByte.Models.GameProfileAttributeFormatter();
+                case 113: return new Utf8Json.Formatters.AccelByte.Models.GameProfilePublicInfoFormatter();
+                case 114: return new Utf8Json.Formatters.AccelByte.Models.UserGameProfilesFormatter();
+                case 115: return new Utf8Json.Formatters.AccelByte.Models.TelemetryBodyFormatter();
+                case 116: return new Utf8Json.Formatters.AccelByte.Models.RuleInformationFormatter();
+                case 117: return new Utf8Json.Formatters.AccelByte.Models.RulesFormatter();
+                case 118: return new Utf8Json.Formatters.AccelByte.Models.GroupRulesFormatter();
+                case 119: return new Utf8Json.Formatters.AccelByte.Models.CreateGroupRequestFormatter();
+                case 120: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberFormatter();
+                case 121: return new Utf8Json.Formatters.AccelByte.Models.GroupMemberInformationFormatter();
+                case 122: return new Utf8Json.Formatters.AccelByte.Models.GroupInformationFormatter();
+                case 123: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupListResponseFormatter();
+                case 124: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupRequestFormatter();
+                case 125: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupNoTypeRequestFormatter();
+                case 126: return new Utf8Json.Formatters.AccelByte.Models.UserInvitationResponseFormatter();
+                case 127: return new Utf8Json.Formatters.AccelByte.Models.JoinGroupResponseFormatter();
+                case 128: return new Utf8Json.Formatters.AccelByte.Models.KickMemberResponseFormatter();
+                case 129: return new Utf8Json.Formatters.AccelByte.Models.RejectOtherJoinResponseFormatter();
+                case 130: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupCustomRuleRequestFormatter();
+                case 131: return new Utf8Json.Formatters.AccelByte.Models.UpdateGroupPredefinedRuleRequestFormatter();
+                case 132: return new Utf8Json.Formatters.AccelByte.Models.GroupGeneralResponseFormatter();
+                case 133: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupMemberListFormatter();
+                case 134: return new Utf8Json.Formatters.AccelByte.Models.GroupRequestFormatter();
+                case 135: return new Utf8Json.Formatters.AccelByte.Models.PaginatedGroupRequestListFormatter();
+                case 136: return new Utf8Json.Formatters.AccelByte.Models.AssignRoleRequestFormatter();
+                case 137: return new Utf8Json.Formatters.AccelByte.Models.MemberRolePermissionFormatter();
+                case 138: return new Utf8Json.Formatters.AccelByte.Models.MemberRoleFormatter();
+                case 139: return new Utf8Json.Formatters.AccelByte.Models.PaginatedMemberRolesFormatter();
+                case 140: return new Utf8Json.Formatters.AccelByte.Models.JsonWebTokenDefaultHeaderFormatter();
+                case 141: return new Utf8Json.Formatters.AccelByte.Models.UserPointFormatter();
+                case 142: return new Utf8Json.Formatters.AccelByte.Models.UserRankingFormatter();
+                case 143: return new Utf8Json.Formatters.AccelByte.Models.UserRankingDataFormatter();
+                case 144: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardRankingResultFormatter();
+                case 145: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardDataFormatter();
+                case 146: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagingFormatter();
+                case 147: return new Utf8Json.Formatters.AccelByte.Models.LeaderboardPagedListFormatter();
+                case 148: return new Utf8Json.Formatters.AccelByte.Models.DisconnectNotifFormatter();
+                case 149: return new Utf8Json.Formatters.AccelByte.Models.LobbySessionIdFormatter();
+                case 150: return new Utf8Json.Formatters.AccelByte.Models.NotificationFormatter();
+                case 151: return new Utf8Json.Formatters.AccelByte.Models.ChatMessageFormatter();
+                case 152: return new Utf8Json.Formatters.AccelByte.Models.PersonalChatRequestFormatter();
+                case 153: return new Utf8Json.Formatters.AccelByte.Models.ChatChannelSlugFormatter();
+                case 154: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatRequestFormatter();
+                case 155: return new Utf8Json.Formatters.AccelByte.Models.ChannelChatMessageFormatter();
+                case 156: return new Utf8Json.Formatters.AccelByte.Models.PartyInfoFormatter();
+                case 157: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateNotifFormatter();
+                case 158: return new Utf8Json.Formatters.AccelByte.Models.PartyDataUpdateRequestFormatter();
+                case 159: return new Utf8Json.Formatters.AccelByte.Models.ActivePartiesDataFormatter();
+                case 160: return new Utf8Json.Formatters.AccelByte.Models.PartyInviteRequestFormatter();
+                case 161: return new Utf8Json.Formatters.AccelByte.Models.PartyInvitationFormatter();
+                case 162: return new Utf8Json.Formatters.AccelByte.Models.PartyChatRequestFormatter();
+                case 163: return new Utf8Json.Formatters.AccelByte.Models.PartyJoinRequestFormatter();
+                case 164: return new Utf8Json.Formatters.AccelByte.Models.PartyKickRequestFormatter();
+                case 165: return new Utf8Json.Formatters.AccelByte.Models.JoinNotificationFormatter();
+                case 166: return new Utf8Json.Formatters.AccelByte.Models.KickNotificationFormatter();
+                case 167: return new Utf8Json.Formatters.AccelByte.Models.LeaveNotificationFormatter();
+                case 168: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectRequestFormatter();
+                case 169: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectResponseFormatter();
+                case 170: return new Utf8Json.Formatters.AccelByte.Models.PartyRejectNotifFormatter();
+                case 171: return new Utf8Json.Formatters.AccelByte.Models.PartyPromoteLeaderRequestFormatter();
+                case 172: return new Utf8Json.Formatters.AccelByte.Models.PartyPromoteLeaderResponseFormatter();
+                case 173: return new Utf8Json.Formatters.AccelByte.Models.StartMatchmakingRequestFormatter();
+                case 174: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingNotifFormatter();
+                case 175: return new Utf8Json.Formatters.AccelByte.Models.DsNotifFormatter();
+                case 176: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingCodeFormatter();
+                case 177: return new Utf8Json.Formatters.AccelByte.Models.ReadyConsentRequestFormatter();
+                case 178: return new Utf8Json.Formatters.AccelByte.Models.ReadyForMatchConfirmationFormatter();
+                case 179: return new Utf8Json.Formatters.AccelByte.Models.RematchmakingNotificationFormatter();
+                case 180: return new Utf8Json.Formatters.AccelByte.Models.FriendshipStatusFormatter();
+                case 181: return new Utf8Json.Formatters.AccelByte.Models.FriendsFormatter();
+                case 182: return new Utf8Json.Formatters.AccelByte.Models.FriendFormatter();
+                case 183: return new Utf8Json.Formatters.AccelByte.Models.AcquaintanceFormatter();
+                case 184: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusFormatter();
+                case 185: return new Utf8Json.Formatters.AccelByte.Models.BulkFriendsRequestFormatter();
+                case 186: return new Utf8Json.Formatters.AccelByte.Models.FriendsStatusNotifFormatter();
+                case 187: return new Utf8Json.Formatters.AccelByte.Models.SetUserStatusRequestFormatter();
+                case 188: return new Utf8Json.Formatters.AccelByte.Models.OnlineFriendsFormatter();
+                case 189: return new Utf8Json.Formatters.AccelByte.Models.UserStatusNotifFormatter();
+                case 190: return new Utf8Json.Formatters.AccelByte.Models.BulkUserStatusNotifFormatter();
+                case 191: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerRequestFormatter();
+                case 192: return new Utf8Json.Formatters.AccelByte.Models.BlockPlayerResponseFormatter();
+                case 193: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerRequestFormatter();
+                case 194: return new Utf8Json.Formatters.AccelByte.Models.UnblockPlayerResponseFormatter();
+                case 195: return new Utf8Json.Formatters.AccelByte.Models.PlayerBlockedNotifFormatter();
+                case 196: return new Utf8Json.Formatters.AccelByte.Models.PlayerUnblockedNotifFormatter();
+                case 197: return new Utf8Json.Formatters.AccelByte.Models.BlockedDataFormatter();
+                case 198: return new Utf8Json.Formatters.AccelByte.Models.BlockedListFormatter();
+                case 199: return new Utf8Json.Formatters.AccelByte.Models.BlockerDataFormatter();
+                case 200: return new Utf8Json.Formatters.AccelByte.Models.BlockerListFormatter();
+                case 201: return new Utf8Json.Formatters.AccelByte.Models.SetSessionAttributeRequestFormatter();
+                case 202: return new Utf8Json.Formatters.AccelByte.Models.PlatformLinkFormatter();
+                case 203: return new Utf8Json.Formatters.AccelByte.Models.CollectionFormatter();
+                case 204: return new Utf8Json.Formatters.AccelByte.Models.QosServerFormatter();
+                case 205: return new Utf8Json.Formatters.AccelByte.Models.QosServerListFormatter();
+                case 206: return new Utf8Json.Formatters.AccelByte.Models.ServerConfigFormatter();
+                case 207: return new Utf8Json.Formatters.AccelByte.Models.RegisterServerRequestFormatter();
+                case 208: return new Utf8Json.Formatters.AccelByte.Models.ShutdownServerRequestFormatter();
+                case 209: return new Utf8Json.Formatters.AccelByte.Models.RegisterLocalServerRequestFormatter();
+                case 210: return new Utf8Json.Formatters.AccelByte.Models.PartyMemberFormatter();
+                case 211: return new Utf8Json.Formatters.AccelByte.Models.MatchPartyFormatter();
+                case 212: return new Utf8Json.Formatters.AccelByte.Models.MatchingAllyFormatter();
+                case 213: return new Utf8Json.Formatters.AccelByte.Models.MatchRequestFormatter();
+                case 214: return new Utf8Json.Formatters.AccelByte.Models.DSMClientFormatter();
+                case 215: return new Utf8Json.Formatters.AccelByte.Models.PubIpFormatter();
+                case 216: return new Utf8Json.Formatters.AccelByte.Models.ServerInfoFormatter();
+                case 217: return new Utf8Json.Formatters.AccelByte.Models.MatchmakingResultFormatter();
+                case 218: return new Utf8Json.Formatters.AccelByte.Models.AddUserIntoSessionRequestFormatter();
+                case 219: return new Utf8Json.Formatters.AccelByte.Models.DequeueRequestFormatter();
+                case 220: return new Utf8Json.Formatters.AccelByte.Models.ServerSessionResponseFormatter();
+                case 221: return new Utf8Json.Formatters.AccelByte.Models.StatConfigFormatter();
+                case 222: return new Utf8Json.Formatters.AccelByte.Models.StatItemFormatter();
+                case 223: return new Utf8Json.Formatters.AccelByte.Models.CreateStatItemRequestFormatter();
+                case 224: return new Utf8Json.Formatters.AccelByte.Models.PagedStatItemsFormatter();
+                case 225: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemIncrementFormatter();
+                case 226: return new Utf8Json.Formatters.AccelByte.Models.StatItemIncrementFormatter();
+                case 227: return new Utf8Json.Formatters.AccelByte.Models.StatItemOperationResultFormatter();
+                case 228: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemResetFormatter();
+                case 229: return new Utf8Json.Formatters.AccelByte.Models.StatItemResetFormatter();
+                case 230: return new Utf8Json.Formatters.AccelByte.Models.UserStatItemUpdateFormatter();
+                case 231: return new Utf8Json.Formatters.AccelByte.Models.StatItemUpdateFormatter();
+                case 232: return new Utf8Json.Formatters.AccelByte.Models.TelemetryEventTagFormatter();
+                case 233: return new Utf8Json.Formatters.AccelByte.Models.TokenDataFormatter();
+                case 234: return new Utf8Json.Formatters.AccelByte.Models.SessionDataFormatter();
+                case 235: return new Utf8Json.Formatters.AccelByte.Models.BanFormatter();
+                case 236: return new Utf8Json.Formatters.AccelByte.Models.PermissionFormatter();
+                case 237: return new Utf8Json.Formatters.AccelByte.Models.UserDataFormatter();
+                case 238: return new Utf8Json.Formatters.AccelByte.Models.PublicUserDataFormatter();
+                case 239: return new Utf8Json.Formatters.AccelByte.Models.PublicUserInfoFormatter();
+                case 240: return new Utf8Json.Formatters.AccelByte.Models.PagedPublicUsersInfoFormatter();
+                case 241: return new Utf8Json.Formatters.AccelByte.Models.PolicyAcceptanceFormatter();
+                case 242: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestFormatter();
+                case 243: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserRequestv2Formatter();
+                case 244: return new Utf8Json.Formatters.AccelByte.Models.RegisterUserResponseFormatter();
+                case 245: return new Utf8Json.Formatters.AccelByte.Models.UpdateUserRequestFormatter();
+                case 246: return new Utf8Json.Formatters.AccelByte.Models.PagedPlatformLinksFormatter();
+                case 247: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdRequestFormatter();
+                case 248: return new Utf8Json.Formatters.AccelByte.Models.PlatformUserIdMapFormatter();
+                case 249: return new Utf8Json.Formatters.AccelByte.Models.BulkPlatformUserIdResponseFormatter();
+                case 250: return new Utf8Json.Formatters.AccelByte.Models.CountryInfoFormatter();
+                case 251: return new Utf8Json.Formatters.AccelByte.Models.UpgradeUserRequestFormatter();
+                case 252: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkedPlatformFormatter();
+                case 253: return new Utf8Json.Formatters.AccelByte.Models.UnlinkPlatformAccountRequestFormatter();
+                case 254: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkPublisherAccountFormatter();
+                case 255: return new Utf8Json.Formatters.AccelByte.Models.AccountLinkConfictMessageVariablesFormatter();
+                case 256: return new Utf8Json.Formatters.AccelByte.Models.LinkPlatformAccountRequestFormatter();
+                case 257: return new Utf8Json.Formatters.AccelByte.Models.UpdateEmailRequestFormatter();
+                case 258: return new Utf8Json.Formatters.AccelByte.Models.PublicIpFormatter();
                 default: return null;
             }
         }
@@ -4168,46 +4176,38 @@ namespace Utf8Json.Formatters.AccelByte.Models
             this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
             {
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("Namespace"), 0},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("UseSessionManagement"), 1},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("UsePlayerPrefs"), 2},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("EnableDebugLog"), 3},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("DebugLogFilter"), 4},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BaseUrl"), 5},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ApiBaseUrl"), 6},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("NonApiBaseUrl"), 7},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LoginServerUrl"), 8},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 9},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 10},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BasicServerUrl"), 11},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 12},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudStorageServerUrl"), 13},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameProfileServerUrl"), 14},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 15},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 16},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AgreementServerUrl"), 17},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LeaderboardServerUrl"), 18},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 19},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 20},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 21},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 22},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 23},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GroupServerUrl"), 24},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 25},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 26},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 27},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("UsePlayerPrefs"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("EnableDebugLog"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("DebugLogFilter"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BaseUrl"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BasicServerUrl"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 8},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudStorageServerUrl"), 9},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameProfileServerUrl"), 10},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 11},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 12},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AgreementServerUrl"), 13},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LeaderboardServerUrl"), 14},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 15},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 16},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 17},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 18},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 19},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GroupServerUrl"), 20},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 21},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AppId"), 22},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PublisherNamespace"), 23},
             };
 
             this.____stringByteKeys = new byte[][]
             {
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("Namespace"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("UseSessionManagement"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("UsePlayerPrefs"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("EnableDebugLog"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("DebugLogFilter"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("BaseUrl"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ApiBaseUrl"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("NonApiBaseUrl"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("LoginServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("IamServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("PlatformServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("BasicServerUrl"),
@@ -4243,58 +4243,50 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.WriteString(value.Namespace);
             writer.WriteRaw(this.____stringByteKeys[1]);
-            writer.WriteBoolean(value.UseSessionManagement);
-            writer.WriteRaw(this.____stringByteKeys[2]);
             writer.WriteBoolean(value.UsePlayerPrefs);
-            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteRaw(this.____stringByteKeys[2]);
             writer.WriteBoolean(value.EnableDebugLog);
-            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteRaw(this.____stringByteKeys[3]);
             writer.WriteString(value.DebugLogFilter);
-            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteRaw(this.____stringByteKeys[4]);
             writer.WriteString(value.BaseUrl);
-            writer.WriteRaw(this.____stringByteKeys[6]);
-            writer.WriteString(value.ApiBaseUrl);
-            writer.WriteRaw(this.____stringByteKeys[7]);
-            writer.WriteString(value.NonApiBaseUrl);
-            writer.WriteRaw(this.____stringByteKeys[8]);
-            writer.WriteString(value.LoginServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[9]);
+            writer.WriteRaw(this.____stringByteKeys[5]);
             writer.WriteString(value.IamServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[10]);
+            writer.WriteRaw(this.____stringByteKeys[6]);
             writer.WriteString(value.PlatformServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[11]);
+            writer.WriteRaw(this.____stringByteKeys[7]);
             writer.WriteString(value.BasicServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[12]);
+            writer.WriteRaw(this.____stringByteKeys[8]);
             writer.WriteString(value.LobbyServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[13]);
+            writer.WriteRaw(this.____stringByteKeys[9]);
             writer.WriteString(value.CloudStorageServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[14]);
+            writer.WriteRaw(this.____stringByteKeys[10]);
             writer.WriteString(value.GameProfileServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[15]);
+            writer.WriteRaw(this.____stringByteKeys[11]);
             writer.WriteString(value.StatisticServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[16]);
+            writer.WriteRaw(this.____stringByteKeys[12]);
             writer.WriteString(value.QosManagerServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[17]);
+            writer.WriteRaw(this.____stringByteKeys[13]);
             writer.WriteString(value.AgreementServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[18]);
+            writer.WriteRaw(this.____stringByteKeys[14]);
             writer.WriteString(value.LeaderboardServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[19]);
+            writer.WriteRaw(this.____stringByteKeys[15]);
             writer.WriteString(value.CloudSaveServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[20]);
+            writer.WriteRaw(this.____stringByteKeys[16]);
             writer.WriteString(value.GameTelemetryServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[21]);
+            writer.WriteRaw(this.____stringByteKeys[17]);
             writer.WriteString(value.AchievementServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[22]);
+            writer.WriteRaw(this.____stringByteKeys[18]);
             writer.WriteString(value.ClientId);
-            writer.WriteRaw(this.____stringByteKeys[23]);
+            writer.WriteRaw(this.____stringByteKeys[19]);
             writer.WriteString(value.ClientSecret);
-            writer.WriteRaw(this.____stringByteKeys[24]);
+            writer.WriteRaw(this.____stringByteKeys[20]);
             writer.WriteString(value.GroupServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[25]);
+            writer.WriteRaw(this.____stringByteKeys[21]);
             writer.WriteString(value.RedirectUri);
-            writer.WriteRaw(this.____stringByteKeys[26]);
+            writer.WriteRaw(this.____stringByteKeys[22]);
             writer.WriteString(value.AppId);
-            writer.WriteRaw(this.____stringByteKeys[27]);
+            writer.WriteRaw(this.____stringByteKeys[23]);
             writer.WriteString(value.PublisherNamespace);
             
             writer.WriteEndObject();
@@ -4310,8 +4302,6 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var __Namespace__ = default(string);
             var __Namespace__b__ = false;
-            var __UseSessionManagement__ = default(bool);
-            var __UseSessionManagement__b__ = false;
             var __UsePlayerPrefs__ = default(bool);
             var __UsePlayerPrefs__b__ = false;
             var __EnableDebugLog__ = default(bool);
@@ -4320,12 +4310,6 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __DebugLogFilter__b__ = false;
             var __BaseUrl__ = default(string);
             var __BaseUrl__b__ = false;
-            var __ApiBaseUrl__ = default(string);
-            var __ApiBaseUrl__b__ = false;
-            var __NonApiBaseUrl__ = default(string);
-            var __NonApiBaseUrl__b__ = false;
-            var __LoginServerUrl__ = default(string);
-            var __LoginServerUrl__b__ = false;
             var __IamServerUrl__ = default(string);
             var __IamServerUrl__b__ = false;
             var __PlatformServerUrl__ = default(string);
@@ -4384,110 +4368,94 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __Namespace__b__ = true;
                         break;
                     case 1:
-                        __UseSessionManagement__ = reader.ReadBoolean();
-                        __UseSessionManagement__b__ = true;
-                        break;
-                    case 2:
                         __UsePlayerPrefs__ = reader.ReadBoolean();
                         __UsePlayerPrefs__b__ = true;
                         break;
-                    case 3:
+                    case 2:
                         __EnableDebugLog__ = reader.ReadBoolean();
                         __EnableDebugLog__b__ = true;
                         break;
-                    case 4:
+                    case 3:
                         __DebugLogFilter__ = reader.ReadString();
                         __DebugLogFilter__b__ = true;
                         break;
-                    case 5:
+                    case 4:
                         __BaseUrl__ = reader.ReadString();
                         __BaseUrl__b__ = true;
                         break;
-                    case 6:
-                        __ApiBaseUrl__ = reader.ReadString();
-                        __ApiBaseUrl__b__ = true;
-                        break;
-                    case 7:
-                        __NonApiBaseUrl__ = reader.ReadString();
-                        __NonApiBaseUrl__b__ = true;
-                        break;
-                    case 8:
-                        __LoginServerUrl__ = reader.ReadString();
-                        __LoginServerUrl__b__ = true;
-                        break;
-                    case 9:
+                    case 5:
                         __IamServerUrl__ = reader.ReadString();
                         __IamServerUrl__b__ = true;
                         break;
-                    case 10:
+                    case 6:
                         __PlatformServerUrl__ = reader.ReadString();
                         __PlatformServerUrl__b__ = true;
                         break;
-                    case 11:
+                    case 7:
                         __BasicServerUrl__ = reader.ReadString();
                         __BasicServerUrl__b__ = true;
                         break;
-                    case 12:
+                    case 8:
                         __LobbyServerUrl__ = reader.ReadString();
                         __LobbyServerUrl__b__ = true;
                         break;
-                    case 13:
+                    case 9:
                         __CloudStorageServerUrl__ = reader.ReadString();
                         __CloudStorageServerUrl__b__ = true;
                         break;
-                    case 14:
+                    case 10:
                         __GameProfileServerUrl__ = reader.ReadString();
                         __GameProfileServerUrl__b__ = true;
                         break;
-                    case 15:
+                    case 11:
                         __StatisticServerUrl__ = reader.ReadString();
                         __StatisticServerUrl__b__ = true;
                         break;
-                    case 16:
+                    case 12:
                         __QosManagerServerUrl__ = reader.ReadString();
                         __QosManagerServerUrl__b__ = true;
                         break;
-                    case 17:
+                    case 13:
                         __AgreementServerUrl__ = reader.ReadString();
                         __AgreementServerUrl__b__ = true;
                         break;
-                    case 18:
+                    case 14:
                         __LeaderboardServerUrl__ = reader.ReadString();
                         __LeaderboardServerUrl__b__ = true;
                         break;
-                    case 19:
+                    case 15:
                         __CloudSaveServerUrl__ = reader.ReadString();
                         __CloudSaveServerUrl__b__ = true;
                         break;
-                    case 20:
+                    case 16:
                         __GameTelemetryServerUrl__ = reader.ReadString();
                         __GameTelemetryServerUrl__b__ = true;
                         break;
-                    case 21:
+                    case 17:
                         __AchievementServerUrl__ = reader.ReadString();
                         __AchievementServerUrl__b__ = true;
                         break;
-                    case 22:
+                    case 18:
                         __ClientId__ = reader.ReadString();
                         __ClientId__b__ = true;
                         break;
-                    case 23:
+                    case 19:
                         __ClientSecret__ = reader.ReadString();
                         __ClientSecret__b__ = true;
                         break;
-                    case 24:
+                    case 20:
                         __GroupServerUrl__ = reader.ReadString();
                         __GroupServerUrl__b__ = true;
                         break;
-                    case 25:
+                    case 21:
                         __RedirectUri__ = reader.ReadString();
                         __RedirectUri__b__ = true;
                         break;
-                    case 26:
+                    case 22:
                         __AppId__ = reader.ReadString();
                         __AppId__b__ = true;
                         break;
-                    case 27:
+                    case 23:
                         __PublisherNamespace__ = reader.ReadString();
                         __PublisherNamespace__b__ = true;
                         break;
@@ -4502,14 +4470,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var ____result = new global::AccelByte.Models.Config();
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
-            if(__UseSessionManagement__b__) ____result.UseSessionManagement = __UseSessionManagement__;
             if(__UsePlayerPrefs__b__) ____result.UsePlayerPrefs = __UsePlayerPrefs__;
             if(__EnableDebugLog__b__) ____result.EnableDebugLog = __EnableDebugLog__;
             if(__DebugLogFilter__b__) ____result.DebugLogFilter = __DebugLogFilter__;
             if(__BaseUrl__b__) ____result.BaseUrl = __BaseUrl__;
-            if(__ApiBaseUrl__b__) ____result.ApiBaseUrl = __ApiBaseUrl__;
-            if(__NonApiBaseUrl__b__) ____result.NonApiBaseUrl = __NonApiBaseUrl__;
-            if(__LoginServerUrl__b__) ____result.LoginServerUrl = __LoginServerUrl__;
             if(__IamServerUrl__b__) ____result.IamServerUrl = __IamServerUrl__;
             if(__PlatformServerUrl__b__) ____result.PlatformServerUrl = __PlatformServerUrl__;
             if(__BasicServerUrl__b__) ____result.BasicServerUrl = __BasicServerUrl__;
@@ -18679,6 +18643,97 @@ namespace Utf8Json.Formatters.AccelByte.Models
     }
 
 
+    public sealed class SetUserStatusRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.SetUserStatusRequest>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public SetUserStatusRequestFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("availability"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("activity"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("availability"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("activity"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.SetUserStatusRequest value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteUInt32(value.availability);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.activity);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.SetUserStatusRequest Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __availability__ = default(uint);
+            var __availability__b__ = false;
+            var __activity__ = default(string);
+            var __activity__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __availability__ = reader.ReadUInt32();
+                        __availability__b__ = true;
+                        break;
+                    case 1:
+                        __activity__ = reader.ReadString();
+                        __activity__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.SetUserStatusRequest();
+            if(__availability__b__) ____result.availability = __availability__;
+            if(__activity__b__) ____result.activity = __activity__;
+
+            return ____result;
+        }
+    }
+
+
     public sealed class OnlineFriendsFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.OnlineFriends>
     {
         readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
@@ -20504,27 +20559,25 @@ namespace Utf8Json.Formatters.AccelByte.Models
             {
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("Namespace"), 0},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("BaseUrl"), 1},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ApiBaseUrl"), 2},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 3},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("DSMControllerServerUrl"), 4},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 5},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 6},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 7},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 8},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 9},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 10},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 11},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 12},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 13},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 14},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("MatchmakingServerUrl"), 15},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("IamServerUrl"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("DSMControllerServerUrl"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("StatisticServerUrl"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("PlatformServerUrl"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("QosManagerServerUrl"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("GameTelemetryServerUrl"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("AchievementServerUrl"), 8},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("LobbyServerUrl"), 9},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("CloudSaveServerUrl"), 10},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientId"), 11},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ClientSecret"), 12},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("RedirectUri"), 13},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("MatchmakingServerUrl"), 14},
             };
 
             this.____stringByteKeys = new byte[][]
             {
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("Namespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("BaseUrl"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ApiBaseUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("IamServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("DSMControllerServerUrl"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("StatisticServerUrl"),
@@ -20556,32 +20609,30 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[1]);
             writer.WriteString(value.BaseUrl);
             writer.WriteRaw(this.____stringByteKeys[2]);
-            writer.WriteString(value.ApiBaseUrl);
-            writer.WriteRaw(this.____stringByteKeys[3]);
             writer.WriteString(value.IamServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteRaw(this.____stringByteKeys[3]);
             writer.WriteString(value.DSMControllerServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteRaw(this.____stringByteKeys[4]);
             writer.WriteString(value.StatisticServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[6]);
+            writer.WriteRaw(this.____stringByteKeys[5]);
             writer.WriteString(value.PlatformServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteRaw(this.____stringByteKeys[6]);
             writer.WriteString(value.QosManagerServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[8]);
+            writer.WriteRaw(this.____stringByteKeys[7]);
             writer.WriteString(value.GameTelemetryServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[9]);
+            writer.WriteRaw(this.____stringByteKeys[8]);
             writer.WriteString(value.AchievementServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[10]);
+            writer.WriteRaw(this.____stringByteKeys[9]);
             writer.WriteString(value.LobbyServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[11]);
+            writer.WriteRaw(this.____stringByteKeys[10]);
             writer.WriteString(value.CloudSaveServerUrl);
-            writer.WriteRaw(this.____stringByteKeys[12]);
+            writer.WriteRaw(this.____stringByteKeys[11]);
             writer.WriteString(value.ClientId);
-            writer.WriteRaw(this.____stringByteKeys[13]);
+            writer.WriteRaw(this.____stringByteKeys[12]);
             writer.WriteString(value.ClientSecret);
-            writer.WriteRaw(this.____stringByteKeys[14]);
+            writer.WriteRaw(this.____stringByteKeys[13]);
             writer.WriteString(value.RedirectUri);
-            writer.WriteRaw(this.____stringByteKeys[15]);
+            writer.WriteRaw(this.____stringByteKeys[14]);
             writer.WriteString(value.MatchmakingServerUrl);
             
             writer.WriteEndObject();
@@ -20599,8 +20650,6 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __Namespace__b__ = false;
             var __BaseUrl__ = default(string);
             var __BaseUrl__b__ = false;
-            var __ApiBaseUrl__ = default(string);
-            var __ApiBaseUrl__b__ = false;
             var __IamServerUrl__ = default(string);
             var __IamServerUrl__b__ = false;
             var __DSMControllerServerUrl__ = default(string);
@@ -20651,58 +20700,54 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __BaseUrl__b__ = true;
                         break;
                     case 2:
-                        __ApiBaseUrl__ = reader.ReadString();
-                        __ApiBaseUrl__b__ = true;
-                        break;
-                    case 3:
                         __IamServerUrl__ = reader.ReadString();
                         __IamServerUrl__b__ = true;
                         break;
-                    case 4:
+                    case 3:
                         __DSMControllerServerUrl__ = reader.ReadString();
                         __DSMControllerServerUrl__b__ = true;
                         break;
-                    case 5:
+                    case 4:
                         __StatisticServerUrl__ = reader.ReadString();
                         __StatisticServerUrl__b__ = true;
                         break;
-                    case 6:
+                    case 5:
                         __PlatformServerUrl__ = reader.ReadString();
                         __PlatformServerUrl__b__ = true;
                         break;
-                    case 7:
+                    case 6:
                         __QosManagerServerUrl__ = reader.ReadString();
                         __QosManagerServerUrl__b__ = true;
                         break;
-                    case 8:
+                    case 7:
                         __GameTelemetryServerUrl__ = reader.ReadString();
                         __GameTelemetryServerUrl__b__ = true;
                         break;
-                    case 9:
+                    case 8:
                         __AchievementServerUrl__ = reader.ReadString();
                         __AchievementServerUrl__b__ = true;
                         break;
-                    case 10:
+                    case 9:
                         __LobbyServerUrl__ = reader.ReadString();
                         __LobbyServerUrl__b__ = true;
                         break;
-                    case 11:
+                    case 10:
                         __CloudSaveServerUrl__ = reader.ReadString();
                         __CloudSaveServerUrl__b__ = true;
                         break;
-                    case 12:
+                    case 11:
                         __ClientId__ = reader.ReadString();
                         __ClientId__b__ = true;
                         break;
-                    case 13:
+                    case 12:
                         __ClientSecret__ = reader.ReadString();
                         __ClientSecret__b__ = true;
                         break;
-                    case 14:
+                    case 13:
                         __RedirectUri__ = reader.ReadString();
                         __RedirectUri__b__ = true;
                         break;
-                    case 15:
+                    case 14:
                         __MatchmakingServerUrl__ = reader.ReadString();
                         __MatchmakingServerUrl__b__ = true;
                         break;
@@ -20718,7 +20763,6 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var ____result = new global::AccelByte.Models.ServerConfig();
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
             if(__BaseUrl__b__) ____result.BaseUrl = __BaseUrl__;
-            if(__ApiBaseUrl__b__) ____result.ApiBaseUrl = __ApiBaseUrl__;
             if(__IamServerUrl__b__) ____result.IamServerUrl = __IamServerUrl__;
             if(__DSMControllerServerUrl__b__) ____result.DSMControllerServerUrl = __DSMControllerServerUrl__;
             if(__StatisticServerUrl__b__) ____result.StatisticServerUrl = __StatisticServerUrl__;
@@ -21548,6 +21592,86 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__region__b__) ____result.region = __region__;
             if(__status__b__) ____result.status = __status__;
             if(__provider__b__) ____result.provider = __provider__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class PubIpFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PubIp>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PubIpFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ip"), 0},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("ip"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PubIp value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.ip);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PubIp Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __ip__ = default(string);
+            var __ip__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __ip__ = reader.ReadString();
+                        __ip__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PubIp();
+            if(__ip__b__) ____result.ip = __ip__;
 
             return ____result;
         }
@@ -23590,6 +23714,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("user_id"), 4},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("display_name"), 5},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("namespace"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("is_comply"), 7},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -23601,6 +23726,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("user_id"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("display_name"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("namespace"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("is_comply"),
                 
             };
         }
@@ -23628,6 +23754,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.display_name);
             writer.WriteRaw(this.____stringByteKeys[6]);
             writer.WriteString(value.Namespace);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteBoolean(value.is_comply);
             
             writer.WriteEndObject();
         }
@@ -23654,6 +23782,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __display_name__b__ = false;
             var __Namespace__ = default(string);
             var __Namespace__b__ = false;
+            var __is_comply__ = default(bool);
+            var __is_comply__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -23697,6 +23827,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __Namespace__ = reader.ReadString();
                         __Namespace__b__ = true;
                         break;
+                    case 7:
+                        __is_comply__ = reader.ReadBoolean();
+                        __is_comply__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -23714,6 +23848,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__user_id__b__) ____result.user_id = __user_id__;
             if(__display_name__b__) ____result.display_name = __display_name__;
             if(__Namespace__b__) ____result.Namespace = __Namespace__;
+            if(__is_comply__b__) ____result.is_comply = __is_comply__;
 
             return ____result;
         }
@@ -24863,6 +24998,119 @@ namespace Utf8Json.Formatters.AccelByte.Models
     }
 
 
+    public sealed class PolicyAcceptanceFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.PolicyAcceptance>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public PolicyAcceptanceFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("isAccepted"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("localizedPolicyVersionId"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("policyId"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("policyVersionId"), 3},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("isAccepted"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("localizedPolicyVersionId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("policyId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("policyVersionId"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::AccelByte.Models.PolicyAcceptance value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteBoolean(value.isAccepted);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.localizedPolicyVersionId);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.policyId);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.policyVersionId);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::AccelByte.Models.PolicyAcceptance Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __isAccepted__ = default(bool);
+            var __isAccepted__b__ = false;
+            var __localizedPolicyVersionId__ = default(string);
+            var __localizedPolicyVersionId__b__ = false;
+            var __policyId__ = default(string);
+            var __policyId__b__ = false;
+            var __policyVersionId__ = default(string);
+            var __policyVersionId__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __isAccepted__ = reader.ReadBoolean();
+                        __isAccepted__b__ = true;
+                        break;
+                    case 1:
+                        __localizedPolicyVersionId__ = reader.ReadString();
+                        __localizedPolicyVersionId__b__ = true;
+                        break;
+                    case 2:
+                        __policyId__ = reader.ReadString();
+                        __policyId__b__ = true;
+                        break;
+                    case 3:
+                        __policyVersionId__ = reader.ReadString();
+                        __policyVersionId__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::AccelByte.Models.PolicyAcceptance();
+            if(__isAccepted__b__) ____result.isAccepted = __isAccepted__;
+            if(__localizedPolicyVersionId__b__) ____result.localizedPolicyVersionId = __localizedPolicyVersionId__;
+            if(__policyId__b__) ____result.policyId = __policyId__;
+            if(__policyVersionId__b__) ____result.policyVersionId = __policyVersionId__;
+
+            return ____result;
+        }
+    }
+
+
     public sealed class RegisterUserRequestFormatter : global::Utf8Json.IJsonFormatter<global::AccelByte.Models.RegisterUserRequest>
     {
         readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
@@ -24878,6 +25126,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("displayName"), 3},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("emailAddress"), 4},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("password"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("acceptedPolicies"), 6},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -24888,6 +25137,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("displayName"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("emailAddress"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("password"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("acceptedPolicies"),
                 
             };
         }
@@ -24913,6 +25163,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.emailAddress);
             writer.WriteRaw(this.____stringByteKeys[5]);
             writer.WriteString(value.password);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>>().Serialize(ref writer, value.acceptedPolicies, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -24937,6 +25189,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __emailAddress__b__ = false;
             var __password__ = default(string);
             var __password__b__ = false;
+            var __acceptedPolicies__ = default(global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>);
+            var __acceptedPolicies__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -24976,6 +25230,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __password__ = reader.ReadString();
                         __password__b__ = true;
                         break;
+                    case 6:
+                        __acceptedPolicies__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>>().Deserialize(ref reader, formatterResolver);
+                        __acceptedPolicies__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -24992,6 +25250,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__displayName__b__) ____result.displayName = __displayName__;
             if(__emailAddress__b__) ____result.emailAddress = __emailAddress__;
             if(__password__b__) ____result.password = __password__;
+            if(__acceptedPolicies__b__) ____result.acceptedPolicies = __acceptedPolicies__;
 
             return ____result;
         }
@@ -25014,6 +25273,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("emailAddress"), 4},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("password"), 5},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("username"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("acceptedPolicies"), 7},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -25025,6 +25285,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("emailAddress"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("password"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("username"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("acceptedPolicies"),
                 
             };
         }
@@ -25052,6 +25313,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteString(value.password);
             writer.WriteRaw(this.____stringByteKeys[6]);
             writer.WriteString(value.username);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>>().Serialize(ref writer, value.acceptedPolicies, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -25078,6 +25341,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __password__b__ = false;
             var __username__ = default(string);
             var __username__b__ = false;
+            var __acceptedPolicies__ = default(global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>);
+            var __acceptedPolicies__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -25121,6 +25386,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __username__ = reader.ReadString();
                         __username__b__ = true;
                         break;
+                    case 7:
+                        __acceptedPolicies__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.List<global::AccelByte.Models.PolicyAcceptance>>().Deserialize(ref reader, formatterResolver);
+                        __acceptedPolicies__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -25138,6 +25407,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__emailAddress__b__) ____result.emailAddress = __emailAddress__;
             if(__password__b__) ____result.password = __password__;
             if(__username__b__) ____result.username = __username__;
+            if(__acceptedPolicies__b__) ____result.acceptedPolicies = __acceptedPolicies__;
 
             return ____result;
         }

@@ -13,7 +13,7 @@ namespace AccelByte.Core
 {
     public class HttpRequestBuilder
     {
-        private StringBuilder formBuilder = new StringBuilder(1024);
+        private readonly StringBuilder formBuilder = new StringBuilder(1024);
         private HttpRequestPrototype result;
 
         private static HttpRequestBuilder CreatePrototype(string method, string url)
@@ -52,8 +52,11 @@ namespace AccelByte.Core
 
         public HttpRequestBuilder WithPathParam(string key, string value)
         {
-            Assert.IsNotNull(key, "path key is null");
-            Assert.IsNotNull(value, $"path value is null for key {key}");
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+            {
+                throw new Exception($"Path parameter with key={key} is null or empty.");
+            }
+
             this.result.UrlBuilder.Replace("{" + key + "}", Uri.EscapeDataString(value));
             this.result.BaseUrlLength = this.result.UrlBuilder.Length;
 

@@ -10,14 +10,10 @@ namespace AccelByte.Models
     public class Config
     {
         [DataMember] public string Namespace { get; set; }
-        [DataMember] public bool UseSessionManagement { get; set; }
         [DataMember] public bool UsePlayerPrefs { get; set; }
         [DataMember] public bool EnableDebugLog { get; set; }
         [DataMember] public string DebugLogFilter { get; set; }
         [DataMember] public string BaseUrl { get; set; }
-        [DataMember] public string ApiBaseUrl { get; set; }
-        [DataMember] public string NonApiBaseUrl { get; set; }
-        [DataMember] public string LoginServerUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
         [DataMember] public string PlatformServerUrl { get; set; }
         [DataMember] public string BasicServerUrl { get; set; }
@@ -48,39 +44,30 @@ namespace AccelByte.Models
 
         public bool Compare(Config anotherConfig)
         {
-            if (this.Namespace == anotherConfig.Namespace &&
-                this.UseSessionManagement == anotherConfig.UseSessionManagement &&
-                this.UsePlayerPrefs == anotherConfig.UsePlayerPrefs &&
-                this.EnableDebugLog == anotherConfig.EnableDebugLog &&
-                this.DebugLogFilter == anotherConfig.DebugLogFilter &&
-                this.BaseUrl == anotherConfig.BaseUrl &&
-                this.ApiBaseUrl == anotherConfig.ApiBaseUrl &&
-                this.NonApiBaseUrl == anotherConfig.NonApiBaseUrl &&
-                this.LoginServerUrl == anotherConfig.LoginServerUrl &&
-                this.IamServerUrl == anotherConfig.IamServerUrl &&
-                this.PlatformServerUrl == anotherConfig.PlatformServerUrl &&
-                this.BasicServerUrl == anotherConfig.BasicServerUrl &&
-                this.LobbyServerUrl == anotherConfig.LobbyServerUrl &&
-                this.CloudStorageServerUrl == anotherConfig.CloudStorageServerUrl &&
-                this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
-                this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
-                this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
-                this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
-                this.LeaderboardServerUrl == anotherConfig.LeaderboardServerUrl &&
-                this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
-                this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
-                this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
-                this.GroupServerUrl == anotherConfig.GroupServerUrl &&
-                this.ClientId == anotherConfig.ClientId &&
-                this.ClientSecret == anotherConfig.ClientSecret &&
-                this.RedirectUri == anotherConfig.RedirectUri &&
-                this.AppId == anotherConfig.AppId &&
-                this.PublisherNamespace == anotherConfig.PublisherNamespace)
-            {
-                return true;
-            }
-
-            return false;
+            return this.Namespace == anotherConfig.Namespace &&
+                   this.UsePlayerPrefs == anotherConfig.UsePlayerPrefs &&
+                   this.EnableDebugLog == anotherConfig.EnableDebugLog &&
+                   this.DebugLogFilter == anotherConfig.DebugLogFilter &&
+                   this.BaseUrl == anotherConfig.BaseUrl &&
+                   this.IamServerUrl == anotherConfig.IamServerUrl &&
+                   this.PlatformServerUrl == anotherConfig.PlatformServerUrl &&
+                   this.BasicServerUrl == anotherConfig.BasicServerUrl &&
+                   this.LobbyServerUrl == anotherConfig.LobbyServerUrl &&
+                   this.CloudStorageServerUrl == anotherConfig.CloudStorageServerUrl &&
+                   this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
+                   this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
+                   this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
+                   this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
+                   this.LeaderboardServerUrl == anotherConfig.LeaderboardServerUrl &&
+                   this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
+                   this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
+                   this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
+                   this.GroupServerUrl == anotherConfig.GroupServerUrl &&
+                   this.ClientId == anotherConfig.ClientId &&
+                   this.ClientSecret == anotherConfig.ClientSecret &&
+                   this.RedirectUri == anotherConfig.RedirectUri &&
+                   this.AppId == anotherConfig.AppId &&
+                   this.PublisherNamespace == anotherConfig.PublisherNamespace;
         }
 
         /// <summary>
@@ -94,15 +81,15 @@ namespace AccelByte.Models
                 // remove protocol
                 string baseUrl = this.BaseUrl;
                 if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
-                if ((index = this.NonApiBaseUrl.IndexOf("://")) > 0) this.NonApiBaseUrl = this.NonApiBaseUrl.Substring(index + 3);
-                if ((index = this.ApiBaseUrl.IndexOf("://")) > 0) this.ApiBaseUrl = this.ApiBaseUrl.Substring(index + 3);
 
                 string httpsBaseUrl = "https://" + baseUrl;
-                string wssBaseUrl = "wss://" + NonApiBaseUrl;
+                string wssBaseUrl = "wss://" + baseUrl;
 
-                if (this.ClientSecret == null) this.ClientSecret = "";
+                if (this.ClientSecret == null)
+                {
+                    this.ClientSecret = "";
+                }
 
-                if (string.IsNullOrEmpty(this.LoginServerUrl)) this.LoginServerUrl = httpsBaseUrl;
 
                 this.IamServerUrl = GetDefaultApiUrl(this.IamServerUrl, "/iam");
 
@@ -112,11 +99,11 @@ namespace AccelByte.Models
 
                 if (string.IsNullOrEmpty(this.LobbyServerUrl)) this.LobbyServerUrl = wssBaseUrl + "/lobby/";
 
-                this.CloudStorageServerUrl = GetDefaultApiUrl(this.CloudStorageServerUrl, "/binary-store");
+                this.CloudStorageServerUrl = GetDefaultApiUrl(this.CloudStorageServerUrl, "/social");
 
-                this.GameProfileServerUrl = GetDefaultApiUrl(this.GameProfileServerUrl, "/soc-profile");
+                this.GameProfileServerUrl = GetDefaultApiUrl(this.GameProfileServerUrl, "/social");
 
-                this.StatisticServerUrl = GetDefaultApiUrl(this.StatisticServerUrl, "/statistic");
+                this.StatisticServerUrl = GetDefaultApiUrl(this.StatisticServerUrl, "/social");
 
                 this.QosManagerServerUrl = GetDefaultApiUrl(this.QosManagerServerUrl, "/qosm");
 
@@ -143,8 +130,6 @@ namespace AccelByte.Models
             // remove protocol
             string baseUrl = this.BaseUrl;
             if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
-            if ((index = this.NonApiBaseUrl.IndexOf("://")) > 0) this.NonApiBaseUrl = this.NonApiBaseUrl.Substring(index + 3);
-            if ((index = this.ApiBaseUrl.IndexOf("://")) > 0) this.ApiBaseUrl = this.ApiBaseUrl.Substring(index + 3);
 
             if (baseUrl != null)
             {
@@ -159,11 +144,11 @@ namespace AccelByte.Models
 
                 if (this.LobbyServerUrl == wssBaseUrl + "/lobby/") this.LobbyServerUrl = null;
 
-                if (this.CloudStorageServerUrl == httpsBaseUrl + "/binary-store") this.CloudStorageServerUrl = null;
+                if (this.CloudStorageServerUrl == httpsBaseUrl + "/social") this.CloudStorageServerUrl = null;
 
-                if (this.GameProfileServerUrl == httpsBaseUrl + "/soc-profile") this.GameProfileServerUrl = null;
+                if (this.GameProfileServerUrl == httpsBaseUrl + "/social") this.GameProfileServerUrl = null;
 
-                if (this.StatisticServerUrl == httpsBaseUrl + "/statistic") this.StatisticServerUrl = null;
+                if (this.StatisticServerUrl == httpsBaseUrl + "/social") this.StatisticServerUrl = null;
 
                 if (this.QosManagerServerUrl == httpsBaseUrl + "/qosm") this.QosManagerServerUrl = null;
 
@@ -191,10 +176,6 @@ namespace AccelByte.Models
             if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
 
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
-
-            if (string.IsNullOrEmpty(this.ApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, API Base URL must not null or empty.");
-
-            if (string.IsNullOrEmpty(this.NonApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Non-API URL must not null or empty.");
         }
 
         /// <summary>
@@ -207,7 +188,7 @@ namespace AccelByte.Models
         {
             if(string.IsNullOrEmpty(specificServerUrl))
             {
-                return string.Format("{0}{1}", BaseUrl, defaultServerUrl);
+                return $"{this.BaseUrl}{defaultServerUrl}";
             }
 
             return specificServerUrl;

@@ -24,8 +24,6 @@ namespace AccelByte.Api
 
         IEnumerator Upgradev2(string emailAddress, string username, string password, ResultCallback<UserData> callback);
 
-        IEnumerator UpgradeWithPlayerPortal(string returnUrl, int ttl, ResultCallback<UpgradeUserRequest> callback);
-
         IEnumerator SendVerificationCode(VerificationContext context, string username, ResultCallback callback);
 
         IEnumerator Verify(string verificationCode, string contactType, ResultCallback callback);

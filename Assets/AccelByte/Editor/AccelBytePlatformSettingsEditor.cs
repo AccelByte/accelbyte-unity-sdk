@@ -85,11 +85,6 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Use Session Management");
-            TemporarySetting.UseSessionManagement = EditorGUILayout.Toggle(TemporarySetting.UseSessionManagement);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use PlayerPrefs");
             TemporarySetting.UsePlayerPrefs = EditorGUILayout.Toggle(TemporarySetting.UsePlayerPrefs);
             EditorGUILayout.EndHorizontal();
@@ -108,21 +103,6 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Base Url");
             TemporarySetting.BaseUrl = EditorGUILayout.TextField(TemporarySetting.BaseUrl);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Api Base Url");
-            TemporarySetting.ApiBaseUrl = EditorGUILayout.TextField(TemporarySetting.ApiBaseUrl);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Non Api Base Url");
-            TemporarySetting.NonApiBaseUrl = EditorGUILayout.TextField(TemporarySetting.NonApiBaseUrl);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Login Server Url");
-            TemporarySetting.LoginServerUrl = EditorGUILayout.TextField(TemporarySetting.LoginServerUrl);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

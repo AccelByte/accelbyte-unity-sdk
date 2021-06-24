@@ -10,6 +10,7 @@ namespace AccelByte.Models
     public enum MatchmakingStatus
     {
         none,
+        matched,
         done, // when matchmaking request is done successfully
         cancel, // when matchmaking request is cancelled
         timeout, // when matchmaking request is timed out
@@ -80,6 +81,12 @@ namespace AccelByte.Models
         [DataMember] public string region { get; set; }
         [DataMember] public string status { get; set; }
         [DataMember] public string provider { get; set; }
+    }
+
+    [DataContract]
+    public class PubIp
+    {
+        [DataMember] public string ip { get; set; }
     }
 
     [DataContract]

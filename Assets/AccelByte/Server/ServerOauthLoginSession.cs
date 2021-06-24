@@ -73,7 +73,7 @@ namespace AccelByte.Server
 
         private IEnumerator GetClientToken(ResultCallback<TokenData> callback)
         {
-            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
+            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
@@ -90,7 +90,7 @@ namespace AccelByte.Server
 
         public IEnumerator Logout(ResultCallback callback)
         {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/revoke/token")
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/revoke/token")
                 .WithBearerAuth(this.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)

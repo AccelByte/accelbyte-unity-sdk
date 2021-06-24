@@ -10,7 +10,6 @@ namespace AccelByte.Models {
     {
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
-        [DataMember] public string ApiBaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
         [DataMember] public string DSMControllerServerUrl { get; set; }
         [DataMember] public string StatisticServerUrl { get; set; }
@@ -39,29 +38,27 @@ namespace AccelByte.Models {
         /// </summary>
         public void Expand()
         {
-            if (this.BaseUrl != null)
-            {
-                this.IamServerUrl = GetDefaultServerApiUrl(this.IamServerUrl, "/iam");
+            if (this.BaseUrl == null) return;
+            
+            this.IamServerUrl = this.GetDefaultServerApiUrl(this.IamServerUrl, "/iam");
 
-                this.DSMControllerServerUrl = GetDefaultServerApiUrl(this.DSMControllerServerUrl, "/dsmcontroller");
+            this.DSMControllerServerUrl = this.GetDefaultServerApiUrl(this.DSMControllerServerUrl, "/dsmcontroller");
 
-                this.PlatformServerUrl = GetDefaultServerApiUrl(this.PlatformServerUrl, "/platform");
+            this.PlatformServerUrl = this.GetDefaultServerApiUrl(this.PlatformServerUrl, "/platform");
 
-                this.StatisticServerUrl = GetDefaultServerApiUrl(this.StatisticServerUrl, "/social");
+            this.StatisticServerUrl = this.GetDefaultServerApiUrl(this.StatisticServerUrl, "/social");
 
-                this.QosManagerServerUrl = GetDefaultServerApiUrl(this.QosManagerServerUrl, "/qosm");
+            this.QosManagerServerUrl = this.GetDefaultServerApiUrl(this.QosManagerServerUrl, "/qosm");
 
-                this.GameTelemetryServerUrl = GetDefaultServerApiUrl(this.GameTelemetryServerUrl, "/game-telemetry");
+            this.GameTelemetryServerUrl = this.GetDefaultServerApiUrl(this.GameTelemetryServerUrl, "/game-telemetry");
 
-                this.AchievementServerUrl = GetDefaultServerApiUrl(this.AchievementServerUrl, "/achievement");
+            this.AchievementServerUrl = this.GetDefaultServerApiUrl(this.AchievementServerUrl, "/achievement");
 
-                this.LobbyServerUrl = GetDefaultServerApiUrl(this.LobbyServerUrl, "/lobby");
+            this.LobbyServerUrl = this.GetDefaultServerApiUrl(this.LobbyServerUrl, "/lobby");
 
-                this.CloudSaveServerUrl = GetDefaultServerApiUrl(this.CloudSaveServerUrl, "/cloudsave");
+            this.CloudSaveServerUrl = this.GetDefaultServerApiUrl(this.CloudSaveServerUrl, "/cloudsave");
 
-                this.MatchmakingServerUrl = GetDefaultServerApiUrl(this.MatchmakingServerUrl, "/matchmaking");
-
-            }
+            this.MatchmakingServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingServerUrl, "/matchmaking");
         }
 
         /// <summary>
@@ -73,31 +70,28 @@ namespace AccelByte.Models {
             // remove protocol
             if ((index = this.BaseUrl.IndexOf("://")) > 0) this.BaseUrl = this.BaseUrl.Substring(index + 3);
 
-            if (this.BaseUrl != null)
-            {
-                string httpBaseUrl = "https://" + this.BaseUrl;
+            if (this.BaseUrl == null) return;
+            string httpBaseUrl = "https://" + this.BaseUrl;
 
-                if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
+            if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
 
-                if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
+            if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
 
-                if (this.PlatformServerUrl == httpBaseUrl + "/platform") this.PlatformServerUrl = null;
+            if (this.PlatformServerUrl == httpBaseUrl + "/platform") this.PlatformServerUrl = null;
 
-                if (this.StatisticServerUrl == httpBaseUrl + "/statistic") this.StatisticServerUrl = null;
+            if (this.StatisticServerUrl == httpBaseUrl + "/statistic") this.StatisticServerUrl = null;
 
-                if (this.QosManagerServerUrl == httpBaseUrl + "/qosm") this.QosManagerServerUrl = null;
+            if (this.QosManagerServerUrl == httpBaseUrl + "/qosm") this.QosManagerServerUrl = null;
 
-                if (this.GameTelemetryServerUrl == httpBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
+            if (this.GameTelemetryServerUrl == httpBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
 
-                if (this.AchievementServerUrl == httpBaseUrl + "/achievement") this.AchievementServerUrl = null;
+            if (this.AchievementServerUrl == httpBaseUrl + "/achievement") this.AchievementServerUrl = null;
 
-                if (this.LobbyServerUrl == httpBaseUrl + "/lobby") this.LobbyServerUrl = null;
+            if (this.LobbyServerUrl == httpBaseUrl + "/lobby") this.LobbyServerUrl = null;
 
-                if (this.CloudSaveServerUrl == httpBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
+            if (this.CloudSaveServerUrl == httpBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
 
-                if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
-
-            }
+            if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
         }
 
         /// <summary>
@@ -110,8 +104,6 @@ namespace AccelByte.Models {
             if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Server Client ID must not null or empty.");
 
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server Base URL must not null or empty.");
-
-            if (string.IsNullOrEmpty(this.ApiBaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server API Base URL must not null or empty.");
         }
 
         /// <summary>

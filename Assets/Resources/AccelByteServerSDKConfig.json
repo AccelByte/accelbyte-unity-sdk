@@ -1,16 +1,7 @@
 {
-  "Namespace": "<YOUR-GAME-NAMESPACE>",
-  "BaseUrl": "https://demo.accelbyte.io",
-  "ApiBaseUrl": "https://api.demo.accelbyte.io",
-  "IamServerUrl": "",
-  "DSMControllerServerUrl": "",
-  "StatisticServerUrl": "",
-  "PlatformServerUrl": "",
-  "GameTelemetryServerUrl": "",
-  "AchievementServerUrl": "",
-  "LobbyServerUrl": "",
-  "CloudSaveServerUrl": "",
-  "ClientId": "<YOUR-DS-CLIENT-ID>",
-  "ClientSecret": "<YOUR-DS-CLIENT-SECRET>",
+  "Namespace": "sdktest",
+  "BaseUrl": "https://dev.accelbyte.io",
+  "ClientId": null,
+  "ClientSecret": null,
   "RedirectUri": "http://127.0.0.1"
 }
