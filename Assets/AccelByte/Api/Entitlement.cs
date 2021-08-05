@@ -250,6 +250,36 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get user entitlement ownership token if any of item IDs, app IDs, or SKUs are true
+        /// </summary>
+        /// <param name="itemIds">the item Ids</param>
+        /// <param name="appIds">the app Ids</param>
+        /// <param name="skus">the skus</param>
+        /// <param name="callback">Returns user's entitlement ownership token if any parameters are true via callback when completed</param>
+        public void GetUserEntitlementOwnershipTokenOnly(string[] itemIds, string[] appIds, string[] skus,
+            ResultCallback<OwnershipToken> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlementOwnershipToken(
+                    AccelBytePlugin.Config.PublisherNamespace,
+                    this.session.AuthorizationToken,
+                    itemIds,
+                    appIds,
+                    skus,
+                    callback));
+        }
+
+        /// <summary>
         /// Consume a user entitlement.
         /// </summary>
         /// <param name="entitlementId">The id of the user entitlement.</param>

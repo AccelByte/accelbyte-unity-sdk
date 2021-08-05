@@ -34,6 +34,7 @@ namespace AccelByte.Core
         RequestedRangeNotSatisfiable = 416,
         ExpectationFailed = 417,
         UnprocessableEntity = 422,
+        HttpTooManyRequests = 429,
         InternalServerError = 500,
         NotImplemented = 501,
         BadGateway = 502,

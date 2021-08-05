@@ -19,6 +19,9 @@ namespace AccelByte.Api
     /// </summary>
     public class Lobby
     {
+        /// <summary>
+        /// Raised when lobby is connected
+        /// </summary>
         public event Action Connected;
 
         /// <summary>
@@ -157,6 +160,7 @@ namespace AccelByte.Api
         private WsCloseCode wsCloseCode = WsCloseCode.NotSet;
         private long id;
         private LobbySessionId lobbySessionId;
+        private ITokenGenerator tokenGenerator;
         private Coroutine maintainConnectionCoroutine;
         private string channelSlug = null;
 
@@ -193,6 +197,7 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Connect to lobby with current logged in user credentials.
+        /// The token generator need to be set for connection with entitlement verification.
         /// </summary>
         public void Connect()
         {
@@ -215,8 +220,18 @@ namespace AccelByte.Api
                 return;
             }
 
+            if (this.tokenGenerator != null)
+            {
+                if (!this.tokenGenerator.IsValid())
+                {
+                    this.tokenGenerator.RequestToken();
+
+                    return;
+                }
+            }
+
             this.wsCloseCode = WsCloseCode.NotSet;
-            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
+            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID, this.tokenGenerator?.Token);
 
             // check status after connect, only maintain connection when close code is reconnectable
             if (this.wsCloseCode == WsCloseCode.NotSet || isReconnectable(this.wsCloseCode))
@@ -244,6 +259,30 @@ namespace AccelByte.Api
             this.totalTimeout = totalTimeout;
             this.backoffDelay = backoffDelay;
             this.maxDelay = maxDelay;
+        }
+
+        /// <summary>
+        /// TokenGenerator is used for generate access token when connecting to lobby. 
+        /// If token generator is not specified, no token will be used when connecting to lobby.
+        /// For entitlement token verification, use EntitlementTokenGenerator class on the parameter.
+        /// </summary>
+        /// <param name="tokenGenerator"> Token generator for connecting lobby. </param>
+        public void SetConnectionTokenGenerator(ITokenGenerator tokenGenerator)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsFalse(tokenGenerator == null, "Can't set connection token generator! Token generator is null.");
+
+            if (maintainConnectionCoroutine != null)
+            {
+                AccelByteDebug.LogWarning("Can't set connection token generator! Lobby is already connected.");
+                return;
+            }
+
+            if (this.tokenGenerator == null)
+            {
+                this.tokenGenerator = tokenGenerator;
+                this.tokenGenerator.TokenReceivedEvent += OnTokenReceived;
+            }
         }
 
         private void StartMaintainConnection()
@@ -317,7 +356,15 @@ namespace AccelByte.Api
 #if DEBUG
                         AccelByteDebug.Log("[WS] Re-Connecting");
 #endif
-                        this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
+                        if (this.tokenGenerator == null)
+                        {
+                            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
+                        }
+                        else
+                        {
+                            this.tokenGenerator.RequestToken();
+                        }
+
                         float randomizedDelay = (float) (nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
 #if DEBUG
                         AccelByteDebug.Log("[WS] Next reconnection in: " + randomizedDelay);
@@ -1285,6 +1332,23 @@ namespace AccelByte.Api
             }, callback);
         }
 
+        public void GetSessionAttribute(string key, ResultCallback<GetSessionAttributeResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            SendRequest(MessageType.getSessionAttributeRequest, new GetSessionAttributeRequest()
+            {
+                key = key
+            }, callback);
+        }
+
+        public void GetSessionAttributeAll(ResultCallback<GetSessionAttributeAllResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            SendRequest(MessageType.getAllSessionAttributeRequest, callback);
+        }
+
         private long GenerateId()
         {
             lock (this.syncToken)
@@ -1586,6 +1650,18 @@ namespace AccelByte.Api
                 case WsCloseCode.TryAgainLater:
                 case WsCloseCode.TlsHandshakeFailure: return true;
                 default: return false;
+            }
+        }
+
+        private void OnTokenReceived(string token)
+        {
+            if (maintainConnectionCoroutine != null)
+            {
+                this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID, token);
+            }
+            else
+            {
+                Connect();
             }
         }
     }

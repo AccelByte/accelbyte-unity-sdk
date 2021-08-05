@@ -98,7 +98,11 @@ namespace AccelByte.Models
         blockPlayerNotif,
         unblockPlayerNotif,
         setSessionAttributeRequest,
-        setSessionAttributeResponse
+        setSessionAttributeResponse,
+        getSessionAttributeRequest,
+        getSessionAttributeResponse,
+        getAllSessionAttributeRequest,
+        getAllSessionAttributeResponse
     }
 
     [DataContract]
@@ -574,6 +578,32 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string key;
         [DataMember] public string value;
+    }
+    
+    public class GetSessionAttributeRequest
+    {
+        [DataMember] public string key;
+    }
+
+    public class GetSessionAttributeResponse
+    {
+        [DataMember] public string value;
+    }
+
+    public class ServerGetSessionAttributeResponse
+    {
+        [DataMember] public string key;
+        [DataMember] public string value;
+    }
+
+    public class GetSessionAttributeAllResponse
+    {
+        [DataMember] public Dictionary<string, string> attributes;
+    }
+
+    public class ServerSetSessionAttributeRequest
+    {
+        [DataMember] public Dictionary<string, string> attributes;
     }
 
     #endregion

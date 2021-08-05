@@ -21,7 +21,7 @@ namespace AccelByte.Core
         /// <typeparam name="T"> A class of the payload object. </typeparam>
         /// <param name="publicKey"> Public key to verify the token. </param>
         /// <param name="token"> Token that will be decoded. </param>
-        /// <param name="result"> Payload object that will be return if the token is valid. </param>
+        /// <param name="result"> Payload object that will be returned if the token is valid. </param>
         /// <param name="verifyPublicKey"> Do verification on public key. Set False to skip this. </param>
         /// <param name="verifyExpiration"> Do verification on expiration. Set False to skip this. </param>
         /// <returns></returns>
@@ -32,12 +32,12 @@ namespace AccelByte.Core
             try
             {
                 SetPublicKey(publicKey);
-                if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(publicKey))
+                if (string.IsNullOrEmpty(publicKey))
                 {
                     return false;
                 }
 
-                if (!SplitToken(token, out string[] parts))
+                if (!CheckTokenFormat(token, out string[] parts))
                 {
                     return false;
                 }
@@ -63,7 +63,47 @@ namespace AccelByte.Core
                 result = payloadData;
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
+            {
+                // Ignored
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get expiration time from the token.
+        /// </summary>
+        /// <param name="token"> Token that will be decoded. </param>
+        /// <param name="expired"> Expiration time in second that will be returned if successful.</param>
+        /// <returns></returns>
+        public static bool TryDecodeExpiration(string token, out double expired)
+        {
+            expired = default;
+
+            try
+            {
+                if (!CheckTokenFormat(token, out string[] parts))
+                {
+                    return false;
+                }
+
+                var decodedPayload = ConvertStringToBase64(parts[(int)JsonWebTokenIndex.Payload]);
+                var payloadData = decodedPayload.ToObject<Dictionary<string, object>>();
+
+                if ((!payloadData.ContainsKey("exp") || payloadData["exp"] == null)
+                    || (!payloadData.ContainsKey("iat") || payloadData["iat"] == null))
+                {
+                    return false;
+                }
+
+                double expiration = Convert.ToDouble(payloadData["exp"]);
+                double issuedAt = Convert.ToDouble(payloadData["iat"]);
+
+                expired = expiration - issuedAt;
+                return true;
+            }
+            catch (Exception)
             {
                 // Ignored
             }
@@ -141,10 +181,16 @@ namespace AccelByte.Core
             publicKey = key;
         }
 
-        static bool SplitToken(string token, out string[] parts)
+        static bool CheckTokenFormat(string token, out string[] parts)
         {
             parts = default;
 
+            if (string.IsNullOrEmpty(token))
+            {
+                return false;
+            }
+
+            // Split token
             parts = token.Split('.');
             if (parts.Length != 3)
             {

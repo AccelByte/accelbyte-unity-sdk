@@ -380,7 +380,7 @@ namespace HybridWebSocket
             this.IsProxySet = true;
         }
 
-        public void Connect(string url, string protocols, string sessionId)
+        public void Connect(string url, string protocols, string sessionId, string entitlementToken)
         {
             try
             {
@@ -389,10 +389,17 @@ namespace HybridWebSocket
                     | System.Security.Authentication.SslProtocols.Tls11 
                     | System.Security.Authentication.SslProtocols.Tls12;
 
-                this.webSocket.CustomHeaders = new Dictionary<string, string>
-                {
-                    { "X-Ab-LobbySessionID" , sessionId}
-                };
+                this.webSocket.CustomHeaders = string.IsNullOrEmpty(entitlementToken) ?
+                    new Dictionary<string, string>
+                    {
+                        { "X-Ab-LobbySessionID" , sessionId}
+                    } :
+                    new Dictionary<string, string>
+                    {
+                        { "X-Ab-LobbySessionID" , sessionId},
+                        { "Entitlement" , entitlementToken}
+                    };
+
                 if (IsProxySet)
                 {
                     this.webSocket.SetProxy(this.ProxyUrl, this.ProxyUsername, this.ProxyPassword);

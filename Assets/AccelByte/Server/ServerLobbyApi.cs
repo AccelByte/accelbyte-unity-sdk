@@ -129,5 +129,83 @@ namespace AccelByte.Server
 
             callback.Try(result);
         }
+
+        public IEnumerator GetSessionAttribute(string @namespace, string accessToken, string userId, string key, ResultCallback<ServerGetSessionAttributeResponse> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "namespace cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "accessToken cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(userId), "userId cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(key), "key cannot be null or empty");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v1/admin/player/namespaces/{namespace}/users/{userId}/attributes/{attribute}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("attribute", key)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<ServerGetSessionAttributeResponse>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetSessionAttributeAll(string @namespace, string accessToken, string userId, ResultCallback<GetSessionAttributeAllResponse> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "namespace cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "accessToken cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(userId), "userId cannot be null or empty");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/v1/admin/player/namespaces/{namespace}/users/{userId}/attributes")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<GetSessionAttributeAllResponse>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator SetSessionAttribute(string @namespace, string accessToken, string userId, Dictionary<string, string> attributes, ResultCallback callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "namespace cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "accessToken cannot be null or empty");
+            Assert.IsFalse(string.IsNullOrEmpty(userId), "userId cannot be null or empty");
+            Assert.IsFalse(attributes == null || attributes.Count == 0, "attributes cannot be null or empty.");
+
+            ServerSetSessionAttributeRequest body = new ServerSetSessionAttributeRequest() { attributes = attributes };
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/admin/player/namespaces/{namespace}/users/{userId}/attributes")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(body.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+
+            callback.Try(result);
+        }
     }
 }

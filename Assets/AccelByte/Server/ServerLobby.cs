@@ -242,5 +242,79 @@ namespace AccelByte.Server
                     userId,
                     callback));
         }
+
+        /// <summary>
+        /// Get a user's session attribute by key
+        /// </summary>
+        /// <param name="userId">the user ID to be searched</param>
+        /// <param name="key">The user's session attribute key</param>
+        /// <param name="callback">Returns ServerGetSessionAttributeResponse via callback when found"</param>
+        public void GetSessionAttribute(string userId, string key, ResultCallback<ServerGetSessionAttributeResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if(!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetSessionAttribute(
+                    this.namespace_,
+                    this.session.AuthorizationToken,
+                    userId,
+                    key,
+                    callback));
+        }
+
+        /// <summary>
+        /// Get all of user's session attribute
+        /// </summary>
+        /// <param name="userId">the user ID to be searched</param>
+        /// <param name="callback">Returns GetSessionAttributeAllResponse via callback when found"</param>
+        public void GetSessionAttributeAll(string userId, ResultCallback<GetSessionAttributeAllResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetSessionAttributeAll(
+                    this.namespace_,
+                    this.session.AuthorizationToken,
+                    userId,
+                    callback));
+        }
+
+        public void SetSessionAttribute(string userId, Dictionary<string, string> attributes, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SetSessionAttribute(
+                    this.namespace_,
+                    this.session.AuthorizationToken,
+                    userId,
+                    attributes,
+                    callback));
+        }
+
+        public void SetSessionAttribute(string userId, string key, string value, ResultCallback callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(key), "key parameter cannot be null or empty");
+
+            SetSessionAttribute(userId, new Dictionary<string, string>() { { key, value } }, callback);
+        }
     }
 }

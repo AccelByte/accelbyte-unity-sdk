@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/4.1.0%0D4.0.0) (2021-08-02)
+
+
+### Features
+
+* **lobby:** add get & getAll session attribute ws command ([b3aae1f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b3aae1fdef6c25a10afb5f1a5c7c2cedcee3f327))
+* **server lobby:** add get, getAll and set user session attribute ([b8feece](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b8feece56da58c4a33d4d521c11409bc5d054158))
+
+
+### Bug Fixes
+
+* **utf8json:** update utf8json ([728e000](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/728e00012f100caaa63d18d39f3bd744d15ca6ee))
+
+
+### Tests
+
+* **jenkins:** add quotes to block secrets and passwords ([9f8c9bc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9f8c9bc47681d9da3cf804de9ff9bfd993da40a7))
+* **joinable:** increase timeout because of mm delay logic changes ([14958c4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/14958c424c3f620f96d715aba4ceeacf599d50f6))
+* **lobby:** fixed some lobby tests ([8d65e6d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8d65e6daea7a759a9951e7223be9405e5687ecf6))
+* **server lobby:** rename UnityTearDown function to CleanupLobbyConnections ([524fee3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/524fee3b4b33b74cb439d38a66b18fd6fcc79c77))
+
 ## [4.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/4.0.0%0D3.0.0) (2021-06-23)
 
 
