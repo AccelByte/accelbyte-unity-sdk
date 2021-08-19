@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/5.0.0%0D4.1.0) (2021-08-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **Achievement:** Change the type of latestValue of UserAchievement model from int into float.
+
+### Features
+
+* **UGC:** add UGC into Unity SDK ([26d2ab0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/26d2ab0088da06063cc60a5c37e60ecd2cde49f5))
+
+
+### Bug Fixes
+
+* **Achievement:** Fix the User Achievement response model ([8a2fcdb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8a2fcdb16c9a1fe28bb18abfda295f6b77ac25c3))
+* **LoginSession:** Fix the LoginWithAuthorizationCode() using v1 endpoint ([2192b48](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2192b48c1d6587c3737b02fb7cdacd4c9a693484))
+
 ## [4.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/4.1.0%0D4.0.0) (2021-08-02)
 
 

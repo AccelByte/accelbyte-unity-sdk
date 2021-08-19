@@ -50,6 +50,33 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator CancelOrderApi(string orderNo, string @namespace, string userId, string userAccessToken, ResultCallback<OrderInfo> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(orderNo, "Can't cancel the order! orderNo parameter is null!");
+            Assert.IsNotNull(@namespace, "Can't cancel the order! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't cancel the order! userId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't cancel the order! userAccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/orders/{orderNo}/cancel")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("orderNo", orderNo)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<OrderInfo>();
+
+            callback.Try(result);
+        }
+
         public IEnumerator GetUserOrder(string @namespace, string userId, string userAccessToken, string orderNumber,
             ResultCallback<OrderInfo> callback)
         {

@@ -167,7 +167,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(code, "Code parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
                 .WithBasicAuth(this.clientId, this.clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)

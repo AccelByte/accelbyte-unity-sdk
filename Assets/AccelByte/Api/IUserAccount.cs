@@ -51,5 +51,8 @@ namespace AccelByte.Api
             ResultCallback<BulkPlatformUserIdResponse> callback);
 
         IEnumerator GetCountryFromIP(ResultCallback<CountryInfo> callback);
+
+        IEnumerator BanUser(string @namespace, string accessToken, string userId, BanCreateRequest banRequest,
+            ResultCallback<UserBanResponseV3> callback);
     }
 }

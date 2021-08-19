@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace AccelByte.Models
 {
@@ -358,6 +359,22 @@ namespace AccelByte.Models
     {
         [DataMember] public ItemInfo[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
+    }
+
+    [DataContract]
+    public class CurrencyList
+    {
+        [DataMember] public string currencyCode { get; set; }
+        [DataMember] public Dictionary<string, string> localizationDescriptions { get; set; }
+        [DataMember] public string currencySymbol { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string currencyType { get; set; }
+        [DataMember] public int decimals { get; set; }
+        [DataMember] public int maxAmountPerTransaction { get; set; }
+        [DataMember] public int maxTransactionAmountPerDay { get; set; }
+        [DataMember] public int maxBalanceAmount { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
     }
 
     #endregion

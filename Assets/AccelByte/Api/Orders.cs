@@ -58,6 +58,32 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Cancel the Order after Create the Order
+        /// </summary>
+        /// <param name="orderNo">need orderNo parameter to cancel the payment</param>
+        /// <param name="callback">callback delegate that will send the OrderInfo models parameter value</param>
+        public void CancelOrder(string orderNo, ResultCallback<OrderInfo> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(orderNo, "Can't cancel the order. orderNo parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.CancelOrderApi(
+                    orderNo,
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
         /// Get a specific order by orderNo
         /// </summary>
         /// <param name="orderNo">Order number</param>

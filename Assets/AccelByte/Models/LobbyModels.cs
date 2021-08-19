@@ -102,7 +102,8 @@ namespace AccelByte.Models
         getSessionAttributeRequest,
         getSessionAttributeResponse,
         getAllSessionAttributeRequest,
-        getAllSessionAttributeResponse
+        getAllSessionAttributeResponse,
+        userBannedNotification
     }
 
     [DataContract]
@@ -579,7 +580,7 @@ namespace AccelByte.Models
         [DataMember] public string key;
         [DataMember] public string value;
     }
-    
+
     public class GetSessionAttributeRequest
     {
         [DataMember] public string key;
@@ -606,5 +607,28 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, string> attributes;
     }
 
+    #endregion
+
+    #region Ban
+
+    /// <summary>
+    ///  Information about user that got banned
+    /// </summary>
+    /// <param name="userId"> banned user ID</param>
+    /// <param name="Namespace">Namespace that user got banned</param>
+    /// <param name="banType">The type of Ban</param>
+    /// <param name="endDate">The date when the ban is lifted with format "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffzzz"</param>
+    /// <param name="reason">The reason of Banning</param>
+    /// <param name="enable">is the ban still going for the user</param>
+    [DataContract]
+    public class UserBannedNotification
+    {
+        [DataMember] public string userId;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string ban;
+        [DataMember] public string endDate;
+        [DataMember] public BanReason reason;
+        [DataMember] public bool enable;
+    }
     #endregion
 }

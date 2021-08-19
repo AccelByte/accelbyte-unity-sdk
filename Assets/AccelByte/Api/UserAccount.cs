@@ -493,5 +493,30 @@ namespace AccelByte.Api
             var result = response.TryParseJson<CountryInfo>();
             callback.Try(result);
         }
+
+        public IEnumerator BanUser(string @namespace, string accessToken, string userId, BanCreateRequest banRequest, ResultCallback<UserBanResponseV3> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var request = HttpRequestBuilder
+               .CreatePost(this.baseUrl + "/v3/admin/namespaces/{namespace}/users/{userId}/bans")
+               .WithPathParam("namespace", @namespace)
+               .WithPathParam("userId", userId)
+               .WithBearerAuth(accessToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .WithBody(banRequest.ToUtf8Json())
+               .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<UserBanResponseV3>();
+
+            callback.Try(result);
+        }
     }
 }

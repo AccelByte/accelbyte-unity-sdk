@@ -276,4 +276,78 @@ namespace AccelByte.Models
         [DataMember] public string code;
         [DataMember] public string emailAddress;
     }
+
+    #region Ban
+    /// <summary>
+    /// Type of Ban that available
+    /// </summary>
+    public enum BanType { LOGIN, STATISTICS, LEADERBOARD, ORDER_AND_PAYMENT, CHAT_SEND, CHAT_ALL }
+
+    /// <summary>
+    /// Type of Ban reason that available
+    /// </summary>
+    public enum BanReason { VIOLENCE, HARASSMENT, HATEFUL_CONDUCT, OFFENSIVE_USERNAME, IMPERSONATION, 
+        MALICIOUS_CONTENT, SEXUALLY_SUGGESTIVE, SEXUAL_VIOLENCE, EXTREME_VIOLENCE, UNDERAGE_USER, CHEATING, TOS_VIOLATION }
+
+    /// <summary>
+    /// Information about user that performing a ban
+    /// </summary>
+    /// <param name="displayName"> display name of the User</param>
+    /// <param name="userId"> user ID of the User</param>
+    [DataContract]
+    public class BannedByV3
+    {
+        [DataMember] public string displayName;
+        [DataMember] public string userId;
+    }
+
+    /// <summary>
+    /// Template for making a Ban request
+    /// </summary>
+    /// <param name="ban">The type of Ban</param>
+    /// <param name="comment">The detail or comment about the banning</param>
+    /// <param name="endDate">The date when the ban is lifted with format "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffzzz"</param>
+    /// <param name="reason">The reason of Banning</param>
+    /// <param name="skipNotif">Notify user via email or not</param>
+    [DataContract]
+    public class BanCreateRequest
+    {
+        [DataMember] public string ban;
+        [DataMember] public string comment;
+        [DataMember] public string endDate;
+        [DataMember] public string reason;
+        [DataMember] public bool skipNotif;
+    }
+
+    /// <summary>
+    /// Template for Ban response
+    /// </summary>
+    /// <param name="ban">The type of Ban</param>
+    /// <param name="banId">The Ban ID</param>
+    /// <param name="bannedBy">Information about user that performing a ban</param>
+    /// <param name="comment">The detail or comment about the banning</param>
+    /// <param name="createdAt">The date when the ban is created</param>
+    /// <param name="disabledAt">The date when user got disabled</param>
+    /// <param name="enabled">is the ban still going for the user</param>
+    /// <param name="endDate">The date when the ban is lifted</param>
+    /// <param name="Namespace">Namespace that user got banned</param>
+    /// <param name="reason">The reason of Banning</param>
+    /// <param name="userId">The user ID that got banned</param>
+    [DataContract]
+    public class UserBanResponseV3
+    {
+        [DataMember] public string ban;
+        [DataMember] public string banId;
+        [DataMember] public BannedByV3 bannedBy;
+        [DataMember] public string comment;
+        [DataMember] public DateTime createdAt;
+        [DataMember] public DateTime disabledDate;
+        [DataMember] public bool enabled;
+        [DataMember] public DateTime endDate;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public BanReason reason;
+        [DataMember] public string userId;
+    }
+
+    #endregion
 }

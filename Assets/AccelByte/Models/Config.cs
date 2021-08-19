@@ -27,6 +27,7 @@ namespace AccelByte.Models
         [DataMember] public string CloudSaveServerUrl { get; set; }
         [DataMember] public string GameTelemetryServerUrl { get; set; }
         [DataMember] public string AchievementServerUrl { get; set; }
+        [DataMember] public string UGCServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string GroupServerUrl { get; set; }
@@ -63,6 +64,7 @@ namespace AccelByte.Models
                    this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
                    this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
+                   this.UGCServerUrl == anotherConfig.UGCServerUrl &&
                    this.ClientId == anotherConfig.ClientId &&
                    this.ClientSecret == anotherConfig.ClientSecret &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
@@ -118,6 +120,10 @@ namespace AccelByte.Models
                 this.AchievementServerUrl = GetDefaultApiUrl(this.AchievementServerUrl, "/achievement");
 
                 this.GroupServerUrl = GetDefaultApiUrl(this.GroupServerUrl, "/group");
+
+                this.UGCServerUrl = GetDefaultApiUrl(this.UGCServerUrl, "/ugc");
+
+
             }
         }
 
@@ -163,6 +169,8 @@ namespace AccelByte.Models
                 if (this.AchievementServerUrl == httpsBaseUrl + "/achievement") this.AchievementServerUrl = null;
                 
                 if (this.GroupServerUrl == httpsBaseUrl + "/group") this.GroupServerUrl = null;
+
+                if (this.UGCServerUrl == httpsBaseUrl + "/ugc") this.UGCServerUrl = null;
             }
         }
 

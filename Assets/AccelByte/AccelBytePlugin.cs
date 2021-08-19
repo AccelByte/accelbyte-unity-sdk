@@ -34,6 +34,7 @@ namespace AccelByte.Api
 #endif
         private static Categories categories;
         private static Items items;
+        private static Currencies currencies;
         private static Orders orders;
         private static Wallet wallet;
         private static UserProfiles userProfiles;
@@ -49,6 +50,7 @@ namespace AccelByte.Api
         private static GameTelemetry gameTelemetry;
         private static Achievement achievement;
         private static Group group;
+        private static UGC ugc;
 
         private static bool hasBeenInitialized = false;
 
@@ -85,6 +87,7 @@ namespace AccelByte.Api
                     leaderboard = null;
                     cloudSave = null;
                     gameTelemetry = null;
+                    ugc = null;
                 }
             };
         }
@@ -238,6 +241,21 @@ namespace AccelByte.Api
             }
 
             return AccelBytePlugin.items;
+        }
+
+        public static Currencies GetCurrencies()
+        {
+            if (AccelBytePlugin.currencies == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.currencies = new Currencies(
+                    new CurrenciesApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.currencies;
         }
 
         public static Orders GetOrders()
@@ -445,6 +463,20 @@ namespace AccelByte.Api
                     AccelBytePlugin.coroutineRunner);
             }
             return AccelBytePlugin.group;
+        }
+
+        public static UGC GetUgc()
+        {
+            if (AccelBytePlugin.ugc == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.ugc = new UGC(
+                    new UGCApi(AccelBytePlugin.config.UGCServerUrl, AccelBytePlugin.httpWorker),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+            return AccelBytePlugin.ugc;
         }
     }
 }

@@ -141,6 +141,11 @@ namespace AccelByte.Api
         /// </summary>
         public event ResultCallback<PlayerUnblockedNotif> PlayerUnblockedNotif;
 
+        /// <summary>
+        /// Raised when player is banned
+        /// </summary>
+        public event ResultCallback<UserBannedNotification> UserBannedNotification;
+
         private readonly int pingDelay;
         private int backoffDelay;
         private int maxDelay;
@@ -1604,6 +1609,9 @@ namespace AccelByte.Api
                 break;
             case MessageType.unblockPlayerNotif:
                 Lobby.HandleNotification(message, this.PlayerUnblockedNotif);
+                break;
+            case MessageType.userBannedNotification:
+                Lobby.HandleNotification(message, this.UserBannedNotification);
                 break;
             default:
                 Action<ErrorCode, string> handler;

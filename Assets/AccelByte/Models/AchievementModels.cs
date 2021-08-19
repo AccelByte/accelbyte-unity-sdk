@@ -84,9 +84,11 @@ namespace AccelByte.Models
     [DataContract]
     public class UserAchievement
     {
+        [DataMember] public string id { get; set; }
+        [DataMember] public Dictionary<string, string> name { get; set; }
         [DataMember] public string achievementCode { get; set; }
         [DataMember] public string achievedAt { get; set; }
-        [DataMember] public int latestValue { get; set; }
+        [DataMember] public float latestValue { get; set; }
         [DataMember] public int status { get; set; } // 1: In-Progress, 2: Unlocked
     }
 

@@ -569,9 +569,9 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by email, displayName, or username
+        /// Get user data from another user by email, displayName, or username. The query must be exactly match with the targeted user's.
         /// </summary>
-        /// <param name="query"> email, display name, or username that needed to get user data</param>
+        /// <param name="query"> Email, display name, or username that needed to get user data. The query must be exactly match with the targeted user's.</param>
         /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
         public void SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback)
@@ -589,9 +589,9 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by email, displayName, and username
+        /// Get user data from another user by email, displayName, and username. The query must be exactly match with the targeted user's.
         /// </summary>
-        /// <param name="query"> email, display name, or username that needed to get user data</param>
+        /// <param name="query"> Email, display name, or username that needed to get user data. The query must be exactly match with the targeted user's.</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
         public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
         {
@@ -708,6 +708,47 @@ namespace AccelByte.Api
         public void RefreshTokenCallback(Action<string> refreshTokenCallback)
         {
             this.loginSession.RefreshTokenCallback += refreshTokenCallback;
+        }
+
+        /// <summary>
+        /// Ban a Single User.
+        /// Only Moderator that can ban other user.
+        /// </summary>
+        /// <param name="userId">Ban user's user ID</param>
+        /// <param name="banType">The type of Ban</param>
+        /// <param name="reason">The reason of Banning</param>
+        /// <param name="endDate">The date when the ban is lifted</param>
+        /// <param name="comment">The detail or comment about the banning</param>
+        /// <param name="notifyUser">Notify user via email or not</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void BanUser(string userId, BanType banType, BanReason reason, DateTime endDate, string comment, bool notifyUser,
+            ResultCallback <UserBanResponseV3> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            var banRequest = new BanCreateRequest
+            {
+                ban = banType.ToString(),
+                comment = comment,
+                endDate = endDate.ToString("o"),
+                reason = reason.ToString(),
+                skipNotif = !notifyUser
+            };
+
+            this.coroutineRunner.Run(
+                this.userAccount.BanUser(
+                    AccelBytePlugin.Config.Namespace,
+                    this.loginSession.AuthorizationToken,
+                    userId,
+                    banRequest,
+                    callback));
         }
     }
 }

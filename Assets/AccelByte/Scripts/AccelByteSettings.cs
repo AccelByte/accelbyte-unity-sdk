@@ -122,6 +122,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.GameTelemetryServerUrl = value; }
         }
 
+        public static string UGCServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.UGCServerUrl; }
+            set { AccelByteSettings.Instance.config.UGCServerUrl = value; }
+        }
+
         public static string ClientId
         {
             get { return AccelByteSettings.Instance.config.ClientId; }
