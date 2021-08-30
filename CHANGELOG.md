@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/6.0.0%0D5.0.0) (2021-08-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* **Achievement:** Change the type of goalValue of PublicAchievement and MultiLanguageAchievement and model from int into float.
+
+### Features
+
+* **accelbyteplugin:** provide basic api url to miscelaneus ([a0737ed](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a0737edca56c10b82ec2cf144a5ba31dddfdb1a2))
+* **ECommerceModel:** new model for fulfilluserItem api  ([b9a7c27](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b9a7c272517837b5c4b3c73a7061c566a2f1ef39))
+* **ECommerceModels:** add itemid property ([ce716a9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ce716a95f43827998e07ecd785647fedaa967cc3))
+* **fulfillment:** add new fulfillmentapi, add new fulfillment ([9ae1c2d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9ae1c2dbbe1098b169b6d2124c19b5e1a1c82aad))
+* **HttpRequestBuilder:** Refactor how http api works to simplify http request creation and make it more testable ([3af039a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3af039a744b4a0c7ef9058a8d4d22cf4148bd27e))
+* **miscellaneous:** miscellaneous api,http request and model ([d71ecd5](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d71ecd5abcfad75d0c8dd57c9c58041c68047161))
+* **model:** add var in the leaderboard model ([5a122e1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5a122e138c2e3f334a409399a6d6f73d314cde5f))
+* **OrderWalletEntitlementTest:** add fulfilluseritem test for invalid item id and negative amount number ([23576f0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/23576f022f3dccd4808bdc3e379506ef843eeeff))
+* **ServerEcommerceApi:** new fulfill user item method ([8a76ca0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8a76ca0e6cbe7b1f08d0028ac35c1f88782e6b7d))
+* **ServerEcommerce:** fulfill user item ([1f3c6cd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1f3c6cd515c0fdcc274476f7bef933a3ebda48a7))
+
+
+### Bug Fixes
+
+* **Achievement:** Fix the Achievement Api's Public Achievement and Multi Language Achievement model difference with the Backend response. Fix the Test Helper's Achievement Request and Achievement Response model difference with the Backend response. ([745b4a7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/745b4a7e2ec70ec0be33431bb034b37055ba36a2))
+* **Subscription:** Adjusting from single draft store change ([69b2a98](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/69b2a988ab0d3509dd5aebbdeca406ec4d815b05))
+* **testhelper:** revert unintended config change ([de74844](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/de74844fdf54982bd0051390732a1f27c19217e5))
+
+
+### Refactors
+
+* **accelbyteplugin:** use base url instead of platform url for fulfillment api ([e0d219c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e0d219c73480ede82485f7874b17b5cc71b149f8))
+* **fulfillmentapi:** user PlatformUrl instead of BaseUrl ([36069c0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/36069c0ad4242752738b9bcffdc1bd25b743162b))
+
+
+### Tests
+
+* **fulfillmentTest:** add test for fulfillment api ([09fdc55](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/09fdc55daa1fc7604bc001adee6833f26ec8d5da))
+* **fulfillmentTest:** complete test ([f562834](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f56283480adae8dd346f40735d1ee92ad74283a4))
+* **miscellaneous:** add miscellaneous test ([9fcbd75](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9fcbd7557aee1a12ab2646f43a52842e630e223b))
+* **OrderWalletEntitlementTest:** add server fulfill in-game item success test ([ab78e41](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ab78e41da0a191fe4257e114c7933487b9419118))
+
 ## [5.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/5.0.0%0D4.1.0) (2021-08-16)
 
 

@@ -12,15 +12,15 @@ namespace AccelByte.Api
     internal class WalletApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        internal WalletApi(string baseUrl, IHttpWorker httpWorker)
+        internal WalletApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator GetWalletInfoByCurrencyCode(string @namespace, string userId, string userAccessToken,
@@ -47,7 +47,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<WalletInfo>();
             callback.Try(result);

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020-2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -23,6 +23,7 @@ namespace AccelByte.Models {
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string MatchmakingServerUrl { get; set; }
+        [DataMember] public string SeasonPassServerUrl { get; set; }
 
 
         /// <summary>
@@ -59,6 +60,8 @@ namespace AccelByte.Models {
             this.CloudSaveServerUrl = this.GetDefaultServerApiUrl(this.CloudSaveServerUrl, "/cloudsave");
 
             this.MatchmakingServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingServerUrl, "/matchmaking");
+
+            this.SeasonPassServerUrl = this.GetDefaultServerApiUrl(this.SeasonPassServerUrl, "/seasonpass");
         }
 
         /// <summary>
@@ -92,6 +95,8 @@ namespace AccelByte.Models {
             if (this.CloudSaveServerUrl == httpBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
 
             if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
+
+            if (this.SeasonPassServerUrl == httpBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
         }
 
         /// <summary>

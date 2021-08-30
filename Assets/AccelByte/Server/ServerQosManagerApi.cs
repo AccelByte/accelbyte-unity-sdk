@@ -12,15 +12,15 @@ namespace AccelByte.Server
     public class ServerQosManagerApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        internal ServerQosManagerApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerQosManagerApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, nameof(baseUrl) + "is null");
-            Assert.IsNotNull(httpWorker, nameof(httpWorker) + "is null");
+            Assert.IsNotNull(httpClient, nameof(httpClient) + "is null");
 
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
@@ -33,7 +33,7 @@ namespace AccelByte.Server
             
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
             
             var result = response.TryParseJson<QosServerList>();
             callback.Try(result);

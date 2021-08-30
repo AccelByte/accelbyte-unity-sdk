@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019-2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -168,6 +168,11 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Group Server Url");
             TemporarySetting.GroupServerUrl = EditorGUILayout.TextField(TemporarySetting.GroupServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Season Pass Server Url");
+            TemporarySetting.SeasonPassServerUrl = EditorGUILayout.TextField(TemporarySetting.SeasonPassServerUrl);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

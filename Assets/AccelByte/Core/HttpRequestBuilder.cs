@@ -4,9 +4,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Text;
 using AccelByte.Api;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Core
@@ -14,13 +15,22 @@ namespace AccelByte.Core
     public class HttpRequestBuilder
     {
         private readonly StringBuilder formBuilder = new StringBuilder(1024);
+        private readonly StringBuilder queryBuilder = new StringBuilder(256);
+        private readonly StringBuilder urlBuilder = new StringBuilder(256);
         private HttpRequestPrototype result;
 
         private static HttpRequestBuilder CreatePrototype(string method, string url)
         {
-            var builder = new HttpRequestBuilder {result = new HttpRequestPrototype(url) {Method = method}};
+            var builder = new HttpRequestBuilder
+            {
+                result = new HttpRequestPrototype
+                {
+                    Method = method,
+                    Headers = { ["X-Amzn-TraceId"] = AwsXRayTraceIdFactory.GetNewXRayTraceId() }
+                }
+            };
 
-            builder.result.Headers["X-Amzn-TraceId"] = AwsXRayTraceIdFactory.GetNewXRayTraceId();
+            builder.urlBuilder.Append(url);
 
             return builder;
         }
@@ -57,8 +67,17 @@ namespace AccelByte.Core
                 throw new Exception($"Path parameter with key={key} is null or empty.");
             }
 
-            this.result.UrlBuilder.Replace("{" + key + "}", Uri.EscapeDataString(value));
-            this.result.BaseUrlLength = this.result.UrlBuilder.Length;
+            this.urlBuilder.Replace("{" + key + "}", Uri.EscapeDataString(value));
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithPathParams(IDictionary<string, string> pathParams)
+        {
+            foreach (var param in pathParams)
+            {
+                WithPathParam(param.Key, param.Value);
+            }
 
             return this;
         }
@@ -68,11 +87,14 @@ namespace AccelByte.Core
             Assert.IsNotNull(key, "query key is null");
             Assert.IsNotNull(value, $"query value is null for key {key}");
             
-            string formatString = this.result.BaseUrlLength == this.result.UrlBuilder.Length ? "?{0}={1}" : "&{0}={1}";
-            if (!string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value)) return this;
+            
+            if (this.queryBuilder.Length > 0)
             {
-                this.result.UrlBuilder.AppendFormat(formatString, Uri.EscapeDataString(key), Uri.EscapeDataString(value));
+                this.queryBuilder.Append("&");
             }
+                
+            this.queryBuilder.Append($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value)}");
 
             return this;
         }
@@ -81,15 +103,15 @@ namespace AccelByte.Core
         {
             foreach (string value in values)
             {
-                WithQueryParam(key, value);
+                WithQueryParam(Uri.EscapeDataString(key), Uri.EscapeDataString(value));
             }
 
             return this;
         }
 
-        public HttpRequestBuilder WithQueries(Dictionary<string, string> queries)
+        public HttpRequestBuilder WithQueries(Dictionary<string, string> queryMap)
         {
-            foreach (var queryPair in queries)
+            foreach (var queryPair in queryMap)
             {
                 WithQueryParam(queryPair.Key, queryPair.Value);
             }
@@ -97,17 +119,55 @@ namespace AccelByte.Core
             return this;
         }
 
+        public HttpRequestBuilder WithQueries<T>(T queryObject)
+        {
+            if (this.queryBuilder.Length > 0)
+            {
+                this.queryBuilder.Append("&");
+            }
+            
+            this.queryBuilder.Append(queryObject.ToForm());
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithBasicAuth()
+        {
+            this.result.AuthType = HttpAuth.Basic;
+
+            return this;
+        }
+
         public HttpRequestBuilder WithBasicAuth(string username, string password)
         {
-            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException("username and password for Basic Authorization shouldn't be empty or null");
+            }
+
+            string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
             this.result.Headers["Authorization"] = "Basic " + credentials;
+            this.result.AuthType = HttpAuth.Basic;
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithBearerAuth()
+        {
+            this.result.AuthType = HttpAuth.Bearer;
 
             return this;
         }
 
         public HttpRequestBuilder WithBearerAuth(string token)
         {
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentException("token for Bearer Authorization shouldn't be empty or null");
+            }
+            
             this.result.Headers["Authorization"] = "Bearer " + token;
+            this.result.AuthType = HttpAuth.Bearer;
 
             return this;
         }
@@ -137,67 +197,106 @@ namespace AccelByte.Core
         {
             Assert.IsNotNull(key, "form key is null");
             Assert.IsNotNull(value, $"form value is null for key {key}");
+
+            if (string.IsNullOrEmpty(value)) return this;
             
             if (this.formBuilder.Length > 0)
             {
                 this.formBuilder.Append("&");
             }
-
-            this.formBuilder.AppendFormat("{0}={1}", Uri.EscapeDataString(key), Uri.EscapeDataString(value));
-
-            return this;
-        }
-
-        public HttpRequestBuilder WithBody(byte[] body)
-        {
-            this.result.BodyBytes = body;
+                
+            this.formBuilder.Append($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value)}");
 
             return this;
         }
 
         public HttpRequestBuilder WithBody(string body)
         {
+            if (!this.result.Headers.ContainsKey("Content-Type"))
+            {
+                this.result.Headers.Add("Content-Type", MediaType.TextPlain.ToString());
+            }
+            
             this.result.BodyBytes = Encoding.UTF8.GetBytes(body);
 
             return this;
         }
-
-        public HttpRequestBuilder WithBody(FormDataContent formDataContent)
+        
+        public HttpRequestBuilder WithBody(byte[] body)
         {
-            this.result.BodyBytes = formDataContent.Get();
+            if (!this.result.Headers.ContainsKey("Content-Type"))
+            {
+                this.result.Headers.Add("Content-Type", MediaType.ApplicationOctetStream.ToString());
+            }
+            
+            this.result.BodyBytes = body;
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithBody(FormDataContent body)
+        {
+            if (!this.result.Headers.ContainsKey("Content-Type"))
+            {
+                this.result.Headers.Add("Content-Type", body.GetMediaType());
+            }
+            
+            this.result.BodyBytes = body.Get();
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithFormBody<T>(T body)
+        {
+            if (!this.result.Headers.ContainsKey("Content-Type"))
+            {
+                this.result.Headers.Add("Content-Type", MediaType.ApplicationForm.ToString());
+            }
+
+            this.result.BodyBytes = Encoding.UTF8.GetBytes(body.ToForm());
+
+            return this;
+        }
+
+        public HttpRequestBuilder WithJsonBody<T>(T body)
+        {
+            if (!this.result.Headers.ContainsKey("Content-Type"))
+            {
+                this.result.Headers.Add("Content-Type", MediaType.ApplicationJson.ToString());
+            }
+
+            this.result.BodyBytes = body.ToUtf8Json();
 
             return this;
         }
 
         public IHttpRequest GetResult()
         {
+            if (this.queryBuilder.Length > 0)
+            {
+                this.urlBuilder.Append("?");
+                this.urlBuilder.Append(this.queryBuilder);
+            }
+            
             if (this.formBuilder.Length > 0)
             {
+                this.result.Headers["Content-Type"] = MediaType.ApplicationForm.ToString();
                 this.result.BodyBytes = Encoding.UTF8.GetBytes(this.formBuilder.ToString());
             }
+
+            this.result.Url = this.urlBuilder.ToString();
 
             return this.result;
         }
 
-        private HttpRequestBuilder() { }
-
         private class HttpRequestPrototype : IHttpRequest
         {
             public string Method { get; set; }
-            public string Url { get { return this.UrlBuilder.ToString(); } }
-            public Dictionary<string, string> Headers { get; private set; }
-            public Stream BodyStream { get; set; }
+            public string Url { get; set; }
+            
+            public HttpAuth AuthType { get; set; }
+            public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
             public byte[] BodyBytes { get; set; }
-
-            public StringBuilder UrlBuilder { get; private set; }
-            public int BaseUrlLength { get; set; }
-
-            public HttpRequestPrototype(string url)
-            {
-                this.UrlBuilder = new StringBuilder(url, 256);
-                this.BaseUrlLength = url.Length;
-                this.Headers = new Dictionary<string, string>();
-            }
         }
     }
 }

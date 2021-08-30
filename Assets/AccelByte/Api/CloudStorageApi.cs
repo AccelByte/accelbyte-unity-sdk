@@ -15,14 +15,14 @@ namespace AccelByte.Api
     public class CloudStorageApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        internal CloudStorageApi(string baseUrl, IHttpWorker httpWorker)
+        internal CloudStorageApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator GetAllSlots(string @namespace, string userId, string accessToken,
@@ -44,7 +44,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<Slot[]>();
             callback.Try(result);
@@ -66,12 +66,12 @@ namespace AccelByte.Api
                 .WithPathParam("slotId", slotId)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.OctedStream)
+                .Accepts(MediaType.ApplicationOctetStream)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             Result<byte[]> result;
 
@@ -125,7 +125,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
             callback.Try(result);
@@ -167,7 +167,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
             callback.Try(result);
@@ -204,7 +204,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
             callback.Try(result);
@@ -230,7 +230,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);

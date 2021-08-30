@@ -12,15 +12,15 @@ namespace AccelByte.Api
     internal class AchievementApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        internal AchievementApi(string baseUrl, IHttpWorker httpWorker)
+        internal AchievementApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         string ConvertAchievementSortByToString(AchievementSortBy sortBy)
@@ -69,7 +69,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedPublicAchievement>();
             callback.Try(result);
@@ -92,7 +92,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<MultiLanguageAchievement>();
             callback.Try(result);
@@ -119,7 +119,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedUserAchievement>();
             callback.Try(result);
@@ -146,7 +146,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);

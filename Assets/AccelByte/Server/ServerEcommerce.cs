@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -133,6 +133,32 @@ namespace AccelByte.Server
                     this.session.AuthorizationToken,
                     currencyCode,
                     creditUserWalletRequest,
+                    callback));
+        }
+
+        /// <summary>
+        /// Fulfill item to a user.
+        /// </summary>
+        /// <param name="userId">UserId of a user who will receive item.</param>
+        /// <param name="fulfillmentRequest">The request to fulfill an item to user.</param>
+        /// <param name="callback">Returns Wallet info via callback when completed.</param>
+        public void FulfillUserItem(string userId, FulfillmentRequest fulfillmentRequest,
+            ResultCallback<FulfillmentResult> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.FulfillUserItem(
+                    this.namespace_,
+                    userId,
+                    this.session.AuthorizationToken,
+                    fulfillmentRequest,
                     callback));
         }
     }

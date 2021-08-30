@@ -41,7 +41,7 @@ namespace AccelByte.Models
         [DataMember] public int listOrder { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public bool incremental { get; set; }
-        [DataMember] public int goalValue { get; set; }
+        [DataMember] public float goalValue { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public string createdAt { get; set; }
         [DataMember] public string updateAt { get; set; }
@@ -67,7 +67,7 @@ namespace AccelByte.Models
         [DataMember] public int listOrder { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public bool incremental { get; set; }
-        [DataMember] public int goalValue { get; set; }
+        [DataMember] public float goalValue { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public string createdAt { get; set; }
         [DataMember] public string updateAt { get; set; }

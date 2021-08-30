@@ -11,7 +11,7 @@ namespace AccelByte.Core
     static class AccelByteNetUtilities
     {
         private static readonly CoroutineRunner coroutineRunner = new CoroutineRunner();
-        private static readonly IHttpWorker httpWorker = new UnityHttpWorker();
+        private static readonly IHttpClient HttpClient = new AccelByteHttpClient();
 
         public static void GetPublicIp(ResultCallback<PublicIp> callback)
         {
@@ -27,7 +27,7 @@ namespace AccelByte.Core
 
             IHttpResponse response = null;
 
-            yield return httpWorker.SendRequest(getPubIpRequest, rsp => response = rsp);
+            yield return AccelByteNetUtilities.HttpClient.SendRequest(getPubIpRequest, rsp => response = rsp);
 
             var result = response.TryParseJson<PublicIp>();
             callback.Try(result);
@@ -41,14 +41,14 @@ namespace AccelByte.Core
         private static IEnumerator UploadToAsync(string url, byte[] data, ResultCallback callback)
         {
             var uploadRequest = HttpRequestBuilder.CreatePut(url)
-                .WithContentType(MediaType.OctedStream)
+                .WithContentType(MediaType.ApplicationOctetStream)
                 .WithBody(System.Convert.ToBase64String(data))
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return httpWorker.SendRequest(uploadRequest, rsp => response = rsp);
+            yield return AccelByteNetUtilities.HttpClient.SendRequest(uploadRequest, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
@@ -62,13 +62,13 @@ namespace AccelByte.Core
         private static IEnumerator DownloadFromAsync(string url, ResultCallback<byte[]> callback)
         {
             var uploadRequest = HttpRequestBuilder.CreateGet(url)
-                .WithContentType(MediaType.OctedStream)
+                .WithContentType(MediaType.ApplicationOctetStream)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return httpWorker.SendRequest(uploadRequest, rsp => response = rsp);
+            yield return AccelByteNetUtilities.HttpClient.SendRequest(uploadRequest, rsp => response = rsp);
 
             Result<byte[]> result;
 

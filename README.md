@@ -1,26 +1,5 @@
 # AccelByte Unity SDK
 
-## Dependencies
-
-AccelByte SDK v5.0.0 is compatible with these AccelByte Services version 3.3.1:
-
-| Service                                             | Version        |
-|-----------------------------------------------------|----------------|
-| justice-iam-service                                 | 4.3.0          |
-| justice-legal-service                               | 1.12.1         |
-| justice-basic-service                               | 1.21.1         |
-| justice-platform-service                            | 3.32.0         |
-| justice-social-service                              | 1.17.1         |
-| justice-leaderboard-service                         | 2.8.0          |
-| justice-achievement-service                         | 2.5.4          |
-| justice-cloudsave-service                           | 1.6.4          |
-| justice-ugc-service                                 | 1.4.0          |
-| justice-lobby-server                                | 1.34.0         |
-| justice-group-service                               | 2.7.3          |
-| Justice QoS Manager Service                         | 1.7.6          |
-| justice-dedicated-server-manager-controller-service | 2.4.1          |
-| amalgam_game_telemetry                              | 1.1.2-392420e1 |          
-
 ## Getting Started
 
 ### Preparation
@@ -32,10 +11,20 @@ AccelByte SDK v5.0.0 is compatible with these AccelByte Services version 3.3.1:
 {
     "ClientId":"<GAME_CLIENT_ID>",
     "ClientSecret":"<GAME_CLIENT_SECRET>",
+    "UseSessionManagement": true,
     "PublisherNamespace":"<PUBLISHER_NAMESPACE>",
     "Namespace":"<GAME_CLIENT_NAMESPACE>",
     "BaseUrl": "https://api-preview.accelbyte.io",
+    "LoginServerUrl":"https://api-preview.accelbyte.io",
+    "IamServerUrl":"https://api-preview.accelbyte.io/iam",
+    "PlatformServerUrl":"https://api-preview.accelbyte.io/platform",
+    "BasicServerUrl":"https://api-preview.accelbyte.io/basic",
+    "LobbyServerUrl":"wss://preview.accelbyte.io/lobby/",
+    "TelemetryServerUrl":"https://api-preview.accelbyte.io/telemetry",
     "RedirectUri":"http://localhost",
+    "CloudStorageServerUrl":"https://api-preview.accelbyte.io/binary-store",
+    "GameProfileServerUrl":"https://api-preview.accelbyte.io/soc-profile",
+    "StatisticServerUrl": "https://api-preview.accelbyte.io/statistic"
 }
 ```
 

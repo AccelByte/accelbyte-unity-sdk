@@ -4,7 +4,8 @@
 
 using Utf8Json;
 
-namespace AccelByte.Core {
+namespace AccelByte.Core
+{
     public static class JsonExtension
     {
         public static byte[] ToUtf8Json<T>(this T obj)
@@ -21,7 +22,7 @@ namespace AccelByte.Core {
         {
             return JsonSerializer.Deserialize<T>(data);
         }
-        
+
         public static T ToObject<T>(this byte[] data)
         {
             return JsonSerializer.Deserialize<T>(data);

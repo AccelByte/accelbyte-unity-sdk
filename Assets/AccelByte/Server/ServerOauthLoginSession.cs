@@ -20,7 +20,7 @@ namespace AccelByte.Server
 
         private readonly string clientId;
         private readonly string clientSecret;
-        private readonly UnityHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
         private readonly CoroutineRunner coroutineRunner;
 
         private readonly string baseUrl;
@@ -31,18 +31,18 @@ namespace AccelByte.Server
         private string clientToken;
         private DateTime clientTokenExpiryTime;
 
-        internal ServerOauthLoginSession(string baseUrl, string clientId, string clientSecret, UnityHttpWorker httpWorker, CoroutineRunner coroutineRunner)
+        internal ServerOauthLoginSession(string baseUrl, string clientId, string clientSecret, IHttpClient httpClient, CoroutineRunner coroutineRunner)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
             Assert.IsNotNull(clientId, "Creating " + GetType().Name + " failed. ClientId parameter is null!");
             Assert.IsNotNull(clientSecret, "Creating " + GetType().Name + " failed. ClientSecret parameter is null!");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             Assert.IsNotNull(coroutineRunner, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
             this.coroutineRunner = coroutineRunner;
         }
 
@@ -82,7 +82,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             Result<TokenData> result = response.TryParseJson<TokenData>();
             callback.Try(result);
@@ -99,7 +99,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             this.tokenData = null;
             var result = response.TryParse();

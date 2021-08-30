@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -28,6 +28,8 @@ namespace AccelByte.Models
         [DataMember] public string GameTelemetryServerUrl { get; set; }
         [DataMember] public string AchievementServerUrl { get; set; }
         [DataMember] public string UGCServerUrl { get; set; }
+        [DataMember] public string ReportingServerUrl { get; set; }
+        [DataMember] public string SeasonPassServerUrl { get; set; }
         [DataMember] public string ClientId { get; set; }
         [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string GroupServerUrl { get; set; }
@@ -65,6 +67,7 @@ namespace AccelByte.Models
                    this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
                    this.UGCServerUrl == anotherConfig.UGCServerUrl &&
+                   this.SeasonPassServerUrl == anotherConfig.SeasonPassServerUrl &&
                    this.ClientId == anotherConfig.ClientId &&
                    this.ClientSecret == anotherConfig.ClientSecret &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
@@ -123,6 +126,9 @@ namespace AccelByte.Models
 
                 this.UGCServerUrl = GetDefaultApiUrl(this.UGCServerUrl, "/ugc");
 
+                this.ReportingServerUrl = GetDefaultApiUrl(this.ReportingServerUrl, "/reporting");
+
+                this.SeasonPassServerUrl = GetDefaultApiUrl(this.SeasonPassServerUrl, "/seasonpass");
 
             }
         }
@@ -171,6 +177,10 @@ namespace AccelByte.Models
                 if (this.GroupServerUrl == httpsBaseUrl + "/group") this.GroupServerUrl = null;
 
                 if (this.UGCServerUrl == httpsBaseUrl + "/ugc") this.UGCServerUrl = null;
+
+                if (this.ReportingServerUrl == httpsBaseUrl + "/reporting") this.ReportingServerUrl = null;
+
+                if (this.SeasonPassServerUrl == httpsBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
             }
         }
 

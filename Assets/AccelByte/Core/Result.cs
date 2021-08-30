@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -85,6 +85,14 @@ namespace AccelByte.Core
         NamespaceNotFound = 2141,
         UserProfileNotFound = 2241,
         WalletAlreadyExist = 3571,
+        CodeNotFound = 37142,
+        CodeRedeemptionNotStarted = 37177,
+        CodeRedeemptionAlreadyEnded = 37178,
+        MaxRedeemCountPerCodeExceeded = 37174,
+        MaxRedeemCountPerCodePerUserExceeded = 37175,
+        MaxRedeemCountPerCodePerCampaignExceeded = 37179,
+        CampaignInactive = 37172,
+        CodeInactive = 37173,
 
         //Leaderboard error codes
         LeaderboardRankingUnableToRetrieve = 71233,
@@ -312,7 +320,7 @@ namespace AccelByte.Core
         //Channel Chat
         ChannelChatSenderBanned                   = 11880,
         //PartyStorage
-        PartyStorageOutdatedUpdateData            = 11903,
+        PartyStorageOutdatedUpdateData            = 119017,
         PartyNotFound                             = 11901,
 
         //AccelByte CloudSave error codes
@@ -474,19 +482,19 @@ namespace AccelByte.Core
 
     public class Result<T> : IResult
     {
-        public Error Error { get; private set; }
-        public T Value { get; private set; }
+        public Error Error { get; }
+        public T Value { get; }
 
-        public bool IsError { get { return this.Error != null; } }
+        public bool IsError => this.Error != null;
 
         public static Result<T> CreateOk(T value) { return new Result<T>(null, value); }
 
         public static Result<T> CreateError(ErrorCode errorCode, string errorMessage = null, object messageVariables = null)
         {
-            return new Result<T>(new Error(errorCode, errorMessage, messageVariables), default(T));
+            return new Result<T>(new Error(errorCode, errorMessage, messageVariables), default);
         }
 
-        public static Result<T> CreateError(Error error) { return new Result<T>(error, default(T)); }
+        public static Result<T> CreateError(Error error) { return new Result<T>(error, default); }
 
         private Result(Error error, T value)
         {
@@ -497,9 +505,9 @@ namespace AccelByte.Core
 
     public class Result : IResult
     {
-        public Error Error { get; private set; }
+        public Error Error { get; }
 
-        public bool IsError { get { return this.Error != null; } }
+        public bool IsError => this.Error != null;
 
         public static Result CreateOk() { return new Result(null); }
 

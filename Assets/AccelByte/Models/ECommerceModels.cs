@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -17,7 +17,9 @@ namespace AccelByte.Models
         INGAMEITEM,
         BUNDLE,
         APP,
-        CODE
+        CODE,
+        SUBSCRIPTION,
+        SEASON
     }
 
     public enum ItemStatus
@@ -85,6 +87,18 @@ namespace AccelByte.Models
         DELETED
     }
 
+    public enum ItemSource
+    {
+        NONE,
+        PURCHASE,
+        IAP,
+        PROMOTION,
+        ACHIEVEMENT,
+        REFERRAL_BONUS,
+        REDEEM_CODE,
+        OTHER
+    }
+
     public enum EntitlementSource
     {
         NONE,
@@ -94,6 +108,8 @@ namespace AccelByte.Models
         ACHIEVEMENT,
         REFERRAL_BONUS,
         REDEEM_CODE,
+        REWARD,
+        GIFT,
         OTHER
     }
 
@@ -107,6 +123,12 @@ namespace AccelByte.Models
         REDEEM_CODE,
         REFUND,
         OTHER
+    }
+
+    public enum SeasonType
+    {
+        PASS = 0,
+        TIER
     }
 
     #endregion
@@ -534,9 +556,10 @@ namespace AccelByte.Models
     public class EntitlementSummary
     {
         [DataMember] public string id { get; set; }
+        [DataMember] public string itemId { get; set; }
         [DataMember(Name ="namespace")] public string Namespace { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public EntitlementClazz clazz { get; set;}
+        [DataMember] public EntitlementClazz clazz { get; set; }
         [DataMember] public EntitlementType type { get; set; }
         [DataMember] public bool stackable { get; set; }
         [DataMember] public int stackedUseCount { get; set; }
@@ -657,6 +680,48 @@ namespace AccelByte.Models
         [DataMember] public DateTime grantedAt { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+    }
+
+    #endregion
+
+    #region Fulfillment
+
+    [DataContract]
+    public class FulfillmentRequest
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public int quantity { get; set; }
+        [DataMember] public string orderNo { get; set; }
+        [DataMember] public ItemSource source { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string language { get; set; }
+    }
+
+    [DataContract]
+    public class FulFillCodeRequest
+    {
+        [DataMember] public string code { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string language { get; set; }
+    }
+
+    [DataContract]
+    public class CreditSummary
+    {
+        [DataMember] public string walletId { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public int amount { get; set; }
+        [DataMember] public int stackedQuantity { get; set; }
+    }
+
+    [DataContract]
+    public class FulfillmentResult
+    {
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public EntitlementSummary[] entitlementSummaries { get; set; }
+        [DataMember] public CreditSummary[] creditSummaries { get; set; }
     }
 
     #endregion

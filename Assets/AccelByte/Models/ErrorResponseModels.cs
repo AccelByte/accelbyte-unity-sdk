@@ -11,6 +11,9 @@ namespace AccelByte.Models
         [DataMember] public string errorMessage { get; set; }
         [DataMember] public string message { get; set; }
         [DataMember] public object messageVariables { get; set; }
+        
+        [DataMember] public string error { get; set; }
+        [DataMember] public string error_description { get; set; }
     }
 
     [DataContract]

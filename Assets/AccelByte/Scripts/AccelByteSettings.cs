@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -126,6 +126,12 @@ namespace AccelByte.Api
         {
             get { return AccelByteSettings.Instance.config.UGCServerUrl; }
             set { AccelByteSettings.Instance.config.UGCServerUrl = value; }
+        }
+
+        public static string SeasonPassServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.SeasonPassServerUrl; }
+            set { AccelByteSettings.Instance.config.SeasonPassServerUrl = value; }
         }
 
         public static string ClientId

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020-2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -19,12 +19,12 @@ namespace AccelByte.Server
         private static ServerOauthLoginSession session;
         private static ServerConfig config;
         private static CoroutineRunner coroutineRunner;
-        private static UnityHttpWorker httpWorker;
+        private static IHttpClient httpClient;
 #else
         private static readonly ServerOauthLoginSession session;
         private static readonly ServerConfig config;
         private static readonly CoroutineRunner coroutineRunner;
-        private static readonly UnityHttpWorker httpWorker;
+        private static readonly IHttpClient httpClient;
 #endif
         private static TokenData accessToken;
         private static DedicatedServer server;
@@ -38,6 +38,7 @@ namespace AccelByte.Server
         private static ServerCloudSave cloudSave;
         private static ServerMatchmaking matchmaking;
         private static ServerUserAccount userAccount;
+        private static ServerSeasonPass seasonPass;
 
         private static bool hasBeenInitialized = false;
 
@@ -68,6 +69,7 @@ namespace AccelByte.Server
                 AccelByteServerPlugin.achievement = null;
                 AccelByteServerPlugin.lobby = null;
                 AccelByteServerPlugin.cloudSave = null;
+                AccelByteServerPlugin.seasonPass = null;
             };
         }
 
@@ -103,13 +105,13 @@ namespace AccelByte.Server
             AccelByteServerPlugin.config.CheckRequiredField();
             AccelByteServerPlugin.config.Expand();
             AccelByteServerPlugin.coroutineRunner = new CoroutineRunner();
-            AccelByteServerPlugin.httpWorker = new UnityHttpWorker();
+            AccelByteServerPlugin.httpClient = new AccelByteHttpClient();
 
             AccelByteServerPlugin.session = new ServerOauthLoginSession(
                 AccelByteServerPlugin.config.IamServerUrl,
                 AccelByteServerPlugin.config.ClientId,
                 AccelByteServerPlugin.config.ClientSecret,
-                AccelByteServerPlugin.httpWorker,
+                AccelByteServerPlugin.httpClient,
                 AccelByteServerPlugin.coroutineRunner);
 
             AccelByteServerPlugin.server = new DedicatedServer(
@@ -148,7 +150,7 @@ namespace AccelByte.Server
                 new DedicatedServerManagerApi(
                     AccelByteServerPlugin.config.DSMControllerServerUrl,
                     AccelByteServerPlugin.config.Namespace,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.coroutineRunner);
 
@@ -163,7 +165,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.ecommerce = new ServerEcommerce(
                 new ServerEcommerceApi(
                     AccelByteServerPlugin.config.PlatformServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner);
@@ -179,7 +181,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.statistic = new ServerStatistic(
                 new ServerStatisticApi(
                     AccelByteServerPlugin.config.StatisticServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner);
@@ -195,7 +197,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.qos = new ServerQos(
                 new ServerQosManagerApi(
                     AccelByteServerPlugin.config.QosManagerServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.coroutineRunner);
 
             return AccelByteServerPlugin.qos;
@@ -209,7 +211,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.gameTelemetry = new ServerGameTelemetry(
                 new ServerGameTelemetryApi(
                     AccelByteServerPlugin.config.GameTelemetryServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.coroutineRunner);
 
@@ -224,7 +226,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.achievement = new ServerAchievement(
                 new ServerAchievementApi(
                     AccelByteServerPlugin.config.AchievementServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner);
@@ -240,7 +242,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.lobby = new ServerLobby(
                 new ServerLobbyApi(
                     AccelByteServerPlugin.config.LobbyServerUrl,
-                    AccelByteServerPlugin.httpWorker), 
+                    AccelByteServerPlugin.httpClient), 
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner);
@@ -256,7 +258,7 @@ namespace AccelByte.Server
             AccelByteServerPlugin.cloudSave = new ServerCloudSave(
                 new ServerCloudSaveApi(
                     AccelByteServerPlugin.config.CloudSaveServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner);
@@ -271,7 +273,7 @@ namespace AccelByte.Server
             return AccelByteServerPlugin.matchmaking ?? (AccelByteServerPlugin.matchmaking = new ServerMatchmaking(
                 new ServerMatchmakingApi(
                     AccelByteServerPlugin.config.MatchmakingServerUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
                 AccelByteServerPlugin.session,
                 AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner));
@@ -284,7 +286,20 @@ namespace AccelByte.Server
             return AccelByteServerPlugin.userAccount ?? (AccelByteServerPlugin.userAccount = new ServerUserAccount(
                 new ServerUserAccountApi(
                     AccelByteServerPlugin.config.BaseUrl,
-                    AccelByteServerPlugin.httpWorker),
+                    AccelByteServerPlugin.httpClient),
+                AccelByteServerPlugin.coroutineRunner));
+        }
+
+        public static ServerSeasonPass GetSeasonPass()
+        {
+            AccelByteServerPlugin.CheckPlugin();
+
+            return AccelByteServerPlugin.seasonPass ?? (AccelByteServerPlugin.seasonPass = new ServerSeasonPass(
+                new ServerSeasonPassApi(
+                    AccelByteServerPlugin.config.BaseUrl,
+                    AccelByteServerPlugin.httpClient),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner));
         }
     }

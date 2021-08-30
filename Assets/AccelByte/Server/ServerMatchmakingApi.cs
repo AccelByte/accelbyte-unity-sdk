@@ -9,15 +9,15 @@ namespace AccelByte.Server
     public class ServerMatchmakingApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        public  ServerMatchmakingApi(string baseUrl, IHttpWorker httpWorker)
+        public  ServerMatchmakingApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator EnqueueJoinableSession(string @namespace, string accessToken, MatchmakingResult body, 
@@ -36,7 +36,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
 
@@ -59,7 +59,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
 
@@ -82,7 +82,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<MatchmakingResult>();
 
@@ -114,7 +114,7 @@ namespace AccelByte.Server
 
             IHttpResponse respose = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => respose = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => respose = rsp);
 
             var result = respose.TryParse();
 
@@ -144,7 +144,7 @@ namespace AccelByte.Server
 
             IHttpResponse respose = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => respose = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => respose = rsp);
 
             var result = respose.TryParse();
 

@@ -14,14 +14,14 @@ namespace AccelByte.Server
     public class ServerLobbyApi
     {
         private string baseUrl;
-        private IHttpWorker httpWorker;
+        private IHttpClient httpClient;
         
-        internal ServerLobbyApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerLobbyApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
         
         public IEnumerator WritePartyStorage(string @namespace, string accessToken, PartyDataUpdateRequest data,
@@ -44,7 +44,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
@@ -75,7 +75,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
@@ -99,7 +99,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<ActivePartiesData>();
 
@@ -123,7 +123,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
@@ -149,7 +149,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<ServerGetSessionAttributeResponse>();
 
@@ -173,7 +173,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GetSessionAttributeAllResponse>();
 
@@ -201,7 +201,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
 

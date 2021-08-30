@@ -13,14 +13,14 @@ namespace AccelByte.Server
     internal class ServerStatisticApi
     {
         private string baseUrl;
-        private IHttpWorker httpWorker;
+        private IHttpClient httpClient;
 
-        internal ServerStatisticApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerStatisticApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator CreateUserStatItems(string @namespace, string userId, string accessToken,
@@ -43,7 +43,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -80,7 +80,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PagedStatItems>();
 
@@ -107,7 +107,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -132,7 +132,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -159,7 +159,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -184,7 +184,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -212,7 +212,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
@@ -237,7 +237,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 

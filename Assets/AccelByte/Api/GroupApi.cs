@@ -14,15 +14,15 @@ namespace AccelByte.Api
     internal class GroupApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        internal GroupApi(string baseUrl, IHttpWorker httpWorker)
+        internal GroupApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsFalse(string.IsNullOrEmpty(baseUrl), "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator CreateGroup(string namespace_, string accessToken, CreateGroupRequest createGroupRequest,
@@ -43,7 +43,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
             callback.Try(result);
@@ -69,7 +69,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupListResponse>();
             callback.Try(result);
@@ -93,7 +93,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
             callback.Try(result);
@@ -136,7 +136,7 @@ namespace AccelByte.Api
             var request = builder.GetResult();
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
             callback.Try(result);
@@ -160,7 +160,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
@@ -190,7 +190,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
             callback.Try(result);
@@ -218,7 +218,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
             callback.Try(result);
@@ -245,7 +245,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
@@ -269,7 +269,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
             callback.Try(result);
@@ -293,7 +293,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -317,7 +317,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -341,7 +341,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<UserInvitationResponse>();
             callback.Try(result);
@@ -366,7 +366,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<JoinGroupResponse>();
             callback.Try(result);
@@ -391,7 +391,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -415,7 +415,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupMemberList>();
             callback.Try(result);
@@ -440,7 +440,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<KickMemberResponse>();
             callback.Try(result);
@@ -463,7 +463,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -490,7 +490,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
             callback.Try(result);
@@ -515,7 +515,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
             callback.Try(result);
@@ -540,7 +540,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -565,7 +565,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
             callback.Try(result);
@@ -596,7 +596,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
             callback.Try(result);
@@ -627,7 +627,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
@@ -650,7 +650,7 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedMemberRoles>();
             callback(result);

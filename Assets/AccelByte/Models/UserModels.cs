@@ -222,10 +222,10 @@ namespace AccelByte.Models
 
     public class CountryInfo
     {
-        [DataMember] public string CountryCode { get; set; }
-        [DataMember] public string CountryName { get; set; }
-        [DataMember] public string State { get; set; }
-        [DataMember] public string City { get; set; }
+        [DataMember] public string countryCode { get; set; }
+        [DataMember] public string countryName { get; set; }
+        [DataMember] public string state { get; set; }
+        [DataMember] public string city { get; set; }
     }
 
     [DataContract]

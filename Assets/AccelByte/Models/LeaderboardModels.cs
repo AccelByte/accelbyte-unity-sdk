@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -24,6 +24,7 @@ namespace AccelByte.Models
     {
         [DataMember] public float point { get; set; }
         [DataMember] public string userId { get; set; }
+        [DataMember] public bool hidden { get; set; }
         [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
 
@@ -32,6 +33,7 @@ namespace AccelByte.Models
     {
         [DataMember] public float point { get; set; }
         [DataMember] public int rank { get; set; }
+        [DataMember] public bool hidden { get; set; }
         [DataMember] public Dictionary<string, object> additionalData {get; set;}
     }
 

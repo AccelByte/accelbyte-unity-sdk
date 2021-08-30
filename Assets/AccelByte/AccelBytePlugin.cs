@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -24,13 +25,15 @@ namespace AccelByte.Api
 #if UNITY_EDITOR
         private static Config config;
         private static CoroutineRunner coroutineRunner;
-        private static UnityHttpWorker httpWorker;
-        private static User user; 
+        private static IHttpClient httpClient;
+        private static User user;
+        private static GameClient gameClient;
 #else
         private static readonly Config config;
         private static readonly CoroutineRunner coroutineRunner;
-        private static readonly UnityHttpWorker httpWorker;
+        private static readonly IHttpClient httpClient;
         private static readonly User user;
+        private static readonly GameClient gameClient;
 #endif
         private static Categories categories;
         private static Items items;
@@ -42,6 +45,7 @@ namespace AccelByte.Api
         private static CloudStorage cloudStorage;
         private static GameProfiles gameProfiles;
         private static Entitlement entitlement;
+        private static Fulfillment fulfillment;
         private static Statistic statistic;
         private static Qos qos;
         private static Agreement agreement;
@@ -51,8 +55,10 @@ namespace AccelByte.Api
         private static Achievement achievement;
         private static Group group;
         private static UGC ugc;
+        private static Reporting reporting;
+        private static SeasonPass seasonPass;
 
-        private static bool hasBeenInitialized = false;
+        private static bool initialized = false;
 
         public static Config Config 
         { 
@@ -70,7 +76,7 @@ namespace AccelByte.Api
             {
                 if (state == PlayModeStateChange.ExitingEditMode)
                 {
-                    hasBeenInitialized = false;
+                    AccelBytePlugin.initialized = false;
 
                     categories = null;
                     items = null;
@@ -88,11 +94,12 @@ namespace AccelByte.Api
                     cloudSave = null;
                     gameTelemetry = null;
                     ugc = null;
+                    seasonPass = null;
                 }
             };
         }
 
-        private static void Init()
+        private static void Initialize()
         {
 #endif
 #if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH || UNITY_STADIA || ENABLE_IL2CPP) && !UNITY_EDITOR
@@ -125,25 +132,28 @@ namespace AccelByte.Api
             AccelBytePlugin.config.Expand();
 
             AccelBytePlugin.coroutineRunner = new CoroutineRunner();
-            AccelBytePlugin.httpWorker = new UnityHttpWorker();
-            var loginSession = new LoginSession(
-                    AccelBytePlugin.config.IamServerUrl,
-                    AccelBytePlugin.config.Namespace,
-                    AccelBytePlugin.config.ClientId,
-                    AccelBytePlugin.config.ClientSecret,
-                    AccelBytePlugin.config.RedirectUri,
-                    AccelBytePlugin.httpWorker,
-                    AccelBytePlugin.coroutineRunner,
-                    AccelBytePlugin.config.UsePlayerPrefs);
+            
+            AccelBytePlugin.httpClient = new AccelByteHttpClient();
+            AccelBytePlugin.httpClient.SetCredentials(AccelBytePlugin.config.ClientId, AccelBytePlugin.config.ClientSecret);
+            AccelBytePlugin.httpClient.SetBaseUri(new Uri(AccelBytePlugin.config.BaseUrl));
 
+            var session = new LoginSession(
+                AccelBytePlugin.config.IamServerUrl,
+                AccelBytePlugin.config.Namespace,
+                AccelBytePlugin.config.RedirectUri,
+                AccelBytePlugin.httpClient,
+                AccelBytePlugin.coroutineRunner,
+                AccelBytePlugin.config.UsePlayerPrefs);
+            
+            AccelBytePlugin.gameClient = new GameClient(AccelBytePlugin.config, AccelBytePlugin.httpClient);
 
             AccelBytePlugin.user = new User(
-                loginSession,
+                session,
                 new UserAccount(
                     AccelBytePlugin.config.IamServerUrl,
                     AccelBytePlugin.config.Namespace,
-                    loginSession,
-                    AccelBytePlugin.httpWorker),
+                    session,
+                    AccelBytePlugin.httpClient),
                 AccelBytePlugin.coroutineRunner);
 
             ServicePointManager.ServerCertificateValidationCallback = AccelBytePlugin.OnCertificateValidated;
@@ -155,10 +165,10 @@ namespace AccelByte.Api
         private static void CheckPlugin()
         {
 #if UNITY_EDITOR
-            if (!hasBeenInitialized)
+            if (!AccelBytePlugin.initialized)
             {
-                hasBeenInitialized = true;
-                Init();
+                AccelBytePlugin.Initialize();
+                AccelBytePlugin.initialized = true;
             }
 #endif
         }
@@ -204,7 +214,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.userProfiles = new UserProfiles(
-                    new UserProfilesApi(AccelBytePlugin.config.BasicServerUrl, AccelBytePlugin.httpWorker),
+                    new UserProfilesApi(AccelBytePlugin.config.BasicServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -219,7 +229,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.categories = new Categories(
-                    new CategoriesApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new CategoriesApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -234,7 +244,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.items = new Items(
-                    new ItemsApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new ItemsApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -249,7 +259,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.currencies = new Currencies(
-                    new CurrenciesApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new CurrenciesApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -264,7 +274,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.orders = new Orders(
-                    new OrdersApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new OrdersApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -279,7 +289,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.wallet = new Wallet(
-                    new WalletApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new WalletApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -296,7 +306,7 @@ namespace AccelByte.Api
                 AccelBytePlugin.lobby = new Lobby(
                     AccelBytePlugin.config.LobbyServerUrl,
                     new WebSocket(),
-                    new LobbyApi(AccelBytePlugin.config.BaseUrl, AccelBytePlugin.httpWorker),
+                    new LobbyApi(AccelBytePlugin.config.BaseUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -311,7 +321,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.cloudStorage = new CloudStorage(
-                    new CloudStorageApi(AccelBytePlugin.config.CloudStorageServerUrl, AccelBytePlugin.httpWorker),
+                    new CloudStorageApi(AccelBytePlugin.config.CloudStorageServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -326,7 +336,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.gameProfiles = new GameProfiles(
-                    new GameProfilesApi(AccelBytePlugin.config.GameProfileServerUrl, AccelBytePlugin.httpWorker),
+                    new GameProfilesApi(AccelBytePlugin.config.GameProfileServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -341,7 +351,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.entitlement = new Entitlement(
-                    new EntitlementApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpWorker),
+                    new EntitlementApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -350,13 +360,28 @@ namespace AccelByte.Api
             return AccelBytePlugin.entitlement;
         }
 
+        public static Fulfillment GetFulfillment()
+        {
+            if(AccelBytePlugin.fulfillment == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.fulfillment = new Fulfillment(
+                    new FulfillmentApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.fulfillment;
+        }
+
         public static Statistic GetStatistic()
         {
             if (AccelBytePlugin.statistic == null)
             {
                 CheckPlugin();
                 AccelBytePlugin.statistic = new Statistic(
-                    new StatisticApi(AccelBytePlugin.config.StatisticServerUrl, AccelBytePlugin.httpWorker),
+                    new StatisticApi(AccelBytePlugin.config.StatisticServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -371,7 +396,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.qos = new Qos(
-                    new QosManagerApi(AccelBytePlugin.config.QosManagerServerUrl, AccelBytePlugin.httpWorker),
+                    new QosManagerApi(AccelBytePlugin.config.QosManagerServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.coroutineRunner);
             }
 
@@ -384,7 +409,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.agreement = new Agreement(
-                    new AgreementApi(AccelBytePlugin.Config.AgreementServerUrl, AccelBytePlugin.httpWorker),
+                    new AgreementApi(AccelBytePlugin.Config.AgreementServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -399,7 +424,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.leaderboard = new Leaderboard(
-                    new LeaderboardApi(AccelBytePlugin.Config.LeaderboardServerUrl, AccelBytePlugin.httpWorker),
+                    new LeaderboardApi(AccelBytePlugin.Config.LeaderboardServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -414,7 +439,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.cloudSave = new CloudSave(
-                    new CloudSaveApi(AccelBytePlugin.config.CloudSaveServerUrl, AccelBytePlugin.httpWorker),
+                    new CloudSaveApi(AccelBytePlugin.config.CloudSaveServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -429,7 +454,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.gameTelemetry = new GameTelemetry(
-                    new GameTelemetryApi(AccelBytePlugin.config.GameTelemetryServerUrl, AccelBytePlugin.httpWorker),
+                    new GameTelemetryApi(AccelBytePlugin.config.GameTelemetryServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.coroutineRunner);
             }
@@ -443,7 +468,7 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.achievement = new Achievement(
-                    new AchievementApi(AccelBytePlugin.config.AchievementServerUrl, AccelBytePlugin.httpWorker),
+                    new AchievementApi(AccelBytePlugin.config.AchievementServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -457,7 +482,7 @@ namespace AccelByte.Api
             if (AccelBytePlugin.group == null)
             {
                 AccelBytePlugin.group = new Group(
-                    new GroupApi(AccelBytePlugin.config.GroupServerUrl, AccelBytePlugin.httpWorker),
+                    new GroupApi(AccelBytePlugin.config.GroupServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
@@ -471,12 +496,52 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 AccelBytePlugin.ugc = new UGC(
-                    new UGCApi(AccelBytePlugin.config.UGCServerUrl, AccelBytePlugin.httpWorker),
+                    new UGCApi(AccelBytePlugin.config.UGCServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.user.Session,
                     AccelBytePlugin.config.Namespace,
                     AccelBytePlugin.coroutineRunner);
             }
             return AccelBytePlugin.ugc;
+        }
+
+        public static Reporting GetReporting()
+        {
+            if (AccelBytePlugin.reporting == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.reporting = new Reporting(
+                    new ReportingApi(AccelBytePlugin.config.ReportingServerUrl, AccelBytePlugin.httpClient),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+            return AccelBytePlugin.reporting;
+        }
+
+        public static void ConfigureHttpApi<T>(params object[] args) where T : HttpApiBase
+        {
+            CheckPlugin();
+            AccelBytePlugin.gameClient.ConfigureHttpApi<T>(args);
+        }
+
+        public static T GetHttpApi<T>() where T : HttpApiBase
+        {
+            CheckPlugin();
+            return AccelBytePlugin.gameClient.GetHttpApi<T>();
+        }
+
+        public static SeasonPass GetSeasonPass()
+        {
+            if (AccelBytePlugin.seasonPass == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.seasonPass = new SeasonPass(
+                    new SeasonPassApi(AccelBytePlugin.config.SeasonPassServerUrl, AccelBytePlugin.httpClient),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+            return AccelBytePlugin.seasonPass;
         }
     }
 }

@@ -11,14 +11,14 @@ namespace AccelByte.Server
     internal class ServerAchievementApi
     {
         private string baseUrl;
-        private IHttpWorker httpWorker;
+        private IHttpClient httpClient;
 
-        internal ServerAchievementApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerAchievementApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator UnlockAchievement(string @namespace, string userId, string accessToken, string achievementCode,
@@ -42,7 +42,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);

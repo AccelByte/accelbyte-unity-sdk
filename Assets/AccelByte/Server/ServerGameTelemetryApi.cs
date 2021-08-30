@@ -13,12 +13,12 @@ namespace AccelByte.Server
     public class ServerGameTelemetryApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
 
-        public ServerGameTelemetryApi(string baseUrl, UnityHttpWorker httpWorker)
+        public ServerGameTelemetryApi(string baseUrl, IHttpClient httpClient)
         {
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
         
         public IEnumerator SendProtectedEvents(List<TelemetryBody> events, string accessToken, ResultCallback callback)
@@ -35,7 +35,7 @@ namespace AccelByte.Server
 
                 IHttpResponse response = null;
 
-                yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+                yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
                 var result = response.TryParse();
                 callback.Try(result);

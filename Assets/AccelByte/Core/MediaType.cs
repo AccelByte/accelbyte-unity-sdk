@@ -14,7 +14,7 @@ namespace AccelByte.Core
 
         public static readonly MediaType ApplicationJson = new MediaType("application/json; charset=utf-8");
         public static readonly MediaType TextPlain = new MediaType("text/plain; charset=utf-8");
-        public static readonly MediaType OctedStream = new MediaType("application/octet-stream; charset=utf-8");
+        public static readonly MediaType ApplicationOctetStream = new MediaType("application/octet-stream; charset=utf-8");
 
         private MediaType(string name) { this.name = name; }
 

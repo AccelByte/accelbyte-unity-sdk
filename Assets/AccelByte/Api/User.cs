@@ -23,14 +23,14 @@ namespace AccelByte.Api
 
         //Readonly members
         private readonly LoginSession loginSession;
-        private readonly IUserAccount userAccount;
+        private readonly UserAccount userAccount;
         private readonly CoroutineRunner coroutineRunner;
 
         public ISession Session => this.loginSession;
 
         private UserData userDataCache;
 
-        internal User(LoginSession loginSession, IUserAccount userAccount, CoroutineRunner coroutineRunner)
+        internal User(LoginSession loginSession, UserAccount userAccount, CoroutineRunner coroutineRunner)
         {
             this.loginSession = loginSession;
             this.userAccount = userAccount;
@@ -176,7 +176,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Logout current user session
+        /// Logout current user session. Access tokens, user ID, and other credentials from memory will be removed.
         /// </summary>
         public void Logout(ResultCallback callback)
         {
@@ -619,6 +619,7 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Get other user data by other platform userId (such as SteamID, for example)
+        /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
         /// </summary>
         /// <param name="platformType"></param>
         /// <param name="otherPlatformUserId"></param>
@@ -641,6 +642,7 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Get other user data by other platform userId(s) (such as SteamID, for example)
+        /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
         /// </summary>
         /// <param name="platformType"></param>
         /// <param name="otherPlatformUserIds"></param>
@@ -688,7 +690,7 @@ namespace AccelByte.Api
                     }
 
                     string[] skus = itemInfoResult.Value.features;
-                    string[] appIds = new string[] { AccelBytePlugin.Config.AppId };
+                    string[] appIds = { AccelBytePlugin.Config.AppId };
 
                     AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, (ownershipResult) =>
                     {

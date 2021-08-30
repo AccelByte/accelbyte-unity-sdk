@@ -27,24 +27,24 @@ namespace AccelByte.Server
     internal class DedicatedServerManagerApi
     {
         private readonly string baseUrl;
-        private readonly IHttpWorker httpWorker;
+        private readonly IHttpClient httpClient;
         private readonly string namespace_;
         private string region = "";
         private RegisterServerRequest serverSetup;
         private ServerType serverType = ServerType.NONE;
 
-        internal DedicatedServerManagerApi(string baseUrl, string namespace_, IHttpWorker httpWorker)
+        internal DedicatedServerManagerApi(string baseUrl, string namespace_, IHttpClient httpClient)
         {
             AccelByteDebug.Log("ServerApi init serverapi start");
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
             Assert.IsFalse(
                 string.IsNullOrEmpty(namespace_),
                 "Creating " + GetType().Name + " failed. Parameter namespace is null.");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
 
             this.baseUrl = baseUrl;
             this.namespace_ = namespace_;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
             this.serverSetup = new RegisterServerRequest() {
                 game_version = "",
                 ip = "",
@@ -88,7 +88,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<ServerInfo>();
             if (!result.IsError)
@@ -122,7 +122,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             serverType = ServerType.NONE;
@@ -152,7 +152,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             if(!result.IsError)
@@ -209,7 +209,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParse();
             serverType = ServerType.NONE;
@@ -237,7 +237,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<ServerSessionResponse>();
 

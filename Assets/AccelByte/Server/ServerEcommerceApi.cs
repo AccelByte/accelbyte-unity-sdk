@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -12,14 +12,14 @@ namespace AccelByte.Server
     internal class ServerEcommerceApi
     {
         private string baseUrl;
-        private IHttpWorker httpWorker;
+        private IHttpClient httpClient;
 
-        internal ServerEcommerceApi(string baseUrl, IHttpWorker httpWorker)
+        internal ServerEcommerceApi(string baseUrl, IHttpClient httpClient)
         {
             Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpWorker, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
+            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
             this.baseUrl = baseUrl;
-            this.httpWorker = httpWorker;
+            this.httpClient = httpClient;
         }
 
         public IEnumerator GetUserEntitlementById(string @namespace, string accessToken, string entitlementId,
@@ -40,7 +40,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<EntitlementInfo>();
 
@@ -67,7 +67,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<StackableEntitlementInfo[]>();
 
@@ -97,9 +97,36 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpWorker.SendRequest(request, rsp => response = rsp);
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<WalletInfo>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator FulfillUserItem(string @namespace, string userId,string accessToken,
+            FulfillmentRequest fulfillmentRequest,ResultCallback<FulfillmentResult> callback)
+        {
+            Assert.IsNotNull(@namespace, $"{nameof(@namespace)} cannot be null");
+            Assert.IsNotNull(userId, $"{nameof(userId)} cannot be null");
+            Assert.IsNotNull(accessToken, $"{nameof(accessToken)} cannot be null");
+            Assert.IsNotNull(fulfillmentRequest, $"{nameof(fulfillmentRequest)} cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/admin/namespaces/{namespace}/users/{userId}/fulfillment")
+                .WithPathParam("namespace",@namespace)
+                .WithPathParam("userId",userId)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(fulfillmentRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<FulfillmentResult>();
 
             callback.Try(result);
         }
