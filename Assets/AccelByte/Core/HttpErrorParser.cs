@@ -27,8 +27,8 @@ namespace AccelByte.Core
 
             try
             {
-                if (response.BodyBytes == null) return Result<T>.CreateOk(default);
-                
+                if (response.BodyBytes == null || response.BodyBytes.Length == 0) return Result<T>.CreateOk(default);
+
                 return Result<T>.CreateOk(response.BodyBytes.ToObject<T>());
             }
             catch (Exception e)
@@ -44,7 +44,7 @@ namespace AccelByte.Core
             if (response.Code >= 200 && response.Code < 300) return null;
 
             if (response.Code < 400 || response.Code >= 600) return HttpErrorParser.ParseDefaultError(response);
-            
+
             if (response.BodyBytes == null) return new Error((ErrorCode)response.Code);
 
             try

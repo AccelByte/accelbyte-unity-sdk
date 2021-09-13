@@ -87,14 +87,6 @@ namespace Tests
                     "Restart Unity after you added it.", varName));
         }
 
-        private static void AssertFailWaitTimeout(string fileName, int lineNumber)
-        {
-            var stackFrame = new StackFrame(3, true);
-            string methodName = Regex.Replace(stackFrame.GetMethod().DeclaringType.Name, @".*<([^)]+)>.*", "$1");
-            Debug.LogError("FAILED TEST " + methodName + " LINE " + stackFrame.GetFileLineNumber() + ": timeout waiting on {fileName}:{lineNumber}");
-            NUnit.Framework.Assert.Fail();
-        }
-
         private static IEnumerator SendAndLogRequest(IHttpRequest request, UnityWebRequest unityWebRequest)
         {
             unityWebRequest.certificateHandler = new BypassCertificate();
@@ -105,33 +97,10 @@ namespace Tests
 
             Report.GetHttpResponse(unityWebRequest);
         }
-        
-        // Wait while condition is true
-        public static IEnumerator WaitWhile(Func<bool> condition, string message = null,
-            int timeoutMs = 10*60*1000,
-            [CallerFilePath] string fileName = "",
-            [CallerLineNumber] int lineNumber = 0)
-        {
-            if (message != null)
-            {
-                Debug.Log($"Waiting: {message}");
-            }
-            while (condition.Invoke())
-            {
-                if (timeoutMs <= 0)
-                {
-                    Debug.LogWarning($"Timeout waiting {fileName}:{lineNumber}");
-                    break;
-                }
 
-                yield return new WaitForSeconds(0.1f);
-                timeoutMs -= 100;
-            }
-        }
-        
-        // Wait until the condition is true
+        // Wait until the condition is true, throws TimeoutException on timeout
         public static IEnumerator WaitUntil(Func<bool> condition, string message = null,
-            int timeoutMs = 10*60*1000,
+            int timeoutMs = 60 * 1000,
             [CallerFilePath] string fileName = "",
             [CallerLineNumber] int lineNumber = 0)
         {
@@ -139,80 +108,31 @@ namespace Tests
             {
                 Debug.Log($"Waiting: {message}");
             }
+
             while (!condition.Invoke())
             {
                 if (timeoutMs <= 0)
                 {
-                    AssertFailWaitTimeout(fileName, lineNumber);
-                    break;
+                    throw new TimeoutException();
                 }
 
                 yield return new WaitForSeconds(0.1f);
                 timeoutMs -= 100;
             }
         }
-        
-        // Wait until value is equal
-        public static IEnumerator WaitEqual(object expected, Func<object> actualFunc, string message = null,
-        int timeoutMs = 10*60*1000,
-        [CallerFilePath] string fileName = "",
-        [CallerLineNumber] int lineNumber = 0)
-        {
-            object actual = actualFunc.Invoke();            
-            if (message != null)
-            {
-                Debug.Log($"WaitEqual {message}: {expected} == {actual}");
-            }
-            
-            while (!Equals(expected, actual))
-            {
-                if (timeoutMs <= 0)
-                {
-                    AssertFailWaitTimeout(fileName, lineNumber);
-                    break;
-                }
 
-                Thread.Sleep(100);
-                yield return new WaitForSeconds(0.1f);
-                object newActual = actualFunc.Invoke();
-                if (!Equals(newActual, actual))
-                {
-                    actual = newActual;
-                    if (message != null)
-                    {
-                        Debug.Log($"WaitEqual {message}: {expected} == {actual}");
-                    }
-                }
-            }
-        }
-        
-        // Wait until value is not null
+        // Wait until value is not null, throws TimeoutException on timeout
         public static IEnumerator WaitForValue(Func<object> function, string message = null,
-            int timeoutMs = 10*60*1000,
+            int timeoutMs = 60*1000,
             [CallerFilePath] string fileName = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-            if (message != null)
-            {
-                Debug.Log($"Waiting: {message}");
-            }
 #if DEBUG
-            else
-            {
-                Debug.Log($"WaitForValue: File:{fileName}, Line: {lineNumber}\n");
-            }
+            Debug.Log($"{nameof(WaitForValue)}: {fileName}:{lineNumber}\n");
 #endif
-            while (function.Invoke() == null)
-            {
-                if (timeoutMs <= 0)
-                {
-                    AssertFailWaitTimeout(fileName, lineNumber);
-                    break;
-                }
-
-                yield return new WaitForSeconds(0.1f);
-                timeoutMs -= 100;
-            }
+            
+            return WaitUntil(() => function() != null, message, timeoutMs, 
+                fileName, lineNumber); // Pass file name and line number explicitly from WaitForValue
         }
 
 #if !DISABLESTEAMWORKS
@@ -2814,13 +2734,6 @@ namespace Tests
             catch (AssertionException ex)
             {
                 Debug.LogError("FAILED TEST " + methodName + " LINE " + stackFrame.GetFileLineNumber() + ": " + ex.Message);
-#if UNITY_EDITOR
-                if (UnityEditorInternal.InternalEditorUtility.inBatchMode)
-                {
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    UnityEditor.EditorApplication.Exit(1);
-                }
-#endif
 
                 throw;
             }
@@ -2840,13 +2753,6 @@ namespace Tests
             catch (AssertionException ex)
             {
                 Debug.Log("FAILED TEST " + methodName + " LINE " + stackFrame.GetFileLineNumber() + ": " + ex.Message);
-#if UNITY_EDITOR
-                if (UnityEditorInternal.InternalEditorUtility.inBatchMode)
-                {
-                    UnityEditor.EditorApplication.isPlaying = false;
-                    UnityEditor.EditorApplication.Exit(1);
-                }
-#endif
 
                 throw;
             }

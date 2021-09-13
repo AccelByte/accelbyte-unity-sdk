@@ -30,6 +30,15 @@ namespace Tests.UnitTests
         }
 
         [Test]
+        public void SuccessResponse_EmptyBody_IsErrorFalse([ValueSource("httpOks")] int httpOk)
+        {
+            var response = new MockHttpResponse { Code = httpOk, BodyBytes = new byte[0]};
+            Result<MockClass> result = response.TryParseJson<MockClass>();
+
+            Assert.False(result.IsError);
+        }
+
+        [Test]
         public void SuccessResponse_WithBody_IsErrorFalse([ValueSource("httpOks")] int httpOk)
         {
             this.AssertTryParseOk(httpOk, new { userId = "abc12345" });
@@ -198,5 +207,8 @@ namespace Tests.UnitTests
             Assert.AreEqual(error.Code, result.Error.Code);
             Assert.AreEqual(error.Message, result.Error.Message);
         }
+
+        private class MockClass { };
+
     }
 }

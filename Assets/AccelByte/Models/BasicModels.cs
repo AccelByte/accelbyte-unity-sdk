@@ -64,4 +64,10 @@ namespace AccelByte.Models
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
     }
+
+    [DataContract]
+    public class Time
+    {
+        [DataMember] public System.DateTime currentTime;
+    }
 }

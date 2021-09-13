@@ -303,7 +303,7 @@ namespace Tests.IntegrationTests
             };
             
             lobby1A.Connect();
-            yield return TestHelper.WaitWhile(() => !lobby1A.IsConnected);
+            yield return TestHelper.WaitUntil(() => lobby1A.IsConnected);
             lobby1B.Connect();
             yield return new WaitForSeconds(2);
             
@@ -444,9 +444,9 @@ namespace Tests.IntegrationTests
                 }
             }
 
-            yield return TestHelper.WaitEqual(lobbies.Length * chatMultiplier, () => chatSent, "chatSent");
+            yield return TestHelper.WaitUntil(() => chatSent == lobbies.Length * chatMultiplier, "chatSent");
 
-            yield return TestHelper.WaitEqual(chatSent * lobbies.Length, () => receivedChatCount, "receivedChatCount");
+            yield return TestHelper.WaitUntil(() => receivedChatCount == chatSent * lobbies.Length, "receivedChatCount");
 
             Debug.Log("Disconnecting chat lobbies");
             

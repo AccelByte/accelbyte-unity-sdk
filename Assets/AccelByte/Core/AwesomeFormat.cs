@@ -285,6 +285,30 @@ namespace AccelByte.Core
                         return ErrorCode.MessageFieldConversionFailed;
                     }
                 }
+                else if (fieldInfo.FieldType == typeof(Dictionary<string, int>)) // Used dsnotif
+                {
+                    try
+                    {
+                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, int>>(fieldValue);
+                        fieldInfo.SetValue(payload, convertedValue);
+                    }
+                    catch (Exception)
+                    {
+                        return ErrorCode.MessageFieldConversionFailed;
+                    }
+                }
+                else if (fieldInfo.FieldType == typeof(Dictionary<string, string>)) // Used session attribute
+                {
+                    try
+                    {
+                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, string>>(fieldValue);
+                        fieldInfo.SetValue(payload, convertedValue);
+                    }
+                    catch (Exception)
+                    {
+                        return ErrorCode.MessageFieldConversionFailed;
+                    }
+                }
                 else if (fieldValue.StartsWith("{"))
                 {
                     try

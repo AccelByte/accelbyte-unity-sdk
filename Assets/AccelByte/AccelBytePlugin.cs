@@ -57,6 +57,7 @@ namespace AccelByte.Api
         private static UGC ugc;
         private static Reporting reporting;
         private static SeasonPass seasonPass;
+        private static Miscellaneous miscellaneous;
 
         private static bool initialized = false;
 
@@ -542,6 +543,19 @@ namespace AccelByte.Api
                     AccelBytePlugin.coroutineRunner);
             }
             return AccelBytePlugin.seasonPass;
+        }
+
+        public static Miscellaneous GetMiscellaneous()
+        {
+            if(AccelBytePlugin.miscellaneous == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.miscellaneous = new Miscellaneous(
+                    new MiscellaneousApi(AccelBytePlugin.config.BasicServerUrl,AccelBytePlugin.httpClient),
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.miscellaneous;
         }
     }
 }

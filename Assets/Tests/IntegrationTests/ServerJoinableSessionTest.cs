@@ -390,7 +390,7 @@ namespace Tests.IntegrationTests
             yield return TestHelper.WaitForValue(() => AMatchmakingResult);
             TestHelper.Assert.IsResultOk(AMatchmakingResult);
 
-            yield return TestHelper.WaitWhile(() => string.IsNullOrEmpty(AMatchId));
+            yield return TestHelper.WaitUntil(() => !string.IsNullOrEmpty(AMatchId));
 
 
             // DS set query session, enqueue joinable session
@@ -455,7 +455,7 @@ namespace Tests.IntegrationTests
             yield return TestHelper.WaitForValue(() => AMatchmakingResult);
             TestHelper.Assert.IsResultOk(AMatchmakingResult);
 
-            yield return TestHelper.WaitWhile(() => string.IsNullOrEmpty(AMatchId));
+            yield return TestHelper.WaitUntil(() => !string.IsNullOrEmpty(AMatchId));
 
 
             // DS set query session, enqueue joinable session
@@ -570,7 +570,7 @@ namespace Tests.IntegrationTests
             yield return TestHelper.WaitForValue(() => AMatchmakingResult);
             TestHelper.Assert.IsResultOk(AMatchmakingResult);
 
-            yield return TestHelper.WaitWhile(() => string.IsNullOrEmpty(AMatchId));
+            yield return TestHelper.WaitUntil(() => !string.IsNullOrEmpty(AMatchId));
 
             // DS set query session, enqueue joinable session
             yield return GetSessionIdAndQueueSession();
@@ -719,7 +719,7 @@ namespace Tests.IntegrationTests
             yield return TestHelper.WaitForValue(() => AMatchmakingResult);
             TestHelper.Assert.IsResultOk(AMatchmakingResult);
 
-            yield return TestHelper.WaitWhile(() => string.IsNullOrEmpty(AMatchId));
+            yield return TestHelper.WaitUntil(() => !string.IsNullOrEmpty(AMatchId));
 
             // DS set query session, enqueue joinable session
             yield return GetSessionIdAndQueueSession();
@@ -775,7 +775,7 @@ namespace Tests.IntegrationTests
             yield return TestHelper.WaitForValue(() => AMatchmakingResult);
             TestHelper.Assert.IsResultOk(AMatchmakingResult);
 
-            yield return TestHelper.WaitWhile(() => string.IsNullOrEmpty(AMatchId));
+            yield return TestHelper.WaitUntil(() => !string.IsNullOrEmpty(AMatchId));
 
 
             // DS set query session, enqueue joinable session

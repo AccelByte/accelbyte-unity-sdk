@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.0.0%0D6.0.0) (2021-09-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **User:** Change the name of CountryInfo members of UserModel into using camelCase.
+
+### Features
+
+* **GameClient:** add extensible client API ([e189f43](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e189f438f3cb9a76e852d0cdd5f5c5e0b190040a))
+* **reporting:** Add unity reporting SDK ([a0524f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a0524f94d4eb6e19dc776ccfb32a30292fe4c8fd))
+* **SeasonPass:** initial support for Season Pass service ([35be892](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/35be8921ed1857c1a14eb14ff6b06b1ae5348adf))
+* **User:** Reimplement Logout api ([d171c13](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d171c13919f24b4477616c5097f82aca08b164f9))
+
+
+### Bug Fixes
+
+* **User:** Change the name of CountryInfo members of UserModel into using camelCase. ([0107e59](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0107e59c1a6e63fe66c98936da3713c1945562d4))
+
+
+### Reverts
+
+* **accelbyteplugin:** revert accidentally deleted http api configure and getter ([13bebc4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/13bebc469162e13ebb1a36708ab075585a37e4bc))
+
 ## [6.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/6.0.0%0D5.0.0) (2021-08-30)
 
 

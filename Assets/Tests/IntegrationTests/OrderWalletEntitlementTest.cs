@@ -201,9 +201,9 @@ namespace Tests.IntegrationTests
                 Result<ItemPagingSlicedResult> getItems = null;
                 ItemCriteria criteria = new ItemCriteria
                 {
-                    categoryPath = TestVariables.expectedChildCategoryPath,
+                    categoryPath = TestVariables.expectedGrandChildCategoryPath,
                     sortBy = "createdAt:desc",
-                    itemType = ItemType.INGAMEITEM
+                    itemType = ItemType.COINS
                 };
                 abItemStore.GetItemsByCriteria(criteria, result =>
                 {
@@ -261,9 +261,9 @@ namespace Tests.IntegrationTests
                 Result<ItemPagingSlicedResult> getItems = null;
                 ItemCriteria criteria = new ItemCriteria
                 {
-                    categoryPath = TestVariables.expectedChildCategoryPath,
+                    categoryPath = TestVariables.expectedGrandChildCategoryPath,
                     sortBy = "createdAt:desc",
-                    itemType = ItemType.INGAMEITEM
+                    itemType = ItemType.COINS
                 };
                 abItemStore.GetItemsByCriteria(criteria, result =>
                 {
@@ -539,7 +539,7 @@ namespace Tests.IntegrationTests
                 GrantUserEntitlementRequest grantUserEntitlementRequest = new GrantUserEntitlementRequest
                 {
                     itemId = TestVariables.inGameItem.itemId,
-                    itemNamespace = TestVariables.inGameItem.Namespace,
+                    itemNamespace = AccelBytePlugin.Config.Namespace,
                     grantedCode = "123456789",
                     quantity = 1,
                     source = EntitlementSource.ACHIEVEMENT,
