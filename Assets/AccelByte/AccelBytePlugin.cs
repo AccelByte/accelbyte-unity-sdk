@@ -22,19 +22,11 @@ namespace AccelByte.Api
 #endif
     public static class AccelBytePlugin
     {
-#if UNITY_EDITOR
         private static Config config;
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
         private static User user;
         private static GameClient gameClient;
-#else
-        private static readonly Config config;
-        private static readonly CoroutineRunner coroutineRunner;
-        private static readonly IHttpClient httpClient;
-        private static readonly User user;
-        private static readonly GameClient gameClient;
-#endif
         private static Categories categories;
         private static Items items;
         private static Currencies currencies;
@@ -58,16 +50,17 @@ namespace AccelByte.Api
         private static Reporting reporting;
         private static SeasonPass seasonPass;
         private static Miscellaneous miscellaneous;
+        private static Reward reward;
 
         private static bool initialized = false;
 
-        public static Config Config 
-        { 
+        public static Config Config
+        {
             get
             {
                 CheckPlugin();
                 return AccelBytePlugin.config;
-            } 
+            }
         }
 
         static AccelBytePlugin()
@@ -79,30 +72,14 @@ namespace AccelByte.Api
                 {
                     AccelBytePlugin.initialized = false;
 
-                    categories = null;
-                    items = null;
-                    orders = null;
-                    wallet = null;
-                    userProfiles = null;
-                    lobby = null;
-                    cloudStorage = null;
-                    gameProfiles = null;
-                    entitlement = null;
-                    statistic = null;
-                    qos = null;
-                    agreement = null;
-                    leaderboard = null;
-                    cloudSave = null;
-                    gameTelemetry = null;
-                    ugc = null;
-                    seasonPass = null;
+                    AccelBytePlugin.ResetApis();
                 }
             };
+#endif
         }
 
-        private static void Initialize()
+        internal static void Initialize(Config config = null)
         {
-#endif
 #if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH || UNITY_STADIA || ENABLE_IL2CPP) && !UNITY_EDITOR
             Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
                 new [] {
@@ -118,22 +95,32 @@ namespace AccelByte.Api
                 }
             );
 #endif
+            AccelBytePlugin.ResetApis();
+            AccelBytePlugin.initialized = true;
 
-            var configFile = Resources.Load("AccelByteSDKConfig");
-
-            if (configFile == null)
+            if (config == null)
             {
-                throw new Exception("'AccelByteSDKConfig.json' isn't found in the Project/Assets/Resources directory");
+                var configFile = Resources.Load("AccelByteSDKConfig");
+
+                if (configFile == null)
+                {
+                    throw new Exception("'AccelByteSDKConfig.json' isn't found in the Project/Assets/Resources directory");
+                }
+
+                string wholeJsonText = ((TextAsset)configFile).text;
+
+                AccelBytePlugin.config = wholeJsonText.ToObject<Config>();
+                AccelBytePlugin.config.CheckRequiredField();
+                AccelBytePlugin.config.Expand();
+            }
+            else
+            {
+                AccelBytePlugin.config = config;
             }
 
-            string wholeJsonText = ((TextAsset) configFile).text;
-
-            AccelBytePlugin.config = wholeJsonText.ToObject<Config>();
-            AccelBytePlugin.config.CheckRequiredField();
-            AccelBytePlugin.config.Expand();
 
             AccelBytePlugin.coroutineRunner = new CoroutineRunner();
-            
+
             AccelBytePlugin.httpClient = new AccelByteHttpClient();
             AccelBytePlugin.httpClient.SetCredentials(AccelBytePlugin.config.ClientId, AccelBytePlugin.config.ClientSecret);
             AccelBytePlugin.httpClient.SetBaseUri(new Uri(AccelBytePlugin.config.BaseUrl));
@@ -145,7 +132,7 @@ namespace AccelByte.Api
                 AccelBytePlugin.httpClient,
                 AccelBytePlugin.coroutineRunner,
                 AccelBytePlugin.config.UsePlayerPrefs);
-            
+
             AccelBytePlugin.gameClient = new GameClient(AccelBytePlugin.config, AccelBytePlugin.httpClient);
 
             AccelBytePlugin.user = new User(
@@ -190,7 +177,7 @@ namespace AccelByte.Api
                         chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
                         chain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 1, 0);
                         chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllFlags;
-                        bool chainIsValid = chain.Build((X509Certificate2) certificate);
+                        bool chainIsValid = chain.Build((X509Certificate2)certificate);
 
                         if (!chainIsValid)
                         {
@@ -284,6 +271,21 @@ namespace AccelByte.Api
             return AccelBytePlugin.orders;
         }
 
+        public static Reward GetReward()
+        {
+            if (AccelBytePlugin.reward == null)
+            {
+                CheckPlugin();
+                AccelBytePlugin.reward = new Reward(
+                    new RewardApi(AccelBytePlugin.config.PlatformServerUrl, AccelBytePlugin.httpClient),
+                    AccelBytePlugin.user.Session,
+                    AccelBytePlugin.config.Namespace,
+                    AccelBytePlugin.coroutineRunner);
+            }
+
+            return AccelBytePlugin.reward;
+        }
+
         public static Wallet GetWallet()
         {
             if (AccelBytePlugin.wallet == null)
@@ -345,7 +347,7 @@ namespace AccelByte.Api
 
             return AccelBytePlugin.gameProfiles;
         }
-        
+
         public static Entitlement GetEntitlement()
         {
             if (AccelBytePlugin.entitlement == null)
@@ -363,7 +365,7 @@ namespace AccelByte.Api
 
         public static Fulfillment GetFulfillment()
         {
-            if(AccelBytePlugin.fulfillment == null)
+            if (AccelBytePlugin.fulfillment == null)
             {
                 CheckPlugin();
                 AccelBytePlugin.fulfillment = new Fulfillment(
@@ -433,7 +435,7 @@ namespace AccelByte.Api
 
             return AccelBytePlugin.leaderboard;
         }
-        
+
         public static CloudSave GetCloudSave()
         {
             if (AccelBytePlugin.cloudSave == null)
@@ -448,7 +450,7 @@ namespace AccelByte.Api
 
             return AccelBytePlugin.cloudSave;
         }
-        
+
         public static GameTelemetry GetGameTelemetry()
         {
             if (AccelBytePlugin.gameTelemetry == null)
@@ -477,7 +479,7 @@ namespace AccelByte.Api
 
             return AccelBytePlugin.achievement;
         }
-        
+
         public static Group GetGroup()
         {
             if (AccelBytePlugin.group == null)
@@ -547,15 +549,37 @@ namespace AccelByte.Api
 
         public static Miscellaneous GetMiscellaneous()
         {
-            if(AccelBytePlugin.miscellaneous == null)
+            if (AccelBytePlugin.miscellaneous == null)
             {
                 CheckPlugin();
                 AccelBytePlugin.miscellaneous = new Miscellaneous(
-                    new MiscellaneousApi(AccelBytePlugin.config.BasicServerUrl,AccelBytePlugin.httpClient),
+                    new MiscellaneousApi(AccelBytePlugin.config.BasicServerUrl, AccelBytePlugin.httpClient),
                     AccelBytePlugin.coroutineRunner);
             }
 
             return AccelBytePlugin.miscellaneous;
+        }
+
+        private static void ResetApis()
+        {
+            categories = null;
+            items = null;
+            orders = null;
+            wallet = null;
+            userProfiles = null;
+            lobby = null;
+            cloudStorage = null;
+            gameProfiles = null;
+            entitlement = null;
+            statistic = null;
+            qos = null;
+            agreement = null;
+            leaderboard = null;
+            cloudSave = null;
+            gameTelemetry = null;
+            ugc = null;
+            seasonPass = null;
+            reward = null;
         }
     }
 }

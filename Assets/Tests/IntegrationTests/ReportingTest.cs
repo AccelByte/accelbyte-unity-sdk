@@ -33,6 +33,7 @@ namespace Tests.IntegrationTests
 
         private User user2;
         private static string user2email = "reportinguser+unity@game.test";
+        private static string displayNameUser2 = "reportinguser2";
 
         [UnityTest, TestLog, Order(0), Timeout(150000)]
         public IEnumerator Setup()
@@ -100,7 +101,7 @@ namespace Tests.IntegrationTests
             this.helperAccessToken = getAccessToken.Value.access_token;
 
             Result<PagedPublicUsersInfo> searchUser2 = null;
-            this.user.SearchUsers(user2email, result =>
+            this.user.SearchUsers(displayNameUser2, SearchType.DISPLAYNAME, result =>
             {
                 searchUser2 = result;
             });
@@ -133,7 +134,7 @@ namespace Tests.IntegrationTests
                     .Register(
                         user2email,
                         "Password123",
-                        "reportinguser2",
+                        displayNameUser2,
                         "US",
                         DateTime.Now.AddYears(-22),
                         result => registerResult = result);

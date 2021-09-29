@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -96,7 +96,7 @@ namespace AccelByte.Api
                 callback.TryError(error);
             }
 
-            var request = HttpRequestBuilder.CreatePatch(this.baseUrl + "/v3/public/namespaces/{namespace}/users/me")
+            var request = HttpRequestBuilder.CreatePatch(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me")
                 .WithPathParam("namespace", this.@namespace)
                 .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
@@ -387,7 +387,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(query, nameof(query) + " cannot be null.");
 
-            string[] filter = { "", "emailAddress", "displayName", "username" };
+            string[] filter = { "", "displayName", "username" };
 
             var builder = HttpRequestBuilder
                 .CreateGet(this.baseUrl + "/v3/public/namespaces/{namespace}/users")
@@ -515,6 +515,60 @@ namespace AccelByte.Api
             yield return this.httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<UserBanResponseV3>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator ChangeUserBanStatus(string @namespace, string accessToken, string userId, string banId, bool enabled, ResultCallback<UserBanResponseV3> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            UserEnableBan changeRequest = new UserEnableBan { enabled = enabled };
+
+            var request = HttpRequestBuilder
+               .CreatePatch(this.baseUrl + "/v3/admin/namespaces/{namespace}/users/{userId}/bans/{banId}")
+               .WithPathParam("namespace", @namespace)
+               .WithPathParam("userId", userId)
+               .WithPathParam("banId", banId)
+               .WithBearerAuth(accessToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .WithBody(changeRequest.ToUtf8Json())
+               .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<UserBanResponseV3>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserBannedList(string @namespace, string accessToken, bool activeOnly, BanType banType, int offset, int limit, ResultCallback<UserBanPagedList> callback)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var request = HttpRequestBuilder
+               .CreateGet(this.baseUrl + "/v3/admin/namespaces/{namespace}/bans/users")
+               .WithPathParam("namespace", @namespace)
+               .WithQueryParam("activeOnly", activeOnly ? "true" : "false")
+               .WithQueryParam("banType", banType.ToString())
+               .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+               .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
+               .WithBearerAuth(accessToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<UserBanPagedList>();
 
             callback.Try(result);
         }

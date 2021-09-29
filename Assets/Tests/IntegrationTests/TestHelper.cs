@@ -251,9 +251,9 @@ namespace Tests
             this.coroutineRunner.Run(DeleteAsync(user, callback));
         }
 
-        public void DeleteUserByEmailAddress(string emailAddress, ResultCallback callback)
+        public void DeleteUserByDisplayName(string displayName, ResultCallback callback)
         {
-            this.coroutineRunner.Run(DeleteUserByEmailAddressAsync(emailAddress, callback));
+            this.coroutineRunner.Run(DeleteUserByDisplayNameAsync(displayName, callback));
         }
 
         public void DeleteUser(PlatformType platformType, string platformToken, ResultCallback callback)
@@ -269,11 +269,6 @@ namespace Tests
         public void Register(RegisterUserRequest registerUserRequest, ResultCallback<RegisterUserResponse> callback)
         {
             this.coroutineRunner.Run(RegisterAsync(registerUserRequest, callback));
-        }
-
-        public void SearchUserByEmail(string emailAddress, ResultCallback<PagedPublicUsersInfo> callback)
-        {
-            this.coroutineRunner.Run(SearchUserByEmailAsync(emailAddress, callback));
         }
 
         public void LoginThenGetUserData(string username, string password, ResultCallback<UserData> callback)
@@ -507,6 +502,21 @@ namespace Tests
         public void DisableCampaignCode(string accessToken, string code, ResultCallback<CodeInfo> callback)
         {
             this.coroutineRunner.Run(DisableCampaignCodesAsync(accessToken, code, callback));
+        }
+
+        public void CreateReward(string accessToken, RewardCreateModel body, ResultCallback<RewardInfo> callback)
+        {
+            this.coroutineRunner.Run(CreateRewardAsync(accessToken, body, callback));
+        }
+
+        public void QueryRewards(string accessToken, string eventTopic, int offset, int limit, string sortBy, ResultCallback<QueryRewardInfo> callback)
+        {
+            this.coroutineRunner.Run(QueryRewardsAsync(accessToken, eventTopic, offset, limit, sortBy, callback));
+        }
+
+        public void DeleteReward(string accessToken, string rewardId, ResultCallback<QueryRewardInfo> callback)
+        {
+            this.coroutineRunner.Run(DeleteRewardAsync(accessToken, rewardId, callback));
         }
 
         #region Leaderboard
@@ -1031,13 +1041,6 @@ namespace Tests
             callback.Try(regResult);
         }
 
-        private IEnumerator SearchUserByEmailAsync(string emailAddress, ResultCallback<PagedPublicUsersInfo> callback)
-        {
-            Result<PagedPublicUsersInfo> usersInfo = null;
-            yield return this.userAccount.SearchUsers(emailAddress, SearchType.EMAILADDRESS, result => usersInfo = result);
-            callback.Try(usersInfo);
-        }
-
         private IEnumerator LoginThenGetUserDataAsync(string username, string password, ResultCallback<UserData> callback)
         {
             Result loginResult = null;
@@ -1064,7 +1067,7 @@ namespace Tests
             callback.Try(userMapResult);
         }
 
-        private IEnumerator DeleteUserByEmailAddressAsync(string emailAddress, ResultCallback callback)
+        private IEnumerator DeleteUserByDisplayNameAsync(string displayName, ResultCallback callback)
         {
             Result<TokenData> clientLoginResult = null;
 
@@ -1076,7 +1079,7 @@ namespace Tests
 
             Result<PagedPublicUsersInfo> usersInfo = null;
 
-            yield return this.userAccount.SearchUsers(emailAddress, SearchType.EMAILADDRESS , result => usersInfo = result);
+            yield return this.userAccount.SearchUsers(displayName, SearchType.DISPLAYNAME, result => usersInfo = result);
 
             if (usersInfo.Value.data.Length == 0)
             {
@@ -1842,6 +1845,66 @@ namespace Tests
             yield return request.SendWebRequest();
 
             Result<CodeInfo> result = request.GetHttpResponse().TryParseJson<CodeInfo>();
+            callback.Try(result);
+        }
+
+        private IEnumerator CreateRewardAsync(string accessToken, RewardCreateModel body,
+            ResultCallback<RewardInfo> callback)
+        {
+            UnityWebRequest request = HttpRequestBuilder
+                .CreatePost(this.config.PlatformServerUrl + "/admin/namespaces/{namespace}/rewards")
+                .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
+                .WithBody(JsonSerializer.Serialize(body))
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult()
+                .GetUnityWebRequest();
+
+            yield return request.SendWebRequest();
+
+            Result<RewardInfo> result = request.GetHttpResponse().TryParseJson<RewardInfo>();
+            callback.Try(result);
+        }
+
+        private IEnumerator QueryRewardsAsync(string accessToken, string eventTopic, int offset, int limit, string sortBy,
+            ResultCallback<QueryRewardInfo> callback)
+        {
+            UnityWebRequest request = HttpRequestBuilder
+                .CreateGet(this.config.PlatformServerUrl + "/admin/namespaces/{namespace}/rewards/byCriteria")
+                .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
+                .WithQueryParam("eventTopic", eventTopic)
+                .WithQueryParam("offset", offset.ToString())
+                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("sortBy", sortBy)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult()
+                .GetUnityWebRequest();
+
+            yield return request.SendWebRequest();
+
+            Result<QueryRewardInfo> result = request.GetHttpResponse().TryParseJson<QueryRewardInfo>();
+            callback.Try(result);
+        }
+
+        private IEnumerator DeleteRewardAsync(string accessToken, string rewardid,
+            ResultCallback<QueryRewardInfo> callback)
+        {
+            UnityWebRequest request = HttpRequestBuilder
+                .CreateDelete(this.config.PlatformServerUrl + "/admin/namespaces/{namespace}/rewards/{rewardId}")
+                .WithPathParam("namespace", AccelBytePlugin.Config.Namespace)
+                .WithPathParam("rewardId", rewardid)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult()
+                .GetUnityWebRequest();
+
+            yield return request.SendWebRequest();
+
+            Result<QueryRewardInfo> result = request.GetHttpResponse().TryParseJson<QueryRewardInfo>();
             callback.Try(result);
         }
 
@@ -2719,6 +2782,62 @@ namespace Tests
         {
             [DataMember] public CodeInfo[] data { get; set; }
             [DataMember] public Paging paging { get; set; }
+        }
+
+        [DataContract]
+        public class RewardItem
+        {
+            [DataMember] public string itemId { get; set; }
+            [DataMember] public int quantity { get; set; }
+        }
+
+        [DataContract]
+        public class RewardCondition
+        {
+            [DataMember] public string conditionName { get; set; }
+            [DataMember] public string condition { get; set; }
+            [DataMember] public string eventName { get; set; }
+            [DataMember] public RewardItem[] rewardItems { get; set; }
+        }
+
+        [DataContract]
+        public class RewardCreateModel
+        {
+            [DataMember] public string rewardCode { get; set; }
+            [DataMember] public string description { get; set; }
+            [DataMember] public string eventTopic { get; set; }
+            [DataMember] public RewardCondition[] rewardConditions { get; set; }
+            [DataMember] public int maxAwarded { get; set; }
+            [DataMember] public int maxAwardedPerUser { get; set; }
+        }
+
+        [DataContract]
+        public class RewardInfo
+        {
+            [DataMember] public string rewardId { get; set; }
+            [DataMember(Name = "namespace")] public string Namespace { get; set; }
+            [DataMember] public string rewardCode { get; set; }
+            [DataMember] public string description { get; set; }
+            [DataMember] public string eventTopic { get; set; }
+            [DataMember] public RewardCondition[] rewardConditions { get; set; }
+            [DataMember] public int maxAwarded { get; set; }
+            [DataMember] public int maxAwardedPerUser { get; set; }
+            [DataMember] public DateTime createdAt { get; set; }
+            [DataMember] public DateTime updatedAt { get; set; }
+        }
+
+        [DataContract]
+        public class QueryRewardPagingSlicedResult
+        {
+            [DataMember] public string previous { get; set; }
+            [DataMember] public string next { get; set; }
+        }
+
+        [DataContract]
+        public class QueryRewardInfo
+        {
+            [DataMember] public RewardInfo[] data { get; set; }
+            [DataMember] public QueryRewardPagingSlicedResult paging { get; set; }
         }
 
         private static void TryRun(Action action)

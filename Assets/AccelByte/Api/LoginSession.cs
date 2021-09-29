@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -59,6 +59,8 @@ namespace AccelByte.Api
         public string AuthorizationToken => this.tokenData?.access_token;
 
         public string UserId => this.tokenData?.user_id;
+
+        public bool IsComply => this.tokenData?.is_comply ?? false;
 
         public IEnumerator LoginWithUsername(
             string username,

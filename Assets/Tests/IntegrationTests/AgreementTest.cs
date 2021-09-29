@@ -52,7 +52,7 @@ namespace Tests.IntegrationTests
             #region User Setup
             // CLEAN UP PREVIOUS USER
             Result deleteResult = null;
-            testHelper.DeleteUserByEmailAddress(AgreementTestUserInfo.EmailAddress, result => deleteResult = result);
+            testHelper.DeleteUserByDisplayName(AgreementTestUserInfo.DisplayName, result => deleteResult = result);
             yield return TestHelper.WaitForValue(() => deleteResult);
 
             TestHelper.LogResult(deleteResult, "Delete user");

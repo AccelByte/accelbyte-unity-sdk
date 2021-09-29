@@ -490,6 +490,35 @@ namespace Tests.UnitTests
         }
 
         [TestFixture]
+        public class Given_a_AccelByteHttpClient_with_public_client_credentials_set
+        {
+            private IHttpClient client;
+            private Result<Data> result;
+
+            [SetUp]
+            public void SetUp()
+            {
+                this.client = new AccelByteHttpClient(new FakeService());
+                this.client.SetCredentials("username", "");
+                this.result = null;
+            }
+
+            [UnityTest, TestLog]
+            public IEnumerator When_BasicAuth_required__And_BasicAuth_implied__Then_return_no_error()
+            {
+                IHttpRequest request = HttpRequestBuilder.CreatePost(FakeService.BasicUrl)
+                    .WithBasicAuth()
+                    .WithJsonBody(new Data())
+                    .GetResult();
+
+                yield return this.client.Send(request, (Result<Data> r) => this.result = r);
+
+                AssertNoError(this.result);
+            }
+        }
+
+
+        [TestFixture]
         public class Given_a_AccelByteHttpClient_with_client_credentials_and_implicit_bearer_token_set
         {
             private IHttpClient client;
@@ -855,7 +884,19 @@ namespace Tests.UnitTests
                 }
 
                 break;
-            case "PUT " + FakeService.NoAuthUrl:
+            case "POST " + FakeService.BasicUrl:
+                string base64PublicClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes("username:"));
+                if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Basic " + base64PublicClientId)
+                {
+                    FakeService.RespondWithEcho(request, callback);
+                }
+                else
+                {
+                    FakeService.RespondWithAuthError(request, callback);
+                }
+
+                break;
+                case "PUT " + FakeService.NoAuthUrl:
                 FakeService.RespondWithEcho(request, callback);
 
                 break;

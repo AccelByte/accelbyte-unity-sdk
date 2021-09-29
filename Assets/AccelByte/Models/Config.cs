@@ -194,6 +194,8 @@ namespace AccelByte.Models
             if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
 
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
+
+            if (string.IsNullOrEmpty(this.RedirectUri)) throw new System.Exception("Init AccelByte SDK failed, Redirect URI must not null or empty.");
         }
 
         /// <summary>

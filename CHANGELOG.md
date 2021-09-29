@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.0%0D7.0.0) (2021-09-27)
+
+
+### Features
+
+* **httperrorparser:** handle empty response body bytes ([838050b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/838050b28ff3a960e398a2e5903da1d0c5e3715c))
+
+
+### Bug Fixes
+
+* **ecommerce:** fix ecommerce setup teardown dependencies ([d3d48bb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d3d48bb245d57358daf220a8b5109c302a764e0a))
+* **jenkins:** slack notification + add modules.groovy ([2f57192](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2f5719249d972caa01b06540f39a0193070c8130))
+* **jenkins:** workaround for unity test stuck at clean up mono ([bfc63f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bfc63f9e0a84bc302d6618fbe3b9173ba244a382))
+* **lobby:** make Dictionary<string,int> and <string,string> parseable with ws parser. ([f7133bc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f7133bcdc354e8a6cd0e24cad437ff7fba0df7b5))
+* **test:** do not shutdown unity run tests on first test failure ([6dfaf2f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6dfaf2fd25a15e6eeff97ace93cd46a760dbbe8d))
+
+
+### Tests
+
+* **TestHelper:** add Wait* test unit ([af1435e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/af1435ed81c8f4fe45079e014908eda3b8ec9523))
+* **TestHelper:** change Wait* methods timeout to 1 minute ([ee6204d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ee6204d0baeaf0bdb1eab09cea3dbbc7abaa25f0))
+* **TestHelper:** remove WaitWhile & WaitEqual ([8cf0d0f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8cf0d0f122689cad27dadc75e0f74c1f494cbfd1))
+
 ## [7.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.0.0%0D6.0.0) (2021-09-13)
 
 

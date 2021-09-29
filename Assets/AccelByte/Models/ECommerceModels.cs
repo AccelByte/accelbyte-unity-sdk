@@ -131,6 +131,16 @@ namespace AccelByte.Models
         TIER
     }
 
+    public enum RewardSortBy
+    {
+        NAMESPACE,
+        NAMESPACE_ASC,
+        NAMESPACE_DESC,
+        REWARDCODE,
+        REWARDCODE_ASC,
+        REWARDCODE_DESC
+    }
+
     #endregion
 
     #region Wallet
@@ -722,6 +732,48 @@ namespace AccelByte.Models
         [DataMember] public string userId { get; set; }
         [DataMember] public EntitlementSummary[] entitlementSummaries { get; set; }
         [DataMember] public CreditSummary[] creditSummaries { get; set; }
+    }
+
+    #endregion
+
+    #region Reward
+
+    [DataContract]
+    public class RewardItem
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public int quantity { get; set; }
+    }
+
+    [DataContract]
+    public class RewardCondition
+    {
+        [DataMember] public string conditionName { get; set; }
+        [DataMember] public string condition { get; set; }
+        [DataMember] public string eventName { get; set; }
+        [DataMember] public RewardItem[] rewardItems { get; set; }
+    }
+
+    [DataContract]
+    public class RewardInfo
+    {
+        [DataMember] public string rewardId { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string rewardCode { get; set; }
+        [DataMember] public string description { get; set; }
+        [DataMember] public string eventTopic { get; set; }
+        [DataMember] public RewardCondition[] rewardConditions { get; set; }
+        [DataMember] int maxAwarded { get; set; }
+        [DataMember] int maxAwardedPerUser { get; set; }
+        [DataMember] DateTime createdAt { get; set; }
+        [DataMember] DateTime updatedAt { get; set; }
+    }
+
+    [DataContract]
+    public class QueryRewardInfo
+    {
+        [DataMember] public RewardInfo[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -569,11 +569,11 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by email, displayName, or username. The query must be exactly match with the targeted user's.
+        /// Get user data from another user displayName or username. The query will be used to find the user with the most approximate username or display name.
         /// </summary>
-        /// <param name="query"> Email, display name, or username that needed to get user data. The query must be exactly match with the targeted user's.</param>
+        /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
-        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+        /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
         public void SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -589,10 +589,10 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by email, displayName, and username. The query must be exactly match with the targeted user's.
+        /// Get user data from another user by displayName or username. The query will be used to find the user with the most approximate username or display name.
         /// </summary>
-        /// <param name="query"> Email, display name, or username that needed to get user data. The query must be exactly match with the targeted user's.</param>
-        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+        /// <param name="query"> Display name or username that needed to get user data.</param>
+        /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
         public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
         {
             this.SearchUsers(query, SearchType.ALL, callback);
@@ -750,6 +750,66 @@ namespace AccelByte.Api
                     this.loginSession.AuthorizationToken,
                     userId,
                     banRequest,
+                    callback));
+        }
+
+        /// <summary>
+        /// Change Ban Status of a Single User (enabled/disabled).
+        /// Only Moderator that can change ban status.
+        /// </summary>
+        /// <param name="userId">Banned user's user ID</param>
+        /// <param name="banId">Banned user's ban ID</param>
+        /// <param name="enabled">Banned Status, false to disabled</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ChangeUserBanStatus(string userId, string banId, bool enabled, ResultCallback<UserBanResponseV3> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.userAccount.ChangeUserBanStatus(
+                    AccelBytePlugin.Config.Namespace,
+                    this.loginSession.AuthorizationToken,
+                    userId,
+                    banId,
+                    enabled,
+                    callback));
+        }
+
+        /// <summary>
+        /// Get User Banned List
+        /// Only Moderator that can get the banned list.
+        /// </summary>
+        /// <param name="banType">The type of Ban</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0) </param>
+        /// <param name="limit">The limit of item on page (optional) </param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="activeOnly">true to only get the enabled banned list</param>
+        public void GetUserBannedList(BanType banType, int offset, int limit, ResultCallback<UserBanPagedList> callback, bool activeOnly = true)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.userAccount.GetUserBannedList(
+                    AccelBytePlugin.Config.Namespace,
+                    this.loginSession.AuthorizationToken,
+                    activeOnly,
+                    banType,
+                    offset,
+                    limit,
                     callback));
         }
     }

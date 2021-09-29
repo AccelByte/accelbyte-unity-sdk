@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -481,6 +481,30 @@ namespace Tests.IntegrationTests
 
             yield return TestHelper.WaitForValue(() => logoutResult);
             TestHelper.Assert.That(tokenBeforeRefresh, Is.Not.EqualTo(tokenAfterRefresh));
+        }
+
+        [UnityTest, TestLog, Timeout(150000), Order(0)]
+        public IEnumerator LoginWithDevice_IsComply_Success()
+        {
+            var user = AccelBytePlugin.GetUser();
+            Result loginResult = null;
+            user.LoginWithDeviceId(result => loginResult = result);
+
+            yield return TestHelper.WaitUntil(() => loginResult != null);
+
+            bool isComply = user.Session.IsComply;
+
+            TestHelper helper = new TestHelper();
+            Result deleteResult = null;
+            helper.DeleteUser(user, result => deleteResult = result);
+
+            yield return TestHelper.WaitUntil(() => deleteResult != null);
+
+            Result logoutResult = null;
+            user.Logout(r => logoutResult = r);
+
+            yield return TestHelper.WaitForValue(() => logoutResult);
+            TestHelper.Assert.That(isComply);
         }
 
         [UnityTest, TestLog, Timeout(150000), Order(0)]
@@ -2049,7 +2073,7 @@ namespace Tests.IntegrationTests
         }
 
         [UnityTest, TestLog, Timeout(150000), Order(0)]
-        public IEnumerator SearchUserWithEmailAddress_UserExists_UserFound()
+        public IEnumerator SearchUserWithAllSearchType_UserExists_UserFound()
         {
             //Arrange
             var httpWorker = new AccelByteHttpClient();
@@ -2108,7 +2132,7 @@ namespace Tests.IntegrationTests
 
             //Act
             Result<PagedPublicUsersInfo> userData = null;
-            users[0].SearchUsers(registerUserResponses[1].emailAddress, result => userData = result);
+            users[0].SearchUsers(registerUserResponses[1].displayName, result => userData = result);
             yield return TestHelper.WaitForValue(() => userData);
 
             TestHelper.LogResult(userData, "Search UserData of Second Email with email address");
@@ -2197,7 +2221,7 @@ namespace Tests.IntegrationTests
 
             //Act
             Result<PagedPublicUsersInfo> userData = null;
-            users[0].SearchUsers(registerUserResponses[1].username, result => userData = result);
+            users[0].SearchUsers(registerUserResponses[1].username, SearchType.USERNAME, result => userData = result);
             yield return TestHelper.WaitForValue(() => userData);
 
             TestHelper.LogResult(userData, "Search UserData of Second Email with username");
@@ -2287,7 +2311,7 @@ namespace Tests.IntegrationTests
 
             //Act
             Result<PagedPublicUsersInfo> userData = null;
-            users[0].SearchUsers(registerUserResponses[1].displayName, result => userData = result);
+            users[0].SearchUsers(registerUserResponses[1].displayName, SearchType.DISPLAYNAME, result => userData = result);
             yield return TestHelper.WaitForValue(() => userData);
 
             TestHelper.LogResult(userData, "Search UserData of Second Email with display name");
@@ -2488,75 +2512,6 @@ namespace Tests.IntegrationTests
         }
 
 #if !DISABLESTEAMWORKS
-        [UnityTest, TestLog, Timeout(150000), Order(0)]
-        public IEnumerator SearchUserDataWithEmailAddress_NotRegistered_ReturnError()
-        {
-            var user = AccelBytePlugin.GetUser();
-            var helper = new TestHelper();
-            var guid = Guid.NewGuid().ToString("N");
-            string email = string.Format("testeraccelbyte+sdk{0}@gmail.com", guid);
-
-            Result loginDeviceResult = null;
-            user.LoginWithDeviceId(result => { loginDeviceResult = result; });
-            yield return TestHelper.WaitForValue(() => loginDeviceResult);
-
-            TestHelper.LogResult(loginDeviceResult, "Login With Device ID");
-
-            Result<PagedPublicUsersInfo> usersInfo = null;
-            user.SearchUsers(email, result => usersInfo = result);
-            yield return TestHelper.WaitForValue(() => usersInfo);
-
-            TestHelper.LogResult(usersInfo, "Get User Data With Not Registered Email");
-
-            Result deleteResult = null;
-            helper.DeleteUser(user, result => deleteResult = result);
-            yield return TestHelper.WaitForValue(() => deleteResult);
-
-            TestHelper.LogResult(deleteResult, "Delete User");
-
-            Result userLogoutResult = null;
-            user.Logout(result => userLogoutResult = result);
-            yield return TestHelper.WaitForValue(() => userLogoutResult);
-
-            TestHelper.Assert.That(usersInfo.Value.data.Length, Is.EqualTo(0));
-            TestHelper.Assert.IsResultOk(deleteResult);
-        }
-
-        [UnityTest, TestLog, Timeout(150000), Order(0)]
-        public IEnumerator SearchUserDataWithEmailAddress_BadFormat_ReturnError()
-        {
-            var user = AccelBytePlugin.GetUser();
-            var helper = new TestHelper();
-            var guid = Guid.NewGuid().ToString("N");
-            string email = string.Format("@tester@accelbyte+sdk{0}.com", guid);
-
-            Result loginDeviceResult = null;
-            user.LoginWithDeviceId(result => { loginDeviceResult = result; });
-            yield return TestHelper.WaitForValue(() => loginDeviceResult);
-
-            TestHelper.LogResult(loginDeviceResult, "Login With Device ID");
-
-
-            Result<PagedPublicUsersInfo> userData = null;
-            user.SearchUsers(email, result => userData = result);
-            yield return TestHelper.WaitForValue(() => userData);
-
-            TestHelper.LogResult(userData, "Get User Data With Bad Format Email");
-
-            Result deleteResult = null;
-            helper.DeleteUser(user, result => deleteResult = result);
-            yield return TestHelper.WaitForValue(() => deleteResult);
-
-            TestHelper.LogResult(deleteResult, "Delete User");
-
-            Result userLogoutResult = null;
-            user.Logout(result => userLogoutResult = result);
-            yield return TestHelper.WaitForValue(() => userLogoutResult);
-
-            TestHelper.Assert.That(userData.Value.data.Length, Is.EqualTo(0));
-            TestHelper.Assert.IsResultOk(deleteResult);
-        }
-
         [UnityTest, TestLog, Timeout(150000), Order(0)]
         public IEnumerator BulkGetUserBySteamIds_SteamAccount_Success()
         {

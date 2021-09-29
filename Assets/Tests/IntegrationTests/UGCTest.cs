@@ -72,6 +72,7 @@ namespace Tests.IntegrationTests
         private User user2;
         private UserData user2Data;
         private static string user2email = "ugcuser+unity@game.test";
+        private static string user2DisplayName = "ugcuser2";
 
         public bool UGCCheckContainChannel(string expectedChannelId, UGCChannelResponse[] channels)
         {
@@ -317,7 +318,7 @@ namespace Tests.IntegrationTests
             }
 
             Result<PagedPublicUsersInfo> searchUser2 = null;
-            this.user.SearchUsers(user2email, result => 
+            this.user.SearchUsers(user2DisplayName, SearchType.DISPLAYNAME, result => 
             {
                 searchUser2 = result;
             });
@@ -350,7 +351,7 @@ namespace Tests.IntegrationTests
                     .Register(
                         user2email,
                         "Password123",
-                        "ugcuser2",
+                        user2DisplayName,
                         "US",
                         DateTime.Now.AddYears(-22),
                         result => registerResult = result);
@@ -525,7 +526,7 @@ namespace Tests.IntegrationTests
             TestHelper.LogResult(user2LogoutResult, "User 2 logged out");
 
             Result deleteResult = null;
-            this.helper.DeleteUserByEmailAddress(user2email, result => deleteResult = result);
+            this.helper.DeleteUserByDisplayName(user2DisplayName, result => deleteResult = result);
             yield return TestHelper.WaitForValue(() => deleteResult);
             TestHelper.LogResult(deleteResult, "Delete user 2");
             TestHelper.Assert.IsResultOk(deleteResult);

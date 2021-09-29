@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -183,6 +187,60 @@ namespace Tests.IntegrationTests
 
             TestHelper.Assert.IsFalse(banResponse.IsError);
             TestHelper.Assert.IsTrue(banResponse.Value.reason == BanReason.MALICIOUS_CONTENT);
+        }
+
+        [UnityTest, TestLog, Timeout(30000)]
+        public IEnumerator BanUser_GetBanListSuccess()
+        {
+            //Arrange
+            DateTime endDate = DateTime.UtcNow.AddDays(1);
+
+            Result<UserBanResponseV3> banResponse = null;
+            userAdmin.BanUser(userBanned.Session.UserId, BanType.CHAT_ALL, BanReason.MALICIOUS_CONTENT, endDate, "test", false, result => { banResponse = result; });
+            yield return TestHelper.WaitForValue(() => banResponse);
+
+            //Act
+            Result<UserBanPagedList> banListResult = null;
+            userAdmin.GetUserBannedList(BanType.CHAT_ALL, 0, 20, result => banListResult = result);
+            yield return TestHelper.WaitForValue(() => banListResult);
+
+            bool isBanned = false;
+            foreach(var data in banListResult.Value.data)
+            {
+                if (data.userId == userBanned.Session.UserId)
+                {
+                    isBanned = true;
+                }
+            }
+
+            //Assert
+            TestHelper.Assert.IsFalse(banResponse.IsError);
+            TestHelper.Assert.IsFalse(banListResult.IsError);
+            TestHelper.Assert.IsTrue(isBanned);
+        }
+
+        [UnityTest, TestLog, Timeout(30000)]
+        public IEnumerator UnbanUser_Success()
+        {
+            //Arrange
+            DateTime endDate = DateTime.UtcNow.AddDays(1);
+
+            Result<UserBanResponseV3> banResponse = null;
+            userAdmin.BanUser(userBanned.Session.UserId, BanType.CHAT_ALL, BanReason.MALICIOUS_CONTENT, endDate, "test", false, result => { banResponse = result; });
+            yield return TestHelper.WaitForValue(() => banResponse);
+
+            string banId = banResponse.Value.banId;
+
+            //Act
+            Result<UserBanResponseV3> unbanResponse = null;
+            userAdmin.ChangeUserBanStatus(userBanned.Session.UserId, banId, false, result => unbanResponse = result);
+            yield return TestHelper.WaitForValue(() => unbanResponse);
+
+            //Assert
+            TestHelper.Assert.IsFalse(banResponse.IsError);
+            TestHelper.Assert.IsTrue(banResponse.Value.enabled);
+            TestHelper.Assert.IsFalse(unbanResponse.IsError);
+            TestHelper.Assert.IsFalse(unbanResponse.Value.enabled);
         }
 
         [UnityTest, TestLog, Timeout(30000)]

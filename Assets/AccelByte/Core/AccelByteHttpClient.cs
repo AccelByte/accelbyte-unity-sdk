@@ -173,7 +173,7 @@ namespace AccelByte.Core
             switch (request.AuthType)
             {
             case HttpAuth.Basic:
-                if (string.IsNullOrEmpty(this.clientId) || string.IsNullOrEmpty(this.clientSecret)) return;
+                if (string.IsNullOrEmpty(this.clientId)) return;
 
                 string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.clientSecret}"));
                 request.Headers[authHeaderKey] = "Basic " + base64;

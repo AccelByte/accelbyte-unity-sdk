@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -12,7 +12,7 @@ namespace AccelByte.Models
 {
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
-    public enum SearchType { ALL, EMAILADDRESS, DISPLAYNAME, USERNAME }
+    public enum SearchType { ALL, DISPLAYNAME, USERNAME }
 
     [DataContract]
     public class TokenData
@@ -118,8 +118,8 @@ namespace AccelByte.Models
     [DataContract]
     public class PagedPublicUsersInfo
     {
-        public PublicUserInfo[] data { get; set; }
-        public Paging paging { get; set; }
+        [DataMember] public PublicUserInfo[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
     }
 
     [DataContract]
@@ -336,7 +336,7 @@ namespace AccelByte.Models
     [DataContract]
     public class UserBanResponseV3
     {
-        [DataMember] public string ban;
+        [DataMember] public BanType ban;
         [DataMember] public string banId;
         [DataMember] public BannedByV3 bannedBy;
         [DataMember] public string comment;
@@ -349,5 +349,17 @@ namespace AccelByte.Models
         [DataMember] public string userId;
     }
 
+    [DataContract]
+    public class UserEnableBan
+    {
+        [DataMember] public bool enabled;
+    }
+
+    [DataContract]
+    public class UserBanPagedList
+    {
+        [DataMember] public UserBanResponseV3[] data;
+        [DataMember] public Paging paging;
+    }
     #endregion
 }

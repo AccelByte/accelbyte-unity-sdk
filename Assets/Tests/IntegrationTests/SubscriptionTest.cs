@@ -104,6 +104,7 @@ namespace Tests.IntegrationTests
             usersEmail[0] = "Subs1SDKTest@example.com";
             usersEmail[1] = "Subs2SDKTest@example.com";
             usersEmail[2] = "Subs3SDKTest@example.com";
+            string[] userDisplayName = { "Subs SDK Test 0", "Subs SDK Test 1", "Subs SDK Test 2" };
 
             bool notHasAppItem = false;
             bool notHasSubsItem = false;
@@ -340,7 +341,7 @@ namespace Tests.IntegrationTests
             Result<PagedPublicUsersInfo> usersInfo = null;
             for (int i = 0; i < 3; i++)
             {
-                user.SearchUsers(usersEmail[i], result => usersInfo = result);
+                user.SearchUsers(userDisplayName[i], SearchType.DISPLAYNAME, result => usersInfo = result);
                 yield return TestHelper.WaitForValue(() => usersInfo);
                 TestHelper.LogResult(usersInfo, "Get User Data With Not Registered Email");
 

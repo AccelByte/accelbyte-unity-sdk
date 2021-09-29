@@ -1,14 +1,16 @@
-// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using UnityEngine.Assertions;
+using AccelByte.Models;
 
 namespace AccelByte.Core {
     public interface ISession
     {
         string AuthorizationToken { get; }
         string UserId { get; }
+        bool IsComply { get; }
     }
 
     public static class SessionExtension

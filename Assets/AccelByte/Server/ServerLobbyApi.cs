@@ -81,30 +81,6 @@ namespace AccelByte.Server
 
             callback.Try(result);
         }
-        
-        public IEnumerator GetActiveParties(string @namespace, string accessToken, int limit, int offset, ResultCallback<ActivePartiesData> callback)
-        {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
-
-            var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/admin/party/namespaces/{namespace}/parties")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
-                .WithQueryParam("limit", Convert.ToString(limit))
-                .WithQueryParam("offset", Convert.ToString(offset))
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParseJson<ActivePartiesData>();
-
-            callback.Try(result);
-        }
 
         public IEnumerator GetPartyDataByUserId(string @namespace, string accessToken, string userId, ResultCallback<PartyDataUpdateNotif> callback)
         {

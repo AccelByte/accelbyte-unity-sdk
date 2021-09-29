@@ -150,6 +150,7 @@ namespace AccelByte.Core
         CountryNotFound = 10154,
         PlatformAlreadyLinked = 10173,
         UserAlreadyExist = 10180,
+        InvalidSession = 13132,
         FriendListIsEmpty = 11732,
 
         //AccelByte Lobby error codes
@@ -188,6 +189,7 @@ namespace AccelByte.Core
         PartyJoinAlreadyInParty = 11265,
         PartyJoinPartyFull = 11266,
         PartyJoinUnableJoinParty = 11267,
+        PartyJoinBlocked = 112610,
         //Party Kick
         PartyKickUnableGetUserRegistry = 11271,
         PartyKickNotInParty = 11272,
@@ -239,6 +241,7 @@ namespace AccelByte.Core
         StartMatchmakingUnableToFindUserParty = 11604,
         StartMatchmakingNotPartyLeader = 11605,
         StartMatchmakingUnableToStoreMMStatus = 11606,
+        StartMatchmakingMemberBanned = 11607,
         //Cancel Matchmaking
         CancelMatchmakingUnableToFindUserParty = 11611,
         CancelMatchmakingUnableToGetPartyInfo = 11612,
@@ -309,14 +312,14 @@ namespace AccelByte.Core
         GetFriendsUnableGetListOfFriends = 11793,
         GetFriendsUnableToWriteResponse = 11794,
         //Block/Unblock User
-        PlayerBlockRequestInvalidRequestBody      = 11801,
-        PlayerBlockRequestUnableGetUserRegistry   = 11802,
-        PlayerBlockRequestUnableBlockPlayer       = 11803,
-        PlayerUnblockRequestInvalidRequestBody    = 11804,
-        PlayerUnblockRequestUnableGetUserRegistry = 11805,
-        PlayerUnblockRequestUnableBlockPlayer     = 11806,
-        PlayerBlocked                             = 11807,
-        PlayerBlockedUnableGet                    = 11808,
+        PlayerBlockRequestInvalidRequestBody      = 11811,
+        PlayerBlockRequestUnableGetUserRegistry   = 11812,
+        PlayerBlockRequestUnableBlockPlayer       = 11813,
+        PlayerUnblockRequestInvalidRequestBody    = 11814,
+        PlayerUnblockRequestUnableGetUserRegistry = 11815,
+        PlayerUnblockRequestUnableBlockPlayer     = 11816,
+        PlayerBlocked                             = 11817,
+        PlayerBlockedUnableGet                    = 11818,
         //Channel Chat
         ChannelChatSenderBanned                   = 11880,
         //PartyStorage

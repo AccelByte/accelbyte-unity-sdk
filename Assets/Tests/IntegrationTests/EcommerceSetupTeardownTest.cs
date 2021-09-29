@@ -47,6 +47,7 @@ namespace Tests.IntegrationTests
             public static TestHelper.CodeInfo expiredCodeInfo;
             public static TestHelper.CodeInfo notStartedCodeInfo;
             public static bool bPublishedStoreIsExist = false;
+            public static TestHelper.RewardInfo rewardInfo = new TestHelper.RewardInfo();
 
             [DataContract]
             public class EcommerceArgumentsModel
@@ -891,6 +892,87 @@ namespace Tests.IntegrationTests
 
                 #endregion
 
+                #region Create Reward
+
+                TestHelper.RewardItem rewardItem = new TestHelper.RewardItem
+                {
+                    itemId = TestVariables.inGameItem.itemId,
+                    quantity = 1
+                };
+                TestHelper.RewardItem[] rewardItems = new TestHelper.RewardItem[1];
+                rewardItems[0] = rewardItem;
+
+                TestHelper.RewardCondition rewardCondition = new TestHelper.RewardCondition
+                {
+                    eventName = "EventNameTest",
+                    conditionName = "ConditionNameTest",
+                    condition = "$.[?(@.statCode == \"statcodetest\" && @.latestValue == 5)]",
+                    rewardItems = rewardItems,
+                };
+                TestHelper.RewardCondition[] rewardConditions = new TestHelper.RewardCondition[1];
+                rewardConditions[0] = rewardCondition;
+
+                TestHelper.RewardCreateModel rewardCreateModel = new TestHelper.RewardCreateModel
+                {
+                    rewardCode = "unityrewardtest",
+                    description = "RewardDescriptionTest",
+                    eventTopic = "statistic",
+                    rewardConditions = rewardConditions,
+                    maxAwardedPerUser = -1,
+                    maxAwarded = -1
+                };
+
+                Result<TestHelper.QueryRewardInfo> queryRewardResult = null;
+                testHelper.QueryRewards(
+                    TestVariables.accessToken,
+                    "statistic",
+                    0,
+                    99,
+                    "namespace",
+                    result => { queryRewardResult = result; });
+
+                while (queryRewardResult == null)
+                {
+                    Thread.Sleep(100);
+                    yield return null;
+                }
+                TestHelper.Assert.That(!queryRewardResult.IsError);
+
+                TestHelper.RewardInfo getReward = null;
+
+                bool isRewardExist = false;
+                if (queryRewardResult.Value.data.Length != 0)
+                {
+                    foreach (var rewardResult in queryRewardResult.Value.data)
+                    {
+                        if (rewardResult.rewardCode == rewardCreateModel.rewardCode)
+                        {
+                            isRewardExist = true;
+                            getReward = rewardResult;
+                            break;
+                        }
+                    }
+                }
+
+                Result<TestHelper.RewardInfo> createRewardResult = null;
+                if (!isRewardExist)
+                {
+                    testHelper.CreateReward(
+                        TestVariables.accessToken,
+                        rewardCreateModel,
+                        result => { createRewardResult = result; });
+
+                    while (createRewardResult == null)
+                    {
+                        Thread.Sleep(100);
+                        yield return null;
+                    }
+                    TestHelper.Assert.That(!createRewardResult.IsError);
+                    getReward = createRewardResult.Value;
+                }
+                TestVariables.rewardInfo = getReward;
+
+                #endregion
 
             }
 
@@ -912,7 +994,7 @@ namespace Tests.IntegrationTests
 
                 TestHelper testHelper = new TestHelper();
                 Result<TokenData> getAccessToken = null;
-                testHelper.GetAccessToken(result => { getAccessToken = result; });
+                testHelper.GetSuperUserAccessToken(result => { getAccessToken = result; });
                 yield return TestHelper.WaitForValue(() => getAccessToken);
                 TestHelper.Assert.IsResultOk(getAccessToken, "Cannot get access token.");
                 TestVariables.accessToken = getAccessToken.Value.access_token;
@@ -963,6 +1045,19 @@ namespace Tests.IntegrationTests
                     result => { deleteCurrencyResult = result; });
                 yield return TestHelper.WaitForValue(() => deleteCurrencyResult);
                 TestHelper.Assert.IsResultOk(deleteCurrencyResult);
+
+                Result<Tests.TestHelper.QueryRewardInfo> deleteRewardResult = null;
+                testHelper.DeleteReward(
+                    TestVariables.accessToken,
+                    TestVariables.rewardInfo.rewardId,
+                    result => { deleteRewardResult = result; });
+
+                while (deleteRewardResult == null)
+                {
+                    Thread.Sleep(100);
+                    yield return null;
+                }
+                TestHelper.Assert.That(!deleteRewardResult.IsError);
             }
         }
     }
