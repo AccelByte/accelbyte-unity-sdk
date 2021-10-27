@@ -121,6 +121,7 @@ namespace AccelByte.Server
             this.coroutineRunner.Run(this.api.RegisterLocalServer(request, authToken, callback));
         }
 
+        [Obsolete("ipify supports will be deprecated in future releases, please use RegisterLocalServer(string ip, uint port, string name, ResultCallback callback)")]
         public void RegisterLocalServer(uint port, string name, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);

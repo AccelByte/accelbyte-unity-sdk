@@ -70,5 +70,12 @@ namespace Tests.UnitTests
             Assert.True(config.PublisherNamespace == AccelBytePlugin.Config.PublisherNamespace);
             Assert.True(config.RedirectUri == AccelBytePlugin.Config.RedirectUri);
         }
+
+        [Test,TestLog,Order(5)]
+        public void Get_Api_Should_Not_Throw_Exception()
+        {
+            Assert.DoesNotThrow(() => AccelBytePlugin.GetLobby());
+            Assert.DoesNotThrow(() => AccelBytePlugin.GetUser());
+        }
     }
 }

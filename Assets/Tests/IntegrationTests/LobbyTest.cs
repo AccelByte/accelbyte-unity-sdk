@@ -1694,49 +1694,6 @@ namespace Tests.IntegrationTests
         }
 
         [UnityTest, TestLog, Order(2), Timeout(100000)]
-        public IEnumerator Notification_GetAsyncNotification()
-        {
-            Result sendNotificationResult = null;
-            string notification = "this is a notification";
-            this.helper.SendNotification(
-                this.users[0].Session.UserId,
-                true,
-                notification,
-                result => { sendNotificationResult = result; });
-
-            yield return TestHelper.WaitForValue(() =>sendNotificationResult);
-
-            TestHelper.LogResult(sendNotificationResult, "send notification");
-
-            var lobby = CreateLobby(this.users[0].Session);
-            lobby.Connect();
-
-            Debug.Log("Connected to lobby");
-
-            Result<Notification> getNotificationResult = null;
-            lobby.OnNotification += result => getNotificationResult = result;
-
-            Result pullResult = null;
-            lobby.PullAsyncNotifications(result => pullResult = result);
-
-            yield return TestHelper.WaitForValue(() => pullResult);
-
-            yield return TestHelper.WaitForValue(() =>getNotificationResult);
-
-            TestHelper.LogResult(getNotificationResult);
-
-            lobby.Disconnect();
-
-            yield return null;
-
-            Assert.IsNotNull(sendNotificationResult);
-            Assert.IsNotNull(getNotificationResult);
-            Assert.IsFalse(sendNotificationResult.IsError);
-            Assert.IsFalse(getNotificationResult.IsError);
-            Assert.IsTrue(getNotificationResult.Value.payload == notification);
-        }
-
-        [UnityTest, TestLog, Order(2), Timeout(100000)]
         public IEnumerator Notification_GetSyncNotification()
         {
             const int repetition = 2;

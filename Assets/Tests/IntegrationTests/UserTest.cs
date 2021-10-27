@@ -1098,6 +1098,32 @@ namespace Tests.IntegrationTests
             TestHelper.LogResult(deleteResult, "Delete");
         }
 
+        [UnityTest, TestLog, Timeout(150000), Order(0)]
+        public IEnumerator LoginWithEmail_LoginWithIncorrectEmail_Failed()
+        {
+            var helper = new TestHelper();
+            var user = AccelBytePlugin.GetUser();
+            var guid = Guid.NewGuid().ToString("N");
+            string email = string.Format("testeraccelbyte+sdk{0}@gmail.com", guid);
+            string password = "AccelbytE123";
+
+            Result<TokenData> clientToken = null;
+            helper.GetAccessToken(result => { clientToken = result; });
+            yield return TestHelper.WaitForValue(() => clientToken);
+
+            Result logoutResult = null;
+            user.Logout(r => logoutResult = r);
+            yield return TestHelper.WaitForValue(() => logoutResult);
+
+            Result loginResult = null;
+            user.LoginWithUsername("a" + email, password, result => loginResult = result);
+            yield return TestHelper.WaitForValue(() => loginResult);
+
+            TestHelper.LogResult(loginResult, "Login With Email");
+
+            TestHelper.Assert.That(loginResult.IsError);
+        }
+
         const int normal_expired_time = 60;
 
         [UnityTest, TestLog, Timeout((normal_expired_time * 2000) + 10000), Ignore("For Manual Test Only")]

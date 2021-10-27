@@ -110,14 +110,14 @@ namespace AccelByte.Api
                 string wholeJsonText = ((TextAsset)configFile).text;
 
                 AccelBytePlugin.config = wholeJsonText.ToObject<Config>();
-                AccelBytePlugin.config.CheckRequiredField();
-                AccelBytePlugin.config.Expand();
             }
             else
             {
                 AccelBytePlugin.config = config;
             }
 
+            AccelBytePlugin.config.CheckRequiredField();
+            AccelBytePlugin.config.Expand();
 
             AccelBytePlugin.coroutineRunner = new CoroutineRunner();
 
@@ -152,13 +152,11 @@ namespace AccelByte.Api
         /// </summary>
         private static void CheckPlugin()
         {
-#if UNITY_EDITOR
             if (!AccelBytePlugin.initialized)
             {
                 AccelBytePlugin.Initialize();
                 AccelBytePlugin.initialized = true;
             }
-#endif
         }
 
         private static bool OnCertificateValidated(object sender, X509Certificate certificate, X509Chain chain,

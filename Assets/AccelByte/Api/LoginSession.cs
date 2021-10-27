@@ -33,6 +33,7 @@ namespace AccelByte.Api
         private DateTime nextRefreshTime;
 
         public event Action<string> RefreshTokenCallback;
+        private Coroutine bearerAuthRejectedCoroutine;
 
         internal LoginSession(
             string baseUrl,
@@ -54,9 +55,12 @@ namespace AccelByte.Api
             this.usePlayerPrefs = usePlayerPrefs;
             this.httpClient = httpClient;
             this.coroutineRunner = coroutineRunner;
+
+            ((AccelByteHttpClient)this.httpClient).BearerAuthRejected += BearerAuthRejected;
+            ((AccelByteHttpClient)this.httpClient).UnauthorizedOccured += UnauthorizedOccured;
         }
 
-        public string AuthorizationToken => this.tokenData?.access_token;
+        public string AuthorizationToken { get => this.tokenData?.access_token; set => this.tokenData.access_token = value; }
 
         public string UserId => this.tokenData?.user_id;
 
@@ -314,6 +318,38 @@ namespace AccelByte.Api
                 }
             }
         }
+        private IEnumerator BearerAuthRejectRefreshToken(Action<string> callback)
+        {
+            Result refreshResult = null;
+
+            yield return this.RefreshSession(result => refreshResult = result);
+
+            callback?.Invoke(this.tokenData.access_token);
+            if (this.bearerAuthRejectedCoroutine != null)
+            {
+                this.coroutineRunner.Stop(this.bearerAuthRejectedCoroutine);
+                this.bearerAuthRejectedCoroutine = null;
+            }
+        }
+
+        private void BearerAuthRejected(string accessToken, Action<string> callback)
+        {
+            if (accessToken == this.tokenData?.access_token && 
+                this.bearerAuthRejectedCoroutine == null &&
+                this.maintainAccessTokenCoroutine != null)
+            {
+                this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
+                this.bearerAuthRejectedCoroutine = this.coroutineRunner.Run(this.BearerAuthRejectRefreshToken(callback));
+            }
+        }
+
+        private void UnauthorizedOccured(string accessToken)
+        {
+            if (accessToken == this.tokenData?.access_token)
+            {
+                this.ClearSession();
+            }
+        }
 
         private static DateTime ScheduleNormalRefresh(int expiresIn)
         {
@@ -378,11 +414,16 @@ namespace AccelByte.Api
             {
                 this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(this.MaintainSession());
             }
+
         }
 
         private void ClearSession()
         {
-            this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
+            if (this.maintainAccessTokenCoroutine != null)
+            {
+                this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
+            }
+
             this.tokenData = null;
             this.httpClient.SetImplicitBearerAuth(null);
             this.httpClient.ClearImplicitPathParams();
@@ -393,4 +434,5 @@ namespace AccelByte.Api
             PlayerPrefs.Save();
         }
     }
+
 }

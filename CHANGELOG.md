@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.1.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.1%0D7.1.0) (2021-10-27)
+
+
+### Refactors
+
+* **DSM:** Removed apify dependencies ([69608fa](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/69608fac4e169ef378bea9a67dfeffeed2267250))
+
 ## [7.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.0%0D7.0.0) (2021-09-27)
 
 

@@ -281,7 +281,7 @@ namespace AccelByte.Models
     /// <summary>
     /// Type of Ban that available
     /// </summary>
-    public enum BanType { LOGIN, STATISTICS, LEADERBOARD, ORDER_AND_PAYMENT, CHAT_SEND, CHAT_ALL }
+    public enum BanType { LOGIN, CHAT_SEND, CHAT_ALL, ORDER_AND_PAYMENT, STATISTICS, LEADERBOARD, MATCHMAKING, UGC_CREATE_UPDATE }
 
     /// <summary>
     /// Type of Ban reason that available

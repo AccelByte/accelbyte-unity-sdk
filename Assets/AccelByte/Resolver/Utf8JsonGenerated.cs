@@ -21924,7 +21924,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[1]);
             writer.WriteString(value.Namespace);
             writer.WriteRaw(this.____stringByteKeys[2]);
-            writer.WriteString(value.ban);
+            formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.BanType>().Serialize(ref writer, value.ban, formatterResolver);
             writer.WriteRaw(this.____stringByteKeys[3]);
             writer.WriteString(value.endDate);
             writer.WriteRaw(this.____stringByteKeys[4]);
@@ -21947,7 +21947,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __userId__b__ = false;
             var __Namespace__ = default(string);
             var __Namespace__b__ = false;
-            var __ban__ = default(string);
+            var __ban__ = default(global::AccelByte.Models.BanType);
             var __ban__b__ = false;
             var __endDate__ = default(string);
             var __endDate__b__ = false;
@@ -21979,7 +21979,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __Namespace__b__ = true;
                         break;
                     case 2:
-                        __ban__ = reader.ReadString();
+                        __ban__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.BanType>().Deserialize(ref reader, formatterResolver);
                         __ban__b__ = true;
                         break;
                     case 3:

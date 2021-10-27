@@ -61,19 +61,6 @@ namespace AccelByte.Server
             Assert.IsNotNull(registerRequest, "Register failed. registerserverRequest is null!");
             Assert.IsNotNull(accessToken, "Can't update a slot! accessToken parameter is null!");
 
-            if(serverSetup.ip.Length == 0)
-            {
-                AccelByteNetUtilities.GetPublicIp(getPublicIpResult =>
-                {
-                    serverSetup.ip = getPublicIpResult.Value.ip;
-                });
-
-                while(serverSetup.ip.Length == 0)
-                {
-                    yield return null;
-                }
-            }
-
             registerRequest.ip = serverSetup.ip;
             registerRequest.provider = serverSetup.provider;
             registerRequest.game_version = serverSetup.game_version;

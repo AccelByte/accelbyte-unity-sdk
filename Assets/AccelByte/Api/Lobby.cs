@@ -146,6 +146,11 @@ namespace AccelByte.Api
         /// </summary>
         public event ResultCallback<UserBannedNotification> UserBannedNotification;
 
+        /// <summary>
+        /// Raised when player is unbanned
+        /// </summary>
+        public event ResultCallback<UserBannedNotification> UserUnbannedNotification;
+
         private readonly int pingDelay;
         private int backoffDelay;
         private int maxDelay;
@@ -162,6 +167,7 @@ namespace AccelByte.Api
         private readonly object syncToken = new object();
         private readonly IWebSocket webSocket;
         private bool reconnectsOnClose;
+        private bool reconnectsOnBans;
         private WsCloseCode wsCloseCode = WsCloseCode.NotSet;
         private long id;
         private LobbySessionId lobbySessionId;
@@ -188,6 +194,7 @@ namespace AccelByte.Api
             this.maxDelay = maxDelay;
             this.totalTimeout = totalTimeout;
             this.reconnectsOnClose = false;
+            this.reconnectsOnBans = false;
             this.lobbySessionId = new LobbySessionId();
 
             this.webSocket.OnOpen += HandleOnOpen;
@@ -561,6 +568,7 @@ namespace AccelByte.Api
         ///  Ask lobby to send all pending notification to user. Listen to OnNotification.
         /// </summary> 
         /// <param name="callback">Returns a Result via callback when completed.</param>
+        [Obsolete("Lobby 2.4.0 and above dropped support for this function")]
         public void PullAsyncNotifications(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -1613,6 +1621,9 @@ namespace AccelByte.Api
             case MessageType.userBannedNotification:
                 Lobby.HandleNotification(message, this.UserBannedNotification);
                 break;
+            case MessageType.userUnbannedNotification:
+                Lobby.HandleNotification(message, this.UserUnbannedNotification);
+                break;
             default:
                 Action<ErrorCode, string> handler;
 
@@ -1623,6 +1634,15 @@ namespace AccelByte.Api
                 }
 
                 break;
+            }
+
+            if (messageType == MessageType.userBannedNotification 
+                || messageType == MessageType.userUnbannedNotification)
+            {
+                this.coroutineRunner.Run(() =>
+                {
+                    HandleBanNotification();
+                });
             }
         }
 
@@ -1648,8 +1668,27 @@ namespace AccelByte.Api
             }
         }
 
+        private void HandleBanNotification()
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            reconnectsOnBans = true;
+            
+            this.api.OnBanNotificationReceived(this.session.AuthorizationToken,
+            session =>
+            {
+                UpdateAuthToken(session);
+            });
+        }
+
+        private void UpdateAuthToken(string session)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.session.AuthorizationToken = session;
+        }
+
         private bool isReconnectable(WsCloseCode code)
         {
+
             switch (code)
             {
                 case WsCloseCode.Abnormal:
@@ -1657,7 +1696,18 @@ namespace AccelByte.Api
                 case WsCloseCode.ServiceRestart:
                 case WsCloseCode.TryAgainLater:
                 case WsCloseCode.TlsHandshakeFailure: return true;
-                default: return false;
+                default:
+                    {
+                        if (reconnectsOnBans)
+                        {
+                            reconnectsOnBans = false;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
             }
         }
 

@@ -179,5 +179,11 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+    
+        public void OnBanNotificationReceived(string accessToken, Action<string> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            ((AccelByteHttpClient)this.httpClient).OnBearerAuthRejected(callback);
+        }
     }
 }

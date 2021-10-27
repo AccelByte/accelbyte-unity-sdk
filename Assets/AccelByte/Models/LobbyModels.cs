@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -103,7 +103,8 @@ namespace AccelByte.Models
         getSessionAttributeResponse,
         getAllSessionAttributeRequest,
         getAllSessionAttributeResponse,
-        userBannedNotification
+        userBannedNotification,
+        userUnbannedNotification
     }
 
     [DataContract]
@@ -625,7 +626,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string userId;
         [DataMember(Name = "namespace")] public string Namespace;
-        [DataMember] public string ban;
+        [DataMember] public BanType ban;
         [DataMember] public string endDate;
         [DataMember] public BanReason reason;
         [DataMember] public bool enable;

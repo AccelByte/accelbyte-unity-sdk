@@ -16,14 +16,28 @@ namespace AccelByte.Core
 
     public class AccelByteHttpClient : IHttpClient
     {
+        enum RequestState
+        {
+            Invalid = 0,
+            Running,
+            Paused,
+            Resumed,
+            Stoped
+        }
+
         public event Action<IHttpRequest> ServerErrorOccured;
         
         public event Action<IHttpRequest> NetworkErrorOccured;
+
+        public event Action<string, Action<string>> BearerAuthRejected;
+
+        public event Action<string> UnauthorizedOccured;
 
         public AccelByteHttpClient(IHttpRequestSender requestSender = null)
         {
             this.sender = requestSender ?? new UnityHttpRequestSender();
             this.SetRetryParameters();
+
         }
 
         public void SetCredentials(string clientId, string clientSecret)
@@ -58,6 +72,19 @@ namespace AccelByte.Core
             this.baseUri = baseUri;
         }
 
+        public void OnBearerAuthRejected(Action<string> callback)
+        {
+            if (!IsBearerAuthRequestPaused())
+            {
+                BearerAuthRejected?.Invoke(accessToken, result => 
+                {
+                    callback?.Invoke(result);
+                    ResumeBearerAuthRequest();
+                });
+                PauseBearerAuthRequest();
+            }
+        }
+
         public void SetImplicitBearerAuth(string accessToken)
         {
             this.accessToken = accessToken;
@@ -90,14 +117,38 @@ namespace AccelByte.Core
             IHttpResponse httpResponse = null;
             Error error = null;
 
+            RequestState state = RequestState.Invalid;
+            if (IsBearerAuthRequestPaused() && request.AuthType == HttpAuth.Bearer )
+            {
+                state = RequestState.Paused;
+            }
+            else
+            {
+                state = RequestState.Running;
+            }
+
             do
             {
+                if (state == RequestState.Paused)
+                {
+                    if (IsBearerAuthRequestPaused())
+                    {
+                        continue;
+                    }
+
+                    state = RequestState.Resumed;
+                    stopwatch.Restart();
+                    request.Headers.Remove("Authorization");
+                    ApplyImplicitAuthorization(request);
+                }
+
                 int timeoutMs = (int)(this.totalTimeoutMs - stopwatch.ElapsedMilliseconds);
 
                 yield return this.sender.Send(request, (rsp, err) => (httpResponse, error) = (rsp, err), timeoutMs);
 
                 if (error != null)
                 {
+                    state = RequestState.Stoped;
                     this.NetworkErrorOccured?.Invoke(request);
                     callback?.Invoke(httpResponse, error);
 
@@ -119,13 +170,30 @@ namespace AccelByte.Core
                     retryDelayMs = Math.Min(retryDelayMs*2, this.maxDelayMs);
 
                     break;
-                default:
-                    callback?.Invoke(httpResponse, null);
+                case HttpStatusCode.Unauthorized:
+                    if (state == RequestState.Resumed || request.AuthType != HttpAuth.Bearer)
+                    {
+                        state = RequestState.Stoped;
+                        callback?.Invoke(httpResponse, error);
+                        UnauthorizedOccured?.Invoke(accessToken);
+                        yield break;
+                    }
+                    else
+                    {
+                        state = RequestState.Paused;
+                        OnBearerAuthRejected(result => {});
+                        yield return new WaitWhile(IsBearerAuthRequestPaused);
+                    }
+                    break;
 
+                default:
+
+                    state = RequestState.Stoped;
+                    callback?.Invoke(httpResponse, null);
                     yield break;
                 }
             }
-            while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(this.totalTimeoutMs));
+            while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(this.totalTimeoutMs) || IsBearerAuthRequestPaused());
 
             callback?.Invoke(httpResponse, null);
         }
@@ -185,6 +253,9 @@ namespace AccelByte.Core
                 break;
             }
         }
+        private bool IsBearerAuthRequestPaused() { return isBanDetected; }
+        private void PauseBearerAuthRequest() { isBanDetected = true; }
+        private void ResumeBearerAuthRequest() { isBanDetected = false; }
 
         private readonly IHttpRequestSender sender;
         private uint totalTimeoutMs;
@@ -195,5 +266,7 @@ namespace AccelByte.Core
         private string accessToken;
         private readonly IDictionary<string,string> pathParams = new Dictionary<string, string>();
         private Uri baseUri;
+
+        private bool isBanDetected;
     }
 }

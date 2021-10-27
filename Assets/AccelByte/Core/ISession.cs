@@ -8,7 +8,7 @@ using AccelByte.Models;
 namespace AccelByte.Core {
     public interface ISession
     {
-        string AuthorizationToken { get; }
+        string AuthorizationToken { get; set; }
         string UserId { get; }
         bool IsComply { get; }
     }

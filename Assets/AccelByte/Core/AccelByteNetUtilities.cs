@@ -5,6 +5,7 @@
 using System.Collections;
 using AccelByte.Models;
 using System.Net;
+using System;
 
 namespace AccelByte.Core
 {
@@ -13,6 +14,7 @@ namespace AccelByte.Core
         private static readonly CoroutineRunner coroutineRunner = new CoroutineRunner();
         private static readonly IHttpClient HttpClient = new AccelByteHttpClient();
 
+        [Obsolete("ipify supports will be deprecated in future releases)")]
         public static void GetPublicIp(ResultCallback<PublicIp> callback)
         {
             coroutineRunner.Run(GetPublicIpAsync(callback));
