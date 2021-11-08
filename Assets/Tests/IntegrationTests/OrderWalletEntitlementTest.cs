@@ -893,6 +893,63 @@ namespace Tests.IntegrationTests
                 TestHelper.Assert.IsTrue(getUserEntitlementByIdResult.Value.id == fulfillmentResult.Value.entitlementSummaries[0].id, "Entitlements is not found.");
                 TestHelper.Assert.IsTrue(getUserEntitlementByIdResult.Value.itemId == TestVariables.inGameItem.itemId, "Loot item is not found.");
             }
+
+            [UnityTest, TestLog, Order(12)]
+            public IEnumerator CreateOrder_MediaItem_Success()
+            {
+                Items items = AccelBytePlugin.GetItems();
+                ItemCriteria itemCriteria = new ItemCriteria
+                {
+                    categoryPath = TestVariables.expectedMediaCategoryPath,
+                    sortBy = "createdAt:desc"
+                };
+                Result<ItemPagingSlicedResult> getItemsByCriteria = null;
+                items.GetItemsByCriteria(
+                    itemCriteria,
+                    result =>
+                    {
+                        getItemsByCriteria = result;
+                    });
+                yield return TestHelper.WaitForValue(() => getItemsByCriteria);
+
+                Orders orders = AccelBytePlugin.GetOrders();
+                OrderRequest orderRequest = new OrderRequest
+                {
+                    currencyCode = getItemsByCriteria.Value.data[0].regionData[0].currencyCode,
+                    discountedPrice = getItemsByCriteria.Value.data[0].regionData[0].discountedPrice,
+                    itemId = getItemsByCriteria.Value.data[0].itemId,
+                    price = getItemsByCriteria.Value.data[0].regionData[0].price,
+                    quantity = 1,
+                    returnUrl = "https://www.example.com",
+                    region = TestVariables.region
+                };
+                Result<OrderInfo> createOrderResult = null;
+                orders.CreateOrder(orderRequest, result => { createOrderResult = result; });
+                yield return TestHelper.WaitForValue(() => createOrderResult);
+
+                TestHelper.Assert.IsResultOk(createOrderResult, "Create order failed.");
+
+                Entitlement entitlement = AccelBytePlugin.GetEntitlement();
+
+                Result<Ownership> getUserEntitlementOwnershipByItemId = null;
+                entitlement.GetUserEntitlementOwnershipByItemId(getItemsByCriteria.Value.data[0].itemId, Result => { getUserEntitlementOwnershipByItemId = Result; });
+
+                TestHelper.WaitForValue(() => getUserEntitlementOwnershipByItemId);
+                while (getUserEntitlementOwnershipByItemId == null)
+                {
+                    Thread.Sleep(100);
+
+                    yield return null;
+                }
+
+                bool MediaItemEntitlementSuccess = false;
+                if (getUserEntitlementOwnershipByItemId.Value.owned)
+                {
+                    MediaItemEntitlementSuccess = true;
+                }
+
+                TestHelper.Assert.IsTrue(MediaItemEntitlementSuccess);
+            }
         }
     }
 }

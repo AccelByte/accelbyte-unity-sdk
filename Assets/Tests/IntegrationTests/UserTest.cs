@@ -1706,7 +1706,58 @@ namespace Tests.IntegrationTests
             TestHelper.Assert.That(updateResult.Value.userName, Is.EqualTo(username));
             TestHelper.Assert.IsResultOk(usernameLoginResult, "username login ");
         }
+        
+        [UnityTest, TestLog, Timeout(150000), Order(0)]
+        public IEnumerator GetPublicUserProfile()
+        {
+            var user = AccelBytePlugin.GetUser();
+            Result loginResult = null;
+            var userProfiles = AccelBytePlugin.GetUserProfiles();
+            
+            Result<UserProfile> createProfileResult = null;
+            Result deleteResult = null;
+            Result deleteProfileResult = null;
+            
+            user.LoginWithDeviceId(result => { loginResult = result; });
+            yield return TestHelper.WaitForValue(() => loginResult);
+            
+            Debug.Log("Access Token: " + user.Session.AuthorizationToken);
+            
+            userProfiles.CreateUserProfile(
+                new CreateUserProfileRequest
+                {
+                    language = "en",
+                    timeZone = "Asia/Jakarta",
+                    firstName = "first",
+                    lastName = "last",
+                    dateOfBirth = "2000-01-01"
+                },
+                result => createProfileResult = result);
+            yield return TestHelper.WaitForValue(() => createProfileResult);
 
+            TestHelper.LogResult(createProfileResult, "\r\nCreate User Profile");
+            
+            Debug.Log("userID: " + user.Session.UserId);
+
+            Result<PublicUserProfile> getPublicProfileResult = null;
+            userProfiles.GetPublicUserProfile(user.Session.UserId,result => { getPublicProfileResult = result; });
+            yield return TestHelper.WaitForValue(() => getPublicProfileResult);
+
+            TestHelper.LogResult(getPublicProfileResult, "Get Public User Profile");
+            
+            helper.DeleteUserProfile(user, result => { deleteProfileResult = result; });
+            yield return TestHelper.WaitForValue(() => deleteProfileResult);
+
+            TestHelper.LogResult(deleteProfileResult, "Delete User Profile");
+
+            helper.DeleteUser(user, result => { deleteResult = result; });
+            yield return TestHelper.WaitForValue(() => deleteResult);
+
+            TestHelper.LogResult(deleteResult, "Delete User");
+            
+        }
+        
+        
         [UnityTest, TestLog, Timeout(150000), Order(0)]
         public IEnumerator CreateAndGetUserProfiles_WithDefaultFields_Success()
         {

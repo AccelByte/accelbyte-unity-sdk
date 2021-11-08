@@ -133,6 +133,32 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator GetUserEntitlementOwnershipByItemId(string Namespace, string userId, string userAccessToken, string itemId, 
+            ResultCallback<Ownership> callback)
+        {
+            Assert.IsNotNull(Namespace, "Can't get user entitlements! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't get user entitlements! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't get user entitlements! UserAccessToken parameter is null!");
+            Assert.IsNotNull(itemId, "Can't get user entitlements! itemId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/me/entitlements/ownership/byItemId")
+                .WithPathParam("namespace", Namespace)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("itemId", itemId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<Ownership>();
+            callback.Try(result);
+        }
+
         public IEnumerator GetUserEntitlementOwnershipAny(string publisherNamespace, string userId, string userAccessToken,
             string[] itemIds, string[] appIds, string[] skus, ResultCallback<Ownership> callback)
         {

@@ -303,7 +303,7 @@ namespace AccelByte.Api
             AccelByteDebug.Log("[Lobby] Start Maintaining connection: " + wsCloseCode);
 #endif
             this.reconnectsOnClose = true;
-            this.maintainConnectionCoroutine = this.coroutineRunner.Run(
+            this.maintainConnectionCoroutine = coroutineRunner.Run(
                 MaintainConnection(this.backoffDelay, this.maxDelay, this.totalTimeout));
         }
 
@@ -316,7 +316,7 @@ namespace AccelByte.Api
 
             if (this.maintainConnectionCoroutine == null) return;
 
-            this.coroutineRunner.Stop(this.maintainConnectionCoroutine);
+            coroutineRunner.Stop(this.maintainConnectionCoroutine);
             this.maintainConnectionCoroutine = null;
             this.channelSlug = null;
         }
@@ -602,7 +602,7 @@ namespace AccelByte.Api
                 return;
             }
             BulkFriendsRequest otherUserIds= new BulkFriendsRequest{ friendIds = userIds };
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 this.api.BulkFriendRequest(
                     this.@namespace,
                     this.session.UserId,
@@ -712,7 +712,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 this.api.BulkGetUserPresence(
                     this.@namespace,
                     userIds,
@@ -1158,7 +1158,7 @@ namespace AccelByte.Api
 
                 return;
             }
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 this.api.GetPartyStorage(
                     this.@namespace,
                     this.session.AuthorizationToken,
@@ -1213,7 +1213,7 @@ namespace AccelByte.Api
                     updateRequest.custom_attribute = getPartyStorageResult.Value.custom_attribute;
                     updateRequest.updatedAt = getPartyStorageResult.Value.updatedAt;
 
-                    this.coroutineRunner.Run(
+                    coroutineRunner.Run(
                         this.api.WritePartyStorage(
                             this.@namespace,
                             this.session.AuthorizationToken,
@@ -1295,7 +1295,7 @@ namespace AccelByte.Api
 
                 return;
             }
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 this.api.GetListOfBlockedUser(
                     this.@namespace,
                     this.session.AuthorizationToken,
@@ -1314,8 +1314,8 @@ namespace AccelByte.Api
 
                 return;
             }
-            this.coroutineRunner.Run(
-                this.api.GetListOfBlocker(
+            coroutineRunner.Run(
+               this.api.GetListOfBlocker(
                     this.@namespace,
                     this.session.AuthorizationToken,
                     this.session.UserId,
@@ -1405,7 +1405,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload);
                 }
 
-                this.coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback.Try(result));
             };
 
             this.webSocket.Send(writer.ToString());
@@ -1423,7 +1423,7 @@ namespace AccelByte.Api
             {
                 Result result = errorCode != ErrorCode.None ? Result.CreateError(errorCode) : Result.CreateOk();
 
-                this.coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback.Try(result));
             };
 
             this.webSocket.Send(writer.ToString());
@@ -1453,7 +1453,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload);
                 }
 
-                this.coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback.Try(result));
             };
 
             this.webSocket.Send(writer.ToString());
@@ -1469,7 +1469,7 @@ namespace AccelByte.Api
             {
                 Result result = errorCode != ErrorCode.None ? Result.CreateError(errorCode) : Result.CreateOk();
 
-                this.coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback.Try(result));
             };
 
             this.webSocket.Send(writer.ToString());
@@ -1481,7 +1481,7 @@ namespace AccelByte.Api
 #if DEBUG
             AccelByteDebug.Log("[WS] Connection open");
 #endif
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 () =>
                 {
                     Action handler = this.Connected;
@@ -1501,7 +1501,7 @@ namespace AccelByte.Api
 #endif
             var code = (WsCloseCode)closecode;
             this.wsCloseCode = code;
-            this.coroutineRunner.Run(
+            coroutineRunner.Run(
                 () =>
                 {
                     if (!isReconnectable(code))
@@ -1529,100 +1529,100 @@ namespace AccelByte.Api
             switch (messageType)
             {
             case MessageType.partyGetInvitedNotif:
-                Lobby.HandleNotification(message, this.InvitedToParty);
+                HandleNotification(message, this.InvitedToParty);
 
                 break;
             case MessageType.partyJoinNotif:
-                Lobby.HandleNotification(message, this.JoinedParty);
+                HandleNotification(message, this.JoinedParty);
 
                 break;
             case MessageType.partyKickNotif:
-                Lobby.HandleNotification(message, this.KickedFromParty);
+                HandleNotification(message, this.KickedFromParty);
 
                 break;
             case MessageType.partyLeaveNotif:
-                Lobby.HandleNotification(message, this.LeaveFromParty);
+                HandleNotification(message, this.LeaveFromParty);
 
                 break;
             case MessageType.personalChatNotif:
-                Lobby.HandleNotification(message, this.PersonalChatReceived);
+                HandleNotification(message, this.PersonalChatReceived);
 
                 break;
             case MessageType.partyChatNotif:
-                Lobby.HandleNotification(message, this.PartyChatReceived);
+                HandleNotification(message, this.PartyChatReceived);
 
                 break;
             case MessageType.messageNotif:
-                Lobby.HandleNotification(message, this.OnNotification);
+                HandleNotification(message, this.OnNotification);
 
                 break;
             case MessageType.userStatusNotif:
-                Lobby.HandleNotification(message, this.FriendsStatusChanged);
+                HandleNotification(message, this.FriendsStatusChanged);
 
                 break;
             case MessageType.matchmakingNotif:
-                Lobby.HandleNotification(message, this.MatchmakingCompleted);
+                HandleNotification(message, this.MatchmakingCompleted);
 
                 break;
             case MessageType.dsNotif:
-                Lobby.HandleNotification(message, this.DSUpdated);
+                HandleNotification(message, this.DSUpdated);
 
                 break;
             case MessageType.acceptFriendsNotif:
-                Lobby.HandleNotification(message, this.FriendRequestAccepted);
+                HandleNotification(message, this.FriendRequestAccepted);
 
                 break;
             case MessageType.requestFriendsNotif:
-                Lobby.HandleNotification(message, this.OnIncomingFriendRequest);
+                HandleNotification(message, this.OnIncomingFriendRequest);
 
                 break;
             case MessageType.unfriendNotif:
-                Lobby.HandleNotification(message, this.OnUnfriend);
+                HandleNotification(message, this.OnUnfriend);
 
                 break;
             case MessageType.cancelFriendsNotif:
-                Lobby.HandleNotification(message, this.FriendRequestCanceled);
+                HandleNotification(message, this.FriendRequestCanceled);
 
                 break;
             case MessageType.rejectFriendsNotif:
-                Lobby.HandleNotification(message, this.FriendRequestRejected);
+                HandleNotification(message, this.FriendRequestRejected);
 
                 break;
             case MessageType.setReadyConsentNotif:
-                Lobby.HandleNotification(message, this.ReadyForMatchConfirmed);
+                HandleNotification(message, this.ReadyForMatchConfirmed);
 
                 break;
             case MessageType.rematchmakingNotif:
-                Lobby.HandleNotification(message, this.RematchmakingNotif);
+                HandleNotification(message, this.RematchmakingNotif);
 
                 break;
             case MessageType.channelChatNotif:
-                Lobby.HandleNotification(message, this.ChannelChatReceived);
+                HandleNotification(message, this.ChannelChatReceived);
 
                 break;
             case MessageType.connectNotif:
                 AwesomeFormat.ReadPayload(message, out lobbySessionId);
                 break;
             case MessageType.disconnectNotif:
-                Lobby.HandleNotification(message, this.Disconnecting);
+                HandleNotification(message, this.Disconnecting);
                 break;
             case MessageType.partyDataUpdateNotif:
-                Lobby.HandleNotification(message, this.PartyDataUpdateNotif);
+                HandleNotification(message, this.PartyDataUpdateNotif);
                 break;
             case MessageType.partyRejectNotif:
-                Lobby.HandleNotification(message, this.RejectedPartyInvitation);
+                HandleNotification(message, this.RejectedPartyInvitation);
                 break;
             case MessageType.blockPlayerNotif:
-                Lobby.HandleNotification(message, this.PlayerBlockedNotif);
+                HandleNotification(message, this.PlayerBlockedNotif);
                 break;
             case MessageType.unblockPlayerNotif:
-                Lobby.HandleNotification(message, this.PlayerUnblockedNotif);
+                HandleNotification(message, this.PlayerUnblockedNotif);
                 break;
             case MessageType.userBannedNotification:
-                Lobby.HandleNotification(message, this.UserBannedNotification);
+                HandleNotification(message, this.UserBannedNotification);
                 break;
             case MessageType.userUnbannedNotification:
-                Lobby.HandleNotification(message, this.UserUnbannedNotification);
+                HandleNotification(message, this.UserUnbannedNotification);
                 break;
             default:
                 Action<ErrorCode, string> handler;
@@ -1639,14 +1639,14 @@ namespace AccelByte.Api
             if (messageType == MessageType.userBannedNotification 
                 || messageType == MessageType.userUnbannedNotification)
             {
-                this.coroutineRunner.Run(() =>
+                coroutineRunner.Run(() =>
                 {
                     HandleBanNotification();
                 });
             }
         }
 
-        private static void HandleNotification<T>(string message, ResultCallback<T> handler) where T : class, new()
+        private void HandleNotification<T>(string message, ResultCallback<T> handler) where T : class, new()
         {
             Report.GetWebSocketNotification(message);
 
@@ -1660,11 +1660,11 @@ namespace AccelByte.Api
 
             if (errorCode != ErrorCode.None)
             {
-                handler(Result<T>.CreateError(errorCode));
+                coroutineRunner.Run( ()=>handler(Result<T>.CreateError(errorCode)));
             }
             else
             {
-                handler(Result<T>.CreateOk(payload));
+                coroutineRunner.Run( ()=>handler(Result<T>.CreateOk(payload)));
             }
         }
 

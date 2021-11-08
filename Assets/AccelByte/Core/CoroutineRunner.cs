@@ -36,7 +36,7 @@ namespace AccelByte.Core
         ~CoroutineRunner() { this.isRunning = false; }
 
         public Coroutine Run(IEnumerator coroutine) { return this.monoBehaviour.StartCoroutine(coroutine); }
-
+        
         public void Stop(Coroutine coroutine) { this.monoBehaviour.StopCoroutine(coroutine); }
 
         public void Run(Action callback)
@@ -46,7 +46,7 @@ namespace AccelByte.Core
                 this.callbacks.Enqueue(callback);
             }
         }
-
+        
         private IEnumerator RunCallbacks()
         {
             while (this.isRunning)

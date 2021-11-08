@@ -26,7 +26,11 @@ namespace AccelByte.Models
         [DataMember] public string ip { get; set; }
         [DataMember] public string pod_name { get; set; }
         [DataMember] public int port { get; set; }
-        [DataMember]public string provider { get; set; }
+        [DataMember] public string provider { get; set; }
+        [DataMember] public string public_ip { get; set; }
+        [DataMember] public string custom_attribute { get; set; }
+        [DataMember] public string allocation_id { get; set; }
+        [DataMember] public Dictionary<string, string> ports { get; set; }
     }
 
     [DataContract]

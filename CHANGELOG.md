@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.0.0%0D7.1.1) (2021-11-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **LobbyServer:** remove GetActiveParties method.
+
+### Features
+
+* **AccelBytePlugin:** changes required for multicredential ([8547780](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8547780bff7e89433a5da1bcf363f3a9754392a5))
+* **ban:** add change ban status, get ban list, and update error code ([9c94372](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9c94372eb3c60a4f3011ca63c58544ab8b7fc7ca))
+* **reward:** Adding GetRewardByRewardCode, GetRewardByRewardId, and QueryRewards . also setup for the integration tests. ([631f6f6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/631f6f6f2b366e0ac6d993bb9cbb58ffdf11986f))
+* **session:** add is comply ([0a13c57](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0a13c57692658f5814c4456e0af1adcc1800eadd))
+* **shadowban:** Add auto refresh token when bearer auth rejected, and try reconnect when in lobby ([543f9f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/543f9f955554acbb878b21a565c82cb0ed46eb6c))
+
+
+### Bug Fixes
+
+* **AccelByteHttpClient:** remove ClientSecret is empty checker ([03826d1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/03826d1bd2b675d48f5ada235130d5c8fbbf8b60))
+* **AccelBytePlugin:** remove CheckPlugin preprocessor so that every platform could manually initialize plugin if the plugin has not been initialized ([c5d7513](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c5d751344ec929703cc4474c07080914c1aba486))
+* **login:** fix null reference when login with incorrect email ([da2ad38](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/da2ad381d275e6546bc47ad6ccf2360209fdbb05))
+
+
+### Refactors
+
+* **LobbyServer:** remove GetActiveParties method. ([e891cb3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e891cb3582cecfd62296074e111b8dfbad9fa7ed))
+
 ### [7.1.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.1%0D7.1.0) (2021-10-27)
 
 

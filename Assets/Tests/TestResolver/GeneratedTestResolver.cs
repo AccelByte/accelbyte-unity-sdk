@@ -43,120 +43,129 @@ namespace AccelByte.Models.Resolvers
 
         static GeneratedTestResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(112)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(121)
             {
                 {typeof(Permission[]), 0 },
                 {typeof(global::Tests.TestHelper.RoleV4Response[]), 1 },
                 {typeof(global::Tests.TestHelper.RedeemableItem[]), 2 },
                 {typeof(global::Tests.TestHelper.CampaignInfo[]), 3 },
                 {typeof(global::Tests.TestHelper.CodeInfo[]), 4 },
-                {typeof(global::Tests.TestHelper.FlexingRule[]), 5 },
-                {typeof(global::Tests.TestHelper.MatchingRule[]), 6 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, string>), 7 },
-                {typeof(RegionDataItem[]), 8 },
-                {typeof(Image[]), 9 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.ItemCreateModel.Localization>), 10 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, RegionDataItem[]>), 11 },
-                {typeof(AchievementIcon[]), 12 },
-                {typeof(global::Tests.TestHelper.ReportingAdminReasonItem[]), 13 },
-                {typeof(Rules[]), 14 },
-                {typeof(global::Tests.TestHelper.CreateGroupConfigResponse[]), 15 },
-                {typeof(MemberRolePermission[]), 16 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyObject[]), 17 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyVersion[]), 18 },
-                {typeof(global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest[]), 19 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.DeploymentConfig>), 20 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.PodConfig>), 21 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.DeploymentWithOverride>), 22 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, int>), 23 },
-                {typeof(global::AccelByte.Models.FlexingRule[]), 24 },
-                {typeof(global::AccelByte.Models.MatchingRule[]), 25 },
-                {typeof(global::System.Collections.Generic.Dictionary<string, object>), 26 },
-                {typeof(global::Tests.TestHelper.RoleV4Response), 27 },
-                {typeof(global::Tests.TestHelper.ListRoleV4Response), 28 },
-                {typeof(global::Tests.TestHelper.AssignUserV4Request), 29 },
-                {typeof(global::Tests.TestHelper.AssignUserV4Response), 30 },
-                {typeof(global::Tests.TestHelper.RedeemableItem), 31 },
-                {typeof(global::Tests.TestHelper.CampaignCreateModel), 32 },
-                {typeof(global::Tests.TestHelper.CampaignInfo), 33 },
-                {typeof(global::Tests.TestHelper.CampaignPagingSlicedResult), 34 },
-                {typeof(global::Tests.TestHelper.CampaignUpdateModel), 35 },
-                {typeof(global::Tests.TestHelper.CampaignCodeCreateModel), 36 },
-                {typeof(global::Tests.TestHelper.CampaignCodeCreateResult), 37 },
-                {typeof(global::Tests.TestHelper.CodeInfo), 38 },
-                {typeof(global::Tests.TestHelper.CodeInfoPagingSlicedResult), 39 },
-                {typeof(global::Tests.TestHelper.AllianceRule), 40 },
-                {typeof(global::Tests.TestHelper.FlexingRule), 41 },
-                {typeof(global::Tests.TestHelper.MatchingRule), 42 },
-                {typeof(global::Tests.TestHelper.RuleSet), 43 },
-                {typeof(global::Tests.TestHelper.CreateChannelRequest), 44 },
-                {typeof(global::Tests.TestHelper.CurrencyCreateModel), 45 },
-                {typeof(global::Tests.TestHelper.CurrencyInfoModel), 46 },
-                {typeof(global::Tests.TestHelper.CurrencySummaryModel), 47 },
-                {typeof(global::Tests.TestHelper.StoreCreateModel), 48 },
-                {typeof(global::Tests.TestHelper.CategoryCreateModel), 49 },
-                {typeof(global::Tests.TestHelper.LocalExt), 50 },
-                {typeof(global::Tests.TestHelper.RegionDataUS), 51 },
-                {typeof(global::Tests.TestHelper.ItemCreateModel.Localization), 52 },
-                {typeof(global::Tests.TestHelper.ItemCreateModel.Recurring), 53 },
-                {typeof(global::Tests.TestHelper.ItemCreateModel), 54 },
-                {typeof(global::Tests.TestHelper.ItemCreateModel.RegionDatas), 55 },
-                {typeof(global::Tests.TestHelper.ItemCreateModel.Localizations), 56 },
-                {typeof(global::Tests.TestHelper.StoreInfoModel), 57 },
-                {typeof(global::Tests.TestHelper.FullCategoryInfo), 58 },
-                {typeof(global::Tests.TestHelper.FullItemInfo), 59 },
-                {typeof(global::Tests.TestHelper.CreditRequestModel), 60 },
-                {typeof(global::Tests.TestHelper.FulfillmentModel), 61 },
-                {typeof(global::Tests.TestHelper.UserMapResponse), 62 },
-                {typeof(global::Tests.TestHelper.StatCreateModel), 63 },
-                {typeof(global::Tests.TestHelper.UserVerificationCode), 64 },
-                {typeof(global::Tests.TestHelper.AchievementRequest), 65 },
-                {typeof(global::Tests.TestHelper.AchievementResponse), 66 },
-                {typeof(global::Tests.TestHelper.ReportingAdminReasonItem), 67 },
-                {typeof(global::Tests.TestHelper.ReportingAdminReasonsResponse), 68 },
-                {typeof(global::Tests.TestHelper.ReportingAddReasonRequest), 69 },
-                {typeof(global::Tests.TestHelper.ReportingAddReasonGroupRequest), 70 },
-                {typeof(global::Tests.TestHelper.LeaderboardDailyConfig), 71 },
-                {typeof(global::Tests.TestHelper.LeaderboardMonthlyConfig), 72 },
-                {typeof(global::Tests.TestHelper.LeaderboardWeeklyConfig), 73 },
-                {typeof(global::Tests.TestHelper.LeaderboardConfigRequest), 74 },
-                {typeof(global::Tests.TestHelper.LeaderboardConfigResponse), 75 },
-                {typeof(global::Tests.TestHelper.CreateGroupConfigResponse), 76 },
-                {typeof(global::Tests.TestHelper.PaginatedGroupConfig), 77 },
-                {typeof(global::Tests.TestHelper.CreateMemberRoleRequest), 78 },
-                {typeof(global::Tests.TestHelper.CreateMemberRoleResponse), 79 },
-                {typeof(global::Tests.TestHelper.AgreementBasePolicyCreate), 80 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyTypeObject), 81 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyObject), 82 },
-                {typeof(global::Tests.TestHelper.AgreementBasePolicy), 83 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyVersionCreate), 84 },
-                {typeof(global::Tests.TestHelper.AgreementPolicyVersion), 85 },
-                {typeof(global::Tests.TestHelper.AgreementCountryPolicy), 86 },
-                {typeof(global::Tests.TestHelper.AgreementLocalizedPolicyCreate), 87 },
-                {typeof(global::Tests.TestHelper.AgreementLocalizedPolicy), 88 },
-                {typeof(global::Tests.TestHelper.AdminCreateProfanityListRequest), 89 },
-                {typeof(global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest), 90 },
-                {typeof(global::Tests.TestHelper.AdminAddProfanityFiltersRequest), 91 },
-                {typeof(global::Tests.TestHelper.AdminSetProfanityRuleForNamespaceRequest), 92 },
-                {typeof(global::Tests.TestHelper.FreeSubscritptionRequest), 93 },
-                {typeof(global::Tests.TestHelper.PodConfig), 94 },
-                {typeof(global::Tests.TestHelper.DeploymentConfig), 95 },
-                {typeof(global::Tests.TestHelper.DeploymentWithOverride), 96 },
-                {typeof(global::Tests.TestHelper.DSMConfig), 97 },
-                {typeof(global::AccelByte.Models.StatCreateRequest), 98 },
-                {typeof(global::AccelByte.Models.StatCode), 99 },
-                {typeof(global::AccelByte.Models.LeaderboardDailyConfig), 100 },
-                {typeof(global::AccelByte.Models.LeaderboardMonthlyConfig), 101 },
-                {typeof(global::AccelByte.Models.LeaderboardWeeklyConfig), 102 },
-                {typeof(global::AccelByte.Models.LeaderboardConfig), 103 },
-                {typeof(global::AccelByte.Models.SetUserVisibilityRequest), 104 },
-                {typeof(global::AccelByte.Models.AllianceRule), 105 },
-                {typeof(global::AccelByte.Models.FlexingRule), 106 },
-                {typeof(global::AccelByte.Models.MatchingRule), 107 },
-                {typeof(global::AccelByte.Models.RuleSet), 108 },
-                {typeof(global::AccelByte.Models.CreateChannelRequest), 109 },
-                {typeof(global::AccelByte.Models.CreateChannelResponse), 110 },
-                {typeof(global::Tests.IntegrationTests.MatchmakingRequest), 111 },
+                {typeof(global::Tests.TestHelper.RewardItem[]), 5 },
+                {typeof(global::Tests.TestHelper.RewardCondition[]), 6 },
+                {typeof(global::Tests.TestHelper.RewardInfo[]), 7 },
+                {typeof(global::Tests.TestHelper.FlexingRule[]), 8 },
+                {typeof(global::Tests.TestHelper.MatchingRule[]), 9 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, string>), 10 },
+                {typeof(RegionDataItem[]), 11 },
+                {typeof(Image[]), 12 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.ItemCreateModel.Localization>), 13 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, RegionDataItem[]>), 14 },
+                {typeof(AchievementIcon[]), 15 },
+                {typeof(global::Tests.TestHelper.ReportingAdminReasonItem[]), 16 },
+                {typeof(Rules[]), 17 },
+                {typeof(global::Tests.TestHelper.CreateGroupConfigResponse[]), 18 },
+                {typeof(MemberRolePermission[]), 19 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyObject[]), 20 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyVersion[]), 21 },
+                {typeof(global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest[]), 22 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.DeploymentConfig>), 23 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.PodConfig>), 24 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, global::Tests.TestHelper.DeploymentWithOverride>), 25 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, int>), 26 },
+                {typeof(global::AccelByte.Models.FlexingRule[]), 27 },
+                {typeof(global::AccelByte.Models.MatchingRule[]), 28 },
+                {typeof(global::System.Collections.Generic.Dictionary<string, object>), 29 },
+                {typeof(global::Tests.TestHelper.RoleV4Response), 30 },
+                {typeof(global::Tests.TestHelper.ListRoleV4Response), 31 },
+                {typeof(global::Tests.TestHelper.AssignUserV4Request), 32 },
+                {typeof(global::Tests.TestHelper.AssignUserV4Response), 33 },
+                {typeof(global::Tests.TestHelper.RedeemableItem), 34 },
+                {typeof(global::Tests.TestHelper.CampaignCreateModel), 35 },
+                {typeof(global::Tests.TestHelper.CampaignInfo), 36 },
+                {typeof(global::Tests.TestHelper.CampaignPagingSlicedResult), 37 },
+                {typeof(global::Tests.TestHelper.CampaignUpdateModel), 38 },
+                {typeof(global::Tests.TestHelper.CampaignCodeCreateModel), 39 },
+                {typeof(global::Tests.TestHelper.CampaignCodeCreateResult), 40 },
+                {typeof(global::Tests.TestHelper.CodeInfo), 41 },
+                {typeof(global::Tests.TestHelper.CodeInfoPagingSlicedResult), 42 },
+                {typeof(global::Tests.TestHelper.RewardItem), 43 },
+                {typeof(global::Tests.TestHelper.RewardCondition), 44 },
+                {typeof(global::Tests.TestHelper.RewardCreateModel), 45 },
+                {typeof(global::Tests.TestHelper.RewardInfo), 46 },
+                {typeof(global::Tests.TestHelper.QueryRewardPagingSlicedResult), 47 },
+                {typeof(global::Tests.TestHelper.QueryRewardInfo), 48 },
+                {typeof(global::Tests.TestHelper.AllianceRule), 49 },
+                {typeof(global::Tests.TestHelper.FlexingRule), 50 },
+                {typeof(global::Tests.TestHelper.MatchingRule), 51 },
+                {typeof(global::Tests.TestHelper.RuleSet), 52 },
+                {typeof(global::Tests.TestHelper.CreateChannelRequest), 53 },
+                {typeof(global::Tests.TestHelper.CurrencyCreateModel), 54 },
+                {typeof(global::Tests.TestHelper.CurrencyInfoModel), 55 },
+                {typeof(global::Tests.TestHelper.CurrencySummaryModel), 56 },
+                {typeof(global::Tests.TestHelper.StoreCreateModel), 57 },
+                {typeof(global::Tests.TestHelper.CategoryCreateModel), 58 },
+                {typeof(global::Tests.TestHelper.LocalExt), 59 },
+                {typeof(global::Tests.TestHelper.RegionDataUS), 60 },
+                {typeof(global::Tests.TestHelper.ItemCreateModel.Localization), 61 },
+                {typeof(global::Tests.TestHelper.ItemCreateModel.Recurring), 62 },
+                {typeof(global::Tests.TestHelper.ItemCreateModel), 63 },
+                {typeof(global::Tests.TestHelper.ItemCreateModel.RegionDatas), 64 },
+                {typeof(global::Tests.TestHelper.ItemCreateModel.Localizations), 65 },
+                {typeof(global::Tests.TestHelper.StoreInfoModel), 66 },
+                {typeof(global::Tests.TestHelper.FullCategoryInfo), 67 },
+                {typeof(global::Tests.TestHelper.FullItemInfo), 68 },
+                {typeof(global::Tests.TestHelper.CreditRequestModel), 69 },
+                {typeof(global::Tests.TestHelper.FulfillmentModel), 70 },
+                {typeof(global::Tests.TestHelper.UserMapResponse), 71 },
+                {typeof(global::Tests.TestHelper.StatCreateModel), 72 },
+                {typeof(global::Tests.TestHelper.UserVerificationCode), 73 },
+                {typeof(global::Tests.TestHelper.AchievementRequest), 74 },
+                {typeof(global::Tests.TestHelper.AchievementResponse), 75 },
+                {typeof(global::Tests.TestHelper.ReportingAdminReasonItem), 76 },
+                {typeof(global::Tests.TestHelper.ReportingAdminReasonsResponse), 77 },
+                {typeof(global::Tests.TestHelper.ReportingAddReasonRequest), 78 },
+                {typeof(global::Tests.TestHelper.ReportingAddReasonGroupRequest), 79 },
+                {typeof(global::Tests.TestHelper.LeaderboardDailyConfig), 80 },
+                {typeof(global::Tests.TestHelper.LeaderboardMonthlyConfig), 81 },
+                {typeof(global::Tests.TestHelper.LeaderboardWeeklyConfig), 82 },
+                {typeof(global::Tests.TestHelper.LeaderboardConfigRequest), 83 },
+                {typeof(global::Tests.TestHelper.LeaderboardConfigResponse), 84 },
+                {typeof(global::Tests.TestHelper.CreateGroupConfigResponse), 85 },
+                {typeof(global::Tests.TestHelper.PaginatedGroupConfig), 86 },
+                {typeof(global::Tests.TestHelper.CreateMemberRoleRequest), 87 },
+                {typeof(global::Tests.TestHelper.CreateMemberRoleResponse), 88 },
+                {typeof(global::Tests.TestHelper.AgreementBasePolicyCreate), 89 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyTypeObject), 90 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyObject), 91 },
+                {typeof(global::Tests.TestHelper.AgreementBasePolicy), 92 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyVersionCreate), 93 },
+                {typeof(global::Tests.TestHelper.AgreementPolicyVersion), 94 },
+                {typeof(global::Tests.TestHelper.AgreementCountryPolicy), 95 },
+                {typeof(global::Tests.TestHelper.AgreementLocalizedPolicyCreate), 96 },
+                {typeof(global::Tests.TestHelper.AgreementLocalizedPolicy), 97 },
+                {typeof(global::Tests.TestHelper.AdminCreateProfanityListRequest), 98 },
+                {typeof(global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest), 99 },
+                {typeof(global::Tests.TestHelper.AdminAddProfanityFiltersRequest), 100 },
+                {typeof(global::Tests.TestHelper.AdminSetProfanityRuleForNamespaceRequest), 101 },
+                {typeof(global::Tests.TestHelper.FreeSubscritptionRequest), 102 },
+                {typeof(global::Tests.TestHelper.PodConfig), 103 },
+                {typeof(global::Tests.TestHelper.DeploymentConfig), 104 },
+                {typeof(global::Tests.TestHelper.DeploymentWithOverride), 105 },
+                {typeof(global::Tests.TestHelper.DSMConfig), 106 },
+                {typeof(global::AccelByte.Models.StatCreateRequest), 107 },
+                {typeof(global::AccelByte.Models.StatCode), 108 },
+                {typeof(global::AccelByte.Models.LeaderboardDailyConfig), 109 },
+                {typeof(global::AccelByte.Models.LeaderboardMonthlyConfig), 110 },
+                {typeof(global::AccelByte.Models.LeaderboardWeeklyConfig), 111 },
+                {typeof(global::AccelByte.Models.LeaderboardConfig), 112 },
+                {typeof(global::AccelByte.Models.SetUserVisibilityRequest), 113 },
+                {typeof(global::AccelByte.Models.AllianceRule), 114 },
+                {typeof(global::AccelByte.Models.FlexingRule), 115 },
+                {typeof(global::AccelByte.Models.MatchingRule), 116 },
+                {typeof(global::AccelByte.Models.RuleSet), 117 },
+                {typeof(global::AccelByte.Models.CreateChannelRequest), 118 },
+                {typeof(global::AccelByte.Models.CreateChannelResponse), 119 },
+                {typeof(global::Tests.IntegrationTests.MatchmakingRequest), 120 },
             };
         }
 
@@ -172,113 +181,122 @@ namespace AccelByte.Models.Resolvers
                 case 2: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.RedeemableItem>();
                 case 3: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.CampaignInfo>();
                 case 4: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.CodeInfo>();
-                case 5: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.FlexingRule>();
-                case 6: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.MatchingRule>();
-                case 7: return new global::Utf8Json.Formatters.DictionaryFormatter<string, string>();
-                case 8: return new global::Utf8Json.Formatters.ArrayFormatter<RegionDataItem>();
-                case 9: return new global::Utf8Json.Formatters.ArrayFormatter<Image>();
-                case 10: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.ItemCreateModel.Localization>();
-                case 11: return new global::Utf8Json.Formatters.DictionaryFormatter<string, RegionDataItem[]>();
-                case 12: return new global::Utf8Json.Formatters.ArrayFormatter<AchievementIcon>();
-                case 13: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.ReportingAdminReasonItem>();
-                case 14: return new global::Utf8Json.Formatters.ArrayFormatter<Rules>();
-                case 15: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.CreateGroupConfigResponse>();
-                case 16: return new global::Utf8Json.Formatters.ArrayFormatter<MemberRolePermission>();
-                case 17: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AgreementPolicyObject>();
-                case 18: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AgreementPolicyVersion>();
-                case 19: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest>();
-                case 20: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.DeploymentConfig>();
-                case 21: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.PodConfig>();
-                case 22: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.DeploymentWithOverride>();
-                case 23: return new global::Utf8Json.Formatters.DictionaryFormatter<string, int>();
-                case 24: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.FlexingRule>();
-                case 25: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchingRule>();
-                case 26: return new global::Utf8Json.Formatters.DictionaryFormatter<string, object>();
-                case 27: return new AccelByte.Models.Formatters.Tests.TestHelper_RoleV4ResponseFormatter();
-                case 28: return new AccelByte.Models.Formatters.Tests.TestHelper_ListRoleV4ResponseFormatter();
-                case 29: return new AccelByte.Models.Formatters.Tests.TestHelper_AssignUserV4RequestFormatter();
-                case 30: return new AccelByte.Models.Formatters.Tests.TestHelper_AssignUserV4ResponseFormatter();
-                case 31: return new AccelByte.Models.Formatters.Tests.TestHelper_RedeemableItemFormatter();
-                case 32: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCreateModelFormatter();
-                case 33: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignInfoFormatter();
-                case 34: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignPagingSlicedResultFormatter();
-                case 35: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignUpdateModelFormatter();
-                case 36: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCodeCreateModelFormatter();
-                case 37: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCodeCreateResultFormatter();
-                case 38: return new AccelByte.Models.Formatters.Tests.TestHelper_CodeInfoFormatter();
-                case 39: return new AccelByte.Models.Formatters.Tests.TestHelper_CodeInfoPagingSlicedResultFormatter();
-                case 40: return new AccelByte.Models.Formatters.Tests.TestHelper_AllianceRuleFormatter();
-                case 41: return new AccelByte.Models.Formatters.Tests.TestHelper_FlexingRuleFormatter();
-                case 42: return new AccelByte.Models.Formatters.Tests.TestHelper_MatchingRuleFormatter();
-                case 43: return new AccelByte.Models.Formatters.Tests.TestHelper_RuleSetFormatter();
-                case 44: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateChannelRequestFormatter();
-                case 45: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencyCreateModelFormatter();
-                case 46: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencyInfoModelFormatter();
-                case 47: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencySummaryModelFormatter();
-                case 48: return new AccelByte.Models.Formatters.Tests.TestHelper_StoreCreateModelFormatter();
-                case 49: return new AccelByte.Models.Formatters.Tests.TestHelper_CategoryCreateModelFormatter();
-                case 50: return new AccelByte.Models.Formatters.Tests.TestHelper_LocalExtFormatter();
-                case 51: return new AccelByte.Models.Formatters.Tests.TestHelper_RegionDataUSFormatter();
-                case 52: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_LocalizationFormatter();
-                case 53: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_RecurringFormatter();
-                case 54: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModelFormatter();
-                case 55: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_RegionDatasFormatter();
-                case 56: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_LocalizationsFormatter();
-                case 57: return new AccelByte.Models.Formatters.Tests.TestHelper_StoreInfoModelFormatter();
-                case 58: return new AccelByte.Models.Formatters.Tests.TestHelper_FullCategoryInfoFormatter();
-                case 59: return new AccelByte.Models.Formatters.Tests.TestHelper_FullItemInfoFormatter();
-                case 60: return new AccelByte.Models.Formatters.Tests.TestHelper_CreditRequestModelFormatter();
-                case 61: return new AccelByte.Models.Formatters.Tests.TestHelper_FulfillmentModelFormatter();
-                case 62: return new AccelByte.Models.Formatters.Tests.TestHelper_UserMapResponseFormatter();
-                case 63: return new AccelByte.Models.Formatters.Tests.TestHelper_StatCreateModelFormatter();
-                case 64: return new AccelByte.Models.Formatters.Tests.TestHelper_UserVerificationCodeFormatter();
-                case 65: return new AccelByte.Models.Formatters.Tests.TestHelper_AchievementRequestFormatter();
-                case 66: return new AccelByte.Models.Formatters.Tests.TestHelper_AchievementResponseFormatter();
-                case 67: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAdminReasonItemFormatter();
-                case 68: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAdminReasonsResponseFormatter();
-                case 69: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAddReasonRequestFormatter();
-                case 70: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAddReasonGroupRequestFormatter();
-                case 71: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardDailyConfigFormatter();
-                case 72: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardMonthlyConfigFormatter();
-                case 73: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardWeeklyConfigFormatter();
-                case 74: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardConfigRequestFormatter();
-                case 75: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardConfigResponseFormatter();
-                case 76: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateGroupConfigResponseFormatter();
-                case 77: return new AccelByte.Models.Formatters.Tests.TestHelper_PaginatedGroupConfigFormatter();
-                case 78: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateMemberRoleRequestFormatter();
-                case 79: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateMemberRoleResponseFormatter();
-                case 80: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementBasePolicyCreateFormatter();
-                case 81: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyTypeObjectFormatter();
-                case 82: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyObjectFormatter();
-                case 83: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementBasePolicyFormatter();
-                case 84: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyVersionCreateFormatter();
-                case 85: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyVersionFormatter();
-                case 86: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementCountryPolicyFormatter();
-                case 87: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementLocalizedPolicyCreateFormatter();
-                case 88: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementLocalizedPolicyFormatter();
-                case 89: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminCreateProfanityListRequestFormatter();
-                case 90: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminAddProfanityFilterIntoListRequestFormatter();
-                case 91: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminAddProfanityFiltersRequestFormatter();
-                case 92: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminSetProfanityRuleForNamespaceRequestFormatter();
-                case 93: return new AccelByte.Models.Formatters.Tests.TestHelper_FreeSubscritptionRequestFormatter();
-                case 94: return new AccelByte.Models.Formatters.Tests.TestHelper_PodConfigFormatter();
-                case 95: return new AccelByte.Models.Formatters.Tests.TestHelper_DeploymentConfigFormatter();
-                case 96: return new AccelByte.Models.Formatters.Tests.TestHelper_DeploymentWithOverrideFormatter();
-                case 97: return new AccelByte.Models.Formatters.Tests.TestHelper_DSMConfigFormatter();
-                case 98: return new AccelByte.Models.Formatters.AccelByte.Models.StatCreateRequestFormatter();
-                case 99: return new AccelByte.Models.Formatters.AccelByte.Models.StatCodeFormatter();
-                case 100: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardDailyConfigFormatter();
-                case 101: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardMonthlyConfigFormatter();
-                case 102: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardWeeklyConfigFormatter();
-                case 103: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardConfigFormatter();
-                case 104: return new AccelByte.Models.Formatters.AccelByte.Models.SetUserVisibilityRequestFormatter();
-                case 105: return new AccelByte.Models.Formatters.AccelByte.Models.AllianceRuleFormatter();
-                case 106: return new AccelByte.Models.Formatters.AccelByte.Models.FlexingRuleFormatter();
-                case 107: return new AccelByte.Models.Formatters.AccelByte.Models.MatchingRuleFormatter();
-                case 108: return new AccelByte.Models.Formatters.AccelByte.Models.RuleSetFormatter();
-                case 109: return new AccelByte.Models.Formatters.AccelByte.Models.CreateChannelRequestFormatter();
-                case 110: return new AccelByte.Models.Formatters.AccelByte.Models.CreateChannelResponseFormatter();
-                case 111: return new AccelByte.Models.Formatters.Tests.IntegrationTests.MatchmakingRequestFormatter();
+                case 5: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.RewardItem>();
+                case 6: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.RewardCondition>();
+                case 7: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.RewardInfo>();
+                case 8: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.FlexingRule>();
+                case 9: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.MatchingRule>();
+                case 10: return new global::Utf8Json.Formatters.DictionaryFormatter<string, string>();
+                case 11: return new global::Utf8Json.Formatters.ArrayFormatter<RegionDataItem>();
+                case 12: return new global::Utf8Json.Formatters.ArrayFormatter<Image>();
+                case 13: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.ItemCreateModel.Localization>();
+                case 14: return new global::Utf8Json.Formatters.DictionaryFormatter<string, RegionDataItem[]>();
+                case 15: return new global::Utf8Json.Formatters.ArrayFormatter<AchievementIcon>();
+                case 16: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.ReportingAdminReasonItem>();
+                case 17: return new global::Utf8Json.Formatters.ArrayFormatter<Rules>();
+                case 18: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.CreateGroupConfigResponse>();
+                case 19: return new global::Utf8Json.Formatters.ArrayFormatter<MemberRolePermission>();
+                case 20: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AgreementPolicyObject>();
+                case 21: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AgreementPolicyVersion>();
+                case 22: return new global::Utf8Json.Formatters.ArrayFormatter<global::Tests.TestHelper.AdminAddProfanityFilterIntoListRequest>();
+                case 23: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.DeploymentConfig>();
+                case 24: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.PodConfig>();
+                case 25: return new global::Utf8Json.Formatters.DictionaryFormatter<string, global::Tests.TestHelper.DeploymentWithOverride>();
+                case 26: return new global::Utf8Json.Formatters.DictionaryFormatter<string, int>();
+                case 27: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.FlexingRule>();
+                case 28: return new global::Utf8Json.Formatters.ArrayFormatter<global::AccelByte.Models.MatchingRule>();
+                case 29: return new global::Utf8Json.Formatters.DictionaryFormatter<string, object>();
+                case 30: return new AccelByte.Models.Formatters.Tests.TestHelper_RoleV4ResponseFormatter();
+                case 31: return new AccelByte.Models.Formatters.Tests.TestHelper_ListRoleV4ResponseFormatter();
+                case 32: return new AccelByte.Models.Formatters.Tests.TestHelper_AssignUserV4RequestFormatter();
+                case 33: return new AccelByte.Models.Formatters.Tests.TestHelper_AssignUserV4ResponseFormatter();
+                case 34: return new AccelByte.Models.Formatters.Tests.TestHelper_RedeemableItemFormatter();
+                case 35: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCreateModelFormatter();
+                case 36: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignInfoFormatter();
+                case 37: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignPagingSlicedResultFormatter();
+                case 38: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignUpdateModelFormatter();
+                case 39: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCodeCreateModelFormatter();
+                case 40: return new AccelByte.Models.Formatters.Tests.TestHelper_CampaignCodeCreateResultFormatter();
+                case 41: return new AccelByte.Models.Formatters.Tests.TestHelper_CodeInfoFormatter();
+                case 42: return new AccelByte.Models.Formatters.Tests.TestHelper_CodeInfoPagingSlicedResultFormatter();
+                case 43: return new AccelByte.Models.Formatters.Tests.TestHelper_RewardItemFormatter();
+                case 44: return new AccelByte.Models.Formatters.Tests.TestHelper_RewardConditionFormatter();
+                case 45: return new AccelByte.Models.Formatters.Tests.TestHelper_RewardCreateModelFormatter();
+                case 46: return new AccelByte.Models.Formatters.Tests.TestHelper_RewardInfoFormatter();
+                case 47: return new AccelByte.Models.Formatters.Tests.TestHelper_QueryRewardPagingSlicedResultFormatter();
+                case 48: return new AccelByte.Models.Formatters.Tests.TestHelper_QueryRewardInfoFormatter();
+                case 49: return new AccelByte.Models.Formatters.Tests.TestHelper_AllianceRuleFormatter();
+                case 50: return new AccelByte.Models.Formatters.Tests.TestHelper_FlexingRuleFormatter();
+                case 51: return new AccelByte.Models.Formatters.Tests.TestHelper_MatchingRuleFormatter();
+                case 52: return new AccelByte.Models.Formatters.Tests.TestHelper_RuleSetFormatter();
+                case 53: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateChannelRequestFormatter();
+                case 54: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencyCreateModelFormatter();
+                case 55: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencyInfoModelFormatter();
+                case 56: return new AccelByte.Models.Formatters.Tests.TestHelper_CurrencySummaryModelFormatter();
+                case 57: return new AccelByte.Models.Formatters.Tests.TestHelper_StoreCreateModelFormatter();
+                case 58: return new AccelByte.Models.Formatters.Tests.TestHelper_CategoryCreateModelFormatter();
+                case 59: return new AccelByte.Models.Formatters.Tests.TestHelper_LocalExtFormatter();
+                case 60: return new AccelByte.Models.Formatters.Tests.TestHelper_RegionDataUSFormatter();
+                case 61: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_LocalizationFormatter();
+                case 62: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_RecurringFormatter();
+                case 63: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModelFormatter();
+                case 64: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_RegionDatasFormatter();
+                case 65: return new AccelByte.Models.Formatters.Tests.TestHelper_ItemCreateModel_LocalizationsFormatter();
+                case 66: return new AccelByte.Models.Formatters.Tests.TestHelper_StoreInfoModelFormatter();
+                case 67: return new AccelByte.Models.Formatters.Tests.TestHelper_FullCategoryInfoFormatter();
+                case 68: return new AccelByte.Models.Formatters.Tests.TestHelper_FullItemInfoFormatter();
+                case 69: return new AccelByte.Models.Formatters.Tests.TestHelper_CreditRequestModelFormatter();
+                case 70: return new AccelByte.Models.Formatters.Tests.TestHelper_FulfillmentModelFormatter();
+                case 71: return new AccelByte.Models.Formatters.Tests.TestHelper_UserMapResponseFormatter();
+                case 72: return new AccelByte.Models.Formatters.Tests.TestHelper_StatCreateModelFormatter();
+                case 73: return new AccelByte.Models.Formatters.Tests.TestHelper_UserVerificationCodeFormatter();
+                case 74: return new AccelByte.Models.Formatters.Tests.TestHelper_AchievementRequestFormatter();
+                case 75: return new AccelByte.Models.Formatters.Tests.TestHelper_AchievementResponseFormatter();
+                case 76: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAdminReasonItemFormatter();
+                case 77: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAdminReasonsResponseFormatter();
+                case 78: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAddReasonRequestFormatter();
+                case 79: return new AccelByte.Models.Formatters.Tests.TestHelper_ReportingAddReasonGroupRequestFormatter();
+                case 80: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardDailyConfigFormatter();
+                case 81: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardMonthlyConfigFormatter();
+                case 82: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardWeeklyConfigFormatter();
+                case 83: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardConfigRequestFormatter();
+                case 84: return new AccelByte.Models.Formatters.Tests.TestHelper_LeaderboardConfigResponseFormatter();
+                case 85: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateGroupConfigResponseFormatter();
+                case 86: return new AccelByte.Models.Formatters.Tests.TestHelper_PaginatedGroupConfigFormatter();
+                case 87: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateMemberRoleRequestFormatter();
+                case 88: return new AccelByte.Models.Formatters.Tests.TestHelper_CreateMemberRoleResponseFormatter();
+                case 89: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementBasePolicyCreateFormatter();
+                case 90: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyTypeObjectFormatter();
+                case 91: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyObjectFormatter();
+                case 92: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementBasePolicyFormatter();
+                case 93: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyVersionCreateFormatter();
+                case 94: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementPolicyVersionFormatter();
+                case 95: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementCountryPolicyFormatter();
+                case 96: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementLocalizedPolicyCreateFormatter();
+                case 97: return new AccelByte.Models.Formatters.Tests.TestHelper_AgreementLocalizedPolicyFormatter();
+                case 98: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminCreateProfanityListRequestFormatter();
+                case 99: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminAddProfanityFilterIntoListRequestFormatter();
+                case 100: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminAddProfanityFiltersRequestFormatter();
+                case 101: return new AccelByte.Models.Formatters.Tests.TestHelper_AdminSetProfanityRuleForNamespaceRequestFormatter();
+                case 102: return new AccelByte.Models.Formatters.Tests.TestHelper_FreeSubscritptionRequestFormatter();
+                case 103: return new AccelByte.Models.Formatters.Tests.TestHelper_PodConfigFormatter();
+                case 104: return new AccelByte.Models.Formatters.Tests.TestHelper_DeploymentConfigFormatter();
+                case 105: return new AccelByte.Models.Formatters.Tests.TestHelper_DeploymentWithOverrideFormatter();
+                case 106: return new AccelByte.Models.Formatters.Tests.TestHelper_DSMConfigFormatter();
+                case 107: return new AccelByte.Models.Formatters.AccelByte.Models.StatCreateRequestFormatter();
+                case 108: return new AccelByte.Models.Formatters.AccelByte.Models.StatCodeFormatter();
+                case 109: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardDailyConfigFormatter();
+                case 110: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardMonthlyConfigFormatter();
+                case 111: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardWeeklyConfigFormatter();
+                case 112: return new AccelByte.Models.Formatters.AccelByte.Models.LeaderboardConfigFormatter();
+                case 113: return new AccelByte.Models.Formatters.AccelByte.Models.SetUserVisibilityRequestFormatter();
+                case 114: return new AccelByte.Models.Formatters.AccelByte.Models.AllianceRuleFormatter();
+                case 115: return new AccelByte.Models.Formatters.AccelByte.Models.FlexingRuleFormatter();
+                case 116: return new AccelByte.Models.Formatters.AccelByte.Models.MatchingRuleFormatter();
+                case 117: return new AccelByte.Models.Formatters.AccelByte.Models.RuleSetFormatter();
+                case 118: return new AccelByte.Models.Formatters.AccelByte.Models.CreateChannelRequestFormatter();
+                case 119: return new AccelByte.Models.Formatters.AccelByte.Models.CreateChannelResponseFormatter();
+                case 120: return new AccelByte.Models.Formatters.Tests.IntegrationTests.MatchmakingRequestFormatter();
                 default: return null;
             }
         }
@@ -2137,6 +2155,706 @@ namespace AccelByte.Models.Formatters.Tests
             }
 
             var ____result = new global::Tests.TestHelper.CodeInfoPagingSlicedResult();
+            if(__data__b__) ____result.data = __data__;
+            if(__paging__b__) ____result.paging = __paging__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_RewardItemFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.RewardItem>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_RewardItemFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("itemId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("quantity"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("itemId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("quantity"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.RewardItem value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.itemId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteInt32(value.quantity);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.RewardItem Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __itemId__ = default(string);
+            var __itemId__b__ = false;
+            var __quantity__ = default(int);
+            var __quantity__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __itemId__ = reader.ReadString();
+                        __itemId__b__ = true;
+                        break;
+                    case 1:
+                        __quantity__ = reader.ReadInt32();
+                        __quantity__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.RewardItem();
+            if(__itemId__b__) ____result.itemId = __itemId__;
+            if(__quantity__b__) ____result.quantity = __quantity__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_RewardConditionFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.RewardCondition>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_RewardConditionFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("conditionName"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("condition"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("eventName"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardItems"), 3},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("conditionName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("condition"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("eventName"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("rewardItems"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.RewardCondition value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.conditionName);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.condition);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.eventName);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardItem[]>().Serialize(ref writer, value.rewardItems, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.RewardCondition Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __conditionName__ = default(string);
+            var __conditionName__b__ = false;
+            var __condition__ = default(string);
+            var __condition__b__ = false;
+            var __eventName__ = default(string);
+            var __eventName__b__ = false;
+            var __rewardItems__ = default(global::Tests.TestHelper.RewardItem[]);
+            var __rewardItems__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __conditionName__ = reader.ReadString();
+                        __conditionName__b__ = true;
+                        break;
+                    case 1:
+                        __condition__ = reader.ReadString();
+                        __condition__b__ = true;
+                        break;
+                    case 2:
+                        __eventName__ = reader.ReadString();
+                        __eventName__b__ = true;
+                        break;
+                    case 3:
+                        __rewardItems__ = formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardItem[]>().Deserialize(ref reader, formatterResolver);
+                        __rewardItems__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.RewardCondition();
+            if(__conditionName__b__) ____result.conditionName = __conditionName__;
+            if(__condition__b__) ____result.condition = __condition__;
+            if(__eventName__b__) ____result.eventName = __eventName__;
+            if(__rewardItems__b__) ____result.rewardItems = __rewardItems__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_RewardCreateModelFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.RewardCreateModel>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_RewardCreateModelFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardCode"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("description"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("eventTopic"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardConditions"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("maxAwarded"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("maxAwardedPerUser"), 5},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("rewardCode"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("description"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("eventTopic"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("rewardConditions"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("maxAwarded"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("maxAwardedPerUser"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.RewardCreateModel value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.rewardCode);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.description);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.eventTopic);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardCondition[]>().Serialize(ref writer, value.rewardConditions, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteInt32(value.maxAwarded);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteInt32(value.maxAwardedPerUser);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.RewardCreateModel Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __rewardCode__ = default(string);
+            var __rewardCode__b__ = false;
+            var __description__ = default(string);
+            var __description__b__ = false;
+            var __eventTopic__ = default(string);
+            var __eventTopic__b__ = false;
+            var __rewardConditions__ = default(global::Tests.TestHelper.RewardCondition[]);
+            var __rewardConditions__b__ = false;
+            var __maxAwarded__ = default(int);
+            var __maxAwarded__b__ = false;
+            var __maxAwardedPerUser__ = default(int);
+            var __maxAwardedPerUser__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __rewardCode__ = reader.ReadString();
+                        __rewardCode__b__ = true;
+                        break;
+                    case 1:
+                        __description__ = reader.ReadString();
+                        __description__b__ = true;
+                        break;
+                    case 2:
+                        __eventTopic__ = reader.ReadString();
+                        __eventTopic__b__ = true;
+                        break;
+                    case 3:
+                        __rewardConditions__ = formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardCondition[]>().Deserialize(ref reader, formatterResolver);
+                        __rewardConditions__b__ = true;
+                        break;
+                    case 4:
+                        __maxAwarded__ = reader.ReadInt32();
+                        __maxAwarded__b__ = true;
+                        break;
+                    case 5:
+                        __maxAwardedPerUser__ = reader.ReadInt32();
+                        __maxAwardedPerUser__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.RewardCreateModel();
+            if(__rewardCode__b__) ____result.rewardCode = __rewardCode__;
+            if(__description__b__) ____result.description = __description__;
+            if(__eventTopic__b__) ____result.eventTopic = __eventTopic__;
+            if(__rewardConditions__b__) ____result.rewardConditions = __rewardConditions__;
+            if(__maxAwarded__b__) ____result.maxAwarded = __maxAwarded__;
+            if(__maxAwardedPerUser__b__) ____result.maxAwardedPerUser = __maxAwardedPerUser__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_RewardInfoFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.RewardInfo>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_RewardInfoFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardId"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("namespace"), 1},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardCode"), 2},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("description"), 3},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("eventTopic"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("rewardConditions"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("maxAwarded"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("maxAwardedPerUser"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("createdAt"), 8},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updatedAt"), 9},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("rewardId"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("namespace"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("rewardCode"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("description"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("eventTopic"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("rewardConditions"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("maxAwarded"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("maxAwardedPerUser"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("createdAt"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("updatedAt"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.RewardInfo value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.rewardId);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.Namespace);
+            writer.WriteRaw(this.____stringByteKeys[2]);
+            writer.WriteString(value.rewardCode);
+            writer.WriteRaw(this.____stringByteKeys[3]);
+            writer.WriteString(value.description);
+            writer.WriteRaw(this.____stringByteKeys[4]);
+            writer.WriteString(value.eventTopic);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardCondition[]>().Serialize(ref writer, value.rewardConditions, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            writer.WriteInt32(value.maxAwarded);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteInt32(value.maxAwardedPerUser);
+            writer.WriteRaw(this.____stringByteKeys[8]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.createdAt, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[9]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.updatedAt, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.RewardInfo Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __rewardId__ = default(string);
+            var __rewardId__b__ = false;
+            var __Namespace__ = default(string);
+            var __Namespace__b__ = false;
+            var __rewardCode__ = default(string);
+            var __rewardCode__b__ = false;
+            var __description__ = default(string);
+            var __description__b__ = false;
+            var __eventTopic__ = default(string);
+            var __eventTopic__b__ = false;
+            var __rewardConditions__ = default(global::Tests.TestHelper.RewardCondition[]);
+            var __rewardConditions__b__ = false;
+            var __maxAwarded__ = default(int);
+            var __maxAwarded__b__ = false;
+            var __maxAwardedPerUser__ = default(int);
+            var __maxAwardedPerUser__b__ = false;
+            var __createdAt__ = default(global::System.DateTime);
+            var __createdAt__b__ = false;
+            var __updatedAt__ = default(global::System.DateTime);
+            var __updatedAt__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __rewardId__ = reader.ReadString();
+                        __rewardId__b__ = true;
+                        break;
+                    case 1:
+                        __Namespace__ = reader.ReadString();
+                        __Namespace__b__ = true;
+                        break;
+                    case 2:
+                        __rewardCode__ = reader.ReadString();
+                        __rewardCode__b__ = true;
+                        break;
+                    case 3:
+                        __description__ = reader.ReadString();
+                        __description__b__ = true;
+                        break;
+                    case 4:
+                        __eventTopic__ = reader.ReadString();
+                        __eventTopic__b__ = true;
+                        break;
+                    case 5:
+                        __rewardConditions__ = formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardCondition[]>().Deserialize(ref reader, formatterResolver);
+                        __rewardConditions__b__ = true;
+                        break;
+                    case 6:
+                        __maxAwarded__ = reader.ReadInt32();
+                        __maxAwarded__b__ = true;
+                        break;
+                    case 7:
+                        __maxAwardedPerUser__ = reader.ReadInt32();
+                        __maxAwardedPerUser__b__ = true;
+                        break;
+                    case 8:
+                        __createdAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __createdAt__b__ = true;
+                        break;
+                    case 9:
+                        __updatedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __updatedAt__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.RewardInfo();
+            if(__rewardId__b__) ____result.rewardId = __rewardId__;
+            if(__Namespace__b__) ____result.Namespace = __Namespace__;
+            if(__rewardCode__b__) ____result.rewardCode = __rewardCode__;
+            if(__description__b__) ____result.description = __description__;
+            if(__eventTopic__b__) ____result.eventTopic = __eventTopic__;
+            if(__rewardConditions__b__) ____result.rewardConditions = __rewardConditions__;
+            if(__maxAwarded__b__) ____result.maxAwarded = __maxAwarded__;
+            if(__maxAwardedPerUser__b__) ____result.maxAwardedPerUser = __maxAwardedPerUser__;
+            if(__createdAt__b__) ____result.createdAt = __createdAt__;
+            if(__updatedAt__b__) ____result.updatedAt = __updatedAt__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_QueryRewardPagingSlicedResultFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.QueryRewardPagingSlicedResult>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_QueryRewardPagingSlicedResultFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("previous"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("next"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("previous"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("next"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.QueryRewardPagingSlicedResult value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            writer.WriteString(value.previous);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            writer.WriteString(value.next);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.QueryRewardPagingSlicedResult Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __previous__ = default(string);
+            var __previous__b__ = false;
+            var __next__ = default(string);
+            var __next__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __previous__ = reader.ReadString();
+                        __previous__b__ = true;
+                        break;
+                    case 1:
+                        __next__ = reader.ReadString();
+                        __next__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.QueryRewardPagingSlicedResult();
+            if(__previous__b__) ____result.previous = __previous__;
+            if(__next__b__) ____result.next = __next__;
+
+            return ____result;
+        }
+    }
+
+
+    public sealed class TestHelper_QueryRewardInfoFormatter : global::Utf8Json.IJsonFormatter<global::Tests.TestHelper.QueryRewardInfo>
+    {
+        readonly global::Utf8Json.Internal.AutomataDictionary ____keyMapping;
+        readonly byte[][] ____stringByteKeys;
+
+        public TestHelper_QueryRewardInfoFormatter()
+        {
+            this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
+            {
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("data"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("paging"), 1},
+            };
+
+            this.____stringByteKeys = new byte[][]
+            {
+                JsonWriter.GetEncodedPropertyNameWithBeginObject("data"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("paging"),
+                
+            };
+        }
+
+        public void Serialize(ref JsonWriter writer, global::Tests.TestHelper.QueryRewardInfo value, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            
+
+            writer.WriteRaw(this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardInfo[]>().Serialize(ref writer, value.data, formatterResolver);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.QueryRewardPagingSlicedResult>().Serialize(ref writer, value.paging, formatterResolver);
+            
+            writer.WriteEndObject();
+        }
+
+        public global::Tests.TestHelper.QueryRewardInfo Deserialize(ref JsonReader reader, global::Utf8Json.IJsonFormatterResolver formatterResolver)
+        {
+            if (reader.ReadIsNull())
+            {
+                return null;
+            }
+            
+
+            var __data__ = default(global::Tests.TestHelper.RewardInfo[]);
+            var __data__b__ = false;
+            var __paging__ = default(global::Tests.TestHelper.QueryRewardPagingSlicedResult);
+            var __paging__b__ = false;
+
+            var ____count = 0;
+            reader.ReadIsBeginObjectWithVerify();
+            while (!reader.ReadIsEndObjectWithSkipValueSeparator(ref ____count))
+            {
+                var stringKey = reader.ReadPropertyNameSegmentRaw();
+                int key;
+                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                {
+                    reader.ReadNextBlock();
+                    goto NEXT_LOOP;
+                }
+
+                switch (key)
+                {
+                    case 0:
+                        __data__ = formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.RewardInfo[]>().Deserialize(ref reader, formatterResolver);
+                        __data__b__ = true;
+                        break;
+                    case 1:
+                        __paging__ = formatterResolver.GetFormatterWithVerify<global::Tests.TestHelper.QueryRewardPagingSlicedResult>().Deserialize(ref reader, formatterResolver);
+                        __paging__b__ = true;
+                        break;
+                    default:
+                        reader.ReadNextBlock();
+                        break;
+                }
+
+                NEXT_LOOP:
+                continue;
+            }
+
+            var ____result = new global::Tests.TestHelper.QueryRewardInfo();
             if(__data__b__) ____result.data = __data__;
             if(__paging__b__) ____result.paging = __paging__;
 

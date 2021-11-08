@@ -1,5 +1,6 @@
 ﻿using AccelByte.Api;
 using AccelByte.Core;
+using AccelByte.Models;
 using NUnit.Framework;
 using Tests.IntegrationTests;
 
@@ -76,6 +77,20 @@ namespace Tests.UnitTests
         {
             Assert.DoesNotThrow(() => AccelBytePlugin.GetLobby());
             Assert.DoesNotThrow(() => AccelBytePlugin.GetUser());
+        }
+
+        [Test,TestLog,Order(5)]
+        public void Call_Register_Resolver_Twice_No_Exception() 
+        {
+            Assert.DoesNotThrow(() => 
+            {
+                AccelBytePlugin.RegisterUtf8JsonResolver();
+
+                var config = new Config();
+                var json = config.ToUtf8Json();
+
+                AccelBytePlugin.RegisterUtf8JsonResolver();
+            });
         }
     }
 }

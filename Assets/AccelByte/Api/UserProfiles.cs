@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -126,6 +127,48 @@ namespace AccelByte.Api
                     this.session.AuthorizationToken,
                     updates,
                     callback));
+        }
+
+        /// <summary>
+        /// Get the <see cref="PublicUserProfile"/> for a specified user.
+        /// </summary>
+        /// <param name="userId">UserID for the profile requested</param>
+        /// <param name="callback">Returns a Result that contains <see cref="PublicUserProfile"/> via callback when completed.</param>
+        public void GetPublicUserProfile(string userId, ResultCallback<PublicUserProfile> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserProfilePublicInfo(this.@namespace, userId, this.session.AuthorizationToken, callback));
+        }
+        /// <summary>
+        /// Request the Avatar of the given UserProfile
+        /// </summary>
+        /// <param name="userID">The UserID of a public Profile</param>
+        /// <param name="callback">Returns a result that contains a <see cref="Texture2D"/></param>
+        public void GetUserAvatar(string userID, ResultCallback<Texture2D> callback)
+        {
+            GetPublicUserProfile(userID,
+                result =>
+                {
+                    if (result.IsError)
+                    {
+                        Debug.LogError(
+                            $"Unable to get Public User Profile Code:{result.Error.Code} Message:{result.Error.Message}");
+                        callback.TryError(result.Error);
+                    }
+                    else
+                    {
+                        this.coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
+                    }
+                });
         }
     }
 }

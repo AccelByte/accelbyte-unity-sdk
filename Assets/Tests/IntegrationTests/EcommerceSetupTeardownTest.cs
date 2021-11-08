@@ -25,6 +25,7 @@ namespace Tests.IntegrationTests
             public static string expectedRootCategoryPath;
             public static string expectedChildCategoryPath;
             public static string expectedGrandChildCategoryPath;
+            public static string expectedMediaCategoryPath;
             public static string currencyCode;
             public static string inGameItemTitle;
             public static string redeemableItemTitle;
@@ -250,10 +251,19 @@ namespace Tests.IntegrationTests
                 unityGrandChildCategory.localizationDisplayNames.Add("en", "Unity's ecommerce grand child category");
                 TestVariables.expectedGrandChildCategoryPath = unityGrandChildCategory.categoryPath;
 
-                TestHelper.CategoryCreateModel[] categoriesModels = new TestHelper.CategoryCreateModel[3];
+                TestHelper.CategoryCreateModel unityMediaCategory = new TestHelper.CategoryCreateModel
+                {
+                    categoryPath = "/UnityMediaCategory",
+                    localizationDisplayNames = new Dictionary<string, string>()
+                };
+                unityMediaCategory.localizationDisplayNames.Add("en", "Unity's ecommerce media category");
+                TestVariables.expectedMediaCategoryPath = unityMediaCategory.categoryPath;
+
+                TestHelper.CategoryCreateModel[] categoriesModels = new TestHelper.CategoryCreateModel[4];
                 categoriesModels[0] = unityRootCategory;
                 categoriesModels[1] = unityChildCategory;
                 categoriesModels[2] = unityGrandChildCategory;
+                categoriesModels[3] = unityMediaCategory;
 
                 for (int i = 0; i < categoriesModels.Length; i++)
                 {
@@ -404,10 +414,51 @@ namespace Tests.IntegrationTests
                 };
                 grandChildItemRequest.regionData.Add("US", grandChildRegionData);
 
-                TestHelper.ItemCreateModel[] itemRequests = new TestHelper.ItemCreateModel[3];
+                TestHelper.ItemCreateModel.Localization mediaLocalization = new TestHelper.ItemCreateModel.Localization
+                {
+                    title = "Unity_MediaItem",
+                    description = "Media item, virtual currency, not free"
+                };
+                Dictionary<string, TestHelper.ItemCreateModel.Localization> mediaLocalizations = new Dictionary<string, TestHelper.ItemCreateModel.Localization>();
+                mediaLocalizations.Add("en", mediaLocalization);
+                RegionDataItem[] mediaRegionData = new RegionDataItem[1];
+                mediaRegionData[0] = new RegionDataItem
+                {
+                    price = 1,
+                    discountPercentage = 0,
+                    discountAmount = 0,
+                    discountedPrice = 0,
+                    currencyCode = "SDKC",
+                    currencyType = "VIRTUAL",
+                    currencyNamespace = AccelBytePlugin.Config.Namespace,
+                    purchaseAt = DateTime.UtcNow,
+                    expireAt = DateTime.UtcNow + TimeSpan.FromDays(1000),
+                    discountPurchaseAt = DateTime.UtcNow,
+                    discountExpireAt = DateTime.UtcNow + TimeSpan.FromDays(1000)
+                };
+                TestHelper.ItemCreateModel mediaItemRequest = new TestHelper.ItemCreateModel
+                {
+                    itemType = "MEDIA",
+                    seasonType = SeasonType.PASS, //set as default
+                    name = "MediaItem",
+                    entitlementType = "CONSUMABLE",
+                    useCount = 1,
+                    targetCurrencyCode = "SDKC",
+                    categoryPath = TestVariables.expectedMediaCategoryPath,
+                    status = "ACTIVE",
+                    sku = "skuMediaItem",
+                    localizations = mediaLocalizations,
+                    regionData = new Dictionary<string, RegionDataItem[]>(),
+                    maxCount = -1,
+                    maxCountPerUser = -1
+                };
+                mediaItemRequest.regionData.Add("US", mediaRegionData);
+
+                TestHelper.ItemCreateModel[] itemRequests = new TestHelper.ItemCreateModel[4];
                 itemRequests[0] = rootItemRequest;
                 itemRequests[1] = childItemRequest;
                 itemRequests[2] = grandChildItemRequest;
+                itemRequests[3] = mediaItemRequest;
                 
                 for (int i = 0; i < itemRequests.Length; i++)
                 {

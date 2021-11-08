@@ -19,7 +19,8 @@ namespace AccelByte.Models
         APP,
         CODE,
         SUBSCRIPTION,
-        SEASON
+        SEASON,
+        MEDIA
     }
 
     public enum ItemStatus
@@ -42,7 +43,8 @@ namespace AccelByte.Models
         APP,
         ENTITLEMENT,
         DISTRIBUTION,
-        CODE
+        CODE,
+        MEDIA
     }
 
     public enum EntitlementStatus
@@ -661,6 +663,7 @@ namespace AccelByte.Models
     public class Ownership
     {
         [DataMember] public bool owned { get; set; }
+        [DataMember] public DateTime endDate { get; set; }
     }
 
     [DataContract]

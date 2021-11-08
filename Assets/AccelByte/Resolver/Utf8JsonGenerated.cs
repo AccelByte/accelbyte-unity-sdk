@@ -10668,11 +10668,13 @@ namespace Utf8Json.Formatters.AccelByte.Models
             this.____keyMapping = new global::Utf8Json.Internal.AutomataDictionary()
             {
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("owned"), 0},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("endDate"), 1},
             };
 
             this.____stringByteKeys = new byte[][]
             {
                 JsonWriter.GetEncodedPropertyNameWithBeginObject("owned"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("endDate"),
                 
             };
         }
@@ -10688,6 +10690,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.WriteBoolean(value.owned);
+            writer.WriteRaw(this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.endDate, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -10702,6 +10706,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var __owned__ = default(bool);
             var __owned__b__ = false;
+            var __endDate__ = default(global::System.DateTime);
+            var __endDate__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -10721,6 +10727,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __owned__ = reader.ReadBoolean();
                         __owned__b__ = true;
                         break;
+                    case 1:
+                        __endDate__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
+                        __endDate__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -10732,6 +10742,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
 
             var ____result = new global::AccelByte.Models.Ownership();
             if(__owned__b__) ____result.owned = __owned__;
+            if(__endDate__b__) ____result.endDate = __endDate__;
 
             return ____result;
         }
@@ -25187,6 +25198,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("pod_name"), 2},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("port"), 3},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("provider"), 4},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("public_ip"), 5},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("custom_attribute"), 6},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("allocation_id"), 7},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("ports"), 8},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -25196,6 +25211,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("pod_name"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("port"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("provider"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("public_ip"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("custom_attribute"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("allocation_id"),
+                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("ports"),
                 
             };
         }
@@ -25219,6 +25238,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteInt32(value.port);
             writer.WriteRaw(this.____stringByteKeys[4]);
             writer.WriteString(value.provider);
+            writer.WriteRaw(this.____stringByteKeys[5]);
+            writer.WriteString(value.public_ip);
+            writer.WriteRaw(this.____stringByteKeys[6]);
+            writer.WriteString(value.custom_attribute);
+            writer.WriteRaw(this.____stringByteKeys[7]);
+            writer.WriteString(value.allocation_id);
+            writer.WriteRaw(this.____stringByteKeys[8]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, string>>().Serialize(ref writer, value.ports, formatterResolver);
             
             writer.WriteEndObject();
         }
@@ -25241,6 +25268,14 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __port__b__ = false;
             var __provider__ = default(string);
             var __provider__b__ = false;
+            var __public_ip__ = default(string);
+            var __public_ip__b__ = false;
+            var __custom_attribute__ = default(string);
+            var __custom_attribute__b__ = false;
+            var __allocation_id__ = default(string);
+            var __allocation_id__b__ = false;
+            var __ports__ = default(global::System.Collections.Generic.Dictionary<string, string>);
+            var __ports__b__ = false;
 
             var ____count = 0;
             reader.ReadIsBeginObjectWithVerify();
@@ -25276,6 +25311,22 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __provider__ = reader.ReadString();
                         __provider__b__ = true;
                         break;
+                    case 5:
+                        __public_ip__ = reader.ReadString();
+                        __public_ip__b__ = true;
+                        break;
+                    case 6:
+                        __custom_attribute__ = reader.ReadString();
+                        __custom_attribute__b__ = true;
+                        break;
+                    case 7:
+                        __allocation_id__ = reader.ReadString();
+                        __allocation_id__b__ = true;
+                        break;
+                    case 8:
+                        __ports__ = formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.Dictionary<string, string>>().Deserialize(ref reader, formatterResolver);
+                        __ports__b__ = true;
+                        break;
                     default:
                         reader.ReadNextBlock();
                         break;
@@ -25291,6 +25342,10 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__pod_name__b__) ____result.pod_name = __pod_name__;
             if(__port__b__) ____result.port = __port__;
             if(__provider__b__) ____result.provider = __provider__;
+            if(__public_ip__b__) ____result.public_ip = __public_ip__;
+            if(__custom_attribute__b__) ____result.custom_attribute = __custom_attribute__;
+            if(__allocation_id__b__) ____result.allocation_id = __allocation_id__;
+            if(__ports__b__) ____result.ports = __ports__;
 
             return ____result;
         }

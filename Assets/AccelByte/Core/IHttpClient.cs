@@ -77,11 +77,22 @@ namespace AccelByte.Core {
             
             return client?.SendRequest(request, HttpClientExtension.CreateResponseHandler(callback));
         }
-        
+
         public static IEnumerator Post<T>(this IHttpClient client, string url, T body, ResultCallback callback)
         {
             IHttpRequest request = HttpRequestBuilder.CreatePost(url).WithBearerAuth().WithJsonBody(body).GetResult();
             
+            return client?.SendRequest(request, HttpClientExtension.CreateResponseHandler(callback));
+        }
+
+        public static IEnumerator Post<R>(this IHttpClient client,string url,ResultCallback<R> callback)
+        {
+            IHttpRequest request = HttpRequestBuilder
+                                                    .CreatePost(url)
+                                                    .WithBearerAuth()
+                                                    .WithContentType(MediaType.ApplicationJson)
+                                                    .GetResult();
+
             return client?.SendRequest(request, HttpClientExtension.CreateResponseHandler(callback));
         }
         

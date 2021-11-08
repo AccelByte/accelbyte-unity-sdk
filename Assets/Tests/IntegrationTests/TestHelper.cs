@@ -2999,7 +2999,7 @@ namespace Tests
     [DataContract]
         public class ItemCreateModel
         {
-            [DataMember] public string itemType { get; set; } // APP/COINS/INGAMEITEM/BUNDLE/PRODUCT/CODE/SUBSCRIPTION/SEASON
+            [DataMember] public string itemType { get; set; } // APP/COINS/INGAMEITEM/BUNDLE/PRODUCT/CODE/SUBSCRIPTION/SEASON/MEDIA
             [DataMember] public SeasonType seasonType { get; set; }
             [DataMember] public string name { get; set; }
             [DataMember] public string entitlementType { get; set; } // DURABLE/CONSUMABLE

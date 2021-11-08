@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -61,6 +62,20 @@ namespace Tests.UnitTests
 
                 AssertNoError(this.nothing);
             }
+
+            [UnityTest, TestLog]
+            public IEnumerator When_POST_without_body__And_expect_response_body__Then_should_return_data()
+            {
+                string url = "https://ab.example.io/path/noauth/echo";
+                Result<object> result = null;
+                
+                yield return this.client.Post<object>(url, r => result = r);
+
+                Assert.NotNull(result);
+                Assert.False(result.IsError);
+                Assert.NotNull(result.Value);
+            }
+
 
             [UnityTest, TestLog]
             public IEnumerator When_POST_with_body__And_expect_response_body__Then_should_return_data()
@@ -720,7 +735,7 @@ namespace Tests.UnitTests
 
                 AssertNoError(this.result);
             }
-            
+
             [UnityTest, TestLog]
             public IEnumerator When_implicit_and_explicit_path_parameters_are_set__Then_both_are_used()
             {
@@ -772,7 +787,7 @@ namespace Tests.UnitTests
                     .GetResult();
 
                 yield return this.client.Send(request, (Result<Data> r) => this.result = r);
-                
+
                 AssertValidationError(this.result);
             }
         }
@@ -838,105 +853,105 @@ namespace Tests.UnitTests
             string auth;
             switch (request.Method + " " + request.Url)
             {
-            case "PUT http://ab.example.io/path":
-                FakeService.RespondWithEcho(request, callback);
+                case "PUT http://ab.example.io/path":
+                    FakeService.RespondWithEcho(request, callback);
 
-                break;
-            case "PUT https://ab.example.io/path":
-                FakeService.RespondWithEcho(request, callback);
+                    break;
+                case "PUT https://ab.example.io/path":
+                    FakeService.RespondWithEcho(request, callback);
 
-                break;
-            case "GET " + FakeService.NoAuthUrl:
-                FakeService.RespondWithDefault(request, callback);
-
-                break;
-            case "GET " + FakeService.NoAuthUrl + "?userId=ab12&offset=36&limit=12":
-                FakeService.RespondWithDefault(request, callback);
-
-                break;
-            case "POST " + FakeService.NoAuthUrl:
-                FakeService.RespondWithEmpty(request, callback);
-
-                break;
-            case "POST " + FakeService.NoAuthUrl + "/echo":
-                FakeService.RespondWithEcho(request, callback);
-
-                break;
-            case "POST " + FakeService.NoAuthUrl + "/formEmpty":
-                if (Encoding.UTF8.GetString(request.BodyBytes) == "userId=ab12&offset=36&limit=12")
-                {
-                    FakeService.RespondWithEmpty(request, callback);
-                }
-                else
-                {
-                    FakeService.RespondWithError(request, 400, callback);
-                }
-
-                break;
-            case "POST " + FakeService.NoAuthUrl + "/formValue":
-                if (Encoding.UTF8.GetString(request.BodyBytes) == "userId=ab12&offset=36&limit=12")
-                {
+                    break;
+                case "GET " + FakeService.NoAuthUrl:
                     FakeService.RespondWithDefault(request, callback);
-                }
-                else
-                {
-                    FakeService.RespondWithError(request, 400, callback);
-                }
 
-                break;
-            case "POST " + FakeService.BasicUrl:
-                string base64PublicClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes("username:"));
-                if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Basic " + base64PublicClientId)
-                {
+                    break;
+                case "GET " + FakeService.NoAuthUrl + "?userId=ab12&offset=36&limit=12":
+                    FakeService.RespondWithDefault(request, callback);
+
+                    break;
+                case "POST " + FakeService.NoAuthUrl:
+                    FakeService.RespondWithEmpty(request, callback);
+
+                    break;
+                case "POST " + FakeService.NoAuthUrl + "/echo":
                     FakeService.RespondWithEcho(request, callback);
-                }
-                else
-                {
-                    FakeService.RespondWithAuthError(request, callback);
-                }
 
-                break;
+                    break;
+                case "POST " + FakeService.NoAuthUrl + "/formEmpty":
+                    if (Encoding.UTF8.GetString(request.BodyBytes) == "userId=ab12&offset=36&limit=12")
+                    {
+                        FakeService.RespondWithEmpty(request, callback);
+                    }
+                    else
+                    {
+                        FakeService.RespondWithError(request, 400, callback);
+                    }
+
+                    break;
+                case "POST " + FakeService.NoAuthUrl + "/formValue":
+                    if (Encoding.UTF8.GetString(request.BodyBytes) == "userId=ab12&offset=36&limit=12")
+                    {
+                        FakeService.RespondWithDefault(request, callback);
+                    }
+                    else
+                    {
+                        FakeService.RespondWithError(request, 400, callback);
+                    }
+
+                    break;
+                case "POST " + FakeService.BasicUrl:
+                    string base64PublicClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes("username:"));
+                    if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Basic " + base64PublicClientId)
+                    {
+                        FakeService.RespondWithEcho(request, callback);
+                    }
+                    else
+                    {
+                        FakeService.RespondWithAuthError(request, callback);
+                    }
+
+                    break;
                 case "PUT " + FakeService.NoAuthUrl:
-                FakeService.RespondWithEcho(request, callback);
-
-                break;
-            case "PATCH " + FakeService.NoAuthUrl:
-                FakeService.RespondWithEcho(request, callback);
-
-                break;
-            case "DELETE " + FakeService.NoAuthUrl:
-                FakeService.RespondWithEmpty(request, callback);
-
-                break;
-            case "PUT " + FakeService.BasicUrl:
-                string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes("username:password"));
-                if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Basic " + base64)
-                {
                     FakeService.RespondWithEcho(request, callback);
-                }
-                else
-                {
-                    FakeService.RespondWithAuthError(request, callback);
-                }
 
-                break;
-            case "PUT " + FakeService.BearerUrl:
-                string token = "AuthorizedAccessToken";
-                if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Bearer " + token)
-                {
+                    break;
+                case "PATCH " + FakeService.NoAuthUrl:
                     FakeService.RespondWithEcho(request, callback);
-                }
-                else
-                {
-                    FakeService.RespondWithAuthError(request, callback);
-                }
 
-                break;
+                    break;
+                case "DELETE " + FakeService.NoAuthUrl:
+                    FakeService.RespondWithEmpty(request, callback);
 
-            default:
-                FakeService.RespondWithError(request, 404, callback);
+                    break;
+                case "PUT " + FakeService.BasicUrl:
+                    string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes("username:password"));
+                    if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Basic " + base64)
+                    {
+                        FakeService.RespondWithEcho(request, callback);
+                    }
+                    else
+                    {
+                        FakeService.RespondWithAuthError(request, callback);
+                    }
 
-                break;
+                    break;
+                case "PUT " + FakeService.BearerUrl:
+                    string token = "AuthorizedAccessToken";
+                    if (request.Headers.TryGetValue("Authorization", out auth) && auth == "Bearer " + token)
+                    {
+                        FakeService.RespondWithEcho(request, callback);
+                    }
+                    else
+                    {
+                        FakeService.RespondWithAuthError(request, callback);
+                    }
+
+                    break;
+
+                default:
+                    FakeService.RespondWithError(request, 404, callback);
+
+                    break;
             }
         }
 
@@ -959,7 +974,8 @@ namespace Tests.UnitTests
 
         private static void RespondWithEcho(IHttpRequest request, Action<IHttpResponse, Error> callback)
         {
-            var response = new MockHttpResponse { Url = request.Url, Code = 200, BodyBytes = request.BodyBytes };
+            var responseBodyByte = request.BodyBytes != null && request.BodyBytes.Any() ? request.BodyBytes : string.Empty.ToUtf8Json();
+            var response = new MockHttpResponse { Url = request.Url, Code = 200, BodyBytes = responseBodyByte};
             callback?.Invoke(response, null);
         }
 

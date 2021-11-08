@@ -53,6 +53,7 @@ namespace AccelByte.Api
         private static Reward reward;
 
         private static bool initialized = false;
+        private static bool utf8JsonResolversRegistered = false;
 
         public static Config Config
         {
@@ -81,19 +82,7 @@ namespace AccelByte.Api
         internal static void Initialize(Config config = null)
         {
 #if (UNITY_WEBGL || UNITY_PS4 || UNITY_XBOXONE || UNITY_SWITCH || UNITY_STADIA || ENABLE_IL2CPP) && !UNITY_EDITOR
-            Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
-                new [] {
-                    Utf8Json.Formatters.CustomPrimitiveObjectFormatter.Default
-                },
-                new[] {
-                    Utf8Json.Resolvers.GeneratedResolver.Instance,
-                    Utf8Json.Resolvers.DynamicGenericResolver.Instance,
-                    Utf8Json.Resolvers.BuiltinResolver.Instance,
-                    Utf8Json.Resolvers.EnumResolver.Default,
-                    // for unity
-                    Utf8Json.Unity.UnityResolver.Instance
-                }
-            );
+            AccelBytePlugin.RegisterUtf8JsonResolver();
 #endif
             AccelBytePlugin.ResetApis();
             AccelBytePlugin.initialized = true;
@@ -145,6 +134,27 @@ namespace AccelByte.Api
                 AccelBytePlugin.coroutineRunner);
 
             ServicePointManager.ServerCertificateValidationCallback = AccelBytePlugin.OnCertificateValidated;
+        }
+
+        internal static void RegisterUtf8JsonResolver()
+        {
+            if (AccelBytePlugin.utf8JsonResolversRegistered) return;
+
+            AccelBytePlugin.utf8JsonResolversRegistered = true;
+
+            Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
+                new [] {
+                    Utf8Json.Formatters.CustomPrimitiveObjectFormatter.Default
+                },
+                new[] {
+                    Utf8Json.Resolvers.GeneratedResolver.Instance,
+                    Utf8Json.Resolvers.DynamicGenericResolver.Instance,
+                    Utf8Json.Resolvers.BuiltinResolver.Instance,
+                    Utf8Json.Resolvers.EnumResolver.Default,
+                    // for unity
+                    Utf8Json.Unity.UnityResolver.Instance
+                }
+            );
         }
 
         /// <summary>

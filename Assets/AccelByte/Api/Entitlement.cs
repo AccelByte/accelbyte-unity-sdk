@@ -149,6 +149,32 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get user entitlement ownership by ItemId
+        /// </summary>
+        /// <param name="ItemId">the item's ItemId</param>
+        /// <param name="callback">Returns user's entitlement ownership result via callback when completed</param>
+        public void GetUserEntitlementOwnershipByItemId(string ItemId, ResultCallback<Ownership> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(ItemId, "Can't get user entitlement ownership by ItemId! ItemId parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserEntitlementOwnershipByItemId(
+                    AccelBytePlugin.Config.Namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    ItemId,
+                    callback));
+        }
+
+        /// <summary>
         /// Get user entitlement ownership if any of item IDs, app IDs, or SKUs are true
         /// </summary>
         /// <param name="itemIds">the item Ids</param>
