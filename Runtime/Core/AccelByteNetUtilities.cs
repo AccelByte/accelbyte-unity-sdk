@@ -35,15 +35,15 @@ namespace AccelByte.Core
             callback.Try(result);
         }
 
-        public static void UploadTo(string url, byte[] data, ResultCallback callback)
+        public static void UploadTo(string url, byte[] data, ResultCallback callback, string contentType = "application/octet-stream")
         {
-            coroutineRunner.Run(UploadToAsync(url, data, callback));
+            coroutineRunner.Run(UploadToAsync(url, data, callback, contentType));
         }
 
-        private static IEnumerator UploadToAsync(string url, byte[] data, ResultCallback callback)
+        private static IEnumerator UploadToAsync(string url, byte[] data, ResultCallback callback, string contentType)
         {
             var uploadRequest = HttpRequestBuilder.CreatePut(url)
-                .WithContentType(MediaType.ApplicationOctetStream)
+                .WithContentType(contentType)
                 .WithBody(System.Convert.ToBase64String(data))
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

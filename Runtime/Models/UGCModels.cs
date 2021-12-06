@@ -51,6 +51,7 @@ namespace AccelByte.Models
     [DataContract]
     public class UGCRequest
     {
+        [DataMember] public string contentType { get; set; }
         [DataMember] public string fileExtension { get; set; }
         [DataMember] public string name { get; set; }
         [DataMember] public string preview { get; set; }
@@ -63,6 +64,7 @@ namespace AccelByte.Models
     public class UGCResponse
     {
         [DataMember] public string channelId { get; set; }
+        [DataMember] public string contentType { get; set; }
         [DataMember] public DateTime createdTime { get; set; }
         [DataMember] public string creatorName { get; set; }
         [DataMember] public string fileExtension { get; set; }

@@ -439,5 +439,55 @@ namespace AccelByte.Api
                     callback
                     ));
         }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Google Play platform purchase.
+        /// </summary>
+        /// <param name="syncRequest"> That contain of OrderId, PackageName, ProductId, PurchaseTime, and PurchaseToken to verify and sync item user bought from Google Play.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncMobilePlatformPurchaseGoogle(PlatformSyncMobileGoogle syncRequest, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncMobilePlatformPurchaseGoogle(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    syncRequest,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Apple Store platform purchase.
+        /// </summary>
+        /// <param name="syncRequest"> That contain of ProductId, TransactionId, ReceiptData, and ExcludeOldTransactions to verify and sync item user bought from Apple Store. </param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncMobilePlatformPurchaseApple(PlatformSyncMobileApple syncRequest, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncMobilePlatformPurchaseApple(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    syncRequest,
+                    callback
+                    ));
+        }
     }
 }

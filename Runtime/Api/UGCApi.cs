@@ -34,13 +34,19 @@ namespace AccelByte.Api
             Assert.IsNotNull(accessToken, "Can't create content! AccessToken parameter is null!");
             Assert.IsNotNull(channelId, "Can't create content! channelId parameter is null!");
 
+            UGCRequest Req = createRequest;
+            if (string.IsNullOrEmpty(Req.contentType))
+            {
+                Req.contentType = "application/octet-stream";
+            }
+
             var request = HttpRequestBuilder
                 .CreatePost(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/s3")
                 .WithPathParam("namespace", @namespace)
                 .WithPathParam("userId", userId)
                 .WithPathParam("channelId", channelId)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(createRequest.ToUtf8Json())
+                .WithBody(Req.ToUtf8Json())
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
@@ -54,7 +60,7 @@ namespace AccelByte.Api
         }
 
         public IEnumerator CreateContent(string @namespace, string userId, string accessToken, string channelId, string name, string type, string subtype,
-            string[] tags, byte[] preview, string fileExtension, ResultCallback<UGCResponse> callback)
+            string[] tags, byte[] preview, string fileExtension, ResultCallback<UGCResponse> callback, string contentType)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(@namespace, "Can't create content! Namespace parameter is null!");
@@ -75,7 +81,8 @@ namespace AccelByte.Api
                 subtype = subtype,
                 tags = tags,
                 preview = System.Convert.ToBase64String(preview),
-                fileExtension = fileExtension
+                fileExtension = fileExtension,
+                contentType = contentType
             };
 
             yield return CreateContent(@namespace, userId, accessToken, channelId, createRequest, callback);
@@ -91,6 +98,12 @@ namespace AccelByte.Api
             Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
             Assert.IsNotNull(modifyRequest, "Can't modify content! type parameter is null!");
 
+            UGCRequest Req = modifyRequest;
+            if (string.IsNullOrEmpty(Req.contentType))
+            {
+                Req.contentType = "application/octet-stream";
+            }
+
             var request = HttpRequestBuilder
                 .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/s3/{contentId}")
                 .WithPathParam("namespace", @namespace)
@@ -98,7 +111,7 @@ namespace AccelByte.Api
                 .WithPathParam("channelId", channelId)
                 .WithPathParam("contentId", contentId)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(modifyRequest.ToUtf8Json())
+                .WithBody(Req.ToUtf8Json())
                 .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
@@ -112,7 +125,7 @@ namespace AccelByte.Api
         }
 
         public IEnumerator ModifyContent(string @namespace, string userId, string accessToken, string channelId, string contentId, string name, string type, string subtype,
-            string[] tags, byte[] preview, string fileExtension, ResultCallback<UGCResponse> callback)
+            string[] tags, byte[] preview, string fileExtension, ResultCallback<UGCResponse> callback, string contentType)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(@namespace, "Can't modify content! Namespace parameter is null!");
@@ -134,7 +147,8 @@ namespace AccelByte.Api
                 subtype = subtype,
                 tags = tags,
                 preview = System.Convert.ToBase64String(preview),
-                fileExtension = fileExtension
+                fileExtension = fileExtension,
+                contentType = contentType
             };
 
             yield return ModifyContent(@namespace, userId, accessToken, channelId, contentId, modifyRequest, callback);
