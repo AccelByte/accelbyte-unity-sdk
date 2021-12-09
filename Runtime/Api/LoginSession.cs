@@ -282,22 +282,6 @@ namespace AccelByte.Api
             callback.TryError(result.Error);
         }
 
-        public void SetScheduleRefreshToken(DateTime time)
-        {
-            // don't schedule refresh token if time is in the past.
-            if (time < DateTime.UtcNow)
-                return;
-
-            this.nextRefreshTime = time;
-
-            Debug.Log($"set refresh time to {this.nextRefreshTime}");
-
-            if (this.maintainAccessTokenCoroutine == null)
-            {
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(this.MaintainSession());
-            }
-        }
-
         private IEnumerator MaintainSession()
         {
             this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);

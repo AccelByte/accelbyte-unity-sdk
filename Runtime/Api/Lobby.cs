@@ -151,11 +151,6 @@ namespace AccelByte.Api
         /// </summary>
         public event ResultCallback<UserBannedNotification> UserUnbannedNotification;
 
-        /// <summary>
-        /// Raised when lobby access token succesfully updated
-        /// </summary>
-        public event Action TokenRefreshed;
-
         private readonly int pingDelay;
         private int backoffDelay;
         private int maxDelay;
@@ -415,12 +410,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             StopMaintainConnection();
-
-            LoginSession loginSession = session as LoginSession;
-            if (loginSession != null)
-            {
-                loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
-            }
 
             if (this.webSocket.ReadyState == WsState.Open || this.webSocket.ReadyState == WsState.Connecting)
             {
@@ -1373,16 +1362,6 @@ namespace AccelByte.Api
             SendRequest(MessageType.getAllSessionAttributeRequest, callback);
         }
 
-        private void RefreshToken(string newAccessToken, ResultCallback callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            SendRequest(MessageType.refreshTokenRequest, new RefreshAccessTokenRequest()
-            {
-                token = newAccessToken
-            }, callback);
-        }
-
         private long GenerateId()
         {
             lock (this.syncToken)
@@ -1511,22 +1490,7 @@ namespace AccelByte.Api
                     {
                         handler();
                     }
-
-                    LoginSession loginSession = session as LoginSession;
-                    if(loginSession != null)
-                    {
-                        loginSession.RefreshTokenCallback += LoginSession_RefreshTokenCallback;
-                    }
                 });
-        }
-
-        private void LoginSession_RefreshTokenCallback(string accessToken)
-        {
-            RefreshToken(accessToken, result =>
-            {
-                TokenRefreshed?.Invoke();
-                AccelByteDebug.Log($"Updating access token in lobby {(result.IsError ? $"Error with code {result.Error.Code}, message {result.Error.Message}" : "Success")}");
-            });
         }
 
         private void HandleOnClose(ushort closecode)
@@ -1550,12 +1514,6 @@ namespace AccelByte.Api
                     if (handler != null)
                     {
                         handler(code);
-                    }
-
-                    LoginSession loginSession = session as LoginSession;
-                    if (loginSession != null)
-                    {
-                        loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
                     }
                 });
         }
@@ -1714,13 +1672,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             reconnectsOnBans = true;
-
-            LoginSession loginSession = session as LoginSession;
-            if (loginSession != null)
-            {
-                loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
-            }
-
+            
             this.api.OnBanNotificationReceived(this.session.AuthorizationToken,
             session =>
             {

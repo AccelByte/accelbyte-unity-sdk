@@ -780,32 +780,4 @@ namespace AccelByte.Models
     }
 
     #endregion
-
-    #region SyncPurchaseMobile
-
-    [DataContract]
-    public class PlatformSyncMobileApple
-    {
-        [DataMember] public string productId { get; set; }
-        [DataMember] public string transactionId { get; set; }
-        [DataMember] public string receiptData { get; set; }
-        [DataMember] public bool excludeOldTransactions { get; set; }
-        [DataMember] public string region { get; set; } //optional
-        [DataMember] public string language { get; set; } //optional
-        
-    }
-
-    [DataContract]
-    public class PlatformSyncMobileGoogle
-    {
-        [DataMember] public string orderId { get; set; }
-        [DataMember] public string packageName { get; set; }
-        [DataMember] public string productId { get; set; }
-        [DataMember] public long purchaseTime { get; set; }
-        [DataMember] public string purchaseToken { get; set; }
-        [DataMember] public string region { get; set; } //optional
-        [DataMember] public string language { get; set; } //optional
-    }
-
-    #endregion
 }

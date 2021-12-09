@@ -364,49 +364,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
-        public IEnumerator SyncMobilePlatformPurchaseGoogle(string @namespace, string userId, string userAccessToken, PlatformSyncMobileGoogle syncRequest, ResultCallback callback)
-        {
-            Assert.IsNotNull(@namespace, "Can't update distribution receiver! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update distribution receiver! UserId parameter is null!");
-
-            var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/google/receipt")
-                .WithPathParam("namespace", @namespace)
-                .WithPathParam("userId", userId)
-                .WithBearerAuth(userAccessToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(syncRequest.ToUtf8Json())
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
-        }
-
-        public IEnumerator SyncMobilePlatformPurchaseApple(string @namespace, string userId, string userAccessToken, PlatformSyncMobileApple syncRequest, ResultCallback callback)
-        {
-            Assert.IsNotNull(@namespace, "Can't update distribution receiver! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update distribution receiver! UserId parameter is null!");
-
-            var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/apple/receipt")
-                .WithPathParam("namespace", @namespace)
-                .WithPathParam("userId", userId)
-                .WithBearerAuth(userAccessToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(syncRequest.ToUtf8Json())
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
-        }
     }
 }
