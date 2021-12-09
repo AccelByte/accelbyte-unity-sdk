@@ -48,4 +48,3 @@ Assets/InitTestScene*.unity
 # pre commit hook
 node_modules
 yarn.lock
-package.json
