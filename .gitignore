@@ -40,7 +40,6 @@ sysinfo.txt
 
 *.bak
 *.log
-*.meta
 
 # Generated test files
 Assets/InitTestScene*.unity
