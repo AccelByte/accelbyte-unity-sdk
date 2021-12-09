@@ -813,6 +813,11 @@ namespace AccelByte.Api
                     callback));
         }
 
+        /// <summary>
+        /// Get multiple user(s) information like user's DisplayName.
+        /// </summary>
+        /// <param name="userIds">List UserId(s) to get.</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void BulkGetUserInfo(string[] userIds, ResultCallback<ListBulkUserInfoResponse> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);

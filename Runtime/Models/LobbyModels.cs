@@ -104,7 +104,9 @@ namespace AccelByte.Models
         getAllSessionAttributeRequest,
         getAllSessionAttributeResponse,
         userBannedNotification,
-        userUnbannedNotification
+        userUnbannedNotification,
+        refreshTokenRequest,
+        refreshTokenResponse
     }
 
     [DataContract]
@@ -606,6 +608,16 @@ namespace AccelByte.Models
     public class ServerSetSessionAttributeRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
+    }
+
+    #endregion
+
+    #region Refresh Access Token
+
+    [DataContract]
+    public class RefreshAccessTokenRequest
+    {
+        [DataMember] public string token;
     }
 
     #endregion

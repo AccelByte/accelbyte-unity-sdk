@@ -287,6 +287,8 @@ namespace AccelByte.Server
                 new ServerUserAccountApi(
                     AccelByteServerPlugin.config.BaseUrl,
                     AccelByteServerPlugin.httpClient),
+                AccelByteServerPlugin.session,
+                AccelByteServerPlugin.config.Namespace,
                 AccelByteServerPlugin.coroutineRunner));
         }
 

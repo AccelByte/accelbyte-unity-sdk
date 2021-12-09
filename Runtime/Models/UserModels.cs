@@ -379,14 +379,60 @@ namespace AccelByte.Models
     [DataContract]
     public class BaseUserInfo
     {
-        [DataMember] public string avatarUrl;
-        [DataMember] public string displayName;
-        [DataMember] public string userId;
+        [DataMember] public string avatarUrl { get; set; }
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public string userId { get; set; }
     }
 
     [DataContract]
     public class ListBulkUserInfoResponse
     {
-        [DataMember] public BaseUserInfo[] data;
+        [DataMember] public BaseUserInfo[] data { get; set; }
     }
-}
+
+    [DataContract]
+    public class NamespaceRole
+    {
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public string roleId { get; set; }
+    }
+
+    [DataContract]
+    public class UserOtherPlatformInfo
+    {
+        [DataMember] public string authType { get; set; }
+        [DataMember] public Ban[] bans { get; set; }
+        [DataMember] public string country { get; set; }
+        [DataMember] public string createdAt { get; set; }
+        [DataMember] public string dateOfBirth { get; set; }
+        [DataMember] public bool deletionStatus { get; set; }
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public string emailAddress { get; set; }
+        [DataMember] public bool emailVerified { get; set; }
+        [DataMember] public bool enabled { get; set; }
+        [DataMember] public string lastDateOfBirthChangedTime { get; set; }
+        [DataMember] public string lastEnabledChangedTime { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public NamespaceRole[] namespaceRoles { get; set; }
+        [DataMember] public string newEmailAddress { get; set; }
+        [DataMember] public string oldEmailAddress { get; set; }
+        [DataMember] public Permission[] permissions { get; set; }
+        [DataMember] public string phoneNumber { get; set; }
+        [DataMember] public bool phoneVerified { get; set; }
+        [DataMember] public string platformDisplayName { get; set; } //optional
+        [DataMember] public string platformId { get; set; } //optional
+        [DataMember] public string platformUserId { get; set; } //optional
+        [DataMember] public string[] roles { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string username { get; set; } //optional
+    }
+
+    [DataContract]
+    public class PagedUserOtherPlatformInfo
+    {
+        [DataMember] public UserOtherPlatformInfo[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
+        [DataMember] public int totalData { get; set; }
+    }
+
+};

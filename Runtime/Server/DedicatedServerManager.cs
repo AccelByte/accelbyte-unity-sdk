@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
@@ -47,10 +46,9 @@ namespace AccelByte.Server
         /// <summary>
         /// Register server to DSM and mark this machine as ready
         /// </summary>
-        /// <param name="portNumber">Exposed port number to connect to</param>
+        /// <param name="port">Exposed port number to connect to</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        /// <param name="customAttribute">Custom attribute for this DS</param>
-        public void RegisterServer(int portNumber, ResultCallback callback, string customAttribute = "")
+        public void RegisterServer(int portNumber, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -63,28 +61,7 @@ namespace AccelByte.Server
             }
 
             this.name = Environment.GetEnvironmentVariable("POD_NAME");
-            string allocId = Environment.GetEnvironmentVariable("NOMAD_ALLOC_ID");
-            string ip = Environment.GetEnvironmentVariable("PUBLIC_IP");
-            string provider = Environment.GetEnvironmentVariable("PROVIDER");
-
-            // needs to deserialize ports first to a dict, so later it will be serialized correctly as a json object
-            string portsString = Environment.GetEnvironmentVariable("PORTS");
-            Dictionary<string, string> portsDict = null;
-            if(!string.IsNullOrEmpty(portsString))
-            {
-                portsDict = portsString.ToObject<Dictionary<string, string>>();
-            }
-
-            var request = new RegisterServerRequest {
-                pod_name = this.name,
-                port = portNumber,
-                allocation_id = allocId,
-                public_ip = ip,
-                ports = portsDict,
-                custom_attribute = customAttribute,
-                provider = provider
-            };
-
+            var request = new RegisterServerRequest {pod_name = this.name, port = portNumber};
             this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, callback));
         }
 

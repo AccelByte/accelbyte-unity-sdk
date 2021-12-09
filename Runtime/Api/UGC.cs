@@ -64,8 +64,9 @@ namespace AccelByte.Api
         /// <param name="preview">Preview the byte array of the content's preview.</param>
         /// <param name="fileExtension">FileExtension of the content</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
+        /// <param name="contentType">The specific type of the content's created. default value is "application/octet-stream"</param>
         public void CreateContent(string channelId, string name, string type, string subtype, string[] tags, byte[] preview, string fileExtension,
-            ResultCallback<UGCResponse> callback)
+            ResultCallback<UGCResponse> callback, string contentType = "application/octet-stream")
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -78,7 +79,7 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.api.CreateContent(this.@namespace, this.session.UserId, this.session.AuthorizationToken, channelId, name, type, subtype,
-                    tags, preview, fileExtension, callback));
+                    tags, preview, fileExtension, callback, contentType));
         }
 
         /// <summary>
@@ -115,8 +116,9 @@ namespace AccelByte.Api
         /// <param name="preview">The byte array of the content's Preview</param>
         /// <param name="fileExtension">FileExtension of the content</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
+        /// <param name="contentType">The specific type of the content's modified. Default value is "application/octet-stream"</param>
         public void ModifyContent(string channelId, string contentId, string name, string type, string subtype, string[] tags, byte[] preview, string fileExtension,
-            ResultCallback<UGCResponse> callback)
+            ResultCallback<UGCResponse> callback, string contentType = "application/octet-stream")
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -129,7 +131,7 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.api.ModifyContent(this.@namespace, this.session.UserId, this.session.AuthorizationToken, channelId, contentId, name, type, subtype,
-                    tags, preview, fileExtension, callback));
+                    tags, preview, fileExtension, callback, contentType));
         }
 
         /// <summary>

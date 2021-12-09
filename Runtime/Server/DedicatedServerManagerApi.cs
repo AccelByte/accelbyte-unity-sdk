@@ -47,7 +47,7 @@ namespace AccelByte.Server
             this.httpClient = httpClient;
             this.serverSetup = new RegisterServerRequest() {
                 game_version = "",
-                public_ip = "",
+                ip = "",
                 pod_name = "",
                 provider = ""
             };
@@ -61,16 +61,8 @@ namespace AccelByte.Server
             Assert.IsNotNull(registerRequest, "Register failed. registerserverRequest is null!");
             Assert.IsNotNull(accessToken, "Can't update a slot! accessToken parameter is null!");
 
-            // supports justice dsm controller ver 2.7.0 and below.
-            if(string.IsNullOrEmpty(registerRequest.public_ip))
-            {
-                registerRequest.public_ip = serverSetup.public_ip;
-            }
-            if (string.IsNullOrEmpty(registerRequest.provider))
-            {
-                registerRequest.provider = serverSetup.provider;
-            }
-
+            registerRequest.ip = serverSetup.ip;
+            registerRequest.provider = serverSetup.provider;
             registerRequest.game_version = serverSetup.game_version;
     
             var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/namespaces/{namespace}/servers/register")
@@ -159,7 +151,6 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
-        [Obsolete("ipify supports will be deprecated in future releases, please use RegisterLocalServer(RegisterLocalServerRequest registerRequest, string accessToken, ResultCallback callback)")]
         public IEnumerator RegisterLocalServer(uint port, string name, string accessToken,
             ResultCallback callback)
         {
