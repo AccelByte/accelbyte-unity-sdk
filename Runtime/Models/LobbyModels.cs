@@ -374,6 +374,19 @@ namespace AccelByte.Models
     {
         [DataMember] public int banDuration;
     }
+
+    [DataContract]
+    public class MatchmakingOptionalParam
+    {
+        [DataMember] public string serverName;
+        [DataMember] public string clientVersion;
+        [DataMember] public Dictionary<string, int> latencies;
+        [DataMember] public Dictionary<string, object> partyAttributes;
+        [DataMember] public string[] tempPartyUserIds;
+        [DataMember] public string[] extraAttributes;
+        [DataMember] public string[] subGameModes;
+        [DataMember] public bool newSessionOnly;
+    }
     
     #endregion
 

@@ -6,6 +6,7 @@ using System.Collections;
 using AccelByte.Models;
 using AccelByte.Core;
 using UnityEngine.Assertions;
+using System;
 
 namespace AccelByte.Api
 {
@@ -255,6 +256,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.)")]
         public IEnumerator CreateDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
             Attributes currentAttributes, ResultCallback callback)
         {
@@ -286,6 +288,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.)")]
         public IEnumerator DeleteDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
             ResultCallback callback)
         {
@@ -310,6 +313,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.)")]
         public IEnumerator GetDistributionReceiver(string publisherNamespace, string publisherUserId, string targetNamespace, string userAccessToken,
             ResultCallback<DistributionReceiver[]> callback)
         {
@@ -334,6 +338,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.)")]
         public IEnumerator UpdateDistributionReceiver(string @namespace, string userId, string userAccessToken, string extUserId,
             Attributes currentAttributes, ResultCallback callback)
         {

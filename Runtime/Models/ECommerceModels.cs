@@ -42,7 +42,6 @@ namespace AccelByte.Models
         NONE,
         APP,
         ENTITLEMENT,
-        DISTRIBUTION,
         CODE,
         MEDIA
     }
@@ -53,7 +52,6 @@ namespace AccelByte.Models
         ACTIVE,
         INACTIVE,
         CONSUMED,
-        DISTRIBUTED,
         REVOKED
     }
 
@@ -532,9 +530,9 @@ namespace AccelByte.Models
     {
         [DataMember] public string id { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public EntitlementClazz clazz { get; set; } // ['APP', 'ENTITLEMENT', 'DISTRIBUTION', 'CODE']
+        [DataMember] public EntitlementClazz clazz { get; set; } // ['APP', 'ENTITLEMENT', 'CODE']
         [DataMember] public EntitlementType type { get; set; } //  ['DURABLE', 'CONSUMABLE']
-        [DataMember] public EntitlementStatus status { get; set; } // ['ACTIVE', 'INACTIVE', 'CONSUMED', 'DISTRIBUTED', 'REVOKED']
+        [DataMember] public EntitlementStatus status { get; set; } // ['ACTIVE', 'INACTIVE', 'CONSUMED', 'REVOKED']
         [DataMember] public string appId { get; set; }
         [DataMember] public EntitlementAppType appType { get; set; } // ['GAME', 'SOFTWARE', 'DLC', 'DEMO']
         [DataMember] public string sku { get; set; }
@@ -545,10 +543,7 @@ namespace AccelByte.Models
         [DataMember] public string itemNamespace { get; set; }
         [DataMember] public string name { get; set; }
         [DataMember] public int useCount { get; set; }
-        [DataMember] public int quantity { get; set; }
         [DataMember] public EntitlementSource source { get; set; } // ['PURCHASE', 'IAP', 'PROMOTION', 'ACHIEVEMENT', 'REFERRAL_BONUS', 'REDEEM_CODE', 'OTHER']
-        [DataMember] public int distributedQuantity { get; set; }
-        [DataMember] public string targetNamespace { get; set; }
         [DataMember] public ItemSnapshot itemSnapshot { get; set; }
         [DataMember] public DateTime startDate { get; set; }
         [DataMember] public DateTime endDate { get; set; }

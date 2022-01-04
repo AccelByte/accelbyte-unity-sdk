@@ -739,11 +739,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function with a start matchmaking status code.</param>
         public void StartMatchmaking(string gameMode, ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest {gameMode = gameMode},
-                callback);
+            StartMatchmaking(gameMode, "", null, null, null, null, null, callback);
         }
 
         /// <summary>
@@ -754,11 +750,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function with a start matchmaking status code.</param>
         public void StartMatchmaking(string gameMode, string serverName, ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest {gameMode = gameMode, serverName = serverName},
-                callback);
+            StartMatchmaking(gameMode, serverName, null, null, null, null, null, callback);
         }
 
         /// <summary>
@@ -771,14 +763,7 @@ namespace AccelByte.Api
         public void StartMatchmaking(string gameMode, string serverName, string clientVersion,
             ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode, serverName = serverName, clientVersion = clientVersion
-                },
-                callback);
+            StartMatchmaking(gameMode, serverName, clientVersion, null, null, null, null, callback);
         }
 
         /// <summary>
@@ -791,21 +776,7 @@ namespace AccelByte.Api
         public void StartMatchmaking(string gameMode, string clientVersion,
             Dictionary<string, int> latencies, ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            string strLatencies = "";
-            strLatencies = "{" +
-                string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
-                "}";
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    clientVersion = clientVersion,
-                    latencies = strLatencies
-                },
-                callback);
+            StartMatchmaking(gameMode, "", clientVersion, latencies, null, null, null, callback);
         }
 
         /// <summary>
@@ -819,23 +790,7 @@ namespace AccelByte.Api
         public void StartMatchmaking(string gameMode, string clientVersion,
             Dictionary<string, int> latencies, Dictionary<string, object> partyAttributes, ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            string strLatencies = "";
-            strLatencies = "{" +
-                string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
-                "}";
-            var jsonAttributeString = partyAttributes.ToJsonString();
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    clientVersion = clientVersion,
-                    latencies = strLatencies,
-                    partyAttributes = jsonAttributeString
-                },
-                callback);
+            StartMatchmaking(gameMode, "", clientVersion, latencies, partyAttributes, null, null, callback);
         }
 
         /// <summary>
@@ -851,30 +806,7 @@ namespace AccelByte.Api
             Dictionary<string, object> partyAttributes, string[] tempPartyUserIds,
             ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            string strLatencies = "";
-            if(latencies != null && latencies.Count > 0)
-            {
-                strLatencies = "{" +
-                    string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
-                    "}";
-            }
-
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    clientVersion = clientVersion,
-                    latencies = strLatencies,
-                    partyAttributes = jsonAttributeString,
-                    tempParty = userIdsCSV
-                },
-                callback); ;
+            StartMatchmaking(gameMode, "", clientVersion, latencies, partyAttributes, tempPartyUserIds, null, callback);
         }
 
         /// <summary>
@@ -891,34 +823,7 @@ namespace AccelByte.Api
             Dictionary<string, object> partyAttributes, string[] tempPartyUserIds, string[] extraAttributes,
             ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            string strLatencies = "";
-            if (latencies != null && latencies.Count > 0)
-            {
-                strLatencies = "{" +
-                    string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
-                    "}";
-            }
-
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-
-            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
-            
-            string extraAttributesCSV = extraAttributes == null ? "" : string.Join(",", extraAttributes);
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    clientVersion = clientVersion,
-                    latencies = strLatencies,
-                    partyAttributes = jsonAttributeString,
-                    tempParty = userIdsCSV,
-                    extraAttributes = extraAttributesCSV
-                },
-                callback);
+            StartMatchmaking(gameMode, "", clientVersion, latencies, partyAttributes, tempPartyUserIds, extraAttributes, callback);
         }
 
 
@@ -932,19 +837,7 @@ namespace AccelByte.Api
         /// <param name="callback">Result of the function with a start matchmaking status code.</param>
         public void StartMatchmaking(string gameMode, string serverName, string clientVersion, Dictionary<string, object> partyAttributes, ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    serverName = serverName,
-                    clientVersion = clientVersion,
-                    partyAttributes = jsonAttributeString
-                },
-                callback);
+            StartMatchmaking(gameMode, serverName, clientVersion, null, partyAttributes, null, null, callback);
         }
 
         /// <summary>
@@ -960,21 +853,7 @@ namespace AccelByte.Api
             Dictionary<string, object> partyAttributes, string[] tempPartyUserIds, 
             ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    serverName = serverName,
-                    clientVersion = clientVersion,
-                    partyAttributes = jsonAttributeString,
-                    tempParty = userIdsCSV
-                },
-                callback);
+            StartMatchmaking(gameMode, serverName, clientVersion, null, partyAttributes, tempPartyUserIds, null, callback);
         }
 
         /// <summary>
@@ -991,26 +870,7 @@ namespace AccelByte.Api
             Dictionary<string, object> partyAttributes, string[] tempPartyUserIds, string[] extraAttributes,
             ResultCallback<MatchmakingCode> callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-
-            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
-
-            string extraAttributesCSV = extraAttributes == null ? "" : string.Join(",", extraAttributes);
-
-            SendRequest(
-                MessageType.startMatchmakingRequest,
-                new StartMatchmakingRequest
-                {
-                    gameMode = gameMode,
-                    serverName = serverName,
-                    clientVersion = clientVersion,
-                    partyAttributes = jsonAttributeString,
-                    tempParty = userIdsCSV,
-                    extraAttributes = extraAttributesCSV
-                },
-                callback);
+            StartMatchmaking(gameMode, serverName, clientVersion, null, partyAttributes, tempPartyUserIds, extraAttributes, callback);
         }
 
         /// <summary>
@@ -1034,29 +894,82 @@ namespace AccelByte.Api
             string[] extraAttributes,
             ResultCallback<MatchmakingCode> callback)
         {
+            MatchmakingOptionalParam param = new MatchmakingOptionalParam
+            {
+                serverName = serverName,
+                clientVersion = clientVersion,
+                latencies = latencies,
+                partyAttributes = partyAttributes,
+                tempPartyUserIds = tempPartyUserIds,
+                extraAttributes = extraAttributes
+            };
+
+            StartMatchmaking(gameMode, param, callback);
+        }
+
+        /// <summary>
+        /// Send matchmaking start request.
+        /// </summary>
+        /// <param name="gameMode"></param>
+        /// <param name="callback"></param>
+        /// <param name="param"></param>
+        public void StartMatchmaking(string gameMode, MatchmakingOptionalParam param, ResultCallback<MatchmakingCode> callback)
+        {
             Report.GetFunctionLog(this.GetType().Name);
 
             string strLatencies = "";
-            if (latencies != null && latencies.Count > 0)
+            string jsonAttributeString = "";
+            string userIdsCSV = "";
+            string extraAttributesCSV = "";
+
+            if(param != null)
             {
-                strLatencies = "{" +
-                    string.Join(",", latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
+                if(param.latencies != null && param.latencies.Count > 0)
+                {
+                    strLatencies = "{" +
+                    string.Join(",", param.latencies.Select(pair => $@"""{pair.Key}"":{pair.Value}").ToArray()) +
                     "}";
+                }
+
+                if(param.tempPartyUserIds != null && param.tempPartyUserIds.Length > 0)
+                {
+                    userIdsCSV = String.Join(",", param.tempPartyUserIds);
+                }
+
+                if(param.extraAttributes != null && param.extraAttributes.Length > 0)
+                {
+                    extraAttributesCSV = string.Join(",", param.extraAttributes);
+                }
+
+                if(param.subGameModes != null && param.subGameModes.Length > 0)
+                {
+                    if (param.partyAttributes == null)
+                        param.partyAttributes = new Dictionary<string, object>();
+
+                    param.partyAttributes.Add("sub_game_mode", param.subGameModes);
+                }
+
+                if(param.newSessionOnly)
+                {
+                    if (param.partyAttributes == null)
+                        param.partyAttributes = new Dictionary<string, object>();
+
+                    param.partyAttributes.Add("new_session_only", "true");
+                }
+
+                if(param.partyAttributes != null)
+                {
+                    jsonAttributeString = param.partyAttributes.ToJsonString();
+                }
             }
-
-            var jsonAttributeString = partyAttributes != null ? partyAttributes.ToJsonString() : "";
-
-            string userIdsCSV = tempPartyUserIds == null ? "" : String.Join(",", tempPartyUserIds);
-
-            string extraAttributesCSV = extraAttributes == null ? "" : string.Join(",", extraAttributes);
 
             SendRequest(
                 MessageType.startMatchmakingRequest,
                 new StartMatchmakingRequest
                 {
                     gameMode = gameMode,
-                    serverName = serverName,
-                    clientVersion = clientVersion,
+                    serverName = param?.serverName,
+                    clientVersion = param?.clientVersion,
                     latencies = strLatencies,
                     partyAttributes = jsonAttributeString,
                     tempParty = userIdsCSV,

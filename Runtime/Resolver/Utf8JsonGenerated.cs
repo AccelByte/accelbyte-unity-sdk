@@ -9130,16 +9130,13 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("itemNamespace"), 12},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("name"), 13},
                 { JsonWriter.GetEncodedPropertyNameWithoutQuotation("useCount"), 14},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("quantity"), 15},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("source"), 16},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("distributedQuantity"), 17},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("targetNamespace"), 18},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("itemSnapshot"), 19},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("startDate"), 20},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("endDate"), 21},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("grantedAt"), 22},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("createdAt"), 23},
-                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updatedAt"), 24},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("source"), 15},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("itemSnapshot"), 16},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("startDate"), 17},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("endDate"), 18},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("grantedAt"), 19},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("createdAt"), 20},
+                { JsonWriter.GetEncodedPropertyNameWithoutQuotation("updatedAt"), 21},
             };
 
             this.____stringByteKeys = new byte[][]
@@ -9159,10 +9156,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("itemNamespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("name"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("useCount"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("quantity"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("source"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("distributedQuantity"),
-                JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("targetNamespace"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("itemSnapshot"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("startDate"),
                 JsonWriter.GetEncodedPropertyNameWithPrefixValueSeparator("endDate"),
@@ -9213,24 +9207,18 @@ namespace Utf8Json.Formatters.AccelByte.Models
             writer.WriteRaw(this.____stringByteKeys[14]);
             writer.WriteInt32(value.useCount);
             writer.WriteRaw(this.____stringByteKeys[15]);
-            writer.WriteInt32(value.quantity);
-            writer.WriteRaw(this.____stringByteKeys[16]);
             formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.EntitlementSource>().Serialize(ref writer, value.source, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[17]);
-            writer.WriteInt32(value.distributedQuantity);
-            writer.WriteRaw(this.____stringByteKeys[18]);
-            writer.WriteString(value.targetNamespace);
-            writer.WriteRaw(this.____stringByteKeys[19]);
+            writer.WriteRaw(this.____stringByteKeys[16]);
             formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.ItemSnapshot>().Serialize(ref writer, value.itemSnapshot, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[20]);
+            writer.WriteRaw(this.____stringByteKeys[17]);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.startDate, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[21]);
+            writer.WriteRaw(this.____stringByteKeys[18]);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.endDate, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[22]);
+            writer.WriteRaw(this.____stringByteKeys[19]);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.grantedAt, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[23]);
+            writer.WriteRaw(this.____stringByteKeys[20]);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.createdAt, formatterResolver);
-            writer.WriteRaw(this.____stringByteKeys[24]);
+            writer.WriteRaw(this.____stringByteKeys[21]);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.updatedAt, formatterResolver);
             
             writer.WriteEndObject();
@@ -9274,14 +9262,8 @@ namespace Utf8Json.Formatters.AccelByte.Models
             var __name__b__ = false;
             var __useCount__ = default(int);
             var __useCount__b__ = false;
-            var __quantity__ = default(int);
-            var __quantity__b__ = false;
             var __source__ = default(global::AccelByte.Models.EntitlementSource);
             var __source__b__ = false;
-            var __distributedQuantity__ = default(int);
-            var __distributedQuantity__b__ = false;
-            var __targetNamespace__ = default(string);
-            var __targetNamespace__b__ = false;
             var __itemSnapshot__ = default(global::AccelByte.Models.ItemSnapshot);
             var __itemSnapshot__b__ = false;
             var __startDate__ = default(global::System.DateTime);
@@ -9370,42 +9352,30 @@ namespace Utf8Json.Formatters.AccelByte.Models
                         __useCount__b__ = true;
                         break;
                     case 15:
-                        __quantity__ = reader.ReadInt32();
-                        __quantity__b__ = true;
-                        break;
-                    case 16:
                         __source__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.EntitlementSource>().Deserialize(ref reader, formatterResolver);
                         __source__b__ = true;
                         break;
-                    case 17:
-                        __distributedQuantity__ = reader.ReadInt32();
-                        __distributedQuantity__b__ = true;
-                        break;
-                    case 18:
-                        __targetNamespace__ = reader.ReadString();
-                        __targetNamespace__b__ = true;
-                        break;
-                    case 19:
+                    case 16:
                         __itemSnapshot__ = formatterResolver.GetFormatterWithVerify<global::AccelByte.Models.ItemSnapshot>().Deserialize(ref reader, formatterResolver);
                         __itemSnapshot__b__ = true;
                         break;
-                    case 20:
+                    case 17:
                         __startDate__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
                         __startDate__b__ = true;
                         break;
-                    case 21:
+                    case 18:
                         __endDate__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
                         __endDate__b__ = true;
                         break;
-                    case 22:
+                    case 19:
                         __grantedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
                         __grantedAt__b__ = true;
                         break;
-                    case 23:
+                    case 20:
                         __createdAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
                         __createdAt__b__ = true;
                         break;
-                    case 24:
+                    case 21:
                         __updatedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, formatterResolver);
                         __updatedAt__b__ = true;
                         break;
@@ -9434,10 +9404,7 @@ namespace Utf8Json.Formatters.AccelByte.Models
             if(__itemNamespace__b__) ____result.itemNamespace = __itemNamespace__;
             if(__name__b__) ____result.name = __name__;
             if(__useCount__b__) ____result.useCount = __useCount__;
-            if(__quantity__b__) ____result.quantity = __quantity__;
             if(__source__b__) ____result.source = __source__;
-            if(__distributedQuantity__b__) ____result.distributedQuantity = __distributedQuantity__;
-            if(__targetNamespace__b__) ____result.targetNamespace = __targetNamespace__;
             if(__itemSnapshot__b__) ____result.itemSnapshot = __itemSnapshot__;
             if(__startDate__b__) ____result.startDate = __startDate__;
             if(__endDate__b__) ____result.endDate = __endDate__;
