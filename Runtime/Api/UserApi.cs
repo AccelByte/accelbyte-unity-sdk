@@ -586,7 +586,6 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreatePost(this.baseUrl + "/v3/public/namespaces/{namespace}/users/bulk/basic")
                 .WithPathParam("namespace", this.@namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(bulkUserInfoRequest.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)

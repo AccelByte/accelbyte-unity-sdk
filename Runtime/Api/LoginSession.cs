@@ -438,6 +438,7 @@ namespace AccelByte.Api
             if (this.maintainAccessTokenCoroutine != null)
             {
                 this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
+                this.maintainAccessTokenCoroutine = null;
             }
 
             this.tokenData = null;

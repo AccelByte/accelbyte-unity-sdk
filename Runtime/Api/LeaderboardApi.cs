@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020-2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -23,12 +23,11 @@ namespace AccelByte.Api
             this.httpClient = httpClient;
         }
 
-        public IEnumerator GetRankings(string @namespace, string accessToken, string leaderboardCode, LeaderboardTimeFrame timeFrame, int offset, int limit,
+        public IEnumerator GetRankings(string @namespace, string leaderboardCode, LeaderboardTimeFrame timeFrame, int offset, int limit,
             ResultCallback<LeaderboardRankingResult> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(@namespace, "Can't get ranking! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get ranking! AccessToken parameter is null!");
             Assert.IsNotNull(leaderboardCode, "Can't get ranking! Leaderboard Code parameter is null!");
 
             string timeFrameString = "";
@@ -60,7 +59,6 @@ namespace AccelByte.Api
                 .WithPathParam("timeFrame", timeFrameString)
                 .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
                 .WithQueryParam("limit", (limit >= 0) ? limit.ToString() : "")
-                .WithBearerAuth(accessToken)
                 .Accepts(MediaType.ApplicationJson);
 
             var request = builder.GetResult();

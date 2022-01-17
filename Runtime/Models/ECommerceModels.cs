@@ -343,6 +343,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public ItemInfo[] items { get; set; }
         [DataMember] public string localExt { get; set; }
+        [DataMember] public Dictionary<string, int> itemQty { get; set; }
     }
 
     [DataContract]
@@ -384,6 +385,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public string localExt { get; set; }
+        [DataMember] public Dictionary<string, int> itemQty { get; set; }
     }
 
     [DataContract]
