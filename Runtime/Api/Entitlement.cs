@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -486,6 +486,81 @@ namespace AccelByte.Api
                     this.session.UserId,
                     this.session.AuthorizationToken,
                     syncRequest,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Synchronize Xbox inventory's DLC items.
+        /// </summary>
+        /// <param name="XboxDLCSync"> Contains XSTSToken needed for Xbox DLC sync</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncXBoxDLC(XBoxDLCSync XboxDLCSync, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncXBoxDLC(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    XboxDLCSync,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Synchronize Steam DLC.
+        /// </summary>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncSteamDLC(string userSteamId, string userAppId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncSteamDLC(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    userSteamId,
+                    userAppId,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Synchronize with DLC entitlements in PSN Store.
+        /// </summary>
+        /// <param name="PSSyncModel"> Contains ServiceLabel needed for PlayStation DLC sync</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncPSNDLC(PlayStationDLCSync PSSyncModel, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncPSNDLC(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    PSSyncModel,
                     callback
                     ));
         }

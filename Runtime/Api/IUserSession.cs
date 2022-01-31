@@ -16,6 +16,9 @@ namespace AccelByte.Api
         IEnumerator LoginWithUsername(string username, string password, ResultCallback callback,
             bool rememberMe = false);
 
+        IEnumerator LoginWithUsernameV3(string username, string password, ResultCallback callback,
+            bool rememberMe = false);
+
         IEnumerator LoginWithDeviceId(ResultCallback callback);
 
         IEnumerator LoginWithOtherPlatform(PlatformType platformType, string platformToken,

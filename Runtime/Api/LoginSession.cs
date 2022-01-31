@@ -104,6 +104,44 @@ namespace AccelByte.Api
             }
         }
 
+        public IEnumerator LoginWithUsernameV3(
+            string username,
+            string password,
+            ResultCallback callback,
+            bool rememberMe = false)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(username, "Username parameter is null.");
+            Assert.IsNotNull(password, "Password parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("grant_type", "password")
+                .WithFormParam("username", username)
+                .WithFormParam("password", password)
+                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                this.SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
         public IEnumerator LoginWithDeviceId(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);

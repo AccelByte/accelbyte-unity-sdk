@@ -50,6 +50,19 @@ namespace AccelByte.Api
             this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback, rememberMe));
         }
 
+        /// <summary>
+        /// Login to AccelByte account with username (or email) and password using V3 endpoint
+        /// </summary>
+        /// <param name="username">Could be username or email</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        public void LoginWithUsernameV3(string username, string password, ResultCallback callback, bool rememberMe = false)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(LoginWithUserNameAsyncV3(username, password, callback, rememberMe));
+        }
+
         private IEnumerator LoginAsync(Func<ResultCallback, IEnumerator> loginMethod, ResultCallback callback)
         {
             if (this.loginSession.IsValid())
@@ -76,6 +89,11 @@ namespace AccelByte.Api
         private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback callback, bool rememberMe = false)
         {
             yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb, rememberMe), callback);
+        }
+
+        private IEnumerator LoginWithUserNameAsyncV3(string email, string password, ResultCallback callback, bool rememberMe = false)
+        {
+            yield return LoginAsync(cb => this.loginSession.LoginWithUsernameV3(email, password, cb, rememberMe), callback);
         }
 
         /// <summary>

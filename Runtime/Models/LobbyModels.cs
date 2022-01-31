@@ -229,6 +229,12 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class PartyInviteResponse
+    {
+        [DataMember] public string inviteeID;
+    }
+
+    [DataContract]
     public class PartyInvitation
     {
         [DataMember] public string from;
@@ -253,6 +259,12 @@ namespace AccelByte.Models
     public class PartyKickRequest
     {
         [DataMember] public string memberID;
+    }
+
+    [DataContract]
+    public class KickResponse
+    {
+        [DataMember] public string userID;
     }
 
     [DataContract]
@@ -331,10 +343,22 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class MatchmakingNotifAllies
+    {
+        [DataMember] public MatchingAlly[] data;
+    }
+
+    [DataContract]
     public class MatchmakingNotif
     {
         [DataMember] public string status;
         [DataMember] public string matchId;
+        [DataMember] public string gameMode;
+        [DataMember] public string deployment;
+        [DataMember] public string clientVersion;
+        [DataMember] public bool joinable;
+        [DataMember] public MatchmakingNotifAllies matchingAllies;
+
     }
 
     [DataContract]

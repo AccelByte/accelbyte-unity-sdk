@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -690,6 +690,18 @@ namespace AccelByte.Models
         [DataMember] public DateTime grantedAt { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+    }
+
+    [DataContract]
+    public class XBoxDLCSync
+    {
+        [DataMember] public string xstsToken { get; set; }
+    }
+
+    [DataContract]
+    public class PlayStationDLCSync
+    {
+        [DataMember] public int serviceLabel { get; set; }
     }
 
     #endregion

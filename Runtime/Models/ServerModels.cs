@@ -49,6 +49,7 @@ namespace AccelByte.Models
     public class PartyMember
     {
         [DataMember] public string user_id { get; set; }
+        [DataMember] public Dictionary<string, object> extra_attributes;
     }
 
     [DataContract]

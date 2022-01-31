@@ -476,6 +476,17 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Invite other user by userId with detailed model in response callback. Only party leader (creator) can invite other user.
+        /// </summary>
+        /// <param name="userId">User Id of a person to be invited to </param>
+        /// <param name="callback">Returns a Result that contain PartyInviteResponse via callback when completed</param>
+        public void InviteToPartyDetailedCallback(string userId, ResultCallback<PartyInviteResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.partyInviteRequest, new PartyInviteRequest { friendID = userId }, callback);
+        }
+
+        /// <summary>
         /// Join a party by invitation from party leader.
         /// </summary>
         /// <param name="partyID">Party ID of the party to join to</param>
@@ -499,6 +510,17 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             SendRequest(MessageType.partyKickRequest, new PartyKickRequest {memberID = userId}, callback);
+        }
+
+        /// <summary>
+        /// Kick a member out of our party with detailed model in response callback. Only a party leader can kick a party member.
+        /// </summary>
+        /// <param name="userId">User Id of the user to be kicked out of party</param>
+        /// <param name="callback">Returns a Result that contains PartyKickResponse via callback when completed.</param>
+        public void KickPartyMemberDetailedCallback(string userId, ResultCallback<KickResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            SendRequest(MessageType.partyKickRequest, new PartyKickRequest { memberID = userId }, callback);
         }
 
         /// <summary>

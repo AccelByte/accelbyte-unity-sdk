@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -404,6 +404,84 @@ namespace AccelByte.Api
                 .WithBearerAuth(userAccessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(syncRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncXBoxDLC(string @namespace, string userId, string userAccessToken, XBoxDLCSync XBoxDLCSync, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't sync DLC item! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't sync DLC item! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't sync DLC item! userAccessToken parameter is null!");
+
+            string content = "{}";
+
+            if (!string.IsNullOrEmpty(XBoxDLCSync.xstsToken))
+            {
+                content = string.Format("{\"xstsToken\": \"{0}\"}", XBoxDLCSync.xstsToken);
+            }
+            
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/xbl/sync")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(content)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncSteamDLC(string @namespace, string userId, string userAccessToken,
+            string userSteamId, string userAppId, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't sync DLC item! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't sync DLC item! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't sync DLC item! userAccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/steam/sync")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(string.Format("{\"steamId\": \"{0}\", \"appId\": \"{1}\"}", userSteamId, userAppId))
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncPSNDLC(string @namespace, string userId, string userAccessToken, PlayStationDLCSync playStationDLCSync,
+            ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't sync DLC item! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't sync DLC item! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't sync DLC item! userAccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/psn/sync")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(string.Format("{\"serviceLabel\": \"{0}\"}", playStationDLCSync.serviceLabel))
                 .GetResult();
 
             IHttpResponse response = null;
