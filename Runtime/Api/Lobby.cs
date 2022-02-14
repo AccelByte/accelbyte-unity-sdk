@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -170,14 +170,10 @@ namespace AccelByte.Api
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
         private readonly object syncToken = new object();
-        private readonly IWebSocket webSocket;
-        private bool reconnectsOnClose;
+        private AccelByteWebSocket webSocket;
         private bool reconnectsOnBans;
-        private WsCloseCode wsCloseCode = WsCloseCode.NotSet;
         private long id;
         private LobbySessionId lobbySessionId;
-        private ITokenGenerator tokenGenerator;
-        private Coroutine maintainConnectionCoroutine;
         private string channelSlug = null;
 
         public event EventHandler OnRetryAttemptFailed;
@@ -189,7 +185,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(coroutineRunner);
 
             this.websocketUrl = websocketUrl;
-            this.webSocket = webSocket;
+            this.webSocket = new AccelByteWebSocket(webSocket, coroutineRunner);
             this.api = api;
             this.session = session;
             this.@namespace = @namespace;
@@ -198,7 +194,6 @@ namespace AccelByte.Api
             this.backoffDelay = backoffDelay;
             this.maxDelay = maxDelay;
             this.totalTimeout = totalTimeout;
-            this.reconnectsOnClose = false;
             this.reconnectsOnBans = false;
             this.lobbySessionId = new LobbySessionId();
 
@@ -210,7 +205,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Lobby connection status
         /// </summary>
-        public bool IsConnected { get { return this.webSocket.ReadyState == WsState.Open; } }
+        public bool IsConnected { get { return this.webSocket.IsConnected; } }
 
         /// <summary>
         /// Connect to lobby with current logged in user credentials.
@@ -231,30 +226,13 @@ namespace AccelByte.Api
                 return;
             }
             
-            if (this.webSocket.ReadyState == WsState.Connecting)
+            if (this.webSocket.IsConnecting)
             {
                 AccelByteDebug.LogWarning("[Lobby] lobby is connecting");
                 return;
             }
 
-            if (this.tokenGenerator != null)
-            {
-                if (!this.tokenGenerator.IsValid())
-                {
-                    this.tokenGenerator.RequestToken();
-
-                    return;
-                }
-            }
-
-            this.wsCloseCode = WsCloseCode.NotSet;
-            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID, this.tokenGenerator?.Token);
-
-            // check status after connect, only maintain connection when close code is reconnectable
-            if (this.wsCloseCode == WsCloseCode.NotSet || isReconnectable(this.wsCloseCode))
-            {
-                StartMaintainConnection();
-            }
+            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
         }
 
         /// <summary>
@@ -267,15 +245,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (maintainConnectionCoroutine != null)
-            {
-                AccelByteDebug.LogWarning("Can't change retry parameters! Lobby is already connected.");
-                return;
-            }
-
-            this.totalTimeout = totalTimeout;
-            this.backoffDelay = backoffDelay;
-            this.maxDelay = maxDelay;
+            webSocket.SetRetryParameters(totalTimeout, backoffDelay, maxDelay);
         }
 
         /// <summary>
@@ -289,123 +259,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsFalse(tokenGenerator == null, "Can't set connection token generator! Token generator is null.");
 
-            if (maintainConnectionCoroutine != null)
-            {
-                AccelByteDebug.LogWarning("Can't set connection token generator! Lobby is already connected.");
-                return;
-            }
-
-            if (this.tokenGenerator == null)
-            {
-                this.tokenGenerator = tokenGenerator;
-                this.tokenGenerator.TokenReceivedEvent += OnTokenReceived;
-            }
-        }
-
-        private void StartMaintainConnection()
-        {
-#if DEBUG
-            AccelByteDebug.Log("[Lobby] Start Maintaining connection: " + wsCloseCode);
-#endif
-            this.reconnectsOnClose = true;
-            this.maintainConnectionCoroutine = coroutineRunner.Run(
-                MaintainConnection(this.backoffDelay, this.maxDelay, this.totalTimeout));
-        }
-
-        private void StopMaintainConnection()
-        {
-#if DEBUG
-            AccelByteDebug.Log("[Lobby] Stop Maintaining connection: " + wsCloseCode);
-#endif
-            this.reconnectsOnClose = false;
-
-            if (this.maintainConnectionCoroutine == null) return;
-
-            coroutineRunner.Stop(this.maintainConnectionCoroutine);
-            this.maintainConnectionCoroutine = null;
-            this.channelSlug = null;
-        }
-
-        /// <summary>
-        /// Retrying connection with exponential backoff if disconnected, ping if connected
-        /// </summary>
-        /// <param name="backoffDelay">Initial delay time</param>
-        /// <param name="maxDelay">Maximum delay time</param>
-        /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
-        /// <returns></returns>
-        private IEnumerator MaintainConnection(int backoffDelay, int maxDelay, int totalTimeout)
-        {
-            while (true)
-            {
-                switch (this.webSocket.ReadyState)
-                {
-                case WsState.Open:
-                    this.webSocket.Ping();
-
-                    yield return new WaitForSeconds(this.pingDelay / 1000f);
-
-                    break;
-                case WsState.Connecting:
-                    while (this.webSocket.ReadyState == WsState.Connecting)
-                    {
-                        yield return new WaitForSeconds(1f);
-                    }
-
-                    break;
-                case WsState.Closing:
-                    while (this.webSocket.ReadyState == WsState.Closing)
-                    {
-                        yield return new WaitForSeconds(1f);
-                    }
-
-                    break;
-                case WsState.Closed:
-                    System.Random rand = new System.Random();
-                    int nextDelay = backoffDelay;
-                    var firstClosedTime = DateTime.Now;
-                    var timeout = TimeSpan.FromSeconds(totalTimeout / 1000f);
-
-                    while (this.reconnectsOnClose &&
-                        this.webSocket.ReadyState == WsState.Closed &&
-                        DateTime.Now - firstClosedTime < timeout)
-                    {
-                        // debug ws connection
-#if DEBUG
-                        AccelByteDebug.Log("[WS] Re-Connecting");
-#endif
-                        if (this.tokenGenerator == null)
-                        {
-                            this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID);
-                        }
-                        else
-                        {
-                            this.tokenGenerator.RequestToken();
-                        }
-
-                        float randomizedDelay = (float) (nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
-#if DEBUG
-                        AccelByteDebug.Log("[WS] Next reconnection in: " + randomizedDelay);
-#endif
-                        yield return new WaitForSeconds(randomizedDelay / 1000f);
-
-                        nextDelay *= 2;
-
-                        if (nextDelay > maxDelay)
-                        {
-                            nextDelay = maxDelay;
-                        }
-                    }
-
-                    if (this.webSocket.ReadyState == WsState.Closed)
-                    {
-                        RaiseOnRetryAttemptFailed();
-
-                        yield break;
-                    }
-
-                    break;
-                }
-            }
+            this.webSocket.SetConnectionTokenGenerator(tokenGenerator);
         }
 
         /// <summary>
@@ -414,24 +268,15 @@ namespace AccelByte.Api
         public void Disconnect()
         {
             Report.GetFunctionLog(this.GetType().Name);
-            StopMaintainConnection();
 
+            this.webSocket.Disconnect();
+
+            this.channelSlug = null;
             LoginSession loginSession = session as LoginSession;
             if (loginSession != null)
             {
                 loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
             }
-
-            if (this.webSocket.ReadyState == WsState.Open || this.webSocket.ReadyState == WsState.Connecting)
-            {
-                this.webSocket.Close();
-            }
-        }
-
-        // Invoker for OnRetryAttemptFailed
-        protected virtual void RaiseOnRetryAttemptFailed()
-        {
-            this.OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -1437,22 +1282,18 @@ namespace AccelByte.Api
 #if DEBUG
             AccelByteDebug.Log("[WS] Connection open");
 #endif
-            coroutineRunner.Run(
-                () =>
-                {
-                    Action handler = this.Connected;
+            Action handler = this.Connected;
 
-                    if (handler != null)
-                    {
-                        handler();
-                    }
+            if (handler != null)
+            {
+                handler();
+            }
 
-                    LoginSession loginSession = session as LoginSession;
-                    if(loginSession != null)
-                    {
-                        loginSession.RefreshTokenCallback += LoginSession_RefreshTokenCallback;
-                    }
-                });
+            LoginSession loginSession = session as LoginSession;
+            if (loginSession != null)
+            {
+                loginSession.RefreshTokenCallback += LoginSession_RefreshTokenCallback;
+            }
         }
 
         private void LoginSession_RefreshTokenCallback(string accessToken)
@@ -1471,30 +1312,30 @@ namespace AccelByte.Api
             AccelByteDebug.Log("[WS] Connection close: " + closecode);
 #endif
             var code = (WsCloseCode)closecode;
-            this.wsCloseCode = code;
-            coroutineRunner.Run(
-                () =>
-                {
-                    if (!isReconnectable(code))
-                    {
-                        StopMaintainConnection();
-                    }
-                    
-                    Action<WsCloseCode> handler = this.Disconnected;
 
-                    if (handler != null)
-                    {
-                        handler(code);
-                    }
+            LoginSession loginSession = session as LoginSession;
+            if (loginSession != null)
+            {
+                loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
+            }
 
-                    LoginSession loginSession = session as LoginSession;
-                    if (loginSession != null)
-                    {
-                        loginSession.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
-                    }
-                });
+            this.Disconnected?.Invoke(code);
+
+            if (reconnectsOnBans)
+            {
+                reconnectsOnBans = false;
+                coroutineRunner.Run(ReconnectOnBan());
+            }
         }
 
+        private IEnumerator ReconnectOnBan()
+        {
+            System.Random rand = new System.Random();
+            float randomFloat = (float)(rand.NextDouble());
+            yield return new WaitForSeconds((backoffDelay + ((randomFloat * 0.5f) - 0.5f)) / 1000);
+
+            Connect();
+        }
         private void HandleOnMessage(string message)
         {
             Report.GetWebSocketResponse(message);
@@ -1667,43 +1508,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(this.GetType().Name);
             this.session.AuthorizationToken = session;
-        }
-
-        private bool isReconnectable(WsCloseCode code)
-        {
-
-            switch (code)
-            {
-                case WsCloseCode.Abnormal:
-                case WsCloseCode.ServerError:
-                case WsCloseCode.ServiceRestart:
-                case WsCloseCode.TryAgainLater:
-                case WsCloseCode.TlsHandshakeFailure: return true;
-                default:
-                    {
-                        if (reconnectsOnBans)
-                        {
-                            reconnectsOnBans = false;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-            }
-        }
-
-        private void OnTokenReceived(string token)
-        {
-            if (maintainConnectionCoroutine != null)
-            {
-                this.webSocket.Connect(this.websocketUrl, this.session.AuthorizationToken, this.lobbySessionId.lobbySessionID, token);
-            }
-            else
-            {
-                Connect();
-            }
         }
     }
 }
