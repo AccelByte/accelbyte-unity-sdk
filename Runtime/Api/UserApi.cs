@@ -178,6 +178,30 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.code, "Can't upgrade the user! code parameter is null!");
+            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.emailAddress, "Can't upgrade the user! emailAddress parameter is null!");
+            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.password, "Can't upgrade the user! password parameter is null!");
+            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.username, "Can't upgrade the user! username parameter is null!");
+            
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/headless/code/verify")
+                .WithPathParam("namespace", this.@namespace)
+                .WithBearerAuth(this.session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(upgradeAndVerifyHeadlessRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
         public IEnumerator SendVerificationCode(VerificationContext context, string emailAddress,
             ResultCallback callback)
         {

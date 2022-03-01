@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -171,7 +171,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
         /// </summary>
         /// <param name="refreshToken">The latest user's refresh token</param>
         /// <param name="callback">Returns Result via callback when completed</param>
@@ -187,6 +187,10 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => this.loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
         }
 
+        /// <summary>
+        /// Refresh current login session. Will update current token.
+        /// </summary>
+        /// <param name="callback">Returns Result via callback when completed</param>
         public void RefreshSession(ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -424,6 +428,33 @@ namespace AccelByte.Api
             }
 
             callback.Try(result);
+        }
+
+        /// <summary>
+        /// Upgrade a headless account. User must be logged in first then call
+        /// SendUpgradeVerificationCode code to get verification code send to their email 
+        /// </summary>
+        /// <param name="upgradeAndVerifyHeadlessRequest">Contain user data that will be used to upgrade the headless account</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
+        public void UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(this.userAccount.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback));
+        }
+
+        /// <summary>
+        /// Trigger an email that contains verification code to be sent to user's email. User must be logged in with headless account.
+        /// This function context is "upgradeHeadlessAccount".
+        /// </summary>
+        /// <param name="emailAddress">The email use to send verification code</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SendUpgradeVerificationCode(string emailAddress, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            this.coroutineRunner.Run(this.userAccount.SendVerificationCode(
+                VerificationContext.upgradeHeadlessAccount,
+                emailAddress,
+                callback));
         }
 
         /// <summary>

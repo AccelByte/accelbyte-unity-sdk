@@ -564,5 +564,30 @@ namespace AccelByte.Api
                     callback
                     ));
         }
+
+        /// <summary>
+        /// Synchronize with Twitch entitlements in Twitch Drop.
+        /// </summary>
+        /// <param name="TwitchDropSyncReq"> Contains gameId, region, and language needed for Twitch Drop sync</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncTwitchDropItem(TwitchDropSync TwitchDropSyncReq, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SyncTwitchDropItem(
+                    this.@namespace,
+                    this.session.UserId,
+                    this.session.AuthorizationToken,
+                    TwitchDropSyncReq,
+                    callback
+                    ));
+        }
     }
 }

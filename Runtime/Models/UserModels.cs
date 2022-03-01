@@ -242,6 +242,20 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class UpgradeAndVerifyHeadlessRequest
+    {
+        [DataMember] public string code { get; set; }
+        [DataMember] public string country { get; set; } //optional
+        [DataMember] public string dateOfBirth { get; set; } //optional
+        [DataMember] public string displayName { get; set; } //optional
+        [DataMember] public string emailAddress { get; set; }
+        [DataMember] public string password { get; set; }
+        [DataMember] public bool reachMinimumAge { get; set; } = true; //optional. If user input DOB, BE will not check this field
+        [DataMember] public string username { get; set; }
+        [DataMember] public bool validateOnly { get; set; } = false;
+    }
+
+    [DataContract]
     public class AccountLinkedPlatform
     {
         [DataMember(Name = "namespace")] public string namespace_ { get; set; }

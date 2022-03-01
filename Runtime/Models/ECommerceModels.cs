@@ -704,6 +704,14 @@ namespace AccelByte.Models
         [DataMember] public int serviceLabel { get; set; }
     }
 
+    [DataContract]
+    public class TwitchDropSync
+    {
+        [DataMember] public string gameId { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string language { get; set; }
+    }
+
     #endregion
 
     #region Fulfillment

@@ -491,5 +491,28 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+
+        public IEnumerator SyncTwitchDropItem(string @namespace, string userId, string userAccessToken, TwitchDropSync TwitchDropSyncReq, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't sync Twitch drop item! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't sync Twitch drop item! UserId parameter is null!");
+            Assert.IsNotNull(userAccessToken, "Can't sync Twitch drop item! userAccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/twitch/sync")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(TwitchDropSyncReq.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
     }
 }
