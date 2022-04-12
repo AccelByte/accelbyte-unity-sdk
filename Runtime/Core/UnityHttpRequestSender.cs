@@ -12,37 +12,39 @@ namespace AccelByte.Core
     {
         public IEnumerator Send(IHttpRequest request, Action<IHttpResponse, Error> callback, int timeoutMs)
         {
-            UnityWebRequest unityWebRequest = request.GetUnityWebRequest();
-            unityWebRequest.timeout = timeoutMs / 1000;
+            using(UnityWebRequest unityWebRequest = request.GetUnityWebRequest())
+            {
+                unityWebRequest.timeout = timeoutMs / 1000;
 
-            Report.GetHttpRequest(request, unityWebRequest);
+                Report.GetHttpRequest(request, unityWebRequest);
 
-            yield return unityWebRequest.SendWebRequest();
+                yield return unityWebRequest.SendWebRequest();
 
-            Report.GetHttpResponse(unityWebRequest);
+                Report.GetHttpResponse(unityWebRequest);
                 
 #if UNITY_2020_3_OR_NEWER
-            switch (unityWebRequest.result)
-            {
-            case UnityWebRequest.Result.Success:
-            case UnityWebRequest.Result.ProtocolError:
-            case UnityWebRequest.Result.DataProcessingError:
-                callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
-                break;
-            case UnityWebRequest.Result.ConnectionError:
-                callback?.Invoke(null, new Error(ErrorCode.NetworkError));
-                break;
-            }
+                switch (unityWebRequest.result)
+                {
+                case UnityWebRequest.Result.Success:
+                case UnityWebRequest.Result.ProtocolError:
+                case UnityWebRequest.Result.DataProcessingError:
+                    callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
+                    break;
+                case UnityWebRequest.Result.ConnectionError:
+                    callback?.Invoke(null, new Error(ErrorCode.NetworkError));
+                    break;
+                }
 #else
-            if (unityWebRequest.isNetworkError)
-            {
-                callback?.Invoke(null, new Error(ErrorCode.NetworkError));
-            }
-            else
-            {
-                callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
-            }
+                if (unityWebRequest.isNetworkError)
+                {
+                    callback?.Invoke(null, new Error(ErrorCode.NetworkError));
+                }
+                else
+                {
+                    callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
+                }
 #endif
+            }
         }
 
         public void ClearCookies(Uri uri)
