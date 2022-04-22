@@ -25,5 +25,8 @@
     "url": "https://github.com/AccelByte/accelbyte-unity-sdk"
   },
   "bugs": "https://github.com/AccelByte/accelbyte-unity-sdk/issues",
-  "type": "library"
+  "type": "library",
+  "dependencies": {	  
+	"com.unity.nuget.newtonsoft-json": "3.0.1"
+  }
 }
