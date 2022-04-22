@@ -6,15 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace AccelByte.Models
 {
     #region enum
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SeasonPassStrategyMethod
     {
         NONE = 0,
         CURRENCY
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SeasonPassStatus
     {
         DRAFT = 0,
@@ -22,6 +27,7 @@ namespace AccelByte.Models
         RETIRED
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SeasonPassRewardType
     {
         ITEM //currently only support this type

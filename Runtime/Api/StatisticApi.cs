@@ -12,8 +12,14 @@ namespace AccelByte.Api
 {
     public class StatisticApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal StatisticApi(string baseUrl, IHttpClient httpClient)
         {
@@ -22,6 +28,10 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IEnumerator CreateUserStatItems(string @namespace, string userId, string accessToken,
             CreateStatItemRequest[] statItems, ResultCallback<StatItemOperationResult[]> callback)
@@ -161,5 +171,7 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+		
+        #endregion
     }
 }

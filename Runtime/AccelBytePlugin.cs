@@ -136,27 +136,6 @@ namespace AccelByte.Api
             ServicePointManager.ServerCertificateValidationCallback = AccelBytePlugin.OnCertificateValidated;
         }
 
-        internal static void RegisterUtf8JsonResolver()
-        {
-            if (AccelBytePlugin.utf8JsonResolversRegistered) return;
-
-            AccelBytePlugin.utf8JsonResolversRegistered = true;
-
-            Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
-                new [] {
-                    Utf8Json.Formatters.CustomPrimitiveObjectFormatter.Default
-                },
-                new[] {
-                    Utf8Json.Resolvers.GeneratedResolver.Instance,
-                    Utf8Json.Resolvers.DynamicGenericResolver.Instance,
-                    Utf8Json.Resolvers.BuiltinResolver.Instance,
-                    Utf8Json.Resolvers.EnumResolver.Default,
-                    // for unity
-                    Utf8Json.Unity.UnityResolver.Instance
-                }
-            );
-        }
-
         /// <summary>
         /// Check whether if this static class is need to be refreshed/re-init
         /// </summary>

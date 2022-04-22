@@ -277,7 +277,8 @@ namespace AccelByte.Core
                 {
                     try
                     {
-                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, object>>(fieldValue);
+                        //var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, object>>(fieldValue);
+                        var convertedValue = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(fieldValue);
                         fieldInfo.SetValue(payload, convertedValue);
                     }
                     catch (Exception)
@@ -289,7 +290,7 @@ namespace AccelByte.Core
                 {
                     try
                     {
-                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, int>>(fieldValue);
+                        var convertedValue = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, int>>(fieldValue);
                         fieldInfo.SetValue(payload, convertedValue);
                     }
                     catch (Exception)
@@ -301,7 +302,7 @@ namespace AccelByte.Core
                 {
                     try
                     {
-                        var convertedValue = Utf8Json.JsonSerializer.Deserialize<Dictionary<string, string>>(fieldValue);
+                        var convertedValue = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(fieldValue);
                         fieldInfo.SetValue(payload, convertedValue);
                     }
                     catch (Exception)
@@ -313,7 +314,7 @@ namespace AccelByte.Core
                 {
                     try
                     {
-                        var convertedValue = Utf8Json.JsonSerializer.NonGeneric.Deserialize(fieldInfo.FieldType, fieldValue);
+                        var convertedValue = Newtonsoft.Json.JsonConvert.DeserializeObject(fieldValue,fieldInfo.FieldType);
                         fieldInfo.SetValue(payload, convertedValue);
                     }
                     catch (Exception)

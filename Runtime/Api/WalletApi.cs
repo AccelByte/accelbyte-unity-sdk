@@ -11,8 +11,14 @@ namespace AccelByte.Api
 {
     internal class WalletApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal WalletApi(string baseUrl, IHttpClient httpClient)
         {
@@ -22,6 +28,11 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
+
 
         public IEnumerator GetWalletInfoByCurrencyCode(string @namespace, string userId, string userAccessToken,
             string currencyCode, ResultCallback<WalletInfo> callback)
@@ -52,5 +63,7 @@ namespace AccelByte.Api
             var result = response.TryParseJson<WalletInfo>();
             callback.Try(result);
         }
+
+        #endregion
     }
 }

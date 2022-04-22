@@ -3,9 +3,11 @@
 // and restrictions contact your company contract manager.
 
 using System.Text;
+using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
-using Utf8Json;
+
+using Newtonsoft.Json;
 
 namespace AccelByte.Api
 {
@@ -225,7 +227,7 @@ namespace AccelByte.Api
             else
             {
                 string wholeJsonText = ((TextAsset) configFile).text;
-                this.config = JsonSerializer.Deserialize<Config>(wholeJsonText);
+                this.config = wholeJsonText.ToObject<Config>();
             }
         }
 
@@ -246,10 +248,8 @@ namespace AccelByte.Api
 
             string fullPath =
                 System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKConfig.json");
-
-            byte[] notPrettyConfig = JsonSerializer.Serialize(this.config);
-            string prettyConfig = JsonSerializer.PrettyPrint(notPrettyConfig);
-            System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(prettyConfig));
+            
+            System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(this.config.ToJsonString(Formatting.Indented)));
         }
     }
 }

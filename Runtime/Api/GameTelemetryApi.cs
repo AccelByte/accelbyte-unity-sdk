@@ -12,8 +12,14 @@ namespace AccelByte.Api
 {
     public class GameTelemetryApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Public Methods
 
         public GameTelemetryApi(string baseUrl, IHttpClient httpClient)
         {
@@ -40,5 +46,7 @@ namespace AccelByte.Api
                 var result = response.TryParse();
                 callback.Try(result);
         }
+
+        #endregion
     }
 }

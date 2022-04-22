@@ -8,6 +8,28 @@ using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
+    public enum RecordSetBy
+    {
+        CLIENT,
+        SERVER
+    }
+
+    public static class RecordSetByExtensions
+    {
+        public static string GetString(this RecordSetBy me)
+        {
+            switch (me)
+            {
+                case RecordSetBy.CLIENT:
+                    return "CLIENT";
+                case RecordSetBy.SERVER:
+                    return "SERVER";
+                default:
+                    return "NO VALUE GIVEN";
+            }
+        }
+    }
+
     [DataContract]
     public class UserRecord
     {
@@ -17,6 +39,25 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
         [DataMember] public DateTime created_at { get; set; }
         [DataMember] public DateTime updated_at { get; set; }
+        [DataMember] public bool is_public { get; set; }
+        [DataMember] public string set_by { get; set; }
+    }
+
+    [DataContract]
+    public class PagingGameRecord
+    {
+        [DataMember] public string first { get; set; }
+        [DataMember] public string last { get; set; }
+        [DataMember] public string next { get; set; }
+        [DataMember] public string previous { get; set; }
+    }
+
+    [DataContract]
+    public class GameRecordList 
+    {
+        [DataMember] public string[] data { get; set; }
+        [DataMember] public PagingGameRecord paging { get; set; }
+
     }
 
     [DataContract]
@@ -27,12 +68,16 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
         [DataMember] public DateTime created_at { get; set; }
         [DataMember] public DateTime updated_at { get; set; }
+        [DataMember] public string set_by { get; set; }
+
     }
 
     [DataContract]
     public class ConcurrentReplaceRequest
-    {
-        [DataMember] public DateTime updatedAt { get; set; }
+    {        
+        [DataMember] public DateTime updatedAt { get; set; } // Time format should style: RFC3339
         [DataMember] public Dictionary<string, object> value { get; set; }
     }
+
+
 }
