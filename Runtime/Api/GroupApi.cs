@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
-using Newtonsoft.Json;
+using Utf8Json;
 
 namespace AccelByte.Api
 {

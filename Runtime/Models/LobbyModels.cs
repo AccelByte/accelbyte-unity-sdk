@@ -6,14 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace AccelByte.Models
 {
     #region General
-
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    
     public enum MessageType
     {
         unknown,
@@ -110,7 +106,8 @@ namespace AccelByte.Models
         userBannedNotification,
         userUnbannedNotification,
         refreshTokenRequest,
-        refreshTokenResponse
+        refreshTokenResponse,
+        signalingP2PNotif
     }
 
     [DataContract]
@@ -415,12 +412,11 @@ namespace AccelByte.Models
         [DataMember] public string[] subGameModes;
         [DataMember] public bool newSessionOnly;
     }
-
+    
     #endregion
 
     #region Friends
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     [DataContract]
     public enum RelationshipStatusCode
     {
@@ -473,7 +469,6 @@ namespace AccelByte.Models
 
     #region Presence
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum UserStatus
     {
         Offline = 0,
@@ -482,7 +477,6 @@ namespace AccelByte.Models
         Invisible = 3
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum GeneralUserStatus
     {
         offline,
@@ -608,13 +602,11 @@ namespace AccelByte.Models
 
     #region Session Attribute
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SessionAttributeName
     {
         profanity_filtering_level
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ProfanityFilterLevel
     {
         all,
@@ -689,5 +681,23 @@ namespace AccelByte.Models
         [DataMember] public BanReason reason;
         [DataMember] public bool enable;
     }
+    #endregion
+
+    #region Signaling
+
+    /// <summary>
+    /// Struct to send signaling message and parsing incoming notification.
+    /// As the sender: the destinationId is the targeted user ID.
+    /// As the receiver (handle notification): the destinationId is the sender's user ID.
+    /// </summary>
+    /// <param name="destinationId"> The targeted user ID or the sender's UserID</param>
+    /// <param name="message"> The content</param>
+    [DataContract]
+    public class SignalingP2P
+    {
+        [DataMember] public string destinationId;
+        [DataMember] public string message;
+    }
+
     #endregion
 }

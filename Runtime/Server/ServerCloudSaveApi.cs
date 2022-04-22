@@ -23,7 +23,33 @@ namespace AccelByte.Server
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-        
+
+        string ConvertPlayerRecordSetByToString(UserRecordSetBy setBy)
+        {
+            switch (setBy)
+            {
+                case UserRecordSetBy.SERVER:
+                    return "SERVER";
+                case UserRecordSetBy.CLIENT:
+                    return "CLIENT";
+                default:
+                    return "CLIENT";
+            }
+        }
+
+        Dictionary<string, object> AddMetaDataJson(bool isPublic, UserRecordSetBy setBy, Dictionary<string, object> RequestToInject)
+        {
+            ServerMetaRequest serverMetaRequest = new ServerMetaRequest
+            {
+                is_public = isPublic,
+                set_by = ConvertPlayerRecordSetByToString(setBy)
+            };
+            
+            RequestToInject["META"] = serverMetaRequest;
+
+            return RequestToInject;
+        }
+
         public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, bool isPublic,
             ResultCallback callback)
         {
@@ -47,6 +73,36 @@ namespace AccelByte.Server
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
+            UserRecordSetBy setBy, bool isPublic, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't save user record! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't save user record! AccessToken parameter is null!");
+            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
+            Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
+
+            Dictionary<string, object> requestToSend = AddMetaDataJson(isPublic, setBy, recordRequest);
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestToSend.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
@@ -112,6 +168,36 @@ namespace AccelByte.Server
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
+            UserRecordSetBy setBy, bool isPublic, ResultCallback callback)
+        {
+            Assert.IsNotNull(@namespace, "Can't replace user record! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't replace user record! userId parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't replace user record! AccessToken parameter is null!");
+            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
+            Assert.IsNotNull(recordRequest, "Can't replace user record! recordRequest parameter is null!");
+
+            Dictionary<string, object> requestToSend = AddMetaDataJson(isPublic, setBy, recordRequest);
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestToSend.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 

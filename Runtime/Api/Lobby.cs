@@ -152,6 +152,11 @@ namespace AccelByte.Api
         public event ResultCallback<UserBannedNotification> UserUnbannedNotification;
 
         /// <summary>
+        /// Raised when there is an incoming signaling notification
+        /// </summary>
+        public event ResultCallback<SignalingP2P> SignalingP2PNotification;
+
+        /// <summary>
         /// Raised when lobby access token succesfully updated
         /// </summary>
         public event Action TokenRefreshed;
@@ -1153,6 +1158,16 @@ namespace AccelByte.Api
             SendRequest(MessageType.getAllSessionAttributeRequest, callback);
         }
 
+        /// <summary>
+        /// Send a signaling message to another user.
+        /// </summary>
+        /// <param name="userId">The recipient's user ID.</param>
+        /// <param name="message">Signaling message to be sent.</param>
+        public void SendSignalingMessage(string userId, string message)
+        {
+            SendRequest(MessageType.signalingP2PNotif, new SignalingP2P { destinationId = userId, message = message }, r => { });
+        }
+
         private void RefreshToken(string newAccessToken, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -1441,6 +1456,9 @@ namespace AccelByte.Api
                 break;
             case MessageType.userUnbannedNotification:
                 HandleNotification(message, this.UserUnbannedNotification);
+                break;
+            case MessageType.signalingP2PNotif:
+                HandleNotification(message, this.SignalingP2PNotification);
                 break;
             default:
                 Action<ErrorCode, string> handler;

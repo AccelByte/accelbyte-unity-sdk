@@ -8,6 +8,6 @@ namespace AccelByte.Api
     {
         UserAccountRegistration,
         UpdateEmailAddress,
-        UpgradeHeadlessAccount
+        upgradeHeadlessAccount //this changes regarding to BE restriction which only allow 'u' lowercase 
     }
 }

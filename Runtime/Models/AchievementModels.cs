@@ -5,12 +5,8 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace AccelByte.Models
 {
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum AchievementSortBy
     {
         NONE,

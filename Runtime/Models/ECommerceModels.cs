@@ -6,14 +6,10 @@ using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace AccelByte.Models
 {
     #region Enum
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemType
     {
         NONE,
@@ -27,7 +23,6 @@ namespace AccelByte.Models
         MEDIA
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemStatus
     {
         NONE,
@@ -35,7 +30,6 @@ namespace AccelByte.Models
         INACTIVE
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum CurrencyType
     {
         NONE,
@@ -43,7 +37,6 @@ namespace AccelByte.Models
         VIRTUAL
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementClazz
     {
         NONE,
@@ -53,7 +46,6 @@ namespace AccelByte.Models
         MEDIA
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementStatus
     {
         NONE,
@@ -63,7 +55,6 @@ namespace AccelByte.Models
         REVOKED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementAppType
     {
         NONE,
@@ -73,7 +64,6 @@ namespace AccelByte.Models
         DEMO
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementType
     {
         NONE,
@@ -81,7 +71,6 @@ namespace AccelByte.Models
         CONSUMABLE
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum OrderStatus
     {
         NONE,
@@ -98,7 +87,6 @@ namespace AccelByte.Models
         DELETED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemSource
     {
         NONE,
@@ -111,7 +99,6 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementSource
     {
         NONE,
@@ -126,7 +113,6 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum CreditUserWalletSource
     {
         PURCHASE,
@@ -139,14 +125,12 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SeasonType
     {
         PASS = 0,
         TIER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum RewardSortBy
     {
         NAMESPACE,
@@ -838,6 +822,7 @@ namespace AccelByte.Models
         [DataMember] public string purchaseToken { get; set; }
         [DataMember] public string region { get; set; } //optional
         [DataMember] public string language { get; set; } //optional
+        [DataMember] public bool autoAck { get; set; }  //should be true for sync DURABLE item entitlement
     }
 
     #endregion
