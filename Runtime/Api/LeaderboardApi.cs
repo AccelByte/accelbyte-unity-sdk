@@ -11,13 +11,8 @@ namespace AccelByte.Api
 {
     internal class LeaderboardApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-        #endregion
-
-        #region Constructor
 
         internal LeaderboardApi(string baseUrl, IHttpClient httpClient)
         {
@@ -27,10 +22,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator GetRankings(string @namespace, string leaderboardCode, LeaderboardTimeFrame timeFrame, int offset, int limit,
             ResultCallback<LeaderboardRankingResult> callback)
@@ -132,8 +123,5 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-
-
-        #endregion
     }
 }

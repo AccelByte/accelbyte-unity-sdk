@@ -13,8 +13,6 @@ namespace AccelByte.Api
 {
     internal class ItemsApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
 
@@ -26,10 +24,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator GetItem(string @namespace, string accessToken, string itemId, string region, string language,
             ResultCallback<PopulatedItemInfo> callback)
@@ -187,7 +181,5 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-
-        #endregion
     }
 }

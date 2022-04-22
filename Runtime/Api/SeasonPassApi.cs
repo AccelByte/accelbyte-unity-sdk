@@ -13,15 +13,10 @@ namespace AccelByte.Api
 {
     internal class SeasonPassApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly string @namespace;
         private readonly ISession session;
         private readonly IHttpClient httpClient;
-        #endregion
-
-        #region Constructor
 
         internal SeasonPassApi(string baseUrl, IHttpClient httpClient)
         {
@@ -31,10 +26,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator GetCurrentSeason(string @namespace, string accessToken, string language, ResultCallback<SeasonInfo> callback)
         {
@@ -170,8 +161,6 @@ namespace AccelByte.Api
             var result = response.TryParseJson<SeasonClaimRewardResponse>();
             callback.Try(result);
         }
-
-        #endregion
     }
 }
 

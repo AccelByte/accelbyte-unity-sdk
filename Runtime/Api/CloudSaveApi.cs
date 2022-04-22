@@ -13,14 +13,8 @@ namespace AccelByte.Api
 {
     internal class CloudSaveApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal CloudSaveApi(string baseUrl, IHttpClient httpClient)
         {
@@ -31,37 +25,8 @@ namespace AccelByte.Api
             this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Private Methods 
-
-        Dictionary<string, object> AddMetaDataJsonGameRecord(RecordSetBy setBy, Dictionary<string, object> RequestToInject)
-        {
-            RequestToInject["__META"] = new { set_by = setBy.GetString() };
-            return RequestToInject;
-        }
-
-        Dictionary<string, object> AddMetaDataJsonUserRecord(RecordSetBy setBy, bool isPublic, Dictionary<string, object> RequestToInject)
-        {
-            RequestToInject["__META"] = new { set_by = setBy.GetString(), is_public = isPublic };
-            return RequestToInject;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        #region User Records
-
-        public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, RecordSetBy setBy, bool setPublic,
+        public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, bool isPublic,
             ResultCallback callback)
-        {
-            recordRequest = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
-            yield return SaveUserRecord(@namespace, userId, accessToken, key, recordRequest, callback, false);
-        }
-
-        public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
-            ResultCallback callback, bool isPublic)
         {
             Assert.IsNotNull(@namespace, "Can't save user record! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
@@ -72,7 +37,7 @@ namespace AccelByte.Api
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
             {
-                url += "/public"; //POST method for endpoint using this suffix will be deprecated in the future, please pay attention to declaration warning
+                url += "/public";
             }
 
             var request = HttpRequestBuilder
@@ -94,9 +59,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-
-        public IEnumerator GetUserRecord(string @namespace, string userId, string accessToken, string key,
-            ResultCallback<UserRecord> callback, bool isPublic)
+        public IEnumerator GetUserRecord(string @namespace, string userId, string accessToken, string key, bool isPublic,
+            ResultCallback<UserRecord> callback)
         {
             Assert.IsNotNull(@namespace, "Can't get user record! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get user record! userId parameter is null!");
@@ -126,17 +90,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-
-        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
-            RecordSetBy setBy, bool setPublic, ResultCallback callback)
-        {
-
-            recordRequest = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
-            yield return ReplaceUserRecord(@namespace, userId, accessToken, key, recordRequest, callback, false);
-        }
-
-        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, 
-            ResultCallback callback, bool isPublic)
+        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, bool isPublic,
+            ResultCallback callback)
         {
             Assert.IsNotNull(@namespace, "Can't replace user record! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't replace user record! userId parameter is null!");
@@ -147,7 +102,7 @@ namespace AccelByte.Api
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
             {
-                url += "/public"; //PUT method for endpoint using this suffix will be deprecated in the future, please pay attention to declaration warning
+                url += "/public";
             }
 
             var request = HttpRequestBuilder
@@ -168,7 +123,6 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
 
         public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key,
             ConcurrentReplaceRequest data, ResultCallback callback, Action callbackOnConflictedData = null)
@@ -231,18 +185,6 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        #endregion
-
-        #region Game Records
-
-        public IEnumerator SaveGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
-            RecordSetBy setBy,  ResultCallback callback)
-        {
-            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
-
-            yield return SaveGameRecord(@namespace, accessToken, key, recordRequest, callback);
-        }
-
         public IEnumerator SaveGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
             ResultCallback callback)
         {
@@ -290,13 +232,6 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameRecord>();
             callback.Try(result);
-        }
-
-        public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
-            RecordSetBy setBy, ResultCallback callback)
-        {
-            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
-            yield return ReplaceGameRecord(@namespace, accessToken, key, recordRequest, callback);
         }
 
         public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
@@ -381,9 +316,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
-        #endregion 
-
-        #endregion
     }
 }

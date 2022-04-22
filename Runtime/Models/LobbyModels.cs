@@ -106,8 +106,7 @@ namespace AccelByte.Models
         userBannedNotification,
         userUnbannedNotification,
         refreshTokenRequest,
-        refreshTokenResponse,
-        signalingP2PNotif
+        refreshTokenResponse
     }
 
     [DataContract]
@@ -371,7 +370,6 @@ namespace AccelByte.Models
         [DataMember] public string ip;
         [DataMember] public int port;
         [DataMember] public Dictionary<string, int> ports;
-        [DataMember] public string customAttribute;
         [DataMember] public string message;
         [DataMember] public string isOK;
     }
@@ -682,23 +680,5 @@ namespace AccelByte.Models
         [DataMember] public BanReason reason;
         [DataMember] public bool enable;
     }
-    #endregion
-
-    #region Signaling
-
-    /// <summary>
-    /// Struct to send signaling message and parsing incoming notification.
-    /// As the sender: the destinationId is the targeted user ID.
-    /// As the receiver (handle notification): the destinationId is the sender's user ID.
-    /// </summary>
-    /// <param name="destinationId"> The targeted user ID or the sender's UserID</param>
-    /// <param name="message"> The content</param>
-    [DataContract]
-    public class SignalingP2P
-    {
-        [DataMember] public string destinationId;
-        [DataMember] public string message;
-    }
-
     #endregion
 }

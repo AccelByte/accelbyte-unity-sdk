@@ -11,14 +11,8 @@ namespace AccelByte.Api
 {
     internal class AchievementApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal AchievementApi(string baseUrl, IHttpClient httpClient)
         {
@@ -28,10 +22,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Private Methods 
 
         string ConvertAchievementSortByToString(AchievementSortBy sortBy)
         {
@@ -58,10 +48,6 @@ namespace AccelByte.Api
             }
             return "";
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator QueryAchievements(string @namespace, string accessToken, string language, AchievementSortBy sortBy,
             ResultCallback<PaginatedPublicAchievement> callback, int offset, int limit)
@@ -165,7 +151,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
-        #endregion
     }
 }

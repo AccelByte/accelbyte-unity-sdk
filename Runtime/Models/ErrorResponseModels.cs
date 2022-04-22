@@ -22,9 +22,5 @@ namespace AccelByte.Models
         [DataMember] public string error { get; set; }
         [DataMember] public string error_description { get; set; }
         [DataMember] public string error_uri { get; set; }
-
-        [DataMember] public string default_factor { get; set; }
-        [DataMember] public string[] factors { get; set; }
-        [DataMember] public string mfa_token { get; set; }  
     }
 }

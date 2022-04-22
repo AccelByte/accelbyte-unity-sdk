@@ -37,45 +37,6 @@ namespace AccelByte.Core
             }
         }
 
-        public static Result<T, U> TryParseJson<T, U>(this IHttpResponse response) where U : new()
-        {
-            bool errorResponse = false;
-            bool successResponseCode = response.Code >= 200 && response.Code < 300;
-            if (response == null || successResponseCode == false)
-            {
-                errorResponse = true;
-            }
-
-            bool bodyResponseNullOrEmpty = response.BodyBytes == null || response.BodyBytes.Length == 0;
-            if (errorResponse)
-            {
-                return bodyResponseNullOrEmpty ? Result<T, U>.CreateError(new U()) :
-                    Result<T, U>.CreateError(response.BodyBytes.ToObject<U>());
-            }
-            else if (bodyResponseNullOrEmpty)
-            {
-                Result<T, U>.CreateOk();
-            }
-
-            return Result<T, U>.CreateOk(response.BodyBytes.ToObject<T>());            
-             
-        }
-
-        private static OAuthError ParseOAuthError(IHttpResponse response)
-        { 
-            try
-            {
-                return response.BodyBytes.ToObject<OAuthError>();
-            }
-            catch (Exception ex)
-            {
-                return new OAuthError() {
-                    error = "Exception Error",
-                    error_description = ex.Message 
-                };
-            }
-
-        }
         private static Error ParseError(IHttpResponse response)
         {
             if (response == null) return new Error(ErrorCode.NetworkError, "There is no response.");

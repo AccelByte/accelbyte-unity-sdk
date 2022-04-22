@@ -138,21 +138,13 @@ namespace AccelByte.Core
             return this;
         }
 
-        public HttpRequestBuilder WithBasicAuthWithCookie()
-        {
-            this.result.AuthType = HttpAuth.Basic;
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(); 
-            this.result.Headers["cookie"] = "device_token=" + deviceProvider.DeviceId;
-            return this;
-        }
-
         public HttpRequestBuilder WithBasicAuth(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 throw new ArgumentException("username and password for Basic Authorization shouldn't be empty or null");
             }
-            
+
             string credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(username + ":" + password));
             this.result.Headers["Authorization"] = "Basic " + credentials;
             this.result.AuthType = HttpAuth.Basic;

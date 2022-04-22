@@ -11,14 +11,8 @@ namespace AccelByte.Api
 {
     internal class FulfillmentApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal FulfillmentApi(string baseUrl, IHttpClient httpClient)
         {
@@ -28,10 +22,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator RedeemCode(string @namespace, string userId, string accessToken, FulFillCodeRequest fulFillCodeRequest,
             ResultCallback<FulfillmentResult> callback)
@@ -59,8 +49,5 @@ namespace AccelByte.Api
             var result = response.TryParseJson<FulfillmentResult>();
             callback.Try(result);
         }
-
-
-        #endregion
     }
 }

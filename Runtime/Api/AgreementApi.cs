@@ -12,14 +12,8 @@ namespace AccelByte.Api
 {
     internal class AgreementApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal AgreementApi(string baseUrl, IHttpClient httpClient)
         {
@@ -29,10 +23,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods 
 
         public IEnumerator GetLegalPolicies(string namespace_, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
             ResultCallback<PublicPolicy[]> callback)
@@ -171,7 +161,5 @@ namespace AccelByte.Api
             }
             callback(result);
         }
-
-        #endregion
     }
 }

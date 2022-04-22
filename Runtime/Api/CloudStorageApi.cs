@@ -14,14 +14,8 @@ namespace AccelByte.Api
 {
     public class CloudStorageApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal CloudStorageApi(string baseUrl, IHttpClient httpClient)
         {
@@ -30,10 +24,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator GetAllSlots(string @namespace, string userId, string accessToken,
             ResultCallback<Slot[]> callback)
@@ -245,7 +235,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
-        #endregion
     }
 }

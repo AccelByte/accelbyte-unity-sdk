@@ -7,20 +7,14 @@ using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
-using Newtonsoft.Json;
+using Utf8Json;
 
 namespace AccelByte.Api
 {
     internal class GroupApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal GroupApi(string baseUrl, IHttpClient httpClient)
         {
@@ -30,11 +24,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
-
 
         public IEnumerator CreateGroup(string namespace_, string accessToken, CreateGroupRequest createGroupRequest,
             ResultCallback<GroupInformation> callback)
@@ -666,7 +655,5 @@ namespace AccelByte.Api
             var result = response.TryParseJson<PaginatedMemberRoles>();
             callback(result);
         }
-
-        #endregion
     }
 }

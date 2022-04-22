@@ -11,16 +11,10 @@ namespace AccelByte.Api
 {
     internal class UserAccount
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly string @namespace;
         private readonly ISession session;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal UserAccount(string baseUrl, string @namespace, ISession session, IHttpClient httpClient)
         {
@@ -35,11 +29,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
-
 
         public IEnumerator Register(RegisterUserRequest registerUserRequest,
             ResultCallback<RegisterUserResponse> callback)
@@ -633,191 +622,5 @@ namespace AccelByte.Api
             Result<ListBulkUserInfoResponse> result = response.TryParseJson<ListBulkUserInfoResponse>();
             callback.Try(result);
         }
-
-        public IEnumerator Change2FAFactor(string mfaToken, TwoFAFactorType factor, ResultCallback<TokenData> callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/mfa/factor/change")
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithFormParam("mfaToken", mfaToken)
-                .WithFormParam("factor", factor.GetString())
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result<TokenData> result = response.TryParseJson<TokenData>();
-            callback.Try(result);
-        }
-
-        public IEnumerator Disable2FAAuthenticator(ResultCallback callback)
-        {
-            var request = HttpRequestBuilder.CreateDelete(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/disable")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken) 
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }
-
-        public IEnumerator Enable2FAAuthenticator(string code, ResultCallback callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/enable")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithFormParam("code", code)
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }
-
-        public IEnumerator GenerateSecretKeyFor3rdPartyAuthenticateApp(ResultCallback<SecretKey3rdPartyApp> callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/key")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken) 
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result< SecretKey3rdPartyApp> result = response.TryParseJson<SecretKey3rdPartyApp>();
-            callback.Try(result);
-        }
-        
-        public IEnumerator GenerateBackUpCode(ResultCallback<TwoFACode> callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode")
-                .WithPathParam("namespace", this.@namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result); 
-        }
-
-        public IEnumerator Disable2FABackupCodes(ResultCallback callback)
-        {
-            var request = HttpRequestBuilder.CreateDelete(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/disable")
-                .WithPathParam("namespace", this.@namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }
-        
-        public IEnumerator Enable2FABackupCodes(ResultCallback<TwoFACode> callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/enable")
-                .WithPathParam("namespace", this.@namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result); 
-        }
-
-        public IEnumerator GetBackUpCode(ResultCallback<TwoFACode> callback)
-        {
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken) 
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result);
-        }
-
-        public IEnumerator GetUserEnabledFactors(ResultCallback<Enable2FAFactors> callback)
-        {
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/factor")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result<Enable2FAFactors> result = response.TryParseJson<Enable2FAFactors>();
-            callback.Try(result);
-        }
-        
-        public IEnumerator Make2FAFactorDefault(TwoFAFactorType factor, ResultCallback callback)
-        {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/factor")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(this.session.AuthorizationToken)
-                .WithFormParam("factor", factor.GetString())
-                .WithContentType(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }      
-
-        public IEnumerator GetInputValidations(string languageCode, ResultCallback<InputValidation> callback, bool defaultOnEmpty = true)
-        {
-            Assert.IsNotNull(languageCode, nameof(languageCode) + " cannot be null");
-
-            var request = HttpRequestBuilder
-               .CreateGet(this.baseUrl + "/v3/public/inputValidations")
-               .WithQueryParam("languageCode", languageCode)
-               .WithQueryParam("defaultOnEmpty", defaultOnEmpty ? "true" : "false")
-               .WithBearerAuth(this.session.AuthorizationToken)
-               .Accepts(MediaType.ApplicationJson)
-               .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParseJson<InputValidation>();
-
-            callback.Try(result);
-        }
-		
-        #endregion
     }
 }
