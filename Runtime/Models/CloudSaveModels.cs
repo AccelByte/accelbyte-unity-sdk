@@ -8,12 +8,6 @@ using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
-    public enum UserRecordSetBy
-    {
-        CLIENT,
-        SERVER
-    }
-
     [DataContract]
     public class UserRecord
     {
@@ -23,8 +17,6 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
         [DataMember] public DateTime created_at { get; set; }
         [DataMember] public DateTime updated_at { get; set; }
-        [DataMember] public bool is_public { get; set; }
-        [DataMember] public string set_by { get; set; }
     }
 
     [DataContract]
@@ -35,8 +27,6 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
         [DataMember] public DateTime created_at { get; set; }
         [DataMember] public DateTime updated_at { get; set; }
-        [DataMember] public string set_by { get; set; }
-
     }
 
     [DataContract]
@@ -44,18 +34,5 @@ namespace AccelByte.Models
     {
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public Dictionary<string, object> value { get; set; }
-    }
-
-    [DataContract]
-    public class ServerMetaRequest
-    {
-        [DataMember] public string set_by { get; set; }
-        [DataMember] public bool is_public { get; set; }
-    }
-
-    [DataContract]
-    public class UserMetaRequest
-    {
-        [DataMember] public bool is_public { get; set; }
     }
 }
