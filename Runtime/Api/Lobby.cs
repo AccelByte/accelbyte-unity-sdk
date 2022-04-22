@@ -154,7 +154,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Raised when there is an incoming signaling notification
         /// </summary>
-        public event ResultCallback<SignalingP2PNotif> SignalingP2PNotification;
+        public event ResultCallback<SignalingP2P> SignalingP2PNotification;
 
         /// <summary>
         /// Raised when lobby access token succesfully updated
@@ -1165,7 +1165,7 @@ namespace AccelByte.Api
         /// <param name="message">Signaling message to be sent.</param>
         public void SendSignalingMessage(string userId, string message)
         {
-            SendRequest(MessageType.signalingP2PNotif, new SignalingP2PMessage { destinationId = userId, message = message }, r => { });
+            SendRequest(MessageType.signalingP2PNotif, new SignalingP2P { destinationId = userId, message = message }, r => { });
         }
 
         private void RefreshToken(string newAccessToken, ResultCallback callback)

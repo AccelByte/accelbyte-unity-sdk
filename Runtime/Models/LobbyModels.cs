@@ -686,26 +686,16 @@ namespace AccelByte.Models
     #region Signaling
 
     /// <summary>
-    /// Struct to send signaling message
+    /// Struct to send signaling message and parsing incoming notification.
+    /// As the sender: the destinationId is the targeted user ID.
+    /// As the receiver (handle notification): the destinationId is the sender's user ID.
     /// </summary>
-    /// <param name="destinationId"> The targeted user ID</param>
+    /// <param name="destinationId"> The targeted user ID or the sender's UserID</param>
     /// <param name="message"> The content</param>
     [DataContract]
-    public class SignalingP2PMessage
+    public class SignalingP2P
     {
         [DataMember] public string destinationId;
-        [DataMember] public string message;
-    }
-
-    /// <summary>
-    ///  Information about signaling P2P notification
-    /// </summary>
-    /// <param name="destinationId"> The User ID of the SENDER</param>
-    /// <param name="message"> The content</param>
-    [DataContract]
-    public class SignalingP2PNotif
-    {
-        [DataMember] public string destinationId;//sender's user ID
         [DataMember] public string message;
     }
 

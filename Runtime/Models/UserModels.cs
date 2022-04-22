@@ -4,15 +4,43 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Utf8Json;
 using Utf8Json.Formatters;
 
 namespace AccelByte.Models
 {
+    #region enum
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
     public enum SearchType { ALL, DISPLAYNAME, USERNAME }
+
+    public enum TwoFAFactorType
+    {
+        [Description("authenticator")]
+        AUTHENTICATOR,
+        [Description("backupCode")]
+        BACKUPCODE
+    }
+
+    public static class TwoFAFactorTypeExtensions
+    {
+        public static string GetString(this TwoFAFactorType me)
+        {
+            switch (me)
+            {
+                case TwoFAFactorType.AUTHENTICATOR:
+                    return "authenticator";
+                case TwoFAFactorType.BACKUPCODE:
+                    return "backupCode"; 
+                default:
+                    return "NO VALUE GIVEN";
+            }
+        }
+    }
+
+    #endregion enum
 
     [DataContract]
     public class TokenData
@@ -449,4 +477,66 @@ namespace AccelByte.Models
         [DataMember] public int totalData { get; set; }
     }
 
+    [DataContract]
+    public class TwoFACode
+    {
+        [DataMember] public int generatedAt { get; set; }
+        [DataMember] public string[] invalidCode { get; set; }
+        [DataMember] public string[] validCodes { get; set; }
+    }
+
+    [DataContract]
+    public class SecretKey3rdPartyApp
+    {
+        [DataMember] public string secretKey { get; set; }
+        [DataMember] public string uri { get; set; }
+    }
+
+    [DataContract]
+    public class Enable2FAFactors
+    { 
+        [DataMember(Name = "default")] public string default_ { get; set; }
+        [DataMember] public string[] enabled { get; set; }
+    }
+    [DataContract]
+    public class ValidationDescription
+    {
+        [DataMember] public string language { get; set; }
+        [DataMember] public string[] message { get; set; }
+    }
+
+    [DataContract]
+    public class Validation
+    {
+        [DataMember] public bool allowDigit { get; set; }
+        [DataMember] public bool allowLetter { get; set; }
+        [DataMember] public bool allowSpace { get; set; }
+        [DataMember] public bool allowUnicode { get; set; }
+        [DataMember] public ValidationDescription description { get; set; }
+        [DataMember] public bool isCustomRegex { get; set; }
+        [DataMember] public string letterCase { get; set; }
+        [DataMember] public int maxLength { get; set; }
+        [DataMember] public int maxRepeatingAlphaNum { get; set; }
+        [DataMember] public int maxRepeatingSpecialCharacter { get; set; }
+        [DataMember] public int minCharType { get; set; }
+        [DataMember] public int minLength { get; set; }
+        [DataMember] public string regex { get; set; }
+        [DataMember] public string specialCharacterLocation { get; set; }
+        [DataMember] public string[] specialCharacters { get; set; }
+    }
+
+    [DataContract]
+    public class DataInputValidation
+    {
+        [DataMember] public string field { get; set; }
+        [DataMember] public Validation validation { get; set; }
+
+    }
+
+    [DataContract]
+    public class InputValidation
+    {
+        [DataMember] public DataInputValidation[] data { get; set; } 
+        [DataMember] public int version { get; set; }
+    }
 };
