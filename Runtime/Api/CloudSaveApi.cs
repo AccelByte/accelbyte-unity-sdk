@@ -25,6 +25,18 @@ namespace AccelByte.Api
             this.httpClient = httpClient;
         }
 
+        Dictionary<string, object> AddMetaDataJson(bool isPublic, Dictionary<string, object> RequestToInject)
+        {
+            UserMetaRequest userMetaRequest = new UserMetaRequest
+            {
+                is_public = isPublic,
+            };
+
+            RequestToInject["META"] = userMetaRequest;
+
+            return RequestToInject;
+        }
+
         public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, bool isPublic,
             ResultCallback callback)
         {
@@ -37,7 +49,7 @@ namespace AccelByte.Api
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
             {
-                url += "/public";
+                url += "/public"; //POST method for endpoint using this suffix will be deprecated in the future, please pay attention to declaration warning
             }
 
             var request = HttpRequestBuilder
@@ -48,6 +60,36 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SaveUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
+            ResultCallback callback, bool isPublic)
+        {
+            Assert.IsNotNull(@namespace, "Can't save user record! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't save user record! AccessToken parameter is null!");
+            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
+            Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
+
+            Dictionary<string, object> requestToSend = AddMetaDataJson(isPublic, recordRequest);
+
+            var request = HttpRequestBuilder
+                .CreatePost(this.baseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestToSend.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
@@ -102,7 +144,7 @@ namespace AccelByte.Api
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
             {
-                url += "/public";
+                url += "/public"; //PUT method for endpoint using this suffix will be deprecated in the future, please pay attention to declaration warning
             }
 
             var request = HttpRequestBuilder
@@ -113,6 +155,36 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator ReplaceUserRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
+            ResultCallback callback, bool isPublic)
+        {
+            Assert.IsNotNull(@namespace, "Can't replace user record! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't replace user record! userId parameter is null!");
+            Assert.IsNotNull(accessToken, "Can't replace user record! AccessToken parameter is null!");
+            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
+            Assert.IsNotNull(recordRequest, "Can't replace user record! recordRequest parameter is null!");
+
+            Dictionary<string, object> requestToSend = AddMetaDataJson(isPublic, recordRequest);
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestToSend.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 

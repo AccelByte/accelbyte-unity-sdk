@@ -822,6 +822,7 @@ namespace AccelByte.Models
         [DataMember] public string purchaseToken { get; set; }
         [DataMember] public string region { get; set; } //optional
         [DataMember] public string language { get; set; } //optional
+        [DataMember] public bool autoAck { get; set; }  //should be true for sync DURABLE item entitlement
     }
 
     #endregion
