@@ -11,7 +11,6 @@ using Utf8Json.Formatters;
 
 namespace AccelByte.Models
 {
-    #region enum
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
     public enum SearchType { ALL, DISPLAYNAME, USERNAME }

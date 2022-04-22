@@ -308,7 +308,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void LoginWithLatestRefreshToken(ResultCallback<TokenData, OAuthError> callback)
