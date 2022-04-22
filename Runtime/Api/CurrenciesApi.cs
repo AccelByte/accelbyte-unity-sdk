@@ -11,14 +11,8 @@ namespace AccelByte.Api
 {
     internal class CurrenciesApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal CurrenciesApi(string baseUrl, IHttpClient httpClient)
         {
@@ -28,11 +22,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
-
 
         public IEnumerator GetCurrencyList(string @namespace, string accessToken, ResultCallback<CurrencyList[]> callback)
         {
@@ -54,8 +43,5 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-
-
-        #endregion
     }
 }

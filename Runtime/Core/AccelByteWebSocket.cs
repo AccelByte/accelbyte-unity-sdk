@@ -166,17 +166,9 @@ namespace AccelByte.Api
                 case WsCloseCode.ServerError:
                 case WsCloseCode.ServiceRestart:
                 case WsCloseCode.TryAgainLater:
-                case WsCloseCode.TlsHandshakeFailure:
-                case WsCloseCode.ServerShuttingDown:  
-                    return true;
-                
+                case WsCloseCode.TlsHandshakeFailure: return true;
                 default: return false;
             }
-        }
-
-        public void SetSessionId(string sessionId)
-        {
-            this.sessionId = sessionId;
         }
 
         /// <summary>

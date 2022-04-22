@@ -2,9 +2,6 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using AccelByte.Models;
-using System;
-
 namespace AccelByte.Core
 {
     //Although HTTP Status Codes are standard way to communicate web requests error, it's definitely not sufficient.
@@ -484,39 +481,6 @@ namespace AccelByte.Core
     {
         Error Error { get; }
         bool IsError { get; }
-    }
-
-    public class Result<T, U>  
-    {
-        public T Value { get; }
-        public U Error { get; }
-        public bool IsError => this.Error != null; 
-
-        public static Result<T, U> CreateOk() { return new Result<T, U>(); }
-
-        public static Result<T, U> CreateError() { return new Result<T, U>(); } 
-
-        public static Result<T, U> CreateOk(T value) 
-        { 
-            return value != null ? new Result<T, U>(value) : new Result<T, U>(); 
-        }
-
-        public static Result<T, U> CreateError(U value) 
-        { 
-            return value != null ? new Result<T, U>(value) : new Result<T, U>(); 
-        }
-
-        private Result() { }
-
-        private Result(U error)
-        {
-            this.Error = error;
-        }
-
-        private Result(T value)
-        {
-            this.Value = value;
-        }
     }
 
     public class Result<T> : IResult

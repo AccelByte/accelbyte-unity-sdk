@@ -11,14 +11,8 @@ namespace AccelByte.Api
 {
     internal class CategoriesApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal CategoriesApi(string baseUrl, IHttpClient httpClient)
         {
@@ -28,10 +22,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator GetCategory(string @namespace, string accessToken, string categoryPath, string language,
             ResultCallback<CategoryInfo> callback)
@@ -133,7 +123,5 @@ namespace AccelByte.Api
             var result = response.TryParseJson<CategoryInfo[]>();
             callback.Try(result);
         }
-
-        #endregion 
     }
 }

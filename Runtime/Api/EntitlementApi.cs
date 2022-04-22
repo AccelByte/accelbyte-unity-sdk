@@ -12,14 +12,8 @@ namespace AccelByte.Api
 {
     internal class EntitlementApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
 
         internal EntitlementApi(string baseUrl, IHttpClient httpClient)
         {
@@ -29,10 +23,6 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IEnumerator QueryUserEntitlements(string @namespace, string userId, string userAccessToken, string entitlementName, string itemId, int offset,
             int limit, EntitlementClazz entitlementClazz, EntitlementAppType entitlementAppType, ResultCallback<EntitlementPagingSlicedResult> callback)
@@ -524,7 +514,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-
-        #endregion
     }
 }

@@ -13,21 +13,21 @@ namespace AccelByte.Api
     {
         event Action<string> RefreshTokenCallback;
 
-        IEnumerator LoginWithUsername(string username, string password, ResultCallback<TokenData, OAuthError> callback,
+        IEnumerator LoginWithUsername(string username, string password, ResultCallback callback,
             bool rememberMe = false);
 
-        IEnumerator LoginWithUsernameV3(string username, string password, ResultCallback<TokenData, OAuthError> callback,
+        IEnumerator LoginWithUsernameV3(string username, string password, ResultCallback callback,
             bool rememberMe = false);
 
-        IEnumerator LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback);
+        IEnumerator LoginWithDeviceId(ResultCallback callback);
 
         IEnumerator LoginWithOtherPlatform(PlatformType platformType, string platformToken,
-            ResultCallback<TokenData, OAuthError> callback);
+            ResultCallback callback);
 
-        IEnumerator LoginWithAuthorizationCode(string code, ResultCallback<TokenData, OAuthError> callback);
-        IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback<TokenData, OAuthError> callback);
+        IEnumerator LoginWithAuthorizationCode(string code, ResultCallback callback);
+        IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback callback);
         
         IEnumerator Logout(ResultCallback callback);
-        IEnumerator RefreshSession(ResultCallback<TokenData, OAuthError> callback);
+        IEnumerator RefreshSession(ResultCallback callback);
     }
 }

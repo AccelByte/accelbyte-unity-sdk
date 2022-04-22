@@ -13,16 +13,10 @@ namespace AccelByte.Api
 {
     internal class TelemetryApi
     {
-        #region Fields 
-
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
         private readonly uint agentType;
         private readonly string deviceId;
-
-        #endregion
-
-        #region Constructor
 
         public TelemetryApi(string baseUrl, IHttpClient httpClient)
         {
@@ -104,10 +98,6 @@ namespace AccelByte.Api
             this.deviceId = DeviceProvider.GetFromSystemInfo().DeviceId;
         }
 
-        #endregion
-
-        #region Public Methods
-
         public IEnumerator SendEvent<T>(string @namespace, string clientId, string userID, TelemetryEventTag eventTag,
             T eventData, ResultCallback callback) where T : class
         {
@@ -172,7 +162,5 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-		
-        #endregion
     }
 }

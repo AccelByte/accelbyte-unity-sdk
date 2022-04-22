@@ -6,14 +6,10 @@ using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace AccelByte.Models
 {
     #region Enum
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemType
     {
         NONE,
@@ -27,7 +23,6 @@ namespace AccelByte.Models
         MEDIA
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemStatus
     {
         NONE,
@@ -35,7 +30,6 @@ namespace AccelByte.Models
         INACTIVE
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum CurrencyType
     {
         NONE,
@@ -43,7 +37,6 @@ namespace AccelByte.Models
         VIRTUAL
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementClazz
     {
         NONE,
@@ -53,7 +46,6 @@ namespace AccelByte.Models
         MEDIA
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementStatus
     {
         NONE,
@@ -63,7 +55,6 @@ namespace AccelByte.Models
         REVOKED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementAppType
     {
         NONE,
@@ -73,7 +64,6 @@ namespace AccelByte.Models
         DEMO
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementType
     {
         NONE,
@@ -81,7 +71,6 @@ namespace AccelByte.Models
         CONSUMABLE
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum OrderStatus
     {
         NONE,
@@ -98,7 +87,6 @@ namespace AccelByte.Models
         DELETED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ItemSource
     {
         NONE,
@@ -111,7 +99,6 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum EntitlementSource
     {
         NONE,
@@ -126,7 +113,6 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum CreditUserWalletSource
     {
         PURCHASE,
@@ -139,14 +125,12 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SeasonType
     {
         PASS = 0,
         TIER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum RewardSortBy
     {
         NAMESPACE,
@@ -155,22 +139,6 @@ namespace AccelByte.Models
         REWARDCODE,
         REWARDCODE_ASC,
         REWARDCODE_DESC
-    }
-
-    [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum WalletTable
-    {
-        Playstation = 0,
-        Xbox,
-        Steam,
-        Epic,
-        Stadia,
-        IOS,
-        GooglePlay,
-        Twitch,
-        System,
-        Nintendo,
-        Other
     }
 
     #endregion
@@ -201,14 +169,6 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class TimeLimitedBalance
-    {
-        [DataMember] public int balance { get; set; }
-        [DataMember] public string balanceSource { get; set; }
-        [DataMember] public DateTime expiredAt { get; set; }
-    }
-
-    [DataContract]
     public class WalletInfo
     {
         [DataMember] public string id { get; set; }
@@ -217,8 +177,6 @@ namespace AccelByte.Models
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencySymbol { get; set; }
         [DataMember] public int balance { get; set; }
-        [DataMember] public string balanceOrigin { get; set; }
-        [DataMember] public TimeLimitedBalance[] timeLimitedBalances { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public ItemStatus status { get; set; }
@@ -252,7 +210,6 @@ namespace AccelByte.Models
         [DataMember] public int amount { get; set; }
         [DataMember] public CreditUserWalletSource source { get; set; }
         [DataMember] public string reason { get; set; }
-        [DataMember] public WalletTable origin { get; set; }
     }
 
     #endregion
@@ -865,7 +822,6 @@ namespace AccelByte.Models
         [DataMember] public string purchaseToken { get; set; }
         [DataMember] public string region { get; set; } //optional
         [DataMember] public string language { get; set; } //optional
-        [DataMember] public bool autoAck { get; set; }  //should be true for sync DURABLE item entitlement
     }
 
     #endregion

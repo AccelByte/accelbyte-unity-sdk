@@ -7,7 +7,7 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "websocket-sharp.dll",
-        "Newtonsoft.Json.dll"
+        "Utf8Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

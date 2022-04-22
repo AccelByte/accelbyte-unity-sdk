@@ -35,10 +35,7 @@ namespace AccelByte.Core {
         TryAgainLater = 1013,
         BadGateway = 1014,
         TlsHandshakeFailure = 1015,
-        ServerShuttingDown = 4000,
-        AuthTokenRevoked = 4001,
-        ServerClosed = 4002,
-        ServerDisconnected = 4003
+        ClosedByServer = 4000
     }
 
     public abstract class WebSocketException : Exception
