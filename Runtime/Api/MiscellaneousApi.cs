@@ -11,9 +11,15 @@ using UnityEngine.Assertions;
 namespace AccelByte.Api {
     internal class MiscellaneousApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
         private readonly string @namespace;
+
+        #endregion
+
+        #region Constructor
 
         internal MiscellaneousApi(string @namespace ,string baseUrl, IHttpClient httpClient)
         {
@@ -25,6 +31,10 @@ namespace AccelByte.Api {
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IEnumerator GetCurrentTime(ResultCallback<Time> callback)
         {
@@ -60,6 +70,7 @@ namespace AccelByte.Api {
             var result = response.TryParseJson<Country[]>();
             callback.Try(result);
         }
+
         public IEnumerator GetLanguages(ResultCallback<Dictionary<string,string>> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -76,6 +87,7 @@ namespace AccelByte.Api {
             var result = response.TryParseJson<Dictionary<string,string>>();
             callback.Try(result);
         }
+
         public IEnumerator GetTimeZones(ResultCallback<string[]> callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -92,5 +104,7 @@ namespace AccelByte.Api {
             var result = response.TryParseJson<string[]>();
             callback.Try(result);
         }
+
+        #endregion
     }
 }

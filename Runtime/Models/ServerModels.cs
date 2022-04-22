@@ -27,6 +27,8 @@ namespace AccelByte.Models
         [DataMember] public string pod_name { get; set; }
         [DataMember] public int port { get; set; }
         [DataMember]public string provider { get; set; }
+
+        [DataMember] public string custom_attribute { get; set; }
     }
 
     [DataContract]
@@ -43,6 +45,7 @@ namespace AccelByte.Models
         [DataMember] public string ip { get; set; }
         [DataMember] public string name { get; set; }
         [DataMember] public uint port { get; set; }
+        [DataMember] public string custom_attribute { get; set; }
     }
 
     [DataContract]

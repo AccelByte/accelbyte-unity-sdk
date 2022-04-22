@@ -2,9 +2,13 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
+
 namespace AccelByte.Core
 {
     public delegate void ResultCallback<T>(Result<T> result);
+
+    public delegate void ResultCallback<T, U>(Result<T, U> result);
 
     public delegate void ResultCallback(Result result);
 
@@ -35,9 +39,19 @@ namespace AccelByte.Core
             callback?.Invoke(param);
         }
 
+        public static void Try<T, U>(this ResultCallback<T,U> callback, Result<T, U> param)
+        {
+            callback?.Invoke(param);
+        }
+
         public static void TryOk(this ResultCallback callback)
         {
             callback?.Invoke(Result.CreateOk());
+        }
+
+        public static void TryOk<T, U>(this ResultCallback<T, U> callback)
+        {
+            callback?.Invoke(Result<T, U>.CreateOk());
         }
 
         public static void TryError(this ResultCallback callback, ErrorCode errorCode, string errorMessage = null)
@@ -48,6 +62,11 @@ namespace AccelByte.Core
         public static void TryError(this ResultCallback callback, Error error)
         {
             callback?.Invoke(Result.CreateError(error));
+        }
+
+        public static void TryError<T, U>(this ResultCallback<T, U> callback, U error)
+        {
+            callback?.Invoke(Result<T,U>.CreateError(error));
         }
     }
 }

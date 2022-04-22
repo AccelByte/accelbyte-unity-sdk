@@ -48,7 +48,8 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="port">Exposed port number to connect to</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void RegisterServer(int portNumber, ResultCallback callback)
+        /// <param name="customAttribute">A string value that will be sent to game client via DSNotif</param>
+        public void RegisterServer(int portNumber, ResultCallback callback, string customAttribute = "")
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -61,7 +62,11 @@ namespace AccelByte.Server
             }
 
             this.name = Environment.GetEnvironmentVariable("POD_NAME");
-            var request = new RegisterServerRequest {pod_name = this.name, port = portNumber};
+            var request = new RegisterServerRequest {
+                pod_name = this.name, 
+                port = portNumber, 
+                custom_attribute = customAttribute
+            };
             this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, callback));
         }
 
@@ -102,7 +107,8 @@ namespace AccelByte.Server
         /// <param name="port">Port number</param>
         /// <param name="name">Name to uniquely identify this local server</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void RegisterLocalServer(string ip, uint port, string name, ResultCallback callback)
+        /// <param name="customAttribute">A string value that will be sent to game client via DSNotif</param>
+        public void RegisterLocalServer(string ip, uint port, string name, ResultCallback callback, string customAttribute = "")
         {
             Report.GetFunctionLog(this.GetType().Name);
 
@@ -116,7 +122,12 @@ namespace AccelByte.Server
             }
 
             this.name = name;
-            var request = new RegisterLocalServerRequest {ip = ip, port = port, name = name};
+            var request = new RegisterLocalServerRequest {
+                ip = ip, 
+                port = port, 
+                name = name, 
+                custom_attribute = customAttribute
+            };
             string authToken = this.serverSession.AuthorizationToken;
             this.coroutineRunner.Run(this.api.RegisterLocalServer(request, authToken, callback));
         }
