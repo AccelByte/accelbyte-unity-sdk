@@ -12,8 +12,14 @@ namespace AccelByte.Api
 {
     internal class UserProfilesApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal UserProfilesApi(string baseUrl, IHttpClient httpClient)
         {
@@ -23,6 +29,10 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IEnumerator GetUserProfile(string @namespace, string userAccessToken,
             ResultCallback<UserProfile> callback)
@@ -224,5 +234,7 @@ namespace AccelByte.Api
             var result = response.TryParseJson<string[]>();
             callback.Try(result);
         }
+		
+		#endregion
     }
 }

@@ -8,10 +8,26 @@ using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
-    public enum UserRecordSetBy
+    public enum RecordSetBy
     {
         CLIENT,
         SERVER
+    }
+
+    public static class RecordSetByExtensions
+    {
+        public static string GetString(this RecordSetBy me)
+        {
+            switch (me)
+            {
+                case RecordSetBy.CLIENT:
+                    return "CLIENT";
+                case RecordSetBy.SERVER:
+                    return "SERVER";
+                default:
+                    return "NO VALUE GIVEN";
+            }
+        }
     }
 
     [DataContract]
@@ -25,6 +41,23 @@ namespace AccelByte.Models
         [DataMember] public DateTime updated_at { get; set; }
         [DataMember] public bool is_public { get; set; }
         [DataMember] public string set_by { get; set; }
+    }
+
+    [DataContract]
+    public class PagingGameRecord
+    {
+        [DataMember] public string first { get; set; }
+        [DataMember] public string last { get; set; }
+        [DataMember] public string next { get; set; }
+        [DataMember] public string previous { get; set; }
+    }
+
+    [DataContract]
+    public class GameRecordList 
+    {
+        [DataMember] public string[] data { get; set; }
+        [DataMember] public PagingGameRecord paging { get; set; }
+
     }
 
     [DataContract]
@@ -46,16 +79,5 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
     }
 
-    [DataContract]
-    public class ServerMetaRequest
-    {
-        [DataMember] public string set_by { get; set; }
-        [DataMember] public bool is_public { get; set; }
-    }
 
-    [DataContract]
-    public class UserMetaRequest
-    {
-        [DataMember] public bool is_public { get; set; }
-    }
 }

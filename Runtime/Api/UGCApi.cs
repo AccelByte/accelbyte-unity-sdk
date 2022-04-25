@@ -12,10 +12,16 @@ namespace AccelByte.Api
 {
     internal class UGCApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly string @namespace;
         private readonly ISession session;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal UGCApi(string baseUrl, IHttpClient httpClient)
         {
@@ -25,6 +31,12 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+
+        #endregion
+
+        #region Public Methods
+
 
         public IEnumerator CreateContent(string @namespace, string userId, string accessToken, string channelId, UGCRequest createRequest, ResultCallback<UGCResponse> callback)
         {
@@ -394,5 +406,7 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+
+        #endregion
     }
 }

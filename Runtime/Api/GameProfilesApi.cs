@@ -12,8 +12,13 @@ namespace AccelByte.Api
 {
     public class GameProfilesApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+        #endregion
+
+        #region Constructor
 
         internal GameProfilesApi(string baseUrl, IHttpClient httpClient)
         {
@@ -22,6 +27,10 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IEnumerator BatchGetGameProfiles(string @namespace, ICollection<string> userIds, string accessToken,
             ResultCallback<UserGameProfiles[]> callback)
@@ -253,5 +262,7 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+
+        #endregion
     }
 }

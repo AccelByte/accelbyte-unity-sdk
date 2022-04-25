@@ -11,10 +11,16 @@ namespace AccelByte.Api
 {
     internal class UserAccount
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly string @namespace;
         private readonly ISession session;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal UserAccount(string baseUrl, string @namespace, ISession session, IHttpClient httpClient)
         {
@@ -29,6 +35,11 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
+
 
         public IEnumerator Register(RegisterUserRequest registerUserRequest,
             ResultCallback<RegisterUserResponse> callback)
@@ -806,6 +817,7 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-
+		
+        #endregion
     }
 }

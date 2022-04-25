@@ -13,8 +13,14 @@ namespace AccelByte.Api
 {
     public class LobbyApi
     {
+        #region Fields 
+
         private readonly string baseUrl;
         private readonly IHttpClient httpClient;
+
+        #endregion
+
+        #region Constructor
 
         internal LobbyApi(string baseUrl, IHttpClient httpClient)
         {
@@ -23,6 +29,10 @@ namespace AccelByte.Api
             this.baseUrl = baseUrl;
             this.httpClient = httpClient;
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IEnumerator BulkFriendRequest(string @namespace, string ownUserId, BulkFriendsRequest userIds, string accessToken,
             ResultCallback callback)
@@ -185,5 +195,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(this.GetType().Name);
             ((AccelByteHttpClient)this.httpClient).OnBearerAuthRejected(callback);
         }
+
+        #endregion
     }
 }

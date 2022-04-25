@@ -50,7 +50,7 @@ namespace AccelByte.Server
             }
 
             this.coroutineRunner.Run(
-                this.api.SaveUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, false, callback));
+                this.api.SaveUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, callback, false));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace AccelByte.Server
         /// <param name="isPublic">Indicate whether the player record is a public record or not</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SaveUserRecord(string userId, string key, Dictionary<string, object> recordRequest, 
-            UserRecordSetBy setBy, bool isPublic, ResultCallback callback)
+            RecordSetBy setBy, bool isPublic, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
@@ -123,7 +123,7 @@ namespace AccelByte.Server
             }
 
             this.coroutineRunner.Run(
-                this.api.ReplaceUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, false, callback));
+                this.api.ReplaceUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, callback, false));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace AccelByte.Server
         /// <param name="isPublic">Indicate whether the player record is a public record or not.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void ReplaceUserRecord(string userId, string key, Dictionary<string, object> recordRequest,
-            UserRecordSetBy setBy, bool isPublic, ResultCallback callback)
+            RecordSetBy setBy, bool isPublic, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");

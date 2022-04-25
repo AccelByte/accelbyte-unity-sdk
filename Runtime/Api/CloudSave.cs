@@ -55,7 +55,7 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.SaveUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, isPublic, callback));
+                this.api.SaveUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, isPublic));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace AccelByte.Api
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         /// <param name="isPublic">True if you want the record can be accessed by other user. Default is false</param>
-        public void SaveUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback, bool isPublic = false)
+        public void SaveUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
@@ -79,7 +79,31 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.SaveUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, isPublic));
+                this.api.SaveUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, false));
+        }
+
+        /// <summary>
+        /// Save a user-level record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="setPublic">Using metadata, True if you want the record can be accessed by other user. Default is false</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SaveUserRecord(string key, bool setPublic, Dictionary<string, object> recordRequest, ResultCallback callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
+            Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.SaveUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, RecordSetBy.CLIENT, setPublic, callback));
         }
 
         /// <summary>
@@ -100,7 +124,7 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, false, callback));
+                this.api.GetUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, callback, false));
         }
 
         /// <summary>
@@ -122,7 +146,7 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserRecord(this.@namespace, userId, this.session.AuthorizationToken, key, true, callback));
+                this.api.GetUserRecord(this.@namespace, userId, this.session.AuthorizationToken, key, callback, true));
         }
 
         /// <summary>
@@ -147,7 +171,7 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, isPublic, callback));
+                this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, isPublic));
         }
 
         /// <summary>
@@ -157,7 +181,7 @@ namespace AccelByte.Api
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         /// <param name="isPublic">True if you want the record can be accessed by other user. Default is false</param>
-        public void ReplaceUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback, bool isPublic = false)
+        public void ReplaceUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
@@ -171,7 +195,31 @@ namespace AccelByte.Api
             }
 
             this.coroutineRunner.Run(
-                this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, isPublic));
+                this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, callback, false));
+        }
+
+        /// <summary>
+        /// Replace a record in user-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="setPublic">Using metadata, True if you want the record can be accessed by other user. Default is false</param>
+        public void ReplaceUserRecord(string key, bool setPublic, Dictionary<string, object> recordRequest, ResultCallback callback, bool isPublic)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
+            Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.ReplaceUserRecord(this.@namespace, this.session.UserId, this.session.AuthorizationToken, key, recordRequest, RecordSetBy.CLIENT, setPublic, callback));
         }
 
         /// <summary>
@@ -331,7 +379,7 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.api.SaveGameRecord(this.@namespace, this.session.AuthorizationToken, key, recordRequest, callback));
-        }
+        }		 
 
         /// <summary>
         /// Get a record by its key in namespace-level.
@@ -375,7 +423,7 @@ namespace AccelByte.Api
 
             this.coroutineRunner.Run(
                 this.api.ReplaceGameRecord(this.@namespace, this.session.AuthorizationToken, key, recordRequest, callback));
-        }
+        }		 
 
         /// <summary>
         /// Replace a record in namespace-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one, but will failed if lastUpdated is not up-to-date.
