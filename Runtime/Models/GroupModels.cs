@@ -5,8 +5,12 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace AccelByte.Models
 {
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum GroupType
     {
         NONE,
@@ -15,6 +19,7 @@ namespace AccelByte.Models
         PRIVATE
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum RuleCriteria
     {
         MINIMUM,
@@ -22,6 +27,7 @@ namespace AccelByte.Models
         EQUAL
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum JoinGroupStatus
     {
         JOINING,
@@ -29,6 +35,7 @@ namespace AccelByte.Models
         REQUESTED
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum AllowedAction
     {
         None,
@@ -40,6 +47,7 @@ namespace AccelByte.Models
         responseJoinRequest
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum RequestType
     {
         INVITE,
@@ -47,6 +55,7 @@ namespace AccelByte.Models
         JOINED
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum MemberStatus
     {
         NONE,

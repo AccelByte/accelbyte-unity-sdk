@@ -6,16 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using Utf8Json;
-using Utf8Json.Formatters;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace AccelByte.Models
 {
-    #region enum
+	#region enum
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SearchType { ALL, DISPLAYNAME, USERNAME }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum TwoFAFactorType
     {
         [Description("authenticator")]
@@ -208,6 +212,7 @@ namespace AccelByte.Models
         [DataMember] public string username { get; set; }
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, Android, iOS, Nintendo, awscognito, PS5 }
 
     [DataContract]
@@ -330,11 +335,13 @@ namespace AccelByte.Models
     /// <summary>
     /// Type of Ban that available
     /// </summary>
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum BanType { LOGIN, CHAT_SEND, CHAT_ALL, ORDER_AND_PAYMENT, STATISTICS, LEADERBOARD, MATCHMAKING, UGC_CREATE_UPDATE }
 
     /// <summary>
     /// Type of Ban reason that available
     /// </summary>
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum BanReason { VIOLENCE, HARASSMENT, HATEFUL_CONDUCT, OFFENSIVE_USERNAME, IMPERSONATION, 
         MALICIOUS_CONTENT, SEXUALLY_SUGGESTIVE, SEXUAL_VIOLENCE, EXTREME_VIOLENCE, UNDERAGE_USER, CHEATING, TOS_VIOLATION }
 

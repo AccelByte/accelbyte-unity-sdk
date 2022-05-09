@@ -1,7 +1,7 @@
 {
   "name": "com.accelbyte.unitysdk",
   "displayName": "AccelByte Unity SDK",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "unity": "2018.3",
   "description": "Official AccelByte's backend service SDK for Unity3D game engine",
   "keywords": [
@@ -25,5 +25,8 @@
     "url": "https://github.com/AccelByte/accelbyte-unity-sdk"
   },
   "bugs": "https://github.com/AccelByte/accelbyte-unity-sdk/issues",
-  "type": "library"
+  "type": "library",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.1"
+  }
 }

@@ -1435,6 +1435,7 @@ namespace AccelByte.Api
                 break;
             case MessageType.connectNotif:
                 AwesomeFormat.ReadPayload(message, out lobbySessionId);
+                webSocket.SetSessionId(lobbySessionId.lobbySessionID);
                 break;
             case MessageType.disconnectNotif:
                 HandleNotification(message, this.Disconnecting);

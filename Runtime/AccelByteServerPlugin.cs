@@ -76,21 +76,6 @@ namespace AccelByte.Server
         private static void Init()
         {
 #endif
-#if (UNITY_WEBGL || ENABLE_IL2CPP) && !UNITY_EDITOR
-            Utf8Json.Resolvers.CompositeResolver.RegisterAndSetAsDefault(
-                new [] {
-                    Utf8Json.Formatters.PrimitiveObjectFormatter.Default
-                },
-                new[] {
-                    Utf8Json.Resolvers.GeneratedResolver.Instance,
-                    Utf8Json.Resolvers.BuiltinResolver.Instance,
-                    Utf8Json.Resolvers.EnumResolver.Default,
-                    // for unity
-                    Utf8Json.Unity.UnityResolver.Instance
-                }
-            );
-#endif
-
             var configFile = Resources.Load("AccelByteServerSDKConfig");
 
             if (configFile == null)

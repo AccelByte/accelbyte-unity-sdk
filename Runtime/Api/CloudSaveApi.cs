@@ -131,7 +131,7 @@ namespace AccelByte.Api
             RecordSetBy setBy, bool setPublic, ResultCallback callback)
         {
 
-            Dictionary<string, object> requestToSend = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
+            recordRequest = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
             yield return ReplaceUserRecord(@namespace, userId, accessToken, key, recordRequest, callback, false);
         }
 
@@ -238,7 +238,7 @@ namespace AccelByte.Api
         public IEnumerator SaveGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
             RecordSetBy setBy,  ResultCallback callback)
         {
-            Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
+            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
 
             yield return SaveGameRecord(@namespace, accessToken, key, recordRequest, callback);
         }
@@ -295,7 +295,7 @@ namespace AccelByte.Api
         public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
             RecordSetBy setBy, ResultCallback callback)
         {
-            Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
+            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
             yield return ReplaceGameRecord(@namespace, accessToken, key, recordRequest, callback);
         }
 

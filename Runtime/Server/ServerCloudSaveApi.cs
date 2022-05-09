@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -51,18 +52,17 @@ namespace AccelByte.Server
         #region Public Methods
 
         #region Game Record
-        public IEnumerator SaveGameRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest,
+        public IEnumerator SaveGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
           RecordSetBy setBy, ResultCallback callback)
         {
-            Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
+            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
 
-            yield return SaveGameRecord(@namespace, userId, accessToken, key, recordRequest, callback);
+            yield return SaveGameRecord(@namespace, accessToken, key, recordRequest, callback);
         }
 
-        public IEnumerator SaveGameRecord(string @namespace, string userId, string accessToken, string key, Dictionary<string, object> recordRequest, ResultCallback callback)
+        public IEnumerator SaveGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Assert.IsNotNull(@namespace, "Can't save user record! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
             Assert.IsNotNull(accessToken, "Can't save user record! AccessToken parameter is null!");
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
@@ -138,7 +138,7 @@ namespace AccelByte.Server
         public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key, Dictionary<string, object> recordRequest,
             RecordSetBy setBy, ResultCallback callback)
         {
-            Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
+            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
             yield return ReplaceGameRecord(@namespace, accessToken, key, recordRequest, callback);
         }
 
@@ -168,6 +168,40 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
             callback.Try(result);
+        }
+
+        public IEnumerator ReplaceGameRecord(string @namespace, string accessToken, string key, 
+            ConcurrentReplaceRequest data, ResultCallback callback, Action callbackOnConflictedData = null)
+        {
+            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(key, nameof(key) + " cannot be null");
+            Assert.IsNotNull(data, nameof(data) + " cannot be null"); 
+
+            var request = HttpRequestBuilder
+                .CreatePut(this.baseUrl + "/v1/admin/namespaces/{namespace}/concurrent/records/{key}")
+                .WithPathParam("namespace", @namespace)
+                .WithPathParam("key", key)
+                .WithBearerAuth(accessToken)
+                .WithBody(data.ToJsonString())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParse();
+
+            if (result.IsError && result.Error.Code == ErrorCode.GameRecordPreconditionFailed && callbackOnConflictedData != null)
+            {
+                callbackOnConflictedData?.Invoke();
+            }
+            else
+            {
+                callback.Try(result);
+            }
         }
 
         public IEnumerator DeleteGameRecord(string @namespace, string accessToken, string key,

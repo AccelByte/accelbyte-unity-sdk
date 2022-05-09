@@ -3,7 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -64,7 +64,6 @@ namespace AccelByte.Api
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        /// <param name="isPublic">True if you want the record can be accessed by other user. Default is false</param>
         public void SaveUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -180,7 +179,6 @@ namespace AccelByte.Api
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        /// <param name="isPublic">True if you want the record can be accessed by other user. Default is false</param>
         public void ReplaceUserRecord(string key, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
@@ -205,7 +203,7 @@ namespace AccelByte.Api
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         /// <param name="setPublic">Using metadata, True if you want the record can be accessed by other user. Default is false</param>
-        public void ReplaceUserRecord(string key, bool setPublic, Dictionary<string, object> recordRequest, ResultCallback callback, bool isPublic)
+        public void ReplaceUserRecord(string key, bool setPublic, Dictionary<string, object> recordRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");

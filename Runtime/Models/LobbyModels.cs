@@ -6,10 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace AccelByte.Models
 {
     #region General
-    
+
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum MessageType
     {
         unknown,
@@ -371,6 +375,7 @@ namespace AccelByte.Models
         [DataMember] public string ip;
         [DataMember] public int port;
         [DataMember] public Dictionary<string, int> ports;
+        [DataMember] public string customAttribute;
         [DataMember] public string message;
         [DataMember] public string isOK;
     }
@@ -412,11 +417,12 @@ namespace AccelByte.Models
         [DataMember] public string[] subGameModes;
         [DataMember] public bool newSessionOnly;
     }
-    
+
     #endregion
 
     #region Friends
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     [DataContract]
     public enum RelationshipStatusCode
     {
@@ -469,6 +475,7 @@ namespace AccelByte.Models
 
     #region Presence
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum UserStatus
     {
         Offline = 0,
@@ -477,6 +484,7 @@ namespace AccelByte.Models
         Invisible = 3
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum GeneralUserStatus
     {
         offline,
@@ -602,11 +610,13 @@ namespace AccelByte.Models
 
     #region Session Attribute
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum SessionAttributeName
     {
         profanity_filtering_level
     }
 
+    [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ProfanityFilterLevel
     {
         all,

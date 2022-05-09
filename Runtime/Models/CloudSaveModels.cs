@@ -74,8 +74,8 @@ namespace AccelByte.Models
 
     [DataContract]
     public class ConcurrentReplaceRequest
-    {
-        [DataMember] public DateTime updatedAt { get; set; }
+    {        
+        [DataMember] public DateTime updatedAt { get; set; } // Time format should style: RFC3339
         [DataMember] public Dictionary<string, object> value { get; set; }
     }
 
