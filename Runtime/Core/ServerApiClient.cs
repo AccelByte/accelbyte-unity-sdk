@@ -30,7 +30,7 @@ namespace AccelByte.Core
         }
         #endregion /Constructor
 
-
+        private static OAuthConfig serverOAuthConfig => AccelByteServerPlugin.OAuthConfig;
         private static ServerConfig serverConfig => AccelByteServerPlugin.Config;
         
         public object[] getApiArgs() => new object[]
@@ -105,7 +105,7 @@ namespace AccelByte.Core
         internal void environmentChanged()
         {
             session = AccelByteServerPlugin.GetDedicatedServer().Session as ServerOauthLoginSession;
-            httpClient.SetCredentials(serverConfig.ClientId, serverConfig.ClientSecret);
+            httpClient.SetCredentials(serverOAuthConfig.ClientId, serverOAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(serverConfig.BaseUrl));
         }
 

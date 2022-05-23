@@ -17,6 +17,7 @@ namespace AccelByte.Server
     public static class AccelByteServerPlugin
     {
         private static ServerOauthLoginSession session;
+        private static OAuthConfig oAuthConfig;
         private static ServerConfig config;
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
@@ -38,6 +39,15 @@ namespace AccelByte.Server
         private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
+
+        internal static OAuthConfig OAuthConfig
+        {
+            get
+            {
+                CheckPlugin();
+                return oAuthConfig;
+            }
+        }
 
         public static ServerConfig Config
         {
@@ -75,7 +85,14 @@ namespace AccelByte.Server
         private static void Init()
         {
 #endif
-            RetrieveConfigFromJsonFile();
+            string activePlatform = GetServerActivePlatform();
+            RetrieveConfigFromJsonFile(activePlatform);
+            if (oAuthConfig.IsRequiredFieldEmpty())
+            {
+                RetrieveConfigFromJsonFile();
+            }
+            oAuthConfig.CheckRequiredField();
+            oAuthConfig.Expand();
             config.CheckRequiredField();
             config.Expand();
             coroutineRunner = new CoroutineRunner();
@@ -84,9 +101,19 @@ namespace AccelByte.Server
             InitDedicatedServerClient();
         }
 
-        private static void RetrieveConfigFromJsonFile()
+        private static void RetrieveConfigFromJsonFile(string platform = "")
         {
+            var oAuthFile = Resources.Load("AccelByteServerSDKOAuthConfig" + platform);
             var configFile = Resources.Load("AccelByteServerSDKConfig");
+
+            if (oAuthFile == null)
+            {
+                oAuthFile = Resources.Load("AccelByteServerSDKOAuthConfig");
+                if (oAuthFile == null)
+                {
+                    throw new Exception("'AccelByteServerSDKOAuthConfig.json' isn't found in the Project/Assets/Resources directory");
+                }
+            }
 
             if (configFile == null)
             {
@@ -94,19 +121,36 @@ namespace AccelByte.Server
                     "'AccelByteServerSDKConfig.json' isn't found in the Project/Assets/Resources directory");
             }
 
+            string wholeOAuthJsonText = ((TextAsset)oAuthFile).text;
             string wholeJsonText = ((TextAsset)configFile).text;
 
+            MultiOAuthConfigs multiOAuthConfigs = wholeOAuthJsonText.ToObject<MultiOAuthConfigs>();
             MultiServerConfigs multiServerConfigs = wholeJsonText.ToObject<MultiServerConfigs>();
+            if (multiOAuthConfigs == null)
+            {
+                multiOAuthConfigs = new MultiOAuthConfigs();
+            }
+            if (multiServerConfigs == null)
+            {
+                multiServerConfigs = new MultiServerConfigs();
+            }
+            multiOAuthConfigs.Expand();
+            multiServerConfigs.Expand();
+
             switch (activeEnvironment)
             {
                 case SettingsEnvironment.Development:
+                    oAuthConfig = multiOAuthConfigs.Development;
                     config = multiServerConfigs.Development; break;
                 case SettingsEnvironment.Certification:
+                    oAuthConfig = multiOAuthConfigs.Certification;
                     config = multiServerConfigs.Certification; break;
                 case SettingsEnvironment.Production:
+                    oAuthConfig = multiOAuthConfigs.Production;
                     config = multiServerConfigs.Production; break;
                 case SettingsEnvironment.Default:
                 default:
+                    oAuthConfig = multiOAuthConfigs.Default;
                     config = multiServerConfigs.Default; break;
             }
         }
@@ -115,8 +159,8 @@ namespace AccelByte.Server
         {
             session = new ServerOauthLoginSession(
                 config.IamServerUrl,
-                config.ClientId,
-                config.ClientSecret,
+                oAuthConfig.ClientId,
+                oAuthConfig.ClientSecret,
                 httpClient,
                 coroutineRunner);
         }
@@ -464,12 +508,18 @@ namespace AccelByte.Server
         {
             CheckPlugin();
             activeEnvironment = environment;
-            RetrieveConfigFromJsonFile();
+            string activePlatform = GetServerActivePlatform();
+            RetrieveConfigFromJsonFile(activePlatform);
             if (config.IsRequiredFieldEmpty())
             {
                 activeEnvironment = SettingsEnvironment.Default;
+                RetrieveConfigFromJsonFile(activePlatform);
+            }
+            if (oAuthConfig.IsRequiredFieldEmpty())
+            {
                 RetrieveConfigFromJsonFile();
             }
+            oAuthConfig.Expand();
             config.Expand();
             session = null;
             server = null;
@@ -489,6 +539,53 @@ namespace AccelByte.Server
         {
             CheckPlugin();
             environmentChanged = null;
+        }
+
+        internal static string GetServerActivePlatform()
+        {
+            string activePlatform;
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.LinuxPlayer:
+                    if (Resources.Load("AccelByteServerSDKOAuthConfig" + PlatformType.Steam.ToString()) != null)
+                    {
+                        activePlatform = PlatformType.Steam.ToString();
+                    }
+                    else if (Resources.Load("AccelByteServerSDKOAuthConfig" + PlatformType.EpicGames.ToString()) != null)
+                    {
+                        activePlatform = PlatformType.EpicGames.ToString();
+                    }
+                    else
+                    {
+                        activePlatform = "";
+                    }
+                    break;
+                case RuntimePlatform.OSXPlayer:
+                    activePlatform = PlatformType.Apple.ToString(); break;
+                case RuntimePlatform.IPhonePlayer:
+                    activePlatform = PlatformType.iOS.ToString(); break;
+                case RuntimePlatform.Android:
+                    activePlatform = PlatformType.Android.ToString(); break;
+                case RuntimePlatform.PS4:
+                    activePlatform = PlatformType.PS4.ToString(); break;
+#if UNITY_2020_2_OR_NEWER
+                case RuntimePlatform.PS5:
+                    activePlatform = PlatformType.PS5.ToString(); break;
+#endif
+                case RuntimePlatform.XBOX360:
+                case RuntimePlatform.XboxOne:
+                    activePlatform = PlatformType.Live.ToString(); break;
+                case RuntimePlatform.Switch:
+                    activePlatform = PlatformType.Nintendo.ToString(); break;
+#if UNITY_2019_3_OR_NEWER
+                case RuntimePlatform.Stadia:
+                    activePlatform = PlatformType.Stadia.ToString(); break;
+#endif
+                default:
+                    activePlatform = ""; break;
+            }
+            return activePlatform;
         }
     }
 }

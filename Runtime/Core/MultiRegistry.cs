@@ -35,7 +35,11 @@ namespace AccelByte.Core
         
         #region Client
         private static Config config => AccelBytePlugin.Config;
-        
+        private static OAuthConfig oAuthConfig => AccelBytePlugin.OAuthConfig;
+
+        private static OAuthConfig serverOAuthConfig => AccelByteServerPlugin.OAuthConfig;
+        private static ServerConfig serverConfig => AccelByteServerPlugin.Config;
+
         /// <summary>
         /// </summary>
         /// <param name="key"></param>
@@ -72,7 +76,7 @@ namespace AccelByte.Core
             CoroutineRunner coroutineRunner = new CoroutineRunner();
 
             AccelByteHttpClient httpClient = new AccelByteHttpClient();
-            httpClient.SetCredentials( config.ClientId, config.ClientSecret );
+            httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
             httpClient.SetBaseUri( new Uri( config.BaseUrl ) );
 
             LoginSession session;
@@ -152,8 +156,8 @@ namespace AccelByte.Core
             CoroutineRunner coroutineRunner = new CoroutineRunner();
 
             AccelByteHttpClient httpClient = new AccelByteHttpClient();
-            httpClient.SetCredentials( config.ClientId, config.ClientSecret );
-            httpClient.SetBaseUri( new Uri( config.BaseUrl ) );
+            httpClient.SetCredentials( serverOAuthConfig.ClientId, serverOAuthConfig.ClientSecret );
+            httpClient.SetBaseUri( new Uri( serverConfig.BaseUrl ) );
 
             ServerOauthLoginSession session;
 
@@ -164,9 +168,9 @@ namespace AccelByte.Core
             else
             {
                 session = new ServerOauthLoginSession(
-                    config.IamServerUrl,
-                    config.ClientId,
-                    config.ClientSecret,
+                    serverConfig.IamServerUrl,
+                    serverOAuthConfig.ClientId,
+                    serverOAuthConfig.ClientSecret,
                     httpClient,
                     coroutineRunner );
             }

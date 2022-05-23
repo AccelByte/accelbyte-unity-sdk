@@ -40,6 +40,7 @@ namespace AccelByte.Core
         /// <summary>CURRENTLY UNUSED: Added for Unreal parity</summary>
         public bool UseSharedCredentials;
         
+        private static OAuthConfig oAuthConfig => AccelBytePlugin.OAuthConfig;
         private static Config config => AccelBytePlugin.Config;
         
         public object[] getApiArgs() => new object[]
@@ -133,7 +134,7 @@ namespace AccelByte.Core
         internal void environmentChanged()
         {
             session = AccelBytePlugin.GetUser().Session as LoginSession;
-            httpClient.SetCredentials(config.ClientId, config.ClientSecret);
+            httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(config.BaseUrl));
         }
 

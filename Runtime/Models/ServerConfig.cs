@@ -19,8 +19,6 @@ namespace AccelByte.Models {
         [DataMember] public string AchievementServerUrl { get; set; }
         [DataMember] public string LobbyServerUrl { get; set; }
         [DataMember] public string CloudSaveServerUrl { get; set; }
-        [DataMember] public string ClientId { get; set; }
-        [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string MatchmakingServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
@@ -106,16 +104,12 @@ namespace AccelByte.Models {
         {
             if (string.IsNullOrEmpty(this.Namespace)) throw new System.Exception("Init AccelByte SDK failed, Server Namespace must not null or empty.");
 
-            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Server Client ID must not null or empty.");
-
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server Base URL must not null or empty.");
         }
 
         public bool IsRequiredFieldEmpty()
         {
             if (string.IsNullOrEmpty(this.Namespace)) return true;
-
-            if (string.IsNullOrEmpty(this.ClientId)) return true;
 
             if (string.IsNullOrEmpty(this.BaseUrl)) return true;
 
@@ -146,5 +140,29 @@ namespace AccelByte.Models {
         [DataMember] public ServerConfig Certification { get; set; }
         [DataMember] public ServerConfig Production { get; set; }
         [DataMember] public ServerConfig Default { get; set; }
+
+        public void Expand()
+        {
+            if (Development == null)
+            {
+                Development = new ServerConfig();
+                Development.Expand();
+            }
+            if (Certification == null)
+            {
+                Certification = new ServerConfig();
+                Certification.Expand();
+            }
+            if (Production == null)
+            {
+                Production = new ServerConfig();
+                Production.Expand();
+            }
+            if (Default == null)
+            {
+                Default = new ServerConfig();
+                Default.Expand();
+            }
+        }
     }
 }

@@ -35,8 +35,6 @@ namespace AccelByte.Models
         [DataMember] public string UGCServerUrl { get; set; }
         [DataMember] public string ReportingServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
-        [DataMember] public string ClientId { get; set; }
-        [DataMember] public string ClientSecret { get; set; }
         [DataMember] public string GroupServerUrl { get; set; }
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string AppId { get; set; }
@@ -73,8 +71,6 @@ namespace AccelByte.Models
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
                    this.UGCServerUrl == anotherConfig.UGCServerUrl &&
                    this.SeasonPassServerUrl == anotherConfig.SeasonPassServerUrl &&
-                   this.ClientId == anotherConfig.ClientId &&
-                   this.ClientSecret == anotherConfig.ClientSecret &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace;
@@ -94,12 +90,6 @@ namespace AccelByte.Models
 
                 string httpsBaseUrl = "https://" + baseUrl;
                 string wssBaseUrl = "wss://" + baseUrl;
-
-                if (this.ClientSecret == null)
-                {
-                    this.ClientSecret = "";
-                }
-
 
                 this.IamServerUrl = GetDefaultApiUrl(this.IamServerUrl, "/iam");
 
@@ -196,8 +186,6 @@ namespace AccelByte.Models
         {
             if (string.IsNullOrEmpty(this.Namespace)) throw new System.Exception("Init AccelByte SDK failed, Namespace must not null or empty.");
 
-            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
-
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
 
             if (string.IsNullOrEmpty(this.RedirectUri)) throw new System.Exception("Init AccelByte SDK failed, Redirect URI must not null or empty.");
@@ -206,8 +194,6 @@ namespace AccelByte.Models
         public bool IsRequiredFieldEmpty()
         {
             if (string.IsNullOrEmpty(this.Namespace)) return true;
-
-            if (string.IsNullOrEmpty(this.ClientId)) return true;
 
             if (string.IsNullOrEmpty(this.BaseUrl)) return true;
 
@@ -234,11 +220,113 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class OAuthConfig
+    {
+        [DataMember] public string ClientId { get; set; }
+        [DataMember] public string ClientSecret { get; set; }
+
+        /// <summary>
+        ///  Copy member values
+        /// </summary>
+        public OAuthConfig ShallowCopy()
+        {
+            return (OAuthConfig)MemberwiseClone();
+        }
+
+        public bool Compare(OAuthConfig anotherConfig)
+        {
+            return this.ClientId == anotherConfig.ClientId &&
+                   this.ClientSecret == anotherConfig.ClientSecret;
+        }
+
+        /// <summary>
+        ///  Assign missing config values.
+        /// </summary>
+        public void Expand()
+        {
+            if (this.ClientSecret == null)
+            {
+                this.ClientSecret = "";
+            }
+        }
+
+        /// <summary>
+        /// Check required config field.
+        /// </summary>
+        public void CheckRequiredField()
+        {
+            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
+        }
+
+        public bool IsRequiredFieldEmpty()
+        {
+            return (string.IsNullOrEmpty(this.ClientId));
+        }
+    }
+
+    [DataContract]
     public class MultiConfigs
     {
         [DataMember] public Config Development { get; set; }
         [DataMember] public Config Certification { get; set; }
         [DataMember] public Config Production { get; set; }
         [DataMember] public Config Default { get; set; }
+
+        public void Expand()
+        {
+            if(Development == null)
+            {
+                Development = new Config();
+                Development.Expand();
+            }
+            if (Certification == null)
+            {
+                Certification = new Config();
+                Certification.Expand();
+            }
+            if (Production == null)
+            {
+                Production = new Config();
+                Production.Expand();
+            }
+            if (Default == null)
+            {
+                Default = new Config();
+                Default.Expand();
+            }
+        }
+    }
+
+    [DataContract]
+    public class MultiOAuthConfigs
+    {
+        [DataMember] public OAuthConfig Development { get; set; }
+        [DataMember] public OAuthConfig Certification { get; set; }
+        [DataMember] public OAuthConfig Production { get; set; }
+        [DataMember] public OAuthConfig Default { get; set; }
+
+        public void Expand()
+        {
+            if (Development == null)
+            {
+                Development = new OAuthConfig();
+                Development.Expand();
+            }
+            if (Certification == null)
+            {
+                Certification = new OAuthConfig();
+                Certification.Expand();
+            }
+            if (Production == null)
+            {
+                Production = new OAuthConfig();
+                Production.Expand();
+            }
+            if (Default == null)
+            {
+                Default = new OAuthConfig();
+                Default.Expand();
+            }
+        }
     }
 }

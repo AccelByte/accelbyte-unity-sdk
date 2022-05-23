@@ -7,6 +7,7 @@ using AccelByte.Models;
 
 namespace AccelByte.Api
 {
+    using System.Collections.Generic;
     using UnityEditor;
     using UnityEngine;
 
@@ -15,8 +16,11 @@ namespace AccelByte.Api
         private static AccelBytePlatformSettingsEditor _instance;
         public static AccelBytePlatformSettingsEditor Instance { get { return _instance; } }
         public Texture2D AccelByteLogo;
+        public OAuthConfig TemporaryOAuth;
         public Config TemporarySetting;
         public int TemporaryEnvironmentSetting;
+        public int TemporaryPlatformSetting;
+        public List<string> platformList;
         public Rect LogoRect;
         public LogType SelectedLogFilter;
 
@@ -36,10 +40,25 @@ namespace AccelByte.Api
 
         public void Initialize()
         {
+            Debug.LogWarning(Application.platform.ToString());
             titleContent = new GUIContent("AccelByte Configuration");
             AccelByteLogo = Resources.Load<Texture2D>("ab-logo");
+            this.TemporaryOAuth = AccelByteSettings.Instance.CopyOAuthConfig();
             this.TemporarySetting = AccelByteSettings.Instance.CopyConfig();
             this.TemporaryEnvironmentSetting = (int)AccelByteSettings.Instance.GetEditedEnvironment();
+            platformList = new List<string>();
+            platformList.Add(PlatformType.Steam.ToString());
+            platformList.Add(PlatformType.EpicGames.ToString());
+            platformList.Add(PlatformType.Apple.ToString());
+            platformList.Add(PlatformType.iOS.ToString());
+            platformList.Add(PlatformType.Android.ToString());
+            platformList.Add(PlatformType.PS4.ToString());
+            platformList.Add(PlatformType.PS5.ToString());
+            platformList.Add(PlatformType.Live.ToString());
+            platformList.Add(PlatformType.Nintendo.ToString());
+            platformList.Add(PlatformType.Stadia.ToString());
+            platformList.Add("Default");
+            this.TemporaryPlatformSetting = platformList.Count - 1;
             LogoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
             if( !Enum.TryParse( this.TemporarySetting.DebugLogFilter, out SelectedLogFilter ) )
             {
@@ -67,7 +86,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            if (AccelByteSettings.Instance.CompareConfig(TemporarySetting))
+            if (AccelByteSettings.Instance.CompareOAuthConfig(TemporaryOAuth) && AccelByteSettings.Instance.CompareConfig(TemporarySetting))
             {
                 EditorGUILayout.HelpBox("All configs has been saved!", MessageType.Info, true);
             }
@@ -79,13 +98,47 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Environment");
             EditorGUI.BeginChangeCheck();
-            TemporaryEnvironmentSetting = EditorGUILayout.Popup(TemporaryEnvironmentSetting, new string[]{ "Development", "Certification", "Production", "Default"});
+            TemporaryEnvironmentSetting = EditorGUILayout.Popup(TemporaryEnvironmentSetting, new string[] { "Development", "Certification", "Production", "Default" });
             if (EditorGUI.EndChangeCheck())
             {
                 AccelByteSettings.Instance.SetEditedEnvironment((SettingsEnvironment)TemporaryEnvironmentSetting);
+                TemporaryOAuth = AccelByteSettings.Instance.CopyOAuthConfig();
                 TemporarySetting = AccelByteSettings.Instance.CopyConfig();
             }
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Separator();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Platform");
+            
+            EditorGUI.BeginChangeCheck();
+            TemporaryPlatformSetting = EditorGUILayout.Popup(TemporaryPlatformSetting, platformList.ToArray());
+            if (EditorGUI.EndChangeCheck())
+            {
+                if(platformList[TemporaryPlatformSetting] == "Default")
+                {
+                    AccelByteSettings.Instance.SetEditedPlatform();
+                }
+                else
+                {
+                    AccelByteSettings.Instance.SetEditedPlatform(platformList[TemporaryPlatformSetting]);
+                }
+                TemporaryOAuth = AccelByteSettings.Instance.CopyOAuthConfig();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Client Id");
+            TemporaryOAuth.ClientId = EditorGUILayout.TextField(TemporaryOAuth.ClientId);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Client Secret");
+            TemporaryOAuth.ClientSecret = EditorGUILayout.PasswordField(TemporaryOAuth.ClientSecret);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Separator();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Namespace");
@@ -189,16 +242,6 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Client Id");
-            TemporarySetting.ClientId = EditorGUILayout.TextField(TemporarySetting.ClientId);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Client Secret");
-            TemporarySetting.ClientSecret = EditorGUILayout.PasswordField(TemporarySetting.ClientSecret);
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Redirect Uri");
             TemporarySetting.RedirectUri = EditorGUILayout.TextField(TemporarySetting.RedirectUri);
             EditorGUILayout.EndHorizontal();
@@ -211,7 +254,8 @@ namespace AccelByte.Api
             EditorGUILayout.Space();
 
             if (GUILayout.Button("Save"))
-            {                
+            {
+                AccelByteSettings.Instance.UpdateOAuthConfig(TemporaryOAuth.ShallowCopy());
                 AccelByteSettings.Instance.UpdateConfig(TemporarySetting.ShallowCopy());            
                 AccelByteSettings.Instance.Save();
             }

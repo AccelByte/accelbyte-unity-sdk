@@ -12,13 +12,13 @@ namespace AccelByte.Core
     {
         public IUserSession Session => this.session;
 
-        public GameClient(Config config, IHttpClient httpClient)
+        public GameClient(OAuthConfig oAuthConfig, Config config, IHttpClient httpClient)
         {
             this.coroutineRunner = new CoroutineRunner();
 
             this.httpClient = httpClient;
             this.httpClient.SetBaseUri(new Uri(config.BaseUrl));
-            this.httpClient.SetCredentials(config.ClientId, config.ClientSecret);
+            this.httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
 
             this.session = new LoginSession(
                 config.BaseUrl,
