@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,65 +10,61 @@ using UnityEngine.Networking;
 
 namespace AccelByte.Api
 {
-    internal class AgreementApi
+    internal class AgreementApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
-
-        internal AgreementApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==AgreementServerUrl</param>
+        /// <param name="session"></param>
+        internal AgreementApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.AgreementServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods 
-
-        public IEnumerator GetLegalPolicies(string namespace_, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
-            ResultCallback<PublicPolicy[]> callback)
+        public IEnumerator GetLegalPolicies( AgreementPolicyType agreementPolicyType
+            , string[] tags
+            , bool defaultOnEmpty
+            , ResultCallback<PublicPolicy[]> callback )
         {
             string functionName = "GetLegalPolicies";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(namespace_, "Can't " + functionName + "! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't " + functionName + "! AccessToken parameter is null!");
+            Assert.IsNotNull(Namespace_, "Can't " + functionName + "! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(baseUrl + "/public/policies/namespaces/{namespace}")
-                .WithPathParam("namespace", namespace_)
+                .CreateGet(BaseUrl + "/public/policies/namespaces/{namespace}")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
                 .WithQueryParam("tags", string.Join(",",tags))
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PublicPolicy[]>();
             callback.Try(result);
         }
 
-        public IEnumerator GetLegalPoliciesByCountry(string countryCode, AgreementPolicyType agreementPolicyType, string[] tags, bool defaultOnEmpty, string accessToken, 
-            ResultCallback<PublicPolicy[]> callback)
+        public IEnumerator GetLegalPoliciesByCountry(string countryCode
+            , AgreementPolicyType agreementPolicyType
+            , string[] tags
+            , bool defaultOnEmpty
+            , ResultCallback<PublicPolicy[]> callback )
         {
             string functionName = "GetLegalPoliciesByCountry";
             Report.GetFunctionLog(GetType().Name, functionName);
             Assert.IsNotNull(countryCode, "Can't " + functionName + "! CountryCode parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(baseUrl + "/public/policies/countries/{countryCode}")
+                .CreateGet(BaseUrl + "/public/policies/countries/{countryCode}")
                 .WithPathParam("countryCode", countryCode)
                 .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
                 .WithQueryParam("tags", string.Join(",", tags))
@@ -78,22 +74,23 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PublicPolicy[]>();
             callback.Try(result);
         }
 
-        public IEnumerator BulkAcceptPolicyVersions(string accessToken, AcceptAgreementRequest[] acceptAgreementRequests, 
-            ResultCallback<AcceptAgreementResponse> callback)
+        public IEnumerator BulkAcceptPolicyVersions( AcceptAgreementRequest[] acceptAgreementRequests
+            , ResultCallback<AcceptAgreementResponse> callback )
         {
             string functionName = "BulkAcceptPolicyVersions";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(accessToken, "Can't " + functionName + "! AccessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(baseUrl + "/public/agreements/policies")
-                .WithBearerAuth(accessToken)
+                .CreatePost(BaseUrl + "/public/agreements/policies")
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(acceptAgreementRequests.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -101,59 +98,63 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<AcceptAgreementResponse>();
             callback.Try(result);
         }
 
-        public IEnumerator AcceptPolicyVersion(string accessToken, string localizedPolicyVersionId, 
-            ResultCallback callback)
+        public IEnumerator AcceptPolicyVersion( string localizedPolicyVersionId
+            , ResultCallback callback )
         {
             string functionName = "AcceptPolicyVersion";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(accessToken, "Can't " + functionName + "! AccessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(baseUrl + "/public/agreements/localized-policy-versions/{localizedPolicyVersionId}")
+                .CreatePost(BaseUrl + "/public/agreements/localized-policy-versions/{localizedPolicyVersionId}")
                 .WithPathParam("localizedPolicyVersionId", localizedPolicyVersionId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
         }
 
-        public IEnumerator QueryLegalEligibilities(string namespace_, string accessToken, ResultCallback<RetrieveUserEligibilitiesResponse[]> callback)
+        public IEnumerator QueryLegalEligibilities( ResultCallback<RetrieveUserEligibilitiesResponse[]> callback )
         {
             string functionName = "CheckLegalEligibilities";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(namespace_, "Can't " + functionName + "! namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't " + functionName + "! accessToken parameter is null!");
+            Assert.IsNotNull(Namespace_, "Can't " + functionName + "! namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(baseUrl + "/public/eligibilities/namespaces/{namespace}")
-                .WithPathParam("namespace", namespace_)
-                .WithBearerAuth(accessToken)
+                .CreateGet(BaseUrl + "/public/eligibilities/namespaces/{namespace}")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<RetrieveUserEligibilitiesResponse[]>();
             callback.Try(result);
         }
 
-        public IEnumerator GetLegalDocument(string url, ResultCallback<string> callback)
+        public IEnumerator GetLegalDocument( string url
+            , ResultCallback<string> callback )
         {
             string functionName = "GetLegalDocument";
             Report.GetFunctionLog(GetType().Name, functionName);
@@ -172,6 +173,5 @@ namespace AccelByte.Api
             callback(result);
         }
 
-        #endregion
     }
 }

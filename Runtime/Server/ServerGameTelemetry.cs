@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -16,10 +16,10 @@ namespace AccelByte.Server
     /// <summary>
     /// Send telemetry data securely and the server should be logged in.
     /// </summary>
-    public class ServerGameTelemetry
+    public class ServerGameTelemetry : WrapperBase
     {
         private readonly ServerGameTelemetryApi api;
-        private readonly IServerSession session;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
         private TimeSpan telemetryInterval = TimeSpan.FromMinutes(1);
@@ -29,15 +29,16 @@ namespace AccelByte.Server
         private bool isTelemetryJobStarted = false;
         private static readonly TimeSpan MINIMUM_INTERVAL_TELEMETRY = new TimeSpan(0, 0, 5);
 
-        internal ServerGameTelemetry(ServerGameTelemetryApi api, IServerSession session, CoroutineRunner coroutineRunner)
+        internal ServerGameTelemetry( ServerGameTelemetryApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null");
+            Assert.IsNotNull(inApi, "inApi parameter can not be null.");
+            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner parameter can not be null");
 
-            this.api = api;
-            this.session = session;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace AccelByte.Server
         /// Should not be less than 5 seconds.
         /// </summary>
         /// <param name="interval">The interval between telemetry event.</param>
-        public void SetBatchFrequency(TimeSpan interval)
+        public void SetBatchFrequency( TimeSpan interval )
         {
             if (interval >= MINIMUM_INTERVAL_TELEMETRY)
             {
@@ -63,7 +64,7 @@ namespace AccelByte.Server
         /// Set list of event that need to be sent immediately without the needs to jobQueue it.
         /// </summary>
         /// <param name="eventList">String list of payload EventName.</param>
-        public void SetImmediateEventList(List<string> eventList)
+        public void SetImmediateEventList( List<string> eventList )
         {
             immediateEvents = new HashSet<string>(eventList);
         }
@@ -74,16 +75,17 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="telemetryBody">Telemetry request with arbitrary payload. </param>
         /// <param name="callback">Returns boolean status via callback when completed. </param>
-        public void Send(TelemetryBody telemetryBody, ResultCallback callback)
+        public void Send( TelemetryBody telemetryBody
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
             if (immediateEvents.Contains(telemetryBody.EventName))
             {
-                this.coroutineRunner.Run(
-                    this.api.SendProtectedEvents(
+                coroutineRunner.Run(
+                    api.SendProtectedEvents(
                         new List<TelemetryBody> {telemetryBody}, 
-                        this.session.AuthorizationToken, 
+                        session.AuthorizationToken, 
                         callback));
             }
             else
@@ -102,7 +104,7 @@ namespace AccelByte.Server
             {
                 if (!jobQueue.IsEmpty)
                 {
-                    Report.GetFunctionLog(this.GetType().Name);
+                    Report.GetFunctionLog(GetType().Name);
 
                     List<TelemetryBody> telemetryBodies = new List<TelemetryBody>(); 
                     List<ResultCallback> telemetryCallbacks = new List<ResultCallback>();
@@ -115,7 +117,7 @@ namespace AccelByte.Server
                         }
                     }
 
-                    yield return this.api.SendProtectedEvents(telemetryBodies, this.session.AuthorizationToken, result =>
+                    yield return api.SendProtectedEvents(telemetryBodies, session.AuthorizationToken, result =>
                     {
                         foreach (var callback in telemetryCallbacks)
                         {

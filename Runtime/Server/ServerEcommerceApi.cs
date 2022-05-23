@@ -1,65 +1,69 @@
-// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
+using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    internal class ServerEcommerceApi
+    internal class ServerEcommerceApi : ServerApiBase
     {
-        private string baseUrl;
-        private IHttpClient httpClient;
-
-        internal ServerEcommerceApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==PlatformServerUrl</param>
+        /// <param name="session"></param>
+        internal ServerEcommerceApi( IHttpClient httpClient
+            , ServerConfig config
+            , ISession session ) 
+            : base( httpClient, config, config.PlatformServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        public IEnumerator GetUserEntitlementById(string @namespace, string accessToken, string entitlementId,
-            ResultCallback<EntitlementInfo> callback)
+        public IEnumerator GetUserEntitlementById( string entitlementId
+            , ResultCallback<EntitlementInfo> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(entitlementId, nameof(entitlementId) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/admin/namespaces/{namespace}/entitlements/{entitlementId}")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/admin/namespaces/{namespace}/entitlements/{entitlementId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("entitlementId", entitlementId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<EntitlementInfo>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GrantUserEntitlement(string @namespace, string userId, string accessToken,
-            GrantUserEntitlementRequest[] grantUserEntitlementsRequest, ResultCallback<StackableEntitlementInfo[]> callback)
+        public IEnumerator GrantUserEntitlement( string userId
+            , GrantUserEntitlementRequest[] grantUserEntitlementsRequest
+            , ResultCallback<StackableEntitlementInfo[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(grantUserEntitlementsRequest, nameof(grantUserEntitlementsRequest) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/admin/namespaces/{namespace}/users/{userId}/entitlements")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/admin/namespaces/{namespace}/users/{userId}/entitlements")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(grantUserEntitlementsRequest.ToUtf8Json())
@@ -67,29 +71,31 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StackableEntitlementInfo[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator CreditUserWallet(string @namespace, string userId, string accessToken, string currencyCode,
-            CreditUserWalletRequest creditUserWalletRequest, ResultCallback<WalletInfo> callback)
+        public IEnumerator CreditUserWallet( string userId
+            , string currencyCode
+            , CreditUserWalletRequest creditUserWalletRequest
+            , ResultCallback<WalletInfo> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(currencyCode, nameof(currencyCode) + " cannot be null");
             Assert.IsNotNull(creditUserWalletRequest, nameof(creditUserWalletRequest) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/admin/namespaces/{namespace}/users/{userId}/wallets/{currencyCode}/credit")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/admin/namespaces/{namespace}/users/{userId}/wallets/{currencyCode}/credit")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("currencyCode", currencyCode)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(creditUserWalletRequest.ToUtf8Json())
@@ -97,26 +103,28 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<WalletInfo>();
 
             callback.Try(result);
         }
 
-        public IEnumerator FulfillUserItem(string @namespace, string userId,string accessToken,
-            FulfillmentRequest fulfillmentRequest,ResultCallback<FulfillmentResult> callback)
+        public IEnumerator FulfillUserItem( string userId
+            , FulfillmentRequest fulfillmentRequest
+            , ResultCallback<FulfillmentResult> callback )
         {
-            Assert.IsNotNull(@namespace, $"{nameof(@namespace)} cannot be null");
+            Assert.IsNotNull(Namespace_, $"{nameof(Namespace_)} cannot be null");
             Assert.IsNotNull(userId, $"{nameof(userId)} cannot be null");
-            Assert.IsNotNull(accessToken, $"{nameof(accessToken)} cannot be null");
+            Assert.IsNotNull(AuthToken, $"{nameof(AuthToken)} cannot be null");
             Assert.IsNotNull(fulfillmentRequest, $"{nameof(fulfillmentRequest)} cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/admin/namespaces/{namespace}/users/{userId}/fulfillment")
-                .WithPathParam("namespace",@namespace)
+                .CreatePost(BaseUrl + "/admin/namespaces/{namespace}/users/{userId}/fulfillment")
+                .WithPathParam("namespace",Namespace_)
                 .WithPathParam("userId",userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(fulfillmentRequest.ToUtf8Json())
@@ -124,7 +132,8 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<FulfillmentResult>();
 

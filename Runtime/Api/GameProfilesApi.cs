@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,245 +10,253 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class GameProfilesApi
+    public class GameProfilesApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-        #endregion
-
-        #region Constructor
-
-        internal GameProfilesApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==GameProfileServerUrl</param>
+        /// <param name="session"></param>
+        internal GameProfilesApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.GameProfileServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator BatchGetGameProfiles(string @namespace, ICollection<string> userIds, string accessToken,
-            ResultCallback<UserGameProfiles[]> callback)
+        public IEnumerator BatchGetGameProfiles( ICollection<string> userIds
+            , ResultCallback<UserGameProfiles[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get all game profiles! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get all game profiles! namespace parameter is null!");
             Assert.IsNotNull(userIds, "Can't get all game profiles! userIds parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't all game profiles! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't all game profiles! accessToken parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/profiles")
-                .WithPathParam("namespace", @namespace)
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/profiles")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("userIds", userIds)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<UserGameProfiles[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetAllGameProfiles(string @namespace, string userId, string accessToken,
-            ResultCallback<GameProfile[]> callback)
+        public IEnumerator GetAllGameProfiles( string userId
+            , ResultCallback<GameProfile[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get all game profiles! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get all game profiles! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get all game profiles! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't all game profiles! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't all game profiles! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfile[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator CreateGameProfile(string @namespace, string userId, string accessToken,
-            GameProfileRequest gameProfile, ResultCallback<GameProfile> callback)
+        public IEnumerator CreateGameProfile( string userId
+            , GameProfileRequest gameProfile
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't create a game profile! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't create a game profile! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't create a game profile! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't create a game profile! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't create a game profile! accessToken parameter is null!");
             Assert.IsNotNull(gameProfile, "Can't create a game profile! gameProfile parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .Accepts(MediaType.ApplicationJson)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(gameProfile.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfile>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetGameProfile(string @namespace, string userId, string accessToken, string profileId,
-            ResultCallback<GameProfile> callback)
+        public IEnumerator GetGameProfile( string userId
+            , string profileId
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get a game profile! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get a game profile! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get a game profile! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get a game profile! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get a game profile! accessToken parameter is null!");
             Assert.IsNotNull(profileId, "Can't get a game profile! profileId parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("profileId", profileId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfile>();
 
             callback.Try(result);
         }
 
-        public IEnumerator UpdateGameProfile(string @namespace, string userId, string accessToken, string profileId,
-            GameProfileRequest gameProfile, ResultCallback<GameProfile> callback)
+        public IEnumerator UpdateGameProfile( string userId
+            , string profileId
+            , GameProfileRequest gameProfile
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't update a game profile! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't update a game profile! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update a game profile! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't update a game profile! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't update a game profile! accessToken parameter is null!");
             Assert.IsNotNull(gameProfile, "Can't update a game profile! gameProfile parameter is null!");
             Assert.IsNotNull(profileId, "Can't update a game profile! gameProfile.profileId is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("profileId", profileId)
                 .Accepts(MediaType.ApplicationJson)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(gameProfile.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfile>();
 
             callback.Try(result);
         }
 
-        public IEnumerator DeleteGameProfile(string @namespace, string userId, string accessToken, string profileId,
-            ResultCallback callback)
+        public IEnumerator DeleteGameProfile( string userId
+            , string profileId
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't delete a game profile! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't delete a game profile! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't delete a game profile! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't delete a game profile! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't delete a game profile! accessToken parameter is null!");
             Assert.IsNotNull(profileId, "Can't delete a game profile! fileSection parameter is null!");
 
 
             var request = HttpRequestBuilder
-                .CreateDelete(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
-                .WithPathParam("namespace", @namespace)
+                .CreateDelete(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("profileId", profileId)
                 .Accepts(MediaType.ApplicationJson)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetGameProfileAtrribute(string @namespace, string userId, string accessToken,
-            string profileId, string attributeName, ResultCallback<GameProfileAttribute> callback)
+        public IEnumerator GetGameProfileAtrribute( string userId
+            , string profileId
+            , string attributeName
+            , ResultCallback<GameProfileAttribute> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get a game profile attribute! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get a game profile attribute! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get a game profile attribute! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get a game profile attribute! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get a game profile attribute! accessToken parameter is null!");
             Assert.IsNotNull(profileId, "Can't get a game profile attribute! profileId parameter is null!");
             Assert.IsNotNull(attributeName, "Can't get a game profile attribute! attributeName parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreateGet(
-                    this.baseUrl +
+                    BaseUrl +
                     "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/attributes/{attributeName}")
-                .WithPathParam("namespace", @namespace)
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("profileId", profileId)
                 .WithPathParam("attributeName", attributeName)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfileAttribute>();
 
             callback.Try(result);
         }
 
-        public IEnumerator UpdateGameProfileAtrribute(string @namespace, string userId, string accessToken,
-            string profileId, GameProfileAttribute attribute, ResultCallback<GameProfile> callback)
+        public IEnumerator UpdateGameProfileAtrribute( string userId
+            , string profileId
+            , GameProfileAttribute attribute
+            ,  ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't update a game profile attribute! namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't update a game profile attribute! namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update a game profile attribute! userId parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't update a game profile attribute! accessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't update a game profile attribute! accessToken parameter is null!");
             Assert.IsNotNull(profileId, "Can't update a game profile attribute! profileId parameter is null!");
             Assert.IsNotNull(attribute, "Can't update a game profile attribute! attribute parameter is null!");
             Assert.IsNotNull(attribute.name, "Can't update a game profile attribute! attribute.name is null!");
 
             var request = HttpRequestBuilder
                 .CreatePut(
-                    this.baseUrl +
+                    BaseUrl +
                     "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}/attributes/{attributeName}")
-                .WithPathParam("namespace", @namespace)
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("profileId", profileId)
                 .WithPathParam("attributeName", attribute.name)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(attribute.ToUtf8Json())
@@ -256,13 +264,12 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<GameProfile>();
 
             callback.Try(result);
         }
-
-        #endregion
     }
 }

@@ -16,6 +16,7 @@ namespace AccelByte.Api
         public static AccelBytePlatformSettingsEditor Instance { get { return _instance; } }
         public Texture2D AccelByteLogo;
         public Config TemporarySetting;
+        public int TemporaryEnvironmentSetting;
         public Rect LogoRect;
         public LogType SelectedLogFilter;
 
@@ -38,6 +39,7 @@ namespace AccelByte.Api
             titleContent = new GUIContent("AccelByte Configuration");
             AccelByteLogo = Resources.Load<Texture2D>("ab-logo");
             this.TemporarySetting = AccelByteSettings.Instance.CopyConfig();
+            this.TemporaryEnvironmentSetting = (int)AccelByteSettings.Instance.GetEditedEnvironment();
             LogoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
             if( !Enum.TryParse( this.TemporarySetting.DebugLogFilter, out SelectedLogFilter ) )
             {
@@ -73,6 +75,17 @@ namespace AccelByte.Api
             {
                 EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
             }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Environment");
+            EditorGUI.BeginChangeCheck();
+            TemporaryEnvironmentSetting = EditorGUILayout.Popup(TemporaryEnvironmentSetting, new string[]{ "Development", "Certification", "Production", "Default"});
+            if (EditorGUI.EndChangeCheck())
+            {
+                AccelByteSettings.Instance.SetEditedEnvironment((SettingsEnvironment)TemporaryEnvironmentSetting);
+                TemporarySetting = AccelByteSettings.Instance.CopyConfig();
+            }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Namespace");

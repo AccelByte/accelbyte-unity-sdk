@@ -12,10 +12,17 @@ using UnityEngine.Assertions;
 namespace AccelByte.Api
 {
     /// <summary>
-    /// User class provides convenient interaction to user authentication and account management service (AccelByte IAM).
-    /// This user class will manage user credentials to be used to access other services, including refreshing its token
+    /// User class provides convenient interaction to user authentication
+    /// and account management service (AccelByte IAM). This user class
+    /// will manage user credentials to be used to access other services,
+    /// including refreshing its token.
+    /// 
+    /// <remarks>
+    /// This is essentially a gateway to the "User" API; not to be confused
+    /// with LoginSession:ISession (which contains UserId, AuthorizationToken, etc). 
+    /// </remarks> 
     /// </summary>
-    public class User
+    public class User : WrapperBase
     {
         //Constants
         private const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
@@ -23,46 +30,79 @@ namespace AccelByte.Api
 
         //Readonly members
         private readonly LoginSession loginSession;
-        private readonly UserAccount userAccount;
+        private readonly UserApi api;
         private readonly CoroutineRunner coroutineRunner;
 
-        public ISession Session => this.loginSession;
+        public IUserSession Session { get { return loginSession; } }
 
         private UserData userDataCache;
 
         public bool TwoFAEnable { get; private set; } = false;
 
-        internal User(LoginSession loginSession, UserAccount userAccount, CoroutineRunner coroutineRunner)
+        /// <summary>
+        /// </summary>
+        /// <param name="inLoginSession">
+        /// LoginSession; not ISession (unlike similar modules like this)
+        /// </param>
+        /// <param name="inApi"></param>
+        /// <param name="inCoroutineRunner"></param>
+        internal User( UserApi inApi
+            , LoginSession inLoginSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            this.loginSession = loginSession;
-            this.userAccount = userAccount;
-            this.coroutineRunner = coroutineRunner;
+            loginSession = inLoginSession;
+            api = inApi;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inLoginSession">
+        /// LoginSession; not ISession (unlike similar modules like this)
+        /// </param>
+        /// <param name="inApi"></param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("For pattern parity, to conform with other classes, use the overload that starts with api param")]
+        internal User( LoginSession inLoginSession
+            , UserApi inApi
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inLoginSession, inCoroutineRunner )
+        {
+            // Curry this obsolete data to the new overload ->
         }
 
         /// <summary>
-        /// Login to AccelByte account with username (e.g. email) and password
+        /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
         /// <param name="username">Could be email or phone (right now, only email supported)</param>
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        public void LoginWithUsername(string username, string password, ResultCallback callback, bool rememberMe = false)
+        public void LoginWithUsername( string username
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback, rememberMe));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithUserNameAsync(
+                username, password, callback, rememberMe));
         }
-
+        
         /// <summary>
-        /// Login to AccelByte account with username (e.g. email) and password
+        /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
         /// <param name="username">Could be email or phone (right now, only email supported)</param>
         /// <param name="password">Password to login</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        public void LoginWithUsername(string username, string password, ResultCallback<TokenData, OAuthError> callback, bool rememberMe = false)
+        public void LoginWithUsername( string username
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithUserNameAsync(username, password, callback, rememberMe));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithUserNameAsync(
+                username, password, callback, rememberMe));
         }
 
         /// <summary>
@@ -72,31 +112,48 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        public void LoginWithUsernameV3(string username, string password, ResultCallback callback, bool rememberMe = false)
+        [Obsolete("Instead, use LoginWithUsername()")]
+        public void LoginWithUsernameV3( string username
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithUserNameAsyncV3(username, password, callback, rememberMe));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithUserNameAsyncV3(
+                username, password, callback, rememberMe));
         }
-
+        
         /// <summary>
         /// Login to AccelByte account with username (or email) and password using V3 endpoint
         /// </summary>
         /// <param name="username">Could be username or email</param>
         /// <param name="password">Password to login</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        public void LoginWithUsernameV3(string username, string password, ResultCallback<TokenData, OAuthError> callback, bool rememberMe = false)
+        [Obsolete("Instead, use LoginWithUsername()")]
+        public void LoginWithUsernameV3( string username
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithUserNameAsyncV3(username, password, callback, rememberMe));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithUserNameAsyncV3(
+                username, password, callback, rememberMe));
         }
-
-        private IEnumerator LoginAsync(Func<ResultCallback, IEnumerator> loginMethod, ResultCallback callback)
+        
+        /// <summary>
+        /// TODO: Is this deprecated, in favor of the extended callback variant?
+        /// </summary>
+        /// <param name="loginMethod"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IEnumerator LoginAsync( Func<ResultCallback, IEnumerator> loginMethod
+            ,  ResultCallback callback )
         {
-            if (this.loginSession.IsValid())
+            if (loginSession.IsValid())
             {
-                callback.TryError(ErrorCode.InvalidRequest, "User is already logged in.");
-
+                callback.TryError(ErrorCode.InvalidRequest, 
+                    "User is already logged in.");
                 yield break;
             }
 
@@ -107,24 +164,24 @@ namespace AccelByte.Api
             if (loginResult.IsError)
             {
                 callback.TryError(loginResult.Error);
-
                 yield break;
             }
 
             callback.TryOk();
         }
 
-        private IEnumerator LoginAsync(Func<ResultCallback<TokenData, OAuthError>, IEnumerator> loginMethod, 
-            ResultCallback<TokenData, OAuthError> callback)
+        private IEnumerator LoginAsync( Func<ResultCallback<TokenData, OAuthError>, IEnumerator> loginMethod
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            if (this.loginSession.IsValid())
+            if (loginSession.IsValid())
             { 
-                OAuthError error = new OAuthError() {
+                var error = new OAuthError() 
+                {
                     error = ErrorCode.InvalidRequest.ToString(),
                     error_description = "User is already logged in."
                 };
+                
                 callback.TryError(error);
-
                 yield break;
             }
 
@@ -135,32 +192,64 @@ namespace AccelByte.Api
             if (loginResult.IsError)
             {
                 callback.TryError(loginResult.Error);
-
                 yield break;
             }
 
-            TwoFAEnable = true;
-            callback.TryOk();
+            callback.Try(loginResult);
         }
 
-        private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback callback, bool rememberMe = false)
+        /// <summary>
+        /// Login to AccelByte account with username (e.g. email) and password.
+        /// </summary>
+        /// <param name="email">Could be email or phone (right now, only email supported)</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        private IEnumerator LoginWithUserNameAsync( string email
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb, rememberMe), callback);
+            yield return LoginAsync(cb => 
+                loginSession.LoginWithUsername(email, password, cb, rememberMe),
+                callback);
+        }
+        
+        /// <summary>
+        /// Login to AccelByte account with username (e.g. email) and password. 
+        /// TODO: Is this deprecated, in favor of the extended callback variant?
+        /// </summary>
+        /// <param name="email">Could be email or phone (right now, only email supported)</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        private IEnumerator LoginWithUserNameAsync( string email
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
+        {
+            yield return LoginAsync(cb => loginSession.LoginWithUsername(
+                email, password, cb, rememberMe), callback);
         }
 
-        private IEnumerator LoginWithUserNameAsync(string email, string password, ResultCallback<TokenData, OAuthError> callback, bool rememberMe = false)
+		[Obsolete("Instead, use LoginWithUserNameAsync()")]
+        private IEnumerator LoginWithUserNameAsyncV3( string email
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithUsername(email, password, cb, rememberMe), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithUsernameV3(
+                email, password, cb, rememberMe), callback);
         }
 
-        private IEnumerator LoginWithUserNameAsyncV3(string email, string password, ResultCallback callback, bool rememberMe = false)
+        [Obsolete("Instead, use LoginWithUserNameAsync()")]
+        private IEnumerator LoginWithUserNameAsyncV3( string email
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithUsernameV3(email, password, cb, rememberMe), callback);
-        }
-
-        private IEnumerator LoginWithUserNameAsyncV3(string email, string password, ResultCallback<TokenData, OAuthError> callback, bool rememberMe = false)
-        {
-            yield return LoginAsync(cb => this.loginSession.LoginWithUsernameV3(email, password, cb, rememberMe), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithUsernameV3(
+                email, password, cb, rememberMe), callback);
         }
 
         /// <summary>
@@ -171,12 +260,13 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform type</param>
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithOtherPlatform(PlatformType platformType, string platformToken, ResultCallback callback)
+        public void LoginWithOtherPlatform( PlatformType platformType
+            , string platformToken
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback));
         }
-
 
         /// <summary>
         /// Login with token from non AccelByte platforms. This will automatically register a user if the user
@@ -186,61 +276,74 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform type</param>
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithOtherPlatform(PlatformType platformType, string platformToken, ResultCallback<TokenData, OAuthError> callback)
+        public void LoginWithOtherPlatform( PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithOtherPlatformAsync(
+                platformType,
+                platformToken,
+                callback));
         }
 
-        private IEnumerator LoginWithOtherPlatformAsync(PlatformType platformType, string platformToken, 
-            ResultCallback callback)
+        /// <summary>
+        /// TODO: Deprecated for extended callback variant?
+        /// </summary>
+        /// <param name="platformType"></param>
+        /// <param name="platformToken"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
+            , string platformToken
+            , ResultCallback callback )
         {
-            yield return LoginAsync(
-                cb => this.loginSession.LoginWithOtherPlatform(platformType, platformToken, cb),
-                callback);
+            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
+                platformType, platformToken, cb), callback);
         }
 
-        private IEnumerator LoginWithOtherPlatformAsync(PlatformType platformType, string platformToken,
-            ResultCallback<TokenData, OAuthError> callback)
+        private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(
-                cb => this.loginSession.LoginWithOtherPlatform(platformType, platformToken, cb),
-                callback);
+            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
+                platformType, platformToken, cb), callback);
         }
 
         /// <summary>
         /// Login With AccelByte Launcher. Use this only if you integrate your game with AccelByte Launcher
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithLauncher(ResultCallback callback)
+        public void LoginWithLauncher( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            string authCode = Environment.GetEnvironmentVariable(User.AuthorizationCodeEnvironmentVariable);
+            Report.GetFunctionLog(GetType().Name);
+            string authCode = Environment.GetEnvironmentVariable(AuthorizationCodeEnvironmentVariable);
 
             if (string.IsNullOrEmpty(authCode))
             {
-                this.coroutineRunner.Run(() =>
+                coroutineRunner.Run(() =>
                 {
-                    callback.TryError(ErrorCode.InvalidArgument, "The application was not executed from launcher");
+                    callback.TryError(ErrorCode.InvalidArgument, 
+                        "The application was not executed from launcher");
                 });
                 return;
             }
 
-            this.coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
+            coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
         }
 
         /// <summary>
         /// Login With AccelByte Launcher. Use this only if you integrate your game with AccelByte Launcher
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithLauncher(ResultCallback<TokenData, OAuthError> callback)
+        public void LoginWithLauncher( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            string authCode = Environment.GetEnvironmentVariable(User.AuthorizationCodeEnvironmentVariable);
+            Report.GetFunctionLog(GetType().Name);
+            string authCode = Environment.GetEnvironmentVariable(AuthorizationCodeEnvironmentVariable);
 
             if (string.IsNullOrEmpty(authCode))
             {
-                this.coroutineRunner.Run(() =>
+                coroutineRunner.Run(() =>
                 {
                     OAuthError error = new OAuthError()
                     {
@@ -252,17 +355,19 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
+            coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
         }
 
-        private IEnumerator LoginWithAuthorizationCodeAsync(string authCode, ResultCallback callback)
+        private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
+            , ResultCallback callback )
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
         }
 
-        private IEnumerator LoginWithAuthorizationCodeAsync(string authCode, ResultCallback<TokenData, OAuthError> callback)
+        private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(cb => this.loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
         }
 
         /// <summary>
@@ -270,10 +375,10 @@ namespace AccelByte.Api
         /// have username yet.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithDeviceId(ResultCallback callback)
+        public void LoginWithDeviceId( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
         }
 
         /// <summary>
@@ -281,40 +386,40 @@ namespace AccelByte.Api
         /// have username yet.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
+        public void LoginWithDeviceId( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
         }
 
-        private IEnumerator LoginWithDeviceIdAsync(ResultCallback callback)
+        private IEnumerator LoginWithDeviceIdAsync( ResultCallback callback )
         {
-            yield return LoginAsync(this.loginSession.LoginWithDeviceId, callback);
+            yield return LoginAsync(loginSession.LoginWithDeviceId, callback);
         }
 
-        private IEnumerator LoginWithDeviceIdAsync(ResultCallback<TokenData, OAuthError> callback)
+        private IEnumerator LoginWithDeviceIdAsync( ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(this.loginSession.LoginWithDeviceId, callback);
+            yield return LoginAsync(loginSession.LoginWithDeviceId, callback);
         }
 
         /// <summary>
         /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithLatestRefreshToken(ResultCallback callback)
+        public void LoginWithLatestRefreshToken( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
         }
 
         /// <summary>
         /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithLatestRefreshToken(ResultCallback<TokenData, OAuthError> callback)
+        public void LoginWithLatestRefreshToken( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
         }
 
         /// <summary>
@@ -322,10 +427,11 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="refreshToken">The latest user's refresh token</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithLatestRefreshToken(string refreshToken, ResultCallback callback)
+        public void LoginWithLatestRefreshToken( string refreshToken
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
         }
 
 
@@ -334,32 +440,35 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="refreshToken">The latest user's refresh token</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithLatestRefreshToken(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
+        public void LoginWithLatestRefreshToken( string refreshToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
         }
 
-        private IEnumerator LoginWithLatestRefreshTokenAsync(string refreshToken, ResultCallback callback)
+        private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
+            , ResultCallback callback )
         {
 
-            yield return LoginAsync(cb => this.loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
         }
 
-        private IEnumerator LoginWithLatestRefreshTokenAsync(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
+        private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
             
-            yield return LoginAsync(cb => this.loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
+            yield return LoginAsync(cb => loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
         }
 
         /// <summary>
         /// Refresh current login session. Will update current token.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void RefreshSession(ResultCallback callback)
+        public void RefreshSession( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.loginSession.RefreshSession(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(loginSession.RefreshSession(callback));
         }
 
 
@@ -367,28 +476,28 @@ namespace AccelByte.Api
         /// Refresh current login session. Will update current token.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void RefreshSession(ResultCallback<TokenData, OAuthError> callback)
+        public void RefreshSession( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.loginSession.RefreshSession(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(loginSession.RefreshSession(callback));
         }
 
         /// <summary>
         /// Logout current user session. Access tokens, user ID, and other credentials from memory will be removed.
         /// </summary>
-        public void Logout(ResultCallback callback)
+        public void Logout( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryOk();
 
                 return;
             }
 
-            this.userDataCache = null;
-            this.coroutineRunner.Run(this.loginSession.Logout(callback));
+            userDataCache = null;
+            coroutineRunner.Run(loginSession.Logout(callback));
         }
 
         /// <summary>
@@ -398,10 +507,14 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Usernam</param>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void Register(string emailAddress, string password, string displayName, string country,
-            DateTime dateOfBirth, ResultCallback<RegisterUserResponse> callback)
+        public void Register( string emailAddress
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             var registerUserRequest = new RegisterUserRequest
             {
                 authType = AuthenticationType.EMAILPASSWD,
@@ -412,7 +525,7 @@ namespace AccelByte.Api
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
-            this.coroutineRunner.Run(this.userAccount.Register(registerUserRequest, callback));
+            coroutineRunner.Run(api.Register(registerUserRequest, callback));
         }
 
         /// <summary>
@@ -425,10 +538,15 @@ namespace AccelByte.Api
         /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
         /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
-        public void Registerv2(string emailAddress, string username, string password, string displayName, string country,
-            DateTime dateOfBirth, ResultCallback<RegisterUserResponse> callback)
+        public void Registerv2( string emailAddress
+            , string username
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             var registerUserRequest = new RegisterUserRequestv2
             {
                 authType = AuthenticationType.EMAILPASSWD,
@@ -440,7 +558,7 @@ namespace AccelByte.Api
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
-            this.coroutineRunner.Run(this.userAccount.Registerv2(registerUserRequest, callback));
+            coroutineRunner.Run(api.Registerv2(registerUserRequest, callback));
         }
 
         /// <summary>
@@ -448,9 +566,10 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="request">To accept policies, fill acceptedPolicies field</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
-        public void RegisterAndAcceptPolicies(RegisterUserRequestv2 request, ResultCallback<RegisterUserResponse> callback)
+        public void RegisterAndAcceptPolicies( RegisterUserRequestv2 request
+            , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             
             //authType other than EMAILPASSWD is not supported
             request.authType = AuthenticationType.EMAILPASSWD;
@@ -458,26 +577,26 @@ namespace AccelByte.Api
                 Regex.IsMatch(request.dateOfBirth, "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"),
                 "Date of birth format is yyyy-MM-dd");
 
-            this.coroutineRunner.Run(this.userAccount.Registerv2(request, callback));
+            coroutineRunner.Run(api.Registerv2(request, callback));
         }
         
         /// <summary>
         /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void GetData(ResultCallback<UserData> callback)
+        public void GetData( ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(GetDataAsync(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(GetDataAsync(callback));
         }
 
-        private IEnumerator GetDataAsync(ResultCallback<UserData> callback)
+        private IEnumerator GetDataAsync( ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (this.userDataCache != null)
+            if (userDataCache != null)
             {
-                callback.TryOk(this.userDataCache);
+                callback.TryOk(userDataCache);
             }
             else
             {
@@ -489,25 +608,25 @@ namespace AccelByte.Api
         /// Refresh currrent cached user data.
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void RefreshData(ResultCallback<UserData> callback)
+        public void RefreshData( ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.userDataCache = null;
+            Report.GetFunctionLog(GetType().Name);
+            userDataCache = null;
 
-            this.coroutineRunner.Run(RefreshDataAsync(callback));
+            coroutineRunner.Run(RefreshDataAsync(callback));
         }
 
-        private IEnumerator RefreshDataAsync(ResultCallback<UserData> callback)
+        private IEnumerator RefreshDataAsync( ResultCallback<UserData> callback )
         {
             Result<UserData> result = null;
 
-            yield return this.userAccount.GetData(r => result = r);
+            yield return api.GetData(r => result = r);
 
             if (!result.IsError)
             {
-                this.userDataCache = result.Value;
+                userDataCache = result.Value;
 
-                callback.TryOk(this.userDataCache);
+                callback.TryOk(userDataCache);
 
                 yield break;
             }
@@ -520,21 +639,23 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="updateRequest">Set its field if you want to change it, otherwise leave it</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void Update(UpdateUserRequest updateRequest, ResultCallback<UserData> callback)
+        public void Update( UpdateUserRequest updateRequest
+            , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(UpdateAsync(updateRequest, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(UpdateAsync(updateRequest, callback));
         }
 
-        private IEnumerator UpdateAsync(UpdateUserRequest updateRequest, ResultCallback<UserData> callback)
+        private IEnumerator UpdateAsync( UpdateUserRequest updateRequest
+            , ResultCallback<UserData> callback )        
         {
             Result<UserData> updateResult = null;
 
-            yield return this.userAccount.Update(updateRequest, result => updateResult = result);
+            yield return api.Update(updateRequest, result => updateResult = result);
 
             if (!updateResult.IsError)
             {
-                this.userDataCache = updateResult.Value;
+                userDataCache = updateResult.Value;
             }
 
             callback.Try(updateResult);
@@ -545,10 +666,11 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="updateEmailRequest">Set verify code and user new email on the body</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void UpdateEmail(UpdateEmailRequest updateEmailRequest, ResultCallback callback)
+        public void UpdateEmail( UpdateEmailRequest updateEmailRequest
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.UpdateEmail(updateEmailRequest, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.UpdateEmail(updateEmailRequest, callback));
         }
 
         /// <summary>
@@ -558,21 +680,25 @@ namespace AccelByte.Api
         /// <param name="userName">Username the user is upgraded to</param>
         /// <param name="password">Password to login with username</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void Upgrade(string userName, string password, ResultCallback<UserData> callback)
+        public void Upgrade( string userName
+            , string password
+            , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(UpgradeAsync(userName, password, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(UpgradeAsync(userName, password, callback));
         }
 
-        private IEnumerator UpgradeAsync(string username, string password, ResultCallback<UserData> callback)
+        private IEnumerator UpgradeAsync( string username
+            , string password
+            , ResultCallback<UserData> callback )
         {
             Result<UserData> result = null;
 
-            yield return this.userAccount.Upgrade(username, password, r => result = r);
+            yield return api.Upgrade(username, password, r => result = r);
 
             if (!result.IsError)
             {
-                this.userDataCache = result.Value;
+                userDataCache = result.Value;
             }
 
             callback.Try(result);
@@ -586,21 +712,27 @@ namespace AccelByte.Api
         /// <param name="userName">Username the user is upgraded to</param>
         /// <param name="password">Password to login with username</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void Upgradev2(string emailAddress, string userName, string password, ResultCallback<UserData> callback)
+        public void Upgradev2( string emailAddress
+            , string userName
+            , string password
+            , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(Upgradev2Async(emailAddress, userName, password, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(Upgradev2Async(emailAddress, userName, password, callback));
         }
 
-        private IEnumerator Upgradev2Async(string emailAddress, string username, string password, ResultCallback<UserData> callback)
+        private IEnumerator Upgradev2Async( string emailAddress
+            , string username
+            , string password
+            , ResultCallback<UserData> callback )
         {
             Result<UserData> result = null;
 
-            yield return this.userAccount.Upgradev2(emailAddress, username, password, r => result = r);
+            yield return api.Upgradev2(emailAddress, username, password, r => result = r);
 
             if (!result.IsError)
             {
-                this.userDataCache = result.Value;
+                userDataCache = result.Value;
             }
 
             callback.Try(result);
@@ -612,10 +744,11 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="upgradeAndVerifyHeadlessRequest">Contain user data that will be used to upgrade the headless account</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
-        public void UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest, ResultCallback<UserData> callback)
+        public void UpgradeAndVerifyHeadlessAccount( UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest
+            , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback));
         }
 
         /// <summary>
@@ -624,10 +757,11 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="emailAddress">The email use to send verification code</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SendUpgradeVerificationCode(string emailAddress, ResultCallback callback)
+        public void SendUpgradeVerificationCode( string emailAddress
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.SendVerificationCode(
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.SendVerificationCode(
                 VerificationContext.upgradeHeadlessAccount,
                 emailAddress,
                 callback));
@@ -638,10 +772,10 @@ namespace AccelByte.Api
         /// This function context is "UserAccountRegistration". If you want to set your own context, please use the other overload function.
         /// </summary>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SendVerificationCode(ResultCallback callback)
+        public void SendVerificationCode( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(SendVerificationCodeAsync(VerificationContext.UserAccountRegistration, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(SendVerificationCodeAsync(VerificationContext.UserAccountRegistration, callback));
         }
 
         /// <summary>
@@ -649,13 +783,15 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="verifyContext">The context of what verification request</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SendVerificationCode(VerificationContext verificationContext, ResultCallback callback)
+        public void SendVerificationCode( VerificationContext verificationContext
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(SendVerificationCodeAsync(verificationContext, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(SendVerificationCodeAsync(verificationContext, callback));
         }
 
-        private IEnumerator SendVerificationCodeAsync(VerificationContext verificationContext, ResultCallback callback)
+        private IEnumerator SendVerificationCodeAsync( VerificationContext verificationContext
+            , ResultCallback callback )
         {
             Result<UserData> userDataResult = null;
 
@@ -673,9 +809,9 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            yield return this.userAccount.SendVerificationCode(
+            yield return api.SendVerificationCode(
                 verificationContext,
-                this.userDataCache.emailAddress,
+                userDataCache.emailAddress,
                 callback);
         }
 
@@ -684,10 +820,11 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="verificationCode">Verification code received from user's email</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void Verify(string verificationCode, ResultCallback callback)
+        public void Verify( string verificationCode
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.Verify(verificationCode, "email", callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.Verify(verificationCode, "email", callback));
         }
 
         /// <summary>
@@ -697,8 +834,8 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendResetPasswordCode(string userName, ResultCallback callback)
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.SendPasswordResetCode(userName, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.SendPasswordResetCode(userName, callback));
         }
 
         /// <summary>
@@ -708,10 +845,13 @@ namespace AccelByte.Api
         /// <param name="userName">Username with forgotten password</param>
         /// <param name="newPassword">New password</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ResetPassword(string resetCode, string userName, string newPassword, ResultCallback callback)
+        public void ResetPassword( string resetCode
+            , string userName
+            , string newPassword
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.ResetPassword(resetCode, userName, newPassword, callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.ResetPassword(resetCode, userName, newPassword, callback));
         }
 
         /// <summary>
@@ -720,18 +860,19 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformTicket">Ticket / token from other platform to be linked to </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void LinkOtherPlatform(PlatformType platformType, string platformTicket, ResultCallback callback)
+        public void LinkOtherPlatform( PlatformType platformType
+            , string platformTicket
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.LinkOtherPlatform(platformType, platformTicket, callback));
+            coroutineRunner.Run(api.LinkOtherPlatform(platformType, platformTicket, callback));
         }
 
         /// <summary>
@@ -740,18 +881,19 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformUserId"> UserId from other platform to be linked to </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ForcedLinkOtherPlatform(PlatformType platformType, string platformUserId, ResultCallback callback)
+        public void ForcedLinkOtherPlatform( PlatformType platformType
+            , string platformUserId
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.ForcedLinkOtherPlatform(platformType, platformUserId, callback));
+            coroutineRunner.Run(api.ForcedLinkOtherPlatform(platformType, platformUserId, callback));
         }
 
         /// <summary>
@@ -760,18 +902,18 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="callback">Returns a result via callback when completed</param>
-        public void UnlinkOtherPlatform(PlatformType platformType, ResultCallback callback)
+        public void UnlinkOtherPlatform( PlatformType platformType
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.UnlinkOtherPlatform(platformType, callback));
+            coroutineRunner.Run(api.UnlinkOtherPlatform(platformType, callback));
         }
 
         /// <summary>
@@ -779,18 +921,17 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="callback">Returns a Result that contains PlatformLink array via callback when
         /// completed.</param>
-        public void GetPlatformLinks(ResultCallback<PagedPlatformLinks> callback)
+        public void GetPlatformLinks( ResultCallback<PagedPlatformLinks> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetPlatformLinks(callback));
+            coroutineRunner.Run(api.GetPlatformLinks(loginSession.UserId, callback));
         }
 
         /// <summary>
@@ -799,18 +940,19 @@ namespace AccelByte.Api
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
-        public void SearchUsers(string query, SearchType by, ResultCallback<PagedPublicUsersInfo> callback)
+        public void SearchUsers( string query
+            , SearchType by
+            , ResultCallback<PagedPublicUsersInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.SearchUsers(query, by, callback));
+            coroutineRunner.Run(api.SearchUsers(query, by, callback));
         }
 
         /// <summary>
@@ -818,9 +960,10 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
-        public void SearchUsers(string query, ResultCallback<PagedPublicUsersInfo> callback)
+        public void SearchUsers( string query
+            , ResultCallback<PagedPublicUsersInfo> callback )
         {
-            this.SearchUsers(query, SearchType.ALL, callback);
+            SearchUsers(query, SearchType.ALL, callback);
         }
 
         /// <summary>
@@ -828,18 +971,18 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userId"> user id that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-        public void GetUserByUserId(string userId, ResultCallback<PublicUserData> callback)
+        public void GetUserByUserId( string userId
+            , ResultCallback<PublicUserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetUserByUserId(userId, callback));
+            coroutineRunner.Run(api.GetUserByUserId(userId, callback));
         }
 
         /// <summary>
@@ -849,20 +992,20 @@ namespace AccelByte.Api
         /// <param name="platformType"></param>
         /// <param name="otherPlatformUserId"></param>
         /// <param name="callback"></param>
-        public void GetUserByOtherPlatformUserId(PlatformType platformType, string otherPlatformUserId,
-            ResultCallback<UserData> callback)
+        public void GetUserByOtherPlatformUserId( PlatformType platformType
+            , string otherPlatformUserId
+            , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.userAccount.GetUserByOtherPlatformUserId(platformType, otherPlatformUserId, callback));
+            coroutineRunner.Run(
+                api.GetUserByOtherPlatformUserId(platformType, otherPlatformUserId, callback));
         }
 
         /// <summary>
@@ -872,41 +1015,41 @@ namespace AccelByte.Api
         /// <param name="platformType"></param>
         /// <param name="otherPlatformUserIds"></param>
         /// <param name="callback"></param>
-        public void BulkGetUserByOtherPlatformUserIds(PlatformType platformType, string[] otherPlatformUserId,
-            ResultCallback<BulkPlatformUserIdResponse> callback)
+        public void BulkGetUserByOtherPlatformUserIds( PlatformType platformType
+            , string[] otherPlatformUserId
+            , ResultCallback<BulkPlatformUserIdResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
             BulkPlatformUserIdRequest platformUserIds = new BulkPlatformUserIdRequest { platformUserIDs = otherPlatformUserId };
-            this.coroutineRunner.Run(
-                this.userAccount.BulkGetUserByOtherPlatformUserIds(platformType, platformUserIds, callback));
+            coroutineRunner.Run(
+                api.BulkGetUserByOtherPlatformUserIds(platformType, platformUserIds, callback));
         }
         
         /// <summary>
         /// Get spesific country from user IP
         /// </summary>
         /// <param name="callback"> Returns a Result that contains country information via callback when completed</param>
-        public void GetCountryFromIP(ResultCallback<CountryInfo> callback)
+        public void GetCountryFromIP( ResultCallback<CountryInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(this.userAccount.GetCountryFromIP(callback));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.GetCountryFromIP(callback));
         }
 
         /// <summary>
         /// Check if user has purchased the subscription and eligible to play
         /// </summary>
         /// <param name="callback"> Returns the boolean result whether the user is subscribed and eligible to play the game via callback when the operation is completed</param>
-        public void GetUserEligibleToPlay(ResultCallback<bool> callback)
+        public void GetUserEligibleToPlay( ResultCallback<bool> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            ResultCallback<ItemInfo> onGotItemInfo = (itemInfoResult) =>
+            ResultCallback<ItemInfo> onGotItemInfo = itemInfoResult =>
                 {
                     if(itemInfoResult.IsError)
                     {
@@ -917,7 +1060,7 @@ namespace AccelByte.Api
                     string[] skus = itemInfoResult.Value.features;
                     string[] appIds = { AccelBytePlugin.Config.AppId };
 
-                    AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, (ownershipResult) =>
+                    AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, ownershipResult =>
                     {
                         if (ownershipResult.IsError)
                         {
@@ -932,110 +1075,9 @@ namespace AccelByte.Api
             AccelBytePlugin.GetItems().GetItemByAppId(AccelBytePlugin.Config.AppId, onGotItemInfo);
         }
 
-        public void RefreshTokenCallback(Action<string> refreshTokenCallback)
+        public void RefreshTokenCallback( Action<string> refreshTokenCallback )
         {
-            this.loginSession.RefreshTokenCallback += refreshTokenCallback;
-        }
-
-        /// <summary>
-        /// Ban a Single User.
-        /// Only Moderator that can ban other user.
-        /// </summary>
-        /// <param name="userId">Ban user's user ID</param>
-        /// <param name="banType">The type of Ban</param>
-        /// <param name="reason">The reason of Banning</param>
-        /// <param name="endDate">The date when the ban is lifted</param>
-        /// <param name="comment">The detail or comment about the banning</param>
-        /// <param name="notifyUser">Notify user via email or not</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        public void BanUser(string userId, BanType banType, BanReason reason, DateTime endDate, string comment, bool notifyUser,
-            ResultCallback <UserBanResponseV3> callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            if (!this.loginSession.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-
-                return;
-            }
-
-            var banRequest = new BanCreateRequest
-            {
-                ban = banType.ToString(),
-                comment = comment,
-                endDate = endDate.ToString("o"),
-                reason = reason.ToString(),
-                skipNotif = !notifyUser
-            };
-
-            this.coroutineRunner.Run(
-                this.userAccount.BanUser(
-                    AccelBytePlugin.Config.Namespace,
-                    this.loginSession.AuthorizationToken,
-                    userId,
-                    banRequest,
-                    callback));
-        }
-
-        /// <summary>
-        /// Change Ban Status of a Single User (enabled/disabled).
-        /// Only Moderator that can change ban status.
-        /// </summary>
-        /// <param name="userId">Banned user's user ID</param>
-        /// <param name="banId">Banned user's ban ID</param>
-        /// <param name="enabled">Banned Status, false to disabled</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        public void ChangeUserBanStatus(string userId, string banId, bool enabled, ResultCallback<UserBanResponseV3> callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            if (!this.loginSession.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-
-                return;
-            }
-
-            this.coroutineRunner.Run(
-                this.userAccount.ChangeUserBanStatus(
-                    AccelBytePlugin.Config.Namespace,
-                    this.loginSession.AuthorizationToken,
-                    userId,
-                    banId,
-                    enabled,
-                    callback));
-        }
-
-        /// <summary>
-        /// Get User Banned List
-        /// Only Moderator that can get the banned list.
-        /// </summary>
-        /// <param name="banType">The type of Ban</param>
-        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0) </param>
-        /// <param name="limit">The limit of item on page (optional) </param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        /// <param name="activeOnly">true to only get the enabled banned list</param>
-        public void GetUserBannedList(BanType banType, int offset, int limit, ResultCallback<UserBanPagedList> callback, bool activeOnly = true)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            if (!this.loginSession.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-
-                return;
-            }
-
-            this.coroutineRunner.Run(
-                this.userAccount.GetUserBannedList(
-                    AccelBytePlugin.Config.Namespace,
-                    this.loginSession.AuthorizationToken,
-                    activeOnly,
-                    banType,
-                    offset,
-                    limit,
-                    callback));
+            loginSession.RefreshTokenCallback += refreshTokenCallback;
         }
 
         /// <summary>
@@ -1043,18 +1085,18 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userIds">List UserId(s) to get.</param>
         /// <param name="callback">Returns a result via callback when completed</param>
-        public void BulkGetUserInfo(string[] userIds, ResultCallback<ListBulkUserInfoResponse> callback)
+        public void BulkGetUserInfo( string[] userIds
+            , ResultCallback<ListBulkUserInfoResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.BulkGetUserInfo(userIds, callback));
+            coroutineRunner.Run(api.BulkGetUserInfo(userIds, callback));
         }
 
         /// <summary>
@@ -1065,17 +1107,23 @@ namespace AccelByte.Api
         /// <param name="code"></param>
         /// <param name="callback"></param>
         /// <param name="rememberDevice"></param>
-        public void Verify2FACode(string mfaToken, TwoFAFactorType factor, string code,
-           ResultCallback<TokenData, OAuthError> callback, bool rememberDevice = false)
+        public void Verify2FACode( string mfaToken
+            , TwoFAFactorType factor
+            , string code
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberDevice = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            this.coroutineRunner.Run(Verify2FACodeAsync(mfaToken, factor, code, callback, rememberDevice));
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(Verify2FACodeAsync(mfaToken, factor, code, callback, rememberDevice));
         }
 
-        private IEnumerator Verify2FACodeAsync(string mfaToken, TwoFAFactorType factor, string code, 
-            ResultCallback<TokenData, OAuthError> callback, bool rememberDevice = false)
+        private IEnumerator Verify2FACodeAsync( string mfaToken
+            , TwoFAFactorType factor
+            , string code
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberDevice = false )
         {
-            if (this.loginSession.IsValid())
+            if (loginSession.IsValid())
             {
                 OAuthError error = new OAuthError()
                 {
@@ -1087,7 +1135,7 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            yield return this.loginSession.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
+            yield return loginSession.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
         }
 
         /// <summary>
@@ -1096,35 +1144,38 @@ namespace AccelByte.Api
         /// <param name="mfaToken"></param>
         /// <param name="factor"></param>
         /// <param name="callback"></param>
-        public void Change2FAFactor(string mfaToken, TwoFAFactorType factor, ResultCallback<TokenData> callback)
+        public void Change2FAFactor( string mfaToken
+            , TwoFAFactorType factor
+            , ResultCallback<TokenData> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.Change2FAFactor(mfaToken, factor, callback));
+            coroutineRunner.Run(api.Change2FAFactor(mfaToken, factor, callback));
         }
 
         /// <summary>
         /// Disable 2FA Authenticator
         /// </summary>
         /// <param name="callback"></param>
-        public void Disable2FAAuthenticator(ResultCallback callback)
+        public void Disable2FAAuthenticator( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
+
             TwoFAEnable = false;
-            this.coroutineRunner.Run(this.userAccount.Disable2FAAuthenticator(callback));
+            coroutineRunner.Run(api.Disable2FAAuthenticator(callback));
         }
 
         /// <summary>
@@ -1132,126 +1183,130 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="code"></param>
         /// <param name="callback"></param>
-        public void Enable2FAAuthenticator(string code, ResultCallback callback)
+        public void Enable2FAAuthenticator( string code
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
+
             TwoFAEnable = true;
-            this.coroutineRunner.Run(this.userAccount.Enable2FAAuthenticator(code, callback));
+            coroutineRunner.Run(api.Enable2FAAuthenticator(code, callback));
         }
 
         /// <summary>
         /// Generate Secret Key For 3rd Party Authenticate Application 
         /// </summary>
         /// <param name="callback"></param>
-        public void GenerateSecretKeyFor3rdPartyAuthenticateApp(ResultCallback<SecretKey3rdPartyApp> callback)
+        public void GenerateSecretKeyFor3rdPartyAuthenticateApp( ResultCallback<SecretKey3rdPartyApp> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GenerateSecretKeyFor3rdPartyAuthenticateApp(callback));
+            coroutineRunner.Run(api.GenerateSecretKeyFor3rdPartyAuthenticateApp(callback));
         }
 
         /// <summary>
         /// Generate 2FA BackUp Code, will give a new list of new backup code and make codes generated before invalid.
         /// </summary>
         /// <param name="callback"></param>
-        public void GenerateBackUpCode(ResultCallback<TwoFACode> callback)
+        public void GenerateBackUpCode( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             } 
 
-            this.coroutineRunner.Run(this.userAccount.GenerateBackUpCode(callback));
+            coroutineRunner.Run(api.GenerateBackUpCode(callback));
         }
 
         /// <summary>
         /// Disable 2FA Backup Codes
         /// </summary>
         /// <param name="callback"></param>
-        public void Disable2FABackupCodes(ResultCallback callback)
+        public void Disable2FABackupCodes( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
-            TwoFAEnable = false;
-            this.coroutineRunner.Run(this.userAccount.Disable2FABackupCodes(callback));
+
+			TwoFAEnable = false;
+            coroutineRunner.Run(api.Disable2FABackupCodes(callback));
         }
 
         /// <summary>
         /// Enable 2FA Backup Codes, this should be called if the 2FA not only using authenticator/3rd party factor. 
         /// </summary>
         /// <param name="callback"></param>
-        public void Enable2FABackupCodes(ResultCallback<TwoFACode> callback)
+        public void Enable2FABackupCodes( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
-            TwoFAEnable = true; 
-            this.coroutineRunner.Run(this.userAccount.Enable2FABackupCodes(callback));
+
+			TwoFAEnable = true;
+            coroutineRunner.Run(api.Enable2FABackupCodes(callback));
         }
 
         /// <summary>
         /// Get 2FA BackUp Code
         /// </summary>
         /// <param name="callback"></param>
-        public void GetBackUpCode(ResultCallback<TwoFACode> callback)
+        public void GetBackUpCode( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetBackUpCode(callback));
+            coroutineRunner.Run(api.GetBackUpCode(callback));
         }
 
         /// <summary>
         /// Get User Enabled Factors
         /// </summary>
         /// <param name="callback"></param>
-        public void GetUserEnabledFactors(ResultCallback<Enable2FAFactors> callback)
+        public void GetUserEnabledFactors( ResultCallback<Enable2FAFactors> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetUserEnabledFactors(callback));
+            coroutineRunner.Run(api.GetUserEnabledFactors(callback));
         }
 
         /// <summary>
@@ -1259,18 +1314,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="factor"></param>
         /// <param name="callback"></param>
-        public void Make2FAFactorDefault(TwoFAFactorType factor, ResultCallback callback)
+        public void Make2FAFactorDefault( TwoFAFactorType factor
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.Make2FAFactorDefault(factor, callback));
+            coroutineRunner.Run(api.Make2FAFactorDefault(factor, callback));
         }
 
         /// <summary>
@@ -1279,18 +1335,20 @@ namespace AccelByte.Api
         /// <param name="languageCode"></param>
         /// <param name="callback"></param>
         /// <param name="defaultOnEmpty"></param>
-        public void GetInputValidations(string languageCode, ResultCallback<InputValidation> callback, bool defaultOnEmpty = true)
+        public void GetInputValidations( string languageCode
+            , ResultCallback<InputValidation> callback
+            , bool defaultOnEmpty = true )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.loginSession.IsValid())
+            if (!loginSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(this.userAccount.GetInputValidations(languageCode, callback, defaultOnEmpty));
+            coroutineRunner.Run(api.GetInputValidations(languageCode, callback, defaultOnEmpty));
         }
     }
 }

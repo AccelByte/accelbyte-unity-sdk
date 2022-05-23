@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,42 +11,34 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class LobbyApi
+    public class LobbyApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
-
-        internal LobbyApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==BaseUrl</param>
+        /// <param name="session"></param>
+        internal LobbyApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.BaseUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator BulkFriendRequest(string @namespace, string ownUserId, BulkFriendsRequest userIds, string accessToken,
-            ResultCallback callback)
+        public IEnumerator BulkFriendRequest( string ownUserId
+            , BulkFriendsRequest userIds
+            , ResultCallback callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(ownUserId, nameof(ownUserId) + " cannot be null");
             Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/friends/namespaces/{namespace}/users/{userId}/add/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/friends/namespaces/{namespace}/users/{userId}/add/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", ownUserId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(userIds.ToUtf8Json())
@@ -54,50 +46,55 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
 
             callback.Try(result);
         }
         
-        public IEnumerator GetPartyStorage(string @namespace, string accessToken, string partyID, ResultCallback<PartyDataUpdateNotif> callback)
+        public IEnumerator GetPartyStorage( string partyID
+            , ResultCallback<PartyDataUpdateNotif> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(partyID, nameof(partyID) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("partyId", partyID)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
             callback.Try(result);
         }
 
-        public IEnumerator WritePartyStorage(string @namespace, string accessToken, PartyDataUpdateRequest data,
-            string partyId, ResultCallback<PartyDataUpdateNotif> callback, Action callbackOnConflictedData = null)
+        public IEnumerator WritePartyStorage( PartyDataUpdateRequest data
+            , string partyId
+            , ResultCallback<PartyDataUpdateNotif> callback
+            , Action callbackOnConflictedData = null )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}/attributes")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}/attributes")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("partyId", partyId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithBody(data.ToUtf8Json())
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
@@ -105,11 +102,13 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            if (result.IsError && (result.Error.Code == ErrorCode.PreconditionFailed || result.Error.Code == ErrorCode.PartyStorageOutdatedUpdateData))
+            if (result.IsError && (result.Error.Code == ErrorCode.PreconditionFailed || 
+                result.Error.Code == ErrorCode.PartyStorageOutdatedUpdateData))
             {
                 callbackOnConflictedData?.Invoke();
             }
@@ -119,83 +118,89 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator GetListOfBlockedUser(string @namespace, string accessToken, string userId, ResultCallback<BlockedList> callback)
+        public IEnumerator GetListOfBlockedUser( string userId
+            , ResultCallback<BlockedList> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<BlockedList>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetListOfBlocker(string @namespace, string accessToken, string userId, ResultCallback<BlockerList> callback)
+        public IEnumerator GetListOfBlocker( string userId
+            , ResultCallback<BlockerList> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked-by")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/lobby/v1/public/player/namespaces/{namespace}/users/me/blocked-by")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<BlockerList>();
 
             callback.Try(result);
         }
         
-        public IEnumerator BulkGetUserPresence(string @namespace, ICollection<string> userIds, string accessToken, ResultCallback<BulkUserStatusNotif> callback, bool countOnly = false)
+        public IEnumerator BulkGetUserPresence( ICollection<string> userIds
+            , ResultCallback<BulkUserStatusNotif> callback
+            , bool countOnly = false )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/lobby/v1/public/presence/namespaces/{namespace}/users/presence")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/lobby/v1/public/presence/namespaces/{namespace}/users/presence")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("userIds", string.Join(",", userIds))
                 .WithQueryParam("countOnly", countOnly ? "true" : "false")
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<BulkUserStatusNotif>();
 
             callback.Try(result);
         }
     
-        public void OnBanNotificationReceived(string accessToken, Action<string> callback)
+        public void OnBanNotificationReceived( Action<string> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            ((AccelByteHttpClient)this.httpClient).OnBearerAuthRejected(callback);
+            Report.GetFunctionLog(GetType().Name);
+            ((AccelByteHttpClient)HttpClient).OnBearerAuthRejected(callback);
         }
 
-        #endregion
     }
 }

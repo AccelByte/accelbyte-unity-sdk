@@ -1,108 +1,90 @@
-// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    public class ServerEcommerce
+    public class ServerEcommerce : WrapperBase
     {
         private readonly ServerEcommerceApi api;
-        private readonly IServerSession session;
-        private readonly string namespace_;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal ServerEcommerce(ServerEcommerceApi api, IServerSession session, string namespace_, CoroutineRunner coroutineRunner)
+        internal ServerEcommerce( ServerEcommerceApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "Can not construct Ecommerce manager; api is null!");
-            Assert.IsNotNull(session, "Can not construct Ecommerce manager; session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(namespace_), "Can not construct Ecommerce manager; ns paramater couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "Can not construct Ecommerce manager; coroutineRunner is null!");
+            Assert.IsNotNull(inApi, "Cannot construct Ecommerce manager; api is null!");
+            Assert.IsNotNull(inCoroutineRunner, "Cannot construct Ecommerce manager; coroutineRunner is null!");
 
-            this.api = api;
-            this.session = session;
-            this.namespace_ = namespace_;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
         }
 
         /// <summary>
-        ///  Get a user's entitlement by the entitlementId.
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete( "namespace param is deprecated (now passed to Api from Config): Use the overload without it" )]
+        internal ServerEcommerce
+            ( ServerEcommerceApi inApi
+            , ISession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner )
+        {
+        }
+
+        /// <summary>
+        /// Get a user's entitlement by the entitlementId.
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement</param>
         /// <param name="callback">Returns all StackableEntitlements Info via callback when completed</param>
-        public void GetUserEntitlementById(string entitlementId, ResultCallback<EntitlementInfo> callback)
+        public void GetUserEntitlementById( string entitlementId
+            , ResultCallback<EntitlementInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserEntitlementById(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    entitlementId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetUserEntitlementById(entitlementId, callback));
         }
 
         /// <summary>
         /// Granting Entitlement(s) to a user.
         /// </summary>
+        /// <param name="publisherNamespace">Different than Config Namespace</param>
         /// <param name="userId">UserId of a user</param>
         /// <param name="grantUserEntitlementsRequest"> Consist of the entitlement(s) that will be granted</param>
         /// <param name="callback">Returns all StackableEntitlements Info via callback when completed</param>
-        public void GrantUserEntitlement(string userId, GrantUserEntitlementRequest[] grantUserEntitlementsRequest,
-            ResultCallback<StackableEntitlementInfo[]> callback)
+        public void GrantUserEntitlement( string userId
+            , GrantUserEntitlementRequest[] grantUserEntitlementsRequest
+            , ResultCallback<StackableEntitlementInfo[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GrantUserEntitlement(
-                    this.namespace_,
+            coroutineRunner.Run(
+                api.GrantUserEntitlement(
                     userId,
-                    this.session.AuthorizationToken,
-                    grantUserEntitlementsRequest,
-                    callback));
-        }
-
-        /// <summary>
-        /// Granting Entitlement(s) to a user.
-        /// </summary>
-        /// <param name="namespace_">Item namespace, might be game namespace or publisher namespace</param>
-        /// <param name="userId">UserId of a user</param>
-        /// <param name="grantUserEntitlementsRequest"> Consist of the entitlement(s) that will be granted</param>
-        /// <param name="callback">Returns all StackableEntitlements Info via callback when completed</param>
-        public void GrantUserEntitlement(string namespace_, string userId, GrantUserEntitlementRequest[] grantUserEntitlementsRequest,
-            ResultCallback<StackableEntitlementInfo[]> callback)
-        {
-            Report.GetFunctionLog(this.GetType().Name);
-
-            if (!this.session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-
-                return;
-            }
-
-            this.coroutineRunner.Run(
-                this.api.GrantUserEntitlement(
-                    namespace_,
-                    userId,
-                    this.session.AuthorizationToken,
                     grantUserEntitlementsRequest,
                     callback));
         }
@@ -114,23 +96,22 @@ namespace AccelByte.Server
         /// <param name="currencyCode">The currency code</param>
         /// <param name="creditUserWalletRequest">The request to credit a user wallet</param>
         /// <param name="callback">Returns Wallet info via callback when completed</param>
-        public void CreditUserWallet(string userId, string currencyCode, CreditUserWalletRequest creditUserWalletRequest,
-            ResultCallback<WalletInfo> callback)
+        public void CreditUserWallet( string userId
+            , string currencyCode
+            , CreditUserWalletRequest creditUserWalletRequest
+            , ResultCallback<WalletInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.CreditUserWallet(
-                    this.namespace_,
+            coroutineRunner.Run(
+                api.CreditUserWallet(
                     userId,
-                    this.session.AuthorizationToken,
                     currencyCode,
                     creditUserWalletRequest,
                     callback));
@@ -142,22 +123,21 @@ namespace AccelByte.Server
         /// <param name="userId">UserId of a user who will receive item.</param>
         /// <param name="fulfillmentRequest">The request to fulfill an item to user.</param>
         /// <param name="callback">Returns Wallet info via callback when completed.</param>
-        public void FulfillUserItem(string userId, FulfillmentRequest fulfillmentRequest,
-            ResultCallback<FulfillmentResult> callback)
+        public void FulfillUserItem( string userId
+            , FulfillmentRequest fulfillmentRequest
+            , ResultCallback<FulfillmentResult> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.FulfillUserItem(
-                    this.namespace_,
+            coroutineRunner.Run(
+                api.FulfillUserItem(
                     userId,
-                    this.session.AuthorizationToken,
                     fulfillmentRequest,
                     callback));
         }

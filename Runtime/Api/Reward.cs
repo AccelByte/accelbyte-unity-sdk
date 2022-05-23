@@ -1,31 +1,45 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class Reward
+    public class Reward : WrapperBase
     {
         private readonly RewardApi api;
-        private readonly ISession session;
-        private readonly string @namespace;
+        private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Reward(RewardApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
+        internal Reward( RewardApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns parameter can't be empty");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunnerParameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "inApi parameter can not be null.");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunnerParameter can not be null. Construction failed");
 
-            this.api = api;
-            this.session = session;
-            this.@namespace = @namespace;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal Reward( RewardApi inApi
+            , IUserSession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+        {
         }
 
         /// <summary>
@@ -33,23 +47,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="rewardCode"> reward code</param>
         /// <param name="callback"> callback when get the response</param>
-        public void GetRewardByRewardCode(string rewardCode, ResultCallback<RewardInfo> callback)
+        public void GetRewardByRewardCode( string rewardCode
+            , ResultCallback<RewardInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetRewardByRewardCode(
-                    (@namespace == "") ? this.@namespace : @namespace,
-                    this.session.AuthorizationToken,
-                    rewardCode,
-                    callback));
+            coroutineRunner.Run(
+                api.GetRewardByRewardCode(rewardCode, callback));
         }
 
         /// <summary>
@@ -57,23 +67,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="rewardId"> reward id</param>
         /// <param name="callback"> callback when get the response</param>
-        public void GetRewardByRewardId(string rewardId, ResultCallback<RewardInfo> callback)
+        public void GetRewardByRewardId( string rewardId
+            , ResultCallback<RewardInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetRewardByRewardId(
-                    (@namespace == "") ? this.@namespace : @namespace,
-                    this.session.AuthorizationToken,
-                    rewardId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetRewardByRewardId(rewardId, callback));
         }
 
         /// <summary>
@@ -84,21 +90,22 @@ namespace AccelByte.Api
         /// <param name="callback"> callback when get the response</param>
         /// <param name="offset"> offset of the reward</param>
         /// <param name="limit"> limit offset of the reward</param>
-        public void QueryRewards(string eventTopic, RewardSortBy sortBy, ResultCallback<QueryRewardInfo> callback, int offset = 0, int limit = 20)
+        public void QueryRewards( string eventTopic
+            , RewardSortBy sortBy
+            , ResultCallback<QueryRewardInfo> callback
+            , int offset = 0
+            , int limit = 20 )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.QueryRewards(
-                    (@namespace == "") ? this.@namespace : @namespace,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.QueryRewards(
                     eventTopic,
                     offset,
                     limit,

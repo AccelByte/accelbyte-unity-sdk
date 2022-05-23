@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -16,29 +16,35 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class Qos
+    /// <summary>
+    /// QoS == Quality of Service (Latencies, Pings, Regions, etc)
+    /// </summary>
+    public class QosManager : WrapperBase
     {
         private readonly CoroutineRunner coroutineRunner;
-        private readonly QosManagerApi qosManager;
+        private readonly QosManagerApi api;
 
-        internal Qos(QosManagerApi qosManager, CoroutineRunner coroutineRunner)
+        internal QosManager( QosManagerApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(qosManager, nameof(qosManager) + " is null.");
-            Assert.IsNotNull(coroutineRunner, nameof(coroutineRunner) + " is null.");
-            this.qosManager = qosManager;
-            this.coroutineRunner = coroutineRunner;
+            Assert.IsNotNull(inApi, nameof(inApi) + " is null.");
+            Assert.IsNotNull(inCoroutineRunner, nameof(inCoroutineRunner) + " is null.");
+            
+            api = inApi;
+            coroutineRunner = inCoroutineRunner;
         }
 
-        public void GetServerLatencies(ResultCallback<Dictionary<string, int>> callback)
+        public void GetServerLatencies( ResultCallback<Dictionary<string, int>> callback )
         {
-            this.coroutineRunner.Run(GetServerLatenciesAsync(callback));
+            coroutineRunner.Run(GetServerLatenciesAsync(callback));
         }
 
-        private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
+        private IEnumerator GetServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
         {
             Result<QosServerList> getQosServersResult = null;
 
-            yield return this.qosManager.GetQosServers(result => getQosServersResult = result);
+            yield return api.GetQosServers(result => getQosServersResult = result);
 
             if (getQosServersResult.IsError)
             {
@@ -57,7 +63,12 @@ namespace AccelByte.Api
                     udpClient.Connect(new IPEndPoint(IPAddress.Parse(server.ip), server.port));
                     byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
                     stopwatch.Restart();
-                    IAsyncResult asyncResult = udpClient.BeginSend(sendBytes, sendBytes.Length, null, null);
+                    
+                    IAsyncResult asyncResult = udpClient.BeginSend(
+                        sendBytes, 
+                        sendBytes.Length, 
+                        null, 
+                        null);
 
                     yield return new WaitUntil(() => asyncResult.IsCompleted);
 

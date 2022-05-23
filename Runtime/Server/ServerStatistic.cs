@@ -1,7 +1,8 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -9,28 +10,37 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    public class ServerStatistic
+    public class ServerStatistic : WrapperBase
     {
         private readonly ServerStatisticApi api;
-        private readonly IServerSession session;
-        private readonly string namespace_;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal ServerStatistic(ServerStatisticApi api, IServerSession session, string namespace_,
-            CoroutineRunner coroutineRunner)
+        internal ServerStatistic( ServerStatisticApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "Can not construct Statistic manager; api is null!");
-            Assert.IsNotNull(session, "Can not construct Statistic manager; session parameter can not be null");
-            Assert.IsFalse(
-                string.IsNullOrEmpty(namespace_),
-                "Can not construct Statistic manager; ns paramater couldn't be empty");
+            Assert.IsNotNull(inApi, "Cannot construct Statistic manager; inApi is null!");
+            Assert.IsNotNull(inCoroutineRunner, "Cannot construct Statistic manager; inCoroutineRunner is null!");
 
-            Assert.IsNotNull(coroutineRunner, "Can not construct Statistic manager; coroutineRunner is null!");
-
-            this.api = api;
-            this.session = session;
-            this.namespace_ = namespace_;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal ServerStatistic( ServerStatisticApi inApi
+            , ISession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner)
+            : this( inApi, inSession, inCoroutineRunner )
+        {
         }
 
         /// <summary>
@@ -39,25 +49,20 @@ namespace AccelByte.Server
         /// <param name="userId">UserId of a user</param>
         /// <param name="statItems">List of statCodes to be created for a user</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
-        public void CreateUserStatItems(string userId, CreateStatItemRequest[] statItems,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void CreateUserStatItems( string userId
+            , CreateStatItemRequest[] statItems
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.CreateUserStatItems(
-                    this.namespace_,
-                    userId,
-                    this.session.AuthorizationToken,
-                    statItems,
-                    callback));
+            coroutineRunner.Run(
+                api.CreateUserStatItems(userId, statItems, callback));
         }
 
         /// <summary>
@@ -65,25 +70,19 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="userId">UserId of a user</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
-        public void GetAllUserStatItems(string userId, ResultCallback<PagedStatItems> callback)
+        public void GetAllUserStatItems( string userId
+            , ResultCallback<PagedStatItems> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserStatItems(
-                    this.namespace_,
-                    userId,
-                    this.session.AuthorizationToken,
-                    null,
-                    null,
-                    callback));
+            coroutineRunner.Run(
+                api.GetUserStatItems(userId, null, null, callback));
         }
 
         /// <summary>
@@ -93,26 +92,21 @@ namespace AccelByte.Server
         /// <param name="statCodes">List of statCodes that will be included in the result</param>
         /// <param name="tags">List of tags that will be included in the result</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
-        public void GetUserStatItems(string userId, ICollection<string> statCodes, ICollection<string> tags,
-            ResultCallback<PagedStatItems> callback)
+        public void GetUserStatItems( string userId
+            , ICollection<string> statCodes
+            , ICollection<string> tags
+            , ResultCallback<PagedStatItems> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserStatItems(
-                    this.namespace_,
-                    userId,
-                    this.session.AuthorizationToken,
-                    statCodes,
-                    tags,
-                    callback));
+            coroutineRunner.Run(
+                api.GetUserStatItems(userId, statCodes, tags, callback));
         }
 
         /// <summary>
@@ -121,25 +115,20 @@ namespace AccelByte.Server
         /// <param name="userId">UserId of a user</param>
         /// <param name="increments">Consist of one or more statCode and value to update</param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void IncrementUserStatItems(string userId, StatItemIncrement[] increments,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void IncrementUserStatItems( string userId
+            , StatItemIncrement[] increments
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.IncrementUserStatItems(
-                    this.namespace_,
-                    userId,
-                    increments,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.IncrementUserStatItems(userId, increments, callback));
         }
 
         /// <summary>
@@ -147,24 +136,19 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="increments">Consist of one or more statCode and value to update</param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void IncrementManyUsersStatItems(UserStatItemIncrement[] increments,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void IncrementManyUsersStatItems( UserStatItemIncrement[] increments
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.IncrementManyUsersStatItems(
-                    this.namespace_,
-                    increments,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.IncrementManyUsersStatItems(increments, callback));
         }
 
          /// <summary>
@@ -173,25 +157,20 @@ namespace AccelByte.Server
         /// <param name="userId">UserId of a user</param>
         /// <param name="resets">Consist of one or more statCode</param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void ResetUserStatItems(string userId, StatItemReset[] resets,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void ResetUserStatItems( string userId
+            , StatItemReset[] resets
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.ResetUserStatItems(
-                    this.namespace_,
-                    userId,
-                    resets,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.ResetUserStatItems(userId, resets, callback));
         }
 
         /// <summary>
@@ -199,24 +178,19 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="resets">Consist of one or more userId and statCode to reset</param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void ResetManyUsersStatItems(UserStatItemReset[] resets,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void ResetManyUsersStatItems( UserStatItemReset[] resets
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.ResetManyUsersStatItems(
-                    this.namespace_,
-                    resets,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.ResetManyUsersStatItems(resets, callback));
         }
 
         /// <summary>
@@ -230,8 +204,9 @@ namespace AccelByte.Server
         ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
         ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void UpdateUserStatItems(string userId, StatItemUpdate[] updates,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void UpdateUserStatItems( string userId
+            , StatItemUpdate[] updates
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
             UpdateUserStatItems(userId, "", updates, callback);
         }
@@ -248,26 +223,21 @@ namespace AccelByte.Server
         ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
         ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void UpdateUserStatItems(string userId, string additionalKey, StatItemUpdate[] updates,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void UpdateUserStatItems( string userId
+            , string additionalKey
+            , StatItemUpdate[] updates
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateUserStatItems(
-                    this.namespace_,
-                    userId,
-                    additionalKey,
-                    updates,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.UpdateUserStatItems(userId, additionalKey, updates, callback));
         }
 
         /// <summary>
@@ -280,24 +250,19 @@ namespace AccelByte.Server
         ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
         ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
         /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
-        public void UpdateManyUsersStatItems(UserStatItemUpdate[] updates,
-            ResultCallback<StatItemOperationResult[]> callback)
+        public void UpdateManyUsersStatItems( UserStatItemUpdate[] updates
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateManyUsersStatItems(
-                    this.namespace_,
-                    updates,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.UpdateManyUsersStatItems(updates, callback));
         }
     }
 }

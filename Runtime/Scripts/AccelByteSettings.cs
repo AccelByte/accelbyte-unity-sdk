@@ -11,6 +11,10 @@ using Newtonsoft.Json;
 
 namespace AccelByte.Api
 {
+    /// <summary>
+    /// Primarily used by the Editor for the config in the popup menu.
+    /// <para>Looking for runtime settings? See static AccelBytePlugin.Config</para>
+    /// </summary>
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
 #endif
@@ -167,6 +171,8 @@ namespace AccelByte.Api
         }
 
         private Config config;
+        private MultiConfigs multiConfigs;
+        private SettingsEnvironment editedEnvironment = SettingsEnvironment.Default;
 
         private static AccelByteSettings instance;
 
@@ -212,6 +218,12 @@ namespace AccelByte.Api
         public Config CopyConfig() { return this.config.ShallowCopy(); }
         public void UpdateConfig(Config newConfig) { this.config = newConfig; }
         public bool CompareConfig(Config newConfig) { return this.config.Compare(newConfig); }
+        public SettingsEnvironment GetEditedEnvironment() { return this.editedEnvironment; }
+        public void SetEditedEnvironment(SettingsEnvironment environment) 
+        { 
+            this.editedEnvironment = environment;
+            this.Load();
+        }
 
         /// <summary>
         ///  Load configuration from AccelByteSDKConfig.json
@@ -227,8 +239,22 @@ namespace AccelByte.Api
             else
             {
                 string wholeJsonText = ((TextAsset) configFile).text;
-                this.config = wholeJsonText.ToObject<Config>();
+                this.multiConfigs = wholeJsonText.ToObject<MultiConfigs>();
+                switch (editedEnvironment)
+                {
+                    case SettingsEnvironment.Development:
+                        this.config = multiConfigs.Development; break;
+                    case SettingsEnvironment.Certification:
+                        this.config = multiConfigs.Certification; break;
+                    case SettingsEnvironment.Production:
+                        this.config = multiConfigs.Production; break;
+                    case SettingsEnvironment.Default:
+                    default:
+                        this.config = multiConfigs.Default; break;
+                }
             }
+
+            this.config.Expand();
         }
 
         /// <summary>
@@ -248,8 +274,22 @@ namespace AccelByte.Api
 
             string fullPath =
                 System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKConfig.json");
-            
-            System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(this.config.ToJsonString(Formatting.Indented)));
+
+            switch (editedEnvironment)
+            {
+                case SettingsEnvironment.Development:
+                    this.multiConfigs.Development = this.config; break;
+                case SettingsEnvironment.Certification:
+                    this.multiConfigs.Certification = this.config; break;
+                case SettingsEnvironment.Production:
+                    this.multiConfigs.Production = this.config; break;
+                case SettingsEnvironment.Default:
+                default:
+                    this.multiConfigs.Default = this.config; break;
+            }
+
+            string prettyConfig = this.multiConfigs.ToJsonString(Formatting.Indented);
+            System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(prettyConfig));
         }
     }
 }

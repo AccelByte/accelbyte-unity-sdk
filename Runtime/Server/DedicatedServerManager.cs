@@ -1,27 +1,23 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-//TODO: Do authentication using server creadentials
-
 namespace AccelByte.Server
 {
-    public class DedicatedServerManager
+    public class DedicatedServerManager : WrapperBase
     {
         //Readonly members
         private readonly CoroutineRunner coroutineRunner;
-        private readonly IServerSession serverSession;
-        private readonly string @namespace;
+        private readonly ISession session;
         private readonly DedicatedServerManagerApi api;
 
-        private string name = "";
+        private string serverName = "";
         private string matchSessionId = "";
         private bool isHeartBeatAutomatic;
         private float heartbeatTimeoutSeconds;
@@ -29,18 +25,19 @@ namespace AccelByte.Server
         private Coroutine heartBeatCoroutine;
         private uint heartbeatRetryCount = 0;
 
-        internal DedicatedServerManager(DedicatedServerManagerApi api, IServerSession serverSession, CoroutineRunner coroutineRunner)
+        internal DedicatedServerManager( DedicatedServerManagerApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(serverSession, "session parameter can not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.coroutineRunner = coroutineRunner;
-            this.serverSession = serverSession;
-            this.api = api;
+            coroutineRunner = inCoroutineRunner;
+            session = inSession;
+            api = inApi;
 
-            AccelByteDebug.Log("Server init sessionAdapter: " + this.serverSession.AuthorizationToken);
-            AccelByteDebug.Log("Server init podName: " + this.name);
+            AccelByteDebug.Log("Server init sessionAdapter: " + session.AuthorizationToken);
+            AccelByteDebug.Log("Server init podName: " + serverName);
         }
 
         /// <summary>
@@ -49,25 +46,28 @@ namespace AccelByte.Server
         /// <param name="port">Exposed port number to connect to</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         /// <param name="customAttribute">A string value that will be sent to game client via DSNotif</param>
-        public void RegisterServer(int portNumber, ResultCallback callback, string customAttribute = "")
+        public void RegisterServer( int portNumber
+            , ResultCallback callback
+            , string customAttribute = "" )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 AccelByteDebug.Log("Server RegisterServer session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.name = Environment.GetEnvironmentVariable("POD_NAME");
-            var request = new RegisterServerRequest {
-                pod_name = this.name, 
+            serverName = Environment.GetEnvironmentVariable("POD_NAME");
+            var request = new RegisterServerRequest 
+            {
+                pod_name = serverName, 
                 port = portNumber, 
-                custom_attribute = customAttribute
+                custom_attribute = customAttribute,
             };
-            this.coroutineRunner.Run(this.api.RegisterServer(request, this.serverSession.AuthorizationToken, callback));
+            
+            coroutineRunner.Run(api.RegisterServer(request, callback));
         }
 
         /// <summary>
@@ -75,29 +75,29 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="killMe">Signaling DSM to forcefully shutdown this machine</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ShutdownServer(bool killMe, ResultCallback callback)
+        public void ShutdownServer( bool killMe
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (this.heartBeatCoroutine != null)
+            if (heartBeatCoroutine != null)
             {
-                this.coroutineRunner.Stop(this.heartBeatCoroutine);
-                this.heartBeatCoroutine = null;
+                coroutineRunner.Stop(heartBeatCoroutine);
+                heartBeatCoroutine = null;
             }
             
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
             var request = new ShutdownServerRequest
             {
-                kill_me = killMe, pod_name = this.name, session_id = this.matchSessionId
+                kill_me = killMe, pod_name = serverName, session_id = matchSessionId,
             };
 
-            this.coroutineRunner.Run(this.api.ShutdownServer(request, this.serverSession.AuthorizationToken, callback));
+            coroutineRunner.Run(api.ShutdownServer(request, callback));
         }
 
         /// <summary>
@@ -105,65 +105,69 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="ip">Local IP Address</param>
         /// <param name="port">Port number</param>
-        /// <param name="name">Name to uniquely identify this local server</param>
+        /// <param name="inName">Name to uniquely identify this local server</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         /// <param name="customAttribute">A string value that will be sent to game client via DSNotif</param>
-        public void RegisterLocalServer(string ip, uint port, string name, ResultCallback callback, string customAttribute = "")
+        public void RegisterLocalServer( string ip
+            , uint port
+            , string inName
+            , ResultCallback callback
+            , string customAttribute = "" )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            Assert.IsNotNull(name, "Can't Register server; podName is null!");
+            Assert.IsNotNull(inName, "Can't Register server; podName is null!");
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.name = name;
-            var request = new RegisterLocalServerRequest {
+            serverName = inName;
+            var request = new RegisterLocalServerRequest
+            {
                 ip = ip, 
                 port = port, 
-                name = name, 
-                custom_attribute = customAttribute
+                name = inName, 
+                custom_attribute = customAttribute,
             };
-            string authToken = this.serverSession.AuthorizationToken;
-            this.coroutineRunner.Run(this.api.RegisterLocalServer(request, authToken, callback));
+            
+            coroutineRunner.Run(api.RegisterLocalServer(request, callback));
         }
 
-        [Obsolete("ipify supports will be deprecated in future releases, please use RegisterLocalServer(string ip, uint port, string name, ResultCallback callback)")]
-        public void RegisterLocalServer(uint port, string name, ResultCallback callback)
+        [Obsolete("ipify supports will be deprecated in future releases, please use " +
+            "RegisterLocalServer(string ip, uint port, string inName, ResultCallback callback)")]
+        public void RegisterLocalServer( uint port
+            , string inName
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            string accessToken = this.serverSession.AuthorizationToken;
-            this.coroutineRunner.Run(this.api.RegisterLocalServer(port, name, this.serverSession.AuthorizationToken, callback));
+            coroutineRunner.Run(api.RegisterLocalServer(port, inName, callback));
         }
 
         /// <summary>
         /// Deregister local server from DSM
         /// </summary>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void DeregisterLocalServer(ResultCallback callback)
+        public void DeregisterLocalServer( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (this.heartBeatCoroutine != null)
+            if (heartBeatCoroutine != null)
             {
-                this.coroutineRunner.Stop(this.heartBeatCoroutine);
-                this.heartBeatCoroutine = null;
+                coroutineRunner.Stop(heartBeatCoroutine);
+                heartBeatCoroutine = null;
             }
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
             
-            string authToken = this.serverSession.AuthorizationToken;
-            this.coroutineRunner.Run(this.api.DeregisterLocalServer(this.name, authToken, callback));
+            coroutineRunner.Run(api.DeregisterLocalServer(serverName, callback));
         }
 
         /// <summary>
@@ -171,18 +175,17 @@ namespace AccelByte.Server
         /// DS is claimed when a party / player first joined a DS.
         /// </summary>
         /// <param name="callback">Returns a session ID via callback when completed</param>
-        public void GetSessionId(ResultCallback<ServerSessionResponse> callback)
+        public void GetSessionId( ResultCallback<ServerSessionResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if(!this.serverSession.IsValid())
+            if(!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            string authToken = this.serverSession.AuthorizationToken;
-            this.coroutineRunner.Run(this.api.GetSessionId(authToken, callback));
+            coroutineRunner.Run(api.GetSessionId(callback));
         }
     }
 }

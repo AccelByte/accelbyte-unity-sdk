@@ -60,6 +60,16 @@ namespace AccelByte.Core
             return HttpRequestBuilder.CreatePrototype("DELETE", url);
         }
 
+        /// <summary>
+        /// For endpoint URLs, we'll replace "{brackets}" key with urlEncoded (Uri-escaped) val.
+        /// - Eg, "some/url/path/{namespace}/foo" will replace {namespace} key with val.
+        /// - Not to be confused with WithQueryParam (GET) || WithFormParam (POST).  
+        /// - WithParamParams is the singular version of WithPathParams().  
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public HttpRequestBuilder WithPathParam(string key, string value)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
@@ -72,6 +82,14 @@ namespace AccelByte.Core
             return this;
         }
 
+        /// <summary>
+        /// For endpoint URLs, we'll replace "{brackets}" key with urlEncoded (Uri-escaped) val.
+        /// - Eg, "some/url/path/{namespace}/foo" will replace {namespace} key with val.
+        /// - Not to be confused with WithQueryParam(s) (GET) || WithFormParam (POST).  
+        /// - WithParamParams() is the plural version of WithPathParam(). 
+        /// </summary>
+        /// <param name="pathParams"></param>
+        /// <returns></returns>
         public HttpRequestBuilder WithPathParams(IDictionary<string, string> pathParams)
         {
             foreach (var param in pathParams)
@@ -82,6 +100,15 @@ namespace AccelByte.Core
             return this;
         }
 
+        /// <summary>
+        /// For endpoint URLs, we'll replace "{brackets}" key with urlEncoded (Uri-escaped) val.
+        /// - Eg, "some/url/path/{namespace}/foo" will replace {namespace} key with val.
+        /// - Not to be confused with WithFormParam (POST) || WithPathParam ({bracket} val swapping) 
+        /// - WithQueryParam() is the singular version of WithPathParam(). 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public HttpRequestBuilder WithQueryParam(string key, string value)
         {
             Assert.IsNotNull(key, "query key is null");
@@ -98,7 +125,31 @@ namespace AccelByte.Core
 
             return this;
         }
+        
+        /// <summary>
+        /// For endpoint URLs, we'll replace "{brackets}" key with urlEncoded (Uri-escaped) val.
+        /// - Eg, "some/url/path/{namespace}/foo" will replace {namespace} key with val.
+        /// - Not to be confused with WithFormParam (POST) || WithPathParam ({bracket} val swapping) 
+        /// - WithQueryParam() is the singular version of WithPathParam(). 
+        /// </summary>
+        /// <param name="queriesDict"></param>
+        /// <returns></returns>
+        public HttpRequestBuilder WithQueryParams(IDictionary<string, string> queriesDict)
+        {
+            foreach (var query in queriesDict)
+            {
+                WithQueryParam(query.Key, query.Value);
+            }
 
+            return this;
+        }
+
+        /// <summary>
+        /// For GET-like HTTP calls only,  For POST
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public HttpRequestBuilder WithQueryParam(string key, ICollection<string> values)
         {
             foreach (string value in values)
@@ -201,6 +252,14 @@ namespace AccelByte.Core
             return this;
         }
 
+        /// <summary>
+        /// Add a FORM (POST-like) param key:val.
+        /// - Not to be confused with WithQueryParam (GET) || WithPathParam ({bracket} val swapping)
+        /// - TODO: Create plural version, WithFormParams(), like similar funcs. 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public HttpRequestBuilder WithFormParam(string key, string value)
         {
             Assert.IsNotNull(key, "form key is null");

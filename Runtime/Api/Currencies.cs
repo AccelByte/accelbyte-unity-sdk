@@ -1,54 +1,63 @@
-// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class Currencies
+    public class Currencies : WrapperBase
     {
         private readonly CurrenciesApi api;
-        private readonly ISession session;
-        private readonly string @namespace;
+        private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Currencies(CurrenciesApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
+        internal Currencies( CurrenciesApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns parameter can't be empty");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.api = api;
-            this.session = session;
-            this.@namespace = @namespace;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal Currencies( CurrenciesApi inApi
+            , IUserSession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+        {
         }
 
         /// <summary>
         /// Get All Currency List Info by namespace
         /// </summary>
         /// <param name="callback">Return a result that contains CurrencyList via callback</param>
-        /// <param name="namespace">Details about List of Currencies, default value is current namespace</param>
-        public void GetCurrencyList(ResultCallback<CurrencyList[]> callback, string @namespace = "")
+        public void GetCurrencyList( ResultCallback<CurrencyList[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetCurrencyList(
-                    (@namespace == "") ? this.@namespace : @namespace,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.GetCurrencyList(callback));
         }
     }
 }

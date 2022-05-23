@@ -1,7 +1,6 @@
-// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -10,59 +9,61 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class Miscellaneous
+    public class Miscellaneous : WrapperBase
     {
         private readonly MiscellaneousApi api;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Miscellaneous(MiscellaneousApi api, CoroutineRunner coroutineRunner)
+        internal Miscellaneous( MiscellaneousApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.api = api;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            coroutineRunner = inCoroutineRunner;
         }
 
         /// <summary>
         /// Get server current time.
         /// </summary>
         /// <param name="callback">Returns a Result that contains Time via callback when completed.</param>
-        public void GetCurrentTime(ResultCallback<Time> callback)
+        public void GetCurrentTime( ResultCallback<Time> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            this.coroutineRunner.Run(this.api.GetCurrentTime(callback));
+            coroutineRunner.Run(api.GetCurrentTime(callback));
         }
         /// <summary>
         /// Get all valid country codes for User Registration
         /// </summary>
         /// <param name="callback">Returns a Result that contains an Array of <see cref="Country"/> via callback when completed</param>
-        public void GetCountryGroups(ResultCallback<Country[]> callback)
+        public void GetCountryGroups( ResultCallback<Country[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            this.coroutineRunner.Run(this.api.GetCountryGroups(callback));
+            coroutineRunner.Run(api.GetCountryGroups(callback));
         }
         /// <summary>
         /// Get all valid Languages for User Registration
         /// </summary>
         /// <param name="callback">Returns a Result that contains a Dictionary of Language Codes to Native Language via callback when completed</param>
-        public void GetLanguages(ResultCallback<Dictionary<string,string>> callback)
+        public void GetLanguages( ResultCallback<Dictionary<string,string>> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            this.coroutineRunner.Run(this.api.GetLanguages(callback));
+            coroutineRunner.Run(api.GetLanguages(callback));
         }
         /// <summary>
         /// Get all valid Time Zones for User Registration
         /// </summary>
         /// <param name="callback">Returns a Result that contains an array of TimeZone strings via callback when completed</param>
-        public void GetTimeZones(ResultCallback<string[]> callback)
+        public void GetTimeZones( ResultCallback<string[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            this.coroutineRunner.Run(this.api.GetTimeZones(callback));
+            coroutineRunner.Run(api.GetTimeZones(callback));
         }
         
     }

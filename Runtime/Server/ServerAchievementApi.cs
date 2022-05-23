@@ -1,38 +1,43 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
+using AccelByte.Api;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    internal class ServerAchievementApi
+    internal class ServerAchievementApi : ServerApiBase
     {
-        private string baseUrl;
-        private IHttpClient httpClient;
-
-        internal ServerAchievementApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==AchievementServerUrl</param>
+        /// <param name="session"></param>
+        internal ServerAchievementApi( IHttpClient httpClient
+            , ServerConfig config
+            , ISession session ) 
+            : base( httpClient, config, config.AchievementServerUrl,session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        public IEnumerator UnlockAchievement(string @namespace, string userId, string accessToken, string achievementCode,
-            ResultCallback callback)
+        public IEnumerator UnlockAchievement( string userId
+            , string accessToken
+            , string achievementCode
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't unlock achievement! Namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't unlock achievement! Namespace parameter is null!");
             Assert.IsNotNull(accessToken, "Can't unlock achievement! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't unlock achievement! UserId parameter is null!");
             Assert.IsNotNull(achievementCode, "Can't unlock achievement! AchievementCode parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("achievementCode", achievementCode)
                 .WithBearerAuth(accessToken)
@@ -42,7 +47,8 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);

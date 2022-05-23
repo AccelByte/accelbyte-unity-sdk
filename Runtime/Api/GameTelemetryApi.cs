@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,43 +10,41 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class GameTelemetryApi
+    public class GameTelemetryApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Public Methods
-
-        public GameTelemetryApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==GameTelemetryServerUrl</param>
+        /// <param name="session"></param>
+        public GameTelemetryApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.GameTelemetryServerUrl, session )
         {
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
         
-        public IEnumerator SendProtectedEvents(List<TelemetryBody> events, string accessToken, ResultCallback callback)
+        public IEnumerator SendProtectedEvents( List<TelemetryBody> events
+            , ResultCallback callback )
         {
             Assert.IsNotNull(events, nameof(events) + " is null.");
 
                 var request = HttpRequestBuilder
-                    .CreatePost(this.baseUrl + "/v1/protected/events")
+                    .CreatePost(BaseUrl + "/v1/protected/events")
                     .WithContentType(MediaType.ApplicationJson)
                     .WithBody(events.ToUtf8Json())
-                    .WithBearerAuth(accessToken)
+                    .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson)
                     .GetResult();
 
                 IHttpResponse response = null;
 
-                yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+                yield return HttpClient.SendRequest(request, 
+                    rsp => response = rsp);
 
                 var result = response.TryParse();
                 callback.Try(result);
         }
 
-        #endregion
     }
 }

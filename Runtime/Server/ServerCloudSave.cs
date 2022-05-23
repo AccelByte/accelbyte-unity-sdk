@@ -1,61 +1,82 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    public class ServerCloudSave
+    public class ServerCloudSave : WrapperBase
     {
         private readonly ServerCloudSaveApi api;
-        private readonly IServerSession session;
-        private readonly string namespace_;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal ServerCloudSave(ServerCloudSaveApi api, IServerSession session, string namespace_, CoroutineRunner coroutineRunner)
+        internal ServerCloudSave( ServerCloudSaveApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "Can not construct CloudSave manager; api is null!");
-            Assert.IsNotNull(session, "Can not construct CloudSave manager; session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(namespace_), "Can not construct CloudSave manager; namespace parameter couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "Can not construct CloudSave manager; coroutineRunner is null!");
+            Assert.IsNotNull(inApi, "Cannot construct CloudSave manager; api is null!");
+            Assert.IsNotNull(inCoroutineRunner, "Cannot construct CloudSave manager; coroutineRunner is null!");
 
-            this.api = api;
-            this.session = session;
-            this.namespace_ = namespace_;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inAi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal ServerCloudSave( ServerCloudSaveApi inApi
+            , ISession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner )
+        {
         }
 
         /// <summary>
-        /// Save a user-level record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// Save a user-level record. If the record doesn't exist, it will create and save
+        /// the record, if already exists, it will append to the existing one.
         /// </summary>
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SaveUserRecord(string userId, string key, Dictionary<string, object> recordRequest, ResultCallback callback)
+        public void SaveUserRecord( string userId
+            , string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.SaveUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, callback, false));
+            coroutineRunner.Run(api.SaveUserRecord(
+                userId,
+                key,
+                recordRequest,
+                callback,
+                isPublic: false));
         }
 
         /// <summary>
-        /// Save a user-level record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// Save a user-level record. If the record doesn't exist, it will create and save
+        /// the record, if already exists, it will append to the existing one.
         /// </summary>
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
@@ -63,22 +84,32 @@ namespace AccelByte.Server
         /// <param name="setBy">Indicate which party that could modify the player record</param>
         /// <param name="isPublic">Indicate whether the player record is a public record or not</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SaveUserRecord(string userId, string key, Dictionary<string, object> recordRequest, 
-            RecordSetBy setBy, bool isPublic, ResultCallback callback)
+        public void SaveUserRecord( string userId
+            , string key
+            , Dictionary<string, object> recordRequest
+            , RecordSetBy setBy
+            , bool isPublic
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
+                
             }
 
-            this.coroutineRunner.Run(
-                this.api.SaveUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, setBy, isPublic, callback));
+            coroutineRunner.Run(
+                api.SaveUserRecord(
+                    userId,
+                    key,
+                    recordRequest,
+                    setBy,
+                    isPublic,
+                    callback));
         }
 
         /// <summary>
@@ -86,49 +117,60 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
-        /// <param name="callback">Returns a Result that contains UserRecord via callback when completed</param>
-        public void GetUserRecord(string userId, string key, ResultCallback<UserRecord> callback)
+        /// <param name="callback">
+        /// Returns a Result that contains UserRecord via callback when completed
+        /// </param>
+        public void GetUserRecord( string userId
+            , string key
+            , ResultCallback<UserRecord> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, false, callback));
+            coroutineRunner.Run(
+                api.GetUserRecord(userId, key, false, callback));
         }
 
         /// <summary>
-        /// Replace a record in user-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one.
+        /// Replace a record in user-level. If the record doesn't exist, it will create and
+        /// save the record. If already exists, it will replace the existing one.
         /// </summary>
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ReplaceUserRecord(string userId, string key, Dictionary<string, object> recordRequest, ResultCallback callback)
+        public void ReplaceUserRecord( string userId
+            , string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.ReplaceUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, callback, false));
+            coroutineRunner.Run(api.ReplaceUserRecord(
+                userId,
+                key,
+                recordRequest,
+                callback,
+                isPublic:false));
         }
 
         /// <summary>
-        /// Replace a record in user-level. If the record doesn't exist, it will create and save the record. If already exists, it will replace the existing one.
+        /// Replace a record in user-level. If the record doesn't exist, it will create and
+        /// save the record. If already exists, it will replace the existing one.
         /// </summary>
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
@@ -136,22 +178,32 @@ namespace AccelByte.Server
         /// <param name="setBy">Indicate which party that could modify the player record.</param>
         /// <param name="isPublic">Indicate whether the player record is a public record or not.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ReplaceUserRecord(string userId, string key, Dictionary<string, object> recordRequest,
-            RecordSetBy setBy, bool isPublic, ResultCallback callback)
+        public void ReplaceUserRecord( string userId
+            , string key
+            , Dictionary<string, object> recordRequest
+            , RecordSetBy setBy
+            , bool isPublic
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.ReplaceUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, recordRequest, setBy, isPublic, callback));
+            coroutineRunner.Run(
+                api.ReplaceUserRecord(
+                    userId,
+                    key,
+                    recordRequest,
+                    setBy,
+                    isPublic,
+                    callback));
         }
 
         /// <summary>
@@ -160,45 +212,54 @@ namespace AccelByte.Server
         /// <param name="userId">Targeted user ID</param>
         /// <param name="key">Key of record</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void DeleteUserRecord(string userId, string key, ResultCallback callback)
+        public void DeleteUserRecord( string userId
+            , string key
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.DeleteUserRecord(this.namespace_, userId, this.session.AuthorizationToken, key, callback));
+            coroutineRunner.Run(api.DeleteUserRecord(
+                userId,
+                key, 
+                callback));
         }
 
 
         /// <summary>
-        /// Save a game record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// Save a game record. If the record doesn't exist, it will create and
+        /// save the record, if already exists, it will append to the existing one.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SaveGameRecord(string key, Dictionary<string, object> recordRequest, RecordSetBy setBy, ResultCallback callback)
+        public void SaveGameRecord( string key
+            , Dictionary<string, object> recordRequest
+            , RecordSetBy setBy
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.SaveGameRecord(this.namespace_, this.session.AuthorizationToken, key, recordRequest, setBy, callback));
+            coroutineRunner.Run(api.SaveGameRecord(
+                key,
+                recordRequest,
+                setBy,
+                callback));
         }
 
         /// <summary>
@@ -206,75 +267,84 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void DeleteGameRecord(string key, ResultCallback callback)
+        public void DeleteGameRecord( string key
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.DeleteGameRecord(this.namespace_, this.session.AuthorizationToken, key, callback));
+            coroutineRunner.Run(api.DeleteGameRecord(key, callback));
         }
 
         /// <summary>
-        /// Replace a game record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// Replace a game record. If the record doesn't exist, it will create and
+        /// save the record, if already exists, it will append to the existing one.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ReplaceGameRecord(string key, Dictionary<string, object> recordRequest, RecordSetBy setBy, ResultCallback callback)
+        public void ReplaceGameRecord( string key
+            , Dictionary<string, object> recordRequest
+            , RecordSetBy setBy
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.ReplaceGameRecord(this.namespace_, this.session.AuthorizationToken, key, recordRequest, setBy, callback));
+            coroutineRunner.Run(api.ReplaceGameRecord(
+                key, 
+                recordRequest,
+                setBy, 
+                callback));
         }
 
         /// <summary>
-        /// Replace a game record. If the record doesn't exist, it will create and save the record, if already exists, it will append to the existing one.
+        /// Replace a game record. If the record doesn't exist, it will create and
+        /// save the record, if already exists, it will append to the existing one.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="lastUpdated">Last updated</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param> 
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void ReplaceGameRecordCheckLatest(string key, DateTime lastUpdated, Dictionary<string, object> recordRequest, ResultCallback callback)
+        public void ReplaceGameRecordCheckLatest( string key
+            , DateTime lastUpdated
+            , Dictionary<string, object> recordRequest
+            , ResultCallback callback )
         {
             Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
             Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
 
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            ConcurrentReplaceRequest request = new ConcurrentReplaceRequest
+            var request = new ConcurrentReplaceRequest
             {
                 
                 updatedAt = lastUpdated, 
-                value = recordRequest
+                value = recordRequest,
             };
 
-            this.coroutineRunner.Run(this.api.ReplaceGameRecord(this.namespace_, this.session.AuthorizationToken, key, request, callback));
+            coroutineRunner.Run(api.ReplaceGameRecord(
+                key, request, callback));
         }
 
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,6 +14,10 @@ using Random = System.Random;
 
 namespace AccelByte.Api
 {
+    /// <summary>
+    /// This is the actual User's session information (userId, AuthorizationToken...)
+    /// <remarks>Not to be confused with Api/User.cs, which is a gateway to the User API.</remarks> 
+    /// </summary>
     public class LoginSession : IUserSession
     {
         const string RefreshTokenKey = "accelbyte_refresh_token";
@@ -22,7 +26,7 @@ namespace AccelByte.Api
         private static readonly TimeSpan MaxBackoffInterval = TimeSpan.FromDays(1);
 
         private readonly string baseUrl;
-        private readonly string @namespace;
+        private readonly string namespace_;
         private readonly string redirectUri;
         private readonly bool usePlayerPrefs;
         private readonly IHttpClient httpClient;
@@ -35,67 +39,70 @@ namespace AccelByte.Api
         public event Action<string> RefreshTokenCallback;
         private Coroutine bearerAuthRejectedCoroutine;
 
-        internal LoginSession(
-            string baseUrl,
-            string @namespace,
-            string redirectUri,
-            IHttpClient httpClient,
-            CoroutineRunner coroutineRunner,
-            bool usePlayerPrefs = false)
+        internal LoginSession
+            ( string inBaseUrl
+            , string inNamespace
+            , string inRedirectUri
+            , IHttpClient inHttpClient
+            , CoroutineRunner inCoroutineRunner
+            , bool inUsePlayerPrefs = false)
         {
-            Assert.IsNotNull(baseUrl, nameof(baseUrl) + " is null");
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " is null");
-            Assert.IsNotNull(redirectUri, nameof(redirectUri) + " is null");
-            Assert.IsNotNull(httpClient, nameof(httpClient) + " is null");
-            Assert.IsNotNull(coroutineRunner, nameof(coroutineRunner) + " is null");
+            Assert.IsNotNull(inRedirectUri, "inRedirectUri is null");
+            Assert.IsNotNull(inHttpClient, "inHttpClient is null");
+            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner is null");
 
-            this.baseUrl = baseUrl;
-            this.@namespace = @namespace;
-            this.redirectUri = redirectUri;
-            this.usePlayerPrefs = usePlayerPrefs;
-            this.httpClient = httpClient;
-            this.coroutineRunner = coroutineRunner;
+            redirectUri = inRedirectUri;
+            usePlayerPrefs = inUsePlayerPrefs;
+            httpClient = inHttpClient;
+            coroutineRunner = inCoroutineRunner;
+            baseUrl = inBaseUrl;
+            namespace_ = inNamespace;
 
-            ((AccelByteHttpClient)this.httpClient).BearerAuthRejected += BearerAuthRejected;
-            ((AccelByteHttpClient)this.httpClient).UnauthorizedOccured += UnauthorizedOccured;
+            ((AccelByteHttpClient)httpClient).BearerAuthRejected += BearerAuthRejected;
+            ((AccelByteHttpClient)httpClient).UnauthorizedOccured += UnauthorizedOccured;
         }
 
-        public string AuthorizationToken { get => this.tokenData?.access_token; set => this.tokenData.access_token = value; }
-
-        public string UserId => this.tokenData?.user_id;
-
-        public bool IsComply => this.tokenData?.is_comply ?? false;
-
-        public IEnumerator LoginWithUsername(
-            string username,
-            string password,
-            ResultCallback callback,
-            bool rememberMe = false)
+        public string AuthorizationToken
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            get => tokenData?.access_token; 
+            set => tokenData.access_token = value;
+        }
+
+        public string UserId => tokenData?.user_id;
+
+        public bool IsComply => tokenData?.is_comply ?? false;
+
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithUsername
+            ( string username
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
+        {
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(username, "Username parameter is null.");
             Assert.IsNotNull(password, "Password parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/oauth/token")
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "password")
                 .WithFormParam("username", username)
                 .WithFormParam("password", password)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .WithFormParam("extend_exp", rememberMe ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -104,37 +111,38 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithUsername(
-            string username,
-            string password,
-            ResultCallback<TokenData, OAuthError> callback,
-            bool rememberMe = false)
+        public IEnumerator LoginWithUsername
+            ( string username
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(username, "Username parameter is null.");
             Assert.IsNotNull(password, "Password parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/oauth/token")
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "password")
                 .WithFormParam("username", username)
                 .WithFormParam("password", password)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .WithFormParam("extend_exp", rememberMe ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
-                callback.TryOk();
+                SetSession(result.Value);
+                callback.Try(result);
             }
             else
             {
@@ -142,36 +150,37 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithUsernameV3(
-            string username,
-            string password,
-            ResultCallback callback,
-            bool rememberMe = false)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithUsernameV3
+            ( string username
+            , string password
+            , ResultCallback callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(username, "Username parameter is null.");
             Assert.IsNotNull(password, "Password parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "password")
                 .WithFormParam("username", username)
                 .WithFormParam("password", password)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .WithFormParam("extend_exp", rememberMe ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -180,36 +189,37 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithUsernameV3(
-            string username,
-            string password,
-            ResultCallback<TokenData, OAuthError> callback,
-            bool rememberMe = false)
+        public IEnumerator LoginWithUsernameV3
+            ( string username
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(username, "Username parameter is null.");
             Assert.IsNotNull(password, "Password parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "password")
                 .WithFormParam("username", username)
                 .WithFormParam("password", password)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .WithFormParam("extend_exp", rememberMe ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -218,29 +228,30 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithDeviceId(ResultCallback callback)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithDeviceId( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
 
-            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/device/token")
+            IHttpRequest request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/device/token")
                 .WithPathParam("platformId", deviceProvider.DeviceType)
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("device_id", deviceProvider.DeviceId)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -249,29 +260,30 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
+        public IEnumerator LoginWithDeviceId( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
 
-            IHttpRequest request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/device/token")
+            IHttpRequest request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/device/token")
                 .WithPathParam("platformId", deviceProvider.DeviceType)
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("device_id", deviceProvider.DeviceId)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -280,12 +292,13 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithOtherPlatform(
-            PlatformType platformType,
-            string platformToken,
-            ResultCallback callback)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithOtherPlatform
+            ( PlatformType platformType
+            , string platformToken
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
 
             if (platformType == PlatformType.Stadia)
@@ -293,24 +306,24 @@ namespace AccelByte.Api
                 platformToken = platformToken.TrimEnd('=');
             }
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/{platformId}/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/{platformId}/token")
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("platform_token", platformToken)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -319,12 +332,12 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithOtherPlatform(
-            PlatformType platformType,
-            string platformToken,
-            ResultCallback<TokenData, OAuthError> callback)
+        public IEnumerator LoginWithOtherPlatform
+            ( PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
 
             if (platformType == PlatformType.Stadia)
@@ -332,24 +345,25 @@ namespace AccelByte.Api
                 platformToken = platformToken.TrimEnd('=');
             }
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/platforms/{platformId}/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/{platformId}/token")
                 .WithPathParam("platformId", platformType.ToString().ToLower())
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("platform_token", platformToken)
-                .WithFormParam("namespace", this.@namespace)
+                .WithFormParam("namespace", namespace_)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -358,29 +372,32 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithAuthorizationCode(string code, ResultCallback callback)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithAuthorizationCode
+            ( string code
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(code, "Code parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/oauth/token")
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "authorization_code")
                 .WithFormParam("code", code)
-                .WithFormParam("redirect_uri", this.redirectUri)
+                .WithFormParam("redirect_uri", redirectUri)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -389,29 +406,32 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithAuthorizationCode(string code, ResultCallback<TokenData, OAuthError> callback)
+        public IEnumerator LoginWithAuthorizationCode
+            ( string code
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(code, "Code parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/oauth/token")
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "authorization_code")
                 .WithFormParam("code", code)
-                .WithFormParam("redirect_uri", this.redirectUri)
+                .WithFormParam("redirect_uri", redirectUri)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -420,20 +440,23 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback callback)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithLatestRefreshToken
+            ( string refreshToken
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             if (refreshToken != null)
             {
-                this.tokenData = new TokenData { refresh_token = refreshToken };
-                yield return this.RefreshSession(callback);
+                tokenData = new TokenData { refresh_token = refreshToken };
+                yield return RefreshSession(callback);
             }
-            else if (this.usePlayerPrefs)
+            else if (usePlayerPrefs)
             {
                 if (PlayerPrefs.HasKey(LoginSession.RefreshTokenKey))
                 {
-                    this.LoadRefreshToken();
-                    yield return this.RefreshSession(callback);
+                    LoadRefreshToken();
+                    yield return RefreshSession(callback);
                 }
                 else
                 {
@@ -446,20 +469,22 @@ namespace AccelByte.Api
             }
         }
 
-        public IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
+        public IEnumerator LoginWithLatestRefreshToken
+            ( string refreshToken
+            , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             if (refreshToken != null)
             {
-                this.tokenData = new TokenData { refresh_token = refreshToken };
-                yield return this.RefreshSession(callback);
+                tokenData = new TokenData { refresh_token = refreshToken };
+                yield return RefreshSession(callback);
             }
-            else if (this.usePlayerPrefs)
+            else if (usePlayerPrefs)
             {
-                if (PlayerPrefs.HasKey(LoginSession.RefreshTokenKey))
+                if (PlayerPrefs.HasKey(RefreshTokenKey))
                 {
-                    this.LoadRefreshToken();
-                    yield return this.RefreshSession(callback);
+                    LoadRefreshToken();
+                    yield return RefreshSession(callback);
                 }
                 else
                 {
@@ -481,10 +506,10 @@ namespace AccelByte.Api
                 callback.TryError(error);
             }
         }
-
-        public IEnumerator Logout(ResultCallback callback)
+        
+        public IEnumerator Logout( ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
             // user already logout.
             if (!this.IsValid())
@@ -493,39 +518,41 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/logout")
-                .WithBearerAuth(this.AuthorizationToken)
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/logout")
+                .WithBearerAuth(AuthorizationToken)
                 .WithContentType(MediaType.TextPlain)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
-            this.ClearSession();
+            ClearSession();
             var result = response.TryParse();
             callback.Try(result);
         }
 
-        public IEnumerator RefreshSession(ResultCallback callback)
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator RefreshSession( ResultCallback callback )
         {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
                 .WithBasicAuth()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "refresh_token")
-                .WithFormParam("refresh_token", this.tokenData.refresh_token)
+                .WithFormParam("refresh_token", tokenData.refresh_token)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
                 yield break;
             }
@@ -533,25 +560,26 @@ namespace AccelByte.Api
             callback.TryError(result.Error);
         }
 
-        public IEnumerator RefreshSession(ResultCallback<TokenData, OAuthError> callback)
+        public IEnumerator RefreshSession( ResultCallback<TokenData, OAuthError> callback )
         {
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/token")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "refresh_token")
-                .WithFormParam("refresh_token", this.tokenData.refresh_token)
+                .WithFormParam("refresh_token", tokenData.refresh_token)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
                 yield break;
             }
@@ -559,34 +587,34 @@ namespace AccelByte.Api
             callback.TryError(result.Error);
         }
 
-        public void SetScheduleRefreshToken(DateTime time)
+        public void SetScheduleRefreshToken( DateTime time )
         {
             // don't schedule refresh token if time is in the past.
             if (time < DateTime.UtcNow)
                 return;
 
-            this.nextRefreshTime = time;
+            nextRefreshTime = time;
 
-            Debug.Log($"set refresh time to {this.nextRefreshTime}");
+            Debug.Log($"set refresh time to {nextRefreshTime}");
 
-            if (this.maintainAccessTokenCoroutine == null)
+            if (maintainAccessTokenCoroutine == null)
             {
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(this.MaintainSession());
+                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainSession());
             }
         }
 
-        public IEnumerator Verify2FACode(
-            string mfaToken,
-            TwoFAFactorType factor,
-            string code,
-           ResultCallback<TokenData, OAuthError> callback,
-           bool rememberDevice = false)
+        public IEnumerator Verify2FACode
+            ( string mfaToken
+            , TwoFAFactorType factor
+            , string code
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberDevice = false )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(mfaToken, "mfaToken parameter is null.");
             Assert.IsNotNull(code, "code parameter is null.");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v3/oauth/mfa/verify")
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/mfa/verify")
                 .WithBasicAuthWithCookie()
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
@@ -598,13 +626,13 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
 
             Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
             if (!result.IsError)
             {
-                this.SetSession(result.Value);
+                SetSession(result.Value);
                 callback.TryOk();
             }
             else
@@ -615,20 +643,20 @@ namespace AccelByte.Api
 
         private IEnumerator MaintainSession()
         {
-            this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);
+            nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
             TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);
             var rand = new Random();
 
-            while (this.tokenData != null)
+            while (tokenData != null)
             {
-                if (refreshBackoff >= LoginSession.MaxBackoffInterval)
+                if (refreshBackoff >= MaxBackoffInterval)
                 {
                     yield break;
                 }
 
-                if (this.tokenData.access_token == null || DateTime.UtcNow < this.nextRefreshTime)
+                if (tokenData.access_token == null || DateTime.UtcNow < nextRefreshTime)
                 {
-                    yield return new WaitForSeconds(LoginSession.WaitExpiryDelay / 1000f);
+                    yield return new WaitForSeconds(WaitExpiryDelay / 1000f);
 
                     continue;
                 }
@@ -637,87 +665,91 @@ namespace AccelByte.Api
                 {
                     Result<TokenData, OAuthError> refreshResult = null;
 
-                    yield return this.RefreshSession(result => refreshResult = result);
+                    yield return RefreshSession(result => refreshResult = result);
 
                     if (!refreshResult.IsError)
                     {
-                        this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);
+                        nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
                     }
                     else
                     {
-                        refreshBackoff = LoginSession.CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
+                        refreshBackoff = CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
 
-                        this.nextRefreshTime = DateTime.UtcNow + refreshBackoff;
+                        nextRefreshTime = DateTime.UtcNow + refreshBackoff;
                     }
                 }
                 else
                 {
                     Result refreshResult = null;
 
-                    yield return this.RefreshSession(result => refreshResult = result);
+                    yield return RefreshSession(result => refreshResult = result);
 
                     if (!refreshResult.IsError)
                     {
-                        this.nextRefreshTime = LoginSession.ScheduleNormalRefresh(this.tokenData.expires_in);
+                        nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
                     }
                     else
                     {
-                        refreshBackoff = LoginSession.CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
+                        refreshBackoff = CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
 
-                        this.nextRefreshTime = DateTime.UtcNow + refreshBackoff;
+                        nextRefreshTime = DateTime.UtcNow + refreshBackoff;
                     }
                 }
             }
         }
 
-        private IEnumerator BearerAuthRejectRefreshToken(Action<string> callback)
+        private IEnumerator BearerAuthRejectRefreshToken( Action<string> callback )
         {
             if (AccelBytePlugin.GetUser().TwoFAEnable)
             {
                 Result<TokenData, OAuthError> refreshResult = null;
 
-                yield return this.RefreshSession(result => refreshResult = result);
+                yield return RefreshSession(result => refreshResult = result);
             }
             else
             {
                 Result<TokenData, OAuthError> refreshResult = null;
 
-                yield return this.RefreshSession(result => refreshResult = result);
+                yield return RefreshSession(result => refreshResult = result);
             }
 
-            callback?.Invoke(this.tokenData.access_token);
-            if (this.bearerAuthRejectedCoroutine != null)
+            callback?.Invoke(tokenData.access_token);
+            if (bearerAuthRejectedCoroutine != null)
             {
-                this.coroutineRunner.Stop(this.bearerAuthRejectedCoroutine);
-                this.bearerAuthRejectedCoroutine = null;
+                coroutineRunner.Stop(bearerAuthRejectedCoroutine);
+                bearerAuthRejectedCoroutine = null;
             }
         }
 
-        private void BearerAuthRejected(string accessToken, Action<string> callback)
+        private void BearerAuthRejected
+            ( string accessToken
+            , Action<string> callback )
         {
-            if (accessToken == this.tokenData?.access_token && 
-                this.bearerAuthRejectedCoroutine == null &&
-                this.maintainAccessTokenCoroutine != null)
+            if (accessToken == tokenData?.access_token && 
+                bearerAuthRejectedCoroutine == null &&
+                maintainAccessTokenCoroutine != null)
             {
-                this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
-                this.bearerAuthRejectedCoroutine = this.coroutineRunner.Run(this.BearerAuthRejectRefreshToken(callback));
+                coroutineRunner.Stop(maintainAccessTokenCoroutine);
+                bearerAuthRejectedCoroutine = coroutineRunner.Run(BearerAuthRejectRefreshToken(callback));
             }
         }
 
-        private void UnauthorizedOccured(string accessToken)
+        private void UnauthorizedOccured( string accessToken )
         {
-            if (accessToken == this.tokenData?.access_token)
+            if (accessToken == tokenData?.access_token)
             {
-                this.ClearSession();
+                ClearSession();
             }
         }
 
-        private static DateTime ScheduleNormalRefresh(int expiresIn)
+        private static DateTime ScheduleNormalRefresh( int expiresIn )
         {
             return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn - 1) * 0.8);
         }
 
-        private static TimeSpan CalculateBackoffInterval(TimeSpan previousRefreshBackoff, int randomNum)
+        private static TimeSpan CalculateBackoffInterval
+            ( TimeSpan previousRefreshBackoff
+            , int randomNum )
         {
             previousRefreshBackoff = TimeSpan.FromSeconds(previousRefreshBackoff.Seconds * 2);
 
@@ -727,22 +759,24 @@ namespace AccelByte.Api
         private void LoadRefreshToken()
         {
             var deviceProvider = DeviceProvider.GetFromSystemInfo();
-            var refreshToken = PlayerPrefs.GetString(LoginSession.RefreshTokenKey);
+            var refreshToken = PlayerPrefs.GetString(RefreshTokenKey);
             refreshToken = Convert.FromBase64String(refreshToken).ToObject<string>();
-            refreshToken = LoginSession.XorString(deviceProvider.DeviceId, refreshToken);
-            this.tokenData = new TokenData { refresh_token = refreshToken };
+            refreshToken = XorString(deviceProvider.DeviceId, refreshToken);
+            tokenData = new TokenData { refresh_token = refreshToken };
         }
 
         private void SaveRefreshToken()
         {
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
-            string token = LoginSession.XorString(deviceProvider.DeviceId, this.tokenData.refresh_token);
+            string token = XorString(deviceProvider.DeviceId, tokenData.refresh_token);
             token = Convert.ToBase64String(token.ToUtf8Json());
-            PlayerPrefs.SetString(LoginSession.RefreshTokenKey, token);
+            PlayerPrefs.SetString(RefreshTokenKey, token);
             PlayerPrefs.Save();
         }
 
-        private static string XorString(string key, string input)
+        private static string XorString
+            ( string key
+            , string input )
         {
             var resultBuilder = new StringBuilder();
             for (int i = 0; i < input.Length; i++)
@@ -753,46 +787,46 @@ namespace AccelByte.Api
             return resultBuilder.ToString();
         }
 
-        private void SetSession(TokenData loginResponse)
+        private void SetSession( TokenData loginResponse )
         {
             Assert.IsNotNull(loginResponse);
-            this.tokenData = loginResponse;
-            this.httpClient.SetImplicitBearerAuth(this.tokenData.access_token);
-            this.httpClient.SetImplicitPathParams(
+            tokenData = loginResponse;
+            httpClient.SetImplicitBearerAuth(tokenData.access_token);
+            httpClient.SetImplicitPathParams(
                 new Dictionary<string, string>
                 {
-                    { "namespace", this.tokenData.Namespace }, { "userId", this.tokenData.user_id }
+                    { "namespace", tokenData.Namespace }, { "userId", tokenData.user_id }
                 });
-            this.httpClient.ClearCookies();
+            httpClient.ClearCookies();
 
-            if (this.usePlayerPrefs)
+            if (usePlayerPrefs)
             {
-                this.SaveRefreshToken();
+                SaveRefreshToken();
             }
 
-            this.RefreshTokenCallback?.Invoke(this.tokenData.refresh_token);
-            if (this.maintainAccessTokenCoroutine == null)
+            RefreshTokenCallback?.Invoke(tokenData.refresh_token);
+            if (maintainAccessTokenCoroutine == null)
             {
-                this.maintainAccessTokenCoroutine = this.coroutineRunner.Run(this.MaintainSession());
+                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainSession());
             }
 
         }
 
         private void ClearSession()
         {
-            if (this.maintainAccessTokenCoroutine != null)
+            if (maintainAccessTokenCoroutine != null)
             {
-                this.coroutineRunner.Stop(this.maintainAccessTokenCoroutine);
-                this.maintainAccessTokenCoroutine = null;
+                coroutineRunner.Stop(maintainAccessTokenCoroutine);
+                maintainAccessTokenCoroutine = null;
             }
 
-            this.tokenData = null;
-            this.httpClient.SetImplicitBearerAuth(null);
-            this.httpClient.ClearImplicitPathParams();
+            tokenData = null;
+            httpClient.SetImplicitBearerAuth(null);
+            httpClient.ClearImplicitPathParams();
 
-            if (!this.usePlayerPrefs) return;
+            if (!usePlayerPrefs) return;
 
-            PlayerPrefs.DeleteKey(LoginSession.RefreshTokenKey);
+            PlayerPrefs.DeleteKey(RefreshTokenKey);
             PlayerPrefs.Save();
         }
     }

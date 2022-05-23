@@ -1,41 +1,44 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using System.Collections.Generic;
+using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    internal class ServerStatisticApi
+    internal class ServerStatisticApi : ServerApiBase
     {
-        private string baseUrl;
-        private IHttpClient httpClient;
-
-        internal ServerStatisticApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==StatisticServerUrl</param>
+        /// <param name="session"></param>
+        internal ServerStatisticApi( IHttpClient httpClient
+            , ServerConfig config
+            , ISession session ) 
+            : base( httpClient, config, config.StatisticServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        public IEnumerator CreateUserStatItems(string @namespace, string userId, string accessToken,
-            CreateStatItemRequest[] statItems, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator CreateUserStatItems( string userId
+            , CreateStatItemRequest[] statItems
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(statItems, nameof(statItems) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(statItems.ToUtf8Json())
@@ -43,26 +46,28 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetUserStatItems(string @namespace, string userId, string accessToken,
-            ICollection<string> statCodes, ICollection<string> tags,
-            ResultCallback<PagedStatItems> callback)
+        public IEnumerator GetUserStatItems( string userId
+            , ICollection<string> statCodes
+            , ICollection<string> tags
+            , ResultCallback<PagedStatItems> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
 
             var builder = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -80,26 +85,28 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PagedStatItems>();
 
             callback.Try(result);
         }
 
-        public IEnumerator IncrementUserStatItems(string @namespace, string userId, StatItemIncrement[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator IncrementUserStatItems( string userId
+            , StatItemIncrement[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePatch(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePatch(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -107,24 +114,25 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator IncrementManyUsersStatItems(string @namespace, UserStatItemIncrement[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator IncrementManyUsersStatItems( UserStatItemIncrement[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePatch(this.baseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/bulk")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
+                .CreatePatch(BaseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -132,26 +140,28 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator ResetUserStatItems(string @namespace, string userId, StatItemReset[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator ResetUserStatItems( string userId
+            , StatItemReset[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -159,24 +169,25 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator ResetManyUsersStatItems(string @namespace, UserStatItemReset[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator ResetManyUsersStatItems( UserStatItemReset[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/reset/bulk")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/reset/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -184,27 +195,30 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator UpdateUserStatItems(string @namespace, string userId, string additionalKey, StatItemUpdate[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator UpdateUserStatItems( string userId
+            , string additionalKey
+            , StatItemUpdate[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("additionalKey", additionalKey)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -212,24 +226,25 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 
             callback.Try(result);
         }
 
-        public IEnumerator UpdateManyUsersStatItems(string @namespace, UserStatItemUpdate[] data,
-            string accessToken, ResultCallback<StatItemOperationResult[]> callback)
+        public IEnumerator UpdateManyUsersStatItems( UserStatItemUpdate[] data
+            , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(@namespace, nameof(@namespace) + " cannot be null");
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v2/admin/namespaces/{namespace}/statitems/value/bulk")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
+                .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(data.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
@@ -237,7 +252,8 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<StatItemOperationResult[]>();
 

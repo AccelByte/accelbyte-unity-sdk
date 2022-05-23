@@ -29,7 +29,8 @@ namespace AccelByte.Api
         public readonly string DeviceId;
         public readonly string DeviceType;
 
-        private DeviceProvider(string deviceType, string deviceId)
+        private DeviceProvider( string deviceType
+            , string deviceId )
         {
             Assert.IsNotNull(deviceType, "DeviceType is null!");
             Assert.IsNotNull(deviceId, "DeviceId is null!");

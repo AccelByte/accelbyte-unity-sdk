@@ -1,4 +1,4 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,33 +13,35 @@ using System.Threading;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
-using Debug = UnityEngine.Debug;
 
 namespace AccelByte.Server
 {
-    public class ServerQos
+    public class ServerQosManager : WrapperBase
     {
         private readonly CoroutineRunner coroutineRunner;
         private readonly ServerQosManagerApi qosManager;
 
-        internal ServerQos(ServerQosManagerApi qosManager, CoroutineRunner coroutineRunner)
+        internal ServerQosManager( ServerQosManagerApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner)
         {
-            Assert.IsNotNull(qosManager, nameof(qosManager) + " is null.");
-            Assert.IsNotNull(coroutineRunner, nameof(coroutineRunner) + " is null.");
-            this.qosManager = qosManager;
-            this.coroutineRunner = coroutineRunner;
+            Assert.IsNotNull( inApi, nameof( inApi ) + " is null.");
+            Assert.IsNotNull( inCoroutineRunner, nameof( inCoroutineRunner ) + " is null.");
+            
+            qosManager = inApi;
+            coroutineRunner = inCoroutineRunner;
         }
 
-        public void GetServerLatencies(ResultCallback<Dictionary<string, int>> callback)
+        public void GetServerLatencies( ResultCallback<Dictionary<string, int>> callback )
         {
-            this.coroutineRunner.Run(GetServerLatenciesAsync(callback));
+            coroutineRunner.Run(GetServerLatenciesAsync(callback));
         }
 
-        private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
+        private IEnumerator GetServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
         {
             Result<QosServerList> getQosServersResult = null;
 
-            yield return this.qosManager.GetQosServers(result => getQosServersResult = result);
+            yield return qosManager.GetQosServers(result => getQosServersResult = result);
 
             if (getQosServersResult.IsError)
             {
@@ -80,7 +82,8 @@ namespace AccelByte.Server
             callback.TryOk(latencies);
         }
         
-        private static IEnumerator WaitUntil(Func<bool> condition, int timeoutMs)
+        private static IEnumerator WaitUntil( Func<bool> condition
+            , int timeoutMs )
         {
             while (!condition.Invoke() && timeoutMs > 0)
             {

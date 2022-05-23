@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,11 +10,10 @@ using System.Collections;
 
 namespace AccelByte.Server
 {
-    public class ServerMatchmaking
+    public class ServerMatchmaking : WrapperBase
     {
         private readonly CoroutineRunner coroutineRunner;
-        private readonly IServerSession serverSession;
-        private readonly string @namespace;
+        private readonly ISession session;
         private readonly ServerMatchmakingApi api;
 
         private Coroutine statusPollingCoroutine;
@@ -22,17 +21,30 @@ namespace AccelByte.Server
         private ResultCallback<MatchmakingResult> statusPollingCallback;
         private string statusPollingMatchId;
 
-        public ServerMatchmaking(ServerMatchmakingApi api, IServerSession serverSession, string @namespace, CoroutineRunner coroutineRunner)
+        internal ServerMatchmaking( ServerMatchmakingApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(serverSession, "session parameter can not be null");
-            Assert.IsNotNull(@namespace, "@namespace parameter can not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "inApi==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner==null (@ constructor)");
 
-            this.coroutineRunner = coroutineRunner;
-            this.serverSession = serverSession;
-            this.@namespace = @namespace;
-            this.api = api;
+            coroutineRunner = inCoroutineRunner;
+            session = inSession;
+            api = inApi;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="session"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="coroutineRunner"></param>
+        internal ServerMatchmaking( ServerMatchmakingApi inApi
+            , ISession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner )
+        {
         }
 
         /// <summary>
@@ -41,17 +53,18 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="body">the session's data (get this data from QuerySessionStatus)</param>
         /// <param name="callback">the result of this operation</param>
-        public void EnqueueJoinableSession(MatchmakingResult body, ResultCallback callback)
+        public void EnqueueJoinableSession( MatchmakingResult body
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.EnqueueJoinableSession(this.@namespace, serverSession.AuthorizationToken, body, callback));
+            coroutineRunner.Run(api.EnqueueJoinableSession(body, callback));
         }
 
         /// <summary>
@@ -60,21 +73,21 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="matchId">the match/session ID</param>
         /// <param name="callback">the result of this operation</param>
-        public void DequeueJoinableSession(string matchId, ResultCallback callback)
+        public void DequeueJoinableSession( string matchId
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 Debug.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
             DequeueRequest body = new DequeueRequest(){match_id = matchId};
 
-            coroutineRunner.Run(api.DequeueJoinableSession(this.@namespace, serverSession.AuthorizationToken, body, callback));
+            coroutineRunner.Run(api.DequeueJoinableSession(body, callback));
         }
 
         /// <summary>
@@ -85,19 +98,22 @@ namespace AccelByte.Server
         /// <param name="userId">user ID to be added.</param>
         /// <param name="callback">the result of this operation.</param>
         /// <param name="partyId">optional, the party ID of the user to be added. if not listed user will be added to a new party.</param>
-        public void AddUserToSession(string channelName, string matchId, string userId, ResultCallback callback, string partyId = "")
+        public void AddUserToSession( string channelName
+            , string matchId
+            , string userId
+            , ResultCallback callback
+            , string partyId = "" )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 Debug.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            coroutineRunner.Run(api.AddUserToSession(this.@namespace, serverSession.AuthorizationToken, channelName, matchId, userId, partyId, callback));
+            coroutineRunner.Run(api.AddUserToSession(channelName, matchId, userId, partyId, callback));
         }
 
         /// <summary>
@@ -108,19 +124,22 @@ namespace AccelByte.Server
         /// <param name="userId">user ID to be removed.</param>
         /// <param name="callback">the result of this operation.</param>
         /// <param name="body">optional, the session's data</param>
-        public void RemoveUserFromSession(string channelName, string matchId, string userId, ResultCallback callback, MatchmakingResult body = null)
+        public void RemoveUserFromSession( string channelName
+            , string matchId
+            , string userId
+            , ResultCallback callback
+            , MatchmakingResult body = null )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if(!this.serverSession.IsValid())
+            if(!session.IsValid())
             {
                 Debug.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            coroutineRunner.Run(api.RemoveUserFromSession(this.@namespace, serverSession.AuthorizationToken, channelName, matchId, userId, body, callback));
+            coroutineRunner.Run(api.RemoveUserFromSession(channelName, matchId, userId, body, callback));
         }
 
         /// <summary>
@@ -128,19 +147,19 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="matchId">the match/session ID</param>
         /// <param name="callback">Result of this operation, will return Session Data as MatchmakingResult class</param>
-        public void QuerySessionStatus(string matchId, ResultCallback<MatchmakingResult> callback)
+        public void QuerySessionStatus( string matchId
+            , ResultCallback<MatchmakingResult> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.serverSession.IsValid())
+            if (!session.IsValid())
             {
                 Debug.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            coroutineRunner.Run(api.QuerySessionStatus(this.@namespace, serverSession.AuthorizationToken, matchId, callback));
+            coroutineRunner.Run(api.QuerySessionStatus(matchId, callback));
         }
 
         /// <summary>
@@ -149,7 +168,9 @@ namespace AccelByte.Server
         /// <param name="matchId">the match/session ID</param>
         /// <param name="callback">Result of this operation, will return Session Data as MatchmakingResult class</param>
         /// <param name="intervalSec">the interval of every session data get call in second</param>
-        public void ActivateSessionStatusPolling(string matchId, ResultCallback<MatchmakingResult> callback, int intervalSec = 5)
+        public void ActivateSessionStatusPolling( string matchId
+            , ResultCallback<MatchmakingResult> callback
+            , int intervalSec = 5 )
         {
             if(statusPollingActive == false)
             {
@@ -160,7 +181,7 @@ namespace AccelByte.Server
             }
         }
 
-        private IEnumerator SessionStatusPolling(int intervalSec = 5)
+        private IEnumerator SessionStatusPolling( int intervalSec = 5 )
         {
             var waitTime = new WaitForSeconds(intervalSec);
             while(statusPollingActive)

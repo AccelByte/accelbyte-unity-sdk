@@ -25,4 +25,12 @@ namespace AccelByte.Models
         NEXT,
         PREVIOUS
     }
+
+    public enum SettingsEnvironment
+    {
+        Development,
+	    Certification,
+	    Production,
+	    Default
+    };
 }

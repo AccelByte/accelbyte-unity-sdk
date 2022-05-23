@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -9,31 +9,23 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class AchievementApi
+    internal class AchievementApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
-
-        internal AchievementApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==AchievementServerUrl</param>
+        /// <param name="session"></param>
+        internal AchievementApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.AchievementServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
+        #region Methods 
 
-        #region Private Methods 
-
-        string ConvertAchievementSortByToString(AchievementSortBy sortBy)
+        private string ConvertAchievementSortByToString( AchievementSortBy sortBy )
         {
             switch (sortBy)
             {
@@ -59,108 +51,117 @@ namespace AccelByte.Api
             return "";
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator QueryAchievements(string @namespace, string accessToken, string language, AchievementSortBy sortBy,
-            ResultCallback<PaginatedPublicAchievement> callback, int offset, int limit)
+        public IEnumerator QueryAchievements( string language
+            , AchievementSortBy sortBy
+            , ResultCallback<PaginatedPublicAchievement> callback
+            , int offset
+            , int limit )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't query achievements! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't query achievements! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't query achievements! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't query achievements! AuthToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/achievements")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("language", language)
                 .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
                 .WithQueryParam("offset", offset.ToString())
                 .WithQueryParam("limit", limit.ToString())
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedPublicAchievement>();
             callback.Try(result);
         }
 
-        public IEnumerator GetAchievement(string @namespace, string accessToken, string achievementCode,
-            ResultCallback<MultiLanguageAchievement> callback)
+        public IEnumerator GetAchievement( string achievementCode
+            , ResultCallback<MultiLanguageAchievement> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get achievement! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get achievement! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get achievement! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get achievement! AuthToken parameter is null!");
             Assert.IsNotNull(achievementCode, "Can't get achievement! AchievementCode parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/achievements/{achievementCode}")
-                .WithPathParam("namespace", @namespace)
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements/{achievementCode}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("achievementCode", achievementCode)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<MultiLanguageAchievement>();
             callback.Try(result);
         }
 
-        public IEnumerator QueryUserAchievements(string @namespace, string userId, string accessToken, AchievementSortBy sortBy,
-            ResultCallback<PaginatedUserAchievement> callback, int offset, int limit, bool PreferUnlocked)
+        public IEnumerator QueryUserAchievements( string userId
+            , AchievementSortBy sortBy
+            , ResultCallback<PaginatedUserAchievement> callback
+            , int offset
+            , int limit
+            , bool PreferUnlocked )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't query user achievements! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't query user achievements! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't query user achievements! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't query user achievements! AuthToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
                 .WithQueryParam("offset", offset.ToString())
                 .WithQueryParam("limit", limit.ToString())
                 .WithQueryParam("preferUnlocked", PreferUnlocked.ToString())
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedUserAchievement>();
             callback.Try(result);
         }
 
-        public IEnumerator UnlockAchievement(string @namespace, string userId, string accessToken, string achievementCode,
-            ResultCallback callback)
+        public IEnumerator UnlockAchievement( string userId
+            , string AuthToken
+            , string achievementCode
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't unlock achievement! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't unlock achievement! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't unlock achievement! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't unlock achievement! AuthToken parameter is null!");
             Assert.IsNotNull(userId, "Can't unlock achievement! UserId parameter is null!");
             Assert.IsNotNull(achievementCode, "Can't unlock achievement! AchievementCode parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("achievementCode", achievementCode)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);

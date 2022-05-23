@@ -1,7 +1,8 @@
-// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -10,43 +11,55 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class UserProfiles
+    public class UserProfiles : WrapperBase
     {
         private readonly UserProfilesApi api;
-        private readonly ISession session;
-        private readonly string @namespace;
+        private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal UserProfiles(UserProfilesApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
+        internal UserProfiles( UserProfilesApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.api = api;
-            this.session = session;
-            this.@namespace = @namespace;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal UserProfiles( UserProfilesApi inApi
+            , IUserSession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+        {
         }
 
         /// <summary>
         /// Get user profile for current logged in user.
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed.</param>
-        public void GetUserProfile(ResultCallback<UserProfile> callback)
+        public void GetUserProfile( ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserProfile(this.@namespace, this.session.AuthorizationToken, callback));
+            coroutineRunner.Run(
+                api.GetUserProfile(callback));
         }
 
         /// <summary>
@@ -54,19 +67,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="createRequest">User profile details to create user profile.</param>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
-        public void CreateUserProfile(CreateUserProfileRequest createRequest, ResultCallback<UserProfile> callback)
+        public void CreateUserProfile( CreateUserProfileRequest createRequest
+            , ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.CreateUserProfile(this.@namespace, this.session.AuthorizationToken, createRequest, callback));
+            coroutineRunner.Run(
+                api.CreateUserProfile(createRequest, callback));
         }
 
         /// <summary>
@@ -74,59 +87,48 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="updateRequest">User profile details to update user profile</param>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
-        public void UpdateUserProfile(UpdateUserProfileRequest updateRequest, ResultCallback<UserProfile> callback)
+        public void UpdateUserProfile( UpdateUserProfileRequest updateRequest
+            , ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateUserProfile(this.@namespace, this.session.AuthorizationToken, updateRequest, callback));
+            coroutineRunner.Run(
+                api.UpdateUserProfile(updateRequest, callback));
         }
 
-        public void GetCustomAttributes(ResultCallback<Dictionary<string, object>> callback)
+        public void GetCustomAttributes( ResultCallback<Dictionary<string, object>> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetCustomAttributes(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
-                    callback));
+            coroutineRunner.Run(
+                api.GetCustomAttributes(session.UserId, callback));
         }
 
-        public void UpdateCustomAttributes(Dictionary<string, object> updates,
-            ResultCallback<Dictionary<string, object>> callback)
+        public void UpdateCustomAttributes( Dictionary<string, object> updates
+            , ResultCallback<Dictionary<string, object>> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
             
-            this.coroutineRunner.Run(
-                this.api.UpdateCustomAttributes(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
-                    updates,
-                    callback));
+            coroutineRunner.Run(
+                api.UpdateCustomAttributes(session.UserId, updates, callback));
         }
 
         /// <summary>
@@ -134,26 +136,27 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userId">UserID for the profile requested</param>
         /// <param name="callback">Returns a Result that contains <see cref="PublicUserProfile"/> via callback when completed.</param>
-        public void GetPublicUserProfile(string userId, ResultCallback<PublicUserProfile> callback)
+        public void GetPublicUserProfile( string userId
+            , ResultCallback<PublicUserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetUserProfilePublicInfo(this.@namespace, userId, this.session.AuthorizationToken, callback));
+            coroutineRunner.Run(
+                api.GetUserProfilePublicInfo(userId, callback));
         }
         /// <summary>
         /// Request the Avatar of the given UserProfile
         /// </summary>
         /// <param name="userID">The UserID of a public Profile</param>
         /// <param name="callback">Returns a result that contains a <see cref="Texture2D"/></param>
-        public void GetUserAvatar(string userID, ResultCallback<Texture2D> callback)
+        public void GetUserAvatar( string userID
+            , ResultCallback<Texture2D> callback )
         {
             GetPublicUserProfile(userID,
                 result =>
@@ -166,7 +169,7 @@ namespace AccelByte.Api
                     }
                     else
                     {
-                        this.coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
+                        coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
                     }
                 });
         }

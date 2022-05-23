@@ -1,34 +1,38 @@
-﻿using System.Collections;
+﻿// Copyright (c) 20?? - 2022 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
+
+using System.Collections;
 using AccelByte.Models;
 using AccelByte.Core;
 using UnityEngine.Assertions;
-using System;
+using AccelByte.Api;
 
 namespace AccelByte.Server
 {
-    public class ServerMatchmakingApi
+    internal class ServerMatchmakingApi : ServerApiBase
     {
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        public  ServerMatchmakingApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==MatchmakingServerUrl</param>
+        /// <param name="session"></param>
+        public ServerMatchmakingApi( IHttpClient httpClient
+            , ServerConfig config
+            , ISession session ) 
+            : base( httpClient, config, config.MatchmakingServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        public IEnumerator EnqueueJoinableSession(string @namespace, string accessToken, MatchmakingResult body, 
-            ResultCallback callback)
+        public IEnumerator EnqueueJoinableSession( MatchmakingResult body
+            , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "RegisterSession failed. accessToken parameter is null!");
+            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "RegisterSession failed. accessToken parameter is null!");
             Assert.IsNotNull(body, "RegisterSession failed. body parameter is null");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/namespaces/{namespace}/sessions")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/namespaces/{namespace}/sessions")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(body.ToJsonString())
@@ -36,22 +40,23 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
 
             callback.Try(result);
         }
 
-        public IEnumerator DequeueJoinableSession(string @namespace, string accessToken, DequeueRequest body, 
-            ResultCallback callback)
+        public IEnumerator DequeueJoinableSession(DequeueRequest body
+            , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "DequeueJoinableSession failed. accessToken parameter is null!");
+            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "DequeueJoinableSession failed. accessToken parameter is null!");
             Assert.IsNotNull(body, "DequeueJoinableSession failed. body parameter is null");
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/namespaces/{namespace}/sessions/dequeue")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(accessToken)
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/namespaces/{namespace}/sessions/dequeue")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(body.ToJsonString())
@@ -59,39 +64,45 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
 
             callback.Try(result);
         }
 
-        public IEnumerator QuerySessionStatus(string @namespace, string accessToken, string matchId, 
-            ResultCallback<MatchmakingResult> callback)
+        public IEnumerator QuerySessionStatus( string matchId
+            ,  ResultCallback<MatchmakingResult> callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "RegisterSession failed. accessToken parameter is null!");
+            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "RegisterSession failed. accessToken parameter is null!");
             Assert.IsFalse(string.IsNullOrEmpty(matchId), "RegisterSession failed. accessToken parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/namespaces/{namespace}/sessions/{matchID}/status")
-                .WithPathParam("namespace", @namespace)
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/namespaces/{namespace}/sessions/{matchID}/status")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("matchID", matchId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<MatchmakingResult>();
 
             callback.Try(result);
         }
 
-        public IEnumerator AddUserToSession(string @namespace, string accessToken, string channelName, string matchId, string userId, string partyId, ResultCallback callback)
+        public IEnumerator AddUserToSession( string channelName
+            , string matchId
+            , string userId
+            , string partyId
+            , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
+            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(matchId), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(channelName), "RemoveUserFromSession failed, channelName is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(userId), "RemoveUserFromSession failed, userId is null or empty!");
@@ -102,38 +113,42 @@ namespace AccelByte.Server
                 party_id = partyId
             };
 
-            var request = HttpRequestBuilder.CreatePost(this.baseUrl + "/v1/admin/namespaces/{namespace}/channels/{channelName}/sessions/{matchId}")
-                .WithPathParam("namespace", @namespace)
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/channels/{channelName}/sessions/{matchId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("channelName", channelName)
                 .WithPathParam("matchId", matchId)
                 .WithBody(body.ToUtf8Json())
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse respose = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => respose = rsp);
+            yield return HttpClient.SendRequest(request, rsp => respose = rsp);
 
             var result = respose.TryParse();
 
             callback.Try(result);
         }
 
-        public IEnumerator RemoveUserFromSession(string @namespace, string accessToken, string channelName, string matchId, string userId, MatchmakingResult body, ResultCallback callback)
+        public IEnumerator RemoveUserFromSession( string channelName
+            , string matchId
+            , string userId
+            , MatchmakingResult body
+            , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(accessToken), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
+            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(matchId), "RemoveUserFromSession failed. accessToken parameter is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(channelName), "RemoveUserFromSession failed, channelName is null or empty!");
             Assert.IsFalse(string.IsNullOrEmpty(userId), "RemoveUserFromSession failed, userId is null or empty!");
 
-            var requestBuilder = HttpRequestBuilder.CreateDelete(this.baseUrl + "/v1/admin/namespaces/{namespace}/channels/{channelName}/sessions/{matchId}/users/{userId}")
-                .WithPathParam("namespace", @namespace)
+            var requestBuilder = HttpRequestBuilder.CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/channels/{channelName}/sessions/{matchId}/users/{userId}")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("channelName", channelName)
                 .WithPathParam("matchId", matchId)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -144,7 +159,7 @@ namespace AccelByte.Server
 
             IHttpResponse respose = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => respose = rsp);
+            yield return HttpClient.SendRequest(request, rsp => respose = rsp);
 
             var result = respose.TryParse();
 

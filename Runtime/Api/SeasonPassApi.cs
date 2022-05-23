@@ -1,59 +1,47 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class SeasonPassApi
+    internal class SeasonPassApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly string @namespace;
-        private readonly ISession session;
-        private readonly IHttpClient httpClient;
-        #endregion
-
-        #region Constructor
-
-        internal SeasonPassApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==SeasonPassServerUrl</param>
+        /// <param name="session"></param>
+        internal SeasonPassApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.SeasonPassServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator GetCurrentSeason(string @namespace, string accessToken, string language, ResultCallback<SeasonInfo> callback)
+        public IEnumerator GetCurrentSeason( string language
+            , ResultCallback<SeasonInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't Get Current Season! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't Get Current Season! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Current Season! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Get Current Season! AccessToken parameter is null!");
             Assert.IsNotNull(language, "Can't Get Current Season! language parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/seasons/current")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/seasons/current")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("language", language)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp =>
+            yield return HttpClient.SendRequest(request, rsp =>
             {
                 response = rsp;
             });
@@ -62,26 +50,28 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetUserSeason(string @namespace, string accessToken, string userId, string seasonId, ResultCallback<UserSeasonInfo> callback)
+        public IEnumerator GetUserSeason( string userId
+            , string seasonId
+            , ResultCallback<UserSeasonInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't Get User Season! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't Get User Season! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get User Season! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Get User Season! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't Get User Season! userId parameter is null!");
             Assert.IsNotNull(seasonId, "Can't Get User Season! seasonId parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/{seasonId}/data")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/{seasonId}/data")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("seasonId", seasonId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp =>
+            yield return HttpClient.SendRequest(request, rsp =>
             {
                 response = rsp;
             });
@@ -90,24 +80,25 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator GetCurrentUserSeason(string @namespace, string accessToken, string userId, ResultCallback<UserSeasonInfo> callback)
+        public IEnumerator GetCurrentUserSeason( string userId
+            , ResultCallback<UserSeasonInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't Get User Current Season! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't Get User Current Season! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get User Current Season! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Get User Current Season! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't Get User Current Season! userId parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/data")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/data")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp =>
+            yield return HttpClient.SendRequest(request, rsp =>
             {
                 response = rsp;
             });
@@ -116,27 +107,28 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator ClaimRewards(string @namespace, string accessToken, string userId, SeasonClaimRewardRequest rewardRequest,
-            ResultCallback<SeasonClaimRewardResponse> callback)
+        public IEnumerator ClaimRewards( string userId
+            , SeasonClaimRewardRequest rewardRequest
+            , ResultCallback<SeasonClaimRewardResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't Claim Rewards! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't Claim Rewards! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Claim Rewards! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Claim Rewards! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't Claim Rewards! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(rewardRequest.ToUtf8Json())
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp =>
+            yield return HttpClient.SendRequest(request, rsp =>
             {
                 response = rsp;
             });
@@ -145,24 +137,25 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator BulkClaimRewards(string @namespace, string accessToken, string userId, ResultCallback<SeasonClaimRewardResponse> callback)
+        public IEnumerator BulkClaimRewards( string userId
+            , ResultCallback<SeasonClaimRewardResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't Claim Rewards! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't Claim Rewards! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Claim Rewards! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Claim Rewards! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't Claim Rewards! AccessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards/bulk")
-                .WithPathParam("namespace", @namespace)
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards/bulk")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp =>
+            yield return HttpClient.SendRequest(request, rsp =>
             {
                 response = rsp;
             });
@@ -171,7 +164,6 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        #endregion
     }
 }
 

@@ -1,11 +1,16 @@
-﻿﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Runtime.Serialization;
+using AccelByte.Api;
 
 namespace AccelByte.Models
 {
+    /// <summary>
+    /// Primarily used by the Editor for the config in the popup menu.
+    /// <para>Looking for runtime settings? See static AccelBytePlugin.Config</para>
+    /// </summary>
     [DataContract]
     public class Config
     {
@@ -198,6 +203,19 @@ namespace AccelByte.Models
             if (string.IsNullOrEmpty(this.RedirectUri)) throw new System.Exception("Init AccelByte SDK failed, Redirect URI must not null or empty.");
         }
 
+        public bool IsRequiredFieldEmpty()
+        {
+            if (string.IsNullOrEmpty(this.Namespace)) return true;
+
+            if (string.IsNullOrEmpty(this.ClientId)) return true;
+
+            if (string.IsNullOrEmpty(this.BaseUrl)) return true;
+
+            if (string.IsNullOrEmpty(this.RedirectUri)) return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Set services URL.
         /// </summary>
@@ -213,5 +231,14 @@ namespace AccelByte.Models
 
             return specificServerUrl;
         }
+    }
+
+    [DataContract]
+    public class MultiConfigs
+    {
+        [DataMember] public Config Development { get; set; }
+        [DataMember] public Config Certification { get; set; }
+        [DataMember] public Config Production { get; set; }
+        [DataMember] public Config Default { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -9,24 +10,37 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class GameProfiles
+    public class GameProfiles : WrapperBase
     {
         private readonly GameProfilesApi api;
-        private readonly ISession session;
-        private readonly string @namespace;
+        private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal GameProfiles(GameProfilesApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
+        internal GameProfiles( GameProfilesApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.api = api;
-            this.session = session;
-            this.@namespace = @namespace;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal GameProfiles( GameProfilesApi inApi
+            , IUserSession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+        {
         }
 
         /// <summary>
@@ -34,36 +48,35 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userIds">Id of some users to get</param>
         /// <param name="callback">Returns all profiles for specified users via callback when completed.</param>
-        public void BatchGetGameProfiles(ICollection<string> userIds, ResultCallback<UserGameProfiles[]> callback)
+        public void BatchGetGameProfiles( ICollection<string> userIds
+            , ResultCallback<UserGameProfiles[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.BatchGetGameProfiles(this.@namespace, userIds, this.session.AuthorizationToken, callback));
+            coroutineRunner.Run(
+                api.BatchGetGameProfiles(userIds, callback));
         }
 
         /// <summary>
         /// Get all profiles of current user
         /// </summary>
         /// <param name="callback">Returns all profiles of current user via callback when completed.</param>
-        public void GetAllGameProfiles(ResultCallback<GameProfile[]> callback)
+        public void GetAllGameProfiles( ResultCallback<GameProfile[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetAllGameProfiles(this.@namespace, this.session.UserId, this.session.AuthorizationToken, callback));
+            coroutineRunner.Run(
+                api.GetAllGameProfiles(session.UserId, callback));
         }
 
         /// <summary>
@@ -71,23 +84,18 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="gameProfile">The game profile that about to create</param>
         /// <param name="callback">Returns the created game profile via callback when completed.</param>
-        public void CreateGameProfile(GameProfileRequest gameProfile, ResultCallback<GameProfile> callback)
+        public void CreateGameProfile( GameProfileRequest gameProfile
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.CreateGameProfile(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
-                    gameProfile,
-                    callback));
+            coroutineRunner.Run(
+                api.CreateGameProfile(session.UserId, gameProfile, callback));
         }
 
         /// <summary>
@@ -95,23 +103,18 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="profileId"> the id of profile that about to get</param>
         /// <param name="callback">Returns a profile of current user via callback when completed. </param>
-        public void GetGameProfile(string profileId, ResultCallback<GameProfile> callback)
+        public void GetGameProfile( string profileId
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetGameProfile(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
-                    profileId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetGameProfile(session.UserId, profileId, callback));
         }
 
         /// <summary>
@@ -119,21 +122,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="gameProfile">The game profile that about to update</param>
         /// <param name="callback">Returns updated game profile via callback when completed.</param>
-        public void UpdateGameProfile(GameProfile gameProfile, ResultCallback<GameProfile> callback)
+        public void UpdateGameProfile( GameProfile gameProfile
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateGameProfile(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.UpdateGameProfile(
+                    session.UserId,
                     gameProfile.profileId,
                     gameProfile,
                     callback));
@@ -145,22 +146,20 @@ namespace AccelByte.Api
         /// <param name="profileId">The id of game profile that about to update</param>
         /// <param name="gameProfile">The game profile that about to update</param>
         /// <param name="callback">Returns updated game profile via callback when completed.</param>
-        public void UpdateGameProfile(string profileId, GameProfileRequest gameProfile,
-            ResultCallback<GameProfile> callback)
+        public void UpdateGameProfile( string profileId
+            , GameProfileRequest gameProfile
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateGameProfile(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.UpdateGameProfile(
+                    session.UserId,
                     profileId,
                     gameProfile,
                     callback));
@@ -171,21 +170,19 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="profileId">The id of game profile that about to delete</param>
         /// <param name="callback">Returns boolean status via callback when completed.</param>
-        public void DeleteGameProfile(string profileId, ResultCallback callback)
+        public void DeleteGameProfile( string profileId
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.DeleteGameProfile(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.DeleteGameProfile(
+                    session.UserId,
                     profileId,
                     callback));
         }
@@ -196,22 +193,20 @@ namespace AccelByte.Api
         /// <param name="profileId">The game profile that about to get</param>
         /// <param name="attributeName">The attribute name that about to get</param>
         /// <param name="callback">Returns an attribute via callback when completed.</param>
-        public void GetGameProfileAttribute(string profileId, string attributeName,
-            ResultCallback<GameProfileAttribute> callback)
+        public void GetGameProfileAttribute( string profileId
+            , string attributeName
+            , ResultCallback<GameProfileAttribute> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetGameProfileAtrribute(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.GetGameProfileAtrribute(
+                    session.UserId,
                     profileId,
                     attributeName,
                     callback));
@@ -223,22 +218,20 @@ namespace AccelByte.Api
         /// <param name="profileId">The id of game profile that about to update</param>
         /// <param name="attribute">The attribute of game profile that about to update</param>
         /// <param name="callback">Returns updated game profile via callback when completed.</param>
-        public void UpdateGameProfileAttribute(string profileId, GameProfileAttribute attribute,
-            ResultCallback<GameProfile> callback)
+        public void UpdateGameProfileAttribute( string profileId
+            , GameProfileAttribute attribute
+            , ResultCallback<GameProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            if (!this.session.IsValid())
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.UpdateGameProfileAtrribute(
-                    this.@namespace,
-                    this.session.UserId,
-                    this.session.AuthorizationToken,
+            coroutineRunner.Run(
+                api.UpdateGameProfileAtrribute(
+                    session.UserId,
                     profileId,
                     attribute,
                     callback));

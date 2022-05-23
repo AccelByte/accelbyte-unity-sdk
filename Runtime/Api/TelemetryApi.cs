@@ -1,117 +1,92 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
 using System.Collections;
-using AccelByte.Models;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class TelemetryApi
-    {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
+    internal class TelemetryApi : ApiBase
+    {        
         private readonly uint agentType;
         private readonly string deviceId;
 
-        #endregion
-
-        #region Constructor
-
-        public TelemetryApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==BaseUrl</param> // TODO: Should this be raw BaseUrl?
+        /// <param name="session"></param>
+        public TelemetryApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.BaseUrl, session )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
-
+            Report.GetFunctionLog(GetType().Name);
+            
+            agentType = getAgentTypeByPlatform();
+            deviceId = DeviceProvider.GetFromSystemInfo().DeviceId;
+        }
+        
+        private static uint getAgentTypeByPlatform()
+        {
             switch (Application.platform)
             {
-            case RuntimePlatform.WindowsPlayer:
-                this.agentType = 70;
+                case RuntimePlatform.WindowsPlayer:
+                    return 70;
 
-                break;
+                case RuntimePlatform.OSXPlayer:
+                    return 80;
 
-            case RuntimePlatform.OSXPlayer:
-                this.agentType = 80;
+                case RuntimePlatform.LinuxPlayer:
+                    return 90;
 
-                break;
+                case RuntimePlatform.Android:
+                    return 110;
 
-            case RuntimePlatform.LinuxPlayer:
-                this.agentType = 90;
+                case RuntimePlatform.IPhonePlayer:
+                    return 120;
 
-                break;
+                case RuntimePlatform.XboxOne:
+                    return 130;
 
-            case RuntimePlatform.Android:
-                this.agentType = 110;
+                case RuntimePlatform.PS4:
+                    return 140;
 
-                break;
+                case RuntimePlatform.Switch:
+                    return 170;
 
-            case RuntimePlatform.IPhonePlayer:
-                this.agentType = 120;
+                case RuntimePlatform.tvOS:
+                    return 200;
 
-                break;
+                case RuntimePlatform.WSAPlayerX86:
+                    return 210;
 
-            case RuntimePlatform.XboxOne:
-                this.agentType = 130;
+                case RuntimePlatform.WSAPlayerX64:
+                    return 211;
 
-                break;
+                case RuntimePlatform.WSAPlayerARM:
+                    return 212;
 
-            case RuntimePlatform.PS4:
-                this.agentType = 140;
-
-                break;
-
-            case RuntimePlatform.Switch:
-                this.agentType = 170;
-
-                break;
-
-            case RuntimePlatform.tvOS:
-                this.agentType = 200;
-
-                break;
-
-            case RuntimePlatform.WSAPlayerX86:
-                this.agentType = 210;
-
-                break;
-
-            case RuntimePlatform.WSAPlayerX64:
-                this.agentType = 211;
-
-                break;
-
-            case RuntimePlatform.WSAPlayerARM:
-                this.agentType = 212;
-
-                break;
-
-            case RuntimePlatform.WebGLPlayer:
-                this.agentType = 220;
-
-                break;
+                case RuntimePlatform.WebGLPlayer:
+                    return 220;
+                
+                default: 
+                    return 0;
             }
-
-            this.deviceId = DeviceProvider.GetFromSystemInfo().DeviceId;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator SendEvent<T>(string @namespace, string clientId, string userID, TelemetryEventTag eventTag,
-            T eventData, ResultCallback callback) where T : class
+        public IEnumerator SendEvent<T>( string clientId
+            , string userID
+            , TelemetryEventTag eventTag
+            , T eventData
+            , ResultCallback callback ) 
+            where T : class
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             string nowTime = DateTime.UtcNow.ToString("O");
             string strEventData;
 
@@ -139,11 +114,11 @@ namespace AccelByte.Api
                 "\"UX\": {10}," +
                 "\"UserID\": \"{11}\"" +
                 "}}",
-                this.agentType,
+                agentType,
                 eventTag.AppId,
                 clientId,
                 strEventData,
-                this.deviceId,
+                deviceId,
                 eventTag.Id,
                 eventTag.Level,
                 nowTime,
@@ -154,9 +129,9 @@ namespace AccelByte.Api
 
             var request = HttpRequestBuilder
                 .CreatePost(
-                    this.baseUrl +
+                    BaseUrl +
                     "/public/namespaces/{namespace}/events/gameclient/{appID}/{eventType}/{eventLevel}/{eventID}")
-                .WithPathParam("namespace", @namespace)
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("appID", eventTag.AppId.ToString())
                 .WithPathParam("eventType", eventTag.Type.ToString())
                 .WithPathParam("eventLevel", eventTag.Level.ToString())
@@ -167,12 +142,12 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
         }
 		
-        #endregion
     }
 }

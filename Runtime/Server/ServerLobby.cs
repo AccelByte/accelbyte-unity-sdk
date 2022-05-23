@@ -1,14 +1,11 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -16,24 +13,37 @@ namespace AccelByte.Server
     /// <summary>
     /// Lobby utilities.
     /// </summary>
-    public class ServerLobby
+    public class ServerLobby : WrapperBase
     {
         private readonly ServerLobbyApi api;
-        private readonly IServerSession session;
-        private readonly string namespace_;
+        private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
         
-        internal ServerLobby(ServerLobbyApi api, IServerSession session, string namespace_, CoroutineRunner coroutineRunner)
+        internal ServerLobby( ServerLobbyApi inApi
+            , ISession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsNotNull(namespace_, "namespace parameter can not be null");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null");
+            Assert.IsNotNull(inApi, "inApi parameter can not be null.");
+            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner parameter can not be null");
 
-            this.api = api;
-            this.session = session;
-            this.namespace_ = namespace_;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal ServerLobby( ServerLobbyApi inApi
+            , ISession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner )
+        {
         }
         
         /// <summary>
@@ -45,23 +55,28 @@ namespace AccelByte.Server
         /// <param name="callback">Returns a Result via callback when completed.</param>
         /// <param name="payloadModifier">Function to modify the latest party data with your customized modifier.</param>
         /// <param name="retryAttempt">the number of retry to do when there is an error in writing to party storage (likely due to write conflicts)</param>
-        public void WritePartyStorage(string partyId, ResultCallback<PartyDataUpdateNotif> callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier, int retryAttempt = 1)
+        public void WritePartyStorage( string partyId
+            , ResultCallback<PartyDataUpdateNotif> callback
+            , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier
+            , int retryAttempt = 1 )
         {
             Assert.IsFalse(string.IsNullOrEmpty(partyId), "Party ID should not be null.");
 
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
             WritePartyStorageRecursive(retryAttempt, partyId, callback, payloadModifier);
         }
         
-        private void WritePartyStorageRecursive(int remainingAttempt, string partyId, ResultCallback<PartyDataUpdateNotif> callback, Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier)
+        private void WritePartyStorageRecursive( int remainingAttempt
+            , string partyId
+            , ResultCallback<PartyDataUpdateNotif> callback
+            , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier )
         {
             if (remainingAttempt <= 0)
             {
@@ -83,10 +98,8 @@ namespace AccelByte.Server
                     updateRequest.custom_attribute = getPartyStorageResult.Value.custom_attribute;
                     updateRequest.updatedAt = getPartyStorageResult.Value.updatedAt;
                     
-                    this.coroutineRunner.Run(
-                        this.api.WritePartyStorage(
-                            this.namespace_,
-                            this.session.AuthorizationToken,
+                    coroutineRunner.Run(
+                        api.WritePartyStorage(
                             updateRequest,
                             partyId,
                             callback,
@@ -103,24 +116,20 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="partyId">Targeted party ID.</param>
         /// <param name="callback">Returns a Result via callback when completed.</param>
-        public void GetPartyStorage(string partyId, ResultCallback<PartyDataUpdateNotif> callback)
+        public void GetPartyStorage( string partyId
+            , ResultCallback<PartyDataUpdateNotif> callback )
         {
             Assert.IsFalse(string.IsNullOrEmpty(partyId), "Party ID should not be null.");
             
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
-            this.coroutineRunner.Run(
-                this.api.GetPartyStorage(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    partyId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetPartyStorage(partyId, callback));
         }
 
         /// <summary>
@@ -128,24 +137,21 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="userId">The user ID to be searched</param>
         /// <param name="callback">Returns PartyDataUpdateNotif via callback when party is found</param>
-        public void GetPartyDataByUserId(string userId, ResultCallback<PartyDataUpdateNotif> callback)
+        public void GetPartyDataByUserId( string userId
+            , ResultCallback<PartyDataUpdateNotif> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
             Assert.IsFalse(string.IsNullOrEmpty(userId), "Parameter userId cannot be null or empty string");
 
-            if(!this.session.IsValid())
+            if(!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetPartyDataByUserId(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    userId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetPartyDataByUserId(userId, callback));
         }
 
         /// <summary>
@@ -154,23 +160,20 @@ namespace AccelByte.Server
         /// <param name="userId">the user ID to be searched</param>
         /// <param name="key">The user's session attribute key</param>
         /// <param name="callback">Returns ServerGetSessionAttributeResponse via callback when found"</param>
-        public void GetSessionAttribute(string userId, string key, ResultCallback<ServerGetSessionAttributeResponse> callback)
+        public void GetSessionAttribute( string userId
+            , string key
+            , ResultCallback<ServerGetSessionAttributeResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if(!this.session.IsValid())
+            if(!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetSessionAttribute(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    userId,
-                    key,
-                    callback));
+            coroutineRunner.Run(
+                api.GetSessionAttribute(userId, key, callback));
         }
 
         /// <summary>
@@ -178,44 +181,41 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="userId">the user ID to be searched</param>
         /// <param name="callback">Returns GetSessionAttributeAllResponse via callback when found"</param>
-        public void GetSessionAttributeAll(string userId, ResultCallback<GetSessionAttributeAllResponse> callback)
+        public void GetSessionAttributeAll( string userId
+            , ResultCallback<GetSessionAttributeAllResponse> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.GetSessionAttributeAll(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    userId,
-                    callback));
+            coroutineRunner.Run(
+                api.GetSessionAttributeAll(userId, callback));
         }
 
-        public void SetSessionAttribute(string userId, Dictionary<string, string> attributes, ResultCallback callback)
+        public void SetSessionAttribute( string userId
+            , Dictionary<string, string> attributes
+            , ResultCallback callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            this.coroutineRunner.Run(
-                this.api.SetSessionAttribute(
-                    this.namespace_,
-                    this.session.AuthorizationToken,
-                    userId,
-                    attributes,
-                    callback));
+            coroutineRunner.Run(
+                api.SetSessionAttribute(userId, attributes, callback));
         }
 
-        public void SetSessionAttribute(string userId, string key, string value, ResultCallback callback)
+        public void SetSessionAttribute( string userId
+            , string key
+            , string value
+            , ResultCallback callback )
         {
             Assert.IsFalse(string.IsNullOrEmpty(key), "key parameter cannot be null or empty");
 

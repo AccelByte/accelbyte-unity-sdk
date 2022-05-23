@@ -1,39 +1,42 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class QosManagerApi
+    /// <summary>
+    /// QoS == Quality of Service (Latencies, Pings, Regions, etc)
+    /// </summary>
+    public class QosManagerApi : ApiBase
     {
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        internal QosManagerApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==QosManagerServerUrl</param>
+        /// <param name="session"></param>
+        internal QosManagerApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.QosManagerServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, nameof(baseUrl) + "is null");
-            Assert.IsNotNull(httpClient, nameof(httpClient) + "is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
+        public IEnumerator GetQosServers( ResultCallback<QosServerList> callback )
         {
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/qos")
+                .CreateGet(BaseUrl + "/public/qos")
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
             
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
             
             var result = response.TryParseJson<QosServerList>();
             callback.Try(result);

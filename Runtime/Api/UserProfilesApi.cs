@@ -1,77 +1,67 @@
-﻿// Copyright (c) 2018 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using System.Collections.Generic;
-using AccelByte.Models;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class UserProfilesApi
+    internal class UserProfilesApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        #endregion
-
-        #region Constructor
-
-        internal UserProfilesApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==BasicServerUrl</param>
+        /// <param name="session"></param>
+        internal UserProfilesApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.BasicServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator GetUserProfile(string @namespace, string userAccessToken,
-            ResultCallback<UserProfile> callback)
+        public IEnumerator GetUserProfile( ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get user profile! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get user profile! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get user profile! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(userAccessToken)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<UserProfile>();
 
             callback.Try(result);
         }
 
-        public IEnumerator CreateUserProfile(string @namespace, string userAccessToken,
-            CreateUserProfileRequest createRequest, ResultCallback<UserProfile> callback)
+        public IEnumerator CreateUserProfile( CreateUserProfileRequest createRequest
+            , ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't create user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't create user profile! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't create user profile! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't create user profile! accessToken parameter is null!");
             Assert.IsNotNull(createRequest, "Can't create user profile! CreateRequest parameter is null!");
             Assert.IsNotNull(
                 createRequest.language,
                 "Can't create user profile! CreateRequest.language parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePost(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(userAccessToken)
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(createRequest.ToUtf8Json())
@@ -79,25 +69,26 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<UserProfile>();
 
             callback.Try(result);
         }
 
-        public IEnumerator UpdateUserProfile(string @namespace, string userAccessToken,
-            UpdateUserProfileRequest updateRequest, ResultCallback<UserProfile> callback)
+        public IEnumerator UpdateUserProfile( UpdateUserProfileRequest updateRequest
+            , ResultCallback<UserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't update user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't update user profile! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
             Assert.IsNotNull(updateRequest, "Can't update user profile! ProfileRequest parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(userAccessToken)
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(updateRequest.ToUtf8Json())
@@ -105,51 +96,53 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<UserProfile>();
             callback.Try(result);
         }
 
-        public IEnumerator GetUserProfilePublicInfo(string @namespace, string userId, string userAccessToken,
-            ResultCallback<PublicUserProfile> callback)
+        public IEnumerator GetUserProfilePublicInfo( string userId
+            , ResultCallback<PublicUserProfile> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get user profile public info! Namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get user profile public info! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't get user profile public info! userId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get user profile public info! UserAccessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get user profile public info! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/public")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/public")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(userAccessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PublicUserProfile>();
             callback.Try(result);
         }
 
-        public IEnumerator GetUserProfilePublicInfosByIds(string @namespace, string userAccessToken, string[] userIds,
-            ResultCallback<PublicUserProfile[]> callback)
+        public IEnumerator GetUserProfilePublicInfosByIds( string[] userIds
+            , ResultCallback<PublicUserProfile[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get user profile public info by ids! Namespace parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get user profile public info by ids! Namespace parameter is null!");
             Assert.IsNotNull(
-                userAccessToken,
-                "Can't get user profile public info by ids! UserAccessToken parameter is null!");
+                AuthToken,
+                "Can't get user profile public info by ids! accessToken parameter is null!");
 
             Assert.IsNotNull(userIds, "Can't get user profile info by ids! userIds parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/profiles/public")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(userAccessToken)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/profiles/public")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithQueryParam("userIds", string.Join(",", userIds))
@@ -157,50 +150,53 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PublicUserProfile[]>();
             callback.Try(result);
         }
 
-        public IEnumerator GetCustomAttributes(string @namespace, string userId, string userAccessToken,
-            ResultCallback<Dictionary<string, object>> callback)
+        public IEnumerator GetCustomAttributes( string userId
+            , ResultCallback<Dictionary<string, object>> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get custom attributes! userId is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get custom attributes! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! userId is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(userAccessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<Dictionary<string, object>>();
             callback.Try(result);
         }
 
-        public IEnumerator UpdateCustomAttributes(string @namespace, string userId, string userAccessToken,
-            Dictionary<string, object> updates, ResultCallback<Dictionary<string, object>> callback)
+        public IEnumerator UpdateCustomAttributes( string userId
+            , Dictionary<string, object> updates
+            , ResultCallback<Dictionary<string, object>> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get custom attributes! userId is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get custom attributes! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! userId is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreatePut(this.baseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
-                .WithPathParam("namespace", @namespace)
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithBearerAuth(userAccessToken)
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(updates.ToUtf8Json())
@@ -208,33 +204,34 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<Dictionary<string, object>>();
             callback.Try(result);
         }
 
-        public IEnumerator GetTimeZones(string @namespace, string userAccessToken, ResultCallback<string[]> callback)
+        public IEnumerator GetTimeZones( ResultCallback<string[]> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get time zones! Namespace parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get time zones! UserAccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get time zones! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get time zones! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/v1/public/namespaces/{namespace}/misc/timezones")
-                .WithPathParam("namespace", @namespace)
-                .WithBearerAuth(userAccessToken)
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/misc/timezones")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<string[]>();
             callback.Try(result);
         }
 		
-		#endregion
     }
 }

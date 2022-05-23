@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,39 +11,35 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class ItemsApi
+    internal class ItemsApi : ApiBase
     {
-        #region Fields 
-
-        private readonly string baseUrl;
-        private readonly IHttpClient httpClient;
-
-        internal ItemsApi(string baseUrl, IHttpClient httpClient)
+        /// <summary>
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="config">baseUrl==PlatformServerUrl</param>
+        /// <param name="session"></param>
+        internal ItemsApi( IHttpClient httpClient
+            , Config config
+            , ISession session ) 
+            : base( httpClient, config, config.PlatformServerUrl, session )
         {
-            Assert.IsNotNull(baseUrl, "Creating " + GetType().Name + " failed. Parameter baseUrl is null");
-            Assert.IsNotNull(httpClient, "Creating " + GetType().Name + " failed. Parameter httpWorker is null");
-
-            this.baseUrl = baseUrl;
-            this.httpClient = httpClient;
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public IEnumerator GetItem(string @namespace, string accessToken, string itemId, string region, string language,
-            ResultCallback<PopulatedItemInfo> callback)
+        public IEnumerator GetItem( string itemId
+            , string region
+            , string language
+            , ResultCallback<PopulatedItemInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get item! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get item! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
             Assert.IsNotNull(itemId, "Can't get item! ItemId parameter is null!");
 
             var builder = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
-                .WithPathParam("namespace", @namespace)
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
+                .WithPathParam("namespace", Namespace_)
                 .WithPathParam("itemId", itemId)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
             if(region != null)
@@ -60,22 +56,35 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<PopulatedItemInfo>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetItemByAppId(string publisherNamespace, string accessToken, string appId, ResultCallback<ItemInfo> callback, string language = null, string region = null)
+        /// <summary>
+        /// </summary>
+        /// <param name="publisherNamespace">Different than Config Namespace</param>
+        /// <param name="appId"></param>
+        /// <param name="callback"></param>
+        /// <param name="language"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        public IEnumerator GetItemByAppId( string publisherNamespace
+            , string appId
+            , ResultCallback<ItemInfo> callback
+            , string language = null
+            , string region = null )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(publisherNamespace, "Can't get items by appId! publisherNamespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get items by appId! AccessToken parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get items by appId! AccessToken parameter is null!");
             Assert.IsNotNull(appId, "Can't get items by appId! appId parameter is null!");
 
             var builder = HttpRequestBuilder
-                .CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/byAppId")
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byAppId")
                 .WithPathParam("namespace", publisherNamespace)
                 .WithQueryParam("appId", appId)
                 .Accepts(MediaType.ApplicationJson);
@@ -94,19 +103,20 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<ItemInfo>();
 
             callback.Try(result);
         }
 
-        public IEnumerator GetItemsByCriteria(string @namespace, string accessToken,
-            ItemCriteria criteria, ResultCallback<ItemPagingSlicedResult> callback)
+        public IEnumerator GetItemsByCriteria( ItemCriteria criteria
+            , ResultCallback<ItemPagingSlicedResult> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
-            Assert.IsNotNull(@namespace, "Can't get items by criteria! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get items by criteria! AccessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get items by criteria! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get items by criteria! AccessToken parameter is null!");
             Assert.IsNotNull(criteria, "Can't get items by criteria! Criteria parameter is null!");
 
             var queries = new Dictionary<string, string>();
@@ -172,22 +182,22 @@ namespace AccelByte.Api
                 }
             }
 
-            var request = HttpRequestBuilder.CreateGet(this.baseUrl + "/public/namespaces/{namespace}/items/byCriteria")
-                .WithPathParam("namespace", @namespace)
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byCriteria")
+                .WithPathParam("namespace", Namespace_)
                 .WithQueries(queries)
-                .WithBearerAuth(accessToken)
+                .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             IHttpResponse response = null;
 
-            yield return this.httpClient.SendRequest(request, rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
 
             var result = response.TryParseJson<ItemPagingSlicedResult>();
 
             callback.Try(result);
         }
 
-        #endregion
     }
 }

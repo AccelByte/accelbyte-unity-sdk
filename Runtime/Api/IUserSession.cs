@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using UnityEngine.Assertions;
 using AccelByte.Core;
 using AccelByte.Models;
 
@@ -11,6 +12,9 @@ namespace AccelByte.Api
 {
     public interface IUserSession : ISession
     {
+        string UserId { get; }
+        bool IsComply { get; }
+        
         event Action<string> RefreshTokenCallback;
 
         IEnumerator LoginWithUsername(string username, string password, ResultCallback<TokenData, OAuthError> callback,
@@ -29,5 +33,19 @@ namespace AccelByte.Api
         
         IEnumerator Logout(ResultCallback callback);
         IEnumerator RefreshSession(ResultCallback<TokenData, OAuthError> callback);
+    }
+    public static class UserSessionExtension
+    {
+        public static bool IsValid( this IUserSession session )
+        {
+            return session != null && !string.IsNullOrEmpty( session.AuthorizationToken ) && !string.IsNullOrEmpty( session.UserId );
+        }
+
+        public static void AssertValid( this IUserSession session )
+        {
+            Assert.IsNotNull( session );
+            Assert.IsFalse( string.IsNullOrEmpty( session.AuthorizationToken ) );
+            Assert.IsFalse( string.IsNullOrEmpty( session.UserId ) );
+        }
     }
 }

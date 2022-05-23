@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using AccelByte.Models;
+using System;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -11,24 +12,37 @@ namespace AccelByte.Api
     /// <summary>
     /// Provide information virtual currency owned by the user
     /// </summary>
-    public class Wallet
+    public class Wallet : WrapperBase
     {
         private readonly WalletApi api;
-        private readonly ISession session;
-        private readonly string @namespace;
+        private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal Wallet(WalletApi api, ISession session, string @namespace, CoroutineRunner coroutineRunner)
+        internal Wallet( WalletApi inApi
+            , IUserSession inSession
+            , CoroutineRunner inCoroutineRunner )
         {
-            Assert.IsNotNull(api, "api parameter can not be null.");
-            Assert.IsNotNull(session, "session parameter can not be null");
-            Assert.IsFalse(string.IsNullOrEmpty(@namespace), "ns paramater couldn't be empty");
-            Assert.IsNotNull(coroutineRunner, "coroutineRunner parameter can not be null. Construction failed");
+            Assert.IsNotNull(inApi, "api==null (@ constructor)");
+            Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            this.api = api;
-            this.session = session;
-            this.@namespace = @namespace;
-            this.coroutineRunner = coroutineRunner;
+            api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
+        }
+        
+        /// <summary>
+        /// </summary>
+        /// <param name="inApi"></param>
+        /// <param name="inSession"></param>
+        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
+        /// <param name="inCoroutineRunner"></param>
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        internal Wallet( WalletApi inApi
+            , IUserSession inSession
+            , string inNamespace
+            , CoroutineRunner inCoroutineRunner )
+            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+        {
         }
 
         /// <summary>
@@ -36,24 +50,22 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="currencyCode">Currency code for the wallet</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void GetWalletInfoByCurrencyCode(string currencyCode, ResultCallback<WalletInfo> callback)
+        public void GetWalletInfoByCurrencyCode( string currencyCode
+            , ResultCallback<WalletInfo> callback )
         {
-            Report.GetFunctionLog(this.GetType().Name);
+            Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code; CurrencyCode is null!");
 
-            if (!this.session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
-            this.coroutineRunner.Run(this.api.GetWalletInfoByCurrencyCode(
-                        this.@namespace,
-                        this.session.UserId,
-                        this.session.AuthorizationToken,
-                        currencyCode,
-                        callback));
+            coroutineRunner.Run(api.GetWalletInfoByCurrencyCode(
+                session.UserId,
+                currencyCode,
+                callback));
         }
     }
 }

@@ -111,6 +111,17 @@ namespace AccelByte.Models {
             if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Server Base URL must not null or empty.");
         }
 
+        public bool IsRequiredFieldEmpty()
+        {
+            if (string.IsNullOrEmpty(this.Namespace)) return true;
+
+            if (string.IsNullOrEmpty(this.ClientId)) return true;
+
+            if (string.IsNullOrEmpty(this.BaseUrl)) return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Set services URL.
         /// </summary>
@@ -126,5 +137,14 @@ namespace AccelByte.Models {
 
             return specificServerUrl;
         }
+    }
+
+    [DataContract]
+    public class MultiServerConfigs
+    {
+        [DataMember] public ServerConfig Development { get; set; }
+        [DataMember] public ServerConfig Certification { get; set; }
+        [DataMember] public ServerConfig Production { get; set; }
+        [DataMember] public ServerConfig Default { get; set; }
     }
 }
