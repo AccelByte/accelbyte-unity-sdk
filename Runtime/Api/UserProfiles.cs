@@ -150,6 +150,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetUserProfilePublicInfo(userId, callback));
         }
+
         /// <summary>
         /// Request the Avatar of the given UserProfile
         /// </summary>
@@ -172,6 +173,26 @@ namespace AccelByte.Api
                         coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
                     }
                 });
+        }
+
+        /// <summary>
+        /// Get user public profile info by public id/code.
+        /// </summary>
+        /// <param name="publicId">The publicId/public code of a user</param>
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed.</param>
+        public void GetUserProfilePublicInfoByPublicId(string publicId, 
+            ResultCallback<PublicUserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserProfilePublicInfoByPublicId(publicId, callback));
         }
     }
 }

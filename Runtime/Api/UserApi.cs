@@ -480,7 +480,9 @@ namespace AccelByte.Api
 
         public IEnumerator SearchUsers( string query
             , SearchType by
-            , ResultCallback<PagedPublicUsersInfo> callback )
+            , ResultCallback<PagedPublicUsersInfo> callback
+            , int offset
+            , int limit)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(query, nameof(query) + " cannot be null.");
@@ -491,6 +493,8 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("query", query)
+                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
+                .WithQueryParam( "limit", ( limit >= 0 ) ? limit.ToString() : "" )
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);

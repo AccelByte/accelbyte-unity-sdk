@@ -17,12 +17,14 @@ namespace AccelByte.Models
         [DataMember] public string avatarSmallUrl { get; set; }
         [DataMember] public string avatarUrl { get; set; }
         [DataMember] public string avatarLargeUrl { get; set; }
-        [DataMember] public string email { get; set; }
         [DataMember] public string status { get; set; }
         [DataMember] public string language { get; set; }
         [DataMember] public string timeZone { get; set; }
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string publicId { get; set; }
+        [DataMember] public Dictionary<string, object> privateCustomAttributes { get; set; }
+
     }
 
     [DataContract]
@@ -35,6 +37,7 @@ namespace AccelByte.Models
         [DataMember] public string avatarUrl { get; set; }
         [DataMember] public string avatarLargeUrl { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string publicId { get; set; }
     }
 
     [DataContract]

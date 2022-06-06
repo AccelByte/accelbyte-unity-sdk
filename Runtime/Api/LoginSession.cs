@@ -296,7 +296,8 @@ namespace AccelByte.Api
         public IEnumerator LoginWithOtherPlatform
             ( PlatformType platformType
             , string platformToken
-            , ResultCallback callback )
+            , ResultCallback callback
+            , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
@@ -313,6 +314,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("platform_token", platformToken)
                 .WithFormParam("namespace", namespace_)
+                .WithFormParam("createHeadless", createHeadless ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
@@ -335,7 +337,8 @@ namespace AccelByte.Api
         public IEnumerator LoginWithOtherPlatform
             ( PlatformType platformType
             , string platformToken
-            , ResultCallback<TokenData, OAuthError> callback )
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
@@ -352,11 +355,154 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("platform_token", platformToken)
                 .WithFormParam("namespace", namespace_)
+                .WithFormParam("createHeadless", createHeadless ? "true" : "false")
                 .GetResult();
 
             IHttpResponse response = null;
 
             yield return httpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator CreateHeadlessAccountAndResponseToken
+            (string linkingToken
+            , bool extendExp
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(linkingToken, "linkingToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/headless/token")
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("linkingToken", linkingToken)
+                .WithFormParam("extend_exp", extendExp ? "true" : "false")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        public IEnumerator CreateHeadlessAccountAndResponseToken
+            (string linkingToken
+            , bool extendExp
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(linkingToken, "linkingToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/headless/token")
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("linkingToken", linkingToken)
+                .WithFormParam("extend_exp", extendExp ? "true" : "false")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator AuthenticationWithPlatformLink
+            (string username
+            , string password
+            , string linkingToken
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(linkingToken, "linkingToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/authenticateWithLink")
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("username", username)
+                .WithFormParam("password", password)
+                .WithFormParam("linkingToken", linkingToken)
+                .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        public IEnumerator AuthenticationWithPlatformLink
+            (string username
+            , string password
+            , string linkingToken
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(linkingToken, "linkingToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/authenticateWithLink")
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("username", username)
+                .WithFormParam("password", password)
+                .WithFormParam("linkingToken", linkingToken)
+                .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request,
                 rsp => response = rsp);
 
             var result = response.TryParseJson<TokenData, OAuthError>();

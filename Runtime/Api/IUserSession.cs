@@ -26,7 +26,7 @@ namespace AccelByte.Api
         IEnumerator LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback);
 
         IEnumerator LoginWithOtherPlatform(PlatformType platformType, string platformToken,
-            ResultCallback<TokenData, OAuthError> callback);
+            ResultCallback<TokenData, OAuthError> callback, bool createHeadless);
 
         IEnumerator LoginWithAuthorizationCode(string code, ResultCallback<TokenData, OAuthError> callback);
         IEnumerator LoginWithLatestRefreshToken(string refreshToken, ResultCallback<TokenData, OAuthError> callback);

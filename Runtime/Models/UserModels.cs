@@ -430,6 +430,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string avatarUrl { get; set; }
         [DataMember] public string displayName { get; set; }
+        [DataMember] public Dictionary<string, string> platformUserIds { get; set; } 
         [DataMember] public string userId { get; set; }
     }
 

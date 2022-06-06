@@ -262,10 +262,11 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void LoginWithOtherPlatform( PlatformType platformType
             , string platformToken
-            , ResultCallback callback )
+            , ResultCallback callback
+            , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback));
+            coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback, createHeadless));
         }
 
         /// <summary>
@@ -278,13 +279,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void LoginWithOtherPlatform( PlatformType platformType
             , string platformToken
-            , ResultCallback<TokenData, OAuthError> callback )
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(LoginWithOtherPlatformAsync(
                 platformType,
                 platformToken,
-                callback));
+                callback,
+                createHeadless));
         }
 
         /// <summary>
@@ -296,18 +299,20 @@ namespace AccelByte.Api
         /// <returns></returns>
         private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
             , string platformToken
-            , ResultCallback callback )
+            , ResultCallback callback
+            , bool createHeadless = true )
         {
             yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
-                platformType, platformToken, cb), callback);
+                platformType, platformToken, cb, createHeadless), callback);
         }
 
         private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
             , string platformToken
-            , ResultCallback<TokenData, OAuthError> callback )
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true )
         {
             yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
-                platformType, platformToken, cb), callback);
+                platformType, platformToken, cb, createHeadless), callback);
         }
 
         /// <summary>
@@ -940,9 +945,13 @@ namespace AccelByte.Api
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
+        /// <param name="limit"> Targeted offset query filter. </param>
+        /// <param name="offset"> Targeted offset query filter. </param>
         public void SearchUsers( string query
             , SearchType by
-            , ResultCallback<PagedPublicUsersInfo> callback )
+            , ResultCallback<PagedPublicUsersInfo> callback
+            , int offset = 0 
+            , int limit = 100 )
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -952,7 +961,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.SearchUsers(query, by, callback));
+            coroutineRunner.Run(api.SearchUsers(query, by, callback, offset, limit));
         }
 
         /// <summary>
@@ -960,10 +969,14 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
+        /// <param name="limit"> Targeted offset query filter. </param>
+        /// <param name="offset"> Targeted offset query filter. </param>
         public void SearchUsers( string query
-            , ResultCallback<PagedPublicUsersInfo> callback )
+            , ResultCallback<PagedPublicUsersInfo> callback
+            , int offset = 0
+            , int limit = 100)
         {
-            SearchUsers(query, SearchType.ALL, callback);
+            SearchUsers(query, SearchType.ALL, callback, offset, limit);
         }
 
         /// <summary>
@@ -1349,6 +1362,119 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(api.GetInputValidations(languageCode, callback, defaultOnEmpty));
+        }
+
+        /// <summary>
+        /// Create Headless Account for Account Linking
+        /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="extendExp">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void CreateHeadlessAccountAndResponseToken(string linkingToken
+            , bool extendExp
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(CreateHeadlessAccountAndResponseTokenAsync(linkingToken, extendExp, callback));
+        }
+
+        /// <summary>
+        /// Create Headless Account for Account Linking
+        /// </summary>
+        /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="extendExp">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void CreateHeadlessAccountAndResponseToken(string linkingToken
+            , bool extendExp
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(CreateHeadlessAccountAndResponseTokenAsync(
+                linkingToken,
+                extendExp,
+                callback));
+        }
+
+        /// <summary>
+        /// TODO: Deprecated for extended callback variant?
+        /// </summary>
+        /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="extendExp">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <returns></returns>
+        private IEnumerator CreateHeadlessAccountAndResponseTokenAsync(string linkingToken
+            , bool extendExp
+            , ResultCallback callback)
+        {
+            yield return LoginAsync(cb => loginSession.CreateHeadlessAccountAndResponseToken(
+                linkingToken, extendExp, cb), callback);
+        }
+
+        private IEnumerator CreateHeadlessAccountAndResponseTokenAsync(string linkingToken
+            , bool extendExp
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            yield return LoginAsync(cb => loginSession.CreateHeadlessAccountAndResponseToken(
+                linkingToken, extendExp, cb), callback);
+        }
+
+        /// <summary>
+        /// Authentication With PlatformLink for Account Linking
+        /// </summary>
+        /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="extendExp">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void AuthenticationWithPlatformLink(string username
+            , string password
+            , string linkingToken
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(AuthenticationWithPlatformLinkAsync(username, password, linkingToken, callback));
+        }
+
+        /// <summary>
+        /// Authentication With PlatformLink for Account Linking
+        /// </summary>
+        /// <param name="username">Username to login</param>
+        /// <param name="password">Password to login</param>
+        /// /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void AuthenticationWithPlatformLink(string username
+            , string password
+            , string linkingToken
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(AuthenticationWithPlatformLinkAsync(
+                username,
+                password,
+                linkingToken,
+                callback));
+        }
+
+        /// <summary>
+        /// Authentication With PlatformLink for Account Linking
+        /// </summary>
+        /// <param name="username">Username to login</param>
+        /// <param name="password">Password to login</param>
+        /// /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        private IEnumerator AuthenticationWithPlatformLinkAsync(string username
+            , string password
+            , string linkingToken
+            , ResultCallback callback)
+        {
+            yield return LoginAsync(cb => loginSession.AuthenticationWithPlatformLink(
+                username, password, linkingToken, cb), callback);
+        }
+
+        private IEnumerator AuthenticationWithPlatformLinkAsync(string username
+            , string password
+            , string linkingToken
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            yield return LoginAsync(cb => loginSession.AuthenticationWithPlatformLink(
+                username, password, linkingToken, cb), callback);
         }
     }
 }

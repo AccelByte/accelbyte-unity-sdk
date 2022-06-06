@@ -232,6 +232,29 @@ namespace AccelByte.Api
             var result = response.TryParseJson<string[]>();
             callback.Try(result);
         }
-		
+
+        public IEnumerator GetUserProfilePublicInfoByPublicId(string publicId, ResultCallback<PublicUserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(publicId, "publicId parameter is null!");
+            Assert.IsNotNull(Namespace_, "Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "AccessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/profiles/public/byPublicId")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("publicId", publicId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PublicUserProfile>();
+            callback.Try(result);
+        }
     }
 }
