@@ -118,6 +118,35 @@ namespace AccelByte.Api
             }
         }
 
+        public IEnumerator SetPartySizeLimit(string partyId, int limit, ResultCallback callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            Assert.IsTrue(limit > 0, nameof(limit) + " muts be above zero");
+
+            SetPartySizeLimitRequest body = new SetPartySizeLimitRequest() { limit = limit };
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/lobby/v1/public/party/namespaces/{namespace}/parties/{partyId}/limit")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("partyId", partyId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(body.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParse();
+
+            callback.Try(result);
+        }
+
         public IEnumerator GetListOfBlockedUser( string userId
             , ResultCallback<BlockedList> callback )
         {

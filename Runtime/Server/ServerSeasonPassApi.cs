@@ -23,14 +23,23 @@ namespace AccelByte.Server
         {
         }
 
-        public IEnumerator GrantExpToUser( string userId
+        public IEnumerator GrantExpToUser(string userId
             , int exp
-            , ResultCallback<UserSeasonInfoWithoutReward> callback )
+            , ResultCallback<UserSeasonInfoWithoutReward> callback
+            , SeasonPassSource source = SeasonPassSource.SWEAT
+            , string[] tags = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't Grant Exp! Namespace parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't Grant Exp! AccessToken parameter is null!");
             Assert.IsNotNull(userId, "Can't Grant Exp! UserId parameter is null!");
+
+            GrantExpRequest grantExpRequest = new GrantExpRequest
+            {
+                exp = exp,
+                source = source,
+                tags = tags,
+            };
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/users/{userId}/seasons/current/exp")
@@ -38,7 +47,7 @@ namespace AccelByte.Server
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{ \"exp\": {0} }}", exp))
+                .WithBody(grantExpRequest.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
@@ -48,6 +57,127 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GrantTierToUser(string userId
+            , int count
+            , ResultCallback<UserSeasonInfoWithoutReward> callback
+            , SeasonPassSource source = SeasonPassSource.SWEAT
+            , string[] tags = null)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't check user progression! UserId parameter is null!");
+
+            GrantTierRequest grantTierRequest = new GrantTierRequest
+            {
+                count = count,
+                source = source,
+                tags = tags,
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/users/{userId}/seasons/current/tiers")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(grantTierRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetCurrentUserSeasonHistory(string userId
+            , string seasonId
+            , ResultCallback<UserSeasonExpHistory> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't check user progression! UserId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/users/{userId}/seasons/exp/history")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("seasonId", seasonId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserSeasonExpHistory>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserSeasonData(string userId
+            , string seasonId
+            , ResultCallback<UserSeasonInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't Get User ID! userId parameter is null!");
+            Assert.IsNotNull(seasonId, "Can't Get User Season! seasonId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/users/{userId}/seasons/{seasonId}/data")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("seasonId", seasonId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserSeasonInfo>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryUserSeasonExp(string userId
+            , string seasonId
+            , ResultCallback<QueryUserSeasonExp> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
+            Assert.IsNotNull(userId, "Can't check user progression! UserId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/users/{userId}/seasons/exp/history/tags")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("seasonId", seasonId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<QueryUserSeasonExp>();
             callback.Try(result);
         }
 

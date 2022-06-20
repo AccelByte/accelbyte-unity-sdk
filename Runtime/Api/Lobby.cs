@@ -450,6 +450,13 @@ namespace AccelByte.Api
                 new PartyPromoteLeaderRequest { newLeaderUserId = userId }, callback);
         }
 
+        public void SetPartySizeLimit(string partyId, int limit, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            coroutineRunner.Run(api.SetPartySizeLimit(partyId, limit, callback));
+        }
+
         /// <summary>
         /// Send chat to other party members
         /// </summary>
@@ -535,6 +542,19 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             SendRequest(MessageType.requestFriendsRequest, 
                 new Friend {friendId = userId}, callback);
+        }
+
+        /// <summary>
+        /// Send request friend request using other profile's public id
+        /// </summary>
+        /// <param name="publicId">Targeted user ID.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void RequestFriendByPublicId(string publicId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.requestFriendsByPublicIDRequest,
+                new FriendByPublicId { friendPublicId = publicId }, callback);
         }
 
         /// <summary>

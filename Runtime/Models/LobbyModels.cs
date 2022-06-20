@@ -57,6 +57,8 @@ namespace AccelByte.Models
         offlineNotificationResponse,
         requestFriendsRequest,
         requestFriendsResponse,
+        requestFriendsByPublicIDRequest,
+        requestFriendsByPublicIDResponse,
         unfriendRequest,
         unfriendResponse,
         listOutgoingFriendsRequest,
@@ -218,6 +220,12 @@ namespace AccelByte.Models
     {
         [DataMember] public long updatedAt;
         [DataMember] public Dictionary<string, object> custom_attribute;
+    }
+
+    [DataContract]
+    public class SetPartySizeLimitRequest
+    {
+        [DataMember] public int limit;
     }
     
     [DataContract]
@@ -448,6 +456,12 @@ namespace AccelByte.Models
     public class Friend
     {
         [DataMember] public string friendId;
+    }
+
+    [DataContract]
+    public class FriendByPublicId
+    {
+        [DataMember] public string friendPublicId;
     }
 
     [DataContract]

@@ -32,6 +32,13 @@ namespace AccelByte.Models
     {
         ITEM //currently only support this type
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SeasonPassSource
+    {
+        SWEAT = 0,
+        PAID_FOR
+    }
     #endregion enum
 
     [DataContract]
@@ -143,6 +150,9 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<int, Dictionary<string, string[]>> claimingRewards { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public int totalPaidForExp { get; set; }
+        [DataMember] public int totalSweatExp { get; set; }
+        [DataMember] public int totalExp { get; set; }
     }
 
     [DataContract]
@@ -165,6 +175,22 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class GrantExpRequest
+    {
+        [DataMember] public int exp { get; set; }
+        [DataMember] public SeasonPassSource source { get; set; }
+        [DataMember] public string[] tags { get; set; }
+    }
+
+    [DataContract]
+    public class GrantTierRequest
+    {
+        [DataMember] public int count { get; set; }
+        [DataMember] public SeasonPassSource source { get; set; }
+        [DataMember] public string[] tags { get; set; }
+    }
+
+    [DataContract]
     public class SeasonClaimRewardRequest
     {
         [DataMember] public string passCode { get; set; }
@@ -177,5 +203,39 @@ namespace AccelByte.Models
     {
         [DataMember] public Dictionary<int, Dictionary<string, string[]>> toClaimRewards { get; set; }
         [DataMember] public Dictionary<int, Dictionary<string, string[]>> claimingRewards { get; set; }
+    }
+
+    [DataContract]
+    public class UserSeasonData
+    {
+        [DataMember] public string id { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string seasonId { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public int grantExp { get; set; }
+        [DataMember] public string[] tags { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public SeasonPassSource source { get; set; }
+    }
+
+    [DataContract]
+    public class UserSeasonPaging
+    {
+        [DataMember] public string previous { get; set; }
+        [DataMember] public string next { get; set; }
+    }
+
+    [DataContract]
+    public class UserSeasonExpHistory
+    {
+        [DataMember] public UserSeasonData[] data { get; set; }
+        [DataMember] public UserSeasonPaging paging { get; set; }
+        [DataMember] public int total { get; set; }
+    }
+
+    [DataContract]
+    public class QueryUserSeasonExp
+    {
+        [DataMember] public string[] tags { get; set; }
     }
 }

@@ -48,9 +48,13 @@ namespace AccelByte.Server
         /// <param name="userId">The User ID will be granted the exp.</param>
         /// <param name="exp">Total of the exp will be granted to user.</param>
         /// <param name="callback">Returns a Result that contains UserSeasonInfoWithoutReward via callback when completed.</param>
+        /// <param name="source">Granted tier source. Default value SWEAT.</param>
+        /// <param name="tags">Grant for reason. Default value null.</param>
         public void GrantExpToUser( string userId
             , int exp
-            , ResultCallback<UserSeasonInfoWithoutReward> callback )
+            , ResultCallback<UserSeasonInfoWithoutReward> callback 
+            , SeasonPassSource source = SeasonPassSource.SWEAT
+            , string[] tags = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(userId, "Can't Grant Exp; UserId parameter is null!");
@@ -62,7 +66,102 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GrantExpToUser(userId, exp, callback));
+                api.GrantExpToUser(userId, exp, callback, source, tags));
+        }
+
+        /// <summary>
+        /// Grant tier to user by UserId. used to grant tier to user, it will auto enroll if there's no user season but active published season exist, season only located in non-publisher namespace, otherwise ignore.
+        /// </summary>
+        /// <param name="userId">The User ID will be granted the exp.</param>
+        /// <param name="count">Total of the count will be granted to user.</param>
+        /// <param name="source">Granted tier source.</param>
+        /// <param name="tags">Grant for reason.</param>
+        /// <param name="callback">Returns a Result that contains UserSeasonInfoWithoutReward via callback when completed.</param>
+        public void GrantTierToUser(string userId
+            , int count
+            , ResultCallback<UserSeasonInfoWithoutReward> callback
+            , SeasonPassSource source = SeasonPassSource.SWEAT
+            , string[] tags = null)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(userId, "Can't Grant Exp; UserId parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GrantTierToUser(userId, count, callback, source, tags));
+        }
+
+        /// <summary>
+        /// Get User Season Data  by UserId. Used for get user season data, season only located in non-publisher namespace.
+        /// </summary>
+        /// <param name="userId">The User ID will be granted the exp.</param>
+        /// <param name="exp">Total of the exp will be granted to user.</param>
+        /// <param name="source">Granted tier source.</param>
+        /// <param name="tags">Grant for reason.</param>
+        /// <param name="callback">Returns a Result that contains UserSeasonInfo via callback when completed.</param>
+        public void GetUserSeasonData(string userId
+            , string seasonId
+            , ResultCallback<UserSeasonInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserSeasonData(userId, seasonId, callback));
+        }
+
+        /// <summary>
+        /// Get Current User Season History  by UserId. used to get user exp acquisition history, season only located in non-publisher namespace.
+        /// </summary>
+        /// <param name="userId">The User ID will be granted the exp.</param>
+        /// <param name="seasonId">The Id of the Season.</param>
+        /// <param name="callback">Returns a Result that contains UserSeasonExpHistory via callback when completed.</param>
+        public void GetCurrentUserSeasonHistory(string userId
+            , string seasonId
+            , ResultCallback<UserSeasonExpHistory> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetCurrentUserSeasonHistory(userId, seasonId, callback));
+        }
+
+        /// <summary>
+        /// Get Query User Season Exp Season History  by UserId. After reaching to the next level, used to get user exp acquisition history's tag list.
+        /// </summary>
+        /// <param name="userId">The User ID will be granted the exp.</param>
+        /// <param name="seasonId">The Id of the Season.</param>
+        /// <param name="callback">Returns a Result that contains QueryUserSeasonExp via callback when completed.</param>
+        public void QueryUserSeasonExp(string userId
+            , string seasonId
+            , ResultCallback<QueryUserSeasonExp> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.QueryUserSeasonExp(userId, seasonId, callback));
         }
 
         /// <summary>
