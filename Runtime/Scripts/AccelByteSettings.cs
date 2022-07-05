@@ -140,6 +140,48 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.SeasonPassServerUrl = value; }
         }
 
+        public static string TurnManagerServerUrl
+        {
+            get { return AccelByteSettings.Instance.config.TurnManagerServerUrl; }
+            set { AccelByteSettings.Instance.config.TurnManagerServerUrl = value; }
+        }
+
+        public static bool UseTurnManager
+        {
+            get { return AccelByteSettings.Instance.config.UseTurnManager; }
+            set { AccelByteSettings.Instance.config.UseTurnManager = value; }
+        }
+
+        public static string TurnServerHost
+        {
+            get { return AccelByteSettings.Instance.config.TurnServerHost; }
+            set { AccelByteSettings.Instance.config.TurnServerHost = value; }
+        }
+
+        public static string TurnServerPort
+        {
+            get { return AccelByteSettings.Instance.config.TurnServerPort; }
+            set { AccelByteSettings.Instance.config.TurnServerPort = value; }
+        }
+        
+        public static string TurnServerUsername
+        {
+            get { return AccelByteSettings.Instance.config.TurnServerUsername; }
+            set { AccelByteSettings.Instance.config.TurnServerUsername = value; }
+        }
+        
+        public static string TurnServerSecret
+        {
+            get { return AccelByteSettings.Instance.config.TurnServerSecret; }
+            set { AccelByteSettings.Instance.config.TurnServerSecret = value; }
+        }
+        
+        public static string TurnServerPassword
+        {
+            get { return AccelByteSettings.Instance.config.TurnServerPassword; }
+            set { AccelByteSettings.Instance.config.TurnServerPassword = value; }
+        }
+
         public static string ClientId
         {
             get { return AccelByteSettings.Instance.oAuthConfig.ClientId; }

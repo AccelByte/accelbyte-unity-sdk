@@ -45,7 +45,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user profile for current logged in user.
+        /// Get (my) user profile / current logged in user.
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed.</param>
         public void GetUserProfile( ResultCallback<UserProfile> callback )
@@ -63,7 +63,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Create user profile for current logged in user.
+        /// Create (my) user profile / current logged in user.
         /// </summary>
         /// <param name="createRequest">User profile details to create user profile.</param>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
@@ -83,7 +83,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Update some fields of user profile for current logged in user. 
+        /// Update some fields of (my) user profile / current logged in user. 
         /// </summary>
         /// <param name="updateRequest">User profile details to update user profile</param>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
@@ -193,6 +193,124 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserProfilePublicInfoByPublicId(publicId, callback));
+        }
+
+
+        /// <summary>
+        /// Create an user profile 
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param>
+        /// <param name="language">Language allowed format: en, en-US.</param>
+        /// <param name="customAttributes">Custom attribues value to be included.</param>
+        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void CreateUserProfile(string userId
+            , string language
+            , Dictionary<string, object> customAttributes
+            , string timezone
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.CreateUserProfile(userId, language, customAttributes, timezone, callback));
+        }
+
+        /// <summary>
+        /// Update some fields of an user profile 
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param>
+        /// <param name="language">Language allowed format: en, en-US.</param>
+        /// <param name="customAttributes">Custom attribues value to be included.</param>
+        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void UpdateUserProfile(string userId
+            , string language
+            , string timezone
+            , Dictionary<string, object> customAttributes
+            , string zipCode
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateUserProfile(userId, language, timezone, customAttributes, zipCode, callback));
+        }
+
+        /// <summary>
+        /// Get an user profile  
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param> 
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void GetUserProfile(string userId 
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserProfile(userId, callback));
+        }
+
+        /// <summary>
+        /// Generate an upload URL. It's valid for 10 minutes.
+        /// </summary>
+        /// <param name="folder">The name of folder where the file will be uploaded, must be between 1-256 characters, all characters allowed no whitespace</param>
+        /// <param name="fileType">One of the these types: jpeg, jpg, png, bmp, gif, mp3, bin, webp</param>
+        /// <param name="callback">Returns a Result that contains <see cref="PublicUserProfile"/> via callback when completed.</param>
+        public void GenerateUploadURL(string folder
+            , FileType fileType
+            , ResultCallback<GenerateUploadURLResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GenerateUploadURL(folder, fileType, callback));
+        }
+
+        /// <summary>
+        /// Generate an upload URL for user content. It's valid for 10 minutes.
+        /// </summary>
+        /// <param name="userId">UserID for the requested</param>
+        /// <param name="fileType">One of the these types: jpeg, jpg, png, bmp, gif, mp3, bin, webp</param>
+        /// <param name="callback">Returns a Result that contains <see cref="PublicUserProfile"/> via callback when completed.</param>
+        public void GenerateUploadURLForUserContent(string userId
+            , FileType fileType
+            , ResultCallback<GenerateUploadURLResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GenerateUploadURLForUserContent(userId, fileType, callback));
         }
     }
 }

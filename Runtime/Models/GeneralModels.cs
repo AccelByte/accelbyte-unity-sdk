@@ -18,6 +18,13 @@ namespace AccelByte.Models
         [DataMember] public string previous { get; set; }
     }
 
+    [DataContract]
+    public class PagingCursor
+    {
+        [DataMember] public string next { get; set; }
+        [DataMember] public string previous { get; set; }
+    }
+
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum PaginationType
     {

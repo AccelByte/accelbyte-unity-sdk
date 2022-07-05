@@ -256,5 +256,168 @@ namespace AccelByte.Api
             var result = response.TryParseJson<PublicUserProfile>();
             callback.Try(result);
         }
+
+        public IEnumerator CreateUserProfile(string userId
+            , string language
+            , Dictionary<string, object> customAttributes
+            , string timezone
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't create user profile! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
+            Assert.IsNotNull(language, "Can't update user profile! language parameter is null!");
+            Assert.IsNotNull(customAttributes, "Can't update user profile! customAttributes parameter is null!");
+            Assert.IsNotNull(timezone, "Can't update user profile! timezone parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't create user profile! accessToken parameter is null!"); 
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(new {
+                    language = language,
+                    customAttributes = customAttributes,
+                    timezone = timezone,
+                }.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserProfile>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateUserProfile(string userId
+            , string language 
+            , string timezone
+            , Dictionary<string, object> customAttributes
+            , string zipCode 
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
+            Assert.IsNotNull(language, "Can't update user profile! language parameter is null!");
+            Assert.IsNotNull(timezone, "Can't update user profile! timezone parameter is null!");
+            Assert.IsNotNull(customAttributes, "Can't update user profile! customAttributes parameter is null!");
+            Assert.IsNotNull(zipCode, "Can't update user profile! zipCode parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(new {
+                    language = language,
+                    timezone = timezone,
+                    customAttributes = customAttributes,
+                    zipCode = zipCode
+                }.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserProfile>();
+            callback.Try(result);
+        }
+
+
+        public IEnumerator GetUserProfile(string userId 
+          , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson) 
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserProfile>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GenerateUploadURL(string folder
+          , FileType filetype
+          , ResultCallback<GenerateUploadURLResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Generate Upload URL! Namespace parameter is null!");
+            Assert.IsNotNull(folder, "Can't Generate Upload URL! folder parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Generate Upload URL! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/folders/{folder}/files")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("folder", folder)
+                .WithQueryParam("fileType", filetype.ToString().ToLower())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GenerateUploadURLResult>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GenerateUploadURLForUserContent(string userId
+        , FileType filetype
+        , ResultCallback<GenerateUploadURLResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Generate Upload URL for User Content! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't Generate Upload URL for User Content! userId parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't Generate Upload URL for User Content! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/files")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("fileType", filetype.ToString().ToLower())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GenerateUploadURLResult>();
+
+            callback.Try(result);
+        }
     }
 }

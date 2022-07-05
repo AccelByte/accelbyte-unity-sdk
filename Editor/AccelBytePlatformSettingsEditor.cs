@@ -242,6 +242,46 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Use TURN Manager");
+            TemporarySetting.UseTurnManager = EditorGUILayout.Toggle(TemporarySetting.UseTurnManager);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Server Host");
+            TemporarySetting.TurnServerHost = EditorGUILayout.TextField(TemporarySetting.TurnServerHost);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Server Port");
+            TemporarySetting.TurnServerPort = EditorGUILayout.TextField(TemporarySetting.TurnServerPort);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Manager Server Url");
+            TemporarySetting.TurnManagerServerUrl = EditorGUILayout.TextField(TemporarySetting.TurnManagerServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Server Username");
+            TemporarySetting.TurnServerUsername = EditorGUILayout.TextField(TemporarySetting.TurnServerUsername);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Server Secret");
+            TemporarySetting.TurnServerSecret = EditorGUILayout.TextField(TemporarySetting.TurnServerSecret);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TURN Server Password");
+            TemporarySetting.TurnServerPassword = EditorGUILayout.TextField(TemporarySetting.TurnServerPassword);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Session BrowserServer Url");
+            TemporarySetting.SessionBrowserServerUrl = EditorGUILayout.TextField(TemporarySetting.SessionBrowserServerUrl);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Redirect Uri");
             TemporarySetting.RedirectUri = EditorGUILayout.TextField(TemporarySetting.RedirectUri);
             EditorGUILayout.EndHorizontal();

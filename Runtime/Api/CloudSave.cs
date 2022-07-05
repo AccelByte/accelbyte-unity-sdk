@@ -88,7 +88,8 @@ namespace AccelByte.Api
         /// <param name="isPublic">True if you want the record can be accessed by other user. Default is false</param>
         public void SaveUserRecord( string key
             , Dictionary<string, object> recordRequest
-            , ResultCallback callback )
+            , ResultCallback callback
+            , bool isPublic = false)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
@@ -101,7 +102,6 @@ namespace AccelByte.Api
                 return;
             }
 
-			const bool isPublic = false;
             coroutineRunner.Run(
                 api.SaveUserRecord(
                     session.UserId,

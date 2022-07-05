@@ -845,6 +845,29 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-		
+
+        public IEnumerator UpdateUser(UpdateUserRequest updateUserRequest
+            , ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(updateUserRequest, "Update failed. updateEmailRequest is null!");
+
+            var request = HttpRequestBuilder.CreatePut(BaseUrl + "/v3/public/namespaces/{namespace}/users/me")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(updateUserRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
+
     }
 }

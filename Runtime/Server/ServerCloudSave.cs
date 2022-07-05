@@ -347,5 +347,32 @@ namespace AccelByte.Server
                 key, request, callback));
         }
 
+        /// <summary>
+        /// Get a record (arbitrary JSON data) by its key in user-level.
+        /// </summary>
+        /// <param name="callback">
+        /// <param name="query">list of GameRecordKey</param>
+        /// <param name="offset">Offset The offset of GameRecord result. Default value is 0.</param>
+        /// <param name="limit">limit The limit of GameRecord result. Default value is 20.</param>
+        /// Returns a Result that contains UserRecord via callback when completed
+        /// </param>
+        public void RetrieveGameRecordsKey(ResultCallback<GameRecordList> callback
+            , string query = "{}"
+            , int offset = 0
+            , int limit  = 20 )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(offset.ToString(), "Can't get query user record! offset parameter is null!");
+            Assert.IsNotNull(limit.ToString(), "Can't get query user record! limit parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.RetrieveGameRecordsKey(callback, query, offset, limit));
+        }
     }
 }

@@ -377,6 +377,80 @@ namespace AccelByte.Api
         }
 
         [Obsolete("Instead, use the overload with the extended callback")]
+        public IEnumerator LoginWithOtherPlatformId
+            (string platformId
+            , string platformToken
+            , ResultCallback callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/{platformId}/token")
+                .WithPathParam("platformId", platformId)
+                .WithBasicAuth()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("platform_token", platformToken)
+                .WithFormParam("namespace", namespace_)
+                .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request, rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        public IEnumerator LoginWithOtherPlatformId
+            (string platformId
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
+
+            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/platforms/{platformId}/token")
+                .WithPathParam("platformId", platformId)
+                .WithBasicAuthWithCookie()
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .WithFormParam("platform_token", platformToken)
+                .WithFormParam("namespace", namespace_)
+                .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                SetSession(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        }
+
+        [Obsolete("Instead, use the overload with the extended callback")]
         public IEnumerator CreateHeadlessAccountAndResponseToken
             (string linkingToken
             , bool extendExp

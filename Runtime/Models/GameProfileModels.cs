@@ -13,7 +13,6 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string profileId { get; set; }
         [DataMember] public string userId { get; set; }
-
         [DataMember] public Dictionary<string, string> attributes { get; set; }
         [DataMember] public string avatarUrl { get; set; }
         [DataMember] public string label { get; set; }

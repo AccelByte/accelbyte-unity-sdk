@@ -219,5 +219,25 @@ namespace AccelByte.Server
                     callback));
         }
 
+        /// <summary>
+        /// Get user data from another user by user id
+        /// </summary>
+        /// <param name="userId"> user id that needed to get user data</param> 
+        public void GetUserByUserId(string userId
+            , ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserByUserId(userId, callback));
+        }
+
     }
 }

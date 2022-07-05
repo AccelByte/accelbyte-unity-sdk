@@ -6,8 +6,11 @@ using System;
 using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace AccelByte.Server
 {

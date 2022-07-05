@@ -315,11 +315,25 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Create a party and become a party leader for the party. 
+        /// The newer function has different struct return callback and it has partyCode.
         /// </summary>
         /// <param name="callback">
         /// Returns a Result that contain PartyInfo via callback when completed.
         /// </param>
         public void CreateParty( ResultCallback<PartyInfo> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.partyCreateRequest, callback);
+        }
+
+        /// <summary>
+        /// Create a party and become a party leader for the party.
+        /// PartyCode is also provided to the party creator through the callback.
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contain PartyCreateResponse via callback when completed.
+        /// </param>
+        public void CreateParty( ResultCallback<PartyCreateResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
             SendRequest(MessageType.partyCreateRequest, callback);
@@ -439,6 +453,47 @@ namespace AccelByte.Api
                 }, callback);
         }
 
+        /// <summary>
+        /// Generate party code for invitation
+        /// </summary>
+        /// <param name="callback">Return the party code that has been generated if success</param>
+        public void GeneratePartyCode(ResultCallback<PartyGenerateCodeResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.partyGenerateCodeRequest, callback);
+        }
+        
+        /// <summary>
+        /// Get party code
+        /// </summary>
+        /// <param name="callback">Return the party code that has been generated previously if success</param>
+        public void GetPartyCode(ResultCallback<PartyGetCodeResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.partyGetCodeRequest, callback);
+        }
+        
+        /// <summary>
+        /// Remove party invite code
+        /// </summary>
+        /// <param name="callback"></param>
+        public void DeletePartyCode(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.partyDeleteCodeRequest, callback);
+        }
+
+        /// <summary>
+        /// Join to a party via party code
+        /// </summary>
+        /// <param name="callback"></param>
+        public void JoinPartyViaCode(string invitationPartyCode, ResultCallback<PartyInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.partyJoinViaCodeRequest,
+                new PartyJoinViaCodeRequest { partyCode = invitationPartyCode }, callback);
+        }
+
         /// <summary> Promote member to be a party leader.</summary>
         /// <param name="userId">User ID that will be promoted as a party leader.</param>
         /// <param name="callback">Returns a Result via callback when completed.</param>
@@ -502,7 +557,7 @@ namespace AccelByte.Api
                 MessageType.setUserStatusRequest,
                 new SetUserStatusRequest
                 {
-                    availability = (uint) status, 
+                    availability = status.ToString().ToLower(),
                     activity = Uri.EscapeDataString(activity), // Escape the string first for customizable string
                 }, 
                 callback);
@@ -1130,6 +1185,19 @@ namespace AccelByte.Api
                     isTempParty = isTempParty,
                 },
                 callback);
+        }
+
+        /// <summary>
+        /// Request Dedicated Custom Server
+        /// </summary>
+        /// <param name="request">Specification</param>
+        /// <param name="callback"></param>
+        public void RequestDS(CustomDsCreateRequest request)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            SendRequest(MessageType.createDSRequest,
+                request,
+                r => { });
         }
 
         /// <summary>

@@ -35,6 +35,14 @@ namespace AccelByte.Models
         [DataMember] public string UGCServerUrl { get; set; }
         [DataMember] public string ReportingServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
+        [DataMember] public string SessionBrowserServerUrl { get; set; }
+        [DataMember] public bool UseTurnManager { get; set; }
+        [DataMember] public string TurnManagerServerUrl { get; set; }
+        [DataMember] public string TurnServerHost { get; set; }
+        [DataMember] public string TurnServerPort { get; set; }
+        [DataMember] public string TurnServerPassword { get; set; }
+        [DataMember] public string TurnServerSecret { get; set; }
+        [DataMember] public string TurnServerUsername { get; set; }
         [DataMember] public string GroupServerUrl { get; set; }
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string AppId { get; set; }
@@ -71,6 +79,14 @@ namespace AccelByte.Models
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
                    this.UGCServerUrl == anotherConfig.UGCServerUrl &&
                    this.SeasonPassServerUrl == anotherConfig.SeasonPassServerUrl &&
+                   this.SessionBrowserServerUrl == anotherConfig.SessionBrowserServerUrl &&
+                   this.TurnManagerServerUrl == anotherConfig.TurnManagerServerUrl &&
+                   this.UseTurnManager == anotherConfig.UseTurnManager &&
+                   this.TurnServerHost == anotherConfig.TurnServerHost &&
+                   this.TurnServerPort == anotherConfig.TurnServerPort &&
+                   this.TurnServerUsername == anotherConfig.TurnServerUsername &&
+                   this.TurnServerPassword == anotherConfig.TurnServerPassword &&
+                   this.TurnServerSecret == anotherConfig.TurnServerSecret &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace;
@@ -124,6 +140,10 @@ namespace AccelByte.Models
                 this.ReportingServerUrl = GetDefaultApiUrl(this.ReportingServerUrl, "/reporting");
 
                 this.SeasonPassServerUrl = GetDefaultApiUrl(this.SeasonPassServerUrl, "/seasonpass");
+                
+                this.SessionBrowserServerUrl = GetDefaultApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser");
+                
+                this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
 
             }
         }
@@ -176,6 +196,10 @@ namespace AccelByte.Models
                 if (this.ReportingServerUrl == httpsBaseUrl + "/reporting") this.ReportingServerUrl = null;
 
                 if (this.SeasonPassServerUrl == httpsBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
+
+                if (this.SessionBrowserServerUrl == httpsBaseUrl + "/sessionbrowser") this.SessionBrowserServerUrl = null;
+
+                if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
             }
         }
 

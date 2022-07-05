@@ -23,17 +23,21 @@ namespace AccelByte.Api
         {
         }
 
-        public IEnumerator GetCurrencyList( ResultCallback<CurrencyList[]> callback )
+        public IEnumerator GetCurrencyList( ResultCallback<CurrencyList[]> callback, CurrencyType currencyType = CurrencyType.NONE )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't Get Currency List! Namespace parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't Get Currency List! accessToken parameter is null!");
 
-            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/currencies")
+            var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/currencies")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
+            if (currencyType != CurrencyType.NONE)
+            {
+                builder.WithQueryParam("currencyType", currencyType.ToString());
+            }
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 

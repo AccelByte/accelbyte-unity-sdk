@@ -44,9 +44,10 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Get All Currency List Info by namespace
+        /// <param name="currencyType">Currency Type</param>
         /// </summary>
         /// <param name="callback">Return a result that contains CurrencyList via callback</param>
-        public void GetCurrencyList( ResultCallback<CurrencyList[]> callback )
+        public void GetCurrencyList( ResultCallback<CurrencyList[]> callback, CurrencyType currencyType = CurrencyType.NONE)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -57,7 +58,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetCurrencyList(callback));
+                api.GetCurrencyList(callback, currencyType));
         }
     }
 }

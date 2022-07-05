@@ -28,6 +28,7 @@ namespace AccelByte.Core {
     {
         string Url { get; }
         long Code { get; }
+        IDictionary<string, string> Headers { get; }
         byte[] BodyBytes { get; }
     }
 

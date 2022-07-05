@@ -2,11 +2,35 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FileType
+    {
+        [Description("jpeg")]
+        JPEG,
+        [Description("jpg")]
+        JPG,
+        [Description("png")]
+        PNG,
+        [Description("bmp")]
+        BMP,
+        [Description("gif")]
+        GIF,
+        [Description("mp3")]
+        MP3,
+        [Description("bin")]
+        BIN,
+        [Description("webp")]
+        WEBP
+    }
+
     [DataContract]
     public class UserProfile
     {
@@ -23,7 +47,8 @@ namespace AccelByte.Models
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
         [DataMember] public string publicId { get; set; }
-        [DataMember] public Dictionary<string, object> privateCustomAttributes { get; set; }
+		[DataMember] public string zipCode { get; set; }
+        [DataMember] public Dictionary<string, object> privateCustomAttributes { get; set; } // This fiels will not appear when call public user profile 
 
     }
 
@@ -52,6 +77,7 @@ namespace AccelByte.Models
         [DataMember] public string timeZone { get; set; }
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public Dictionary<string, object> privateCustomAttributes { get; set; }
     }
 
     [DataContract]
@@ -66,11 +92,22 @@ namespace AccelByte.Models
         [DataMember] public string timeZone { get; set; }
         [DataMember] public string dateOfBirth { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string zipCode { get; set; }
+        [DataMember] public Dictionary<string, object> privateCustomAttributes { get; set; }
     }
 
     [DataContract]
     public class Time
     {
         [DataMember] public System.DateTime currentTime;
+    }
+
+    [DataContract]
+    public class GenerateUploadURLResult
+    {
+        [DataMember] public string url { get; set; }
+        [DataMember] public string accessUrl { get; set; }
+        [DataMember] public string method { get; set; }
+        [DataMember] public string contentType { get; set; }
     }
 }

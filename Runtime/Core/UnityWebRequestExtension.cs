@@ -4,8 +4,7 @@
 
 using System;
 using System.Linq;
-using AccelByte.Api;
-using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 
 namespace AccelByte.Core
@@ -41,7 +40,7 @@ namespace AccelByte.Core
         {
             return new UnityHttpResponseAdapter
             {
-                Url = request.url, Code = request.responseCode, BodyBytes = request.downloadHandler.data
+                Url = request.url, Code = request.responseCode, Headers = request.GetResponseHeaders(), BodyBytes = request.downloadHandler.data
             };
         }
 
@@ -49,6 +48,8 @@ namespace AccelByte.Core
         {
             public string Url { get; set; }
             public long Code { get; set; }
+            
+            public IDictionary<string, string> Headers { get; set;  }
             public byte[] BodyBytes { get; set; }
         }
     }

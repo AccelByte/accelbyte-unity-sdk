@@ -445,7 +445,7 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, string> localizationDescriptions { get; set; }
         [DataMember] public string currencySymbol { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string currencyType { get; set; }
+        [DataMember] public CurrencyType currencyType { get; set; }  
         [DataMember] public int decimals { get; set; }
         [DataMember] public int maxAmountPerTransaction { get; set; }
         [DataMember] public int maxTransactionAmountPerDay { get; set; }

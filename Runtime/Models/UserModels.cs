@@ -86,9 +86,17 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class NamespaceRoles
+    {
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public string roleId { get; set; }
+    }
+
+    [DataContract]
     public class UserData
     {
         [DataMember] public string authType { get; set; }
+        [DataMember] public string avatarUrl { get; set; }
         [DataMember] public Ban[] bans { get; set; }
         [DataMember] public string country { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
@@ -101,11 +109,14 @@ namespace AccelByte.Models
         [DataMember] public DateTime lastDateOfBirthChangedTime { get; set; }
         [DataMember] public DateTime lastEnabledChangedTime { get; set; }
         [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public NamespaceRoles[] namespaceRoles { get; set; }
         [DataMember] public string newEmailAddress { get; set; }
         [DataMember] public string oldEmailAddress { get; set; }
         [DataMember] public Permission[] permissions { get; set; }
         [DataMember] public string phoneNumber { get; set; }
         [DataMember] public bool phoneVerified { get; set; }
+        [DataMember] public bool platformAvatarUrl { get; set; }
+        [DataMember] public bool platformDisplayName { get; set; }
         [DataMember] public string platformId { get; set; }
         [DataMember] public string platformUserId { get; set; }
         [DataMember] public string[] roles { get; set; }
@@ -118,6 +129,7 @@ namespace AccelByte.Models
     public class PublicUserData
     {
         [DataMember] public string authType { get; set; }
+        [DataMember] public string avatarUrl { get; set; }
         [DataMember] public Ban[] bans { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public bool deletionStatus { get; set; }
@@ -204,12 +216,13 @@ namespace AccelByte.Models
     [DataContract]
     public class UpdateUserRequest
     {
-        [DataMember] public string country { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
+        [DataMember] public string country { get; set; } // Country use ISO3166-1 alpha-2 two letter, e.g. US.
+        [DataMember] public string dateOfBirth { get; set; } // Date of Birth format : YYYY-MM-DD, e.g. 2019-04-29.
         [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string languageTag { get; set; }
+        [DataMember] public string emailAddress { get; set; } // Able to be used in publisher namespace 
+        [DataMember] public string languageTag { get; set; } 
         [DataMember] public string username { get; set; }
+        [DataMember] public string avatarUrl { get; set; }
     }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
@@ -432,6 +445,7 @@ namespace AccelByte.Models
         [DataMember] public string displayName { get; set; }
         [DataMember] public Dictionary<string, string> platformUserIds { get; set; } 
         [DataMember] public string userId { get; set; }
+        [DataMember] public string publisherAvatarUrl { get; set; }
     }
 
     [DataContract]

@@ -39,6 +39,14 @@ namespace AccelByte.Models
         partyRejectRequest,
         partyRejectResponse,
         partyRejectNotif,
+        partyGenerateCodeRequest,
+        partyGenerateCodeResponse,
+        partyGetCodeRequest,
+        partyGetCodeResponse,
+        partyDeleteCodeRequest,
+        partyDeleteCodeResponse,
+        partyJoinViaCodeRequest,
+        partyJoinViaCodeResponse,
         partyPromoteLeaderRequest,
         partyPromoteLeaderResponse,
         personalChatRequest,
@@ -82,6 +90,7 @@ namespace AccelByte.Models
         rejectFriendsNotif,
         startMatchmakingRequest,
         startMatchmakingResponse,
+        createDSRequest,
         cancelMatchmakingRequest,
         cancelMatchmakingResponse,
         matchmakingNotif,
@@ -195,10 +204,17 @@ namespace AccelByte.Models
     #region Party
 
     [DataContract]
+    public class PartyCreateResponse : PartyInfo
+    {
+        [DataMember] public string partyCode; // Can be used by another player to join the recently created party
+    }
+
+    [DataContract]
     public class PartyInfo
     {
         [DataMember] public string partyID;
         [DataMember] public string leaderID;
+        [DataMember] public string leader;
         [DataMember] public string[] members;
         [DataMember] public string[] invitees;
         [DataMember] public string invitationToken;
@@ -290,6 +306,7 @@ namespace AccelByte.Models
     public class KickNotification
     {
         [DataMember] public string leaderID;
+        [DataMember] public string leader;
         [DataMember] public string userID;
         [DataMember] public string partyID;
     }
@@ -298,6 +315,7 @@ namespace AccelByte.Models
     public class LeaveNotification
     {
         [DataMember] public string leaderID;
+        [DataMember] public string leader;
         [DataMember] public string userID;
     }
 
@@ -319,6 +337,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string partyID;
         [DataMember] public string leaderID;
+        [DataMember] public string leader;
         [DataMember] public string userID;
     }
 
@@ -333,11 +352,29 @@ namespace AccelByte.Models
     {
         [DataMember] public string partyID;
         [DataMember] public string leaderID;
+        [DataMember] public string leader;
         [DataMember] public string members;
         [DataMember] public string invitees;
         [DataMember] public string invitationToken;
     }
 
+    [DataContract]
+    public class PartyGenerateCodeResponse
+    {
+        [DataMember] public string partyCode;
+    }
+
+    [DataContract]
+    public class PartyGetCodeResponse
+    {
+        [DataMember] public string partyCode;
+    }
+
+    [DataContract]
+    public class PartyJoinViaCodeRequest
+    {
+        [DataMember] public string partyCode;
+    }
     #endregion
 
     #region Matchmaking
@@ -426,6 +463,17 @@ namespace AccelByte.Models
         [DataMember] public bool newSessionOnly;
     }
 
+    [DataContract]
+    public class CustomDsCreateRequest
+    {
+        [DataMember] public string matchId;
+        [DataMember] public string gameMode;
+        [DataMember] public string servername; //The Local DS name, fill it blank if you don't use Local DS.
+        [DataMember] public string clientVersion;
+        [DataMember] public string region;
+        [DataMember] public string deployment;
+    }
+
     #endregion
 
     #region Friends
@@ -492,26 +540,18 @@ namespace AccelByte.Models
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum UserStatus
     {
-        Offline = 0,
-        Availabe = 1,
-        Busy = 2,
-        Invisible = 3
+        Offline,
+        Online,
+        Busy,
+        Invisible
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum GeneralUserStatus
-    {
-        offline,
-        online,
-        busy,
-        invisible
-    }
     
     [DataContract]
     public class FriendsStatusNotif
     {
         [DataMember] public string userID;
-        [DataMember] public string availability;
+        [DataMember] public UserStatus availability;
         [DataMember] public string activity;
         [DataMember] public DateTime lastSeenAt;
     }
@@ -519,7 +559,7 @@ namespace AccelByte.Models
     [DataContract]
     public class SetUserStatusRequest
     {
-        [DataMember] public uint availability;
+        [DataMember] public string availability;
         [DataMember] public string activity;
     }
 
@@ -533,7 +573,7 @@ namespace AccelByte.Models
     public class UserStatusNotif
     {
         [DataMember] public string userID;
-        [DataMember] public GeneralUserStatus availability;
+        [DataMember] public UserStatus availability;
         [DataMember] public string activity;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public DateTime lastSeenAt;

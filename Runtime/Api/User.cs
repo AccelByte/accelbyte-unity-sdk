@@ -7,6 +7,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using AccelByte.Core;
 using AccelByte.Models;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -313,6 +314,69 @@ namespace AccelByte.Api
         {
             yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
                 platformType, platformToken, cb, createHeadless), callback);
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void LoginWithOtherPlatformId(string platformId
+            , string platformToken
+            , ResultCallback callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithOtherPlatformIdAsync(platformId, platformToken, callback, createHeadless));
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        public void LoginWithOtherPlatformId(string platformId
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(LoginWithOtherPlatformIdAsync(
+                platformId,
+                platformToken,
+                callback,
+                createHeadless));
+        }
+
+        /// <summary>
+        /// TODO: Deprecated for extended callback variant?
+        /// </summary>
+        /// <param name="platformId"></param>
+        /// <param name="platformToken"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
+            , string platformToken
+            , ResultCallback callback
+            , bool createHeadless = true)
+        {
+            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatformId(
+                platformId, platformToken, cb, createHeadless), callback);
+        }
+
+        private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless = true)
+        {
+            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatformId(
+                platformId, platformToken, cb, createHeadless), callback);
         }
 
         /// <summary>
@@ -1365,6 +1429,25 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Update current user 
+        /// </summary>
+        /// <param name="updateUserRequest">Update user request variables to be updated</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void UpdateUser(UpdateUserRequest updateUserRequest
+            , ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            coroutineRunner.Run(api.UpdateUser(updateUserRequest, callback));
+        }
+
+        /// <summary>
         /// Create Headless Account for Account Linking
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
@@ -1450,6 +1533,42 @@ namespace AccelByte.Api
                 password,
                 linkingToken,
                 callback));
+        }
+
+        /// <summary>
+        /// Request the Avatar of the given UserProfile
+        /// </summary>
+        /// <param name="userId">The UserId of a public Profile</param>
+        /// <param name="callback">Returns a result that contains a <see cref="Texture2D"/></param>
+        public void GetUserAvatar(string userId
+            , ResultCallback<Texture2D> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!loginSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            } 
+
+            GetUserByUserId(userId, result =>
+            {
+                if (result.IsError)
+                {
+                    Debug.LogError(
+                        $"Unable to get Bulk Get User Info Code:{result.Error.Code} Message:{result.Error.Message}");
+                    callback.TryError(result.Error);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(result.Value.avatarUrl))
+                    {
+                        callback.TryError(new Error(ErrorCode.GameRecordNotFound, "avatarUrl value is null or empty"));
+                    }
+                    coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
+                }
+            });
         }
 
         /// <summary>

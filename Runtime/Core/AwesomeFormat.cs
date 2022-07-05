@@ -265,7 +265,7 @@ namespace AccelByte.Core
                     try
                     {
                         var obj = Activator.CreateInstance(fieldInfo.FieldType);
-                        obj = Enum.Parse(fieldInfo.FieldType, fieldValue);
+                        obj = Enum.Parse(fieldInfo.FieldType, fieldValue, true);
                         fieldInfo.SetValue(payload, obj);
                     }
                     catch (Exception)

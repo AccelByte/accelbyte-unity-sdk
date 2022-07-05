@@ -184,5 +184,29 @@ namespace AccelByte.Server
             var result = response.TryParseJson<UserBanPagedList>();
             callback.Try(result);
         }
+
+        public IEnumerator GetUserByUserId(string userId 
+            , ResultCallback<UserData> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/iam/v3/namespaces/{namespace}/users/{userId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .GetResult();
+
+            IHttpResponse response = null;
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserData>();
+            callback.Try(result);
+        }
     }
 }

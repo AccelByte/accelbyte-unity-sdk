@@ -58,6 +58,8 @@ namespace AccelByte.Api
         private static SeasonPass seasonPass;
         private static Miscellaneous miscellaneous;
         private static Reward reward;
+        private static SessionBrowser sessionBrowser;
+        private static TurnManager turnManager;
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
@@ -959,6 +961,38 @@ namespace AccelByte.Api
             return seasonPass;
         }
 
+        public static SessionBrowser GetSessionBrowser()
+        {
+            if (sessionBrowser == null)
+            {
+                CheckPlugin();
+                sessionBrowser = new SessionBrowser(
+                    new SessionBrowserApi(
+                        httpClient,
+                        Config, // baseUrl==SessionBrowserServerUrl
+                        GetUser().Session),
+                    user.Session,
+                    coroutineRunner);
+            }
+            return sessionBrowser;
+        }
+
+        public static TurnManager GetTurnManager()
+        {
+            if (turnManager == null)
+            {
+                CheckPlugin();
+                turnManager = new TurnManager(
+                    new TurnManagerApi(
+                        httpClient,
+                        Config, // baseUrl==TurnManagerServerUrl
+                        GetUser().Session),
+                    user.Session,
+                    coroutineRunner);
+            }
+            return turnManager;
+        }
+
         public static Miscellaneous GetMiscellaneous()
         {
             if (miscellaneous == null)
@@ -1021,6 +1055,8 @@ namespace AccelByte.Api
             ugc = null;
             seasonPass = null;
             reward = null;
+            sessionBrowser = null;
+            turnManager = null;
             configReset = null;
             environmentChanged = null;
         }
