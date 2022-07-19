@@ -4,12 +4,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using AccelByte.Models;
+using UnityEngine.TestTools;
 
 namespace AccelByte.Core
 {
@@ -208,21 +210,32 @@ namespace AccelByte.Core
                         {
                             for (int i = 0; i < array.Length; i++)
                             {
-                                var parsedValue = Convert.ChangeType(strItems[i].Trim(' '), fieldInfo.FieldType.GetElementType());
-                                if (fieldInfo.FieldType.GetElementType() == typeof(string))
+                                if (fieldInfo.FieldType.GetElementType().IsEnum)
                                 {
-                                    array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
+                                    var obj = Activator.CreateInstance(fieldInfo.FieldType.GetElementType());
+                                    obj = Enum.Parse(fieldInfo.FieldType.GetElementType(), Uri.UnescapeDataString((string)strItems[i]), true);
+                                    array.SetValue(obj, i);
                                 }
                                 else
                                 {
-                                    array.SetValue(parsedValue, i);
+                                    var parsedValue = Convert.ChangeType(strItems[i].Trim(' '), fieldInfo.FieldType.GetElementType());
+
+                                    if (fieldInfo.FieldType.GetElementType() == typeof(string))
+                                    {
+                                        array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
+                                    }
+                                    else
+                                    {
+                                        array.SetValue(parsedValue, i);
+                                    }
                                 }
                             }
 
                             fieldInfo.SetValue(payload, array);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
+                            AccelByteDebug.Log($"Error parsing field {fieldInfo.Name}\n{e}");
                             return ErrorCode.MessageFieldConversionFailed;
                         }
                     }

@@ -522,7 +522,7 @@ namespace AccelByte.Models
     public class FriendsStatus
     {
         [DataMember] public string[] friendsId;
-        [DataMember] public string[] availability;
+        [DataMember] public UserStatus[] availability;
         [DataMember] public string[] activity;
         [DataMember] public DateTime[] lastSeenAt;
     }
