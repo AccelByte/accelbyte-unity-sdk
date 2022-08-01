@@ -392,8 +392,9 @@ namespace AccelByte.Api
         }
 
         public IEnumerator GenerateUploadURLForUserContent(string userId
-        , FileType filetype
-        , ResultCallback<GenerateUploadURLResult> callback)
+            , FileType filetype
+            , ResultCallback<GenerateUploadURLResult> callback
+            , UploadCategory category = UploadCategory.DEFAULT)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't Generate Upload URL for User Content! Namespace parameter is null!");
@@ -405,6 +406,7 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("fileType", filetype.ToString().ToLower())
+                .WithQueryParam("category", category.ToString().ToLower())
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)

@@ -4,6 +4,7 @@
 
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Models;
 using AccelByte.Server;
@@ -20,6 +21,7 @@ namespace AccelByte.Core
         public LoginSession session;
         public IHttpClient httpClient;
         public readonly CoroutineRunner coroutineRunner;
+        public Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
 
         public ApiClient( LoginSession inSession
             , IHttpClient inHttpClient
@@ -98,6 +100,13 @@ namespace AccelByte.Core
             where TWrapper : WrapperBase 
             where TApi  : ApiBase // `Parent` supports both client and server
         {
+            string currentWrapperName = typeof(TWrapper).GetTypeInfo().FullName;
+
+            if (wrapperBaseCollection.ContainsKey(currentWrapperName))
+            {
+                return (TWrapper)wrapperBaseCollection[currentWrapperName];
+            }
+
             // ####################################################################
             // Expected TApi constructor params: (IHttpClient, Config, ISession)
             // Expected TWrapper constructor params: (TApi, IUserSession, CoroutineRunner)
@@ -127,8 +136,9 @@ namespace AccelByte.Core
                 binder: null,
                 args: wrapperArgs,
                 culture: null);
-            
-            return (TWrapper)newWrapperInstance;
+
+            wrapperBaseCollection.Add(currentWrapperName, (WrapperBase)newWrapperInstance);
+            return (TWrapper)wrapperBaseCollection[currentWrapperName];
         }
 
         internal void environmentChanged()

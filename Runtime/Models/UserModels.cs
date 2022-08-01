@@ -226,7 +226,7 @@ namespace AccelByte.Models
     }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, Android, iOS, Nintendo, awscognito, PS5, Netflix }
+    public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin }
 
     [DataContract]
     public class PlatformLink

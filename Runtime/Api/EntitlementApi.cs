@@ -276,10 +276,11 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator ConsumeUserEntitlement( string userId
+        public IEnumerator ConsumeUserEntitlement(string userId
             , string entitlementId
             , int useCount
-            , ResultCallback<EntitlementInfo> callback )
+            , ResultCallback<EntitlementInfo> callback
+            , string[] options )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't consume user entitlement! Namespace_ from parent  is null!");
@@ -289,7 +290,9 @@ namespace AccelByte.Api
 
             ConsumeUserEntitlementRequest consumeUserEntitlement = new ConsumeUserEntitlementRequest
             {
-                useCount = useCount
+                useCount = useCount,
+                options = options
+
             };
 
             var request = HttpRequestBuilder
@@ -605,5 +608,84 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator SyncEpicGamesDurableItems(string userId
+            , string epicGamesJwtToken
+            , ResultCallback callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't sync EpicGames durable item! Namespace_ from parent is null!");
+            Assert.IsNotNull(AuthToken, "Can't sync EpicGames durable item! AccessToken from parent is null!");
+            Assert.IsNotNull(userId, "Can't sync EpicGames durable item! UserId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/epicgames/sync")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(epicGamesJwtToken.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator ValidateUserItemPurchaseCondition(string[] items
+           , ResultCallback<PlatformValidateUserItemPurchaseResponse[]> callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
+            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
+            Assert.IsNotNull(items, "Can't validate user item purchase condition! items parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/items/purchase/conditions/validate")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(new{itemIds = items}.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PlatformValidateUserItemPurchaseResponse[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserEntitlementOwnershipByItemIds(string userId
+            ,string[] ids
+            , ResultCallback<EntitlementOwnershipItemIds[]> callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
+            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
+            Assert.IsNotNull(ids, "Can't Get ids condition! ids parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/ownership/byItemIds")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson); 
+                if (ids != null) 
+                { foreach (var id in ids) 
+                    { 
+                        builder.WithQueryParam("ids", id); 
+                    } 
+                }
+                var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<EntitlementOwnershipItemIds[]>();
+            callback.Try(result);
+        }
     }
 }

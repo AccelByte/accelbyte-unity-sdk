@@ -482,28 +482,22 @@ namespace AccelByte.Api
                 CheckPlugin();
                 IUserSession session = GetUser().Session;
                 lobby = new Lobby(
-                    config.LobbyServerUrl,
-                    new WebSocket(),
                     new LobbyApi(
                         httpClient, 
                         Config, // baseUrl==LobbyServerUrl
                         session),
                     session,
-                    config.Namespace,
                     coroutineRunner);
 
                 configReset += () =>
                 {
                     lobby = null;
                     lobby = new Lobby(
-                        config.LobbyServerUrl,
-                        new WebSocket(),
                         new LobbyApi(
                             httpClient,
                             Config, // baseUrl==LobbyServerUrl
                             session),
                         session,
-                        config.Namespace,
                         coroutineRunner);
                 };
             }

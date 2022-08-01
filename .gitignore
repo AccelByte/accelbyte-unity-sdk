@@ -4,6 +4,7 @@
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
+[Ll]ogs/
 UAssets/AssetStoreTools*
 Assets/Plugins/Editor/Jetbrains
 
@@ -40,10 +41,14 @@ sysinfo.txt
 
 *.bak
 *.log
+!Plugin/**/*.meta
 
 # Generated test files
 Assets/InitTestScene*.unity
 
-# pre commit hook
-node_modules
-yarn.lock
+# Plugin Development
+
+plugin-dev.config.ps1
+test.log
+test.xml
+build.log

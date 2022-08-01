@@ -24,6 +24,7 @@ namespace AccelByte.Models
         CODE,
         SUBSCRIPTION,
         SEASON,
+        OPTIONBOX,
         MEDIA
     }
 
@@ -173,6 +174,23 @@ namespace AccelByte.Models
         Other
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Cycle
+    {
+        WEEKLY,
+        MONTHLY,
+        QUARTERLY,
+        YEARLY
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum PredicateType
+    {
+        EntitlementPredicate,
+        SeasonPassPredicate,
+        SeasonTierPredicate
+    }
+
     #endregion
 
     #region Wallet
@@ -285,6 +303,7 @@ namespace AccelByte.Models
         [DataMember] public string currencyCode { get; set; }
         [DataMember] public string currencyType { get; set; }
         [DataMember] public string currencyNamespace { get; set; }
+        [DataMember] public int trialPrice { get; set; }
         [DataMember] public DateTime purchaseAt { get; set; }
         [DataMember] public DateTime expireAt { get; set; }
         [DataMember] public DateTime discountPurchaseAt { get; set; }
@@ -301,22 +320,31 @@ namespace AccelByte.Models
         [DataMember] public string sku { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string name { get; set; }
+        [DataMember] public bool listable { get; set; }
         [DataMember] public EntitlementType entitlementType { get; set; }
         [DataMember] public int useCount { get; set; }
         [DataMember] public bool stackable { get; set; }
+        [DataMember] public bool purchasable { get; set; }
         [DataMember] public ItemType itemType { get; set; }
         [DataMember] public string thumbnailUrl { get; set; }
         [DataMember] public string targetNamespace { get; set; }
         [DataMember] public string targetCurrencyCode { get; set; }
         [DataMember] public string targetItemId { get; set; }
         [DataMember] public string title { get; set; }
+        [DataMember] public string description { get; set; }
+        [DataMember] public ItemRecurring recurring { get; set; }
         [DataMember] public RegionDataItem regionDataItem { get; set; }
         [DataMember] public string[] itemIds { get; set; }
+        [DataMember] public string itemQty { get; set; }
+        [DataMember] public string[] features { get; set; }
         [DataMember] public int maxCountPerUser { get; set; }
         [DataMember] public int maxCount { get; set; }
         [DataMember] public string boothName { get; set; }
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
     }
 
     [DataContract]
@@ -344,6 +372,53 @@ namespace AccelByte.Models
         [DataMember] public int width { get; set; }
         [DataMember] public string imageUrl { get; set; }
         [DataMember] public string smallImageUrl { get; set; }
+    }
+
+    [DataContract]
+    public class ItemRecurring
+    {
+        [DataMember] public Cycle cycle { get; set; }
+        [DataMember] public int fixedFreeDays { get; set; }
+        [DataMember] public int fixedTrialCycles { get; set; }
+        [DataMember] public int graceDays { get; set; }
+    }
+
+    [DataContract]
+    public class ItemPredicate
+    {
+        [DataMember] public string name { get; set; }
+        [DataMember] public PredicateType predicateType { get; set; }
+        [DataMember] public string comparison { get; set; }
+        [DataMember] public string anyOf { get; set; }
+        [DataMember] public string[] values { get; set; }
+        [DataMember] public string value { get; set; }
+    }
+
+    [DataContract]
+    public class ItemConditionGroup
+    {
+        [DataMember] public ItemPredicate[] predicate { get; set; }
+        [DataMember] public string operators { get; set; }
+    }
+
+    [DataContract]
+    public class ItemPurchaseCondition
+    {
+        [DataMember] public ItemConditionGroup[] itemConditionGroup { get; set; }
+    }
+
+    [DataContract]
+    public class ItemBoxItem
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string itemSku { get; set; }
+        [DataMember] public int count { get; set; }
+    }
+
+    [DataContract]
+    public class ItemOptionBoxConfig
+    {
+        [DataMember] public ItemBoxItem[] boxItems { get; set; }
     }
 
     [DataContract]
@@ -397,7 +472,8 @@ namespace AccelByte.Models
         [DataMember] public string longDescription { get; set; }
         [DataMember] public string itemId { get; set; }
         [DataMember] public string appId { get; set; }
-        [DataMember] public EntitlementAppType appType { get; set; } //"GAME"
+        [DataMember] public EntitlementAppType appType { get; set; } //"GAME" 
+        [DataMember] public SeasonType SeasonType { get; set; }
         [DataMember] public string baseAppId { get; set; }
         [DataMember] public string sku { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
@@ -407,6 +483,8 @@ namespace AccelByte.Models
         [DataMember] public bool stackable { get; set; }
         [DataMember] public string categoryPath { get; set; }
         [DataMember] public ItemStatus status { get; set; }
+        [DataMember] public bool listable { get; set; }
+        [DataMember] public bool purchasable { get; set; }
         [DataMember] public ItemType itemType { get; set; }
         [DataMember] public string targetNamespace { get; set; }
         [DataMember] public string targetCurrencyCode { get; set; }
@@ -414,7 +492,9 @@ namespace AccelByte.Models
         [DataMember] public Image[] images { get; set; }
         [DataMember] public string thumbnailUrl { get; set; }
         [DataMember] public RegionDataItem[] regionData { get; set; }
+        [DataMember] public ItemRecurring recurring { get; set; }
         [DataMember] public string[] itemIds { get; set; }
+        [DataMember] public string[] boundItemIds { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string[] features { get; set; }
         [DataMember] public int maxCountPerUser { get; set; }
@@ -427,6 +507,8 @@ namespace AccelByte.Models
         [DataMember] public string language { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public ItemPurchaseCondition purchaseCondition { get; set; }
+        [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
         [DataMember] public string localExt { get; set; }
         [DataMember] public Dictionary<string, int> itemQty { get; set; }
     }
@@ -445,7 +527,7 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, string> localizationDescriptions { get; set; }
         [DataMember] public string currencySymbol { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public CurrencyType currencyType { get; set; }  
+        [DataMember] public CurrencyType currencyType { get; set; }
         [DataMember] public int decimals { get; set; }
         [DataMember] public int maxAmountPerTransaction { get; set; }
         [DataMember] public int maxTransactionAmountPerDay { get; set; }
@@ -587,14 +669,17 @@ namespace AccelByte.Models
         [DataMember] public string grantedCode { get; set; }
         [DataMember] public string itemNamespace { get; set; }
         [DataMember] public string name { get; set; }
+        [DataMember] public string[] features { get; set; }
         [DataMember] public int useCount { get; set; }
         [DataMember] public EntitlementSource source { get; set; } // ['PURCHASE', 'IAP', 'PROMOTION', 'ACHIEVEMENT', 'REFERRAL_BONUS', 'REDEEM_CODE', 'OTHER']
         [DataMember] public ItemSnapshot itemSnapshot { get; set; }
         [DataMember] public DateTime startDate { get; set; }
         [DataMember] public DateTime endDate { get; set; }
+        [DataMember] public bool stackable { get; set; }
         [DataMember] public DateTime grantedAt { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
     }
 
     [DataContract]
@@ -627,6 +712,14 @@ namespace AccelByte.Models
     public class ConsumeUserEntitlementRequest
     {
         [DataMember] public int useCount { get; set; }
+        [DataMember] public string[] options { get; set; }
+    };
+
+    [DataContract]
+    public class EntitlementOwnershipItemIds
+    {
+        [DataMember] public bool owned { get; set; }
+        [DataMember] public string itemId { get; set; }
     };
 
     [DataContract]
@@ -839,6 +932,30 @@ namespace AccelByte.Models
         [DataMember] public Paging paging { get; set; }
     }
 
+    [DataContract]
+    public class PlatformPredicateValidateResults
+    {
+        [DataMember] public string predicateName { get; set; }
+        [DataMember] public string validate { get; set; }
+        [DataMember] public string[] matched { get; set; }
+        [DataMember] public string[] unmatched { get; set; }
+    }
+
+    [DataContract]
+    public class PlatformValidateDetails
+    {
+        [DataMember] public PlatformPredicateValidateResults[] predicateValidateResults { get; set; }
+    }
+
+    [DataContract]
+    public class PlatformValidateUserItemPurchaseResponse
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string sku { get; set; }
+        [DataMember] public bool purchaseable { get; set; }
+        [DataMember] public PlatformValidateDetails[] validateDetails { get; set; }
+    }
+
     #endregion
 
     #region SyncPurchaseMobile
@@ -852,7 +969,6 @@ namespace AccelByte.Models
         [DataMember] public bool excludeOldTransactions { get; set; }
         [DataMember] public string region { get; set; } //optional
         [DataMember] public string language { get; set; } //optional
-        
     }
 
     [DataContract]

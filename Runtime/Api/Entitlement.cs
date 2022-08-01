@@ -30,7 +30,7 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -259,7 +259,7 @@ namespace AccelByte.Api
 
             Assert.IsFalse(string.IsNullOrEmpty(key), 
                 "Can't get user entitlement any ownership! public key is null!");
-            
+
             Assert.IsFalse(itemIds == null && appIds == null && skus == null, 
                 "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
 
@@ -368,7 +368,8 @@ namespace AccelByte.Api
         /// </param>
         public void ConsumeUserEntitlement( string entitlementId
             , int useCount
-            , ResultCallback<EntitlementInfo> callback )
+            , ResultCallback<EntitlementInfo> callback
+            , string[] options = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(entitlementId, 
@@ -385,7 +386,8 @@ namespace AccelByte.Api
                     session.UserId,
                     entitlementId,
                     useCount,
-                    callback));
+                    callback,
+                    options));
         }
 
         /// <summary>
@@ -633,6 +635,76 @@ namespace AccelByte.Api
                 api.SyncTwitchDropItem(
                     session.UserId,
                     TwitchDropSyncReq,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Synchronize Epic Game Durable/dlc Items.
+        /// </summary>
+        /// <param name="epicGamesJwtToken"> Contains epicGamesJwtToken needed for EpicGames Durable sync</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncEpicGamesDurableItems(string epicGamesJwtToken
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncEpicGamesDurableItems(
+                    session.UserId,
+                    epicGamesJwtToken,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Validate User Item Purchase Condition.
+        /// </summary>
+        /// <param name="items"> Contains item that needed for Validate User Item Purchase Condition</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void ValidateUserItemPurchaseCondition(string[] items
+            , ResultCallback<PlatformValidateUserItemPurchaseResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ValidateUserItemPurchaseCondition(
+                    items,
+                    callback
+                    ));
+        }
+
+        /// <summary>
+        /// Get user entitlement ownership by itemIds.
+        /// </summary>
+        /// <param name="ids"> Contains ids ItemIds</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void GetUserEntitlementOwnershipByItemIds(string[] ids
+            , ResultCallback<EntitlementOwnershipItemIds[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserEntitlementOwnershipByItemIds(
+                    session.UserId,
+                    ids,
                     callback
                     ));
         }

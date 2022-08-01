@@ -15,13 +15,20 @@ namespace AccelByte.Models
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum ReportingCategory
     {
-        UGC
+        UGC,
+        USER
+    }
+
+    [DataContract]
+    public class ReportingAdditionalInfo
+    {
+        [DataMember] public string[] screenshots { get; set; }
     }
 
     [DataContract]
     public class ReportingSubmitData
     {
-        [DataMember] public Dictionary<string, string> additionalInfo { get; set; }
+        [DataMember] public ReportingAdditionalInfo additionalInfo { get; set; }
         [DataMember] public ReportingCategory category { get; set; }
         [DataMember] public string comment { get; set; }
         [DataMember] public string objectId { get; set; }

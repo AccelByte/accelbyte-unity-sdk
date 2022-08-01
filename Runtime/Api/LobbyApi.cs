@@ -25,6 +25,14 @@ namespace AccelByte.Api
         {
         }
 
+        /// <summary>
+        /// Need to be accessed by the Lobby (WrapperBase) since it has no access to the Config.
+        /// </summary>
+        public Config GetConfig()
+        {
+            return this.Config;
+        }
+
         public IEnumerator BulkFriendRequest( string ownUserId
             , BulkFriendsRequest userIds
             , ResultCallback callback )

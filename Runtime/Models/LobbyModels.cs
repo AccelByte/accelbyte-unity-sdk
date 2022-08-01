@@ -519,15 +519,6 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class FriendsStatus
-    {
-        [DataMember] public string[] friendsId;
-        [DataMember] public UserStatus[] availability;
-        [DataMember] public string[] activity;
-        [DataMember] public DateTime[] lastSeenAt;
-    }
-
-    [DataContract]
     public class BulkFriendsRequest
     {
         [DataMember] public string[] friendIds { get; set; }
@@ -546,6 +537,14 @@ namespace AccelByte.Models
         Invisible
     }
 
+    [DataContract]
+    public class FriendsStatus
+    {
+        [DataMember] public string[] friendsId;
+        [DataMember] public UserStatus[] availability;
+        [DataMember] public string[] activity;
+        [DataMember] public DateTime[] lastSeenAt;
+    }
     
     [DataContract]
     public class FriendsStatusNotif

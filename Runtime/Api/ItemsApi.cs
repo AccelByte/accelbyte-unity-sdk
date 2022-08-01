@@ -28,7 +28,9 @@ namespace AccelByte.Api
         public IEnumerator GetItem( string itemId
             , string region
             , string language
-            , ResultCallback<PopulatedItemInfo> callback )
+            , ResultCallback<PopulatedItemInfo> callback
+            , string storeId
+            , bool populateBundle )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
@@ -39,18 +41,12 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("itemId", itemId)
+                .WithQueryParam("region", region)
+                .WithQueryParam("language", language)
+                .WithQueryParam("storeId", storeId)
+                .WithQueryParam("populateBundle", populateBundle ? "true" : "false")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
-
-            if(region != null)
-            {
-                builder.WithQueryParam("region", region);
-            }
-
-            if(language != null)
-            {
-                builder.WithQueryParam("language", language);
-            }
 
             var request = builder.GetResult();
 
@@ -87,17 +83,9 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byAppId")
                 .WithPathParam("namespace", publisherNamespace)
                 .WithQueryParam("appId", appId)
+                .WithQueryParam("region", region)
+                .WithQueryParam("language", language)
                 .Accepts(MediaType.ApplicationJson);
-
-            if (region != null)
-            {
-                builder.WithQueryParam("region", region);
-            }
-
-            if (language != null)
-            {
-                builder.WithQueryParam("language", language);
-            }
 
             var request = builder.GetResult();
 
@@ -199,5 +187,100 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator SearchItem(string language
+            , string keyword
+            , int offset
+            , int limit
+            , string region
+            , ResultCallback<ItemPagingSlicedResult> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/search")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("language", language)
+                .WithQueryParam("keyword", keyword)
+                .WithQueryParam("region", region)
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+                .WithQueryParam("limit", (limit >= 0) ? limit.ToString() : "")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<ItemPagingSlicedResult>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetItemBySku(string sku
+            , string language
+            , string region
+            , ResultCallback<ItemInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/bySku")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("sku", sku)
+                .WithQueryParam("language", language)
+                .WithQueryParam("region", region)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<ItemInfo>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator BulkGetLocaleItems(string[] itemIds
+            , string language
+            , string region
+            , ResultCallback<ItemInfo[]> callback
+            , string storeId)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/locale/byIds")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("storeId", storeId)
+                .WithQueryParam("itemIds", itemIds)
+                .WithQueryParam("region", region)
+                .WithQueryParam("language", language)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<ItemInfo[]>();
+
+            callback.Try(result);
+        }
     }
 }

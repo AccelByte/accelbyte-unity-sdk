@@ -297,9 +297,11 @@ namespace AccelByte.Api
         /// <param name="userId">UserID for the requested</param>
         /// <param name="fileType">One of the these types: jpeg, jpg, png, bmp, gif, mp3, bin, webp</param>
         /// <param name="callback">Returns a Result that contains <see cref="PublicUserProfile"/> via callback when completed.</param>
+        /// <param name="category">Supported categories: default, reporting. Default value : default</param>
         public void GenerateUploadURLForUserContent(string userId
             , FileType fileType
-            , ResultCallback<GenerateUploadURLResult> callback)
+            , ResultCallback<GenerateUploadURLResult> callback 
+            , UploadCategory category = UploadCategory.DEFAULT)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -310,7 +312,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GenerateUploadURLForUserContent(userId, fileType, callback));
+                api.GenerateUploadURLForUserContent(userId, fileType, callback, category));
         }
     }
 }

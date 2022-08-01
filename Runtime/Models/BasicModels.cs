@@ -31,6 +31,15 @@ namespace AccelByte.Models
         WEBP
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UploadCategory
+    {
+        [Description("Default")]
+        DEFAULT,
+        [Description("Reporting")]
+        REPORTING,
+    }
+
     [DataContract]
     public class UserProfile
     {

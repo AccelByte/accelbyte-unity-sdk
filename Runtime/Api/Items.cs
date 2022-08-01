@@ -52,10 +52,14 @@ namespace AccelByte.Api
         /// <param name="region">Region of the item</param>
         /// <param name="language">Display language</param>
         /// <param name="callback">Returns a Result that contains ItemInfo via callback when completed.</param>
+        /// <param name="storeId">If it's leaved string empty, the value will be got from published store id on the namespace</param>
+        /// <param name="populateBundle">Whether populate bundled items if it's a bundle, default value is false</param>
         public void GetItemById( string itemId
             , string region
             , string language
-            , ResultCallback<PopulatedItemInfo> callback )
+            , ResultCallback<PopulatedItemInfo> callback
+            , string storeId = ""
+            , bool populateBundle = false )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(itemId, "Can't get item; ItemId parameter is null!");
@@ -67,7 +71,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetItem(itemId, region, language, callback));
+                api.GetItem(itemId, region, language, callback, storeId, populateBundle));
         }
 
         /// <summary>
@@ -120,6 +124,103 @@ namespace AccelByte.Api
                     callback,
                     language,
                     region));
+        }
+
+        /// <summary>
+        /// Search Item.
+        /// </summary>
+        /// <param name="language">display language</param>
+        /// <param name="keyword">Keyword Item's keyword in title or description or long description</param>
+        /// <param name="offset">offset of items</param>
+        /// <param name="limit">limit of items</param>
+        /// <param name="region">Region ISO 3166-1 alpha-2 country tag, e.g., "US", "CN".</param>
+        /// <param name="callback">Returns a result that contain ItemPagingSlicedResult via callback when completed.</param>
+        public void SearchItem(string language
+            , string keyword
+            , int offset
+            , int limit
+            , string region
+            , ResultCallback<ItemPagingSlicedResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(language, "Can't search item; language parameter is null!");
+            Assert.IsNotNull(keyword, "Can't search item; keyword parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SearchItem(
+                    language,
+                    keyword,
+                    offset,
+                    limit,
+                    region,
+                    callback));
+        }
+
+        /// <summary>
+        /// Get item info by sku.
+        /// </summary>
+        /// <param name="sku">Sku should contain specific number of item Sku</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        public void GetItemBySku(string sku
+            , string language
+            , string region
+            , ResultCallback<ItemInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sku, "Can't get item by sku; sku parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetItemBySku(
+                    sku,
+                    language,
+                    region,
+                    callback ));
+        }
+
+        /// <summary>
+        /// Bulk Get Locale Items.
+        /// </summary>
+        /// <param name="appId">AppId of an item</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        /// <param name="storeId">If it's leaved string empty, the value will be got from published store id on the namespace</param>
+        public void BulkGetLocaleItems(string[] itemIds
+            , string language
+            , string region
+            , ResultCallback<ItemInfo[]> callback
+            , string storeId = "" )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(itemIds, "Can't bulk Get Locale Items; itemIds parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetLocaleItems(
+                    itemIds,
+                    language,
+                    region,
+                    callback,
+                    storeId ));
         }
     }
 }

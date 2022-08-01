@@ -11,6 +11,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
 using UnityEngine.Assertions;
+using HybridWebSocket;
 using Random = System.Random;
 
 namespace AccelByte.Api
@@ -169,7 +170,7 @@ namespace AccelByte.Api
         private readonly IUserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        private readonly int pingDelay;
+        private int pingDelay;
         private int backoffDelay;
         private int maxDelay;
         private int totalTimeout;
@@ -177,7 +178,7 @@ namespace AccelByte.Api
         private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks =
             new Dictionary<long, Action<ErrorCode, string>>();
 
-        private readonly string websocketUrl;
+        private string websocketUrl;
         private readonly object syncToken = new object();
         private AccelByteWebSocket webSocket;
         private bool reconnectsOnBans;
@@ -187,38 +188,39 @@ namespace AccelByte.Api
 
         public event EventHandler OnRetryAttemptFailed;
         
-        internal Lobby( string inWebsocketUrl
-            , IWebSocket inWebSocket
-            , LobbyApi inApi
+        internal Lobby(LobbyApi inApi
             , IUserSession inSession
-            , string inNamespace
-            , CoroutineRunner inCoroutineRunner
-            , int inPingDelay = 4000
-            , int inBackoffDelay = 1000
-            , int inMaxDelay = 30000
-            , int inTotalTimeout = 60000 )
+            , CoroutineRunner inCoroutineRunner)
         {
-            Assert.IsNotNull(inWebSocket);
             Assert.IsNotNull(inCoroutineRunner);
 
-            websocketUrl = inWebsocketUrl;
-            webSocket = new AccelByteWebSocket(inWebSocket, inCoroutineRunner);
+            websocketUrl = inApi.GetConfig().LobbyServerUrl;
+            namespace_ = inApi.GetConfig().Namespace;
 
-            namespace_ = inNamespace;
             api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
-            
+
+            reconnectsOnBans = false;
+            lobbySessionId = new LobbySessionId();
+            OverrideWebsocket(new WebSocket());
+        }
+
+        public void OverrideWebsocket(IWebSocket inWebSocket
+            , int inPingDelay = 4000
+            , int inBackoffDelay = 1000
+            , int inMaxDelay = 30000
+            , int inTotalTimeout = 60000)
+        {
+            webSocket = new AccelByteWebSocket(inWebSocket, coroutineRunner);
+            webSocket.OnOpen += HandleOnOpen;
+            webSocket.OnMessage += HandleOnMessage;
+            webSocket.OnClose += HandleOnClose;
+
             pingDelay = inPingDelay;
             backoffDelay = inBackoffDelay;
             maxDelay = inMaxDelay;
             totalTimeout = inTotalTimeout;
-            reconnectsOnBans = false;
-            lobbySessionId = new LobbySessionId();
-
-            webSocket.OnOpen += HandleOnOpen;
-            webSocket.OnMessage += HandleOnMessage;
-            webSocket.OnClose += HandleOnClose;
         }
 
         /// <summary>

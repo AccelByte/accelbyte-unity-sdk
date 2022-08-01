@@ -1,9 +1,9 @@
 {
   "name": "com.accelbyte.unitysdk",
   "displayName": "AccelByte Unity SDK",
-  "version": "14.0.1",
-  "unity": "2018.3",
-  "description": "Official AccelByte's backend service SDK for Unity3D game engine",
+  "version": "14.1.0",
+  "unity": "2020.3",
+  "description": "Official AccelByte's backend service SDK for Unity game engine",
   "keywords": [
     "accelbyte",
     "third party",
