@@ -24,14 +24,15 @@ namespace AccelByte.Api
         {
         }
 
-        public IEnumerator QueryUserEntitlements( string userId
+        public IEnumerator QueryUserEntitlements(string userId
             , string entitlementName
             , string itemId
+            , string[] features
             , int offset
             , int limit
-            , EntitlementClazz entitlementClazz 
-            , EntitlementAppType entitlementAppType 
-            , ResultCallback<EntitlementPagingSlicedResult> callback )
+            , EntitlementClazz entitlementClazz
+            , EntitlementAppType entitlementAppType
+            , ResultCallback<EntitlementPagingSlicedResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't get user entitlements! Namespace_ from parent  is null!");
@@ -47,7 +48,8 @@ namespace AccelByte.Api
                 .WithQueryParam("entitlementAppType", 
                     (entitlementAppType == EntitlementAppType.NONE) ? "" : entitlementAppType.ToString())
                 .WithQueryParam("entitlementName", entitlementName)
-                .WithQueryParam("itemId", itemId)
+                .WithQueryParam("itemId", itemId) 
+                .WithQueryParam("features", features == null ? new string[] { } : features)
                 .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
                 .WithQueryParam("limit", (limit >= 0)? limit.ToString() : "")
                 .WithBearerAuth(AuthToken)

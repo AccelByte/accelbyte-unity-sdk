@@ -350,6 +350,7 @@ namespace AccelByte.Models
     [DataContract]
     public class ItemCriteria
     {
+        [DataMember] public string storeId { get; set; }
         [DataMember] public ItemType itemType { get; set; }
         [DataMember] public EntitlementAppType appType { get; set; }
         [DataMember] public string region { get; set; }
@@ -534,6 +535,23 @@ namespace AccelByte.Models
         [DataMember] public int maxBalanceAmount { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+    }
+
+    [DataContract]
+    public class PlatformStore
+    {
+        [DataMember] public string storeId { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string title { get; set; }
+        [DataMember] public string description { get; set; }
+        [DataMember] public bool published { get; set; }
+        [DataMember] public string[] supportedLanguages { get; set; }
+        [DataMember] public string[] supportedRegions { get; set; }
+        [DataMember] public string defaultRegion { get; set; }
+        [DataMember] public string defaultLanguage { get; set; }
+        [DataMember] DateTime publishedTime { get; set; }
+        [DataMember] DateTime createdAt { get; set; }
+        [DataMember] DateTime updatedAt { get; set; }
     }
 
     #endregion

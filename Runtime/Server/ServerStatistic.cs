@@ -264,5 +264,148 @@ namespace AccelByte.Server
             coroutineRunner.Run(
                 api.UpdateManyUsersStatItems(updates, callback));
         }
+
+        /// <summary>
+        /// Bulk fetch multiple user's stat item values for a given namespace and statCode.
+        /// If stat item does not exist, will return default value.
+        /// </summary>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="userIds"> This is the UserId array that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of FetchUser via callback when completed</param>
+        public void BulkFetchUserStatItemValues(string statCode
+           , string[] userIds
+           , string additionalKey
+           , ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkFetchUserStatItemValues(statCode, userIds, additionalKey, callback));
+        }
+
+        /// <summary>
+        /// Bulk update multiple user's statitems value with specific update strategy.
+        /// </summary>
+        /// <param name="bulkUpdateMultipleUserStatItem">This is the BulkUpdateMultipleUserStatItem array that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        public void BulkUpdateMultipleUserStatItemsValue(UpdateUserStatItem[] bulkUpdateMultipleUserStatItem
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, callback));
+        }
+
+        /// <summary>
+        /// Bulk reset user's statitem values for given namespace and user.
+        /// </summary>
+        /// <param name="userId">This is the UserId that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="bulkUserStatItems">This is the BulkUserStatItem array that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        public void BulkResetUserStatItemsValues(string userId
+            , string additionalKey
+            , UserStatItem[] bulkUserStatItems
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, callback));
+        }
+
+        /// <summary>
+        /// Bulk update user's statitems value for given namespace and user with specific update strategy.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="bulkUpdateUserStatItem">This is the BulkUpdateUserStatItem array that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        public void BulkUpdateUserStatItemValue(string userId
+            , string additionalKey
+            , UpdateUserStatItemWithStatCode[] bulkUpdateUserStatItem
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, callback));
+        }
+
+        /// <summary>
+        /// Update user's statitem value for a given namespace and user with a certain update strategy.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="statCode">StatCode</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="updateUserStatItem">This is the FAccelByteModelsUpdateUserStatItem that will be stored in the slot.
+        /// <param name="callback">Returns an array of UpdateUserStatItemValueResponse via callback when completed</param>
+        public void UpdateUserStatItemValue(string userId, string statCode
+            , string additionalKey
+            , UpdateUserStatItem updateUserStatItem
+            , ResultCallback<UpdateUserStatItemValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, callback));
+        }
+
+        /// <summary>
+        /// Delete user's stat items for given namespace, statCode, and user Id.
+        ///     If query param additionalKey is provided, it will delete user stat items of specific key (i.e. characterName).
+        ///     Otherwise, it will delete all stat items related to the user Id.
+        /// </summary>
+        /// <param name="userId">This is the UserId that will be stored in the slot.</param>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="callback">Returns via callback when completed</param>
+        public void DeleteUserStatItems(string userId, string statCode
+           , string additionalKey
+           , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.DeleteUserStatItems(userId, statCode, additionalKey, callback));
+        }
     }
 }

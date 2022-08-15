@@ -182,6 +182,83 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-		
+
+        public IEnumerator ListUserStatItems(string userId
+            , string[] statCodes
+            , string[] tags
+            , string additionalKey
+            , string accessToken
+            , ResultCallback<FetchUser[]> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(statCodes, nameof(statCodes) + " cannot be null");
+            Assert.IsNotNull(tags, nameof(tags) + " cannot be null");
+            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("additionalKey", additionalKey)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+            foreach (var statCode in statCodes)
+            {
+                builder.WithQueryParam("statCodes", statCode);
+            }
+            foreach (var tag in tags)
+            {
+                builder.WithQueryParam("tags", tag);
+            }
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<FetchUser[]>();
+
+            callback.Try(result);
+        } 
+
+        public IEnumerator UpdateUserStatItemsValue(string userId
+            , string statCode 
+            , string additionalKey
+            , PublicUpdateUserStatItem updateUserStatItem
+            , string accessToken
+            , ResultCallback<UpdateUserStatItemValueResponse> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
+            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
+            Assert.IsNotNull(updateUserStatItem, nameof(updateUserStatItem) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems/value")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("statCode", statCode)
+                .WithQueryParam("additionalKey", additionalKey)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(updateUserStatItem.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UpdateUserStatItemValueResponse>();
+
+            callback.Try(result);
+        }
     }
 }

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/14.2.0%0D14.1.0) (2022-08-15)
+
+
+### Features
+
+* expose store Id and list public store ([1acf4ec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1acf4ec49d0d6e121a4a99baafa078779e77c185))
+* exposing v2 statistics endpoint ([2a5b935](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2a5b93519c30f4bc24fb832d193a6c1b8d7a95d1))
+* searching entitlement by feature ([75f2b6e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/75f2b6e74f681a0f2d280fa0f0aac179385ba91d))
+* **sessionbrowser:** add get game sessions by user ids ([9949260](https://github.com/AccelByte/accelbyte-unity-sdk/commits/99492609f5afcb4cd3d8e704e5b5dccc53119c9c))
+
 ## [14.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/14.1.0%0D14.0.1) (2022-08-01)
 
 

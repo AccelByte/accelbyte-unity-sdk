@@ -222,5 +222,23 @@ namespace AccelByte.Api
                     callback,
                     storeId ));
         }
+
+        /// <summary>
+        /// Get list all stores in a namespace.
+        /// </summary>
+        /// <param name="callback">Returns a result that contain PlatformStore via callback when completed.</param>
+        public void GetListAllStore(ResultCallback<PlatformStore[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListAllStore(callback));
+        }
     }
 }

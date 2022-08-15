@@ -184,8 +184,8 @@ namespace AccelByte.Api
             UpdateUserStatItems("", updates, callback);
         }
 
-        /// <summary>
-        /// Update stat items with the specified update strategy for a user
+        /// <summary> 
+        /// Public bulk update user's statitems value for given namespace and user with specific update strategy. 
         /// </summary>
         /// <param name="additionalKey">To identify multi level user statItem, such as character</param>
         /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
@@ -215,5 +215,70 @@ namespace AccelByte.Api
                     session.AuthorizationToken,
                     callback));
         }
+
+        /// <summary>
+        /// Public list all statItems of user.
+        /// NOTE:
+        ///     If stat code does not exist, will ignore this stat code.
+        ///     If stat item does not exist, will return default value
+        /// </summary>
+        /// <param name="statCodes">StatCodes</param>
+        /// <param name="tags">This is the Tag array that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of FetchUser via callback when completed</param>
+        public void ListUserStatItems(string[] statCodes
+            , string[] tags
+            , string additionalKey
+            , ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ListUserStatItems(
+                    session.UserId,
+                    statCodes,
+                    tags,
+                    additionalKey,
+                    session.AuthorizationToken,
+                    callback));
+        }
+
+        /// <summary>
+        /// Public update user's statitem value for a given namespace and user with a certain update strategy.
+        /// </summary>
+        /// <param name="statCode">StatCode.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="updateUserStatItem">This is the UpdateUserStatItem that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemValueResponse via callback when completed</param>
+        public void UpdateUserStatItemsValue(string statCode
+            , string additionalKey
+            , PublicUpdateUserStatItem updateUserStatItem
+            , ResultCallback<UpdateUserStatItemValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateUserStatItemsValue(
+                    session.UserId,
+                    statCode, 
+                    additionalKey,
+                    updateUserStatItem,
+                    session.AuthorizationToken,
+                    callback));
+        }
+
+      
     }
 }

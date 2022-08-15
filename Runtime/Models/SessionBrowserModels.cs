@@ -124,6 +124,12 @@ namespace AccelByte.Models
         [DataMember] public AccelByte.Models.PagingCursor pagination { get; set; }
         [DataMember] public SessionBrowserData[] sessions { get; set; }
     }
+    
+    [DataContract]
+    public class SessionBrowserGetByUserIdsResult
+    {
+        [DataMember] public SessionBrowserData[] data { get; set; }
+    }
 
     [DataContract]
     public class SessionBrowserAddPlayerRequest

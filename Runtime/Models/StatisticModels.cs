@@ -10,21 +10,21 @@ using Newtonsoft.Json.Converters;
 
 namespace AccelByte.Models
 {
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatisticSetBy
     {
         CLIENT,
         SERVER
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatisticStatus
     {
         INIT,
         TIED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatisticUpdateStrategy
     {
         OVERRIDE,
@@ -120,7 +120,7 @@ namespace AccelByte.Models
         [DataMember] public float value { get; set; }
         [DataMember] public string statCode { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public string additionalKey {get; set;}
+        [DataMember] public string additionalKey { get; set; }
         [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
 
@@ -132,4 +132,55 @@ namespace AccelByte.Models
         [DataMember] public string statCode { get; set; }
         [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
+
+    public class FetchUser
+    {
+        [DataMember] public string profileId { get; set; }
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public float value { get; set; }
+    }
+
+    public class UpdateUserStatItem
+    {
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string additionalKey { get; set; }
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public object additionalData { get; set; }
+    }
+
+    public class UpdateUserStatItemsResponse
+    {
+        [DataMember] public bool success { get; set; }
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public object details { get; set; }
+    }
+
+    public class UserStatItem
+    {
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public object additionalData { get; set; }
+    }
+
+    public class UpdateUserStatItemWithStatCode
+    {
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public object additionalData { get; set; }
+    }
+
+    public class PublicUpdateUserStatItem
+    {
+        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public object additionalData { get; set; }
+    }
+
+    public class UpdateUserStatItemValueResponse
+    {
+        [DataMember] public float currentValue { get; set; }
+    };
+
 }

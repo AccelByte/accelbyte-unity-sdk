@@ -109,6 +109,25 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetGameSessions(filter, callback));
         }
+        
+        /// <summary>
+        /// Query available game sessions
+        /// </summary>
+        /// <param name="userIds">List of user id</param>
+        /// <param name="callback">Return the query result</param>
+        /// <returns></returns>
+        public void GetGameSessionsByUserIds(string[] userIds, ResultCallback<SessionBrowserGetByUserIdsResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetGameSessionsByUserIds(userIds, callback));
+        }
 
         /// <summary>
         /// Get a specific game sessions

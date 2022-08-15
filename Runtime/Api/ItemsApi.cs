@@ -168,6 +168,10 @@ namespace AccelByte.Api
                 {
                     queries.Add("sortBy", criteria.sortBy);
                 }
+                if (criteria.storeId != null)
+                {
+                    queries.Add("storeId", criteria.storeId);
+                }
             }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byCriteria")
@@ -279,6 +283,29 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<ItemInfo[]>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListAllStore(ResultCallback<PlatformStore[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/stores")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PlatformStore[]>();
 
             callback.Try(result);
         }

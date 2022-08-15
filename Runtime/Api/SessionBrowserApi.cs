@@ -190,6 +190,38 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator GetGameSessionsByUserIds(string[] userIds, ResultCallback<SessionBrowserGetByUserIdsResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(userIds, "Can't get game sessions! userIds parameter is null!");
+
+            if (userIds.Length == 0)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Empty userIds"));
+                yield break;
+            }
+
+            string url = BaseUrl + "/namespaces/" + Namespace_ + "/gamesession/bulk";
+
+            string userIdsQueryString = string.Join(',', userIds);
+
+            var request = HttpRequestBuilder
+                .CreateGet(url)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .WithQueryParam("user_ids", userIdsQueryString)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<SessionBrowserGetByUserIdsResult>();
+            callback.Try(result);
+        }
+
         public IEnumerator GetGameSession(string sessionId, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
