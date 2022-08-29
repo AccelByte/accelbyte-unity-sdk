@@ -19,7 +19,7 @@ namespace AccelByte.Api
     public class GameTelemetry : WrapperBase
     {
         private readonly GameTelemetryApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
         private TimeSpan telemetryInterval = TimeSpan.FromMinutes(1);
@@ -33,7 +33,7 @@ namespace AccelByte.Api
             new TimeSpan(0, 0, 5);
         
         internal GameTelemetry( GameTelemetryApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");

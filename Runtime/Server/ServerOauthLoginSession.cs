@@ -14,22 +14,11 @@ namespace AccelByte.Server
 {
     public class ServerOauthLoginSession : ISession
     {
-        private const uint MaxWaitTokenRefresh = 60000;
-        private const uint WaitExpiryDelay = 100;
-        private static readonly TimeSpan MaxBackoffInterval = TimeSpan.FromDays(1);
 
         private readonly string clientId;
         private readonly string clientSecret;
-        private readonly IHttpClient httpClient;
-        private readonly CoroutineRunner coroutineRunner;
-
         private readonly string baseUrl;
-
-        private Coroutine maintainAccessTokenCoroutine;
-        private TokenData tokenData;
-        private DateTime nextRefreshTime;
-        private string clientToken;
-        private DateTime clientTokenExpiryTime;
+        private readonly IHttpClient httpClient;
 
         internal ServerOauthLoginSession( string inBaseUrl
             , string inClientId
@@ -50,7 +39,7 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
         }
 
-        public string AuthorizationToken 
+        public override string AuthorizationToken 
         { 
             get { return tokenData != null ? tokenData.access_token : null; }
             set { tokenData.access_token = value; }
@@ -62,13 +51,12 @@ namespace AccelByte.Server
 
             yield return GetClientToken(r => getClientTokenResult = r);
 
-            tokenData = getClientTokenResult.Value;
-
             if (!getClientTokenResult.IsError)
             {
+                SetSession(getClientTokenResult.Value);
                 if (maintainAccessTokenCoroutine == null)
                 {
-                    maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainAccessToken());
+                    maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
                 }
 
                 callback.TryOk();
@@ -118,53 +106,29 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
-        private IEnumerator MaintainAccessToken()
+        public override IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback)
         {
-            TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);
-            var rand = new Random();
-
-            while (true)
+            yield return GetClientToken(result=>
             {
-                if (refreshBackoff >= ServerOauthLoginSession.MaxBackoffInterval)
+                if (result.IsError || result.Value == null)
                 {
-                    yield break;
-                }
-
-                if (tokenData == null || DateTime.UtcNow < nextRefreshTime)
-                {
-                    yield return new WaitForSeconds(ServerOauthLoginSession.WaitExpiryDelay / 1000f);
-
-                    continue;
-                }
-
-                Result refreshResult = null;
-
-                yield return LoginWithClientCredentials(result => refreshResult = result);
-
-                if (!refreshResult.IsError)
-                {
-                    nextRefreshTime = ServerOauthLoginSession.ScheduleNormalRefresh(tokenData.expires_in);
+                    var error = new OAuthError();
+                    error.error = result.Error.Code.ToString();
+                    error.error_description = result.Error.Message?.ToString();
+                    callback.TryError(error);
                 }
                 else
                 {
-                    refreshBackoff = ServerOauthLoginSession.CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
-
-                    nextRefreshTime = DateTime.UtcNow + refreshBackoff;
+                    SetSession(result.Value);
+                    callback.TryOk(result.Value);
                 }
-            }
+            });
         }
 
-        private static DateTime ScheduleNormalRefresh( int expiresIn )
+        public override void SetSession(TokenData loginResponse)
         {
-            return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn + 1) * 0.8);
-        }
-
-        private static TimeSpan CalculateBackoffInterval( TimeSpan previousRefreshBackoff
-            , int randomNum )
-        {
-            previousRefreshBackoff = TimeSpan.FromSeconds(previousRefreshBackoff.Seconds * 2);
-
-            return previousRefreshBackoff + TimeSpan.FromSeconds(randomNum);
+            tokenData = loginResponse;
+            return;
         }
     }
 }

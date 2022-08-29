@@ -16,10 +16,10 @@ namespace AccelByte.Api
     {
         private readonly AchievementApi api;
         private readonly CoroutineRunner coroutineRunner;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         
         internal Achievement( AchievementApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi==null (@ constructor)");
@@ -38,7 +38,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal Achievement( AchievementApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this(inApi, inSession, inCoroutineRunner) // Curry this obsolete data to the new overload ->

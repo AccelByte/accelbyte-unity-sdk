@@ -12,12 +12,12 @@ namespace AccelByte.Api
     public class Telemetry : WrapperBase
     {
         private readonly TelemetryApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly string clientId;
         private readonly CoroutineRunner coroutineRunner;
 
         internal Telemetry( TelemetryApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inClientId
             , CoroutineRunner inCoroutineRunner )
         {
@@ -40,7 +40,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal Telemetry( TelemetryApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , string inClientId
             , CoroutineRunner inCoroutineRunner )

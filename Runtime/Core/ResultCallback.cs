@@ -54,6 +54,11 @@ namespace AccelByte.Core
             callback?.Invoke(Result<T, U>.CreateOk());
         }
 
+        public static void TryOk<T, U>(this ResultCallback<T, U> callback, T value)
+        {
+            callback?.Invoke(Result<T, U>.CreateOk(value));
+        }
+
         public static void TryError(this ResultCallback callback, ErrorCode errorCode, string errorMessage = null)
         {
             callback?.Invoke(Result.CreateError(errorCode, errorMessage));

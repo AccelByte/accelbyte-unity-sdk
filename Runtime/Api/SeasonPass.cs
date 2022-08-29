@@ -15,11 +15,11 @@ namespace AccelByte.Api
     public class SeasonPass : WrapperBase
     {
         private readonly SeasonPassApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
         internal SeasonPass( SeasonPassApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null. Construction is failed.");
@@ -38,7 +38,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal SeasonPass( SeasonPassApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->

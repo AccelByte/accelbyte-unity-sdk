@@ -20,7 +20,7 @@ namespace AccelByte.Api
     /// 
     /// <remarks>
     /// This is essentially a gateway to the "User" API; not to be confused
-    /// with LoginSession:ISession (which contains UserId, AuthorizationToken, etc). 
+    /// with UserSession:ISession (which contains UserId, AuthorizationToken, etc). 
     /// </remarks> 
     /// </summary>
     public class User : WrapperBase
@@ -30,11 +30,13 @@ namespace AccelByte.Api
         private const int ttl = 60;
 
         //Readonly members
-        private readonly LoginSession loginSession;
+        private readonly UserSession userSession;//renamed from LoginSession
+        public readonly OAuth2 oAuth2;
         private readonly UserApi api;
         private readonly CoroutineRunner coroutineRunner;
 
-        public IUserSession Session { get { return loginSession; } }
+        public UserSession Session { get { return userSession; } }
+
 
         private UserData userDataCache;
 
@@ -43,28 +45,32 @@ namespace AccelByte.Api
         /// <summary>
         /// </summary>
         /// <param name="inLoginSession">
-        /// LoginSession; not ISession (unlike similar modules like this)
+        /// UserSession; not ISession (unlike similar modules like this)
         /// </param>
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
         internal User( UserApi inApi
-            , LoginSession inLoginSession
+            , UserSession inLoginSession
             , CoroutineRunner inCoroutineRunner )
         {
-            loginSession = inLoginSession;
+            userSession = inLoginSession;
             api = inApi;
             coroutineRunner = inCoroutineRunner;
+            oAuth2 = new OAuth2(
+                inApi.HttpClient,
+                inApi.Config,
+                userSession);
         }
         
         /// <summary>
         /// </summary>
         /// <param name="inLoginSession">
-        /// LoginSession; not ISession (unlike similar modules like this)
+        /// UserSession; not ISession (unlike similar modules like this)
         /// </param>
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("For pattern parity, to conform with other classes, use the overload that starts with api param")]
-        internal User( LoginSession inLoginSession
+        internal User( UserSession inLoginSession
             , UserApi inApi
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inLoginSession, inCoroutineRunner )
@@ -79,6 +85,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete("This end point is going to be deprected, use LoginWithUsername with other callback type instead")]
         public void LoginWithUsername( string username
             , string password
             , ResultCallback callback
@@ -151,7 +158,7 @@ namespace AccelByte.Api
         private IEnumerator LoginAsync( Func<ResultCallback, IEnumerator> loginMethod
             ,  ResultCallback callback )
         {
-            if (loginSession.IsValid())
+            if (userSession.IsValid())
             {
                 callback.TryError(ErrorCode.InvalidRequest, 
                     "User is already logged in.");
@@ -174,7 +181,7 @@ namespace AccelByte.Api
         private IEnumerator LoginAsync( Func<ResultCallback<TokenData, OAuthError>, IEnumerator> loginMethod
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            if (loginSession.IsValid())
+            if (userSession.IsValid())
             { 
                 var error = new OAuthError() 
                 {
@@ -212,7 +219,7 @@ namespace AccelByte.Api
             , bool rememberMe = false )
         {
             yield return LoginAsync(cb => 
-                loginSession.LoginWithUsername(email, password, cb, rememberMe),
+                oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe),
                 callback);
         }
         
@@ -229,7 +236,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithUsername(
+            yield return LoginAsync(cb => oAuth2.LoginWithUsername(
                 email, password, cb, rememberMe), callback);
         }
 
@@ -239,7 +246,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithUsernameV3(
+            yield return LoginAsync(cb => oAuth2.LoginWithUsernameV3(
                 email, password, cb, rememberMe), callback);
         }
 
@@ -249,7 +256,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithUsernameV3(
+            yield return LoginAsync(cb => oAuth2.LoginWithUsernameV3(
                 email, password, cb, rememberMe), callback);
         }
 
@@ -303,7 +310,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool createHeadless = true )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
+            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatform(
                 platformType, platformToken, cb, createHeadless), callback);
         }
 
@@ -312,7 +319,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool createHeadless = true )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatform(
+            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatform(
                 platformType, platformToken, cb, createHeadless), callback);
         }
 
@@ -366,7 +373,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool createHeadless = true)
         {
-            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatformId(
+            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatformId(
                 platformId, platformToken, cb, createHeadless), callback);
         }
 
@@ -375,7 +382,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool createHeadless = true)
         {
-            yield return LoginAsync(cb => loginSession.LoginWithOtherPlatformId(
+            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatformId(
                 platformId, platformToken, cb, createHeadless), callback);
         }
 
@@ -430,13 +437,13 @@ namespace AccelByte.Api
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback callback )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
         }
 
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(cb => loginSession.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
         }
 
         /// <summary>
@@ -463,12 +470,12 @@ namespace AccelByte.Api
 
         private IEnumerator LoginWithDeviceIdAsync( ResultCallback callback )
         {
-            yield return LoginAsync(loginSession.LoginWithDeviceId, callback);
+            yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
         }
 
         private IEnumerator LoginWithDeviceIdAsync( ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(loginSession.LoginWithDeviceId, callback);
+            yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
         }
 
         /// <summary>
@@ -516,18 +523,67 @@ namespace AccelByte.Api
             coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
         }
 
+        [Obsolete("Instead, use the overload with the extended callback")]
         private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
             , ResultCallback callback )
         {
-
-            yield return LoginAsync(cb => loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
+            if (refreshToken != null)
+            {
+                userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
+                yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+            }
+            else if (userSession.usePlayerPrefs)
+            {
+                if (PlayerPrefs.HasKey(UserSession.RefreshTokenKey))
+                {
+                    userSession.LoadRefreshToken();
+                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                }
+                else
+                {
+                    callback.TryError(ErrorCode.InvalidRequest, "Refresh token not found!");
+                }
+            }
+            else
+            {
+                callback.TryError(ErrorCode.InvalidRequest, "Refresh Token is null or PlayerPrefs is disabled!");
+            }
         }
 
         private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            
-            yield return LoginAsync(cb => loginSession.LoginWithLatestRefreshToken(refreshToken, cb), callback);
+            if (refreshToken != null)
+            {
+                userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
+                yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+            }
+            else if (userSession.usePlayerPrefs)
+            {
+                if (PlayerPrefs.HasKey(UserSession.RefreshTokenKey))
+                {
+                    userSession.LoadRefreshToken();
+                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                }
+                else
+                {
+                    OAuthError error = new OAuthError()
+                    {
+                        error = ErrorCode.InvalidRequest.ToString(),
+                        error_description = "Refresh token not found!"
+                    };
+                    callback.TryError(error);
+                }
+            }
+            else
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "Refresh Token is null or PlayerPrefs is disabled!"
+                };
+                callback.TryError(error);
+            }
         }
 
         /// <summary>
@@ -537,7 +593,7 @@ namespace AccelByte.Api
         public void RefreshSession( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(loginSession.RefreshSession(callback));
+            coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
         }
 
 
@@ -548,7 +604,7 @@ namespace AccelByte.Api
         public void RefreshSession( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(loginSession.RefreshSession(callback));
+            coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
         }
 
         /// <summary>
@@ -558,15 +614,19 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryOk();
-
                 return;
             }
 
             userDataCache = null;
-            coroutineRunner.Run(loginSession.Logout(callback));
+            coroutineRunner.Run(oAuth2.Logout(userSession.AuthorizationToken,
+                result=>
+            {
+                userSession.ClearSession();
+                callback.Invoke(result);
+            }));
         }
 
         /// <summary>
@@ -935,7 +995,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -956,7 +1016,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -976,7 +1036,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -994,13 +1054,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.GetPlatformLinks(loginSession.UserId, callback));
+            coroutineRunner.Run(api.GetPlatformLinks(userSession.UserId, callback));
         }
 
         /// <summary>
@@ -1019,7 +1079,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1053,7 +1113,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1075,7 +1135,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1098,7 +1158,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1154,7 +1214,7 @@ namespace AccelByte.Api
 
         public void RefreshTokenCallback( Action<string> refreshTokenCallback )
         {
-            loginSession.RefreshTokenCallback += refreshTokenCallback;
+            userSession.RefreshTokenCallback += refreshTokenCallback;
         }
 
         /// <summary>
@@ -1167,7 +1227,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1200,7 +1260,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberDevice = false )
         {
-            if (loginSession.IsValid())
+            if (userSession.IsValid())
             {
                 OAuthError error = new OAuthError()
                 {
@@ -1212,7 +1272,28 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            yield return loginSession.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
+            yield return oAuth2.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
+        }
+
+        /// <summary>
+        ///  OAuth2 token verification API 
+        /// </summary>
+        /// <param name="callback"></param>
+        public void VerifyToken(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(VerifyTokenAsync(callback));
+        }
+
+        private IEnumerator VerifyTokenAsync(ResultCallback callback)
+        {
+            if (!userSession.IsValid())
+            {
+                const string errorMessage = "User is not log in.";
+                callback.TryError(new Error(ErrorCode.InvalidRequest, errorMessage));
+                yield break;
+            }
+            yield return oAuth2.VerifyToken(Session.AuthorizationToken, callback);
         }
 
         /// <summary>
@@ -1227,7 +1308,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -1244,7 +1325,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1265,7 +1346,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1284,7 +1365,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1302,7 +1383,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1320,7 +1401,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1339,7 +1420,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1358,7 +1439,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1376,7 +1457,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1396,7 +1477,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1418,7 +1499,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1438,7 +1519,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1488,7 +1569,7 @@ namespace AccelByte.Api
             , bool extendExp
             , ResultCallback callback)
         {
-            yield return LoginAsync(cb => loginSession.CreateHeadlessAccountAndResponseToken(
+            yield return LoginAsync(cb => oAuth2.CreateHeadlessAccountAndResponseToken(
                 linkingToken, extendExp, cb), callback);
         }
 
@@ -1496,7 +1577,7 @@ namespace AccelByte.Api
             , bool extendExp
             , ResultCallback<TokenData, OAuthError> callback)
         {
-            yield return LoginAsync(cb => loginSession.CreateHeadlessAccountAndResponseToken(
+            yield return LoginAsync(cb => oAuth2.CreateHeadlessAccountAndResponseToken(
                 linkingToken, extendExp, cb), callback);
         }
 
@@ -1545,7 +1626,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!loginSession.IsValid())
+            if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -1583,7 +1664,7 @@ namespace AccelByte.Api
             , string linkingToken
             , ResultCallback callback)
         {
-            yield return LoginAsync(cb => loginSession.AuthenticationWithPlatformLink(
+            yield return LoginAsync(cb => oAuth2.AuthenticationWithPlatformLink(
                 username, password, linkingToken, cb), callback);
         }
 
@@ -1592,8 +1673,27 @@ namespace AccelByte.Api
             , string linkingToken
             , ResultCallback<TokenData, OAuthError> callback)
         {
-            yield return LoginAsync(cb => loginSession.AuthenticationWithPlatformLink(
+            yield return LoginAsync(cb => oAuth2.AuthenticationWithPlatformLink(
                 username, password, linkingToken, cb), callback);
+        }
+        
+        /// <summary>
+        /// Get Publisher User 
+        /// </summary>
+        /// <param name="userId"> user id that needed to get publisher user</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void GetPublisherUser(string userId
+            , ResultCallback<GetPublisherUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            coroutineRunner.Run(api.GetPublisherUser(userId, callback));
         }
     }
 }

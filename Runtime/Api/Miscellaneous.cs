@@ -15,7 +15,7 @@ namespace AccelByte.Api
         private readonly CoroutineRunner coroutineRunner;
 
         internal Miscellaneous( MiscellaneousApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "api==null (@ constructor)");

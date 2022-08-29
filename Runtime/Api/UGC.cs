@@ -15,11 +15,11 @@ namespace AccelByte.Api
     public class UGC : WrapperBase
     {
         private readonly UGCApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
         internal UGC( UGCApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null. Construction is failed.");
@@ -38,7 +38,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal UGC( UGCApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
@@ -385,6 +385,111 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.DeleteChannel(session.UserId, channelId, callback));
+        }
+
+        /// <summary>
+        /// Search Content player's channel based on the its channel id.
+        /// </summary>
+        /// <param name="searchContentRequest ">Detail information for the search content request..</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void SearchContent(SearchContentRequest searchContentRequest
+            , ResultCallback<UGCSearchContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            coroutineRunner.Run(
+                api.SearchContent(searchContentRequest, session.UserId, callback));
+        }
+
+        /// <summary>
+        /// Search Content player's channel based on the its channel id.
+        /// </summary>
+        /// <param name="channelId ">The id of the content's channel.</param>
+        /// <param name="searchContentRequest ">Detail information for the content request..</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void SearchContentsSpesificToChannel(string channelId
+            , SearchContentRequest searchContentRequest
+            , ResultCallback<UGCSearchContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            coroutineRunner.Run(
+                api.SearchContentsSpesificToChannel(channelId, searchContentRequest, session.UserId, callback));
+        }
+
+        /// </summary>
+        /// Update like/unlike status to a content.
+        /// </summary>
+        /// <param name="contentId ">The content id that will be updated.</param>
+        /// <param name="likeStatus ">New like Status value.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateLikeStatusToContent(string contentId
+            , bool likeStatus
+            , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateLikeStatusToContent(contentId, likeStatus, callback));
+        }
+
+        /// <summary>
+        /// Get List Followers.
+        /// </summary>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetListFollowers(
+            ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListFollowers(session.UserId, callback, limit, offset));
+        }
+
+        /// <summary>
+        /// Update follow/unfollow status to user.
+        /// </summary>
+        /// <param name="followStatus">The new follow status value.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateFollowStatus(bool followStatus
+            , ResultCallback<UGCUpdateFollowStatusToUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateFollowStatus(session.UserId, followStatus, callback));
         }
     }
 }

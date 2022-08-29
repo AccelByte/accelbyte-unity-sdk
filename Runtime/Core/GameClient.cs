@@ -10,7 +10,8 @@ namespace AccelByte.Core
 {
     public class GameClient
     {
-        public IUserSession Session => this.session;
+        public UserSession Session => this.session;
+        public User User => this.user;
 
         public GameClient(OAuthConfig oAuthConfig, Config config, IHttpClient httpClient)
         {
@@ -20,14 +21,17 @@ namespace AccelByte.Core
             this.httpClient.SetBaseUri(new Uri(config.BaseUrl));
             this.httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
 
-            this.session = new LoginSession(
-                config.BaseUrl,
-                config.Namespace,
-                config.RedirectUri,
+            this.session = new UserSession(
                 httpClient,
                 this.coroutineRunner,
                 config.UsePlayerPrefs);
-
+                this.user = new User(
+                    new UserApi(
+                        this.httpClient,
+                        config,
+                        this.session),
+                    this.session,
+                    this.coroutineRunner);
             this.httpApis = new HttpApiContainer(httpClient);
         }
 
@@ -44,6 +48,7 @@ namespace AccelByte.Core
         private readonly CoroutineRunner coroutineRunner;
         private readonly IHttpClient httpClient;
         private readonly HttpApiContainer httpApis;
-        private readonly IUserSession session;
+        private readonly UserSession session;
+        private readonly User user;
     }
 }

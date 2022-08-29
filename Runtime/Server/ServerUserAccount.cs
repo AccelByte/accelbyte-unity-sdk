@@ -5,7 +5,6 @@
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
-using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server

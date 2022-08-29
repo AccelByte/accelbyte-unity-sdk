@@ -12,11 +12,11 @@ namespace AccelByte.Api
     public class Reward : WrapperBase
     {
         private readonly RewardApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
         internal Reward( RewardApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");
@@ -35,7 +35,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal Reward( RewardApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->

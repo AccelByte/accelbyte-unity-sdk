@@ -21,7 +21,7 @@ namespace AccelByte.Api
         /// <param name="config"></param>
         /// <param name="session">
         /// BaseUrl==IamServerUrl
-        /// (!) This will soon be replaced with ISession instead of LoginSession
+        /// (!) This will soon be replaced with ISession instead of UserSession
         /// </param>
         public UserApi( IHttpClient httpClient
             , Config config
@@ -868,6 +868,28 @@ namespace AccelByte.Api
             var result = response.TryParseJson<UserData>();
             callback.Try(result);
         }
+        
+        public IEnumerator GetPublisherUser(string userId
+            , ResultCallback<GetPublisherUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(userId, "Get Publisher User failed. userId is null!");
 
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/publisher")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GetPublisherUserResponse>();
+            callback.Try(result);
+        }
     }
 }

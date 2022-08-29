@@ -242,10 +242,7 @@ namespace AccelByte.Api
 
         private static void InitUser()
         {
-            var loginSession = new LoginSession(
-                config.IamServerUrl,
-                config.Namespace,
-                config.RedirectUri,
+            var userSession = new UserSession(
                 httpClient,
                 coroutineRunner,
                 config.UsePlayerPrefs);
@@ -254,8 +251,8 @@ namespace AccelByte.Api
                 new UserApi(
                     httpClient,
                     Config,
-                    loginSession),
-                loginSession,
+                    userSession),
+                userSession,
                 coroutineRunner);
         }
 
@@ -270,7 +267,7 @@ namespace AccelByte.Api
             if (userProfiles == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 userProfiles = new UserProfiles(
                     new UserProfilesApi(
                         httpClient, 
@@ -300,7 +297,7 @@ namespace AccelByte.Api
             if (categories == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 categories = new Categories(
                     new CategoriesApi(
                         httpClient,
@@ -330,7 +327,7 @@ namespace AccelByte.Api
             if (items == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 items = new Items(
                     new ItemsApi(
                         httpClient, 
@@ -360,7 +357,7 @@ namespace AccelByte.Api
             if (currencies == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 currencies = new Currencies(
                     new CurrenciesApi(
                         httpClient, 
@@ -390,7 +387,7 @@ namespace AccelByte.Api
             if (orders == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 orders = new Orders(
                     new OrdersApi(
                         httpClient, 
@@ -420,7 +417,7 @@ namespace AccelByte.Api
             if (reward == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 reward = new Reward(
                     new RewardApi(
                         httpClient,
@@ -450,7 +447,7 @@ namespace AccelByte.Api
             if (wallet == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 wallet = new Wallet(
                     new WalletApi(
                         httpClient, 
@@ -480,7 +477,7 @@ namespace AccelByte.Api
             if (lobby == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 lobby = new Lobby(
                     new LobbyApi(
                         httpClient, 
@@ -510,7 +507,7 @@ namespace AccelByte.Api
             if (cloudStorage == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 cloudStorage = new CloudStorage(
                     new CloudStorageApi(
                         httpClient, 
@@ -540,7 +537,7 @@ namespace AccelByte.Api
             if (gameProfiles == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 gameProfiles = new GameProfiles(
                     new GameProfilesApi(
                         httpClient, 
@@ -570,7 +567,7 @@ namespace AccelByte.Api
             if (entitlement == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 entitlement = new Entitlement(
                     new EntitlementApi(
                         httpClient, 
@@ -600,7 +597,7 @@ namespace AccelByte.Api
             if (fulfillment == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 fulfillment = new Fulfillment(
                     new FulfillmentApi(
                         httpClient, 
@@ -630,7 +627,7 @@ namespace AccelByte.Api
             if (statistic == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 statistic = new Statistic(
                     new StatisticApi(
                         httpClient, 
@@ -660,7 +657,7 @@ namespace AccelByte.Api
             if (_qosManager == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 _qosManager = new QosManager(
                     new QosManagerApi(
                         httpClient, 
@@ -690,7 +687,7 @@ namespace AccelByte.Api
             if (agreement == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 agreement = new Agreement(
                     new AgreementApi(
                         httpClient, 
@@ -720,7 +717,7 @@ namespace AccelByte.Api
             if (leaderboard == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 leaderboard = new Leaderboard(
                     new LeaderboardApi(
                         httpClient, 
@@ -750,7 +747,7 @@ namespace AccelByte.Api
             if (cloudSave == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 cloudSave = new CloudSave(
                     new CloudSaveApi(
                         httpClient, 
@@ -780,7 +777,7 @@ namespace AccelByte.Api
             if (gameTelemetry == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 gameTelemetry = new GameTelemetry(
                     new GameTelemetryApi(
                         httpClient, 
@@ -810,7 +807,7 @@ namespace AccelByte.Api
             if (achievement == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 achievement = new Achievement(
                     new AchievementApi(
                         httpClient,
@@ -840,7 +837,7 @@ namespace AccelByte.Api
             if (group == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 group = new Group(
                     new GroupApi(
                         httpClient, 
@@ -870,7 +867,7 @@ namespace AccelByte.Api
             if (ugc == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 ugc = new UGC(
                     new UGCApi(
                         httpClient, 
@@ -900,7 +897,7 @@ namespace AccelByte.Api
             if (reporting == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 reporting = new Reporting(
                     new ReportingApi(
                         httpClient, 
@@ -930,7 +927,7 @@ namespace AccelByte.Api
             if (seasonPass == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 seasonPass = new SeasonPass(
                     new SeasonPassApi(
                         httpClient, 
@@ -992,7 +989,7 @@ namespace AccelByte.Api
             if (miscellaneous == null)
             {
                 CheckPlugin();
-                IUserSession session = GetUser().Session;
+                UserSession session = GetUser().Session;
                 miscellaneous = new Miscellaneous(
                     new MiscellaneousApi(
                         httpClient, 

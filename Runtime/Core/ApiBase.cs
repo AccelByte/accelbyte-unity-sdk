@@ -18,7 +18,7 @@ namespace AccelByte.Core
         /// Contains namespace, baseUrl's
         /// TODO: Do we want this private, then just make protected Getters() for Config.x?
         /// </summary>
-        protected readonly Config Config;
+        internal readonly Config Config;
         
         protected ApiBase( IHttpClient inHttpClient
             , Config inConfig

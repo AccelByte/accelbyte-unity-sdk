@@ -23,10 +23,10 @@ namespace AccelByte.Api
     public class TurnManager : WrapperBase
     {
         private readonly TurnManagerApi api;
-        private readonly ISession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal TurnManager(TurnManagerApi inApi, ISession inSession, CoroutineRunner inCoroutineRunner)
+        internal TurnManager(TurnManagerApi inApi, UserSession inSession, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, "api parameter can not be null.");
             Assert.IsNotNull(inCoroutineRunner, "coroutineRunner parameter can not be null");

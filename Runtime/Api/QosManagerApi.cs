@@ -25,7 +25,7 @@ namespace AccelByte.Api
         {
         }
 
-        public IEnumerator GetQosServers( ResultCallback<QosServerList> callback )
+        public IEnumerator GetAllQosServers( ResultCallback<QosServerList> callback )
         {
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/qos")
@@ -38,6 +38,25 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, 
                 rsp => response = rsp);
             
+            var result = response.TryParseJson<QosServerList>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
+        {
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("status", "ACTIVE")
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
             var result = response.TryParseJson<QosServerList>();
             callback.Try(result);
         }

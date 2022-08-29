@@ -17,7 +17,7 @@ namespace AccelByte.Core
         /// <summary>
         /// Contains session credential actions
         /// </summary>
-        protected readonly IHttpClient HttpClient;
+        internal readonly IHttpClient HttpClient;
         
         /// <summary>
         /// Contains AuthorizationToken and related auth

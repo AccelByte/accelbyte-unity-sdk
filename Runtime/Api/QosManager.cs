@@ -25,7 +25,7 @@ namespace AccelByte.Api
         private readonly QosManagerApi api;
 
         internal QosManager( QosManagerApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, nameof(inApi) + " is null.");
@@ -35,28 +35,12 @@ namespace AccelByte.Api
             coroutineRunner = inCoroutineRunner;
         }
 
-        public void GetServerLatencies( ResultCallback<Dictionary<string, int>> callback )
+        private IEnumerator CalculateServerLatencies(QosServer[] servers, ResultCallback<Dictionary<string, int>> callback)
         {
-            coroutineRunner.Run(GetServerLatenciesAsync(callback));
-        }
-
-        private IEnumerator GetServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
-        {
-            Result<QosServerList> getQosServersResult = null;
-
-            yield return api.GetQosServers(result => getQosServersResult = result);
-
-            if (getQosServersResult.IsError)
-            {
-                callback.TryError(getQosServersResult.Error.Code);
-
-                yield break;
-            }
-
             var stopwatch = new Stopwatch();
             var latencies = new Dictionary<string, int>();
 
-            foreach (QosServer server in getQosServersResult.Value.servers)
+            foreach (QosServer server in servers)
             {
                 using (var udpClient = new UdpClient(server.port))
                 {
@@ -77,6 +61,10 @@ namespace AccelByte.Api
                     asyncResult = udpClient.BeginReceive(null, null);
 
                     yield return new WaitUntil(() => asyncResult.IsCompleted);
+                    if (!asyncResult.IsCompleted)
+                    {
+                        AccelByteDebug.Log($"[QOS] timeout to PING {server.ip}");
+                    }
 
                     udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
                     latencies[server.region] = stopwatch.Elapsed.Milliseconds;
@@ -84,6 +72,48 @@ namespace AccelByte.Api
             }
 
             callback.TryOk(latencies);
+        }
+
+        public void GetAllServerLatencies( ResultCallback<Dictionary<string, int>> callback )
+        {
+            coroutineRunner.Run(GetAllServerLatenciesAsync(callback));
+        }
+
+        private IEnumerator GetAllServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
+        {
+            Result<QosServerList> getQosServersResult = null;
+
+            yield return api.GetAllQosServers(result => getQosServersResult = result);
+
+            if (getQosServersResult.IsError)
+            {
+                callback.TryError(getQosServersResult.Error.Code);
+
+                yield break;
+            }
+
+            yield return CalculateServerLatencies(getQosServersResult.Value.servers, callback);
+        }
+
+        public void GetServerLatencies(ResultCallback<Dictionary<string, int>> callback)
+        {
+            coroutineRunner.Run(GetServerLatenciesAsync(callback));
+        }
+
+        private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
+        {
+            Result<QosServerList> getQosServersResult = null;
+
+            yield return api.GetQosServers(result => getQosServersResult = result);
+
+            if (getQosServersResult.IsError)
+            {
+                callback.TryError(getQosServersResult.Error.Code);
+
+                yield break;
+            }
+
+            yield return CalculateServerLatencies(getQosServersResult.Value.servers, callback);
         }
     }
 }

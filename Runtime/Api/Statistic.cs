@@ -13,11 +13,11 @@ namespace AccelByte.Api
     public class Statistic : WrapperBase
     {
         private readonly StatisticApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
         
         internal Statistic( StatisticApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "Cannot construct Statistic manager; api is null!");
@@ -37,7 +37,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal Statistic( StatisticApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->

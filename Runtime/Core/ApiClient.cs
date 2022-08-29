@@ -18,12 +18,12 @@ namespace AccelByte.Core
     public class ApiClient
     {
         #region Constructor
-        public LoginSession session;
+        public UserSession session;
         public IHttpClient httpClient;
         public readonly CoroutineRunner coroutineRunner;
         public Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
 
-        public ApiClient( LoginSession inSession
+        public ApiClient( UserSession inSession
             , IHttpClient inHttpClient
             , CoroutineRunner inCoroutineRunner )
         {
@@ -55,7 +55,7 @@ namespace AccelByte.Core
         /// <summary>
         /// Get new CoreBase child class instance with dynamic params.
         /// <para>* Param types: IHttpClient, Config, ISession.</para> 
-        /// <para>* TEMPORARY EXCEPTION: UserApi's ISession param is of type LoginSession</para> 
+        /// <para>* TEMPORARY EXCEPTION: UserApi's ISession param is of type UserSession</para> 
         /// </summary>
         /// 
         /// <list type="bullet">
@@ -143,7 +143,7 @@ namespace AccelByte.Core
 
         internal void environmentChanged()
         {
-            session = AccelBytePlugin.GetUser().Session as LoginSession;
+            session = AccelBytePlugin.GetUser().Session as UserSession;
             httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(config.BaseUrl));
         }

@@ -193,7 +193,7 @@ namespace AccelByte.Core
         {
             this.result.AuthType = HttpAuth.Basic;
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(); 
-            this.result.Headers["cookie"] = "device_token=" + deviceProvider.DeviceId;
+            this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;
             return this;
         }
 

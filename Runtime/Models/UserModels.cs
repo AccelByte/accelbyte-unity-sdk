@@ -561,4 +561,11 @@ namespace AccelByte.Models
         [DataMember] public DataInputValidation[] data { get; set; } 
         [DataMember] public int version { get; set; }
     }
+    
+    [DataContract]
+    public class GetPublisherUserResponse
+    {
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; } 
+        [DataMember] public string userId { get; set; }
+    }
 };

@@ -79,18 +79,15 @@ namespace AccelByte.Core
             httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
             httpClient.SetBaseUri( new Uri( config.BaseUrl ) );
 
-            LoginSession session;
+            UserSession session;
 
             if (key == "default")
             {
-                session = AccelBytePlugin.GetUser().Session as LoginSession;
+                session = AccelBytePlugin.GetUser().Session as UserSession;
             }
             else
             {
-                session = new LoginSession(
-                    config.IamServerUrl,
-                    config.Namespace,
-                    config.RedirectUri,
+                session = new UserSession(
                     httpClient,
                     coroutineRunner,
                     config.UsePlayerPrefs );

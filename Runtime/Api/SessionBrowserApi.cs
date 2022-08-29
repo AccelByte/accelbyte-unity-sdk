@@ -203,7 +203,7 @@ namespace AccelByte.Api
 
             string url = BaseUrl + "/namespaces/" + Namespace_ + "/gamesession/bulk";
 
-            string userIdsQueryString = string.Join(',', userIds);
+            string userIdsQueryString = string.Join(",", userIds);
 
             var request = HttpRequestBuilder
                 .CreateGet(url)

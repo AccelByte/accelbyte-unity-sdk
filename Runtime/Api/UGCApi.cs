@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -179,6 +180,77 @@ namespace AccelByte.Api
             };
 
             yield return ModifyContent(userId, channelId, contentId, modifyRequest, callback);
+        }
+
+        public IEnumerator SearchContent( SearchContentRequest searchContentRequest
+            , string userId
+            , ResultCallback<UGCSearchContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithQueryParam("name", searchContentRequest.name)
+                 .WithQueryParam("creator", searchContentRequest.creator)
+                 .WithQueryParam("type", searchContentRequest.type)
+                 .WithQueryParam("subtype", searchContentRequest.subtype)
+                 .WithQueryParam("tags", string.Join(",", searchContentRequest.tags))
+                 .WithQueryParam("isOfficial", searchContentRequest.isOfficial ? "true" : "false")
+                 .WithQueryParam("sortBy", searchContentRequest.sortBy.ToString())
+                 .WithQueryParam("orderBy", searchContentRequest.orderBy.ToString())
+                 .WithQueryParam("offset", searchContentRequest.offset >= 0 ? searchContentRequest.offset.ToString() : string.Empty)
+                 .WithQueryParam("limit", searchContentRequest.limit >= 0 ? searchContentRequest.limit.ToString() : string.Empty)
+                 .WithQueryParam("userId", userId)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SearchContentsSpesificToChannel(string channelId
+            , SearchContentRequest searchContentRequest
+            , string userId
+            , ResultCallback<UGCSearchContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+            Assert.IsNotNull(channelId, "Can't search content! channelId parameter is null!");
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/channels/{channelId}/contents")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("channelId", channelId)
+                 .WithQueryParam("name", searchContentRequest.name)
+                 .WithQueryParam("creator", searchContentRequest.creator)
+                 .WithQueryParam("type", searchContentRequest.type)
+                 .WithQueryParam("subtype", searchContentRequest.subtype)
+                 .WithQueryParam("tags", string.Join(",", searchContentRequest.tags))
+                 .WithQueryParam("isOfficial", searchContentRequest.isOfficial ? "true" : "false")
+                 .WithQueryParam("sortBy", searchContentRequest.sortBy.ToString())
+                 .WithQueryParam("orderBy", searchContentRequest.orderBy.ToString())
+                 .WithQueryParam("offset", searchContentRequest.offset >= 0 ? searchContentRequest.offset.ToString() : string.Empty)
+                 .WithQueryParam("limit", searchContentRequest.limit >= 0 ? searchContentRequest.limit.ToString() : string.Empty)
+                 .WithQueryParam("userId", userId)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
+            callback.Try(result);
         }
 
         public IEnumerator DeleteContent( string userId
@@ -451,6 +523,86 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+        public IEnumerator UpdateLikeStatusToContent(string contentId
+            , bool likeStatus
+            , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
 
+            var request = HttpRequestBuilder
+                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/contents/{contentId}/like")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("contentId", contentId)
+                 .WithBody(new
+                 {
+                     likeStatus = likeStatus
+                 }.ToUtf8Json())
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCUpdateLikeStatusToContentResponse>();
+            callback.Try(result);
+        }
+        public IEnumerator GetListFollowers(string userId
+            , ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/followers")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("userId", userId)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateFollowStatus(string userId
+            , bool followStatus
+            , ResultCallback<UGCUpdateFollowStatusToUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/follow")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("userId", userId)
+                 .WithBody(new { followStatus = followStatus }.ToUtf8Json())
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCUpdateFollowStatusToUserResponse>();
+            callback.Try(result);
+        }
     }
 }

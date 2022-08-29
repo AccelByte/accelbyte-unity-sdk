@@ -12,11 +12,11 @@ namespace AccelByte.Api
     public class CloudStorage : WrapperBase
     {
         private readonly CloudStorageApi api;
-        private readonly IUserSession session;
+        private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
         internal CloudStorage( CloudStorageApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "api==null (@ constructor)");
@@ -35,7 +35,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
         internal CloudStorage( CloudStorageApi inApi
-            , IUserSession inSession
+            , UserSession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner )

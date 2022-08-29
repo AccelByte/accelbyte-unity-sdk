@@ -84,7 +84,7 @@ namespace AccelByte.Api
         {
             coroutineRunner.Run(() =>
             {
-                OnMessage(message);
+                OnMessage?.Invoke(message);
             });
         }
 
@@ -233,7 +233,7 @@ namespace AccelByte.Api
         /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
         /// <param name="backoffDelay">Initial delay time</param>
         /// <param name="maxDelay">Maximum delay time</param>
-        public void SetRetryParameters(int totalTimeout, int backoffDelay, int maxDelay)
+        public void SetRetryParameters(int totalTimeout, int backoffDelay, int maxDelay, float pingDelay = 4000)
         {
             if (maintainConnectionCoroutine != null)
             {
@@ -244,6 +244,7 @@ namespace AccelByte.Api
             this.totalTimeout = totalTimeout;
             this.backoffDelay = backoffDelay;
             this.maxDelay = maxDelay;
+            this.pingDelay = pingDelay;
         }
 
         /// <summary>

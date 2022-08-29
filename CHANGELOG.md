@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.0.0%0D14.2.0) (2022-08-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* there is a rename LoginSession -> UserSession
+
+### Features
+
+* adjust function and simplify logic ([0a3c130](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0a3c13052d3b18fd7d57b0bfab02e0c21f06b5f6))
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([ffde0f5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ffde0f58b2f64e0aee0bb1aa55b2cd7b18b065e9))
+* fix merging conflict ([6f7574f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6f7574fa551dc21a0fa277bf14e903aa6aedfc99))
+* IAM Phase 3 Statement & Substitute Implementation ([bde86d4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bde86d470847af4449009313d939c495f157573f))
+* **qos:** add GetAllServerLatencies function ([940af73](https://github.com/AccelByte/accelbyte-unity-sdk/commits/940af737d41190085cb89c7492dbce202c701281))
+* SDK Implementation for UGC service - get follower count & update Follow status ([c8b5c41](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c8b5c41d36832c0f945374040aa0ed69dadf8a3d))
+* SDK Implementation for UGC service - Get list content ([290f5b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/290f5b2e04a7eb9b54fc0ab39a4479d8899d8357))
+* SDK Implementation for UGC service - like a content ([740ebc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/740ebc441ade46f224aefacbb4ab4b15db3280ca))
+* SDK Implementation for UGC service - Query by Tags ([e30c5f9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e30c5f9bf55b9f9d89c1ffaa51277747e2920ce5))
+
+
+### Bug Fixes
+
+* Cannot remember "device_token" if comes from request header. rename header device_token to device-token ([2af20b1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2af20b1a9066acfd27a817b919154e9992cd1430))
+* use proper LoginWithUsernameV3 in User.cs ([5df2273](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5df22734702ef30eb14138c11573690a54fa3592))
+
+
+### feature
+
+* refactor LoginSession ([76b7e3a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76b7e3a92447825783adf6bf813ade2f5f2c48b9))
+
+
+### Refactors
+
+* **lobby:** move websocket api call into a new class ([e763547](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e7635479cad6853edc38947cbabff7f9dc79490d))
+
 ## [14.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/14.2.0%0D14.1.0) (2022-08-15)
 
 
