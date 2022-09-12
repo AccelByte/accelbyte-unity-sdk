@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.1.0%0D15.0.0) (2022-09-12)
+
+
+### Features
+
+* ApiClient API Getter to ease the transition from singleton ([76e1487](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76e14874ca8073d90e3026018e6385eb921b199f))
+* change access modifier from internal to public ([d9a53a3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9a53a34db541dcfd4cae7c4e881ffdb30b4ab3c))
+* IAM Phase 4 Statement & Substitute Implementation ([af2c4d8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/af2c4d8b746505b82020f972f44d383de436c3d0))
+* SDK Implementation for UGC service Test ([b3f816b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b3f816bf5cf41b720b705308ef0268bfc5069a3b))
+
+
+### Bug Fixes
+
+* compile error on Unity 2019 ([c1af4b6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c1af4b67a05200ad5b14652439db41b3b4d31eaa))
+* use proper LoginWithUsernameV3 in User.cs ([a127a33](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a127a33292abff8d17f9625861a6e50babbe73da))
+
 ## [15.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.0.0%0D14.2.0) (2022-08-29)
 
 

@@ -491,5 +491,209 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.UpdateFollowStatus(session.UserId, followStatus, callback));
         }
+        
+        /// <summary>
+        /// Get Bulk ContentId.
+        /// </summary>
+        /// <param name="contentId">The content Ids.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetBulkContentId(string[] contentId
+            , ResultCallback<UGCModelsContentsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetBulkContentId(contentId, callback));
+        }
+        
+        /// <summary>
+        /// Get User Contents.
+        /// </summary>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetUserContents(string userId
+            , ResultCallback<UGCContentsPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserContents(userId, callback, limit, offset));
+        }
+        
+        /// <summary>
+        /// Get User Contents.
+        /// </summary>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="userId">The userId.</param>
+        /// <param name="screenshotsRequest">Supported file extensions: pjp, jpg, jpeg, jfif, bmp, png.
+        /// Maximum description length: 1024..</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UploadScreenshotContent(string contentId
+            , string userId
+            , ScreenshotsRequest screenshotsRequest
+            , ResultCallback<ScreenshotsResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UploadScreenshotContent(contentId, userId, screenshotsRequest, callback));
+        }
+        
+        /// <summary>
+        /// Get Content Followed.
+        /// </summary>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetContentFollowed(
+            ResultCallback<UGCContentsPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetContentFollowed(callback, limit, offset));
+        }
+        
+        /// <summary>
+        /// Get Followed Creators.
+        /// </summary>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetFollowedCreators(
+            ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetFollowedCreators(callback, limit, offset));
+        }
+        
+        /// <summary>
+        /// Get List Following.
+        /// </summary>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetListFollowing(string userId
+            , ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListFollowing(userId, callback, limit, offset));
+        }
+        
+        /// <summary>
+        /// Get Liked Contents.
+        /// </summary>
+        /// <param name="getLikedContentRequest">Detail information for the content request.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetLikedContents(
+            GetLikedContentRequest getLikedContentRequest
+            , ResultCallback<UGCContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetLikedContents(getLikedContentRequest, callback));
+        }
+        
+        /// <summary>
+        /// Get Creator Stats.
+        /// </summary>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetCreatorStats(string userId
+            , ResultCallback<UGCGetCreatorStatsResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetCreatorStats(userId, callback));
+        }
+        
+        /// <summary>
+        /// Get User Groups.
+        /// </summary>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 1000.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        public void GetUserGroups(string userId
+            , ResultCallback<UGCGetUserGroupsPagingResponse> callback
+            , int limit = 1000
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserGroups(userId, callback, limit, offset));
+        }
     }
 }

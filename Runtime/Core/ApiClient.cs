@@ -141,6 +141,38 @@ namespace AccelByte.Core
             return (TWrapper)wrapperBaseCollection[currentWrapperName];
         }
 
+
+#region API_GETTER
+        public User GetUser() { return GetApi<User, UserApi>(); }
+        public UserProfiles GetUserProfiles() { return GetApi<UserProfiles, UserProfilesApi>(); }
+        public Categories GetCategories() { return GetApi<Categories, CategoriesApi>(); }
+        public Items GetItems() { return GetApi<Items, ItemsApi>(); }
+        public Currencies GetCurrencies() { return GetApi<Currencies, CurrenciesApi>(); }
+        public Orders GetOrders() { return GetApi<Orders, OrdersApi>(); }
+        public Reward GetReward() { return GetApi<Reward, RewardApi>(); }
+        public Wallet GetWallet() { return GetApi<Wallet, WalletApi>(); }
+        public Lobby GetLobby() { return GetApi<Lobby, LobbyApi>(); }
+        public CloudStorage GetCloudStorage() { return GetApi<CloudStorage, CloudStorageApi>(); }
+        public GameProfiles GetGameProfiles() { return GetApi<GameProfiles, GameProfilesApi>(); }
+        public Entitlement GetEntitlement() { return GetApi<Entitlement, EntitlementApi>(); }
+        public Fulfillment GetFulfillment() { return GetApi<Fulfillment, FulfillmentApi>(); }
+        public Statistic GetStatistic() { return GetApi<Statistic, StatisticApi>(); }
+        public QosManager GetQos() { return GetApi<QosManager, QosManagerApi>(); }
+        public Agreement GetAgreement() { return GetApi<Agreement, AgreementApi>(); }
+        public Leaderboard GetLeaderboard() { return GetApi<Leaderboard, LeaderboardApi>(); }
+        public CloudSave GetCloudSave() { return GetApi<CloudSave, CloudSaveApi>(); }
+        public GameTelemetry GetGameTelemetry() { return GetApi<GameTelemetry, GameTelemetryApi>(); }
+        public Achievement GetAchievement() { return GetApi<Achievement, AchievementApi>(); }
+        public Group GetGroup() { return GetApi<Group, GroupApi>(); }
+        public UGC GetUgc() { return GetApi<UGC, UGCApi>(); }
+        public Reporting GetReporting() { return GetApi<Reporting, ReportingApi>(); }
+        public SeasonPass GetSeasonPass() { return GetApi<SeasonPass, SeasonPassApi>(); }
+        public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
+        public TurnManager GetTurnManager() { return GetApi<TurnManager, TurnManagerApi>(); }
+        public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, MiscellaneousApi>(); }
+#endregion
+
+
         internal void environmentChanged()
         {
             session = AccelBytePlugin.GetUser().Session as UserSession;

@@ -10,7 +10,7 @@ using AccelByte.Api;
 
 namespace AccelByte.Server
 {
-    internal class ServerMatchmakingApi : ServerApiBase
+    public class ServerMatchmakingApi : ServerApiBase
     {
         /// <summary>
         /// </summary>

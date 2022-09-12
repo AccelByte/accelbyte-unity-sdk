@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 
 namespace AccelByte.Api
 {
-    internal class AgreementApi : ApiBase
+    public class AgreementApi : ApiBase
     {
         /// <summary>
         /// </summary>

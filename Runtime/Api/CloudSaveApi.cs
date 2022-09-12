@@ -11,7 +11,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class CloudSaveApi : ApiBase
+    public class CloudSaveApi : ApiBase
     {
         /// <summary>
         /// </summary>

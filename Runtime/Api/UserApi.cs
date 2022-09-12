@@ -891,5 +891,27 @@ namespace AccelByte.Api
             var result = response.TryParseJson<GetPublisherUserResponse>();
             callback.Try(result);
         }
+        public IEnumerator GetUserInformation(string userId
+            , ResultCallback<GetUserInformationResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(userId, "Get User Information failed. userId is null!");
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/information")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GetUserInformationResponse>();
+            callback.Try(result);
+        }
     }
 }

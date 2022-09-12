@@ -1695,5 +1695,24 @@ namespace AccelByte.Api
             }
             coroutineRunner.Run(api.GetPublisherUser(userId, callback));
         }
+        
+        /// <summary>
+        /// Get User Information 
+        /// </summary>
+        /// <param name="userId"> user id that needed to get user information</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void GetUserInformation(string userId
+            , ResultCallback<GetUserInformationResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            coroutineRunner.Run(api.GetUserInformation(userId, callback));
+        }
     }
 }

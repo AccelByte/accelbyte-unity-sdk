@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class CategoriesApi : ApiBase
+    public class CategoriesApi : ApiBase
     {
         /// <summary>
         /// </summary>

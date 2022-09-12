@@ -30,6 +30,17 @@ namespace AccelByte.Models
         ASC = 0,
         DESC
     }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCFileExtension 
+    {
+        PJP,
+        JPG,
+        JPEG,
+        JFIF,
+        BMP,
+        PNG
+    }
 
     #endregion
 
@@ -163,12 +174,37 @@ namespace AccelByte.Models
         [DataMember] public bool state { get; set; }
         [DataMember] public string userId { get; set; }
     }
+    
+    [DataContract]
+    public class UGCGetCreatorStatsResponse
+    {
+        [DataMember] public UserIdState creatorFollowState { get; set; }
+        [DataMember] public int followCount { get; set; }
+        [DataMember] public int followingCount { get; set; }
+        [DataMember] public string id { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public int totalLikedContent { get; set; }
+    }
 
     [DataContract]
     public class PayLoadUrl
     {
         [DataMember] public string source { get; set; }
         [DataMember] public string url { get; set; }
+    }
+    
+    [DataContract]
+    public class ScreenshotRequest
+    {
+        [DataMember] public string contentType { get; set; }
+        [DataMember] public string description { get; set; }
+        [DataMember] public UGCFileExtension fileExtension { get; set; }
+    }
+    
+    [DataContract]
+    public class ScreenshotsRequest
+    {
+        [DataMember] public ScreenshotRequest[] screenshots { get; set; }
     }
 
     [DataContract]
@@ -180,6 +216,12 @@ namespace AccelByte.Models
         [DataMember] public string screenshootId { get; set; }
         [DataMember] public string source { get; set; }
         [DataMember] public string url { get; set; }
+    }
+    
+    [DataContract]
+    public class ScreenshotsResponse
+    {
+        [DataMember] public Screenshots[] screenshots { get; set; }
     }
 
     [DataContract]
@@ -196,9 +238,23 @@ namespace AccelByte.Models
         [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
         [DataMember] public int offset { get; set; } = 0; //Default value = 0
     }
+    
+    [DataContract]
+    public class GetLikedContentRequest
+    {
+        [DataMember] public string[] tags { get; set; }
+        [DataMember] public string name { get; set; }
+        [DataMember] public string type { get; set; }
+        [DataMember] public string subtype { get; set; }
+        [DataMember] public bool isOfficial { get; set; }
+        [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
+        [DataMember] public int offset { get; set; } = 0; //Default value = 0
+        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; //default to sorting criteria = date
+        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; //default to sorting order = desc
+    }
 
     [DataContract]
-    public class UGCSearchContentsResponse
+    public class UGCModelsContentsResponse
     {
         [DataMember] public string channelId { get; set; }
         [DataMember] public string createdTime { get; set; }
@@ -229,7 +285,14 @@ namespace AccelByte.Models
     [DataContract]
     public class UGCSearchContentsPagingResponse
     {
-        [DataMember] public UGCSearchContentsResponse[] data { get; set; }
+        [DataMember] public UGCModelsContentsResponse[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
+    }
+    
+    [DataContract]
+    public class UGCContentsPagingResponse
+    {
+        [DataMember] public UGCModelsContentsResponse[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
 
@@ -262,5 +325,23 @@ namespace AccelByte.Models
     {
         [DataMember] public bool followStatus { get; set; }
         [DataMember] public string userId { get; set; }
+    }
+    
+    [DataContract]
+    public class UGCGetUserGroupsResponse
+    {
+        [DataMember] public string[] contents { get; set; }
+        [DataMember] public string createdAt { get; set; }
+        [DataMember] public string id { get; set; }
+        [DataMember] public string name { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+    }
+    
+    [DataContract]
+    public class UGCGetUserGroupsPagingResponse
+    {
+        [DataMember] public UGCGetUserGroupsResponse[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
     }
 }

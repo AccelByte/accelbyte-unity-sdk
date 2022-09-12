@@ -18,14 +18,14 @@ namespace AccelByte.Server
         CLOUDSERVER,
     }
 
-    internal struct ServerSetupData
+    public struct ServerSetupData
     {
         public string region;
         public string provider;
         public string gameVersion;
     }
 
-    internal class DedicatedServerManagerApi : ServerApiBase
+    public class DedicatedServerManagerApi : ServerApiBase
     {        
         private string region = "";
         private RegisterServerRequest serverSetup;

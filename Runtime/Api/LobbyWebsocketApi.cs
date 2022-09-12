@@ -39,7 +39,7 @@ namespace AccelByte.Api
         private readonly string namespace_;
         private readonly object syncToken = new object();
 
-        private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks = new();
+        private readonly Dictionary<long, Action<ErrorCode, string>> responseCallbacks = new Dictionary<long, Action<ErrorCode, string>>();
 
         private readonly CoroutineRunner coroutineRunner;
         private readonly UserSession session;
@@ -113,7 +113,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Lobby connection status
         /// </summary>
-        public bool IsConnected => webSocket is { IsConnected: true };
+        public bool IsConnected => webSocket?.IsConnected == true;
 
         /// <summary>
         /// Connect to lobby with current logged in user credentials.

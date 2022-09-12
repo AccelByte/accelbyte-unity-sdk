@@ -102,6 +102,20 @@ namespace AccelByte.Core
             return (TServerWrapper)newWrapperInstance;
         }
 
+#region API_GETTER
+        public DedicatedServerManager GetDedicatedServerManager() { return GetServerApi<DedicatedServerManager, DedicatedServerManagerApi>(); }
+        public ServerEcommerce GetEcommerce() { return GetServerApi<ServerEcommerce, ServerEcommerceApi>(); }
+        public ServerStatistic GetStatistic() { return GetServerApi<ServerStatistic, ServerStatisticApi>(); }
+        public ServerQosManager GetQos() { return GetServerApi<ServerQosManager, ServerQosManagerApi>(); }
+        public ServerGameTelemetry GetGameTelemetry() { return GetServerApi<ServerGameTelemetry, ServerGameTelemetryApi>(); }
+        public ServerAchievement GetAchievement() { return GetServerApi<ServerAchievement, ServerAchievementApi>(); }
+        public ServerLobby GetLobby() { return GetServerApi<ServerLobby, ServerLobbyApi>(); }
+        public ServerCloudSave GetCloudSave() { return GetServerApi<ServerCloudSave, ServerCloudSaveApi>(); }
+        public ServerMatchmaking GetMatchmaking() { return GetServerApi<ServerMatchmaking, ServerMatchmakingApi>(); }
+        public ServerUserAccount GetUserAccount() { return GetServerApi<ServerUserAccount, ServerUserAccountApi>(); }
+        public ServerSeasonPass GetSeasonPass() { return GetServerApi<ServerSeasonPass, ServerSeasonPassApi>(); }
+#endregion
+
         internal void environmentChanged()
         {
             session = AccelByteServerPlugin.GetDedicatedServer().Session as ServerOauthLoginSession;

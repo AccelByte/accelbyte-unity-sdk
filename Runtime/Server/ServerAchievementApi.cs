@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    internal class ServerAchievementApi : ServerApiBase
+    public class ServerAchievementApi : ServerApiBase
     {
         /// <summary>
         /// </summary>

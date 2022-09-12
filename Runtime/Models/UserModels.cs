@@ -568,4 +568,28 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_ { get; set; } 
         [DataMember] public string userId { get; set; }
     }
+    
+    [DataContract]
+    public class PlatformUserInformation
+    {
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public string emailAddress { get; set; }
+        [DataMember] public string linkedAt { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
+        [DataMember] public string platformId { get; set; }
+        [DataMember] public string platformUserId { get; set; }
+        [DataMember] public string xboxUserId { get; set; }
+    }
+    
+    [DataContract]
+    public class GetUserInformationResponse
+    {
+        [DataMember] public string country { get; set; }
+        [DataMember] public string displayName { get; set; }
+        [DataMember] public string[] emailAddresses { get; set; }
+        [DataMember] public string phoneNumber { get; set; }
+        [DataMember] public PlatformUserInformation[] platformUsers { get; set; }
+        [DataMember] public string username { get; set; }
+        [DataMember] public string xboxUserId { get; set; }
+    }
 };

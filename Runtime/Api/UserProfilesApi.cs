@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class UserProfilesApi : ApiBase
+    public class UserProfilesApi : ApiBase
     {
         /// <summary>
         /// </summary>

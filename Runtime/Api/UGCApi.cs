@@ -604,5 +604,250 @@ namespace AccelByte.Api
             var result = response.TryParseJson<UGCUpdateFollowStatusToUserResponse>();
             callback.Try(result);
         }
+        
+        public IEnumerator GetBulkContentId(string[] contentId
+            , ResultCallback<UGCModelsContentsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Content Followed! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/contents/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBody(new{contentIds = contentId}.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCModelsContentsResponse[]>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetUserContents(string userId
+            , ResultCallback<UGCContentsPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't Get Followed Creators! userId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCContentsPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator UploadScreenshotContent(string contentId
+            , string userId
+            , ScreenshotsRequest screenshotsRequest
+            , ResultCallback<ScreenshotsResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't Get Followed Creators! userId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBody(screenshotsRequest.ToJsonString().ToLower())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<ScreenshotsResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetContentFollowed(ResultCallback<UGCContentsPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Content Followed! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/followed")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCContentsPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetFollowedCreators(ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/followed")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetListFollowing(string userId
+            , ResultCallback<UGCGetListFollowersPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/following")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetLikedContents( GetLikedContentRequest getLikedContentRequest
+            , ResultCallback<UGCContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/liked")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("tags", string.Join(",", getLikedContentRequest.tags))
+                .WithQueryParam("name", getLikedContentRequest.name)
+                .WithQueryParam("type", getLikedContentRequest.type)
+                .WithQueryParam("subtype", getLikedContentRequest.subtype)
+                .WithQueryParam("isOfficial", getLikedContentRequest.isOfficial ? "true" : "false")
+                .WithQueryParam("limit", getLikedContentRequest.limit >= 0 ? getLikedContentRequest.limit.ToString() : string.Empty)
+                .WithQueryParam("offset", getLikedContentRequest.offset >= 0 ? getLikedContentRequest.offset.ToString() : string.Empty)
+                .WithQueryParam("sortBy", getLikedContentRequest.sortBy.ToString())
+                .WithQueryParam("orderBy", getLikedContentRequest.orderBy.ToString())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCContentsPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetCreatorStats(string userId
+            , ResultCallback<UGCGetCreatorStatsResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't GetCreatorStats! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't GetCreatorStats! userId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCGetCreatorStatsResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetUserGroups(string userId
+            , ResultCallback<UGCGetUserGroupsPagingResponse> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/groups")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCGetUserGroupsPagingResponse>();
+            callback.Try(result);
+        }
     }
 }

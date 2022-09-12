@@ -11,7 +11,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
-    internal class ServerStatisticApi : ServerApiBase
+    public class ServerStatisticApi : ServerApiBase
     {
         /// <summary>
         /// </summary>

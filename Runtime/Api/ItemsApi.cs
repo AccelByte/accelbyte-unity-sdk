@@ -11,7 +11,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    internal class ItemsApi : ApiBase
+    public class ItemsApi : ApiBase
     {
         /// <summary>
         /// </summary>
