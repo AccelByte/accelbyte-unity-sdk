@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using AccelByte.Api;
 using AccelByte.Core;
@@ -78,7 +79,8 @@ namespace AccelByte.Server
 
             callback.Try(result);
         }
-
+        
+        [Obsolete("This does not support for multiplatform wallet, use CreditUserWalletV2 instead")] 
         public IEnumerator CreditUserWallet( string userId
             , string currencyCode
             , CreditUserWalletRequest creditUserWalletRequest
@@ -107,6 +109,38 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<WalletInfo>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator CreditUserWalletV2( string userId
+            , string currencyCode
+            , CreditUserWalletRequest creditUserWalletRequest
+            , ResultCallback<CreditUserWalletResponse> callback )
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(currencyCode, nameof(currencyCode) + " cannot be null");
+            Assert.IsNotNull(creditUserWalletRequest, nameof(creditUserWalletRequest) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/admin/namespaces/{namespace}/users/{userId}/wallets/{currencyCode}/credit")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("currencyCode", currencyCode)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(creditUserWalletRequest.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<CreditUserWalletResponse>();
 
             callback.Try(result);
         }

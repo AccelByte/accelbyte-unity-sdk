@@ -67,5 +67,28 @@ namespace AccelByte.Api
                 currencyCode,
                 callback));
         }
+        
+        /// <summary>
+        /// Get wallet information owned by a user
+        /// </summary>
+        /// <param name="currencyCode">Currency code for the wallet</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void GetWalletInfoByCurrencyCodeV2( string currencyCode
+            , ResultCallback<WalletInfoResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code; CurrencyCode is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetWalletInfoByCurrencyCodeV2(
+                session.UserId,
+                currencyCode,
+                callback));
+        }
     }
 }

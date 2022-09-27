@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.2.0%0D15.1.0) (2022-09-27)
+
+
+### Features
+
+* AccelByteUnitySdk Plug-in's GetWalletInfoByCurrencyCode returns a partial response ([bd3c2ce](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bd3c2ce0d55401eaf4c967f796f5d2c7c29a74e6))
+* Improve Store Category search results to display all items from its sub-categories ([29271da](https://github.com/AccelByte/accelbyte-unity-sdk/commits/29271dae27872f380376f57ab07fe2004c5e067f))
+* providing mac address & platform name methods to fulfill client requirement ([5697687](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5697687894b955522c7ee3f75fa3df2d6c7dd7b5))
+* support old walletapi  walkflow and multiple platform ([2cca8ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cca8ef02baa73711291327550c608f0d7ff126b))
+
+
+### Bug Fixes
+
+* Fixed missing Dispose call when creating and assigning UnityWebRequest ([714c8cf](https://github.com/AccelByte/accelbyte-unity-sdk/commits/714c8cfc6fca799e1a771882e9476835aba8b599))
+* Fixed missing Dispose call when creating and assigning UnityWebRequest on the possible issue ([2db0dab](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2db0dab8a1b35b3fcb44fa2ad85f9c1f0f15c36c))
+* player is unable to logout ([4314b02](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4314b02bf7f1146bd0d71dcae6e3b1f5ef890e87))
+* Set OnDispose = true on uploadHandler and downloadHandler ([a3b8da8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3b8da8bdd30752db64f510a277d2f631bd3616f))
+* support get wallet info old workflow ([42d2428](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42d24285eee1db6268557307787a4f44813a97d7))
+
 ## [15.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.1.0%0D15.0.0) (2022-09-12)
 
 

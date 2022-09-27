@@ -88,7 +88,7 @@ namespace AccelByte.Server
                     grantUserEntitlementsRequest,
                     callback));
         }
-
+        
         /// <summary>
         /// Credit a user wallet by currency code, if the wallet does not exist, it will create a new wallet.
         /// </summary>
@@ -111,6 +111,34 @@ namespace AccelByte.Server
 
             coroutineRunner.Run(
                 api.CreditUserWallet(
+                    userId,
+                    currencyCode,
+                    creditUserWalletRequest,
+                    callback));
+        }
+
+        /// <summary>
+        /// Credit a user wallet by currency code, if the wallet does not exist, it will create a new wallet.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="currencyCode">The currency code</param>
+        /// <param name="creditUserWalletRequest">The request to credit a user wallet</param>
+        /// <param name="callback">Returns Wallet info via callback when completed</param>
+        public void CreditUserWalletV2( string userId
+            , string currencyCode
+            , CreditUserWalletRequest creditUserWalletRequest
+            , ResultCallback<CreditUserWalletResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.CreditUserWalletV2(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,

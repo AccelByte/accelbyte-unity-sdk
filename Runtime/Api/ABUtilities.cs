@@ -19,29 +19,31 @@ namespace AccelByte.Api
         /// <returns></returns>
         public static IEnumerator DownloadTexture2D(string url, ResultCallback<Texture2D> callback)
         {
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            yield return request.SendWebRequest();
-            
-            if (request.isNetworkError || request.isHttpError)
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
-                Debug.Log(request.error);
-                ErrorCode code;
-                if (request.isNetworkError)
+                yield return request.SendWebRequest();
+
+                if (request.isNetworkError || request.isHttpError)
                 {
-                    code = ErrorCode.NetworkError;
+                    Debug.Log(request.error);
+                    ErrorCode code;
+                    if (request.isNetworkError)
+                    {
+                        code = ErrorCode.NetworkError;
+                    }
+                    else
+                    {
+                        code = (ErrorCode)request.responseCode;
+                    }
+                    callback.Try(Result<Texture2D>.CreateError(code, request.error));
                 }
                 else
                 {
-                    code = (ErrorCode) request.responseCode;
+                    Texture2D returnedTexture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                    callback.Try(returnedTexture == null
+                        ? Result<Texture2D>.CreateError(ErrorCode.NotFound, $"Could not find specified image file {request.url}")
+                        : Result<Texture2D>.CreateOk(returnedTexture));
                 }
-                callback.Try( Result<Texture2D>.CreateError(code,request.error));
-            }
-            else
-            {
-                Texture2D returnedTexture = ((DownloadHandlerTexture) request.downloadHandler).texture;
-                callback.Try(returnedTexture == null
-                    ? Result<Texture2D>.CreateError(ErrorCode.NotFound, $"Could not find specified image file {request.url}")
-                    : Result<Texture2D>.CreateOk(returnedTexture));
             }
         }
     }

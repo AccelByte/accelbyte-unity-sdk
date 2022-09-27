@@ -158,19 +158,21 @@ namespace AccelByte.Api
         {
             string functionName = "GetLegalDocument";
             Report.GetFunctionLog(GetType().Name, functionName);
-            UnityWebRequest webRequest = UnityWebRequest.Get(url);
-            yield return webRequest.SendWebRequest();
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+            {
+                yield return webRequest.SendWebRequest();
 
-            Result<string> result;
-            if (!webRequest.isNetworkError && !webRequest.isHttpError)
-            {
-                result = Result<string>.CreateOk(webRequest.downloadHandler.text);
+                Result<string> result;
+                if (!webRequest.isNetworkError && !webRequest.isHttpError)
+                {
+                    result = Result<string>.CreateOk(webRequest.downloadHandler.text);
+                }
+                else
+                {
+                    result = Result<string>.CreateError((ErrorCode)webRequest.responseCode);
+                }
+                callback(result);
             }
-            else
-            {
-                result = Result<string>.CreateError((ErrorCode) webRequest.responseCode);
-            }
-            callback(result);
         }
 
     }

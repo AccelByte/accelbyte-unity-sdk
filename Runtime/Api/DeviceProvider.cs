@@ -2,6 +2,8 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Linq;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -36,6 +38,28 @@ namespace AccelByte.Api
             Assert.IsNotNull(deviceId, "DeviceId is null!");
             this.DeviceType = deviceType;
             this.DeviceId = deviceId;
+        }   
+
+        public static string[] GetMacAddress()
+        {
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            string[] macAddressArray = new string[] { };
+            foreach (NetworkInterface adapter in networkInterfaces)
+            {
+                string physicalAddress = adapter.GetPhysicalAddress().ToString();
+                if (!string.IsNullOrEmpty(physicalAddress))
+                {
+                    macAddressArray = macAddressArray.Concat(new string[] { physicalAddress }).ToArray();
+                }
+
+            }
+            return macAddressArray;
+        }
+
+        public static string GetPlatforName()
+        {
+            return Application.platform.ToString();
         }
     }
 }

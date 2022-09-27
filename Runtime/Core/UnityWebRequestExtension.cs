@@ -20,18 +20,20 @@ namespace AccelByte.Core
             {
                 unityWebRequest.SetRequestHeader("Authorization", value);
             }
-            
+
             foreach (var headerPair in request.Headers.Where(x => x.Key != "Authorization"))
             {
                 unityWebRequest.SetRequestHeader(headerPair.Key, headerPair.Value);
             }
-            
+
             if (request.BodyBytes != null)
             {
                 unityWebRequest.uploadHandler = new UploadHandlerRaw(request.BodyBytes);
+                unityWebRequest.disposeUploadHandlerOnDispose = true;
             }
 
             unityWebRequest.downloadHandler = new DownloadHandlerBuffer();
+            unityWebRequest.disposeDownloadHandlerOnDispose = true;
 
             return unityWebRequest;
         }

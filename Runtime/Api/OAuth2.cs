@@ -650,7 +650,7 @@ public class OAuth2 : ApiBase
             Report.GetFunctionLog(GetType().Name);
 
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/logout")
-                .WithBearerAuth()
+                .WithBearerAuth(Bearer)
                 .WithContentType(MediaType.TextPlain)
                 .GetResult();
 

@@ -239,7 +239,23 @@ namespace AccelByte.Models
         [DataMember] public TimeLimitedBalance[] timeLimitedBalances { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public int totalPermanentBalance { get; set; }
+        [DataMember] public int totalTimeLimitedBalance { get; set; }
         [DataMember] public ItemStatus status { get; set; }
+    }
+    
+    [DataContract]
+    public class WalletInfoResponse
+    {
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string currencyCode { get; set; }
+        [DataMember] public string currencySymbol { get; set; }
+        [DataMember] public int balance { get; set; }
+        [DataMember] public WalletInfo[] walletInfos { get; set; }
+        [DataMember] public ItemStatus walletStatus { get; set; }
+        [DataMember] public ItemStatus status { get; set; }
+        [DataMember] public string id { get; set; }
     }
 
     [DataContract]
@@ -271,6 +287,24 @@ namespace AccelByte.Models
         [DataMember] public CreditUserWalletSource source { get; set; }
         [DataMember] public string reason { get; set; }
         [DataMember] public WalletTable origin { get; set; }
+    }
+    
+    [DataContract]
+    public class CreditUserWalletResponse
+    {
+        [DataMember] public string id { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string userId { get; set; }
+        [DataMember] public string currencySymbol { get; set; }
+        [DataMember] public string currencyCode { get; set; }
+        [DataMember] public int balance { get; set; }
+        [DataMember] public string balanceOrigin { get; set; }
+        [DataMember] public TimeLimitedBalance[] timeLimitedBalances { get; set; }
+        [DataMember] public DateTime createdAt { get; set; }
+        [DataMember] public DateTime updatedAt { get; set; }
+        [DataMember] public int totalPermanentBalance { get; set; }
+        [DataMember] public int totalTimeLimitedBalance { get; set; }
+        [DataMember] public ItemStatus status { get; set; }
     }
 
     #endregion
@@ -356,6 +390,7 @@ namespace AccelByte.Models
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
         [DataMember] public string categoryPath { get; set; }
+        [DataMember] public bool includeSubCategoryItem { get; set; } = false;// Default == false. Can change to "true". Anything != "true" will remain default
         [DataMember] public string baseAppId { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string[] features { get; set; }
