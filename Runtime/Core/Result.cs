@@ -338,7 +338,11 @@ namespace AccelByte.Core
         
         //AccelByte DSM error codes
         DedicatedServerNotFound = 9014183,
-        DedicatedServerConfigNotFound = 9014123
+        DedicatedServerConfigNotFound = 9014123,
+        
+        //Matchmaking error codes
+        MatchmakingRoleBasedEmptyRole = 510401,
+        MatchmakingRoleBasedWrongRole = 510402,
     }
 
     public class Error

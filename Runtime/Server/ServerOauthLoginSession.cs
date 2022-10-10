@@ -127,6 +127,7 @@ namespace AccelByte.Server
 
         public override void SetSession(TokenData loginResponse)
         {
+            HttpRequestBuilder.SetNamespace(loginResponse.Namespace);
             tokenData = loginResponse;
             return;
         }

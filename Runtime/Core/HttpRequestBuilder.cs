@@ -19,6 +19,14 @@ namespace AccelByte.Core
         private readonly StringBuilder urlBuilder = new StringBuilder(256);
         private HttpRequestPrototype result;
 
+        //Custom headers
+        private static string @namespace = "";
+        private static string gameClientVersion = "";
+        private static string sdkVersion = "";
+        public static void SetNamespace(string value) { @namespace = value; }
+        public static void SetGameClientVersion(string value) { gameClientVersion = value; }
+        public static void SetSdkVersion(string value) { sdkVersion = value; }
+
         private static HttpRequestBuilder CreatePrototype(string method, string url)
         {
             var builder = new HttpRequestBuilder
@@ -197,6 +205,15 @@ namespace AccelByte.Core
             return this;
         }
 
+        public HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId()
+        {
+            this.result.AuthType = HttpAuth.Basic;
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+            this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;     
+            this.result.Headers["Auth-Trust-Id"] = PlayerPrefs.GetString(UserSession.AuthTrustIdKey);
+            return this;
+        }
+
         public HttpRequestBuilder WithBasicAuth(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -349,6 +366,19 @@ namespace AccelByte.Core
             {
                 this.result.Headers["Content-Type"] = MediaType.ApplicationForm.ToString();
                 this.result.BodyBytes = Encoding.UTF8.GetBytes(this.formBuilder.ToString());
+            }
+
+            if (@namespace.Length > 0)
+            {
+                this.result.Headers["Namespace"] = @namespace;
+            }
+            if (gameClientVersion.Length > 0)
+            {
+                this.result.Headers["Game-Client-Version"] = gameClientVersion;
+            }
+            if (sdkVersion.Length > 0)
+            {
+                this.result.Headers["AccelByte-SDK-Version"] = sdkVersion;
             }
 
             this.result.Url = this.urlBuilder.ToString();

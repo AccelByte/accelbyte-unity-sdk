@@ -129,6 +129,11 @@ namespace AccelByte.Api
         /// Raised when there's an update in the party's storage.
         /// </summary>
         public event ResultCallback<PartyDataUpdateNotif> PartyDataUpdateNotif;
+        
+        /// <summary>
+        /// Raised when other party member send party notification.
+        /// </summary>
+        public event ResultCallback<PartyNotif> PartyNotif;
 
         /// <summary>
         /// Raised when channel chat message received.
@@ -461,6 +466,20 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
 
             coroutineRunner.Run(api.SetPartySizeLimit(partyId, limit, callback));
+        }
+
+        /// <summary>
+        /// Send notification to party member 
+        /// </summary>
+        /// <param name="topic">Topic The topic of the request. Can use this as ID to know how to marshal the payload</param>
+        /// <param name="payload">Payload The Payload of the request. Can be JSON string</param>
+        /// <param name="callback">
+        /// Returns a Result that contains PartySendNotifResponse via callback when completed.
+        /// </param>
+        public void SendNotificationToPartyMember(string topic, string payload, ResultCallback<PartySendNotifResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.SendNotificationToPartyMember(topic, payload, callback);
         }
         #endregion Party
 
@@ -1442,7 +1461,7 @@ namespace AccelByte.Api
 
                 break;
             case MessageType.userStatusNotif:
-                websocketApi.HandleNotification(message, FriendsStatusChanged);
+                websocketApi.HandleUserStatusNotif(message, FriendsStatusChanged);
 
                 break;
             case MessageType.matchmakingNotif:
@@ -1494,6 +1513,9 @@ namespace AccelByte.Api
                 break;
             case MessageType.partyDataUpdateNotif:
                 websocketApi.HandleNotification(message, PartyDataUpdateNotif);
+                break;
+            case MessageType.partyNotif:
+                websocketApi.HandleNotification(message, PartyNotif);
                 break;
             case MessageType.partyRejectNotif:
                 websocketApi.HandleNotification(message, RejectedPartyInvitation);

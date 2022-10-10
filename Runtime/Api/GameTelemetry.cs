@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -26,6 +27,7 @@ namespace AccelByte.Api
         private HashSet<string> immediateEvents = new HashSet<string>();
         private ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue = 
             new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
+        private List<TelemetryBody> eventList = new List<TelemetryBody>();
         
         private Coroutine telemetryCoroutine = null;
         private bool isTelemetryJobStarted = false;
@@ -42,6 +44,14 @@ namespace AccelByte.Api
             api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
+            if (session.IsValid())
+            {
+                LoadEventsFromCache();
+            }
+            else
+            {
+                session.RefreshTokenCallback += LoadEventsFromCache;
+            }
         }
 
         /// <summary>
@@ -98,6 +108,7 @@ namespace AccelByte.Api
                     StartTelemetryScheduler();
                 }
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
+                AppendEventToCache(telemetryBody);
             }
         }
 
@@ -120,8 +131,10 @@ namespace AccelByte.Api
                         }
                     }
 
+                    eventList.Clear();
                     yield return api.SendProtectedEvents(telemetryBodies, result =>
                     {
+                        RemoveEventsFromCache();
                         foreach (var callback in telemetryCallbacks)
                         {
                             callback.Invoke(result);
@@ -145,6 +158,68 @@ namespace AccelByte.Api
         {
             isTelemetryJobStarted = false;
             telemetryCoroutine = null;
+        }
+
+        private string GetTelemetryKey()
+        {
+            return "TELEMETRY_" + session.UserId;
+        }
+
+        private void LoadEventsFromCache( string accessToken = "" )
+        {
+            if (!session.IsValid() || !session.usePlayerPrefs)
+            {
+                return;
+            }
+            string telemetryKey = GetTelemetryKey();
+            var events = PlayerPrefs.GetString(telemetryKey);
+            if (!string.IsNullOrEmpty(events))
+            {
+                List<TelemetryBody> telemetryBodies = new List<TelemetryBody>();
+                var eventListDict = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(events);
+                foreach(var item in eventListDict)
+                {
+                    TelemetryBody telemetryBody = new TelemetryBody();
+                    telemetryBody.EventName = item["EventName"].ToString();
+                    telemetryBody.EventNamespace = item["EventNamespace"].ToString();
+                    telemetryBody.Payload = item["Payload"];
+                    telemetryBodies.Add(telemetryBody);
+                }
+                coroutineRunner.Run(
+                    api.SendProtectedEvents(telemetryBodies, result =>
+                    {
+                        RemoveEventsFromCache();
+                    })
+                );
+            }
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                session.RefreshTokenCallback -= LoadEventsFromCache;
+            }
+        }
+
+        private void RemoveEventsFromCache()
+        {
+            if (!session.IsValid() || !session.usePlayerPrefs)
+            {
+                return;
+            }
+            string telemetryKey = GetTelemetryKey();
+            PlayerPrefs.DeleteKey(telemetryKey);
+            PlayerPrefs.Save();
+        }
+
+        private void AppendEventToCache( TelemetryBody telemetryBody )
+        {
+            if (!session.IsValid() || !session.usePlayerPrefs)
+            {
+                return;
+            }
+            string telemetryKey = GetTelemetryKey();
+            eventList.Add(telemetryBody);
+            var telemetryEventsJson = System.Text.Encoding.UTF8.GetString(eventList.ToUtf8Json());
+            PlayerPrefs.SetString(telemetryKey, telemetryEventsJson);
+            PlayerPrefs.Save();
         }
     }
 }

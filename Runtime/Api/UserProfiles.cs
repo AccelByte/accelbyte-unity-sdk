@@ -102,6 +102,10 @@ namespace AccelByte.Api
                 api.UpdateUserProfile(updateRequest, callback));
         }
 
+        /// <summary>
+        /// Get user's own custom attribute profile information. If it doesn't exist, that will be an error
+        /// </summary>
+        /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
         public void GetCustomAttributes( ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -116,6 +120,11 @@ namespace AccelByte.Api
                 api.GetCustomAttributes(session.UserId, callback));
         }
 
+        /// <summary>
+        /// Update user's own custom attribute profile information. If it doesn't exist, that will be an error
+        /// </summary>
+        /// <param name="updates">ProfileUpdateRequest Request object.</param>
+        /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
         public void UpdateCustomAttributes( Dictionary<string, object> updates
             , ResultCallback<Dictionary<string, object>> callback )
         {
@@ -313,6 +322,43 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GenerateUploadURLForUserContent(userId, fileType, callback, category));
+        }
+        
+        /// <summary>
+        /// Get user's own custom private attribute profile information. If it doesn't exist, that will be an error
+        /// </summary>
+        /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
+        public void GetPrivateCustomAttributes( ResultCallback<Dictionary<string, object>> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetPrivateCustomAttributes(callback));
+        }
+
+        /// <summary>
+        /// Update user's own private custom attribute profile information. If it doesn't exist, that will be an error
+        /// </summary>
+        /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
+        public void UpdatePrivateCustomAttributes( Dictionary<string, object> updates
+            , ResultCallback<Dictionary<string, object>> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            coroutineRunner.Run(
+                api.UpdatePrivateCustomAttributes(updates, callback));
         }
     }
 }

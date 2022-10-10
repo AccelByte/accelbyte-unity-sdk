@@ -49,6 +49,9 @@ namespace AccelByte.Models
         partyJoinViaCodeResponse,
         partyPromoteLeaderRequest,
         partyPromoteLeaderResponse,
+        partySendNotifRequest,
+        partySendNotifResponse,
+        partyNotif,
         personalChatRequest,
         personalChatResponse,
         personalChatNotif,
@@ -237,6 +240,27 @@ namespace AccelByte.Models
         [DataMember] public long updatedAt;
         [DataMember] public Dictionary<string, object> custom_attribute;
     }
+    
+    [DataContract]
+    public class PartySendNotifRequest
+    {
+        [DataMember] public string topic;
+        [DataMember] public string payload;
+    }
+    
+    [DataContract]
+    public class PartySendNotifResponse 
+    {
+        [DataMember] public string code;
+    }
+    
+    [DataContract]
+    public class PartyNotif
+    {
+        [DataMember] public string sender;
+        [DataMember] public string topic;
+        [DataMember] public string payload;
+    }
 
     [DataContract]
     public class SetPartySizeLimitRequest
@@ -408,7 +432,10 @@ namespace AccelByte.Models
         [DataMember] public string clientVersion;
         [DataMember] public bool joinable;
         [DataMember] public MatchmakingNotifAllies matchingAllies;
-
+        // rejected status message
+        [DataMember] public string message;
+        // rejected status error code
+        [DataMember] public int errorCode;
     }
 
     [DataContract]
@@ -709,6 +736,18 @@ namespace AccelByte.Models
     public class ServerSetSessionAttributeRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
+    }
+    
+    public static class MatchExtraAttributes
+    {
+        /** Attributes to start role based matchmaking */
+        public const string Role = "role";
+    }
+    
+    public static class SessionAttributeKeys
+    {
+        /** Attributes for assigning role to user when doing role based matchmaking */
+        public const string Role = "role";
     }
 
     #endregion

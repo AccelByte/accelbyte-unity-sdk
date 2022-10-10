@@ -733,6 +733,8 @@ namespace AccelByte.Models
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
+        [DataMember] public string requestId { get; set; }
+        [DataMember] public bool replayed { get; set; }
     }
 
     [DataContract]
@@ -766,6 +768,7 @@ namespace AccelByte.Models
     {
         [DataMember] public int useCount { get; set; }
         [DataMember] public string[] options { get; set; }
+        [DataMember] public string requestId { get; set; }
     };
 
     [DataContract]

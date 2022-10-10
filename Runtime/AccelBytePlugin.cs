@@ -226,6 +226,11 @@ namespace AccelByte.Api
                     AccelBytePlugin.oAuthConfig = multiOAuthConfigs.Default;
                     AccelBytePlugin.config = multiConfigs.Default; break;
             }
+
+            HttpRequestBuilder.SetNamespace(AccelBytePlugin.config.Namespace);
+            HttpRequestBuilder.SetGameClientVersion(Application.version);
+            HttpRequestBuilder.SetSdkVersion(AccelByteSettings.Instance.AccelByteSDKVersion);
+
         }
 
         private static void InitHttpClient()

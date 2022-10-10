@@ -50,6 +50,7 @@ namespace AccelByte.Models
     public class TokenData
     {
         [DataMember] public string access_token { get; set; }
+        [DataMember] public string auth_trust_id { get; set; }
         [DataMember] public string refresh_token { get; set; }
         [DataMember] public int expires_in { get; set; }
         [DataMember] public string token_type { get; set; }

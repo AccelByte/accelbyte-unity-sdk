@@ -368,11 +368,15 @@ namespace AccelByte.Api
         /// <param name="useCount">Number of consumed entitlement</param>
         /// <param name="callback">
         /// Returns a Result that contains EntitlementInfo via callback when completed
+        /// <param name="options">Options of consumed entitlement</param>
+        /// <param name="requestId">Request id(Optional), A unique tracking ID provided by the developer, can just left it empty if they don't want to track,
+        /// When a request id is submitted, it will return original successful response</param>
         /// </param>
         public void ConsumeUserEntitlement( string entitlementId
             , int useCount
             , ResultCallback<EntitlementInfo> callback
-            , string[] options = null)
+            , string[] options = null
+            , string requestId = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(entitlementId, 
@@ -390,7 +394,8 @@ namespace AccelByte.Api
                     entitlementId,
                     useCount,
                     callback,
-                    options));
+                    options,
+                    requestId));
         }
 
         /// <summary>

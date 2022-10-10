@@ -6,6 +6,10 @@ using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor.Compilation;
+using UnityEditor;
+#endif
 
 using Newtonsoft.Json;
 
@@ -219,6 +223,9 @@ namespace AccelByte.Api
         private SettingsEnvironment editedEnvironment = SettingsEnvironment.Default;
         private string editedPlatform = "";
 
+        private const string AccelByteSDKVersionFilename = "AccelByteSDKVersion";
+        public string AccelByteSDKVersion { get; private set; } = "";
+
         private static AccelByteSettings instance;
 
         public static AccelByteSettings Instance
@@ -279,12 +286,13 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        ///  Load configuration from AccelByteSDKConfig.json
+        ///  Load configuration from Resource directory
         /// </summary>
         public void Load()
         {
             var oAuthFile = Resources.Load("AccelByteSDKOAuthConfig" + editedPlatform);
             var configFile = Resources.Load("AccelByteSDKConfig");
+            var versionFile = Resources.Load(AccelByteSDKVersionFilename);
 
             if (oAuthFile != null)
             {
@@ -296,6 +304,16 @@ namespace AccelByte.Api
             {
                 string wholeJsonText = ((TextAsset) configFile).text;
                 this.multiConfigs = wholeJsonText.ToObject<MultiConfigs>();
+            }
+
+            if (versionFile != null)
+            {
+                string wholeJsonText = ((TextAsset)versionFile).text;
+                var versionObject = wholeJsonText.ToObject<AccelByte.Models.VersionJson>();
+                if (versionObject != null)
+                {
+                    this.AccelByteSDKVersion = versionObject.Version;
+                }
             }
 
             if (this.multiOAuthConfigs == null || oAuthFile == null)
@@ -371,5 +389,48 @@ namespace AccelByte.Api
             System.IO.File.WriteAllBytes(oAuthFullpath, Encoding.ASCII.GetBytes(this.multiOAuthConfigs.ToJsonString(Formatting.Indented)));
             System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(this.multiConfigs.ToJsonString(Formatting.Indented)));
         }
+
+#if UNITY_EDITOR
+        [InitializeOnLoadMethod]
+        private static void OnLoadMethod()
+        {
+            CompilationPipeline.compilationFinished -= CopyAccelByteSDKPackageVersion;
+            CompilationPipeline.compilationFinished += CopyAccelByteSDKPackageVersion;
+        }
+
+        private static void CopyAccelByteSDKPackageVersion(object obj)
+        {
+            var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettings).Assembly);
+            var versionJsonAbs = System.IO.Path.Combine(AccelBytePackageInfo.assetPath, "version.json");
+
+            var versionAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(versionJsonAbs);
+            if (versionAsset == null)
+            {
+                Debug.Log("version.json not found under Package AccelByte SDK directory");
+                goto endfunction;
+            }
+            if (versionAsset.text == string.Empty || versionAsset.text == null)
+            {
+                Debug.Log("version.json for AccelByte SDK is empty");
+                goto endfunction;
+            }
+
+            string versionTextRaw = versionAsset.text;
+            var versionAsObject = versionTextRaw.ToObject<AccelByte.Models.VersionJson>();
+            if (versionAsObject == null)
+            {
+                Debug.Log("Failed to deserialize version.json from AccelByte SDK Package");
+                goto endfunction;
+            }
+
+            string SDKVersionPath = System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), AccelByteSDKVersionFilename + ".json");
+            System.IO.File.WriteAllBytes(SDKVersionPath, Encoding.ASCII.GetBytes(versionTextRaw));
+
+            endfunction:
+            {
+                return;
+            }
+        }
+#endif
     }
 }

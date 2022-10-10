@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.3.0%0D15.2.0) (2022-10-10)
+
+
+### Features
+
+*  Bruteforce protection upon game login ([f24e935](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f24e9354684ff2ad9c609128ea98bf2b3ef537e2))
+* adjustment for improve entitlement track log ([8a98deb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8a98debbf8dda2d38cabdb195a597a3f4af03951))
+* banning by device id (PSN, XBOX) ([0dd98fc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0dd98fc0b9d72ca36a0659154d9f99b05e559aab))
+* expose Get and Update PrivateCustomAttributes ([7adc696](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7adc696c413a9737cfbc5646c5666fdf563b407f))
+* **HTTP:** adding SDK version to the resource and add HTTP headers metadata [sdk version, game client version, namespace] ([fb041ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb041ee42190450100068f6664f96729c0c7625a))
+* **lobby:** add send party notif ([a1f36ed](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a1f36eded46e54ec02ffde8d4bef30071e5ea1f2))
+* **lobby:** support for role based matchmaking ([835704f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/835704f68e556c8e8272ada52baf7625a5481492))
+* **lobby:** support rejected status on role based matchmaking ([2f30c17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2f30c1732ad7a87f53499aedfbd7bbacb3d291df))
+* Temporarily cache telemetry data into the local disk storage ([7676ad8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7676ad85e33bf8ea8139ce2b4525a0d91df7210e))
+
+
+### Bug Fixes
+
+* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends ([d546342](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d546342b3ad5cb68c923e22d10a34bd0c5aa2f74))
+* support get wallet info old workflow ([e59db17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e59db17b72b7e4d53823ef4e76f55df4d70f7752))
+
 ## [15.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.2.0%0D15.1.0) (2022-09-27)
 
 

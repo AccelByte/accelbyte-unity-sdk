@@ -33,6 +33,12 @@ namespace AccelByte.Api
         public event OnErrorHandler OnError;
 
         #endregion public events declaration
+        
+        #region public delegate declaration
+
+        public delegate T NotificationPayloadModifier<T>(T payload) where T : class, new();
+        
+        #endregion
 
         #region private fields declaration
 
@@ -49,7 +55,7 @@ namespace AccelByte.Api
         private string channelSlug;
         private AccelByteWebSocket webSocket;
         private LobbySessionId lobbySessionId;
-
+        
         #endregion private fields declaration
 
         #region public properties
@@ -287,7 +293,7 @@ namespace AccelByte.Api
             webSocket.Send(writer.ToString());
         }
 
-        public void HandleNotification<T>(string message, ResultCallback<T> handler) where T : class, new()
+        public void HandleNotification<T>(string message, ResultCallback<T> handler, NotificationPayloadModifier<T> modifier = null) where T : class, new()
         {
             Report.GetWebSocketNotification(message);
 
@@ -298,6 +304,10 @@ namespace AccelByte.Api
 
             T payload;
             ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out payload);
+            if (modifier != null)
+            {
+                payload = modifier(payload);
+            }
 
             if (errorCode != ErrorCode.None)
             {
@@ -307,6 +317,16 @@ namespace AccelByte.Api
             {
                 coroutineRunner.Run( ()=>handler(Result<T>.CreateOk(payload)));
             }
+        }
+        
+        public void HandleUserStatusNotif(string message, ResultCallback<FriendsStatusNotif> handler)
+        {
+            HandleNotification(message, handler, payload =>
+            {
+                payload.activity = Uri.UnescapeDataString(payload.activity);
+                
+                return payload;
+            });
         }
 
         public void HandleResponse(long messageId, string message, ErrorCode errorCode)
@@ -511,6 +531,20 @@ namespace AccelByte.Api
                 new PartyPromoteLeaderRequest { newLeaderUserId = userId }, callback);
         }
 
+        /// <summary>
+        /// Send notification to party member 
+        /// </summary>
+        /// <param name="topic">Topic The topic of the request. Can use this as ID to know how to marshal the payload</param>
+        /// <param name="payload">Payload The Payload of the request. Can be JSON string</param>
+        /// <param name="callback">
+        /// Returns a Result that contains PartySendNotifResponse via callback when completed.
+        /// </param>
+        public void SendNotificationToPartyMember(string topic, string payload, ResultCallback<PartySendNotifResponse> callback)
+        {
+            SendRequest(MessageType.partySendNotifRequest, 
+                new PartySendNotifRequest { topic = topic, payload = payload}, callback);
+        }
+
         #endregion Party
 
         #region Chat
@@ -616,7 +650,23 @@ namespace AccelByte.Api
         /// </param>
         public void ListFriendsStatus( ResultCallback<FriendsStatus> callback )
         {
-            SendRequest(MessageType.friendsStatusRequest, callback);
+            SendRequest(MessageType.friendsStatusRequest, 
+                (Result<FriendsStatus> result) =>
+                {
+                    if (result.IsError)
+                    {
+                        callback(result);
+                        return;
+                    }
+
+                    int activityLength = result.Value.activity.Length;
+                    for (int i = 0; i < activityLength; i++)
+                    {
+                        result.Value.activity[i] = Uri.UnescapeDataString(result.Value.activity[i]);
+                    }
+
+                    callback(result);
+                });
         }
         #endregion StatusAndPresence
 

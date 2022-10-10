@@ -21,6 +21,7 @@ namespace AccelByte.Api
     public class UserSession : ISession
     {
         public const string RefreshTokenKey = "accelbyte_refresh_token";
+        public const string AuthTrustIdKey = "auth_trust_id";
         public readonly bool usePlayerPrefs;
         private readonly IHttpClient httpClient;
 
@@ -169,6 +170,7 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(loginResponse);
             tokenData = loginResponse;
+            HttpRequestBuilder.SetNamespace(loginResponse.Namespace);
             httpClient.SetImplicitBearerAuth(tokenData.access_token);
             httpClient.SetImplicitPathParams(
                 new Dictionary<string, string>

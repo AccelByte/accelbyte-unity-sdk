@@ -95,7 +95,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(LoginWithUserNameAsync(
                 username, password, callback, rememberMe));
         }
-        
+
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
@@ -103,6 +103,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
         public void LoginWithUsername( string username
             , string password
             , ResultCallback<TokenData, OAuthError> callback
@@ -120,7 +121,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("Instead, use LoginWithUsername()")]
+        [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 with other callback type instead")]
         public void LoginWithUsernameV3( string username
             , string password
             , ResultCallback callback
@@ -138,7 +139,6 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("Instead, use LoginWithUsername()")]
         public void LoginWithUsernameV3( string username
             , string password
             , ResultCallback<TokenData, OAuthError> callback
@@ -213,6 +213,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete("Instead, use LoginWithUserNameAsyncV3()")]
         private IEnumerator LoginWithUserNameAsync( string email
             , string password
             , ResultCallback<TokenData, OAuthError> callback
@@ -222,7 +223,7 @@ namespace AccelByte.Api
                 oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe),
                 callback);
         }
-        
+
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password. 
         /// TODO: Is this deprecated, in favor of the extended callback variant?
@@ -231,6 +232,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete("Instead, use LoginWithUserNameAsync() which use different callback type")]
         private IEnumerator LoginWithUserNameAsync( string email
             , string password
             , ResultCallback callback
@@ -240,7 +242,7 @@ namespace AccelByte.Api
                 email, password, cb, rememberMe), callback);
         }
 
-		[Obsolete("Instead, use LoginWithUserNameAsync()")]
+        [Obsolete("Instead, use LoginWithUserNameAsyncV3() which use different callback type")]
         private IEnumerator LoginWithUserNameAsyncV3( string email
             , string password
             , ResultCallback callback
@@ -250,7 +252,6 @@ namespace AccelByte.Api
                 email, password, cb, rememberMe), callback);
         }
 
-        [Obsolete("Instead, use LoginWithUserNameAsync()")]
         private IEnumerator LoginWithUserNameAsyncV3( string email
             , string password
             , ResultCallback<TokenData, OAuthError> callback

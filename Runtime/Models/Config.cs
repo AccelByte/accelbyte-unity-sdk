@@ -353,4 +353,10 @@ namespace AccelByte.Models
             }
         }
     }
+
+    [DataContract]
+    public class VersionJson
+    {
+        [DataMember] public string Version { get; set; }
+    }
 }

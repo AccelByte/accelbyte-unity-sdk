@@ -282,7 +282,8 @@ namespace AccelByte.Api
             , string entitlementId
             , int useCount
             , ResultCallback<EntitlementInfo> callback
-            , string[] options )
+            , string[] options
+            , string requestId)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't consume user entitlement! Namespace_ from parent  is null!");
@@ -293,8 +294,8 @@ namespace AccelByte.Api
             ConsumeUserEntitlementRequest consumeUserEntitlement = new ConsumeUserEntitlementRequest
             {
                 useCount = useCount,
-                options = options
-
+                options = options,
+                requestId = requestId
             };
 
             var request = HttpRequestBuilder

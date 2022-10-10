@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019-2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -20,6 +20,7 @@ namespace AccelByte.Api
         public Config TemporarySetting;
         public int TemporaryEnvironmentSetting;
         public int TemporaryPlatformSetting;
+        public string TemporarySDKVersion;
         public List<string> platformList;
         public Rect LogoRect;
         public LogType SelectedLogFilter;
@@ -94,6 +95,11 @@ namespace AccelByte.Api
             {
                 EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
             }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("SDK Version");
+            EditorGUILayout.LabelField(AccelByteSettings.Instance.AccelByteSDKVersion);
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Environment");
@@ -296,7 +302,7 @@ namespace AccelByte.Api
             if (GUILayout.Button("Save"))
             {
                 AccelByteSettings.Instance.UpdateOAuthConfig(TemporaryOAuth.ShallowCopy());
-                AccelByteSettings.Instance.UpdateConfig(TemporarySetting.ShallowCopy());            
+                AccelByteSettings.Instance.UpdateConfig(TemporarySetting.ShallowCopy());
                 AccelByteSettings.Instance.Save();
             }
 

@@ -421,5 +421,54 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+        
+        public IEnumerator GetPrivateCustomAttributes(
+            ResultCallback<Dictionary<string, object>> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles/privateCustomAttributes")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<Dictionary<string, object>>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator UpdatePrivateCustomAttributes(Dictionary<string, object> updates
+            , ResultCallback<Dictionary<string, object>> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles/privateCustomAttributes")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(updates.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<Dictionary<string, object>>();
+            callback.Try(result);
+        }
     }
 }

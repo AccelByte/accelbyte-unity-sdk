@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using AccelByte.Models;
+using Newtonsoft.Json;
 
 namespace AccelByte.Core
 {
@@ -238,7 +239,22 @@ namespace AccelByte.Core
                 }
                 else if (fieldInfo.FieldType == typeof(string))
                 {
-                    fieldInfo.SetValue(payload, Uri.UnescapeDataString(fieldValue));
+                    fieldValue = Uri.UnescapeDataString(fieldValue);
+                    // quoted string
+                    if (fieldValue.StartsWith("\"") && fieldValue.EndsWith("\""))
+                    {
+                        // parse string value, will remove enclosed quote and unescape the string
+                        JsonTextReader reader = new JsonTextReader(new StringReader(fieldValue));
+                        if (reader.Read())
+                        {
+                            fieldValue = reader.Value?.ToString();
+                        }
+                        fieldInfo.SetValue(payload, fieldValue);
+                    }
+                    else
+                    {
+                        fieldInfo.SetValue(payload, fieldValue);
+                    }
                 }
                 else if (fieldInfo.FieldType.IsPrimitive)
                 {
