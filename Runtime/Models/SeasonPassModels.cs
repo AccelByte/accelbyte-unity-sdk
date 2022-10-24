@@ -153,6 +153,7 @@ namespace AccelByte.Models
         [DataMember] public int totalPaidForExp { get; set; }
         [DataMember] public int totalSweatExp { get; set; }
         [DataMember] public int totalExp { get; set; }
+        [DataMember] public int accumulatedXpBoost { get; set; }
     }
 
     [DataContract]

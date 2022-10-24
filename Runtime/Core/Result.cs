@@ -156,6 +156,26 @@ namespace AccelByte.Core
         InvalidSession = 13132,
         FriendListIsEmpty = 11732,
 
+        #region SessionErrorCode
+
+        SessionInvalidJoinability = 20021,
+        SessionLeadershipRequired = 20031,
+        SessionJoinNotAllowed = 20032,
+        SessionInvalidId = 20034,
+        SessionPartyNotFound = 20041,
+        SessionIdNotFound = 20042,
+        SessionConfigurationNotExist = 20045,
+        SessionInvitationExpired = 20047,
+        SessionUserInParty = 20048,
+        SessionVersionMismatch = 20071,
+
+        #endregion
+        
+        #region Matchmaking
+        MatchmakingMatchPoolNotFound = 520003,
+        MatchmakingTicketNotFound = 520303,
+        #endregion
+        
         //AccelByte Lobby error codes
         //Connection
         LobbyConnectionUnableToUpgrade = 11211,

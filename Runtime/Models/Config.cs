@@ -36,6 +36,8 @@ namespace AccelByte.Models
         [DataMember] public string ReportingServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
         [DataMember] public string SessionBrowserServerUrl { get; set; }
+        [DataMember] public string SessionServerUrl { get; set; }
+        [DataMember] public string MatchmakingV2ServerUrl { get; set; }
         [DataMember] public bool UseTurnManager { get; set; }
         [DataMember] public string TurnManagerServerUrl { get; set; }
         [DataMember] public string TurnServerHost { get; set; }
@@ -80,6 +82,8 @@ namespace AccelByte.Models
                    this.UGCServerUrl == anotherConfig.UGCServerUrl &&
                    this.SeasonPassServerUrl == anotherConfig.SeasonPassServerUrl &&
                    this.SessionBrowserServerUrl == anotherConfig.SessionBrowserServerUrl &&
+                   this.SessionServerUrl == anotherConfig.SessionServerUrl &&
+                   this.MatchmakingV2ServerUrl == anotherConfig.MatchmakingV2ServerUrl &&
                    this.TurnManagerServerUrl == anotherConfig.TurnManagerServerUrl &&
                    this.UseTurnManager == anotherConfig.UseTurnManager &&
                    this.TurnServerHost == anotherConfig.TurnServerHost &&
@@ -143,6 +147,10 @@ namespace AccelByte.Models
                 
                 this.SessionBrowserServerUrl = GetDefaultApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser");
                 
+                this.SessionServerUrl = GetDefaultApiUrl(this.SessionServerUrl, "/session");
+                
+                this.MatchmakingV2ServerUrl = GetDefaultApiUrl(this.MatchmakingV2ServerUrl, "/match2");
+                
                 this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
 
             }
@@ -198,6 +206,10 @@ namespace AccelByte.Models
                 if (this.SeasonPassServerUrl == httpsBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
 
                 if (this.SessionBrowserServerUrl == httpsBaseUrl + "/sessionbrowser") this.SessionBrowserServerUrl = null;
+                
+                if (this.SessionServerUrl == httpsBaseUrl + "/session") this.SessionServerUrl = null;
+                
+                if (this.MatchmakingV2ServerUrl == httpsBaseUrl + "/match2") this.MatchmakingV2ServerUrl = null;
 
                 if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
             }

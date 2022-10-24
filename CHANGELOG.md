@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.4.0%0D15.3.0) (2022-10-24)
+
+
+### Features
+
+* Bulk get user season progression API ([fb970e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb970e83dcfb39d83f26be259ef4366e32d06b04))
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([066de9a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/066de9acd87bc9b4000411e9c990981cff436323))
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([ceedce0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ceedce00870b360671e8c8aa1146126627730c36))
+* Expose update channel public endpoint ([1bf155b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1bf155bd5453fc661c630364e871c89cfd72bb5d))
+* IAM Phase 3 Statement & Substitute Implementation ([9b680ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9b680ee72b6e80e014212cf4995488874dffedee))
+* IAM Phase 4 Statement & Substitute Implementation ([1ddf21f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1ddf21f72cea41d617a207db3092497c95d00c89))
+* UnitTest/Sample Code SyncSteamDLC ([10a8470](https://github.com/AccelByte/accelbyte-unity-sdk/commits/10a847040e33fbacd72d845e30248557d0bf2dbc))
+
+
+### Bug Fixes
+
+* adopt the changes from lobby session refactoring ([881fd6d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/881fd6d4ff1eaf84255bafb194b9c01d3aa173c2))
+* client sdk config type misplaced ([228295c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/228295c60b2fab59b160358dbb9809172612d190))
+* comment out matchmaking code to avoid build test crashes ([c69679e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c69679e723574202ddd2d5c7db775c4f10bb1445))
+* comment out protobuf messaage notification handling ([4889e85](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4889e858643f51f448bbe06ffed457a682104c2e))
+* fix wrong purchase condition model in item api BREAKING CHANGES: updated item info model ([a94338c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a94338c0152e19da5e3f1900b20c42f24d226829))
+* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends ([71e9044](https://github.com/AccelByte/accelbyte-unity-sdk/commits/71e90447f5d670d98bc4b039bb3f0703fbd0ce0d))
+* missing dependency after rebase ([02d8eec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/02d8eeccb0e558799b86977f87fcf258d2d1fca3))
+* missing request model for promote member to party leader ([b2765d0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b2765d07a73e770708df9e1c7d54cef29a484ec0))
+* mistaken refactor of session model and server config ([7509b78](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7509b78a24cf0d49c8ede65928eb2d47029f133c))
+* rename typo, confusing namespace, remove UpdateGameSession ([6e511ba](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e511ba56997b46972a63f75cf51c82f23207b32))
+* session info replace session member and ds status changed notif ([9d8dda4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9d8dda4ba2fc79f51f9e21e210eea06189bae05b))
+* SessionV2DsInformation can has null requestedAt ([49f2000](https://github.com/AccelByte/accelbyte-unity-sdk/commits/49f2000b0510ac8cc6ebb7af95828f95669408ca))
+* typo in Lobby.cs of session v2 notification ([e1a5249](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e1a524939b56a4b0e89286ae6bf547f9ba38c310))
+* typo in ServerMatchmakingApi.cs ([3870417](https://github.com/AccelByte/accelbyte-unity-sdk/commits/38704173545e296c9c2c83ea89455b3bbcab1892))
+
+
+### Tests
+
+* Refactor and improved party test coverage and quality ([4750084](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4750084ce098e1a1d614d315e4810ff36f8ac58f))
+
+
+### Refactors
+
+* handle session notifications as json instead of protobuf ([f1cba09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f1cba09db43fbf959b744e3b0b3c352cdaccf0cb))
+* **lobby:** move websocket api call into a new class ([8dfcf60](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8dfcf60c495d0ae1b5679a69e3ab38af68dedfcc))
+* MMv2 RejectBackfillProposal use backfill proposal notification directly ([7db3057](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7db3057e530537a5d63c420666d8410218a85c56))
+* remove protobuf library and generated class ([93ed4b7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/93ed4b704659569a83ef25f47c804d7438f698d3))
+
 ## [15.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.3.0%0D15.2.0) (2022-10-10)
 
 

@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,7 +12,7 @@ namespace AccelByte.Models
 {
     #region General
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MessageType
     {
         unknown,
@@ -125,9 +124,38 @@ namespace AccelByte.Models
         userUnbannedNotification,
         refreshTokenRequest,
         refreshTokenResponse,
-        signalingP2PNotif
+        signalingP2PNotif,
+        messageSessionNotif
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MultiplayerV2NotifType
+    {
+        // SessionV2 - Party
+        OnPartyInvited,
+        OnPartyJoined,
+        OnPartyMembersChanged,
+        OnPartyRejected,
+        OnPartyKicked,
+        OnPartyUpdated,
+
+        // SessionV2 - Game
+        OnSessionInvited,
+        OnSessionJoined,
+        OnSessionKicked,
+        OnSessionRejected,
+        OnSessionMembersChanged,
+        OnGameSessionUpdated,
+
+        // SessionV2 - DS
+        OnDSStatusChanged,
+        
+        // MatchmakingV2
+        OnMatchFound,
+        OnMatchmakingStarted,
+        OnMatchmakingTicketExpired,
+    }
+    
     [DataContract]
     public class DisconnectNotif
     {
@@ -154,7 +182,7 @@ namespace AccelByte.Models
         [DataMember] public string payload;
         [DataMember] public string sentAt;
     }
-    
+
     #endregion
 
     #region Personal Chat
@@ -267,7 +295,7 @@ namespace AccelByte.Models
     {
         [DataMember] public int limit;
     }
-    
+
     [DataContract]
     public class ActivePartiesData
     {
@@ -399,6 +427,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string partyCode;
     }
+
     #endregion
 
     #region Matchmaking
@@ -411,8 +440,12 @@ namespace AccelByte.Models
         [DataMember] public string clientVersion;
         [DataMember] public string latencies;
         [DataMember] public string partyAttributes;
-        [DataMember] public string tempParty;           // used to store userIds to form temp party with (please include the matchmaking starter's userIds)
-        [DataMember] public bool isTempParty;           // used for cancel matchmaking when using temp party
+
+        [DataMember]
+        public string
+            tempParty; // used to store userIds to form temp party with (please include the matchmaking starter's userIds)
+
+        [DataMember] public bool isTempParty; // used for cancel matchmaking when using temp party
         [DataMember] public string extraAttributes;
     }
 
@@ -457,7 +490,7 @@ namespace AccelByte.Models
     {
         [DataMember] public int code;
     }
-    
+
     [DataContract]
     public class ReadyConsentRequest
     {
@@ -505,7 +538,7 @@ namespace AccelByte.Models
 
     #region Friends
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     [DataContract]
     public enum RelationshipStatusCode
     {
@@ -555,7 +588,7 @@ namespace AccelByte.Models
 
     #region Presence
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum UserStatus
     {
         Offline,
@@ -572,7 +605,7 @@ namespace AccelByte.Models
         [DataMember] public string[] activity;
         [DataMember] public DateTime[] lastSeenAt;
     }
-    
+
     [DataContract]
     public class FriendsStatusNotif
     {
@@ -594,7 +627,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string[] onlineFriendsId;
     }
-    
+
     [DataContract]
     public class UserStatusNotif
     {
@@ -614,6 +647,7 @@ namespace AccelByte.Models
         [DataMember] public int invisible;
         [DataMember] public int offline;
     }
+
     #endregion
 
     #region Block/Unblock
@@ -625,13 +659,13 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string blockedUserId;
     }
-    
+
     [DataContract]
     public class BlockPlayerResponse
     {
         [DataMember] public string blockedUserId;
     }
-    
+
     [DataContract]
     public class UnblockPlayerRequest
     {
@@ -639,20 +673,20 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string unblockedUserId;
     }
-    
+
     [DataContract]
     public class UnblockPlayerResponse
     {
         [DataMember] public string unblockedUserId;
     }
-    
+
     [DataContract]
     public class PlayerBlockedNotif
     {
         [DataMember] public string userId; //ID of the blocker
         [DataMember] public string blockedUserId; //ID of the blocked user
     }
-    
+
     [DataContract]
     public class PlayerUnblockedNotif
     {
@@ -690,13 +724,13 @@ namespace AccelByte.Models
 
     #region Session Attribute
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SessionAttributeName
     {
         profanity_filtering_level
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ProfanityFilterLevel
     {
         all,
@@ -783,6 +817,7 @@ namespace AccelByte.Models
         [DataMember] public BanReason reason;
         [DataMember] public bool enable;
     }
+
     #endregion
 
     #region Signaling

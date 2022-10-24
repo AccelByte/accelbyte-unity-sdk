@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -540,6 +541,10 @@ namespace AccelByte.Api
             Assert.IsNotNull(Namespace_, "Can't sync DLC item! Namespace_ from parent  is null!");
             Assert.IsNotNull(AuthToken, "Can't sync DLC item! AccessToken from parent is null!");
             Assert.IsNotNull(userId, "Can't sync DLC item! UserId parameter is null!");
+            
+            var body = new Dictionary<string, string>();
+            body.Add("steamId", userSteamId);
+            body.Add("appId", userAppId);
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/steam/sync")
@@ -547,7 +552,7 @@ namespace AccelByte.Api
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{\"steamId\": \"{0}\", \"appId\": \"{1}\"}", userSteamId, userAppId))
+                .WithBody(body.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;

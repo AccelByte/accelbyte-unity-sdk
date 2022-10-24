@@ -24,6 +24,13 @@ namespace AccelByte.Models
         [DataMember] public string next { get; set; }
         [DataMember] public string previous { get; set; }
     }
+    
+    [DataContract]
+    public class PaginatedResponse<T> where T : class, new()
+    {
+        [DataMember] public T[] data;
+        [DataMember] public Paging paging;
+    }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum PaginationType

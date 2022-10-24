@@ -90,6 +90,30 @@ namespace AccelByte.Core
                 message +
                 "\n---\n");
         }
+        
+        public static void GetServerWebSocketResponse(string message)
+        {
+            AccelByteDebug.Log("[Server] WebSocket Receive Message: \n" +
+                               "---\n" +
+                               message +
+                               "\n---\n");
+        }
+        
+        public static void GetServerWebSocketNotification(string message)
+        {
+            AccelByteDebug.Log("[Server] WebSocket Receive Notification: \n" +
+                               "---\n" +
+                               message +
+                               "\n---\n");
+        }
+        
+        public static void GetProtobufNotification(string message)
+        {
+            AccelByteDebug.Log("WebSocket Receive Protobuf Notification: \n" +
+                               "---\n" +
+                               message +
+                               "\n---\n");
+        }
     }
 }
 

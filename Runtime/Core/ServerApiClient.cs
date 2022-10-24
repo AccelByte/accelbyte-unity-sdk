@@ -51,12 +51,15 @@ namespace AccelByte.Core
         /// </summary>
         /// <list type="bullet">
         /// <item><term>DedicatedServerManagerApi</term></item>
+        /// <item><term>ServerDSHubApi</term></item>
         /// <item><term>ServerAchievementApi</term></item>
         /// <item><term>ServerCloudSaveApi</term></item>
         /// <item><term>ServerEcommerceApi</term></item>
         /// <item><term>ServerGameTelemetryApi</term></item>
         /// <item><term>ServerLobbyApi</term></item>
+        /// <item><term>ServerSessionApi</term></item>
         /// <item><term>ServerMatchmakingApi</term></item>
+        /// <item><term>ServerMatchmakingV2Api</term></item>
         /// <item><term>ServerQosManagerApi</term></item>
         /// <item><term>ServerSeasonPassApi</term></item>
         /// <item><term>ServerStatisticApi</term></item>

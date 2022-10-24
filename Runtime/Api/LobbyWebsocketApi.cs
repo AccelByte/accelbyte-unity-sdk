@@ -328,6 +328,14 @@ namespace AccelByte.Api
                 return payload;
             });
         }
+        
+        public void DispatchNotification<T>(T notification, ResultCallback<T> handler)
+            where T : class, new()
+        {
+            if (handler == null) return;
+
+            coroutineRunner.Run(() => handler(Result<T>.CreateOk(notification)));
+        }
 
         public void HandleResponse(long messageId, string message, ErrorCode errorCode)
         {

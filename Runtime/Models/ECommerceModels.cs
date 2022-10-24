@@ -425,7 +425,7 @@ namespace AccelByte.Models
         [DataMember] public string name { get; set; }
         [DataMember] public PredicateType predicateType { get; set; }
         [DataMember] public string comparison { get; set; }
-        [DataMember] public string anyOf { get; set; }
+        [DataMember] public int anyOf { get; set; }
         [DataMember] public string[] values { get; set; }
         [DataMember] public string value { get; set; }
     }
@@ -433,14 +433,14 @@ namespace AccelByte.Models
     [DataContract]
     public class ItemConditionGroup
     {
-        [DataMember] public ItemPredicate[] predicate { get; set; }
-        [DataMember] public string operators { get; set; }
+        [DataMember] public ItemPredicate[] predicates { get; set; }
+        [DataMember(Name = "operator")] public string Operator { get; set; }
     }
 
     [DataContract]
     public class ItemPurchaseCondition
     {
-        [DataMember] public ItemConditionGroup[] itemConditionGroup { get; set; }
+        [DataMember] public ItemConditionGroup[] conditionGroups { get; set; }
     }
 
     [DataContract]

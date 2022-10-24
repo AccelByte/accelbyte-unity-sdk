@@ -285,6 +285,16 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Session BrowserServer Url");
             TemporarySetting.SessionBrowserServerUrl = EditorGUILayout.TextField(TemporarySetting.SessionBrowserServerUrl);
+            EditorGUILayout.EndHorizontal();            
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Session Server Url");
+            TemporarySetting.SessionServerUrl = EditorGUILayout.TextField(TemporarySetting.SessionServerUrl);
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("MatchmakingV2 Server Url");
+            TemporarySetting.MatchmakingV2ServerUrl = EditorGUILayout.TextField(TemporarySetting.MatchmakingV2ServerUrl);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

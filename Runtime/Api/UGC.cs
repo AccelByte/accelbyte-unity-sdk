@@ -18,9 +18,9 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        internal UGC( UGCApi inApi
+        internal UGC(UGCApi inApi
             , UserSession inSession
-            , CoroutineRunner inCoroutineRunner )
+            , CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null. Construction is failed.");
             Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner parameter can not be null. Construction is failed.");
@@ -29,7 +29,7 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -37,11 +37,11 @@ namespace AccelByte.Api
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
-        internal UGC( UGCApi inApi
+        internal UGC(UGCApi inApi
             , UserSession inSession
             , string inNamespace
-            , CoroutineRunner inCoroutineRunner )
-            : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
+            , CoroutineRunner inCoroutineRunner)
+            : this(inApi, inSession, inCoroutineRunner) // Curry this obsolete data to the new overload ->
         {
         }
 
@@ -51,9 +51,9 @@ namespace AccelByte.Api
         /// <param name="channelId">The id of the content's channel.</param>
         /// <param name="createRequest">Detail information for the content request.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
-        public void CreateContent( string channelId
+        public void CreateContent(string channelId
             , UGCRequest createRequest
-            , ResultCallback<UGCResponse> callback )
+            , ResultCallback<UGCResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -83,7 +83,7 @@ namespace AccelByte.Api
         /// <param name="contentType">
         /// The specific type of the content's created. default value is "application/octet-stream"
         /// </param>
-        public void CreateContent( string channelId
+        public void CreateContent(string channelId
             , string name
             , string type
             , string subtype
@@ -91,7 +91,7 @@ namespace AccelByte.Api
             , byte[] preview
             , string fileExtension
             , ResultCallback<UGCResponse> callback
-            , string contentType = "application/octet-stream" )
+            , string contentType = "application/octet-stream")
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -115,10 +115,10 @@ namespace AccelByte.Api
         /// <param name="callback">
         /// This will be called when the operation succeeded. The result is UGCResponse Model.
         /// </param>
-        public void ModifyContent( string channelId
+        public void ModifyContent(string channelId
             , string contentId
             , UGCRequest ModifyRequest
-            , ResultCallback<UGCResponse> callback )
+            , ResultCallback<UGCResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -145,7 +145,7 @@ namespace AccelByte.Api
         /// <param name="fileExtension">FileExtension of the content</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
         /// <param name="contentType">The specific type of the content's modified. Default value is "application/octet-stream"</param>
-        public void ModifyContent( string channelId
+        public void ModifyContent(string channelId
             , string contentId
             , string name
             , string type
@@ -154,7 +154,7 @@ namespace AccelByte.Api
             , byte[] preview
             , string fileExtension
             , ResultCallback<UGCResponse> callback
-            , string contentType = "application/octet-stream" )
+            , string contentType = "application/octet-stream")
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -166,16 +166,16 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.ModifyContent(
-                    session.UserId, 
+                    session.UserId,
                     channelId,
                     contentId,
-                    name, 
+                    name,
                     type,
                     subtype,
-                    tags, 
+                    tags,
                     preview,
                     fileExtension,
-                    callback, 
+                    callback,
                     contentType));
         }
 
@@ -185,9 +185,9 @@ namespace AccelByte.Api
         /// <param name="channelId">The id of the content's channel.</param>
         /// <param name="contentId">The id of the content that will be deleted.</param>
         /// <param name="callback">This will be called when the operation succeeded.</param>
-        public void DeleteContent( string channelId
+        public void DeleteContent(string channelId
             , string contentId
-            , ResultCallback callback )
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -206,8 +206,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="contentId">The id of the content that will be fetched.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCContentResponse Model.</param>
-        public void GetContentByContentId( string contentId
-            , ResultCallback<UGCContentResponse> callback )
+        public void GetContentByContentId(string contentId
+            , ResultCallback<UGCContentResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -226,8 +226,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="shareCode">The share code of the content that will be fetched.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCContentResponse Model.</param>
-        public void GetContentByShareCode( string shareCode
-            , ResultCallback<UGCContentResponse> callback )
+        public void GetContentByShareCode(string shareCode
+            , ResultCallback<UGCContentResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -246,8 +246,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="contentId">The id of the Preview's content that will be fetched.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCPreview Model.</param>
-        public void GetContentPreview( string contentId
-            , ResultCallback<UGCPreview> callback )
+        public void GetContentPreview(string contentId
+            , ResultCallback<UGCPreview> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -266,8 +266,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="contentId">The id of the Preview's content that will be fetched.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is byte array</param>
-        public void GetContentPreview( string contentId
-            , ResultCallback<byte[]> callback )
+        public void GetContentPreview(string contentId
+            , ResultCallback<byte[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -287,9 +287,9 @@ namespace AccelByte.Api
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCTagsPagingResponse Model.</param>
         /// <param name="offset">The offset of the tags results. Default value is 0.</param>
         /// <param name="limit">The limit of the tags results. Default value is 1000.</param>
-        public void GetTags( ResultCallback<UGCTagsPagingResponse> callback
+        public void GetTags(ResultCallback<UGCTagsPagingResponse> callback
             , int offset = 0
-            , int limit = 1000 )
+            , int limit = 1000)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -309,9 +309,9 @@ namespace AccelByte.Api
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCTypesPagingResponse Model.</param>
         /// <param name="offset">The offset of the types and/or subtypes paging data result. Default value is 0.</param>
         /// <param name="limit">The limit of the types and subtypes results. Default value is 1000.</param>
-        public void GetTypes( ResultCallback<UGCTypesPagingResponse> callback
+        public void GetTypes(ResultCallback<UGCTypesPagingResponse> callback
             , int offset = 0
-            , int limit = 1000 )
+            , int limit = 1000)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -330,8 +330,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="channelName">The name of the channel.</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCChannelResponse Model.</param>
-        public void CreateChannel( string channelName
-            , ResultCallback<UGCChannelResponse> callback )
+        public void CreateChannel(string channelName
+            , ResultCallback<UGCChannelResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -351,9 +351,9 @@ namespace AccelByte.Api
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCChannelsPagingResponse Model.</param>
         /// <param name="offset">The offset of the channel results. Default value is 0.</param>
         /// <param name="limit">The limit of the channel results. Default value is 1000.</param>
-        public void GetChannels( ResultCallback<UGCChannelPagingResponse> callback
+        public void GetChannels(ResultCallback<UGCChannelPagingResponse> callback
             , int offset = 0
-            , int limit = 1000 )
+            , int limit = 1000)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -372,8 +372,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="channelId">The id of the channel that will be deleted.</param>
         /// <param name="callback">This will be called when the operation succeeded.</param>
-        public void DeleteChannel( string channelId
-            , ResultCallback callback )
+        public void DeleteChannel(string channelId
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -491,7 +491,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.UpdateFollowStatus(session.UserId, followStatus, callback));
         }
-        
+
         /// <summary>
         /// Get Bulk ContentId.
         /// </summary>
@@ -511,7 +511,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetBulkContentId(contentId, callback));
         }
-        
+
         /// <summary>
         /// Get User Contents.
         /// </summary>
@@ -535,7 +535,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetUserContents(userId, callback, limit, offset));
         }
-        
+
         /// <summary>
         /// Get User Contents.
         /// </summary>
@@ -560,7 +560,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.UploadScreenshotContent(contentId, userId, screenshotsRequest, callback));
         }
-        
+
         /// <summary>
         /// Get Content Followed.
         /// </summary>
@@ -583,7 +583,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetContentFollowed(callback, limit, offset));
         }
-        
+
         /// <summary>
         /// Get Followed Creators.
         /// </summary>
@@ -606,7 +606,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetFollowedCreators(callback, limit, offset));
         }
-        
+
         /// <summary>
         /// Get List Following.
         /// </summary>
@@ -630,7 +630,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetListFollowing(userId, callback, limit, offset));
         }
-        
+
         /// <summary>
         /// Get Liked Contents.
         /// </summary>
@@ -651,7 +651,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetLikedContents(getLikedContentRequest, callback));
         }
-        
+
         /// <summary>
         /// Get Creator Stats.
         /// </summary>
@@ -671,7 +671,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.GetCreatorStats(userId, callback));
         }
-        
+
         /// <summary>
         /// Get User Groups.
         /// </summary>
@@ -694,6 +694,28 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserGroups(userId, callback, limit, offset));
+        }
+
+        /// <summary>
+        /// Update channel.
+        /// </summary>
+        /// <param name="channelId">The channelId value.</param>
+        /// <param name="name">The new channel's name value.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateChannel(string channelId
+            , string name
+            , ResultCallback<UGCChannelResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateChannel(session.UserId, channelId, name, callback));
         }
     }
 }

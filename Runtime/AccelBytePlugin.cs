@@ -59,6 +59,8 @@ namespace AccelByte.Api
         private static Miscellaneous miscellaneous;
         private static Reward reward;
         private static SessionBrowser sessionBrowser;
+        private static Session _session;
+        private static MatchmakingV2 _matchmakingV2;
         private static TurnManager turnManager;
         #endregion /Modules with ApiBase
 
@@ -505,6 +507,66 @@ namespace AccelByte.Api
             }
 
             return lobby;
+        }
+        
+        public static Session GetSession()
+        {
+            if (_session == null)
+            {
+                CheckPlugin();
+                ISession session = GetUser().Session;
+                _session = new Session(
+                    new SessionApi(
+                        httpClient, 
+                        Config, // baseUrl==SessionServerUrl
+                        session),
+                    session,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    _session = null;
+                    _session = new Session(
+                        new SessionApi(
+                            httpClient,
+                            Config, // baseUrl==SessionServerUrl
+                            session),
+                        session,
+                        coroutineRunner);
+                };
+            }
+
+            return _session;
+        }
+        
+        public static MatchmakingV2 GetMatchmaking()
+        {
+            if (_matchmakingV2 == null)
+            {
+                CheckPlugin();
+                ISession session = GetUser().Session;
+                _matchmakingV2 = new MatchmakingV2(
+                    new MatchmakingV2Api(
+                        httpClient, 
+                        Config, // baseUrl==MatchmakingV2ServerUrl
+                        session),
+                    session,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    _matchmakingV2 = null;
+                    _matchmakingV2 = new MatchmakingV2(
+                        new MatchmakingV2Api(
+                            httpClient,
+                            Config, // baseUrl==MatchmakingV2ServerUrl
+                            session),
+                        session,
+                        coroutineRunner);
+                };
+            }
+
+            return _matchmakingV2;
         }
 
         public static CloudStorage GetCloudStorage()

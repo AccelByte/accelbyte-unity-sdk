@@ -206,5 +206,31 @@ namespace AccelByte.Server
             var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
             callback.Try(result);
         }
+
+        public IEnumerator BulkGetUserSessionProgression(string[] userIds
+            , ResultCallback<UserSeasonInfo[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
+            Assert.IsNotNull(userIds, "Can't check user progression! UserIds parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/seasons/current/users/bulk/progression")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(new { userIds = userIds }.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserSeasonInfo[]>();
+            callback.Try(result);
+        }
     }
 }

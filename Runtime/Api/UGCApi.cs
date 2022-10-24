@@ -849,5 +849,36 @@ namespace AccelByte.Api
             var result = response.TryParseJson<UGCGetUserGroupsPagingResponse>();
             callback.Try(result);
         }
+
+        public IEnumerator UpdateChannel(string userId
+            , string channelId
+            , string name 
+            , ResultCallback<UGCChannelResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't UpdateChannel! userId parameter is null!");
+            Assert.IsNotNull(channelId, "Can't UpdateChannel! channelId parameter is null!");
+            Assert.IsNotNull(name, "Can't UpdateChannel! name parameter is null!");
+
+            var request = HttpRequestBuilder
+                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("userId", userId)
+                 .WithPathParam("channelId", channelId)
+                 .WithBody(new { name = name }.ToUtf8Json())
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCChannelResponse>();
+            callback.Try(result);
+        }
     }
 }

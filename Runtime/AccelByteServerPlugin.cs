@@ -26,6 +26,7 @@ namespace AccelByte.Server
         private static IHttpClient httpClient;
         private static TokenData accessToken;
         private static DedicatedServer server;
+        private static ServerDSHub dsHub;
         private static DedicatedServerManager dedicatedServerManager;
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
@@ -33,8 +34,10 @@ namespace AccelByte.Server
         private static ServerGameTelemetry gameTelemetry;
         private static ServerAchievement achievement;
         private static ServerLobby lobby;
+        private static ServerSession _session;
         private static ServerCloudSave cloudSave;
         private static ServerMatchmaking matchmaking;
+        private static ServerMatchmakingV2 _matchmakingV2;
         private static ServerUserAccount userAccount;
         private static ServerSeasonPass seasonPass;
 
@@ -71,6 +74,7 @@ namespace AccelByte.Server
                 hasBeenInitialized = false;
                 accessToken = null;
                 server = null;
+                dsHub = null;
                 dedicatedServerManager = null;
                 ecommerce = null;
                 statistic = null;
@@ -198,6 +202,37 @@ namespace AccelByte.Server
             return server;
         }
 
+        public static ServerDSHub GetDsHub()
+        {
+            if (dsHub != null)
+            {
+                return dsHub;
+            }
+            
+            CheckPlugin();
+            dsHub = new ServerDSHub(
+                new ServerDSHubApi(
+                    httpClient, 
+                    Config, // baseUrl==DSHubServerUrl 
+                    session), 
+                session,
+                coroutineRunner);
+
+            configReset += () =>
+            {
+                dsHub = null;
+                dsHub = new ServerDSHub(
+                    new ServerDSHubApi(
+                        httpClient,
+                        Config, // baseUrl==DSHubServerUrl 
+                        session),
+                    session,
+                    coroutineRunner);
+            };
+
+            return dsHub;
+        }
+        
         public static DedicatedServerManager GetDedicatedServerManager()
         {
             if (dedicatedServerManager != null)
@@ -396,6 +431,34 @@ namespace AccelByte.Server
 
             return lobby;
         }
+        
+        public static ServerSession GetSession()
+        {
+            if (_session != null) return _session;
+            
+            CheckPlugin();
+            _session = new ServerSession(
+                new ServerSessionApi(
+                    httpClient, 
+                    Config, // baseUrl==SessionServerUrl
+                    session), 
+                session,
+                coroutineRunner);
+
+            configReset += () =>
+            {
+                _session = null;
+                _session = new ServerSession(
+                    new ServerSessionApi(
+                        httpClient,
+                        Config, // baseUrl==SessionServerUrl
+                        session),
+                    session,
+                    coroutineRunner);
+            };
+
+            return _session;
+        }
 
         public static ServerCloudSave GetCloudSave()
         {
@@ -453,6 +516,37 @@ namespace AccelByte.Server
                 session,
                 config.Namespace,
                 coroutineRunner));
+        }
+        
+        public static ServerMatchmakingV2 GetMatchmakingV2()
+        {
+            if (_matchmakingV2 != null)
+            {
+                return _matchmakingV2;
+            }
+            
+            CheckPlugin();
+            _matchmakingV2 = new ServerMatchmakingV2(
+                new ServerMatchmakingV2Api(
+                    httpClient, 
+                    Config, // baseUrl==MatchmakingV2ServerUrl 
+                    session), 
+                session,
+                coroutineRunner);
+
+            configReset += () =>
+            {
+                _matchmakingV2 = null;
+                _matchmakingV2 = new ServerMatchmakingV2(
+                    new ServerMatchmakingV2Api(
+                        httpClient,
+                        Config, // baseUrl==MatchmakingV2ServerUrl 
+                        session),
+                    session,
+                    coroutineRunner);
+            };
+
+            return _matchmakingV2;
         }
 
         public static ServerUserAccount GetUserAccount()

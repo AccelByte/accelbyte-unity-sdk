@@ -185,5 +185,28 @@ namespace AccelByte.Server
                 api.GetCurrentUserSeasonProgression(userId, callback));
         }
 
+
+        /// <summary>
+        /// Bulk get current user session progression.
+        /// </summary>
+        /// <param name="userId">The User IDs to get user session progression.</param>
+        /// <param name="callback">Returns a Result that contains UserSeasonInfo via callback when completed.</param>
+        public void BulkGetUserSessionProgression(string[] userIds
+            , ResultCallback<UserSeasonInfo[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(userIds, "Can't check user progression; UserIds parameter is null!");
+            Assert.IsTrue(userIds.Length > 0, " Given validation, you need to at least specify one element on the list");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetUserSessionProgression(userIds, callback));
+        }
+
     }
 }
