@@ -447,6 +447,7 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, string> platformUserIds { get; set; } 
         [DataMember] public string userId { get; set; }
         [DataMember] public string publisherAvatarUrl { get; set; }
+        [DataMember] public string username { get; set; }
     }
 
     [DataContract]

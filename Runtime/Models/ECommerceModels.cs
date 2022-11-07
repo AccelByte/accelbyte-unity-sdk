@@ -51,7 +51,9 @@ namespace AccelByte.Models
         APP,
         ENTITLEMENT,
         CODE,
-        MEDIA
+        MEDIA,
+        SUBSCRIPTION,
+        OPTIONBOX
     }
 
     [JsonConverter( typeof( StringEnumConverter ) )]

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.5.0%0D15.4.0) (2022-11-07)
+
+
+### Features
+
+* fixed subscription test that always fail ([499244f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/499244f9f4b78e24cd01e18e4cb7888a602e5c62))
+* OPTIONBOX on EAccelByteEntitlementClass ([4b3c67a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4b3c67a883811f7367a41bf6e8fc9d43ed8768a5))
+* username field in the BaseUserInfo function ([9cf8eb5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9cf8eb5ccfb7c34a9d61b08a3e41fe90b75565ad))
+
 ## [15.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.4.0%0D15.3.0) (2022-10-24)
 
 

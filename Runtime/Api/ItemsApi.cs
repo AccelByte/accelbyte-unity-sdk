@@ -71,8 +71,8 @@ namespace AccelByte.Api
         public IEnumerator GetItemByAppId( string publisherNamespace
             , string appId
             , ResultCallback<ItemInfo> callback
-            , string language = null
-            , string region = null )
+            , string language
+            , string region )
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(publisherNamespace, "Can't get items by appId! publisherNamespace parameter is null!");
