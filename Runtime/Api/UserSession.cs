@@ -5,6 +5,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -20,6 +22,7 @@ namespace AccelByte.Api
     /// </summary>
     public class UserSession : ISession
     {
+        public static readonly string TokenPath = Path.Combine(Application.persistentDataPath, "TokenData");
         public const string RefreshTokenKey = "accelbyte_refresh_token";
         public const string AuthTrustIdKey = "auth_trust_id";
         public readonly bool usePlayerPrefs;
@@ -51,10 +54,14 @@ namespace AccelByte.Api
         }
 
         public string refreshToken => tokenData.refresh_token;
+        
+        public int refreshExpiresIn => tokenData.refresh_expires_in;
 
         public string UserId => tokenData?.user_id;
 
         public bool IsComply => tokenData?.is_comply ?? false;
+        
+        public RefreshTokenData localTokenData;
 
         public void ForceSetTokenData(TokenData inTokenData)
         {
@@ -79,20 +86,13 @@ namespace AccelByte.Api
 
         private IEnumerator BearerAuthRejectRefreshToken( Action<string> callback )
         {
-            if (AccelBytePlugin.GetUser().TwoFAEnable)
-            {
-                Result<TokenData, OAuthError> refreshResult = null;
+            Result<TokenData, OAuthError> refreshResult = null;
+            yield return RefreshSession(result => {
+                refreshResult = result;
+            });
 
-                yield return RefreshSession(result => refreshResult = result);
-            }
-            else
-            {
-                Result<TokenData, OAuthError> refreshResult = null;
+            callback?.Invoke(refreshResult.IsError ? null : refreshResult.Value.access_token);
 
-                yield return RefreshSession(result => refreshResult = result);
-            }
-
-            callback?.Invoke(tokenData.access_token);
             if (bearerAuthRejectedCoroutine != null)
             {
                 coroutineRunner.Stop(bearerAuthRejectedCoroutine);
@@ -137,11 +137,28 @@ namespace AccelByte.Api
 
         public void LoadRefreshToken()
         {
-            var deviceProvider = DeviceProvider.GetFromSystemInfo();
-            var refreshToken = PlayerPrefs.GetString(RefreshTokenKey);
-            refreshToken = Convert.FromBase64String(refreshToken).ToObject<string>();
-            refreshToken = XorString(deviceProvider.DeviceId, refreshToken);
-            tokenData = new TokenData { refresh_token = refreshToken };
+            if (File.Exists(UserSession.TokenPath))
+            {
+                FileStream dataStream = new FileStream(UserSession.TokenPath, FileMode.Open);
+                if (dataStream.Length == 0)
+                {
+                    AccelByteDebug.LogError($"[RefreshToken] Could not deserialize empty Refresh Token");
+                    return;
+                }
+                BinaryFormatter formatter = new BinaryFormatter();
+                localTokenData = formatter.Deserialize(dataStream) as RefreshTokenData;
+                dataStream.Close();
+                
+                DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+                string refreshToken = localTokenData?.refresh_token;
+                refreshToken = Convert.FromBase64String(refreshToken).ToObject<string>();
+                refreshToken = UserSession.XorString(deviceProvider.DeviceId, refreshToken);
+                tokenData = new TokenData { refresh_token = refreshToken };
+            }
+            else
+            {
+                AccelByteDebug.LogError($"[RefreshToken] Could not find Refresh Token in specified path: {UserSession.TokenPath}");
+            }
         }
 
         private void SaveRefreshToken()
@@ -149,8 +166,20 @@ namespace AccelByte.Api
             DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
             string token = XorString(deviceProvider.DeviceId, tokenData.refresh_token);
             token = Convert.ToBase64String(token.ToUtf8Json());
-            PlayerPrefs.SetString(RefreshTokenKey, token);
-            PlayerPrefs.Save();
+            
+            int epochTimeNow = (int) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            int expirationDate = refreshExpiresIn + epochTimeNow;
+
+            localTokenData = new RefreshTokenData
+            {
+                refresh_token = token,
+                expiration_date = expirationDate,
+            };
+
+            FileStream fileStream = new FileStream(UserSession.TokenPath, FileMode.Create);
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(fileStream, localTokenData);
+            fileStream.Close();
         }
 
         private static string XorString
@@ -178,11 +207,7 @@ namespace AccelByte.Api
                     { "namespace", tokenData.Namespace }, { "userId", tokenData.user_id }
                 });
             httpClient.ClearCookies();
-
-            if (usePlayerPrefs)
-            {
-                SaveRefreshToken();
-            }
+            SaveRefreshToken();
 
             RefreshTokenCallback?.Invoke(tokenData.refresh_token);
             if (maintainAccessTokenCoroutine == null)
@@ -205,8 +230,14 @@ namespace AccelByte.Api
             }
 
             tokenData = null;
+            localTokenData = null;
             httpClient.SetImplicitBearerAuth(null);
             httpClient.ClearImplicitPathParams();
+
+            if (File.Exists(UserSession.TokenPath))
+            {
+                File.Delete(UserSession.TokenPath);
+            }
 
             if (!usePlayerPrefs) return;
 

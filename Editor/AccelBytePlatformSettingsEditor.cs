@@ -23,7 +23,7 @@ namespace AccelByte.Api
         public string TemporarySDKVersion;
         public List<string> platformList;
         public Rect LogoRect;
-        public LogType SelectedLogFilter;
+        public AccelByte.Core.AccelByteLogType SelectedLogFilter;
 
         [MenuItem("AccelByte/Edit Settings")]
         public static void Edit()
@@ -63,7 +63,7 @@ namespace AccelByte.Api
             LogoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
             if( !Enum.TryParse( this.TemporarySetting.DebugLogFilter, out SelectedLogFilter ) )
             {
-                SelectedLogFilter = LogType.Log;
+                SelectedLogFilter = AccelByte.Core.AccelByteLogType.Verbose;
             }
         }
 
@@ -168,7 +168,7 @@ namespace AccelByte.Api
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField( "Log Type Filter" );
-            SelectedLogFilter = (LogType) EditorGUILayout.EnumPopup( SelectedLogFilter );
+            SelectedLogFilter = (AccelByte.Core.AccelByteLogType) EditorGUILayout.EnumPopup( SelectedLogFilter );
             TemporarySetting.DebugLogFilter = SelectedLogFilter.ToString();
             EditorGUILayout.EndHorizontal();
 

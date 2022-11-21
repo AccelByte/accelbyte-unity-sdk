@@ -173,5 +173,25 @@ namespace AccelByte.Server
 
             callback.Try(result);
         }
+        
+        public IEnumerator GetStoreList(ResultCallback<PlatformStore[]> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/admin/namespaces/{namespace}/stores")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+            
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PlatformStore[]>();
+            callback.Try(result);
+        }
     }
 }

@@ -1451,7 +1451,7 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.Log("[WS] Connection open");
+            AccelByteDebug.LogVerbose("[WS] Connection open");
 #endif
             Action handler = Connected;
 
@@ -1483,7 +1483,7 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.Log("[WS] Connection close: " + closecode);
+            AccelByteDebug.LogVerbose("[WS] Connection close: " + closecode);
 #endif
             var code = (WsCloseCode)closecode;
 

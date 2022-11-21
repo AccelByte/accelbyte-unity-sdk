@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using AccelByte.Models;
 using AccelByte.Server;
@@ -19,7 +20,7 @@ namespace AccelByte.Core
         public ServerOauthLoginSession session;
         public IHttpClient httpClient;
         public readonly CoroutineRunner coroutineRunner;
-
+        
         public ServerApiClient( ServerOauthLoginSession inSession
             , IHttpClient inHttpClient
             , CoroutineRunner inCoroutinerunner )
@@ -39,6 +40,8 @@ namespace AccelByte.Core
             serverConfig, 
             session,
         };
+
+        private Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
         
         // Reflection cannot find `internal` scope modifiers without these bindings.
         private const BindingFlags reflectionBindingToFindInternal =
@@ -76,6 +79,13 @@ namespace AccelByte.Core
             // Expected TApi constructor params: (IHttpClient, ServerConfig, ISession)
             // Expected TWrapper constructor params: (TServerApi, ISession, CoroutineRunner)
             // ####################################################################
+            
+            string currentWrapperName = typeof(TServerWrapper).GetTypeInfo().FullName;
+
+            if (wrapperBaseCollection.ContainsKey(currentWrapperName))
+            {
+                return (TServerWrapper)wrapperBaseCollection[currentWrapperName];
+            }
 
             object[] apiArgs = getApiArgs();
             
@@ -101,11 +111,14 @@ namespace AccelByte.Core
                 binder: null,
                 args: wrapperArgs,
                 culture: null);
+
+            TServerWrapper ServerWrapperInstance = (TServerWrapper)newWrapperInstance;
             
-            return (TServerWrapper)newWrapperInstance;
+            wrapperBaseCollection.Add(currentWrapperName, ServerWrapperInstance);
+            return ServerWrapperInstance;
         }
 
-#region API_GETTER
+        #region API_GETTER
         public DedicatedServerManager GetDedicatedServerManager() { return GetServerApi<DedicatedServerManager, DedicatedServerManagerApi>(); }
         public ServerEcommerce GetEcommerce() { return GetServerApi<ServerEcommerce, ServerEcommerceApi>(); }
         public ServerStatistic GetStatistic() { return GetServerApi<ServerStatistic, ServerStatisticApi>(); }
@@ -117,6 +130,11 @@ namespace AccelByte.Core
         public ServerMatchmaking GetMatchmaking() { return GetServerApi<ServerMatchmaking, ServerMatchmakingApi>(); }
         public ServerUserAccount GetUserAccount() { return GetServerApi<ServerUserAccount, ServerUserAccountApi>(); }
         public ServerSeasonPass GetSeasonPass() { return GetServerApi<ServerSeasonPass, ServerSeasonPassApi>(); }
+        public ServerDSHub GetDsHub() { return GetServerApi<ServerDSHub, ServerDSHubApi>(); }
+        public ServerSession GetSession() { return GetServerApi<ServerSession, ServerSessionApi>(); }
+        public ServerMatchmakingV2 GetMatchmakingV2() { return GetServerApi<ServerMatchmakingV2, ServerMatchmakingV2Api>(); }
+
+        
 #endregion
 
         internal void environmentChanged()

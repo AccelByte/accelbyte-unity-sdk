@@ -169,5 +169,24 @@ namespace AccelByte.Server
                     fulfillmentRequest,
                     callback));
         }
+        
+        /// <summary>
+        /// Get List All Store.
+        /// </summary>
+        /// <param name="callback">Returns Store info via callback when completed.</param>
+        public void GetStoreList( 
+            ResultCallback<PlatformStore[]> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetStoreList(callback));
+        }
     }
 }

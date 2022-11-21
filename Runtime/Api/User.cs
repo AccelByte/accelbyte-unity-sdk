@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 using System.Text.RegularExpressions;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -533,16 +534,20 @@ namespace AccelByte.Api
                 userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
                 yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
             }
-            else if (userSession.usePlayerPrefs)
+            else if (File.Exists(UserSession.TokenPath))
             {
-                if (PlayerPrefs.HasKey(UserSession.RefreshTokenKey))
+                if (userSession.localTokenData == null)
                 {
                     userSession.LoadRefreshToken();
-                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                }
+
+                if (userSession.localTokenData == null)
+                {
+                    callback.TryError(ErrorCode.InvalidRequest, "Refresh token not found!");
                 }
                 else
                 {
-                    callback.TryError(ErrorCode.InvalidRequest, "Refresh token not found!");
+                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
                 }
             }
             else
@@ -559,14 +564,14 @@ namespace AccelByte.Api
                 userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
                 yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
             }
-            else if (userSession.usePlayerPrefs)
+            else if (File.Exists(UserSession.TokenPath))
             {
-                if (PlayerPrefs.HasKey(UserSession.RefreshTokenKey))
+                if (userSession.localTokenData == null)
                 {
                     userSession.LoadRefreshToken();
-                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
                 }
-                else
+
+                if (userSession.localTokenData == null)
                 {
                     OAuthError error = new OAuthError()
                     {
@@ -574,6 +579,10 @@ namespace AccelByte.Api
                         error_description = "Refresh token not found!"
                     };
                     callback.TryError(error);
+                }
+                else
+                {
+                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
                 }
             }
             else

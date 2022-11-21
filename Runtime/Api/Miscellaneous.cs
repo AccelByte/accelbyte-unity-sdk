@@ -14,6 +14,10 @@ namespace AccelByte.Api
         private readonly MiscellaneousApi api;
         private readonly CoroutineRunner coroutineRunner;
 
+        static private System.DateTime LastServerTime;
+        static private System.TimeSpan ServerTimestamp;
+
+
         internal Miscellaneous( MiscellaneousApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -23,6 +27,8 @@ namespace AccelByte.Api
 
             api = inApi;
             coroutineRunner = inCoroutineRunner;
+            LastServerTime = System.DateTime.MinValue;
+            ServerTimestamp = System.TimeSpan.MinValue;
         }
 
         /// <summary>
@@ -33,8 +39,38 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            coroutineRunner.Run(api.GetCurrentTime(callback));
+            coroutineRunner.Run(api.GetCurrentTime(
+                (Result<Time> result) => 
+                {
+                    ServerTimestamp = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartupAsDouble);
+                    LastServerTime = result.Value.currentTime;
+                    callback.Try(result);
+                }));
         }
+
+        /// <summary>
+        /// Get server current time back calculated from the last cached query
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains Time via callback when completed.</param>
+        public void GetBackCalculatedServerTime(ResultCallback<Time> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if(ServerTimestamp == System.TimeSpan.MinValue)
+            {
+                GetCurrentTime(callback);
+            }
+            else
+            {
+                System.TimeSpan LocalTimeSpan = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartupAsDouble);
+                System.TimeSpan ServerTimeSpan = LocalTimeSpan - ServerTimestamp;
+                Time Value =  new();
+                Value.currentTime = LastServerTime + ServerTimeSpan;
+                Result<Time> result = Result<Time>.CreateOk(Value);
+                callback.Try(result);
+            }
+        }
+
         /// <summary>
         /// Get all valid country codes for User Registration
         /// </summary>

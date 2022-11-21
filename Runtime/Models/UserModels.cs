@@ -52,6 +52,7 @@ namespace AccelByte.Models
         [DataMember] public string access_token { get; set; }
         [DataMember] public string auth_trust_id { get; set; }
         [DataMember] public string refresh_token { get; set; }
+        [DataMember] public int refresh_expires_in { get; set; }
         [DataMember] public int expires_in { get; set; }
         [DataMember] public string token_type { get; set; }
         [DataMember] public string user_id { get; set; }
@@ -66,6 +67,13 @@ namespace AccelByte.Models
         [DataMember] public string session_id { get; set; }
         [DataMember] public int expires_in { get; set; }
         [DataMember] public string refresh_id { get; set; }
+    }
+
+    [DataContract, Serializable]
+    public class RefreshTokenData
+    {
+        [DataMember] public string refresh_token { get; set; }
+        [DataMember] public int expiration_date { get; set; }
     }
 
     [DataContract]

@@ -113,9 +113,11 @@ namespace AccelByte.Server
                     _serverDSHubWebsocketApi.HandleNotification(backfillProposalNotification.payload,
                         MatchmakingV2BackfillProposalReceived);
                     break;
+                case DsHubNotificationTopic.EMPTY:
+                    break;
                 default:
-                    Debug.LogError(
-                        $"Error {ErrorCode.ErrorFromException}: Server DS Hub notification topic not supported: {notification.topic}");
+                    AccelByteDebug.Log(
+                        $"Server DS Hub notification topic not supported: {notification.topic}");
                     break;
             }
         }

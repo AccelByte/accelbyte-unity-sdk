@@ -22,7 +22,7 @@ namespace AccelByte.Core
             catch (System.Exception){}
 #endif
 
-            AccelByteDebug.Log("Current Function Called: \n" +
+            AccelByteDebug.LogVerbose("Current Function Called: \n" +
                 "---\n" + 
                 "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
                 "Class : " + className + "\n" +
@@ -53,23 +53,31 @@ namespace AccelByte.Core
                 requestBody +
                 "\n---\n";
 
-            AccelByteDebug.Log(tempLog);
+            AccelByteDebug.LogVerbose(tempLog);
         }
 
         public static void GetHttpResponse(UnityWebRequest unityWebRequest)
         {
-            AccelByteDebug.Log("HTTP Response: \n" +
+            var responseLog = "HTTP Response: \n" +
                 "---\n" +
                 "HTTP/1.1 " + unityWebRequest.responseCode + "\n" +
                 "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
                 "Content-Length : " + unityWebRequest.downloadedBytes + "\n\n" +
                 unityWebRequest.downloadHandler.text +
-                "\n---\n");
+                "\n---\n";
+            if(unityWebRequest.responseCode >= 200 && unityWebRequest.responseCode < 300)
+            {
+                AccelByteDebug.LogVerbose(responseLog);
+            }
+            else
+            {
+                AccelByteDebug.LogWarning(responseLog);
+            }
         }
 
         public static void GetWebSocketRequest(string message)
         {
-            AccelByteDebug.Log("WebSocket Send Message: \n" +
+            AccelByteDebug.LogVerbose("WebSocket Send Message: \n" +
                 "---\n" +
                 message +
                 "\n---\n");
@@ -77,7 +85,7 @@ namespace AccelByte.Core
 
         public static void GetWebSocketResponse(string message)
         {
-            AccelByteDebug.Log("WebSocket Receive Message: \n" +
+            AccelByteDebug.LogVerbose("WebSocket Receive Message: \n" +
                 "---\n" +
                 message +
                 "\n---\n");
@@ -85,7 +93,7 @@ namespace AccelByte.Core
 
         public static void GetWebSocketNotification(string message)
         {
-            AccelByteDebug.Log("WebSocket Receive Notification: \n" +
+            AccelByteDebug.LogVerbose("WebSocket Receive Notification: \n" +
                 "---\n" +
                 message +
                 "\n---\n");
@@ -93,7 +101,7 @@ namespace AccelByte.Core
         
         public static void GetServerWebSocketResponse(string message)
         {
-            AccelByteDebug.Log("[Server] WebSocket Receive Message: \n" +
+            AccelByteDebug.LogVerbose("[Server] WebSocket Receive Message: \n" +
                                "---\n" +
                                message +
                                "\n---\n");
@@ -101,7 +109,7 @@ namespace AccelByte.Core
         
         public static void GetServerWebSocketNotification(string message)
         {
-            AccelByteDebug.Log("[Server] WebSocket Receive Notification: \n" +
+            AccelByteDebug.LogVerbose("[Server] WebSocket Receive Notification: \n" +
                                "---\n" +
                                message +
                                "\n---\n");
@@ -109,7 +117,7 @@ namespace AccelByte.Core
         
         public static void GetProtobufNotification(string message)
         {
-            AccelByteDebug.Log("WebSocket Receive Protobuf Notification: \n" +
+            AccelByteDebug.LogVerbose("WebSocket Receive Protobuf Notification: \n" +
                                "---\n" +
                                message +
                                "\n---\n");

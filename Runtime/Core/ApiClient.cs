@@ -170,6 +170,8 @@ namespace AccelByte.Core
         public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
         public TurnManager GetTurnManager() { return GetApi<TurnManager, TurnManagerApi>(); }
         public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, MiscellaneousApi>(); }
+        public Session GetSession() { return GetApi<Session, SessionApi>(); }
+        public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
 #endregion
 
 

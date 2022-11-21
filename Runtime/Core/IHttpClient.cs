@@ -159,7 +159,8 @@ namespace AccelByte.Core {
                 }
                 else
                 {
-                    callback.Try(rsp.TryParseJson<R>());
+                    var result = rsp.TryParseJson<R>();
+                    callback.Try(result);
                 }
             };
         }

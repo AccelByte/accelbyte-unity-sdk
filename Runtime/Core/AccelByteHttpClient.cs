@@ -74,14 +74,26 @@ namespace AccelByte.Core
 
         public void OnBearerAuthRejected(Action<string> callback)
         {
-            if (!IsBearerAuthRequestPaused())
+            PauseBearerAuthRequest();
+            if (!IsRequestingNewAccessToken())
             {
-                BearerAuthRejected?.Invoke(accessToken, result => 
+                if (BearerAuthRejected == null)
                 {
-                    callback?.Invoke(result);
-                    ResumeBearerAuthRequest();
-                });
-                PauseBearerAuthRequest();
+                    callback?.Invoke(null);
+                }
+                else
+                {
+                    SetRequestingNewAccessToken(true);
+                    BearerAuthRejected.Invoke(accessToken, result =>
+                    {
+                        SetRequestingNewAccessToken(false);
+                        if (result != null)
+                        {
+                            ResumeBearerAuthRequest();
+                        }
+                        callback?.Invoke(result);
+                    });
+                }
             }
         }
 
@@ -133,13 +145,25 @@ namespace AccelByte.Core
                 {
                     if (IsBearerAuthRequestPaused())
                     {
-                        continue;
+                        OnBearerAuthRejected(result => { });
+                        yield return new WaitWhile(() => 
+                        { 
+                            return IsBearerAuthRequestPaused() && IsRequestingNewAccessToken(); 
+                        });
+
+                        if (IsBearerAuthRequestPaused())
+                        {
+                            AccelByteDebug.LogWarning("Failed retrieving new access token, resuming");
+                        }
                     }
 
                     state = RequestState.Resumed;
                     stopwatch.Restart();
-                    request.Headers.Remove("Authorization");
-                    ApplyImplicitAuthorization(request);
+                    if(IsBearerAuthRequestPaused())
+                    {
+                        request.Headers.Remove("Authorization");
+                        ApplyImplicitAuthorization(request);
+                    }
                 }
 
                 int timeoutMs = (int)(this.totalTimeoutMs - stopwatch.ElapsedMilliseconds);
@@ -181,8 +205,18 @@ namespace AccelByte.Core
                     else
                     {
                         state = RequestState.Paused;
-                        OnBearerAuthRejected(result => {});
-                        yield return new WaitWhile(IsBearerAuthRequestPaused);
+                        OnBearerAuthRejected(result => { });
+                        yield return new WaitWhile(() => 
+                        { 
+                            return IsBearerAuthRequestPaused() && IsRequestingNewAccessToken();
+                        });
+                        if (IsBearerAuthRequestPaused())
+                        {
+                            state = RequestState.Stoped;
+                            callback?.Invoke(httpResponse, error);
+                            AccelByteDebug.LogWarning("Failed retrieving new access token");
+                            yield break;
+                        }
                     }
                     break;
 
@@ -253,9 +287,26 @@ namespace AccelByte.Core
                 break;
             }
         }
-        private bool IsBearerAuthRequestPaused() { return isBanDetected; }
-        private void PauseBearerAuthRequest() { isBanDetected = true; }
-        private void ResumeBearerAuthRequest() { isBanDetected = false; }
+        private bool IsBearerAuthRequestPaused() 
+        { 
+            return isBanDetected;
+        }
+        private void PauseBearerAuthRequest()
+        {
+            isBanDetected = true;
+        }
+        private void ResumeBearerAuthRequest()
+        {
+            isBanDetected = false;
+        }
+        private bool IsRequestingNewAccessToken()
+        {
+            return isRequestingNewAccessToken;
+        }
+        private void SetRequestingNewAccessToken(bool isRequesting) 
+        { 
+            isRequestingNewAccessToken = isRequesting; 
+        }
 
         private readonly IHttpRequestSender sender;
         private uint totalTimeoutMs;
@@ -268,5 +319,6 @@ namespace AccelByte.Core
         private Uri baseUri;
 
         private bool isBanDetected;
+        private bool isRequestingNewAccessToken;
     }
 }

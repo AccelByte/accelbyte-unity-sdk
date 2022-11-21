@@ -11,6 +11,7 @@ namespace AccelByte.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DsHubNotificationTopic
     {
+        EMPTY,
         serverClaimed,
         BACKFILL_PROPOSAL,
     }

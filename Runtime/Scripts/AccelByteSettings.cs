@@ -258,7 +258,7 @@ namespace AccelByte.Api
 #endif
                     }
 
-                    Debug.Log("AccelByteSettings loaded");
+                    AccelByteDebug.Log("AccelByteSettings loaded");
                     AccelByteSettings.instance.Load();
                 }
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -38,7 +39,10 @@ namespace AccelByte.Models
         LEFT,
         DROPPED,
         REJECTED,
-        KICKED
+        KICKED,
+        TIMEOUT,
+        DISCONNECTED,
+        TERMINATED
     };
     
     [JsonConverter(typeof(StringEnumConverter))]
@@ -309,9 +313,30 @@ namespace AccelByte.Models
     [DataContract]
     public class SessionV2DsInformation
     {
-        [DataMember] public DateTime? requestedAt;
         [DataMember] public SessionV2GameServer server;
         [DataMember] public SessionV2DsStatus status;
+        
+        [DataMember( EmitDefaultValue = false, Name = "requestedAt" )]
+        [CanBeNull]
+        private string RequestedAt
+        {
+            get => requestedAt?.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", DateTimeFormatInfo.InvariantInfo);
+            set
+            {
+                if (DateTime.TryParseExact(value, "yyyy-MM-ddTHH:mm:ss.fffK", DateTimeFormatInfo.InvariantInfo,
+                        DateTimeStyles.None,
+                        out var requestedAtResult))
+                {
+                    requestedAt = requestedAtResult;
+                }
+                else
+                {
+                    requestedAt = null;
+                }
+            }
+        }
+
+        public DateTime? requestedAt { get; set; }
     }
 
     [DataContract]

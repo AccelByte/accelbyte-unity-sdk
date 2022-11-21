@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.6.0%0D15.5.0) (2022-11-21)
+
+
+### Features
+
+* add new item type ecommerce lootbox ([52e0d61](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52e0d615f2ffc9cac546ffefe7368a4380a6638a))
+* **DSM:** add public getter for server name ([73d92cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73d92cb181211929b741cb41b975157b4f6d2a55))
+* expose get store list for ds ([ff5ab53](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ff5ab531f9a667fbbf0911d41e700bc19338fb4e))
+* **misc:** add get back calculated server time ([aec6579](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aec6579c32160325efce5bdf17df6828039b1a32))
+* **refresh token:** change refresh token playerprefs save method with binary file save ([e441db6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e441db6c294880934f68cc62c2d1660977ab2998))
+* **serverApiClient:** cache instantiated wrapper ([36255e4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/36255e4b79c4b856a169a9fdaef3a7ec420b0ead))
+* **session:** add Disconnected and terminated member status enum ([8932068](https://github.com/AccelByte/accelbyte-unity-sdk/commits/89320688e22c695710594fbef69cd0ce1ae1583b))
+
+
+### Bug Fixes
+
+* add empty DsHubNotificationTopic enum ([1437730](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1437730a304ad5d05f93f9bc7bed50dbe81d609e))
+* cache server name when register local server ([e85ece2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e85ece2dd1136d2a62af717ae9b350530ac3ce4e))
+* fix bearer unathorized loop stuck ([d3ab66a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d3ab66a5f18ce4161429c22926e5ea13ddd0d460))
+* update access token failed authentication flow ([a7f0256](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a7f0256e68bb781e723b987780f16ac591b973a6))
+* Update SessionV2DsInformation and SessionV2MemberStatus ([7e50e1e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7e50e1e8dfd929d8515187646944e6f7ea811463))
+
+
+### Tests
+
+* add severity, time, and stacktraces to logger ([5029393](https://github.com/AccelByte/accelbyte-unity-sdk/commits/50293939b275d36dd632e9ccf3944cfe36977f77))
+
 ## [15.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.5.0%0D15.4.0) (2022-11-07)
 
 

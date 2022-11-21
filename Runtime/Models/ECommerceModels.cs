@@ -25,7 +25,8 @@ namespace AccelByte.Models
         SUBSCRIPTION,
         SEASON,
         OPTIONBOX,
-        MEDIA
+        MEDIA,
+        LOOTBOX
     }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
@@ -53,7 +54,8 @@ namespace AccelByte.Models
         CODE,
         MEDIA,
         SUBSCRIPTION,
-        OPTIONBOX
+        OPTIONBOX,
+        LOOTBOX
     }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
@@ -191,6 +193,14 @@ namespace AccelByte.Models
         EntitlementPredicate,
         SeasonPassPredicate,
         SeasonTierPredicate
+    }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum RewardType
+    {
+        REWARD, 
+        REWARD_GROUP, 
+        PROBABILITY_GROUP
     }
 
     #endregion
@@ -458,6 +468,32 @@ namespace AccelByte.Models
     {
         [DataMember] public ItemBoxItem[] boxItems { get; set; }
     }
+    
+    [DataContract]
+    public class LootBoxItems
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string itemSku { get; set; }
+        [DataMember] public string itemType { get; set; }
+        [DataMember] public int count { get; set; }
+    }
+        
+    [DataContract]
+    public class ItemRewards
+    {
+        [DataMember] public string name { get; set; }
+        [DataMember] public RewardType type { get; set; }//REWARD, REWARD_GROUP, PROBABILITY_GROUP
+        [DataMember] public LootBoxItems[] lootBoxItems { get; set; }
+        [DataMember] public int weight { get; set; }
+        [DataMember] public double odds { get; set; }
+    }
+
+    [DataContract]
+    public class LootBoxConfig
+    {
+        [DataMember] public int rewardCount { get; set; }
+        [DataMember] public ItemRewards[] rewards { get; set; }
+    }
 
     [DataContract]
     public class PopulatedItemInfo
@@ -549,6 +585,7 @@ namespace AccelByte.Models
         [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
         [DataMember] public string localExt { get; set; }
         [DataMember] public Dictionary<string, int> itemQty { get; set; }
+        [DataMember] public LootBoxConfig lootBoxConfig { get; set; }
     }
 
     [DataContract]
@@ -706,6 +743,14 @@ namespace AccelByte.Models
     #endregion
 
     #region Entitlements
+    
+    [DataContract]
+    public class EntitlementReward
+    {
+        [DataMember] public string itemId { get; set; }
+        [DataMember] public string itemSku { get; set; }
+        [DataMember] public int count { get; set; }
+    }
 
     [DataContract]
     public class EntitlementInfo
@@ -737,6 +782,8 @@ namespace AccelByte.Models
         [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
         [DataMember] public string requestId { get; set; }
         [DataMember] public bool replayed { get; set; }
+        [DataMember] public EntitlementReward[] rewards { get; set; }
+        [DataMember] public LootBoxConfig lootBoxConfig { get; set; }
     }
 
     [DataContract]
