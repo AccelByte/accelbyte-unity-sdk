@@ -346,6 +346,7 @@ namespace AccelByte.Api
             }
 
             this.oAuthConfig.Expand();
+            this.config.SanitizeBaseUrl();
             this.config.Expand();
         }
 

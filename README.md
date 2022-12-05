@@ -1,50 +1,57 @@
 # AccelByte Unity SDK
+The Unity SDK acts as a bridge between your game and AccelByte Cloud services, making those services easy to access.
 
 ## Getting Started
 
-### Preparation
+### Install the SDK via Unity Package Manager
+ 1. Create or open a Project
+ 2. Go to **Window > Package Manager > + > Add package from git URL**, paste https://github.com/AccelByte/accelbyte-unity-sdk.git into popup and click **Add**
+    - If you are using Assembly Definitions in your project, you may need to add the com.accelbyte.UnitySDK assembly as a reference to your relevant definitions.
+    - You must have Git installed and configured on your computer in orderfor Unity to use a UPM Package
 
-1. Download the whole repository.
-2. Create a file named **AccelByteSDKConfig.json** and add it to *Assets\Resources* directory. Fill the _PublisherNamespace_, _ClientId_, _ClientSecret_, _Namespace_ and _AppId_(app namespace), _BaseUrl_, and _RedirectUri_ according to your own. Here's the content of the json file:
+### Project Settings
+Now that the SDK has been installed in the project, you will need to configure your project settings in order for the SDK to work on your project’s build standalone.
+ 1. In Unity Editor, go to **File > Build Settings** and click **Player Settings.**
+ 2. Select **Other Settings** to expand the options.
+ 3. In **Configurations** section, change the API Compatibility Level to **.NET 4.x** in the drop-down menu.
+
+## AccelByte Configuration
+ 1. Go to **AccelByte > Edit Settings** in the menu bar.
+ 2. Fill in the AccelByte Configuration field using the information based on your game and click **Save**.
+ 3. Alternatively, you can create a file called `AccelByteSDKConfig.json` in your **Assets/Resources** folder and fill it with the appropriate information in the following format:
 
 ```json
 {
-    "ClientId":"<GAME_CLIENT_ID>",
-    "ClientSecret":"<GAME_CLIENT_SECRET>",
-    "UseSessionManagement": true,
-    "PublisherNamespace":"<PUBLISHER_NAMESPACE>",
-    "Namespace":"<GAME_CLIENT_NAMESPACE>",
-    "BaseUrl": "https://api-preview.accelbyte.io",
-    "LoginServerUrl":"https://api-preview.accelbyte.io",
-    "IamServerUrl":"https://api-preview.accelbyte.io/iam",
-    "PlatformServerUrl":"https://api-preview.accelbyte.io/platform",
-    "BasicServerUrl":"https://api-preview.accelbyte.io/basic",
-    "LobbyServerUrl":"wss://preview.accelbyte.io/lobby/",
-    "TelemetryServerUrl":"https://api-preview.accelbyte.io/telemetry",
-    "RedirectUri":"http://localhost",
-    "CloudStorageServerUrl":"https://api-preview.accelbyte.io/binary-store",
-    "GameProfileServerUrl":"https://api-preview.accelbyte.io/soc-profile",
-    "StatisticServerUrl": "https://api-preview.accelbyte.io/statistic"
+	"Default": {
+		"Namespace": "Game Namespace",
+		"UsePlayerPrefs": true,
+		"EnableDebugLog": true,
+		"DebugLogFilter": "Log",
+		"BaseUrl": "<baseURL>",
+		"RedirectUri": "http://127.0.0.1",
+		"AppId": "",
+		"PublisherNamespace": "",
+		"CustomerName": ""
+	}
 }
 ```
 
-3. Copy whole *Assets*/**AccelByte** folder from the repository that has been downloaded and add it to your project in the *Assets* directory.
-4. If you need other functionalities, e.g. Steamworks, Xsolla, Oculus, embedded browser; you can include this whole repository to your project because we already provide those plugin/package here.
-5. For cross platform (primarily iOS and WebGL) and performance reason (Utf8Json is fast), AccelByte Unity SDK uses Utf8Json for serializing objects to JSON. The serialization code is pre-generated, so you need to run RecreateJsonResolver.bat if you somehow change any of AccelByte models class inside Assets/AccelByte/Models.
+### Multi Environment Configuration
+AccelByte enables you to use different environments such as **Production**, **Certification**, **Default**, and **Development**, within one single project, meaning that you only need to build your game once. By using our SDK, you will be able to switch environments even when your build is running. For example, you can run and test your build in the **Certification** environment and then publish your game to the **Production** environment, all without having to rebuild your game for each separate environment
 
-### Using The SDK
+To configure multi environment, go to **AccelByte > Edit Settings** in the menu bar, then change the **Environment** to your desired config and fill in the AccelByte Configuration field using the information based on your game and click **Save**.
 
-At first, you need to import AccelByte namespaces:
+### Multi Platform Configuration
+AccelByte’s Multi-platform Credentials allow you to build your game with different AccelByte credentials for each platform, eliminating the need to change credentials every time the build setting is changed to other platforms. Our supported platforms include:
+ - Steam (Windows/Linux build)
+ - Epic Games (Windows/Linux build) 
+ - Apple
+ - iOS
+ - Android
+ - PS4
+ - PS5
+ - Live (Xbox build)
+ - Nintendo
+ - Stadia
 
-```csharp
-using AccelByte.Api;
-using AccelByte.Models;
-using AccelByte.Core;
-```
-
-After that, you can freely uses AccelByte SDK. Please see [tutorial](docs/tutorial.md) on how to use AccelByte SDK.
-
-# Commit Message Standardization
-We are following Conventional Commits as a standard to follow for writing commit messages. The details of the rules can be found in the [conventional commits website](https://www.conventionalcommits.org/en/v1.0.0/). 
-
-We optionally provide a git commit-hook that will be triggered when you do a commit through the terminal that will execute an interactive cli that can guide you to write commit message that follows the standard, to enable this, run `make SetupCommitHook`
+To configure multi-platform, go to **AccelByte > Edit Settings** in the menu bar, then change the **Platform** to your desired config and fill in Client Id, Client Secret for the selected platform and click **Save**.

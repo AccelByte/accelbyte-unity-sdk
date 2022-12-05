@@ -716,5 +716,28 @@ namespace AccelByte.Api
                     callback
                     ));
         }
+
+        /// <summary>
+        /// Synchronize with entitlements in PSN Store.
+        /// </summary>
+        /// <param name="psnModel"> Playstation's DLC Model Sync Request</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncEntitlementPSNStore(PlayStationDLCSync psnModel
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncEntitlementPSNStore(
+                    session.UserId,
+                    psnModel,
+                    callback
+                ));
+        }
     }
 }

@@ -42,12 +42,12 @@ namespace AccelByte.Core
         {
             yield return RefreshSessionApiCall(result =>
             {
-            if (!result.IsError && result.Value != null)
-            {
-                SetSession(result.Value);
-            }
-            callback.Invoke(result);
-        });
+                if (!result.IsError && result.Value != null)
+                {
+                    SetSession(result.Value);
+                }
+                callback.Invoke(result);
+            });
         }
 
         public abstract IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback);

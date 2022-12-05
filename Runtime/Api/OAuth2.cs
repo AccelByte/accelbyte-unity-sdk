@@ -164,7 +164,11 @@ public class OAuth2 : ApiBase
         IHttpResponse response = null;
 
         yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
+            rsp =>
+            {
+                response = rsp;
+            }
+        );
 
         Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -172,7 +176,7 @@ public class OAuth2 : ApiBase
         {
             SaveAuthTrustId(result.Value);
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
 
         }
         else
@@ -229,15 +233,18 @@ public class OAuth2 : ApiBase
 
         IHttpResponse response = null;
 
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
+        yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            }
+        );
 
         var result = response.TryParseJson<TokenData, OAuthError>();
 
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -321,7 +328,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -397,7 +404,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -465,7 +472,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -539,7 +546,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -608,7 +615,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -642,7 +649,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {
@@ -715,7 +722,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
             yield break;
         }
 
@@ -753,7 +760,7 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
+            callback.TryOk(result.Value);
         }
         else
         {

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.7.0%0D15.6.0) (2022-12-05)
+
+
+### Features
+
+* add .editorconfig ([9cd051a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9cd051a7ac04446b6937e0804a292a9939bef4b0))
+* add heartbeat service ([d9beaae](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9beaaef04d8cb5e39ada42b07b5b9dae998aa68))
+* Exposing Get Item By Criteria in DS ([7c05cde](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c05cde150729c5a0da8fd5bd4940357e42c3a88))
+* PSN sync endpoint to be able to receive multiple service labels ([e44a7bd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e44a7bd60e5a2ab1cd8abeada8aa9559dc32405f))
+* sanitize base url on load ([6ddcfd5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6ddcfd5662c21609a1d9641a7776ad0b67774777))
+* tag query builder class for endpoint with search function with tags. ([9a1bb73](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9a1bb73a8903b7a182c35b8d02af6ef84c7ddca4))
+
+
+### Bug Fixes
+
+* disable HeartBeat in DS ([c452982](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c4529822f4110266e454342b348ec34e90ec3bd1))
+* http request namespace defined from parameter ([f1a4ca4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f1a4ca4ced6ddf216f469c8dab99b4990f9bda02))
+* misleading readme.md ([db98846](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db9884699d09f2e53288727b20f011633fbc316c))
+
+
+### Refactors
+
+* set oAuth return the result ([3ffe332](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3ffe3322985e688d2cb66421c7ceba14ab0912db))
+
 ## [15.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.6.0%0D15.5.0) (2022-11-21)
 
 

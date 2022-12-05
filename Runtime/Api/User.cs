@@ -196,7 +196,11 @@ namespace AccelByte.Api
 
             Result<TokenData, OAuthError> loginResult = null;
 
-            yield return loginMethod(r => loginResult = r);
+            yield return loginMethod(r =>
+                {
+                    loginResult = r;
+                }
+            );
 
             if (loginResult.IsError)
             {

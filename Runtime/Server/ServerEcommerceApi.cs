@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -191,6 +192,42 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PlatformStore[]>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator QueryItemsByCriteria( ItemCriteriaV2 criteria
+            , ResultCallback<ItemPagingSlicedResultV2> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't get items by criteria! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get items by criteria! AccessToken parameter is null!");
+            Assert.IsNotNull(criteria, "Can't get items by criteria! Criteria parameter is null!");
+            
+            string availableDate = criteria.availableDate.ToUniversalTime().ToString("u").Replace(" ", "T");
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/admin/namespaces/{namespace}/items/byCriteria")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("storeId", (criteria.storeId != null)? criteria.storeId : string.Empty)
+                .WithQueryParam("categoryPath",(criteria.categoryPath != null)? criteria.categoryPath : string.Empty)
+                .WithQueryParam("includeSubCategoryItem", (criteria.includeSubCategoryItem) ? "true" : "false")
+                .WithQueryParam("itemType", (criteria.itemType != ItemType.NONE) ? criteria.itemType.ToString() : string.Empty)
+                .WithQueryParam("appType", (criteria.appType != EntitlementAppType.NONE)? criteria.appType.ToString() : string.Empty)
+                .WithQueryParam("baseAppId", (criteria.baseAppId != null)?criteria.baseAppId : string.Empty)
+                .WithQueryParam("tags", (criteria.tags != null)? string.Join(",",criteria.tags) : string.Empty)
+                .WithQueryParam("features", (criteria.features != null)? string.Join(",",criteria.features) : string.Empty)
+                .WithQueryParam("region", (criteria.region != null)? criteria.region : string.Empty)
+                .WithQueryParam("availableDate", (availableDate != string.Empty)? availableDate : string.Empty)
+                .WithQueryParam("targetNamespace", (criteria.targetNamespace != null)? criteria.targetNamespace : string.Empty)
+                .WithQueryParam("offset", (criteria.offset >= 0) ? criteria.offset.ToString() : string.Empty)
+                .WithQueryParam("limit", (criteria.limit >= 0)? criteria.limit.ToString() : string.Empty)
+                .WithQueryParam("sortBy", (criteria.sortBy != null)? criteria.sortBy : string.Empty)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            IHttpResponse response = null;
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+            var result = response.TryParseJson<ItemPagingSlicedResultV2>();
             callback.Try(result);
         }
     }

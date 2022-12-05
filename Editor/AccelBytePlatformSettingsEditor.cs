@@ -157,6 +157,11 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Customer Name");
+            TemporarySetting.CustomerName = EditorGUILayout.TextField(TemporarySetting.CustomerName);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Use PlayerPrefs");
             TemporarySetting.UsePlayerPrefs = EditorGUILayout.Toggle(TemporarySetting.UsePlayerPrefs);
             EditorGUILayout.EndHorizontal();

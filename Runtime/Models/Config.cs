@@ -3,7 +3,9 @@
 // and restrictions contact your company contract manager.
 
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using AccelByte.Api;
+using AccelByte.Core;
 
 namespace AccelByte.Models
 {
@@ -49,6 +51,7 @@ namespace AccelByte.Models
         [DataMember] public string RedirectUri { get; set; }
         [DataMember] public string AppId { get; set; }
         [DataMember] public string PublisherNamespace { get; set; }
+        [DataMember] public string CustomerName { get; set; }
 
         /// <summary>
         ///  Copy member values
@@ -93,7 +96,8 @@ namespace AccelByte.Models
                    this.TurnServerSecret == anotherConfig.TurnServerSecret &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
-                   this.PublisherNamespace == anotherConfig.PublisherNamespace;
+                   this.PublisherNamespace == anotherConfig.PublisherNamespace &&
+                   this.CustomerName == anotherConfig.CustomerName;
         }
 
         /// <summary>
@@ -252,6 +256,19 @@ namespace AccelByte.Models
             }
 
             return specificServerUrl;
+        }
+
+        public void SanitizeBaseUrl()
+        {
+            var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
+            if (Regex.IsMatch(this.BaseUrl, regexStr))
+            {
+                this.BaseUrl = this.BaseUrl.TrimEnd('/');
+            }
+            else
+            {
+                AccelByteDebug.LogWarning("Invalid URL: " + this.BaseUrl);
+            }
         }
     }
 

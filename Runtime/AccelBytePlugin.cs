@@ -62,6 +62,9 @@ namespace AccelByte.Api
         private static Session _session;
         private static MatchmakingV2 _matchmakingV2;
         private static TurnManager turnManager;
+#if !UNITY_SERVER
+        private static HeartBeat heartBeat;
+#endif
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
@@ -1080,7 +1083,37 @@ namespace AccelByte.Api
 
             return miscellaneous;
         }
-        
+
+#if !UNITY_SERVER
+        public static HeartBeat GetHeartBeat()
+        {
+            if (heartBeat == null)
+            {
+                CheckPlugin();
+                UserSession session = GetUser().Session;
+                heartBeat = new HeartBeat(
+                    new HeartBeatApi(
+                        httpClient,
+                        Config,
+                        session),
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    heartBeat = null;
+                    heartBeat = new HeartBeat(
+                        new HeartBeatApi(
+                            httpClient,
+                            Config,
+                            session),
+                        coroutineRunner);
+                };
+            }
+
+            return heartBeat;
+        }
+#endif
+
         public static void ConfigureHttpApi<T>(params object[] args) where T : HttpApiBase
         {
             CheckPlugin();

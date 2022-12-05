@@ -17,15 +17,29 @@ namespace AccelByte.Core
         private readonly StringBuilder formBuilder = new StringBuilder(1024);
         private readonly StringBuilder queryBuilder = new StringBuilder(256);
         private readonly StringBuilder urlBuilder = new StringBuilder(256);
+        private string targetNamespace = null;
         private HttpRequestPrototype result;
 
         //Custom headers
-        private static string @namespace = "";
+        private static string defaultNamespace = null;
         private static string gameClientVersion = "";
         private static string sdkVersion = "";
-        public static void SetNamespace(string value) { @namespace = value; }
+        public static void SetNamespace(string value) { defaultNamespace = value; }
         public static void SetGameClientVersion(string value) { gameClientVersion = value; }
         public static void SetSdkVersion(string value) { sdkVersion = value; }
+
+        public string GetNamespace()
+        {
+            if(targetNamespace != null && targetNamespace.Length > 0)
+            {
+                return targetNamespace;
+            }
+            else if (defaultNamespace != null && defaultNamespace.Length > 0)
+            {
+                return defaultNamespace;
+            }
+            return null;
+        }
 
         private static HttpRequestBuilder CreatePrototype(string method, string url)
         {
@@ -354,6 +368,13 @@ namespace AccelByte.Core
             return this;
         }
 
+        public HttpRequestBuilder WithNamespace(string requestNamespace)
+        {
+            targetNamespace = requestNamespace;
+
+            return this;
+        }
+
         public IHttpRequest GetResult()
         {
             if (this.queryBuilder.Length > 0)
@@ -368,9 +389,9 @@ namespace AccelByte.Core
                 this.result.BodyBytes = Encoding.UTF8.GetBytes(this.formBuilder.ToString());
             }
 
-            if (@namespace.Length > 0)
+            if (GetNamespace() != null)
             {
-                this.result.Headers["Namespace"] = @namespace;
+                this.result.Headers["Namespace"] = GetNamespace();
             }
             if (gameClientVersion.Length > 0)
             {

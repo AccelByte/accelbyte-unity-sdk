@@ -578,7 +578,7 @@ namespace AccelByte.Api
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{\"serviceLabel\": \"{0}\"}", playStationDLCSync.serviceLabel))
+                .WithBody(playStationDLCSync.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;
@@ -693,6 +693,31 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<EntitlementOwnershipItemIds[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncEntitlementPSNStore(string userId
+            , PlayStationDLCSync psnModel
+            , ResultCallback callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
+            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
+
+            var builder = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/psn/sync")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(psnModel.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParse();
             callback.Try(result);
         }
     }
