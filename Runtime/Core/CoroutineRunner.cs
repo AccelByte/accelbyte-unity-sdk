@@ -30,10 +30,11 @@ namespace AccelByte.Core
 
             this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
             this.monoBehaviour.StartCoroutine(this.RunCallbacks());
-            Object.DontDestroyOnLoad(this.gameObject);
         }
 
-        ~CoroutineRunner() { this.isRunning = false; }
+        ~CoroutineRunner() { 
+            this.isRunning = false; 
+        }
 
         public Coroutine Run(IEnumerator coroutine) { return this.monoBehaviour.StartCoroutine(coroutine); }
         
@@ -64,6 +65,11 @@ namespace AccelByte.Core
             }
         }
 
-        private class DummyBehaviour : MonoBehaviour { }
+        private class DummyBehaviour : MonoBehaviour {
+            private void Awake()
+            {
+                Object.DontDestroyOnLoad(this.gameObject);
+            }
+        }
     }
 }

@@ -548,7 +548,7 @@ namespace AccelByte.Models
         [DataMember] public string clazz { get; set; }
         [DataMember] public string boothName { get; set; }
         [DataMember] public int displayOrder { get; set; }
-        [DataMember] public string ext { get; set; }
+        [DataMember] public object ext { get; set; }
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
         [DataMember] public DateTime createdAt { get; set; }

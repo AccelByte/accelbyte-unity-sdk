@@ -35,11 +35,19 @@ namespace AccelByte.Core
 
         public static string GetSeverityLogConfig()
         {
+            if(AccelBytePlugin.Config == null)
+            {
+                return AccelByteLogType.Verbose.ToString();
+            }
             return AccelBytePlugin.Config.DebugLogFilter;
         }
 
         public static bool GetEnableLogConfig()
         {
+            if (AccelBytePlugin.Config == null)
+            {
+                return true;
+            }
             return AccelBytePlugin.Config.EnableDebugLog;
         }
     }

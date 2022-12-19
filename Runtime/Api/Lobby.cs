@@ -1527,150 +1527,142 @@ namespace AccelByte.Api
                     if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
                             out MultiplayerV2NotifType sessionV2NotificationType))
                     {
-                        Debug.LogError(
+                        AccelByteDebug.LogError(
                             $"Error {ErrorCode.ErrorFromException}: SessionV2 notification topic not recognized: {sessionNotification.topic}");
                         return;
                     }
-
                     HandleMultiplayerV2Notification(message, sessionV2NotificationType);
-
                     break;
                 case MessageType.partyGetInvitedNotif:
-                websocketApi.HandleNotification(message, InvitedToParty);
-
+                    websocketApi.HandleNotification(message, InvitedToParty);
                     break;
                 case MessageType.partyJoinNotif:
-                websocketApi.HandleNotification(message, JoinedParty);
-
+                    websocketApi.HandleNotification(message, JoinedParty);
                     break;
                 case MessageType.partyKickNotif:
-                websocketApi.HandleNotification(message, KickedFromParty);
-
+                    websocketApi.HandleNotification(message, KickedFromParty);
                     break;
                 case MessageType.partyLeaveNotif:
-                websocketApi.HandleNotification(message, LeaveFromParty);
-
+                    websocketApi.HandleNotification(message, LeaveFromParty);
                     break;
                 case MessageType.personalChatNotif:
-                websocketApi.HandleNotification(message, PersonalChatReceived);
-
+                    websocketApi.HandleNotification(message, PersonalChatReceived);
                     break;
                 case MessageType.partyChatNotif:
-                websocketApi.HandleNotification(message, PartyChatReceived);
-
+                    websocketApi.HandleNotification(message, PartyChatReceived);
                     break;
                 case MessageType.messageNotif:
                     AwesomeFormat.ReadPayload(message, out Notification notification);
                     if (Enum.TryParse<MultiplayerV2NotifType>(notification.topic, true,
                             out MultiplayerV2NotifType matchmakingV2NotificationType))
+                    {
                         HandleMultiplayerV2Notification(message, matchmakingV2NotificationType);
+                    }
                     else
+                    {
                         websocketApi.HandleNotification(message, OnNotification);
-
+                    }
                     break;
                 case MessageType.userStatusNotif:
                     websocketApi.HandleUserStatusNotif(message, FriendsStatusChanged);
-
                     break;
                 case MessageType.matchmakingNotif:
-                websocketApi.HandleNotification(message, MatchmakingCompleted);
-
+                    websocketApi.HandleNotification(message, MatchmakingCompleted);
                     break;
                 case MessageType.dsNotif:
-                websocketApi.HandleNotification(message, DSUpdated);
-
+                    websocketApi.HandleNotification(message, DSUpdated);
                     break;
                 case MessageType.acceptFriendsNotif:
-                websocketApi.HandleNotification(message, FriendRequestAccepted);
-
+                    websocketApi.HandleNotification(message, FriendRequestAccepted);
                     break;
                 case MessageType.requestFriendsNotif:
-                websocketApi.HandleNotification(message, OnIncomingFriendRequest);
-
+                    websocketApi.HandleNotification(message, OnIncomingFriendRequest);
                     break;
                 case MessageType.unfriendNotif:
-                websocketApi.HandleNotification(message, OnUnfriend);
-
+                    websocketApi.HandleNotification(message, OnUnfriend);
                     break;
                 case MessageType.cancelFriendsNotif:
-                websocketApi.HandleNotification(message, FriendRequestCanceled);
-
+                    websocketApi.HandleNotification(message, FriendRequestCanceled);
                     break;
                 case MessageType.rejectFriendsNotif:
-                websocketApi.HandleNotification(message, FriendRequestRejected);
-
+                    websocketApi.HandleNotification(message, FriendRequestRejected);
                     break;
                 case MessageType.setReadyConsentNotif:
-                websocketApi.HandleNotification(message, ReadyForMatchConfirmed);
-
+                    websocketApi.HandleNotification(message, ReadyForMatchConfirmed);
                     break;
                 case MessageType.rematchmakingNotif:
-                websocketApi.HandleNotification(message, RematchmakingNotif);
-
+                    websocketApi.HandleNotification(message, RematchmakingNotif);
                     break;
                 case MessageType.channelChatNotif:
-                websocketApi.HandleNotification(message, ChannelChatReceived);
-
+                    websocketApi.HandleNotification(message, ChannelChatReceived);
                     break;
                 case MessageType.connectNotif:
-                AwesomeFormat.ReadPayload(message, out LobbySessionId lobbySessionId);
-                websocketApi.SetSessionId(lobbySessionId.lobbySessionID);
+                    AwesomeFormat.ReadPayload(message, out LobbySessionId lobbySessionId);
+                    websocketApi.SetSessionId(lobbySessionId.lobbySessionID);
                     break;
                 case MessageType.disconnectNotif:
-                websocketApi.HandleNotification(message, Disconnecting);
+                    websocketApi.HandleNotification(message, Disconnecting);
                     break;
                 case MessageType.partyDataUpdateNotif:
-                websocketApi.HandleNotification(message, PartyDataUpdateNotif);
+                    websocketApi.HandleNotification(message, PartyDataUpdateNotif);
                     break;
-            case MessageType.partyNotif:
-                websocketApi.HandleNotification(message, PartyNotif);
-                break;
+                case MessageType.partyNotif:
+                    websocketApi.HandleNotification(message, PartyNotif);
+                    break;
                 case MessageType.partyRejectNotif:
-                websocketApi.HandleNotification(message, RejectedPartyInvitation);
+                    websocketApi.HandleNotification(message, RejectedPartyInvitation);
                     break;
                 case MessageType.blockPlayerNotif:
-                websocketApi.HandleNotification(message, PlayerBlockedNotif);
+                    websocketApi.HandleNotification(message, PlayerBlockedNotif);
                     break;
                 case MessageType.unblockPlayerNotif:
-                websocketApi.HandleNotification(message, PlayerUnblockedNotif);
+                    websocketApi.HandleNotification(message, PlayerUnblockedNotif);
                     break;
                 case MessageType.userBannedNotification:
-                websocketApi.HandleNotification(message, UserBannedNotification);
+                    websocketApi.HandleNotification(message, UserBannedNotification);
+                    HandleBanNotification();
                     break;
                 case MessageType.userUnbannedNotification:
-                websocketApi.HandleNotification(message, UserUnbannedNotification);
+                    websocketApi.HandleNotification(message, UserUnbannedNotification);
+                    HandleUnbanNotification();
                     break;
                 case MessageType.signalingP2PNotif:
-                websocketApi.HandleNotification(message, this.SignalingP2PNotification);
+                    websocketApi.HandleNotification(message, this.SignalingP2PNotification);
                     break;
                 default:
-                websocketApi.HandleResponse(messageId, message, errorCode);
+                    websocketApi.HandleResponse(messageId, message, errorCode);
                     break;
-            }
-
-            if (messageType == MessageType.userBannedNotification
-                || messageType == MessageType.userUnbannedNotification)
-            {
             }
         }
 
         private void HandleBanNotification()
         {
-            Report.GetFunctionLog(GetType().Name);
             reconnectsOnBans = true;
+        }
+
+        private void HandleUnbanNotification()
+        {
+            reconnectsOnBans = false;
 
             if (session != null)
             {
                 session.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
             }
 
-            api.OnBanNotificationReceived(UpdateAuthToken);
+            api.OnBanNotificationReceived((newAccessToken) => 
+            { 
+                UpdateAuthToken(newAccessToken);
+                if (session != null)
+                {
+                    session.RefreshTokenCallback += LoginSession_RefreshTokenCallback;
+                }
+            });
         }
 
-        private void UpdateAuthToken(string inNewSession)
+        private void UpdateAuthToken(string newSessionAuthToken)
         {
             Report.GetFunctionLog(GetType().Name);
-            session.AuthorizationToken = inNewSession;
+            session.AuthorizationToken = newSessionAuthToken;
         }
 
         private void HandleMultiplayerV2Notification(string message, MultiplayerV2NotifType notificationType)

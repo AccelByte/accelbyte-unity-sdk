@@ -52,3 +52,8 @@ plugin-dev.config.ps1
 test.log
 test.xml
 build.log
+
+# Doxygen generated files
+Doxygen/build
+Doxygen/Doxyfile
+Documentation

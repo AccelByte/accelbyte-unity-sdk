@@ -234,8 +234,9 @@ namespace AccelByte.Models
         [DataMember] public string avatarUrl { get; set; }
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum PlatformType { Steam, EpicGames, PS4, Live, Stadia, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, 
+        Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin, Discord, Snapchat }
 
     [DataContract]
     public class PlatformLink
@@ -601,5 +602,13 @@ namespace AccelByte.Models
         [DataMember] public PlatformUserInformation[] platformUsers { get; set; }
         [DataMember] public string username { get; set; }
         [DataMember] public string xboxUserId { get; set; }
+    }
+    
+    [DataContract]
+    public class GeneratedOneTimeCode
+    {
+        [DataMember] public string oneTimeLinkCode { get; set; }
+        [DataMember] public string oneTimeLinkURL { get; set; }
+        [DataMember] public int exp { get; set; }
     }
 };

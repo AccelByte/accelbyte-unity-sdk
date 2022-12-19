@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.0%0D15.7.0) (2022-12-19)
+
+
+### Features
+
+* Account linking with one-time code ([c63999b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c63999bcfa5e0ff4362d733ba1fb193fbf6702b3))
+* add Snapchat & Discord to PlatformType Model ([a830e0b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a830e0b56f38db04ddea00a791108d92c29c2e21))
+* **doxygen:** add check envar before generate docs ([a8598c9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8598c91bddc332f0f61b91a1b59946141335144))
+* **doxygen:** generate doxygen document when compilation triggerred ([2a1a10d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2a1a10dbfe944af7725244e4638d581396e23b5a))
+
+
+### Bug Fixes
+
+* fix sdk setting editor error and add scrollbar ([13e051f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13e051f4c6310ba6600ccc19d6dd1480d2bc39ea))
+* GetItemsByCriteria parse Error ([6a4c619](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6a4c61949c2f7eef850f9e2e1d92acf842ff6f8a))
+* handle lobby received ban and unban ([54c2c7d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/54c2c7d2c2809407c8b91fe137cafb1a9c8b085a))
+* set dummy coroutine dont destroy called by gameobject ([aa498ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa498ef6bf155aed9ddc8fce88db359de6241eab))
+
 ## [15.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.7.0%0D15.6.0) (2022-12-05)
 
 

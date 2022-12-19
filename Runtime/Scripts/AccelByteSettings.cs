@@ -258,8 +258,8 @@ namespace AccelByte.Api
 #endif
                     }
 
-                    AccelByteDebug.Log("AccelByteSettings loaded");
                     AccelByteSettings.instance.Load();
+                    AccelByteDebug.Log("AccelByteSettings loaded");
                 }
 
                 return AccelByteSettings.instance;
@@ -267,12 +267,32 @@ namespace AccelByte.Api
             set { AccelByteSettings.instance = value; }
         }
 
-        public OAuthConfig CopyOAuthConfig() { return this.oAuthConfig.ShallowCopy(); }
-        public Config CopyConfig() { return this.config.ShallowCopy(); }
+        public OAuthConfig CopyOAuthConfig() 
+        { 
+            return oAuthConfig != null ? oAuthConfig.ShallowCopy() : null; 
+        }
+        public Config CopyConfig() 
+        {
+            return config != null ? config.ShallowCopy() : null;
+        }
         public void UpdateOAuthConfig(OAuthConfig newConfig) { this.oAuthConfig = newConfig; }
         public void UpdateConfig(Config newConfig) { this.config = newConfig; }
-        public bool CompareOAuthConfig(OAuthConfig newConfig) { return this.oAuthConfig.Compare(newConfig); }
-        public bool CompareConfig(Config newConfig) { return this.config.Compare(newConfig); }
+        public bool CompareOAuthConfig(OAuthConfig newConfig) 
+        { 
+            if(newConfig == null || oAuthConfig == null)
+            {
+                return false;
+            }
+            return this.oAuthConfig.Compare(newConfig); 
+        }
+        public bool CompareConfig(Config newConfig)
+        {
+            if (newConfig == null || config == null)
+            {
+                return false;
+            }
+            return this.config.Compare(newConfig); 
+        }
         public SettingsEnvironment GetEditedEnvironment() { return this.editedEnvironment; }
         public void SetEditedEnvironment(SettingsEnvironment environment) 
         { 
@@ -397,6 +417,8 @@ namespace AccelByte.Api
         {
             CompilationPipeline.compilationFinished -= CopyAccelByteSDKPackageVersion;
             CompilationPipeline.compilationFinished += CopyAccelByteSDKPackageVersion;
+            CompilationPipeline.compilationFinished -= DocsBuilder;
+            CompilationPipeline.compilationFinished += DocsBuilder;
         }
 
         private static void CopyAccelByteSDKPackageVersion(object obj)
@@ -430,6 +452,61 @@ namespace AccelByte.Api
             endfunction:
             {
                 return;
+            }
+        }
+
+        private static void DocsBuilder(object obj)
+        {
+            if (string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("BuildDocs")))
+            {
+                return;
+            }
+
+            var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettings).Assembly);
+            var DoxygenConfig = System.IO.Path.Combine(System.IO.Path.Combine(AccelBytePackageInfo.resolvedPath, "Doxygen"), "docs_config.json");
+
+            if (!System.IO.File.Exists(DoxygenConfig))
+            {
+                return;
+            }
+
+            if (BuildDocs(System.IO.Path.Combine(AccelBytePackageInfo.resolvedPath, "Doxygen")))
+            {
+                Debug.Log("AccelByteDocsBuilder: documentation built successfully");
+            }
+        }
+
+        private static bool BuildDocs(string doxygenPath)
+        {
+            try
+            {
+                using (System.Diagnostics.Process process = new())
+                {
+                    string SDKVersion = Instance?.AccelByteSDKVersion;
+                    var pythonDir = System.IO.Path.Combine(doxygenPath, "docs-builder");
+                    var docsBuilder = System.IO.Path.Combine(pythonDir, "accelbyte_docs_builder.py");
+                    var pythonArgs = docsBuilder + " internal " + SDKVersion;
+
+                    if (!System.IO.File.Exists(docsBuilder))
+                    {
+                        return false;
+                    }
+
+                    process.StartInfo.FileName = "python.exe";
+                    process.StartInfo.Arguments = pythonArgs;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.WorkingDirectory = pythonDir;
+                    process.Start();
+                    if (!process.HasExited) process.WaitForExit();
+
+                    return process.ExitCode == 0;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning("Docs Builder Error: " + e.Message);
+                return false;
             }
         }
 #endif

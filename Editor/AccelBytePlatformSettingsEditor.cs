@@ -24,6 +24,7 @@ namespace AccelByte.Api
         public List<string> platformList;
         public Rect LogoRect;
         public AccelByte.Core.AccelByteLogType SelectedLogFilter;
+        private Vector2 scrollPos;
 
         [MenuItem("AccelByte/Edit Settings")]
         public static void Edit()
@@ -45,7 +46,16 @@ namespace AccelByte.Api
             titleContent = new GUIContent("AccelByte Configuration");
             AccelByteLogo = Resources.Load<Texture2D>("ab-logo");
             this.TemporaryOAuth = AccelByteSettings.Instance.CopyOAuthConfig();
+            if(TemporaryOAuth == null)
+            {
+                TemporaryOAuth = new OAuthConfig();
+            }
+
             this.TemporarySetting = AccelByteSettings.Instance.CopyConfig();
+            if (TemporarySetting == null)
+            {
+                TemporarySetting = new Config();
+            }
             this.TemporaryEnvironmentSetting = (int)AccelByteSettings.Instance.GetEditedEnvironment();
             platformList = new List<string>();
             platformList.Add(PlatformType.Steam.ToString());
@@ -96,6 +106,7 @@ namespace AccelByte.Api
                 EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
             }
 
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("SDK Version");
             EditorGUILayout.LabelField(AccelByteSettings.Instance.AccelByteSDKVersion);
@@ -311,6 +322,8 @@ namespace AccelByte.Api
             EditorGUILayout.LabelField("App Id");
             TemporarySetting.AppId = EditorGUILayout.TextField(TemporarySetting.AppId);
             EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space();
 

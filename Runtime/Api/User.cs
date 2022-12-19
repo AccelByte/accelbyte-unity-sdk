@@ -1728,5 +1728,29 @@ namespace AccelByte.Api
             }
             coroutineRunner.Run(api.GetUserInformation(userId, callback));
         }
+        
+        /// <summary>
+        /// Generate one time linking code
+        /// </summary>
+        /// <param name="platformId">The platform ID</param>
+        /// <param name="callback">Return Result via callback when completed</param>
+        public void GenerateOneTimeCode(PlatformType platformId
+            , ResultCallback<GeneratedOneTimeCode> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(GenerateOneTimeCodeAsync(platformId, callback));
+        }
+
+        private IEnumerator GenerateOneTimeCodeAsync(PlatformType platformId
+            , ResultCallback<GeneratedOneTimeCode> callback)
+        {
+            if (!userSession.IsValid())
+            {
+                const string errorMessage = "User is not log in.";
+                callback.TryError(new Error(ErrorCode.InvalidRequest, errorMessage));
+                yield break;
+            }
+            yield return oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
+        }
     }
 }

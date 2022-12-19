@@ -805,6 +805,31 @@ public class OAuth2 : ApiBase
             callback.TryError(result.Error);
         }
     }
+    
+    public IEnumerator GenerateOneTimeCode(string AccessToken
+        , PlatformType platformId
+        , ResultCallback<GeneratedOneTimeCode> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        Assert.IsNotNull(AccessToken, "Can't verify token! token parameter is null!");
+
+        var request = HttpRequestBuilder
+            .CreatePost(BaseUrl + "/v3/link/code/request")
+            .WithBearerAuth(AccessToken)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("platformId", platformId.ToString().ToLower())
+            .GetResult();
+
+        IHttpResponse response = null;
+
+        yield return HttpClient.SendRequest(request, 
+            rsp => response = rsp);
+
+        var result = response.TryParseJson<GeneratedOneTimeCode>();
+
+        callback.Try(result);
+    }
 
     private void SaveAuthTrustId(TokenData tokenData)
     {
