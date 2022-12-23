@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.8.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.1%0D15.8.0) (2022-12-23)
+
+
+### Bug Fixes
+
+* unsupported implicit instantiation when using .NET Framework ([6af58e5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6af58e519b430bd62402e3405aabf08a64fff51f))
+
 ## [15.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.0%0D15.7.0) (2022-12-19)
 
 

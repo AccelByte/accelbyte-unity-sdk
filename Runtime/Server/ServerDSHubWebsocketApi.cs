@@ -114,7 +114,7 @@ namespace AccelByte.Server
 
         public void Disconnect(WsCloseCode code = WsCloseCode.Normal, string reason = null)
         {
-            if (_webSocket.ReadyState is WebSocketState.Closing or WebSocketState.Closed)
+            if (_webSocket.ReadyState is WebSocketState.Closing || _webSocket.ReadyState is WebSocketState.Closed)
             {
                 return;
             }

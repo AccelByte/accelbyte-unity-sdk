@@ -412,6 +412,7 @@ namespace AccelByte.Api
         }
 
 #if UNITY_EDITOR
+        /** TODO: Disabled and need to be moved to Project code
         [InitializeOnLoadMethod]
         private static void OnLoadMethod()
         {
@@ -480,7 +481,7 @@ namespace AccelByte.Api
         {
             try
             {
-                using (System.Diagnostics.Process process = new())
+                using (var process = new System.Diagnostics.Process())
                 {
                     string SDKVersion = Instance?.AccelByteSDKVersion;
                     var pythonDir = System.IO.Path.Combine(doxygenPath, "docs-builder");
@@ -509,6 +510,7 @@ namespace AccelByte.Api
                 return false;
             }
         }
+        */
 #endif
     }
 }

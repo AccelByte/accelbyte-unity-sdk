@@ -28,7 +28,7 @@ namespace AccelByte.Api
         private bool isHeartBeatEnabled = false;
         private ResultCallback OnHeartBeatResponse = null;
 
-        private Dictionary<string, object> heartBeatData = new();
+        private Dictionary<string, object> heartBeatData = new Dictionary<string, object>();
 
         internal HeartBeat(HeartBeatApi inApi
             , CoroutineRunner inCoroutineRunner)

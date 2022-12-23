@@ -64,7 +64,7 @@ namespace AccelByte.Api
             {
                 System.TimeSpan LocalTimeSpan = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartupAsDouble);
                 System.TimeSpan ServerTimeSpan = LocalTimeSpan - ServerTimestamp;
-                Time Value =  new();
+                Time Value =  new Time();
                 Value.currentTime = LastServerTime + ServerTimeSpan;
                 Result<Time> result = Result<Time>.CreateOk(Value);
                 callback.Try(result);

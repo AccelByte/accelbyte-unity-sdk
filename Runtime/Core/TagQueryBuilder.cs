@@ -16,8 +16,8 @@ namespace AccelByte.Core
         private static readonly string openParentheses = "(";
         private static readonly string closeParentheses = ")";
         
-        private readonly Queue<object> tagObjects = new();
-        private readonly Queue<string> operationOperators = new();
+        private readonly Queue<object> tagObjects = new Queue<object>();
+        private readonly Queue<string> operationOperators = new Queue<string>();
         
         public static TagQueryBuilder Start(string tag)
         {
