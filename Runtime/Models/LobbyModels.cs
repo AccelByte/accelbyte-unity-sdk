@@ -594,7 +594,8 @@ namespace AccelByte.Models
         Offline,
         Online,
         Busy,
-        Invisible
+        Invisible,
+        Away
     }
 
     [DataContract]
@@ -646,6 +647,7 @@ namespace AccelByte.Models
         [DataMember] public int busy;
         [DataMember] public int invisible;
         [DataMember] public int offline;
+        [DataMember] public int away;
     }
 
     #endregion

@@ -104,7 +104,7 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
+        [Obsolete("This end point is going to be deprecated, use LoginWithUsernameV3 instead")]
         public void LoginWithUsername( string username
             , string password
             , ResultCallback<TokenData, OAuthError> callback
@@ -122,7 +122,6 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 with other callback type instead")]
         public void LoginWithUsernameV3( string username
             , string password
             , ResultCallback callback
@@ -150,12 +149,6 @@ namespace AccelByte.Api
                 username, password, callback, rememberMe));
         }
         
-        /// <summary>
-        /// TODO: Is this deprecated, in favor of the extended callback variant?
-        /// </summary>
-        /// <param name="loginMethod"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
         private IEnumerator LoginAsync( Func<ResultCallback, IEnumerator> loginMethod
             ,  ResultCallback callback )
         {
@@ -178,7 +171,7 @@ namespace AccelByte.Api
 
             callback.TryOk();
         }
-
+        
         private IEnumerator LoginAsync( Func<ResultCallback<TokenData, OAuthError>, IEnumerator> loginMethod
             , ResultCallback<TokenData, OAuthError> callback )
         {
@@ -210,7 +203,7 @@ namespace AccelByte.Api
 
             callback.Try(loginResult);
         }
-
+        
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
@@ -228,10 +221,9 @@ namespace AccelByte.Api
                 oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe),
                 callback);
         }
-
+        
         /// <summary>
-        /// Login to AccelByte account with username (e.g. email) and password. 
-        /// TODO: Is this deprecated, in favor of the extended callback variant?
+        /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
         /// <param name="email">Could be email or phone (right now, only email supported)</param>
         /// <param name="password">Password to login</param>
@@ -246,7 +238,7 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => oAuth2.LoginWithUsername(
                 email, password, cb, rememberMe), callback);
         }
-
+        
         [Obsolete("Instead, use LoginWithUserNameAsyncV3() which use different callback type")]
         private IEnumerator LoginWithUserNameAsyncV3( string email
             , string password
@@ -256,7 +248,7 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => oAuth2.LoginWithUsernameV3(
                 email, password, cb, rememberMe), callback);
         }
-
+        
         private IEnumerator LoginWithUserNameAsyncV3( string email
             , string password
             , ResultCallback<TokenData, OAuthError> callback
@@ -303,14 +295,7 @@ namespace AccelByte.Api
                 callback,
                 createHeadless));
         }
-
-        /// <summary>
-        /// TODO: Deprecated for extended callback variant?
-        /// </summary>
-        /// <param name="platformType"></param>
-        /// <param name="platformToken"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
+        
         private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
             , string platformToken
             , ResultCallback callback
@@ -319,7 +304,7 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatform(
                 platformType, platformToken, cb, createHeadless), callback);
         }
-
+        
         private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
@@ -337,6 +322,7 @@ namespace AccelByte.Api
         /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback callback
@@ -354,6 +340,7 @@ namespace AccelByte.Api
         /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
@@ -366,14 +353,7 @@ namespace AccelByte.Api
                 callback,
                 createHeadless));
         }
-
-        /// <summary>
-        /// TODO: Deprecated for extended callback variant?
-        /// </summary>
-        /// <param name="platformId"></param>
-        /// <param name="platformToken"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
+        
         private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
             , string platformToken
             , ResultCallback callback
@@ -382,7 +362,7 @@ namespace AccelByte.Api
             yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatformId(
                 platformId, platformToken, cb, createHeadless), callback);
         }
-
+        
         private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
@@ -439,13 +419,13 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
         }
-
+        
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback callback )
         {
             yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
         }
-
+        
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback<TokenData, OAuthError> callback )
         {
@@ -473,12 +453,12 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
         }
-
+        
         private IEnumerator LoginWithDeviceIdAsync( ResultCallback callback )
         {
             yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
         }
-
+        
         private IEnumerator LoginWithDeviceIdAsync( ResultCallback<TokenData, OAuthError> callback )
         {
             yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
@@ -515,8 +495,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
         }
-
-
+        
         /// <summary>
         /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
         /// </summary>
@@ -528,7 +507,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
         }
-
+        
         [Obsolete("Instead, use the overload with the extended callback")]
         private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
             , ResultCallback callback )
@@ -732,7 +711,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(GetDataAsync(callback));
         }
-
+        
         private IEnumerator GetDataAsync( ResultCallback<UserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -758,7 +737,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(RefreshDataAsync(callback));
         }
-
+        
         private IEnumerator RefreshDataAsync( ResultCallback<UserData> callback )
         {
             Result<UserData> result = null;
@@ -1140,9 +1119,9 @@ namespace AccelByte.Api
         /// Get other user data by other platform userId (such as SteamID, for example)
         /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
         /// </summary>
-        /// <param name="platformType"></param>
-        /// <param name="otherPlatformUserId"></param>
-        /// <param name="callback"></param>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="otherPlatformUserId">Platform UserId that needed to get user data</param>
+        /// <param name="callback">Return a Result that contains UserData when completed.</param>
         public void GetUserByOtherPlatformUserId( PlatformType platformType
             , string otherPlatformUserId
             , ResultCallback<UserData> callback )
@@ -1163,9 +1142,9 @@ namespace AccelByte.Api
         /// Get other user data by other platform userId(s) (such as SteamID, for example)
         /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
         /// </summary>
-        /// <param name="platformType"></param>
-        /// <param name="otherPlatformUserIds"></param>
-        /// <param name="callback"></param>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="otherPlatformUserId">Platform UserId that needed to get user data</param>
+        /// <param name="callback">Return a Result that contains UserData when completed.</param>
         public void BulkGetUserByOtherPlatformUserIds( PlatformType platformType
             , string[] otherPlatformUserId
             , ResultCallback<BulkPlatformUserIdResponse> callback )
@@ -1253,11 +1232,11 @@ namespace AccelByte.Api
         /// <summary>
         /// Verify 2FA Code 
         /// </summary>
-        /// <param name="mfaToken"></param>
-        /// <param name="factor"></param>
-        /// <param name="code"></param>
-        /// <param name="callback"></param>
-        /// <param name="rememberDevice"></param>
+        /// <param name="mfaToken">Multi-factor authentication Token</param>
+        /// <param name="factor">The factor will return factor based on what factors is enabled</param>
+        /// <param name="code">Verification code</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="rememberDevice">Will record device token when true</param>
         public void Verify2FACode( string mfaToken
             , TwoFAFactorType factor
             , string code
@@ -1313,9 +1292,9 @@ namespace AccelByte.Api
         /// <summary>
         /// Change 2FA Factor 
         /// </summary>
-        /// <param name="mfaToken"></param>
-        /// <param name="factor"></param>
-        /// <param name="callback"></param>
+        /// <param name="mfaToken">Multi-factor authentication Token</param>
+        /// <param name="factor">The factor will return factor based on what factors is enabled</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void Change2FAFactor( string mfaToken
             , TwoFAFactorType factor
             , ResultCallback<TokenData> callback )
@@ -1334,7 +1313,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Disable 2FA Authenticator
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void Disable2FAAuthenticator( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1351,10 +1330,10 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Enable 2FA Authenticator, to thable the backup code 2FA factor, you should also call Enable2FABackupcodes.
+        /// Enable 2FA Authenticator, to enable the backup code 2FA factor, you should also call Enable2FABackupcodes.
         /// </summary>
-        /// <param name="code"></param>
-        /// <param name="callback"></param>
+        /// <param name="code">Verification code</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void Enable2FAAuthenticator( string code
             , ResultCallback callback )
         {
@@ -1374,7 +1353,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Generate Secret Key For 3rd Party Authenticate Application 
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void GenerateSecretKeyFor3rdPartyAuthenticateApp( ResultCallback<SecretKey3rdPartyApp> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1484,8 +1463,8 @@ namespace AccelByte.Api
         /// <summary>
         /// Make 2FA Factor Default
         /// </summary>
-        /// <param name="factor"></param>
-        /// <param name="callback"></param>
+        /// <param name="factor">The factor will return factor based on what factors is enabled</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void Make2FAFactorDefault( TwoFAFactorType factor
             , ResultCallback callback )
         {
@@ -1504,9 +1483,9 @@ namespace AccelByte.Api
         /// <summary>
         /// Get IAM Input Validation 
         /// </summary>
-        /// <param name="languageCode"></param>
-        /// <param name="callback"></param>
-        /// <param name="defaultOnEmpty"></param>
+        /// <param name="languageCode">Language Code for description</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="defaultOnEmpty">will return default language if languageCode is empty or language not available</param>
         public void GetInputValidations( string languageCode
             , ResultCallback<InputValidation> callback
             , bool defaultOnEmpty = true )
@@ -1573,7 +1552,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// TODO: Deprecated for extended callback variant?
+        /// Create Headless Account for Account Linking
         /// </summary>
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
@@ -1598,6 +1577,8 @@ namespace AccelByte.Api
         /// <summary>
         /// Authentication With PlatformLink for Account Linking
         /// </summary>
+        /// <param name="username">Username to login</param>
+        /// <param name="password">Password to login</param>
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>

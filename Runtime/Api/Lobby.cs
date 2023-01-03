@@ -265,6 +265,9 @@ namespace AccelByte.Api
         
         private bool reconnectsOnBans;
 
+        /// <summary>
+        /// Event triggered each time a websocket reconnection attempt failed
+        /// </summary>
         public event EventHandler OnRetryAttemptFailed
         {
             add => websocketApi.WebSocket.OnRetryAttemptFailed += value;
@@ -293,6 +296,14 @@ namespace AccelByte.Api
             OverrideWebsocket(webSocket);
         }
 
+        /// <summary>
+        /// Override current websocket instance, and set new retry parameters
+        /// </summary>
+        /// <param name="inWebSocket">IWebsocket instance to use</param>
+        /// <param name="inPingDelay">delay for each connection ping</param>
+        /// <param name="inBackoffDelay">first backoff delay duration for a retry connection attempt</param>
+        /// <param name="inMaxDelay">max delay for each retry connection attempt</param>
+        /// <param name="inTotalTimeout"></param>
         public void OverrideWebsocket(IWebSocket inWebSocket
             , int inPingDelay = 4000
             , int inBackoffDelay = 1000
@@ -545,6 +556,12 @@ namespace AccelByte.Api
             websocketApi.PromotePartyLeader(userId, callback);
         }
 
+        /// <summary>
+        /// Set party member size limit
+        /// </summary>
+        /// <param name="partyId">designated party id</param>
+        /// <param name="limit">member limit</param>
+        /// <param name="callback">returns a Result via callback when completed</param>
         public void SetPartySizeLimit(string partyId, int limit, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1356,7 +1373,10 @@ namespace AccelByte.Api
             websocketApi.UnblockPlayer(userId, callback);
         }
 
-
+        /// <summary>
+        /// get current logged in user's blocked list.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void GetListOfBlockedUser(ResultCallback<BlockedList> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1374,6 +1394,10 @@ namespace AccelByte.Api
         }
 
 
+        /// <summary>
+        /// Get users that currently blocking the user logged in.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void GetListOfBlocker(ResultCallback<BlockerList> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1392,6 +1416,11 @@ namespace AccelByte.Api
         #endregion BlockUnblock
 
         #region ProfanityFilter
+        /// <summary>
+        /// Set chat profanity filter level
+        /// </summary>
+        /// <param name="level">level of profanity filter to apply</param>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void SetProfanityFilterLevel( ProfanityFilterLevel level
             , ResultCallback callback )
         {
@@ -1401,6 +1430,12 @@ namespace AccelByte.Api
         #endregion ProfanityFilter
 
         #region SessionAttribute
+        /// <summary>
+        /// Set user's lobby session attributes.
+        /// </summary>
+        /// <param name="key">Attribute key</param>
+        /// <param name="value">Attribute value</param>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void SetSessionAttribute( string key
             , string value
             , ResultCallback callback )
@@ -1410,6 +1445,11 @@ namespace AccelByte.Api
             websocketApi.SetSessionAttribute(key, value, callback);
         }
 
+        /// <summary>
+        /// Get user's lobby session attributes.
+        /// </summary>
+        /// <param name="key">Attribute key</param>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void GetSessionAttribute(string key, ResultCallback<GetSessionAttributeResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1417,6 +1457,10 @@ namespace AccelByte.Api
             websocketApi.GetSessionAttribute(key, callback);
         }
 
+        /// <summary>
+        /// Get all of the user's lobby session attributes.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when complete</param>
         public void GetSessionAttributeAll(ResultCallback<GetSessionAttributeAllResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -1439,6 +1483,11 @@ namespace AccelByte.Api
         #endregion Signaling
 
         #region Token
+        /// <summary>
+        /// Refresh the access token to be used in lobby.
+        /// </summary>
+        /// <param name="newAccessToken">new access token to user in lobby</param>
+        /// <param name="callback">Returns a result via callback when complete</param>
         private void RefreshToken( string newAccessToken
             , ResultCallback callback )
         {

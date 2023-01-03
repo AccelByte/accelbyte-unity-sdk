@@ -15,18 +15,33 @@ namespace AccelByte.Server
     {
         #region Events
 
+        /// <summary>
+        /// Event triggered when successfully connected to DSHub
+        /// </summary>
         public event Action OnConnected;
 
+        /// <summary>
+        /// Event triggered when disconnected from DSHub
+        /// </summary>
         public event Action<WsCloseCode> OnDisconnected;
 
+        /// <summary>
+        /// Event triggered when this Server is claimed by a match
+        /// </summary>
         public event ResultCallback<ServerClaimedNotification> MatchmakingV2ServerClaimed;
 
+        /// <summary>
+        /// Event triggered when server received a backfill proposal
+        /// </summary>
         public event ResultCallback<MatchmakingV2BackfillProposalNotification> MatchmakingV2BackfillProposalReceived;
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// DSHub connection status
+        /// </summary>
         public bool IsConnected => _serverDSHubWebsocketApi.IsConnected;
 
         #endregion
@@ -56,7 +71,10 @@ namespace AccelByte.Server
             _serverDSHubWebsocketApi.OnMessage += HandleOnMessage;
         }
 
-
+        /// <summary>
+        /// Connect to DSHub
+        /// </summary>
+        /// <param name="serverName">this server's  name</param>
         public void Connect(string serverName)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -64,6 +82,9 @@ namespace AccelByte.Server
             _serverDSHubWebsocketApi.Connect(serverName);
         }
 
+        /// <summary>
+        /// Disconnect from DSHub
+        /// </summary>
         public void Disconnect()
         {
             Report.GetFunctionLog(GetType().Name);

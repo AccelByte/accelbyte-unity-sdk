@@ -194,7 +194,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Bulk Get Locale Items.
         /// </summary>
-        /// <param name="appId">AppId of an item</param>
+        /// <param name="itemIds">Item IDs to get item</param>
         /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
         /// <param name="language">display language</param>
         /// <param name="region">region of items</param>

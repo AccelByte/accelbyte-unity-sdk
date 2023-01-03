@@ -237,7 +237,9 @@ namespace AccelByte.Models
         NEED_TO_REQUEST,
         REQUESTED,
         AVAILABLE,
-        FAILED_TO_REQUEST
+        FAILED_TO_REQUEST,
+        ENDED,
+        UNKNOWN
     };
 
     [JsonConverter(typeof(StringEnumConverter))]

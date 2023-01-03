@@ -196,6 +196,12 @@ namespace AccelByte.Server
                 api.GetSessionAttributeAll(userId, callback));
         }
 
+        /// <summary>
+        /// set a user's session attributes
+        /// </summary>
+        /// <param name="userId">user Id to be set</param>
+        /// <param name="attributes">the attributes dictionary to set</param>
+        /// <param name="callback">Returns result via callback when operation is done</param>
         public void SetSessionAttribute( string userId
             , Dictionary<string, string> attributes
             , ResultCallback callback )
@@ -212,6 +218,13 @@ namespace AccelByte.Server
                 api.SetSessionAttribute(userId, attributes, callback));
         }
 
+        /// <summary>
+        /// Set a user's session attribute
+        /// </summary>
+        /// <param name="userId">user Id to be set</param>
+        /// <param name="key">the attribute's key</param>
+        /// <param name="value">the attribute's value</param>
+        /// <param name="callback">Returns result via callback when operation is done</param>
         public void SetSessionAttribute( string userId
             , string key
             , string value

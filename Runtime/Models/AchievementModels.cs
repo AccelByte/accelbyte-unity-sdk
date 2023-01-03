@@ -103,4 +103,19 @@ namespace AccelByte.Models
         [DataMember] public UserAchievement[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
+
+    [DataContract]
+    public class PublicTag
+    {
+        [DataMember] public string name { get; set; }
+        [DataMember] public string Namespace { get; set; }
+        [DataMember] public string createdAt { get; set; }
+    }
+
+    [DataContract]
+    public class PaginatedPublicTag
+    {
+        [DataMember] public PublicTag[] data { get; set; }
+        [DataMember] public Paging paging { get; set; }
+    }
 }

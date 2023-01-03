@@ -64,7 +64,8 @@ namespace AccelByte.Api
         private static TurnManager turnManager;
 #if !UNITY_SERVER
         private static HeartBeat heartBeat;
-#endif
+#endif 
+        private static StoreDisplay storeDisplay;
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
@@ -1236,6 +1237,35 @@ namespace AccelByte.Api
                     activePlatform = ""; break;
             }
             return activePlatform;
+        } 
+        public static StoreDisplay GetStoreDisplay()
+        {
+            if (storeDisplay == null)
+            {
+                CheckPlugin();
+                UserSession session = GetUser().Session;
+                storeDisplay = new StoreDisplay(
+                    new StoreDisplayApi(
+                        httpClient,
+                        Config,
+                        session),
+                    session,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    storeDisplay = null;
+                    storeDisplay = new StoreDisplay(
+                        new StoreDisplayApi(
+                            httpClient,
+                            Config,
+                            session),
+                        session,
+                        coroutineRunner);
+                };
+            }
+
+            return storeDisplay;
         }
     }
 }

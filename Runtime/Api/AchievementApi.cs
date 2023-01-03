@@ -52,6 +52,7 @@ namespace AccelByte.Api
         }
 
         public IEnumerator QueryAchievements( string language
+            , string tags
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedPublicAchievement> callback
             , int offset
@@ -61,7 +62,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(Namespace_, "Can't query achievements! Namespace parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't query achievements! AuthToken parameter is null!");
 
-            var request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("language", language)
@@ -69,9 +70,14 @@ namespace AccelByte.Api
                 .WithQueryParam("offset", offset.ToString())
                 .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
+            if (!string.IsNullOrEmpty(tags))
+            {
+                requestBuilder.WithQueryParam("tags", tags);
+            }
+
+            var request = requestBuilder.GetResult();
             IHttpResponse response = null;
 
             yield return HttpClient.SendRequest(request, 
@@ -106,6 +112,7 @@ namespace AccelByte.Api
         }
 
         public IEnumerator QueryUserAchievements( string userId
+            , string tags
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedUserAchievement> callback
             , int offset
@@ -116,7 +123,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(Namespace_, "Can't query user achievements! Namespace parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't query user achievements! AuthToken parameter is null!");
 
-            var request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
@@ -125,9 +132,14 @@ namespace AccelByte.Api
                 .WithQueryParam("limit", limit.ToString())
                 .WithQueryParam("preferUnlocked", PreferUnlocked.ToString())
                 .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
+            if (!string.IsNullOrEmpty(tags))
+            {
+                requestBuilder.WithQueryParam("tags", tags);
+            }
+
+            var request = requestBuilder.GetResult();
             IHttpResponse response = null;
 
             yield return HttpClient.SendRequest(request, 
@@ -167,6 +179,36 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator GetTags(string name
+            , AchievementSortBy sortBy
+            , ResultCallback<PaginatedPublicTag> callback
+            , int offset
+            , int limit
+        )
+        {
+            Assert.IsNotNull(Namespace_, "Can't query user achievements! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't query user achievements! AuthToken parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/tags")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("name",name)
+                .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
+                .WithQueryParam("offset", offset.ToString())
+                .WithQueryParam("limit", limit.ToString())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+            
+            var result = response.TryParseJson<PaginatedPublicTag>();
+            
+            callback.Try(result);
+        }
         #endregion
     }
 }

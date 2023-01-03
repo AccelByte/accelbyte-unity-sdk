@@ -554,7 +554,7 @@ public class OAuth2 : ApiBase
         }
     }
 
-    [Obsolete("This end point is going to be deprected, use LoginWithAuthorizationCodeV3 instead")]
+    [Obsolete("This end point is going to be deprecated, use LoginWithAuthorizationCodeV3 instead")]
     public IEnumerator LoginWithAuthorizationCode
         (string code
         , ResultCallback callback)
@@ -588,7 +588,7 @@ public class OAuth2 : ApiBase
         }
     }
 
-    [Obsolete("This end point is going to be deprected, use LoginWithAuthorizationCodeV3 instead")]
+    [Obsolete("This end point is going to be deprecated, use LoginWithAuthorizationCodeV3 instead")]
     public IEnumerator LoginWithAuthorizationCode
         (string code
         , ResultCallback<TokenData, OAuthError> callback)

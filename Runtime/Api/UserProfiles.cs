@@ -345,6 +345,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Update user's own private custom attribute profile information. If it doesn't exist, that will be an error
         /// </summary>
+        /// <param name="updates">additional properties or Custom Attributes</param>
         /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
         public void UpdatePrivateCustomAttributes( Dictionary<string, object> updates
             , ResultCallback<Dictionary<string, object>> callback )

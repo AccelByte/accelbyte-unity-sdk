@@ -80,7 +80,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Register server ready to DSM
+        /// Shutdown cloud server
         /// </summary>
         /// <param name="killMe">Signaling DSM to forcefully shutdown this machine</param>
         /// <param name="callback">Returns a Result via callback when completed</param>

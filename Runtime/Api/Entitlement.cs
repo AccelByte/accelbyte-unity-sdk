@@ -579,6 +579,8 @@ namespace AccelByte.Api
         /// <summary>
         /// Synchronize Steam DLC.
         /// </summary>
+        /// <param name="userSteamId">Steam ID of the user</param>
+        /// <param name="userAppId">Steam app id</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SyncSteamDLC( string userSteamId
             , string userAppId

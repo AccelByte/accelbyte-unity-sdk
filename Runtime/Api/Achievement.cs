@@ -58,7 +58,9 @@ namespace AccelByte.Api
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedPublicAchievement> callback
             , int offset = 0
-            , int limit = 20 )
+            , int limit = 20 
+            , TagQueryBuilder tagBuilder = null
+            )
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -68,8 +70,16 @@ namespace AccelByte.Api
                 return;
             }
 
+            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
+
             coroutineRunner.Run(
-                api.QueryAchievements(language, sortBy, callback, offset, limit));
+                api.QueryAchievements(
+                    language, 
+                    tags,
+                    sortBy, 
+                    callback, 
+                    offset, 
+                    limit));
         }
 
         /// <summary>
@@ -105,7 +115,9 @@ namespace AccelByte.Api
             , ResultCallback<PaginatedUserAchievement> callback
             , int offset = 0
             , int limit = 20
-            , bool PreferUnlocked = true )
+            , bool PreferUnlocked = true 
+            , TagQueryBuilder tagBuilder = null
+            )
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -115,9 +127,12 @@ namespace AccelByte.Api
                 return;
             }
 
+            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
+
             coroutineRunner.Run(
                 api.QueryUserAchievements(
                     session.UserId,
+                    tags,
                     sortBy, 
                     callback, 
                     offset, 
@@ -145,6 +160,23 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, callback));
+        }
+
+        public void GetTags(string name
+            , AchievementSortBy sortBy
+            , ResultCallback<PaginatedPublicTag> callback
+            , int offset = 0
+            , int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+            }
+            
+            coroutineRunner.Run(
+                api.GetTags(name, sortBy, callback, offset, limit));
         }
     }
 }

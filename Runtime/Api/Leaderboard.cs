@@ -148,6 +148,15 @@ namespace AccelByte.Api
                     callback));
         }
 
+        /// <summary>
+        /// List all leaderboard by given namespace
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contains LeaderboardPagedList via callback when completed</param>
+        /// <param name="offset">
+        /// Offset of the list that has been sliced based on Limit parameter (optional, default = 0)
+        /// </param>
+        /// <param name="limit">The limit of item on page (optional) </param>
         public void GetLeaderboardList( ResultCallback<LeaderboardPagedList> callback
             , int offset = 0
             , int limit = 0 )

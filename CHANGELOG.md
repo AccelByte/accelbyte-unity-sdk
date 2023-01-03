@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.9.0%0D15.8.1) (2023-01-03)
+
+
+### Features
+
+* Displays & sections (Rotating Shop Items) ([1e4955c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1e4955c1de8a75d85df20eb0df216cdcea97eb04))
+* **lobby:** Add away availability in lobby presence ([eb0ecb7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eb0ecb7fbcfcd1b280f7ea8b173b6947e493d111))
+* new get achievement public tag endpoint ([0401fb1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0401fb1cec37be216bdfe67f266bc098004ca0d9))
+* renamed api class for rotating item feature ([7295ea8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7295ea8cbdc2239ed5a9fe08ec441d00f0382729))
+* **Session:** add ENDED and UNKNOWN DS status ([0a6db06](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0a6db064b491a237ba05282e592ca12e0d71a4da))
+
+
+### Bug Fixes
+
+* GetItemsByCriteria parse Error ([f02ec4d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f02ec4d578e72c6e21e16f1e51c1099e59888252))
+
 ### [15.8.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.1%0D15.8.0) (2022-12-23)
 
 

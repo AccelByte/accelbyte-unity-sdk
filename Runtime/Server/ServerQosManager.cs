@@ -66,6 +66,10 @@ namespace AccelByte.Server
             callback.TryOk(latencies);
         }
 
+        /// <summary>
+        /// Get all server latencies available
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void GetAllServerLatencies( ResultCallback<Dictionary<string, int>> callback )
         {
             coroutineRunner.Run(GetAllServerLatenciesAsync(callback));
@@ -87,6 +91,10 @@ namespace AccelByte.Server
             yield return CalculateServerLatencies(getQosServersResult.Value.servers, callback);
         }
 
+        /// <summary>
+        /// Get server latencies for active QoS server in the namespace.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void GetServerLatencies( ResultCallback<Dictionary<string, int>> callback )
         {
             coroutineRunner.Run(GetServerLatenciesAsync(callback));
