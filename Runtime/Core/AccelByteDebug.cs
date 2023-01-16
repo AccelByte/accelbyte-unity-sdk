@@ -54,10 +54,20 @@ namespace AccelByte.Core
 
     public static class AccelByteDebug
     {
-        public static Lazy<ILogger> logger = new Lazy<ILogger>(() => new Logger(new AccelByteLogHandler()));
+        public static Lazy<ILogger> logger = new Lazy<ILogger>(() => DefaultLogger);
         
         private static string messageTagFormat = "[Severity][<b>AccelByteSDK</b>][Time]";
         private static AccelByteLogType currentSeverity;
+
+        private static readonly ILogger defaultLogger = new Logger(new AccelByteLogHandler());
+
+        public static ILogger DefaultLogger
+        {
+            get
+            {
+                return defaultLogger;
+            }
+        }
 
         static AccelByteDebug()
         {
@@ -82,27 +92,40 @@ namespace AccelByte.Core
             logger.Value.logEnabled = enable;
         }
 
+        public static void SetLogger(ILogger newLogger)
+        {
+            if(newLogger != null)
+            {
+                logger = new Lazy<ILogger>(() => newLogger);
+                SetFilterLogType(currentSeverity);
+            }
+            else
+            {
+                logger = null;
+            }
+        }
+
         public static void SetFilterLogType(LogType type)
         {
             string unityLogTypeStr = type.ToString();
             if(!Enum.TryParse(unityLogTypeStr, true, out currentSeverity))
             {
                 currentSeverity = AccelByteLogType.Log;
-                logger.Value.filterLogType = LogType.Log;
+                SetLoggerLogFilter(LogType.Log);
                 object warningMessage = $"{GetMessageTag(AccelByteLogType.Warning)}: Failed assign Unity log severity type : {type}.";
                 warningMessage = AppendMessageTrailInfo(warningMessage, AccelByteLogType.Warning, true);
                 Debug.LogWarning(warningMessage);
             }
             else
             {
-                logger.Value.filterLogType = type;
+                SetLoggerLogFilter(type);
             }
         }
 
         public static void SetFilterLogType(AccelByteLogType type)
         {
             currentSeverity = type;
-            logger.Value.filterLogType = ConvertAccelByteLogType(type);
+            SetLoggerLogFilter(ConvertAccelByteLogType(type));
         }
 
         public static void LogVerbose(object message)
@@ -147,7 +170,7 @@ namespace AccelByte.Core
 
         public static void LogException(Exception exception)
         {
-            if (!FilterLogSeverity(currentSeverity, AccelByteLogType.Exception))
+            if (logger == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception))
             {
                 return;
             }
@@ -156,11 +179,19 @@ namespace AccelByte.Core
 
         public static void LogException(Exception exception, Object context)
         {
-            if (!FilterLogSeverity(currentSeverity, AccelByteLogType.Exception))
+            if (logger == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception))
             {
                 return;
             }
             logger.Value.LogException(exception, context);
+        }
+
+        private static void SetLoggerLogFilter(LogType type)
+        {
+            if(logger != null)
+            {
+                logger.Value.filterLogType = type;
+            }
         }
 
         private static object AppendMessageTrailInfo(object message, AccelByteLogType severity, bool appendStackTrace)
@@ -196,7 +227,7 @@ namespace AccelByte.Core
 
         private static void InvokeLog(AccelByteLogType logType, object message)
         {
-            if (!FilterLogSeverity(currentSeverity, logType))
+            if (logger == null || !FilterLogSeverity(currentSeverity, logType))
             {
                 return;
             }
@@ -205,7 +236,7 @@ namespace AccelByte.Core
 
         private static void InvokeLog(AccelByteLogType logType, object message, Object context)
         {
-            if (!FilterLogSeverity(currentSeverity, logType))
+            if (logger == null || !FilterLogSeverity(currentSeverity, logType))
             {
                 return;
             }

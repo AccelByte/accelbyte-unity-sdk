@@ -446,5 +446,27 @@ namespace AccelByte.Server
             var result = response.TryParse();
             callback.Try(result);
         }
+        
+        public IEnumerator GetGlobalStatItemsByStatCode(string statCode, ResultCallback<GlobalStatItem> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(statCode), nameof(statCode) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/globalstatitems/{statCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("statCode", statCode)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GlobalStatItem>();
+
+            callback.Try(result);
+        }
     }        
 }

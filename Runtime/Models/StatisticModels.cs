@@ -183,4 +183,15 @@ namespace AccelByte.Models
         [DataMember] public float currentValue { get; set; }
     };
 
+    [DataContract]
+    public class GlobalStatItem
+    {
+        [DataMember] public string statCode { get; set; }
+        [DataMember] public string statName { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public float value { get; set; }
+        [DataMember] public string[] tags { get; set; }
+        [DataMember] public string createdAt { get; set; }
+        [DataMember] public string updatedAt { get; set; }
+    }
 }

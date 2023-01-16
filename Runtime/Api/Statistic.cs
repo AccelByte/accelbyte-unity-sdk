@@ -279,6 +279,27 @@ namespace AccelByte.Api
                     callback));
         }
 
-      
+        /// <summary>
+        /// Get global statistic item by statistic code.
+        /// </summary>
+        /// <param name="statCode">StatCode.</param>
+        /// <param name="callback">Returns GlobalStatItem via callback when completed</param>
+        public void GetGlobalStatItemsByStatCode(string statCode, ResultCallback<GlobalStatItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetGlobalStatItemsByStatCode(
+                    statCode, 
+                    session.AuthorizationToken, 
+                    callback)
+                );
+        }
     }
 }

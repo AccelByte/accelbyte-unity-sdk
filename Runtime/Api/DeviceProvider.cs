@@ -4,6 +4,8 @@
 
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -11,9 +13,29 @@ namespace AccelByte.Api
 {
     public class DeviceProvider
     {
+        public static string EncodeHMAC(string macAddress, string key)
+        {
+            try
+            {
+                byte[] byteArray = Encoding.ASCII.GetBytes(macAddress);
+                using (var myhmacsha1 = new HMACSHA1(Encoding.ASCII.GetBytes(key)))
+                {
+                    var hashArray = myhmacsha1.ComputeHash(byteArray);
+                    return hashArray.Aggregate("", (s, e) => s + System.String.Format("{0:x2}", e), s => s);
+                }
+            }
+            catch (System.InvalidOperationException e)
+            {
+                throw e;
+            }
+        }
+
         public static DeviceProvider GetFromSystemInfo()
         {
-            string identifier = "unity_" + SystemInfo.deviceType + "_" + Application.platform;
+            string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatforName();
+            string macAddress = GetDeviceMacAddress();
+            string publisherNamespace = AccelBytePlugin.Config.PublisherNamespace;
+
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId")){
                 PlayerPrefs.SetString("AccelByteDeviceUniqueId", System.Guid.NewGuid().ToString());
@@ -24,7 +46,7 @@ namespace AccelByte.Api
 #else
             return new DeviceProvider(
                 "device",
-                identifier + "_" + SystemInfo.deviceUniqueIdentifier);
+                identifier + "_" + EncodeHMAC(macAddress, publisherNamespace));
 #endif
         }
 
@@ -39,6 +61,14 @@ namespace AccelByte.Api
             this.DeviceType = deviceType;
             this.DeviceId = deviceId;
         }   
+
+        public static string GetDeviceMacAddress()
+        {
+            return NetworkInterface.GetAllNetworkInterfaces()
+                .Where(nic => nic.OperationalStatus == OperationalStatus.Up)
+                .Select(nic => nic.GetPhysicalAddress().ToString())
+                .FirstOrDefault();
+        }
 
         public static string[] GetMacAddress()
         {

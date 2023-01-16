@@ -233,7 +233,7 @@ namespace AccelByte.Api
             , ResultCallback<UpdateUserStatItemValueResponse> callback)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
             Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
             Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
@@ -257,6 +257,29 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UpdateUserStatItemValueResponse>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetGlobalStatItemsByStatCode(string statCode,string accessToken, ResultCallback<GlobalStatItem> callback)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(statCode), nameof(statCode) + " cannot be null");
+            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/globalstatitems/{statCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("statCode", statCode)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GlobalStatItem>();
 
             callback.Try(result);
         }

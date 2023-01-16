@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.0%0D15.9.0) (2023-01-16)
+
+
+### Features
+
+* [JSC-916] add device ID generator ([4ae2160](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4ae216021ad2e842cac3074543912739d7396302))
+* ability to set logger ([ea3ebc9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ea3ebc911d6e052dfc560abc2375c9f0c8b5fe96))
+* get global statistic item by stat code ([a3b2bcc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3b2bcc867bd30692908743978679ef1ba69160f))
+
+
+### Bug Fixes
+
+* [JSC-1020] replace websocket-sharp.dll properly ([42e0d9e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42e0d9e96db3319c31209ddfce9835d74296838d))
+
+
+### Refactors
+
+* rename websockket-sharp to accelbyte.websocket.sharp ([c2daec4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c2daec4b6d3a7df9b448aaf9a9b93420445899b1))
+
 ## [15.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.9.0%0D15.8.1) (2023-01-03)
 
 

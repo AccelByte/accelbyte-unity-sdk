@@ -7,8 +7,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "websocket-sharp.dll",
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "accelbyte.websocket.sharp.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
