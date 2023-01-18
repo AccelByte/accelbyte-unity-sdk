@@ -42,7 +42,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(api.GetCurrentTime(
                 (Result<Time> result) => 
                 {
-                    ServerTimestamp = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartupAsDouble);
+                    ServerTimestamp = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartup);
                     LastServerTime = result.Value.currentTime;
                     callback.Try(result);
                 }));
@@ -62,7 +62,7 @@ namespace AccelByte.Api
             }
             else
             {
-                System.TimeSpan LocalTimeSpan = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartupAsDouble);
+                System.TimeSpan LocalTimeSpan = System.TimeSpan.FromSeconds(UnityEngine.Time.realtimeSinceStartup);
                 System.TimeSpan ServerTimeSpan = LocalTimeSpan - ServerTimestamp;
                 Time Value =  new Time();
                 Value.currentTime = LastServerTime + ServerTimeSpan;

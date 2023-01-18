@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.10.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.1%0D15.10.0) (2023-01-18)
+
+
+### Bug Fixes
+
+* missing Unity meta files ([f61bc31](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f61bc314fa49c7c3d9888895986c794e2911ef53))
+* unsupported C# implementation in Unity 2019 ([7ffb40f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7ffb40f4123d8780fb14c55329fa665ab345c9c0))
+
 ## [15.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.0%0D15.9.0) (2023-01-16)
 
 

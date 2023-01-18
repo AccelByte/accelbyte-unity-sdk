@@ -367,7 +367,10 @@ namespace AccelByte.Api
             , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            request ??= new Dictionary<string, object>();
+            if (request == null)
+            {
+                request = new Dictionary<string, object>();
+            }
 
             if (!_session.IsValid())
             {
