@@ -172,6 +172,7 @@ namespace AccelByte.Core
         public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, MiscellaneousApi>(); }
         public Session GetSession() { return GetApi<Session, SessionApi>(); }
         public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
+        public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
 #endregion
 
 
@@ -181,6 +182,6 @@ namespace AccelByte.Core
             httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(config.BaseUrl));
         }
-
-    } // Class
+    }
+    // Class
 } // Namespace

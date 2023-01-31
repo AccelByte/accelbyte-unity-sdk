@@ -117,6 +117,7 @@ namespace AccelByte.Models
         [DataMember] public string configurationName;
         [DataMember(Name = "joinType")] public SessionV2Joinability joinability;
         [DataMember] public SessionV2MemberData[] members;
+        [DataMember] public bool textChat;
     }
 
     [DataContract]
@@ -269,6 +270,7 @@ namespace AccelByte.Models
         [DataMember] public string[] ticketIds;
         [DataMember] public SessionConfigurationTemplateType type;
         [DataMember] public SessionV2MemberData[] members;
+        [DataMember] public bool textChat;
     }
 
     [DataContract]

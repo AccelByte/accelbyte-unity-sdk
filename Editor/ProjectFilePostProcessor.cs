@@ -46,7 +46,7 @@ public class ProjectFilePostprocessor : AssetPostprocessor
     public static string OnGeneratedCSProject(string path, string content)
     {
         var projectPath = Directory.GetCurrentDirectory();
-        var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettings).Assembly);
+        var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettingsV2).Assembly);
         var folderName = MakeRelativePath(projectPath, AccelBytePackageInfo.assetPath);
         
 

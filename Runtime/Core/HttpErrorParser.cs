@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,55 +10,88 @@ namespace AccelByte.Core
 {
     public static class HttpErrorParser
     {
+        internal static string NoResponseMessage = "There is no response.";
         public static Result TryParse(this IHttpResponse response)
         {
+            Result retval;
             Error error = ParseError(response);
-
-            if (error != null) return Result.CreateError(error);
-
-            return Result.CreateOk();
+            if (error != null)
+            {
+                retval = Result.CreateError(error);
+            }
+            else
+            {
+                retval = Result.CreateOk();
+            }
+            return retval;
         }
 
         public static Result<T> TryParseJson<T>(this IHttpResponse response)
         {
+            Result<T> retval;
             Error error = ParseError(response);
 
-            if (error != null) return Result<T>.CreateError(error);
-
-            try
+            if (error != null)
             {
-                if (response.BodyBytes == null || response.BodyBytes.Length == 0) return Result<T>.CreateOk(default);
-
-                return Result<T>.CreateOk(response.BodyBytes.ToObject<T>());
+                retval = Result<T>.CreateError(error);
             }
-            catch (Exception e)
+            else
             {
-                return Result<T>.CreateError(ErrorCode.ErrorFromException, e.Message);
+                try
+                {
+                    if (response.BodyBytes == null || response.BodyBytes.Length == 0)
+                    {
+                        retval = Result<T>.CreateOk(default(T));
+                    }
+                    else
+                    {
+                        retval = Result<T>.CreateOk(response.BodyBytes.ToObject<T>());
+                    }
+                }
+                catch (Exception e)
+                {
+                    retval = Result<T>.CreateError(ErrorCode.ErrorFromException, e.Message);
+                }
             }
+            return retval;
         }
 
         public static Result<T, U> TryParseJson<T, U>(this IHttpResponse response) where U : new()
         {
-            bool errorResponse = false;
-            bool successResponseCode = response.Code >= 200 && response.Code < 300;
-            if (response == null || successResponseCode == false)
+            Result<T, U> retval = null;
+            if (response == null)
             {
-                errorResponse = true;
+                retval = Result<T, U>.CreateError(new U());
             }
+            else
+            {
+                bool errorResponse = false;
+                bool successResponseCode = response.Code >= 200 && response.Code < 300;
+                if (successResponseCode == false)
+                {
+                    errorResponse = true;
+                }
 
-            bool bodyResponseNullOrEmpty = response.BodyBytes == null || response.BodyBytes.Length == 0;
-            if (errorResponse)
-            {
-                return bodyResponseNullOrEmpty ? Result<T, U>.CreateError(new U()) :
-                    Result<T, U>.CreateError(response.BodyBytes.ToObject<U>());
+                bool bodyResponseNullOrEmpty = response.BodyBytes == null || response.BodyBytes.Length == 0;
+                try
+                {
+                    if (errorResponse)
+                    {
+                        retval = bodyResponseNullOrEmpty ? Result<T, U>.CreateError(new U()) :
+                            Result<T, U>.CreateError(response.BodyBytes.ToObject<U>());
+                    }
+                    else
+                    {
+                        retval = bodyResponseNullOrEmpty ? Result<T, U>.CreateOk() : Result<T, U>.CreateOk(response.BodyBytes.ToObject<T>());
+                    }
+                }
+                catch (Exception e)
+                {
+                    AccelByteDebug.LogWarning($"Failed parsing response.\nException: {e.Message}");
+                    retval = Result<T, U>.CreateError(new U());
+                }
             }
-            else if (bodyResponseNullOrEmpty)
-            {
-                Result<T, U>.CreateOk();
-            }
-
-            return Result<T, U>.CreateOk(response.BodyBytes.ToObject<T>());            
-             
+            return retval;
         }
 
         private static OAuthError ParseOAuthError(IHttpResponse response)
@@ -78,13 +111,24 @@ namespace AccelByte.Core
         }
         private static Error ParseError(IHttpResponse response)
         {
-            if (response == null) return new Error(ErrorCode.NetworkError, "There is no response.");
+            if (response == null)
+            {
+                return new Error(ErrorCode.NetworkError, NoResponseMessage);
+            }
+            if (response.Code >= 200 && response.Code < 300)
+            {
+                return null;
+            }
 
-            if (response.Code >= 200 && response.Code < 300) return null;
+            if (response.Code < 400 || response.Code >= 600)
+            {
+                return HttpErrorParser.ParseDefaultError(response);
+            }
 
-            if (response.Code < 400 || response.Code >= 600) return HttpErrorParser.ParseDefaultError(response);
-
-            if (response.BodyBytes == null) return new Error((ErrorCode)response.Code);
+            if (response.BodyBytes == null)
+            {
+                return new Error((ErrorCode)response.Code);
+            }
 
             try
             {
@@ -100,40 +144,50 @@ namespace AccelByte.Core
         {
             var error = response.BodyBytes.ToObject<ServiceError>();
 
+            Error retval;
             if (error.numericErrorCode != 0)
             {
-                return new Error((ErrorCode)error.numericErrorCode, error.errorMessage, error.messageVariables);
+                retval = new Error((ErrorCode)error.numericErrorCode, error.errorMessage, error.messageVariables);
             }
-
-            if (error.errorCode != 0)
+            else if (error.errorCode != 0)
             {
-                return new Error((ErrorCode)error.errorCode, error.errorMessage, error.messageVariables);
+                retval = new Error((ErrorCode)error.errorCode, error.errorMessage, error.messageVariables);
             }
-
-            if (error.code != 0)
+            else if (error.code != 0)
             {
-                return new Error((ErrorCode)error.code, error.message);
+                retval = new Error((ErrorCode)error.code, error.message);
             }
-
-            if (error.error != null)
+            else if (error.error != null)
             {
                 string message = error.error;
 
-                if (error.error_description != null) message += ": " + error.error_description;
-
-                return new Error((ErrorCode)response.Code, message);
+                if (error.error_description != null)
+                {
+                    message += ": " + error.error_description;
+                }
+                retval = new Error((ErrorCode)response.Code, message);
+            }
+            else
+            {
+                retval = new Error((ErrorCode)response.Code);
             }
 
-            return new Error((ErrorCode)response.Code);
+            return retval;
         }
 
         private static Error ParseDefaultError(IHttpResponse response)
         {
-            if (response.BodyBytes == null) return new Error((ErrorCode)response.Code);
-
-            string body = System.Text.Encoding.UTF8.GetString(response.BodyBytes);
-
-            return new Error((ErrorCode)response.Code, "Unknown error: " + body);
+            Error retval;
+            if (response.BodyBytes == null)
+            {
+                retval = new Error((ErrorCode)response.Code);
+            }
+            else
+            {
+                string body = System.Text.Encoding.UTF8.GetString(response.BodyBytes);
+                retval = new Error((ErrorCode)response.Code, "Unknown error: " + body);
+            }
+            return retval;
         }
     }
 }

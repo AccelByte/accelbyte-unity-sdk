@@ -32,6 +32,31 @@ namespace AccelByte.Core {
         byte[] BodyBytes { get; }
     }
 
+    internal class HttpHeaderHelper
+    {
+        public static string GetHeaderValue(IDictionary<string, string> header, string key)
+        {
+            string retval = null;
+            if (header != null)
+            {
+                if (header.ContainsKey(key))
+                {
+                    retval = header[key];
+                }
+
+                if (retval == null)
+                {
+                    string loweredKey = key.ToLower();
+                    if (header.ContainsKey(loweredKey))
+                    {
+                        retval = header[loweredKey];
+                    }
+                }
+            }
+            return retval;
+        }
+    }
+
     public interface IHttpRequestSender
     {
         IEnumerator Send(IHttpRequest request, Action<IHttpResponse, Error> callback, int timeoutMs);

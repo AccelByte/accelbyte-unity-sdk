@@ -101,7 +101,7 @@ namespace AccelByte.Api
             {
                 customerName = AccelBytePlugin.Config.PublisherNamespace;
             }
-            SettingsEnvironment env = AccelByteSettings.Instance.GetEditedEnvironment();
+            SettingsEnvironment env = AccelBytePlugin.GetEnvironment();
             string envString = "";
             switch(env)
             {

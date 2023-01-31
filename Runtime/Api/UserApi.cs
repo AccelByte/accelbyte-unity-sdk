@@ -348,10 +348,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(ticket, 
-                "Can't link platform account! Password parameter is null!");
-
-            if (platformType == PlatformType.Stadia)
-                ticket = ticket.TrimEnd('=');
+                "Can't link platform account! Password parameter is null!"); 
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}";
             

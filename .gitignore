@@ -57,3 +57,9 @@ build.log
 Doxygen/build
 Doxygen/Doxyfile
 Documentation
+
+# Config Directory
+Configs/Resources/AccelByteSDK/*
+Configs/Resources/AccelByteSDKTest/*
+Configs/Resources/AccelByteSDKTest.meta
+!Configs/Resources/AccelByteSDK/CompatibilityMap*

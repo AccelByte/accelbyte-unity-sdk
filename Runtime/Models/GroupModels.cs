@@ -10,7 +10,7 @@ using Newtonsoft.Json.Converters;
 
 namespace AccelByte.Models
 {
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum GroupType
     {
         NONE,
@@ -19,7 +19,7 @@ namespace AccelByte.Models
         PRIVATE
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum RuleCriteria
     {
         MINIMUM,
@@ -27,7 +27,7 @@ namespace AccelByte.Models
         EQUAL
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum JoinGroupStatus
     {
         JOINING,
@@ -35,7 +35,7 @@ namespace AccelByte.Models
         REQUESTED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum AllowedAction
     {
         None,
@@ -47,7 +47,7 @@ namespace AccelByte.Models
         responseJoinRequest
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum RequestType
     {
         INVITE,
@@ -55,7 +55,7 @@ namespace AccelByte.Models
         JOINED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MemberStatus
     {
         NONE,
@@ -93,7 +93,7 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
         [DataMember] public string groupDescription { get; set; }
         [DataMember] public string groupIcon { get; set; }
-        [DataMember] public int groupMaxMember { get; set; } 
+        [DataMember] public int groupMaxMember { get; set; }
         [DataMember] public string groupName { get; set; }
         [DataMember] public string groupRegion { get; set; }
         [DataMember] public GroupRules groupRules { get; set; }
@@ -104,7 +104,7 @@ namespace AccelByte.Models
     public class GroupMember
     {
         [DataMember] public string userId { get; set; }
-        [DataMember] public string []memberRoleId { get; set; }
+        [DataMember] public string[] memberRoleId { get; set; }
     }
 
     [DataContract]
@@ -257,4 +257,17 @@ namespace AccelByte.Models
         [DataMember] public MemberRole[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
+
+    [DataContract]
+    public class GetGroupsByGroupIdsRequest
+    {
+        [DataMember] public string[] groupIDs { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateCustomAttributesRequest
+    {
+        [DataMember] public Dictionary<string,object> customAttributes { get; set; }
+    }
+
 }

@@ -14,6 +14,12 @@ namespace AccelByte.Core
 {
     public class HttpRequestBuilder
     {
+        internal const string GetMethod = "GET";
+        internal const string PostMethod = "POST";
+        internal const string PutMethod = "PUT";
+        internal const string PatchMethod = "PATCH";
+        internal const string DeleteMethod = "DELETE";
+
         private readonly StringBuilder formBuilder = new StringBuilder(1024);
         private readonly StringBuilder queryBuilder = new StringBuilder(256);
         private readonly StringBuilder urlBuilder = new StringBuilder(256);
@@ -59,27 +65,27 @@ namespace AccelByte.Core
 
         public static HttpRequestBuilder CreateGet(string url)
         {
-            return HttpRequestBuilder.CreatePrototype("GET", url);
+            return HttpRequestBuilder.CreatePrototype(GetMethod, url);
         }
 
         public static HttpRequestBuilder CreatePost(string url)
         {
-            return HttpRequestBuilder.CreatePrototype("POST", url);
+            return HttpRequestBuilder.CreatePrototype(PostMethod, url);
         }
 
         public static HttpRequestBuilder CreatePut(string url)
         {
-            return HttpRequestBuilder.CreatePrototype("PUT", url);
+            return HttpRequestBuilder.CreatePrototype(PutMethod, url);
         }
 
         public static HttpRequestBuilder CreatePatch(string url)
         {
-            return HttpRequestBuilder.CreatePrototype("PATCH", url);
+            return HttpRequestBuilder.CreatePrototype(PatchMethod, url);
         }
 
         public static HttpRequestBuilder CreateDelete(string url)
         {
-            return HttpRequestBuilder.CreatePrototype("DELETE", url);
+            return HttpRequestBuilder.CreatePrototype(DeleteMethod, url);
         }
 
         /// <summary>
@@ -211,18 +217,18 @@ namespace AccelByte.Core
             return this;
         }
 
-        public HttpRequestBuilder WithBasicAuthWithCookie()
+        public HttpRequestBuilder WithBasicAuthWithCookie(string encodeKey)
         {
             this.result.AuthType = HttpAuth.Basic;
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(); 
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey); 
             this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;
             return this;
         }
 
-        public HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId()
+        public HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId(string encodeKey)
         {
             this.result.AuthType = HttpAuth.Basic;
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey);
             this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;     
             this.result.Headers["Auth-Trust-Id"] = PlayerPrefs.GetString(UserSession.AuthTrustIdKey);
             return this;

@@ -125,7 +125,10 @@ namespace AccelByte.Models
         refreshTokenRequest,
         refreshTokenResponse,
         signalingP2PNotif,
-        messageSessionNotif
+        messageSessionNotif,
+        setRejectConsentRequest,
+        setRejectConsentResponse,
+        setRejectConsentNotif
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

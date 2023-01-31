@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Server;
 using UnityEngine;
 using UnityEngine.Assertions;
 using HybridWebSocket;
@@ -200,6 +201,11 @@ namespace AccelByte.Api
         /// Raised when user from within the same party confirmed he/she is ready for match
         /// </summary>
         public event ResultCallback<ReadyForMatchConfirmation> ReadyForMatchConfirmed;
+        
+        /// <summary>
+        /// Raised when a user rejected the match
+        /// </summary>
+        public event ResultCallback<ReadyForMatchConfirmation> MatchRejected;
 
         /// <summary>
         /// Raised when DS process is updated.
@@ -1181,6 +1187,17 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Reject match that was found.
+        /// </summary>
+        /// <param name="matchId"></param>
+        /// <param name="callback"></param>
+        public void RejectMatch(string matchId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.RejectMatch(matchId, callback);
+        }
+
+        /// <summary>
         /// Send matchmaking cancel request.
         /// </summary>
         /// <param name="gameMode">Target matchmaking game mode</param>
@@ -1677,6 +1694,9 @@ namespace AccelByte.Api
                     break;
                 case MessageType.signalingP2PNotif:
                     websocketApi.HandleNotification(message, this.SignalingP2PNotification);
+                    break;
+                case MessageType.setRejectConsentNotif:
+                    websocketApi.HandleNotification(message, MatchRejected);
                     break;
                 default:
                     websocketApi.HandleResponse(messageId, message, errorCode);

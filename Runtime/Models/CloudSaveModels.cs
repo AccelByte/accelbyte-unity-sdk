@@ -79,5 +79,21 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> value { get; set; }
     }
 
+    [DataContract]
+    public class BulkGetRecordsByKeyRequest
+    {
+        [DataMember] public string[] keys { get; set; }
+    }
 
+    [DataContract]
+    public class UserRecords
+    {
+        [DataMember] public UserRecord[] data { get; set; }
+    }
+    
+    [DataContract]
+    public class GameRecords
+    {
+        [DataMember] public GameRecord[] data { get; set; }
+    }
 }

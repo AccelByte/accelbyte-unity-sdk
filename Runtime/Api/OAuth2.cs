@@ -72,7 +72,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(password, "Password parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/oauth/token")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -112,7 +112,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(password, "Password parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId()
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -151,7 +151,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(password, "Password parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId()
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -189,7 +189,7 @@ public class OAuth2 : ApiBase
     public IEnumerator LoginWithDeviceId(ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
 
         IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/device/token")
             .WithPathParam("platformId", deviceProvider.DeviceType)
@@ -220,11 +220,11 @@ public class OAuth2 : ApiBase
     public IEnumerator LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
 
         IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/device/token")
             .WithPathParam("platformId", deviceProvider.DeviceType)
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("device_id", deviceProvider.DeviceId)
@@ -260,12 +260,7 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
-
-        if (platformType == PlatformType.Stadia)
-        {
-            platformToken = platformToken.TrimEnd('=');
-        }
+        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformType.ToString().ToLower())
@@ -301,16 +296,11 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
-
-        if (platformType == PlatformType.Stadia)
-        {
-            platformToken = platformToken.TrimEnd('=');
-        }
+        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformType.ToString().ToLower())
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
@@ -385,7 +375,7 @@ public class OAuth2 : ApiBase
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
@@ -597,7 +587,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(code, "Code parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/oauth/token")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "authorization_code")
@@ -631,7 +621,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(code, "Code parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "v3/oauth/token")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "authorization_code")
@@ -705,7 +695,7 @@ public class OAuth2 : ApiBase
     public IEnumerator RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
     {
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "refresh_token")
@@ -742,7 +732,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(code, "code parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/mfa/verify")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("mfaToken", mfaToken)
@@ -776,7 +766,7 @@ public class OAuth2 : ApiBase
 
         var request = HttpRequestBuilder
             .CreatePost(BaseUrl + "/v3/oauth/verify")
-            .WithBasicAuthWithCookie()
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("token", token)
@@ -837,6 +827,35 @@ public class OAuth2 : ApiBase
         if (!string.IsNullOrEmpty(authTrustId))
         {
             PlayerPrefs.SetString(UserSession.AuthTrustIdKey, authTrustId);
+        }
+    }
+    
+    public IEnumerator GenerateGameToken(string code
+        , ResultCallback callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        Assert.IsNotNull(code, "Can't Generate Game Token! Code parameter is null!");
+
+        var request = HttpRequestBuilder
+            .CreatePost(BaseUrl + "/v3/token/exchange")
+            .WithBasicAuth()
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("code", code)
+            .GetResult();
+
+        IHttpResponse response = null;
+        yield return HttpClient.SendRequest(request, rsp => response = rsp);
+        var result = response.TryParseJson<TokenData>();
+        if (!result.IsError)
+        {
+            SaveAuthTrustId(result.Value);
+            OnNewTokenObtained?.Invoke(result.Value);
+            callback.TryOk();
+        }
+        else
+        {
+            callback.TryError(result.Error);
         }
     }
 }

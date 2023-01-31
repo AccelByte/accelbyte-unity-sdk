@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -55,6 +59,8 @@ namespace AccelByte.Api
         private string channelSlug;
         private AccelByteWebSocket webSocket;
         private LobbySessionId lobbySessionId;
+
+        private const string LOBBY_SESSION_ID_HEADER_NAME = "X-Ab-LobbySessionID";
         
         #endregion private fields declaration
 
@@ -113,7 +119,12 @@ namespace AccelByte.Api
         /// </summary>
         public void SetSessionId(string lobbySessionID)
         {
-            webSocket?.SetSessionId(lobbySessionID);
+            if(webSocket == null)
+            {
+                return;
+            }
+
+            webSocket.CustomHeaders[LOBBY_SESSION_ID_HEADER_NAME] = lobbySessionID;
         }
 
         /// <summary>
@@ -815,9 +826,9 @@ namespace AccelByte.Api
         /// <summary>
         /// Send matchmaking start request.
         /// </summary>
-        /// <param name="gameMode"></param>
-        /// <param name="callback"></param>
-        /// <param name="param"></param>
+        /// <param name="gameMode">game mode to use</param>
+        /// <param name="param">optional matchmaking parameter</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void StartMatchmaking( string gameMode
             , MatchmakingOptionalParam param
             , ResultCallback<MatchmakingCode> callback )
@@ -881,13 +892,24 @@ namespace AccelByte.Api
         /// <summary>
         /// Send a message to matchmaking service to indicate the user is ready for match
         /// </summary>
-        /// <param name="matchId"></param>
-        /// <param name="callback"></param>
+        /// <param name="matchId">match Id that was found</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void ConfirmReadyForMatch( string matchId
             , ResultCallback callback )
         {
             SendRequest(MessageType.setReadyConsentRequest, 
                 new ReadyConsentRequest { matchId = matchId }, callback);
+        }
+
+        /// <summary>
+        /// Reject match that was found.
+        /// </summary>
+        /// <param name="matchId">match Id we want to reject.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void RejectMatch(string matchId, ResultCallback callback)
+        {
+            SendRequest(MessageType.setRejectConsentRequest,
+                new ReadyConsentRequest {matchId = matchId}, callback);
         }
 
         /// <summary>

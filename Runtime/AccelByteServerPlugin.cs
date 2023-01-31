@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -7,6 +7,7 @@ using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,9 +20,8 @@ namespace AccelByte.Server
 #endif
     public static class AccelByteServerPlugin
     {
+        private static AccelByteSettingsV2 settings;
         private static ServerOauthLoginSession session;
-        private static OAuthConfig oAuthConfig;
-        private static ServerConfig config;
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
         private static TokenData accessToken;
@@ -40,18 +40,20 @@ namespace AccelByte.Server
         private static ServerMatchmakingV2 _matchmakingV2;
         private static ServerUserAccount userAccount;
         private static ServerSeasonPass seasonPass;
+        private static ServiceVersion serviceVersion;
 
-        private static bool hasBeenInitialized = false;
+        private static bool initialized = false;
         private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
+        private static IHttpRequestSender defaultHttpSender = new UnityHttpRequestSender();
 
         internal static OAuthConfig OAuthConfig
         {
             get
             {
                 CheckPlugin();
-                return oAuthConfig;
+                return settings.OAuthConfig;
             }
         }
 
@@ -60,7 +62,20 @@ namespace AccelByte.Server
             get
             {
                 CheckPlugin();
-                return config;
+                return settings.ServerSdkConfig;
+            }
+        }
+
+        internal static IHttpRequestSender DefaultHttpSender
+        {
+            get
+            {
+                return defaultHttpSender;
+            }
+            set
+            {
+                defaultHttpSender = value;
+                UpdateHttpClientSender(defaultHttpSender);
             }
         }
 
@@ -69,118 +84,115 @@ namespace AccelByte.Server
 #if UNITY_EDITOR // Handle an unexpected behaviour if Domain Reload (experimental) is disabled
             EditorApplication.playModeStateChanged += state =>
             {
-                if (state != PlayModeStateChange.ExitingEditMode) return;
+                if (state != PlayModeStateChange.ExitingEditMode)
+                {
+                    return;
+                }
 
-                hasBeenInitialized = false;
-                accessToken = null;
-                server = null;
-                dsHub = null;
-                dedicatedServerManager = null;
-                ecommerce = null;
-                statistic = null;
-                _qosManager = null;
-                gameTelemetry = null;
-                achievement = null;
-                lobby = null;
-                cloudSave = null;
-                seasonPass = null;
-                configReset = null;
-                environmentChanged = null;
+                initialized = false;
+                ResetApis();
             };
         }
 
-        private static void Init()
+        private static void Initialize()
         {
 #endif
-            string activePlatform = GetServerActivePlatform();
-            RetrieveConfigFromJsonFile(activePlatform);
-            if (oAuthConfig.IsRequiredFieldEmpty())
-            {
-                RetrieveConfigFromJsonFile();
-            }
-            oAuthConfig.CheckRequiredField();
-            oAuthConfig.Expand();
-            config.CheckRequiredField();
-            config.Expand();
-            coroutineRunner = new CoroutineRunner();
-            httpClient = new AccelByteHttpClient();
-            InitServerSessionClient();  
-            InitDedicatedServerClient();
+            Initialize(null, null);
+
+            ValidateCompatibility();
         }
 
-        private static void RetrieveConfigFromJsonFile(string platform = "")
+        internal static void Initialize(ServerConfig inConfig, OAuthConfig inOAuthConfig)
         {
-            var oAuthFile = Resources.Load("AccelByteServerSDKOAuthConfig" + platform);
-            var configFile = Resources.Load("AccelByteServerSDKConfig");
+            ResetApis();
 
-            if (oAuthFile == null)
+            AccelByteSettingsV2 newSettings;
+            if (inConfig == null && inOAuthConfig == null)
             {
-                oAuthFile = Resources.Load("AccelByteServerSDKOAuthConfig");
-                if (oAuthFile == null)
+                string activePlatform = AccelByteSettingsV2.GetActivePlatform(true);
+                newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
+                if (newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
                 {
-                    throw new Exception("'AccelByteServerSDKOAuthConfig.json' isn't found in the Project/Assets/Resources directory");
+                    newSettings = RetrieveConfigFromJsonFile("", activeEnvironment);
                 }
             }
-
-            if (configFile == null)
+            else
             {
-                throw new Exception(
-                    "'AccelByteServerSDKConfig.json' isn't found in the Project/Assets/Resources directory");
+                newSettings = new AccelByteSettingsV2(inOAuthConfig, inConfig);
             }
 
-            string wholeOAuthJsonText = ((TextAsset)oAuthFile).text;
-            string wholeJsonText = ((TextAsset)configFile).text;
+            newSettings.OAuthConfig.CheckRequiredField();
+            newSettings.ServerSdkConfig.CheckRequiredField();
 
-            MultiOAuthConfigs multiOAuthConfigs = wholeOAuthJsonText.ToObject<MultiOAuthConfigs>();
-            MultiServerConfigs multiServerConfigs = wholeJsonText.ToObject<MultiServerConfigs>();
-            if (multiOAuthConfigs == null)
-            {
-                multiOAuthConfigs = new MultiOAuthConfigs();
-            }
-            if (multiServerConfigs == null)
-            {
-                multiServerConfigs = new MultiServerConfigs();
-            }
-            multiOAuthConfigs.Expand();
-            multiServerConfigs.Expand();
+            settings = newSettings;
 
-            switch (activeEnvironment)
-            {
-                case SettingsEnvironment.Development:
-                    oAuthConfig = multiOAuthConfigs.Development;
-                    config = multiServerConfigs.Development; break;
-                case SettingsEnvironment.Certification:
-                    oAuthConfig = multiOAuthConfigs.Certification;
-                    config = multiServerConfigs.Certification; break;
-                case SettingsEnvironment.Production:
-                    oAuthConfig = multiOAuthConfigs.Production;
-                    config = multiServerConfigs.Production; break;
-                case SettingsEnvironment.Default:
-                default:
-                    oAuthConfig = multiOAuthConfigs.Default;
-                    config = multiServerConfigs.Default; break;
-            }
-
-            HttpRequestBuilder.SetNamespace(config.Namespace);
+            HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
             HttpRequestBuilder.SetGameClientVersion(Application.version);
-            HttpRequestBuilder.SetSdkVersion(AccelByteSettings.Instance.AccelByteSDKVersion);
+            HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
+
+            coroutineRunner = new CoroutineRunner();
+            var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
+            var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
+            newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
+            httpClient = newHttpClient;
+
+            session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
+            server = CreateDedicatedServerClient(session, coroutineRunner);
+
+            initialized = true;
         }
 
-        private static void InitServerSessionClient()
+        public static ServiceVersion GetServiceVersion()
         {
-            session = new ServerOauthLoginSession(
-                config.IamServerUrl,
-                oAuthConfig.ClientId,
-                oAuthConfig.ClientSecret,
+            if (serviceVersion == null)
+            {
+                CheckPlugin();
+                serviceVersion = new ServiceVersion(
+                    new ServiceVersionApi(
+                        httpClient,
+                        Config, // baseUrl==justBaseUrl
+                        session),
+                    coroutineRunner);
+            }
+
+            return serviceVersion;
+        }
+
+        static bool ValidateCompatibility()
+        {
+            string matrixJsonText = Utils.AccelByteFileUtils.ReadTextFileFromResource(AccelByteSettingsV2.ServiceCompatibilityResourcePath());
+            var result = Utils.ServiceVersionUtils.CheckServicesCompatibility(GetServiceVersion(), new AccelByteServiceVersion(matrixJsonText)); ;
+            return result;
+        }
+
+        public static Version GetPluginVersion()
+        {
+            return new Version(AccelByteSettingsV2.AccelByteSDKVersion);
+        }
+
+        private static AccelByteSettingsV2 RetrieveConfigFromJsonFile(string platform, SettingsEnvironment environment)
+        {
+            var retval = new AccelByteSettingsV2(platform, environment, true);
+            return retval;
+        }
+
+        private static ServerOauthLoginSession CreateServerSessionClient(ServerConfig newSdkConcifg, OAuthConfig newOAuth, IHttpClient httpClient, CoroutineRunner taskRunner)
+        {
+            var newSession = new ServerOauthLoginSession(
+                newSdkConcifg.IamServerUrl,
+                newOAuth.ClientId,
+                newOAuth.ClientSecret,
                 httpClient,
-                coroutineRunner);
+                taskRunner);
+            return newSession;
         }
 
-        private static void InitDedicatedServerClient()
+        private static DedicatedServer CreateDedicatedServerClient(ServerOauthLoginSession newSession, CoroutineRunner taskRunner)
         {
-            server = new DedicatedServer(
+            var newServer = new DedicatedServer(
                 session,
                 coroutineRunner);
+            return newServer;
         }
 
         /// <summary>
@@ -189,10 +201,11 @@ namespace AccelByte.Server
         private static void CheckPlugin()
         {
 #if UNITY_EDITOR
-            if (hasBeenInitialized) return;
-            
-            hasBeenInitialized = true;
-            Init();
+            if (!initialized)
+            {
+                Initialize();
+                initialized = true;
+            }
 #endif
         }
 
@@ -208,13 +221,13 @@ namespace AccelByte.Server
             {
                 return dsHub;
             }
-            
+
             CheckPlugin();
             dsHub = new ServerDSHub(
                 new ServerDSHubApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==DSHubServerUrl 
-                    session), 
+                    session),
                 session,
                 coroutineRunner);
 
@@ -232,20 +245,20 @@ namespace AccelByte.Server
 
             return dsHub;
         }
-        
+
         public static DedicatedServerManager GetDedicatedServerManager()
         {
             if (dedicatedServerManager != null)
             {
                 return dedicatedServerManager;
             }
-            
+
             CheckPlugin();
             dedicatedServerManager = new DedicatedServerManager(
                 new DedicatedServerManagerApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==DSMControllerServerUrl 
-                    session), 
+                    session),
                 session,
                 coroutineRunner);
 
@@ -263,15 +276,15 @@ namespace AccelByte.Server
 
             return dedicatedServerManager;
         }
-        
+
         public static ServerEcommerce GetEcommerce()
         {
             if (ecommerce != null) return ecommerce;
-            
+
             CheckPlugin();
             ecommerce = new ServerEcommerce(
                 new ServerEcommerceApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==PlatformServerUrl
                     session),
                 session,
@@ -291,15 +304,15 @@ namespace AccelByte.Server
 
             return ecommerce;
         }
-        
+
         public static ServerStatistic GetStatistic()
         {
             if (statistic != null) return statistic;
-            
+
             CheckPlugin();
             statistic = new ServerStatistic(
                 new ServerStatisticApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==StatisticServerUrl
                     session),
                 session,
@@ -323,11 +336,11 @@ namespace AccelByte.Server
         public static ServerQosManager GetQos()
         {
             if (_qosManager != null) return _qosManager;
-            
+
             CheckPlugin();
             _qosManager = new ServerQosManager(
                 new ServerQosManagerApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==QosManagerServerUrl
                     session),
                 session,
@@ -351,11 +364,11 @@ namespace AccelByte.Server
         public static ServerGameTelemetry GetGameTelemetry()
         {
             if (gameTelemetry != null) return gameTelemetry;
-            
+
             CheckPlugin();
             gameTelemetry = new ServerGameTelemetry(
                 new ServerGameTelemetryApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==GameTelemetryServerUrl
                     session),
                 session,
@@ -379,11 +392,11 @@ namespace AccelByte.Server
         public static ServerAchievement GetAchievement()
         {
             if (achievement != null) return achievement;
-            
+
             CheckPlugin();
             achievement = new ServerAchievement(
                 new ServerAchievementApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==AchievementServerUrl
                     session),
                 session,
@@ -407,13 +420,13 @@ namespace AccelByte.Server
         public static ServerLobby GetLobby()
         {
             if (lobby != null) return lobby;
-            
+
             CheckPlugin();
             lobby = new ServerLobby(
                 new ServerLobbyApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==LobbyServerUrl
-                    session), 
+                    session),
                 session,
                 coroutineRunner);
 
@@ -431,17 +444,17 @@ namespace AccelByte.Server
 
             return lobby;
         }
-        
+
         public static ServerSession GetSession()
         {
             if (_session != null) return _session;
-            
+
             CheckPlugin();
             _session = new ServerSession(
                 new ServerSessionApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==SessionServerUrl
-                    session), 
+                    session),
                 session,
                 coroutineRunner);
 
@@ -463,11 +476,11 @@ namespace AccelByte.Server
         public static ServerCloudSave GetCloudSave()
         {
             if (cloudSave != null) return cloudSave;
-            
+
             CheckPlugin();
             cloudSave = new ServerCloudSave(
                 new ServerCloudSaveApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==CloudSaveServerUrl
                     session),
                 session,
@@ -492,7 +505,7 @@ namespace AccelByte.Server
         {
             CheckPlugin();
 
-            if(matchmaking == null)
+            if (matchmaking == null)
             {
                 configReset += () =>
                 {
@@ -503,34 +516,34 @@ namespace AccelByte.Server
                         Config, // baseUrl==MatchmakingServerUrl
                         session),
                     session,
-                    config.Namespace,
+                    settings.ServerSdkConfig.Namespace,
                     coroutineRunner);
                 };
             }
 
             return matchmaking ?? (matchmaking = new ServerMatchmaking(
                 new ServerMatchmakingApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==MatchmakingServerUrl
                     session),
                 session,
-                config.Namespace,
+                settings.ServerSdkConfig.Namespace,
                 coroutineRunner));
         }
-        
+
         public static ServerMatchmakingV2 GetMatchmakingV2()
         {
             if (_matchmakingV2 != null)
             {
                 return _matchmakingV2;
             }
-            
+
             CheckPlugin();
             _matchmakingV2 = new ServerMatchmakingV2(
                 new ServerMatchmakingV2Api(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==MatchmakingV2ServerUrl 
-                    session), 
+                    session),
                 session,
                 coroutineRunner);
 
@@ -570,7 +583,7 @@ namespace AccelByte.Server
 
             return userAccount ?? (userAccount = new ServerUserAccount(
                 new ServerUserAccountApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==BaseUrl
                     session),
                 session,
@@ -598,7 +611,7 @@ namespace AccelByte.Server
 
             return seasonPass ?? (seasonPass = new ServerSeasonPass(
                 new ServerSeasonPassApi(
-                    httpClient, 
+                    httpClient,
                     Config, // baseUrl==BaseUrl
                     session),
                 session,
@@ -609,25 +622,49 @@ namespace AccelByte.Server
         {
             CheckPlugin();
             activeEnvironment = environment;
-            string activePlatform = GetServerActivePlatform();
-            RetrieveConfigFromJsonFile(activePlatform);
-            if (config.IsRequiredFieldEmpty())
+            string activePlatform = AccelByteSettingsV2.GetActivePlatform(true);
+            var newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
+            if (newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
             {
                 activeEnvironment = SettingsEnvironment.Default;
-                RetrieveConfigFromJsonFile(activePlatform);
+                newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
             }
-            if (oAuthConfig.IsRequiredFieldEmpty())
+            if (newSettings.OAuthConfig.IsRequiredFieldEmpty())
             {
-                RetrieveConfigFromJsonFile();
+                newSettings = RetrieveConfigFromJsonFile("", activeEnvironment);
             }
-            oAuthConfig.Expand();
-            config.Expand();
-            session = null;
+            settings = newSettings;
+
+            HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
+
+            session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
+            server = CreateDedicatedServerClient(session, coroutineRunner);
+            if (configReset != null) 
+            { 
+                configReset.Invoke(); 
+            }
+            if (environmentChanged != null) 
+            { 
+                environmentChanged.Invoke(activeEnvironment); 
+            }
+        }
+
+        private static void ResetApis()
+        {
+            accessToken = null;
             server = null;
-            InitServerSessionClient();
-            InitDedicatedServerClient();
-            if (configReset != null) { configReset.Invoke(); }
-            if (environmentChanged != null) { environmentChanged.Invoke(activeEnvironment); }
+            dsHub = null;
+            dedicatedServerManager = null;
+            ecommerce = null;
+            statistic = null;
+            _qosManager = null;
+            gameTelemetry = null;
+            achievement = null;
+            lobby = null;
+            cloudSave = null;
+            seasonPass = null;
+            configReset = null;
+            environmentChanged = null;
         }
 
         public static SettingsEnvironment GetEnvironment()
@@ -642,51 +679,12 @@ namespace AccelByte.Server
             environmentChanged = null;
         }
 
-        internal static string GetServerActivePlatform()
+        private static void UpdateHttpClientSender(IHttpRequestSender newSender)
         {
-            string activePlatform;
-            switch (Application.platform)
+            if (httpClient != null && httpClient is AccelByteHttpClient)
             {
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.LinuxPlayer:
-                    if (Resources.Load("AccelByteServerSDKOAuthConfig" + PlatformType.Steam.ToString()) != null)
-                    {
-                        activePlatform = PlatformType.Steam.ToString();
-                    }
-                    else if (Resources.Load("AccelByteServerSDKOAuthConfig" + PlatformType.EpicGames.ToString()) != null)
-                    {
-                        activePlatform = PlatformType.EpicGames.ToString();
-                    }
-                    else
-                    {
-                        activePlatform = "";
-                    }
-                    break;
-                case RuntimePlatform.OSXPlayer:
-                    activePlatform = PlatformType.Apple.ToString(); break;
-                case RuntimePlatform.IPhonePlayer:
-                    activePlatform = PlatformType.iOS.ToString(); break;
-                case RuntimePlatform.Android:
-                    activePlatform = PlatformType.Android.ToString(); break;
-                case RuntimePlatform.PS4:
-                    activePlatform = PlatformType.PS4.ToString(); break;
-#if UNITY_2020_2_OR_NEWER
-                case RuntimePlatform.PS5:
-                    activePlatform = PlatformType.PS5.ToString(); break;
-#endif
-                case RuntimePlatform.XBOX360:
-                case RuntimePlatform.XboxOne:
-                    activePlatform = PlatformType.Live.ToString(); break;
-                case RuntimePlatform.Switch:
-                    activePlatform = PlatformType.Nintendo.ToString(); break;
-#if UNITY_2019_3_OR_NEWER
-                case RuntimePlatform.Stadia:
-                    activePlatform = PlatformType.Stadia.ToString(); break;
-#endif
-                default:
-                    activePlatform = ""; break;
+                (httpClient as AccelByteHttpClient).SetSender(newSender);
             }
-            return activePlatform;
         }
     }
 }

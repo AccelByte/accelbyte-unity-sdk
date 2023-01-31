@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.0%0D15.10.1) (2023-01-30)
+
+
+### Features
+
+* **chat:** add chat apis ([123684c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/123684c1aa3f1bf247c02b6a26dfeb8bbf3c19d5))
+* **turnmanager:** add api to get turn server credential ([5fa327e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5fa327e0e1efbc40babe16ffa2e1e0b3fffa1f35))
+
+
+### Bug Fixes
+
+* set server flag on save OAuth file ([55440e1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55440e198457af6e08954ea53b5bbad322032777))
+
+### [15.9.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.9.1%0D15.10.0) (2023-01-18)
+
+
+### Features
+
+* add required text on config input field ([6e89b48](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e89b4874458377ea29a35aceca18d58bd440f79))
+* implement new endpoint bulk get user and game records ([41c65e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/41c65e87bc7f0246e2d8ea54dc1257084bec2639))
+
+
+### Bug Fixes
+
+* add missing param title to reporting api ([926fd4e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/926fd4ec15f1a86200595dee2205d45a50961f46))
+* add safe guard and refactor with debugable code of http error parser ([76cde28](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76cde28bea30af0a0616c8ac72ff6dd67f8c5eab))
+* fix websocket not running coroutine in their events ([7e90ec9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7e90ec95e85c124212dce509e0717ba213ec0aac))
+* missing Unity meta files ([ebe2c2d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebe2c2d678e6637ea08594706d706f7fd5861d6e))
+* unsupported C# implementation in Unity 2019 ([5b7168e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5b7168ea903e0a45519df834f007ac9e7af4d880))
+
+
+### Refactors
+
+* refactor accelbyte setting into non singleton structure ([bc9bec5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc9bec5b5ab5fe3bf3e26de6101625cff142885f))
+* repositioned config editor order and add foldout category ([e89dbdd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e89dbddebfc86574c24ba9531362acf989a6a3d8))
+
 ### [15.10.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.1%0D15.10.0) (2023-01-18)
 
 

@@ -35,10 +35,44 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<TurnServerList>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetTurnServerCredential(string region
+            , string ip
+            , int port
+            , ResultCallback<TurnServerCredential> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(region, "Can't Get Turn Server Credential! region parameter is null");
+            Assert.IsNotNull(ip, "Can't Get Turn Server Credential! ip parameter is null");
+            Assert.IsTrue(port > 0 && port < 65536,
+                "Can't Get Turn Server Credential! port is not within 1-65535");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/turn/secret/{region}/{ip}/{port}")
+                .WithPathParam("region", region)
+                .WithPathParam("ip", ip)
+                .WithPathParam("port", port.ToString())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<TurnServerCredential>();
             callback.Try(result);
         }
     }

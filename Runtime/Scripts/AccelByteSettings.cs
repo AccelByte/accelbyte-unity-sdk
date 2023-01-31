@@ -310,43 +310,19 @@ namespace AccelByte.Api
         /// </summary>
         public void Load()
         {
-            var oAuthFile = Resources.Load("AccelByteSDKOAuthConfig" + editedPlatform);
-            var configFile = Resources.Load("AccelByteSDKConfig");
-            var versionFile = Resources.Load(AccelByteSDKVersionFilename);
+            this.multiOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(editedPlatform);
+            this.multiConfigs = AccelByteSettingsV2.LoadSDKConfigFile();
+            this.AccelByteSDKVersion = AccelByteSettingsV2.LoadVersionFile();
 
-            if (oAuthFile != null)
-            {
-                string wholeOAuthJsonText = ((TextAsset)oAuthFile).text;
-                this.multiOAuthConfigs = wholeOAuthJsonText.ToObject<MultiOAuthConfigs>();
-            }
-
-            if (configFile != null)
-            {
-                string wholeJsonText = ((TextAsset) configFile).text;
-                this.multiConfigs = wholeJsonText.ToObject<MultiConfigs>();
-            }
-
-            if (versionFile != null)
-            {
-                string wholeJsonText = ((TextAsset)versionFile).text;
-                var versionObject = wholeJsonText.ToObject<AccelByte.Models.VersionJson>();
-                if (versionObject != null)
-                {
-                    this.AccelByteSDKVersion = versionObject.Version;
-                }
-            }
-
-            if (this.multiOAuthConfigs == null || oAuthFile == null)
+            if (this.multiOAuthConfigs == null)
             {
                 this.multiOAuthConfigs = new MultiOAuthConfigs();
             }
-            this.multiOAuthConfigs.Expand();
 
             if (this.multiConfigs == null)
             {
                 this.multiConfigs = new MultiConfigs();
             }
-            this.multiConfigs.Expand();
 
             switch (editedEnvironment)
             {
@@ -364,10 +340,6 @@ namespace AccelByte.Api
                     this.oAuthConfig = multiOAuthConfigs.Default;
                     this.config = multiConfigs.Default; break;
             }
-
-            this.oAuthConfig.Expand();
-            this.config.SanitizeBaseUrl();
-            this.config.Expand();
         }
 
         /// <summary>
@@ -375,20 +347,15 @@ namespace AccelByte.Api
         /// </summary>
         public void Save()
         {
-            // Only in the editor should we save it to disk
-            string properPath = System.IO.Path.Combine(Application.dataPath, "Resources");
-
-            if (!System.IO.Directory.Exists(properPath))
+#if UNITY_EDITOR
+            var configDir = AccelByteSettingsV2.ConfigsDirectoryFullPath();
+            if (!System.IO.Directory.Exists(configDir))
             {
-                #if UNITY_EDITOR 
-                UnityEditor.AssetDatabase.CreateFolder("Assets", "Resources");
-                #endif
+                System.IO.Directory.CreateDirectory(configDir);
             }
 
-            string oAuthFullpath =
-                System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKOAuthConfig"+editedPlatform+".json");
-            string fullPath =
-                System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), "AccelByteSDKConfig.json");
+            string oAuthFullpath = AccelByteSettingsV2.OAuthFullPath(editedPlatform, false);
+            string fullPath = AccelByteSettingsV2.SDKConfigFullPath(false);
 
             switch (editedEnvironment)
             {
@@ -409,108 +376,7 @@ namespace AccelByte.Api
 
             System.IO.File.WriteAllBytes(oAuthFullpath, Encoding.ASCII.GetBytes(this.multiOAuthConfigs.ToJsonString(Formatting.Indented)));
             System.IO.File.WriteAllBytes(fullPath, Encoding.ASCII.GetBytes(this.multiConfigs.ToJsonString(Formatting.Indented)));
-        }
-
-#if UNITY_EDITOR
-        /** TODO: Disabled and need to be moved to Project code
-        [InitializeOnLoadMethod]
-        private static void OnLoadMethod()
-        {
-            CompilationPipeline.compilationFinished -= CopyAccelByteSDKPackageVersion;
-            CompilationPipeline.compilationFinished += CopyAccelByteSDKPackageVersion;
-            CompilationPipeline.compilationFinished -= DocsBuilder;
-            CompilationPipeline.compilationFinished += DocsBuilder;
-        }
-
-        private static void CopyAccelByteSDKPackageVersion(object obj)
-        {
-            var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettings).Assembly);
-            var versionJsonAbs = System.IO.Path.Combine(AccelBytePackageInfo.assetPath, "version.json");
-
-            var versionAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(versionJsonAbs);
-            if (versionAsset == null)
-            {
-                Debug.Log("version.json not found under Package AccelByte SDK directory");
-                goto endfunction;
-            }
-            if (versionAsset.text == string.Empty || versionAsset.text == null)
-            {
-                Debug.Log("version.json for AccelByte SDK is empty");
-                goto endfunction;
-            }
-
-            string versionTextRaw = versionAsset.text;
-            var versionAsObject = versionTextRaw.ToObject<AccelByte.Models.VersionJson>();
-            if (versionAsObject == null)
-            {
-                Debug.Log("Failed to deserialize version.json from AccelByte SDK Package");
-                goto endfunction;
-            }
-
-            string SDKVersionPath = System.IO.Path.Combine(System.IO.Path.Combine("Assets", "Resources"), AccelByteSDKVersionFilename + ".json");
-            System.IO.File.WriteAllBytes(SDKVersionPath, Encoding.ASCII.GetBytes(versionTextRaw));
-
-            endfunction:
-            {
-                return;
-            }
-        }
-
-        private static void DocsBuilder(object obj)
-        {
-            if (string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("BuildDocs")))
-            {
-                return;
-            }
-
-            var AccelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettings).Assembly);
-            var DoxygenConfig = System.IO.Path.Combine(System.IO.Path.Combine(AccelBytePackageInfo.resolvedPath, "Doxygen"), "docs_config.json");
-
-            if (!System.IO.File.Exists(DoxygenConfig))
-            {
-                return;
-            }
-
-            if (BuildDocs(System.IO.Path.Combine(AccelBytePackageInfo.resolvedPath, "Doxygen")))
-            {
-                Debug.Log("AccelByteDocsBuilder: documentation built successfully");
-            }
-        }
-
-        private static bool BuildDocs(string doxygenPath)
-        {
-            try
-            {
-                using (var process = new System.Diagnostics.Process())
-                {
-                    string SDKVersion = Instance?.AccelByteSDKVersion;
-                    var pythonDir = System.IO.Path.Combine(doxygenPath, "docs-builder");
-                    var docsBuilder = System.IO.Path.Combine(pythonDir, "accelbyte_docs_builder.py");
-                    var pythonArgs = docsBuilder + " internal " + SDKVersion;
-
-                    if (!System.IO.File.Exists(docsBuilder))
-                    {
-                        return false;
-                    }
-
-                    process.StartInfo.FileName = "python.exe";
-                    process.StartInfo.Arguments = pythonArgs;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.WorkingDirectory = pythonDir;
-                    process.Start();
-                    if (!process.HasExited) process.WaitForExit();
-
-                    return process.ExitCode == 0;
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning("Docs Builder Error: " + e.Message);
-                return false;
-            }
-        }
-        */
 #endif
+        }
     }
 }

@@ -27,6 +27,7 @@ namespace AccelByte.Api
         public const string AuthTrustIdKey = "auth_trust_id";
         public readonly bool usePlayerPrefs;
         private readonly IHttpClient httpClient;
+        private readonly string encodeUniqueKey;
 
         public event Action<string> RefreshTokenCallback;
         private Coroutine bearerAuthRejectedCoroutine;
@@ -34,6 +35,7 @@ namespace AccelByte.Api
         internal UserSession
             (IHttpClient inHttpClient
             , CoroutineRunner inCoroutineRunner
+            , string encodeUniqueKey
             , bool inUsePlayerPrefs = false)
         {
             Assert.IsNotNull(inHttpClient, "inHttpClient is null");
@@ -42,6 +44,7 @@ namespace AccelByte.Api
             usePlayerPrefs = inUsePlayerPrefs;
             httpClient = inHttpClient;
             coroutineRunner = inCoroutineRunner;
+            this.encodeUniqueKey = encodeUniqueKey;
 
             ((AccelByteHttpClient)httpClient).BearerAuthRejected += BearerAuthRejected;
             ((AccelByteHttpClient)httpClient).UnauthorizedOccured += UnauthorizedOccured;
@@ -149,7 +152,7 @@ namespace AccelByte.Api
                 localTokenData = formatter.Deserialize(dataStream) as RefreshTokenData;
                 dataStream.Close();
                 
-                DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+                DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey);
                 string refreshToken = localTokenData?.refresh_token;
                 refreshToken = Convert.FromBase64String(refreshToken).ToObject<string>();
                 refreshToken = UserSession.XorString(deviceProvider.DeviceId, refreshToken);
@@ -163,7 +166,7 @@ namespace AccelByte.Api
 
         private void SaveRefreshToken()
         {
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo();
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey);
             string token = XorString(deviceProvider.DeviceId, tokenData.refresh_token);
             token = Convert.ToBase64String(token.ToUtf8Json());
             

@@ -3,6 +3,8 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace AccelByte.Core {
     public delegate void OnOpenHandler();
@@ -61,6 +63,7 @@ namespace AccelByte.Core {
 
     public interface IWebSocket
     {
+        void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null);
         void Connect(string url, string protocols, string sessionId, string entitlementToken = null);
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);

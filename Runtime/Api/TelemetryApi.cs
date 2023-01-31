@@ -28,7 +28,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             
             agentType = getAgentTypeByPlatform();
-            deviceId = DeviceProvider.GetFromSystemInfo().DeviceId;
+            deviceId = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace).DeviceId;
         }
         
         private static uint getAgentTypeByPlatform()

@@ -32,24 +32,6 @@ namespace AccelByte.Core
         {
             return printStackTrace;
         }
-
-        public static string GetSeverityLogConfig()
-        {
-            if(AccelBytePlugin.Config == null)
-            {
-                return AccelByteLogType.Verbose.ToString();
-            }
-            return AccelBytePlugin.Config.DebugLogFilter;
-        }
-
-        public static bool GetEnableLogConfig()
-        {
-            if (AccelBytePlugin.Config == null)
-            {
-                return true;
-            }
-            return AccelBytePlugin.Config.EnableDebugLog;
-        }
     }
 
     public static class AccelByteDebug
@@ -71,20 +53,8 @@ namespace AccelByte.Core
 
         static AccelByteDebug()
         {
-            string filterLogTypeString = AccelByteDebugHelper.GetSeverityLogConfig();
-            bool enableLogging = AccelByteDebugHelper.GetEnableLogConfig();
-
-            if (!Enum.TryParse(filterLogTypeString, true, out currentSeverity))
-            {
-                currentSeverity = AccelByteLogType.Verbose;
-
-                object warningMessage = $"{GetMessageTag(AccelByteLogType.Warning)}: Debug log filter is not valid or empty. Debug log filter will use the default verbose.";
-                warningMessage = AppendMessageTrailInfo(warningMessage, AccelByteLogType.Warning, true);
-                Debug.LogWarning(warningMessage);
-            }
-
-            SetEnableLogging(enableLogging);
-            SetFilterLogType(currentSeverity);
+            SetEnableLogging(true);
+            SetFilterLogType(AccelByteLogType.Verbose);
         }
 
         public static void SetEnableLogging(bool enable)

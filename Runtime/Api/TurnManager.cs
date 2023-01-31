@@ -69,6 +69,28 @@ namespace AccelByte.Api
             coroutineRunner.Run(GetClosestTurnServerAsync(callback));
         }
 
+        /// <summary>
+        /// Get the turn server credential
+        /// </summary>
+        /// <param name="region">region of selected turn server</param>
+        /// <param name="ip">ip of selected turn server</param>
+        /// <param name="port">port of selected turn server</param>
+        /// <param name="callback">Return turn server credential</param>
+        public void GetTurnServerCredential(string region
+            , string ip
+            , int port
+            , ResultCallback<TurnServerCredential> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetTurnServerCredential(region, ip, port, callback));
+        }
+
         private IEnumerator GetClosestTurnServerAsync(ResultCallback<TurnServer> callback)
         {
             Report.GetFunctionLog(GetType().Name);

@@ -32,9 +32,13 @@ namespace AccelByte.Api
 
         public static DeviceProvider GetFromSystemInfo()
         {
+            return GetFromSystemInfo(AccelBytePlugin.Config.PublisherNamespace);
+        }
+
+        public static DeviceProvider GetFromSystemInfo(string encodeHMACKey)
+        {
             string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatforName();
             string macAddress = GetDeviceMacAddress();
-            string publisherNamespace = AccelBytePlugin.Config.PublisherNamespace;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId")){
@@ -46,7 +50,7 @@ namespace AccelByte.Api
 #else
             return new DeviceProvider(
                 "device",
-                identifier + "_" + EncodeHMAC(macAddress, publisherNamespace));
+                identifier + "_" + EncodeHMAC(macAddress, encodeHMACKey));
 #endif
         }
 

@@ -683,5 +683,57 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.DeleteGameRecord(key, callback));
         }
+        
+        /// <summary>
+        /// Bulk get user records by keys.
+        /// </summary>
+        /// <param name="keys">Keys of records</param>
+        /// <param name="callback">Returns a Result that contains UserRecords via callback when completed</param>
+        public void BulkGetUserRecords( string[] keys
+            , ResultCallback<UserRecords> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsTrue(keys.Length != 0, "Can't bulk get user records! Key parameter is empty!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            BulkGetRecordsByKeyRequest bulkGetRecordsByKeyRequest = new BulkGetRecordsByKeyRequest
+            {
+                keys = keys
+            };
+            
+            coroutineRunner.Run(
+                api.BulkGetUserRecords(bulkGetRecordsByKeyRequest, callback));
+        }
+        
+        /// <summary>
+        /// Bulk get game records by keys.
+        /// </summary>
+        /// <param name="keys">Keys of records</param>
+        /// <param name="callback">Returns a Result that contains GameRecords via callback when completed</param>
+        public void BulkGetGameRecords( string[] keys
+            , ResultCallback<GameRecords> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsTrue(keys.Length != 0, "Can't bulk get user records! Key parameter is empty!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            BulkGetRecordsByKeyRequest bulkGetRecordsByKeyRequest = new BulkGetRecordsByKeyRequest
+            {
+                keys = keys
+            };
+            
+            coroutineRunner.Run(
+                api.BulkGetGameRecords(bulkGetRecordsByKeyRequest, callback));
+        }
     }
 }

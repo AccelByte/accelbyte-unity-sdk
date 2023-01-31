@@ -41,6 +41,8 @@ namespace AccelByte.Api
             RequestToInject["__META"] = new { set_by = setBy.GetString(), is_public = isPublic };
             return RequestToInject;
         }
+        
+        private const int maxBulkRecords = 20; 
 
         #endregion
 
@@ -445,6 +447,59 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
+            callback.Try(result);
+        }
+        
+        
+        public IEnumerator BulkGetUserRecords( BulkGetRecordsByKeyRequest data
+            , ResultCallback<UserRecords> callback )
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(data, "Can't bulk get user records! data parameter is null!");
+            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get user records! data.keys exceeding {0}!", maxBulkRecords));
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/users/me/records/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<UserRecords>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator BulkGetGameRecords( BulkGetRecordsByKeyRequest data
+            , ResultCallback<GameRecords> callback )
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(data, "Can't bulk get game records! data parameter is null!");
+            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get game records! data.keys exceeding {0}!", maxBulkRecords));
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/records/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GameRecords>();
             callback.Try(result);
         }
     }

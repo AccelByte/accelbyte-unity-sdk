@@ -53,7 +53,8 @@ namespace AccelByte.Api
         public IEnumerator GetReasons( string reasonGroup
             , ResultCallback<ReportingReasonsResponse> callback
             , int offset
-            , int limit )
+            , int limit
+            , string title)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
@@ -64,6 +65,7 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/reasons")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("group", reasonGroup)
+                .WithQueryParam("title", title)
                 .WithQueryParam("limit", limit.ToString())
                 .WithQueryParam("offset", offset.ToString())
                 .WithContentType(MediaType.ApplicationJson)
@@ -82,6 +84,32 @@ namespace AccelByte.Api
         
         public IEnumerator SubmitReport( ReportingSubmitData reportData
             , ResultCallback<ReportingSubmitResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
+            Assert.IsNotNull(reportData, "Can't create content! reasonGroup parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/reports")
+                .WithPathParam("namespace", Namespace_)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .WithBody(reportData.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<ReportingSubmitResponse>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SubmitChatReport(ReportingSubmitDataChat reportData
+            , ResultCallback<ReportingSubmitResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");

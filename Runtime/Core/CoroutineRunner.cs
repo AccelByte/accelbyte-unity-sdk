@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace AccelByte.Core
 {
@@ -28,7 +27,12 @@ namespace AccelByte.Core
                 this.gameObject = new GameObject("AccelByteDummyGameObject");
             }
 
-            this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
+            this.monoBehaviour = this.gameObject.GetComponent<DummyBehaviour>();
+            if(this.monoBehaviour == null)
+            {
+                this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
+            }
+			            
             this.monoBehaviour.StartCoroutine(this.RunCallbacks());
         }
 
@@ -62,13 +66,6 @@ namespace AccelByte.Core
                 }
 
                 callback();
-            }
-        }
-
-        private class DummyBehaviour : MonoBehaviour {
-            private void Awake()
-            {
-                Object.DontDestroyOnLoad(this.gameObject);
             }
         }
     }

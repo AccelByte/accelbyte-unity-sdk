@@ -27,7 +27,7 @@ namespace AccelByte.Api
     public class User : WrapperBase
     {
         //Constants
-        private const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
+        internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
         private const int ttl = 60;
 
         //Readonly members
@@ -405,15 +405,12 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(authCode))
             {
-                coroutineRunner.Run(() =>
+                OAuthError error = new OAuthError()
                 {
-                    OAuthError error = new OAuthError()
-                    {
-                        error = ErrorCode.InvalidArgument.ToString(),
-                        error_description = "The application was not executed from launcher"
-                    };
-                    callback.TryError(error);
-                });
+                    error = ErrorCode.InvalidArgument.ToString(),
+                    error_description = "The application was not executed from launcher"
+                };
+                callback?.TryError(error);
                 return;
             }
 
@@ -429,7 +426,7 @@ namespace AccelByte.Api
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCodeV3(authCode, cb), callback);
         }
 
         /// <summary>
@@ -1732,6 +1729,30 @@ namespace AccelByte.Api
                 yield break;
             }
             yield return oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
+        }
+        
+        /// <summary>
+        /// Generate publisher user's game token. Required a code from request game token
+        /// </summary>
+        /// <param name="code">code from request game token</param>
+        /// <param name="callback">Return Result via callback when completed</param>
+        public void GenerateGameToken(string code
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(GenerateGameTokenAsync(code, callback));
+        }
+
+        private IEnumerator GenerateGameTokenAsync(string code
+            , ResultCallback callback)
+        {
+            if (userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.InvalidRequest, 
+                    "User is already logged in.");
+                yield break;
+            }
+            yield return oAuth2.GenerateGameToken(code, callback);
         }
     }
 }

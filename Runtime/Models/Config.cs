@@ -16,42 +16,48 @@ namespace AccelByte.Models
     [DataContract]
     public class Config
     {
-        [DataMember] public string Namespace { get; set; }
-        [DataMember] public bool UsePlayerPrefs { get; set; }
-        [DataMember] public bool EnableDebugLog { get; set; }
-        [DataMember] public string DebugLogFilter { get; set; }
-        [DataMember] public string BaseUrl { get; set; }
-        [DataMember] public string IamServerUrl { get; set; }
-        [DataMember] public string PlatformServerUrl { get; set; }
-        [DataMember] public string BasicServerUrl { get; set; }
-        [DataMember] public string LobbyServerUrl { get; set; }
-        [DataMember] public string CloudStorageServerUrl { get; set; }
-        [DataMember] public string GameProfileServerUrl { get; set; }
-        [DataMember] public string StatisticServerUrl { get; set; }
-        [DataMember] public string QosManagerServerUrl { get; set; }
-        [DataMember] public string AgreementServerUrl { get; set; }
-        [DataMember] public string LeaderboardServerUrl { get; set; }
-        [DataMember] public string CloudSaveServerUrl { get; set; }
-        [DataMember] public string GameTelemetryServerUrl { get; set; }
-        [DataMember] public string AchievementServerUrl { get; set; }
-        [DataMember] public string UGCServerUrl { get; set; }
-        [DataMember] public string ReportingServerUrl { get; set; }
-        [DataMember] public string SeasonPassServerUrl { get; set; }
-        [DataMember] public string SessionBrowserServerUrl { get; set; }
-        [DataMember] public string SessionServerUrl { get; set; }
-        [DataMember] public string MatchmakingV2ServerUrl { get; set; }
-        [DataMember] public bool UseTurnManager { get; set; }
-        [DataMember] public string TurnManagerServerUrl { get; set; }
-        [DataMember] public string TurnServerHost { get; set; }
-        [DataMember] public string TurnServerPort { get; set; }
-        [DataMember] public string TurnServerPassword { get; set; }
-        [DataMember] public string TurnServerSecret { get; set; }
-        [DataMember] public string TurnServerUsername { get; set; }
-        [DataMember] public string GroupServerUrl { get; set; }
-        [DataMember] public string RedirectUri { get; set; }
-        [DataMember] public string AppId { get; set; }
-        [DataMember] public string PublisherNamespace { get; set; }
-        [DataMember] public string CustomerName { get; set; }
+        private const int defaultCacheSize = 100;
+        private const int defaultCacheLifeTime = 100;
+
+        [DataMember] public string Namespace { get; set; } = "";
+        [DataMember] public bool UsePlayerPrefs { get; set; } = false;
+        [DataMember] public bool EnableDebugLog { get; set; } = true;
+        [DataMember] public string DebugLogFilter { get; set; } = "Verbose";
+        [DataMember] public string BaseUrl { get; set; } = "";
+        [DataMember] public string IamServerUrl { get; set; } = "";
+        [DataMember] public string PlatformServerUrl { get; set; } = "";
+        [DataMember] public string BasicServerUrl { get; set; } = "";
+        [DataMember] public string LobbyServerUrl { get; set; } = "";
+        [DataMember] public string CloudStorageServerUrl { get; set; } = "";
+        [DataMember] public string GameProfileServerUrl { get; set; } = "";
+        [DataMember] public string StatisticServerUrl { get; set; } = "";
+        [DataMember] public string QosManagerServerUrl { get; set; } = "";
+        [DataMember] public string AgreementServerUrl { get; set; } = "";
+        [DataMember] public string LeaderboardServerUrl { get; set; } = "";
+        [DataMember] public string CloudSaveServerUrl { get; set; } = "";
+        [DataMember] public string GameTelemetryServerUrl { get; set; } = "";
+        [DataMember] public string AchievementServerUrl { get; set; } = "";
+        [DataMember] public string UGCServerUrl { get; set; } = "";
+        [DataMember] public string ReportingServerUrl { get; set; } = "";
+        [DataMember] public string SeasonPassServerUrl { get; set; } = "";
+        [DataMember] public string SessionBrowserServerUrl { get; set; } = "";
+        [DataMember] public string SessionServerUrl { get; set; } = "";
+        [DataMember] public string MatchmakingV2ServerUrl { get; set; } = "";
+        [DataMember] public bool UseTurnManager { get; set; } = false;
+        [DataMember] public string TurnManagerServerUrl { get; set; } = "";
+        [DataMember] public string TurnServerHost { get; set; } = "";
+        [DataMember] public string TurnServerPort { get; set; } = "";
+        [DataMember] public string TurnServerPassword { get; set; } = "";
+        [DataMember] public string TurnServerSecret { get; set; } = "";
+        [DataMember] public string TurnServerUsername { get; set; } = "";
+        [DataMember] public string GroupServerUrl { get; set; } = "";
+        [DataMember] public string ChatServerUrl { get; set; } = "";
+        [DataMember] public string RedirectUri { get; set; } = "";
+        [DataMember] public string AppId { get; set; } = "";
+        [DataMember] public string PublisherNamespace { get; set; } = "";
+        [DataMember] public string CustomerName { get; set; } = "";
+        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
+        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
         /// <summary>
         ///  Copy member values
@@ -94,10 +100,13 @@ namespace AccelByte.Models
                    this.TurnServerUsername == anotherConfig.TurnServerUsername &&
                    this.TurnServerPassword == anotherConfig.TurnServerPassword &&
                    this.TurnServerSecret == anotherConfig.TurnServerSecret &&
+                   this.ChatServerUrl == anotherConfig.ChatServerUrl &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace &&
-                   this.CustomerName == anotherConfig.CustomerName;
+                   this.CustomerName == anotherConfig.CustomerName &&
+                   this.MaximumCacheSize == anotherConfig.MaximumCacheSize &&
+                   this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime;
         }
 
         /// <summary>
@@ -105,14 +114,162 @@ namespace AccelByte.Models
         /// </summary>
         public void Expand()
         {
-            if (this.BaseUrl != null)
+            if(Namespace == null)
+            {
+                Namespace = "";
+            }
+            if (string.IsNullOrEmpty(DebugLogFilter))
+            {
+                DebugLogFilter = "Verbose";
+            }
+            if (BaseUrl == null)
+            {
+                BaseUrl = "";
+            }
+            if (IamServerUrl == null)
+            {
+                IamServerUrl = "";
+            }
+            if (PlatformServerUrl == null)
+            {
+                PlatformServerUrl = "";
+            }
+            if (BasicServerUrl == null)
+            {
+                BasicServerUrl = "";
+            }
+            if (LobbyServerUrl == null)
+            {
+                LobbyServerUrl = "";
+            }
+            if (CloudStorageServerUrl == null)
+            {
+                CloudStorageServerUrl = "";
+            }
+            if (GameProfileServerUrl == null)
+            {
+                GameProfileServerUrl = "";
+            }
+            if (StatisticServerUrl == null)
+            {
+                StatisticServerUrl = "";
+            }
+            if (QosManagerServerUrl == null)
+            {
+                QosManagerServerUrl = "";
+            }
+            if (AgreementServerUrl == null)
+            {
+                AgreementServerUrl = "";
+            }
+            if (LeaderboardServerUrl == null)
+            {
+                LeaderboardServerUrl = "";
+            }
+            if (CloudSaveServerUrl == null)
+            {
+                CloudSaveServerUrl = "";
+            }
+            if (GameTelemetryServerUrl == null)
+            {
+                GameTelemetryServerUrl = "";
+            }
+            if (UGCServerUrl == null)
+            {
+                UGCServerUrl = "";
+            }
+            if (ReportingServerUrl == null)
+            {
+                ReportingServerUrl = "";
+            }
+            if (SeasonPassServerUrl == null)
+            {
+                SeasonPassServerUrl = "";
+            }
+            if (SessionBrowserServerUrl == null)
+            {
+                SessionBrowserServerUrl = "";
+            }
+            if (SessionServerUrl == null)
+            {
+                SessionServerUrl = "";
+            }
+            if (MatchmakingV2ServerUrl == null)
+            {
+                MatchmakingV2ServerUrl = "";
+            }
+            if (TurnManagerServerUrl == null)
+            {
+                TurnManagerServerUrl = "";
+            }
+            if (TurnServerHost == null)
+            {
+                TurnServerHost = "";
+            }
+            if (TurnServerPort == null)
+            {
+                TurnServerPort = "";
+            }
+            if (TurnServerPassword == null)
+            {
+                TurnServerPassword = "";
+            }
+            if (TurnServerSecret == null)
+            {
+                TurnServerSecret = "";
+            }
+            if (TurnServerUsername == null)
+            {
+                TurnServerUsername = "";
+            }
+            if (GroupServerUrl == null)
+            {
+                GroupServerUrl = "";
+            }
+
+            if (ChatServerUrl == null)
+            {
+                ChatServerUrl = "";
+            }
+            if (RedirectUri == null)
+            {
+                RedirectUri = "";
+            }
+            if (AppId == null)
+            {
+                AppId = "";
+            }
+            if (PublisherNamespace == null)
+            {
+                PublisherNamespace = "";
+            }
+            if (CustomerName == null)
+            {
+                CustomerName = "";
+            }
+
+            if(MaximumCacheSize <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
+                MaximumCacheSize = defaultCacheSize;
+            }
+
+            if (MaximumCacheLifeTime <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
+                MaximumCacheLifeTime = defaultCacheLifeTime;
+            }
+
+            if (!string.IsNullOrEmpty(this.BaseUrl))
             {
                 int index;
                 // remove protocol
                 string baseUrl = this.BaseUrl;
-                if ((index = baseUrl.IndexOf("://")) > 0) baseUrl = baseUrl.Substring(index + 3);
+                if ((index = baseUrl.IndexOf("://")) > 0)
+                {
+                    baseUrl = baseUrl.Substring(index + 3);
+                }
 
-                string httpsBaseUrl = "https://" + baseUrl;
                 string wssBaseUrl = "wss://" + baseUrl;
 
                 this.IamServerUrl = GetDefaultApiUrl(this.IamServerUrl, "/iam");
@@ -121,7 +278,10 @@ namespace AccelByte.Models
 
                 this.BasicServerUrl = GetDefaultApiUrl(this.BasicServerUrl, "/basic");
 
-                if (string.IsNullOrEmpty(this.LobbyServerUrl)) this.LobbyServerUrl = wssBaseUrl + "/lobby/";
+                if (string.IsNullOrEmpty(this.LobbyServerUrl))
+                {
+                    this.LobbyServerUrl = wssBaseUrl + "/lobby/";
+                }
 
                 this.CloudStorageServerUrl = GetDefaultApiUrl(this.CloudStorageServerUrl, "/social");
 
@@ -157,6 +317,10 @@ namespace AccelByte.Models
                 
                 this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
 
+                if (string.IsNullOrEmpty(this.ChatServerUrl))
+                {
+                    this.ChatServerUrl = wssBaseUrl + "/chat/";
+                }
             }
         }
 
@@ -216,6 +380,9 @@ namespace AccelByte.Models
                 if (this.MatchmakingV2ServerUrl == httpsBaseUrl + "/match2") this.MatchmakingV2ServerUrl = null;
 
                 if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
+              
+                if (this.ChatServerUrl == wssBaseUrl + "/chat/") this.ChatServerUrl = null;
+
             }
         }
 
@@ -224,22 +391,30 @@ namespace AccelByte.Models
         /// </summary>
         public void CheckRequiredField()
         {
-            if (string.IsNullOrEmpty(this.Namespace)) throw new System.Exception("Init AccelByte SDK failed, Namespace must not null or empty.");
-
-            if (string.IsNullOrEmpty(this.BaseUrl)) throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
-
-            if (string.IsNullOrEmpty(this.RedirectUri)) throw new System.Exception("Init AccelByte SDK failed, Redirect URI must not null or empty.");
+            if (string.IsNullOrEmpty(this.Namespace))
+            {
+                throw new System.Exception("Init AccelByte SDK failed, Namespace must not null or empty.");
+            }
+            if (string.IsNullOrEmpty(this.BaseUrl))
+            {
+                throw new System.Exception("Init AccelByte SDK failed, Base URL must not null or empty.");
+            }
+            if (string.IsNullOrEmpty(this.RedirectUri))
+            {
+                throw new System.Exception("Init AccelByte SDK failed, Redirect URI must not null or empty.");
+            }
         }
 
         public bool IsRequiredFieldEmpty()
         {
-            if (string.IsNullOrEmpty(this.Namespace)) return true;
-
-            if (string.IsNullOrEmpty(this.BaseUrl)) return true;
-
-            if (string.IsNullOrEmpty(this.RedirectUri)) return true;
-
-            return false;
+            System.Collections.Generic.List<string> checkedStringFields = new System.Collections.Generic.List<string>()
+            {
+                Namespace,
+                BaseUrl,
+                RedirectUri
+            };
+            var retval = checkedStringFields.Exists((field) => string.IsNullOrEmpty(field));
+            return retval;
         }
 
         /// <summary>
@@ -261,6 +436,10 @@ namespace AccelByte.Models
         public void SanitizeBaseUrl()
         {
             var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
+            if(this.BaseUrl == null)
+            {
+                this.BaseUrl = "";
+            }
             if (Regex.IsMatch(this.BaseUrl, regexStr))
             {
                 this.BaseUrl = this.BaseUrl.TrimEnd('/');
@@ -297,6 +476,10 @@ namespace AccelByte.Models
         /// </summary>
         public void Expand()
         {
+            if (this.ClientId == null)
+            {
+                this.ClientId = "";
+            }
             if (this.ClientSecret == null)
             {
                 this.ClientSecret = "";
@@ -308,12 +491,20 @@ namespace AccelByte.Models
         /// </summary>
         public void CheckRequiredField()
         {
-            if (string.IsNullOrEmpty(this.ClientId)) throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
+            if (string.IsNullOrEmpty(this.ClientId))
+            {
+                throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
+            }
         }
 
         public bool IsRequiredFieldEmpty()
         {
-            return (string.IsNullOrEmpty(this.ClientId));
+            System.Collections.Generic.List<string> checkedStringFields = new System.Collections.Generic.List<string>()
+            {
+                ClientId
+            };
+            var retval = checkedStringFields.Exists((field) => string.IsNullOrEmpty(field));
+            return retval;
         }
     }
 
@@ -330,23 +521,27 @@ namespace AccelByte.Models
             if(Development == null)
             {
                 Development = new Config();
-                Development.Expand();
             }
+            Development.SanitizeBaseUrl();
+            Development.Expand();
             if (Certification == null)
             {
                 Certification = new Config();
-                Certification.Expand();
             }
+            Certification.SanitizeBaseUrl();
+            Certification.Expand();
             if (Production == null)
             {
                 Production = new Config();
-                Production.Expand();
             }
+            Production.SanitizeBaseUrl();
+            Production.Expand();
             if (Default == null)
             {
                 Default = new Config();
-                Default.Expand();
             }
+            Default.SanitizeBaseUrl();
+            Default.Expand();
         }
     }
 
@@ -363,23 +558,23 @@ namespace AccelByte.Models
             if (Development == null)
             {
                 Development = new OAuthConfig();
-                Development.Expand();
             }
+            Development.Expand();
             if (Certification == null)
             {
                 Certification = new OAuthConfig();
-                Certification.Expand();
             }
+            Certification.Expand();
             if (Production == null)
             {
                 Production = new OAuthConfig();
-                Production.Expand();
             }
+            Production.Expand();
             if (Default == null)
             {
                 Default = new OAuthConfig();
-                Default.Expand();
             }
+            Default.Expand();
         }
     }
 

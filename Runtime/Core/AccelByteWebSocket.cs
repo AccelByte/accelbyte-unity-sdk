@@ -5,11 +5,12 @@
 using AccelByte.Core;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AccelByte.Api
 {
-    class AccelByteWebSocket
+    public class AccelByteWebSocket
     {
         private float pingDelay = 4000;
         private int totalTimeout = 60000;
@@ -20,11 +21,13 @@ namespace AccelByte.Api
         private IWebSocket webSocket;
         private string webSocketUrl;
         private string authorizationToken;
-        private string sessionId;
+        
         private CoroutineRunner coroutineRunner;
         private Coroutine maintainConnectionCoroutine;
         private WsCloseCode closeCodeCurrent = WsCloseCode.NotSet;
         private ITokenGenerator tokenGenerator;
+        
+        public Dictionary<string, string> CustomHeaders { get; set; }
 
         /// <summary>
         /// Raised when websocket connection succesfully connected
@@ -90,7 +93,7 @@ namespace AccelByte.Api
 
         private void OnTokenReceived(string token)
         {
-             this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, this.sessionId, token);
+             this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, CustomHeaders, token);
         }
 
         /// <summary>
@@ -137,6 +140,8 @@ namespace AccelByte.Api
             this.webSocket.OnMessage += OnMessageReceived;
             this.webSocket.OnError += OnErrorReceived;
             this.webSocket.OnClose += OnCloseReceived;
+
+            CustomHeaders = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -174,18 +179,23 @@ namespace AccelByte.Api
             }
         }
 
-        public void SetSessionId(string sessionId)
-        {
-            this.sessionId = sessionId;
-        }
-
         /// <summary>
         /// Establish websocket connection
         /// </summary>
         /// <param name="url">url of the websocket server</param>
         /// <param name="authorizationToken">user authorization token</param>
-        /// <param name="sessionId">session id header</param>
+        /// <param name="sessionId">Lobby's session id header</param>
         public void Connect(string url, string authorizationToken, string sessionId = "")
+        {
+            Dictionary<string, string> customHeader = new Dictionary<string, string>()
+            {
+                { "X-Ab-LobbySessionID", sessionId }
+            };
+            
+            Connect(url, authorizationToken, customHeader);
+        }
+
+        public void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders)
         {
             if(State == WsState.Connecting || State == WsState.Open)
             {
@@ -193,11 +203,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            if (this.tokenGenerator != null)
+            if (tokenGenerator != null)
             {
-                if (!this.tokenGenerator.IsValid())
+                if (!tokenGenerator.IsValid())
                 {
-                    this.tokenGenerator.RequestToken();
+                    tokenGenerator.RequestToken();
 
                     return;
                 }
@@ -205,7 +215,14 @@ namespace AccelByte.Api
 
             webSocketUrl = url;
             this.authorizationToken = authorizationToken;
-            webSocket.Connect(url, this.authorizationToken, sessionId, this.tokenGenerator?.Token);
+
+            if (tokenGenerator != null)
+            {
+                customHeaders["Entitlement"] = tokenGenerator.Token;
+            }
+
+            AccelByteDebug.Log($"Connecting websocket to {url}");
+            webSocket.Connect(url, this.authorizationToken, customHeaders);
 
             // check status after connect, only maintain connection when close code is reconnectable
             if (this.closeCodeCurrent == WsCloseCode.NotSet || isReconnectable(this.closeCodeCurrent))
@@ -305,7 +322,7 @@ namespace AccelByte.Api
 #endif
                             if (this.tokenGenerator == null)
                             {
-                                this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, this.sessionId);
+                                this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, CustomHeaders);
                             }
                             else
                             {

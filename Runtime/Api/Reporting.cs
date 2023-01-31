@@ -72,14 +72,16 @@ namespace AccelByte.Api
         /// <summary>
         /// Get reason to retrieve reason list for reporting.
         /// </summary>
-        /// <param name="reasonGroup"></param>
+        /// <param name="reasonGroup">Specified reason group</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is ReportingReasonsResponse Model.</param>
         /// <param name="offset">The offset of the reason results. Default value is 0.</param>
         /// <param name="limit">The limit of the reason results. Default value is 1000.</param>
+        /// <param name="title">Query reason(s) by title</param>
         public void GetReasons( string reasonGroup
             , ResultCallback<ReportingReasonsResponse> callback
             , int offset = 0
-            , int limit = 1000 )
+            , int limit = 1000
+            , string title = "")
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -90,7 +92,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetReasons(reasonGroup, callback, offset, limit));
+                api.GetReasons(reasonGroup, callback, offset, limit, title));
         }
 
         /// <summary>
@@ -113,6 +115,21 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.SubmitReport(reportData, callback));
+        }
+
+        public void SubmitChatReport(ReportingSubmitDataChat reportData,
+            ResultCallback<ReportingSubmitResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SubmitChatReport(reportData, callback));
         }
     }
 }

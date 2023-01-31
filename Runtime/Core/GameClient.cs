@@ -24,8 +24,9 @@ namespace AccelByte.Core
             this.session = new UserSession(
                 httpClient,
                 this.coroutineRunner,
+                config.PublisherNamespace,
                 config.UsePlayerPrefs);
-                this.user = new User(
+            this.user = new User(
                     new UserApi(
                         this.httpClient,
                         config,

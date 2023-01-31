@@ -16,7 +16,19 @@ namespace AccelByte.Models
     public enum ReportingCategory
     {
         UGC,
-        USER
+        USER,
+        CHAT
+    }
+    
+    [DataContract]
+    public class ReportingSubmitDataBase
+    {
+        [DataMember] public ReportingCategory category { get; set; }
+        [DataMember] public string comment { get; set; }
+        [DataMember] public string objectId { get; set; }
+        [DataMember] public string objectType { get; set; }
+        [DataMember] public string reason { get; set; }
+        [DataMember] public string userId { get; set; }
     }
 
     [DataContract]
@@ -26,15 +38,24 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class ReportingSubmitData
+    public class ReportingSubmitData : ReportingSubmitDataBase
     {
         [DataMember] public ReportingAdditionalInfo additionalInfo { get; set; }
-        [DataMember] public ReportingCategory category { get; set; }
-        [DataMember] public string comment { get; set; }
-        [DataMember] public string objectId { get; set; }
-        [DataMember] public string objectType { get; set; }
-        [DataMember] public string reason { get; set; }
-        [DataMember] public string userId { get; set; }
+    }
+    
+    [DataContract]
+    public class ReportingAdditionalInfoChat
+    {
+        [DataMember] public string topicId { get; set; }
+        
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        public DateTime chatCreatedAt { get; set; }
+    }
+
+    [DataContract]
+    public class ReportingSubmitDataChat : ReportingSubmitDataBase
+    {
+        [DataMember] public ReportingAdditionalInfoChat additionalInfo { get; set; }
     }
 
     [DataContract]

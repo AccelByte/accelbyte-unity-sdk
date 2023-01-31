@@ -90,6 +90,7 @@ namespace AccelByte.Core
                 session = new UserSession(
                     httpClient,
                     coroutineRunner,
+                    config.PublisherNamespace,
                     config.UsePlayerPrefs );
             }
 

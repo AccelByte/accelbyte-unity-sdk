@@ -11,7 +11,7 @@ namespace AccelByte.Models
     {
         [EnumMember(Value = "UNREACHABLE")] UNREACHABLE,
         [EnumMember(Value = "ACTIVE")] ACTIVE
-}
+    }
 
     [DataContract]
     public class TurnServerList
@@ -29,5 +29,15 @@ namespace AccelByte.Models
         [DataMember] public TurnServerStatus status { get; set; }
         [DataMember] public string last_update { get; set; }
         [DataMember] public int current_time { get; set; }
+    }
+
+    [DataContract]
+    public class TurnServerCredential
+    {
+        [DataMember] public string ip { get; set; }
+        [DataMember] public int port { get; set; }
+        [DataMember] public string region { get; set; }
+        [DataMember] public string username { get; set; }
+        [DataMember] public string password { get; set; }
     }
 }

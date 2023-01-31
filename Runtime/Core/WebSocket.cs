@@ -380,7 +380,22 @@ namespace HybridWebSocket
             this.IsProxySet = true;
         }
 
-        public void Connect(string url, string protocols, string sessionId, string entitlementToken)
+        public void Connect(string url, string protocols, string sessionId, string entitlementToken = null)
+        {
+            Dictionary<string, string> customHeader = new Dictionary<string, string>()
+            {
+                { "X-Ab-LobbySessionID", sessionId }
+            };
+            
+            if (entitlementToken != null)
+            {
+                customHeader.Add("Entitlement", entitlementToken);
+            }
+            
+            Connect(url, protocols, customHeader);
+        }
+
+        public void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null)
         {
             try
             {
@@ -389,16 +404,7 @@ namespace HybridWebSocket
                     | System.Security.Authentication.SslProtocols.Tls11 
                     | System.Security.Authentication.SslProtocols.Tls12;
 
-                this.webSocket.CustomHeaders = string.IsNullOrEmpty(entitlementToken) ?
-                    new Dictionary<string, string>
-                    {
-                        { "X-Ab-LobbySessionID" , sessionId}
-                    } :
-                    new Dictionary<string, string>
-                    {
-                        { "X-Ab-LobbySessionID" , sessionId},
-                        { "Entitlement" , entitlementToken}
-                    };
+                this.webSocket.CustomHeaders = customHeaders;
 
                 if (IsProxySet)
                 {
