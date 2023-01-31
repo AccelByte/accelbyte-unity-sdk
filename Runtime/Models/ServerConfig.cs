@@ -2,15 +2,12 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using AccelByte.Core;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models {
     [DataContract]
     public class ServerConfig
     {
-        private const int defaultCacheSize = 100;
-        private const int defaultCacheLifeTime = 100;
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
@@ -29,8 +26,6 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl { get; set; }
         [DataMember] public string MatchmakingV2ServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
-        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
-        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
 
         /// <summary>
@@ -75,18 +70,6 @@ namespace AccelByte.Models {
             this.MatchmakingV2ServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingV2ServerUrl, "/match2");
 
             this.SeasonPassServerUrl = this.GetDefaultServerApiUrl(this.SeasonPassServerUrl, "/seasonpass");
-
-            if (MaximumCacheSize <= 0)
-            {
-                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
-                MaximumCacheSize = defaultCacheSize;
-            }
-
-            if (MaximumCacheLifeTime <= 0)
-            {
-                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
-                MaximumCacheLifeTime = defaultCacheLifeTime;
-            }
         }
 
         /// <summary>

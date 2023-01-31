@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.11.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.1%0D15.11.0) (2023-01-31)
+
+
+### Bug Fixes
+
+* **chat:** change class initialization to support c[#8](https://accelbyte.atlassian.net/browse/8) and below ([cfec4ea](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cfec4ea77bd1e3ed52df0eb2d529d20f7dedf775))
+* define AccelByteNetUtilities explicitly public ([b63d37d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b63d37dcb04e067df806e57d4cf77e9af7349004))
+
 ## [15.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.0%0D15.10.1) (2023-01-30)
 
 

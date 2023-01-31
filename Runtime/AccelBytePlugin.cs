@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -61,7 +61,6 @@ namespace AccelByte.Api
         private static Session _session;
         private static MatchmakingV2 _matchmakingV2;
         private static TurnManager turnManager;
-        private static ServiceVersion serviceVersion;
 #if !UNITY_SERVER
         private static HeartBeat heartBeat;
 #endif 
@@ -72,7 +71,6 @@ namespace AccelByte.Api
         private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
-        private static IHttpRequestSender defaultHttpSender = new UnityHttpRequestSender();
 
         internal static OAuthConfig OAuthConfig
         {
@@ -89,19 +87,6 @@ namespace AccelByte.Api
             {
                 CheckPlugin();
                 return settings.SDKConfig;
-            }
-        }
-
-        internal static IHttpRequestSender DefaultHttpSender
-        {
-            get
-            {
-                return defaultHttpSender;
-            }
-            set
-            {
-                defaultHttpSender = value;
-                UpdateHttpClientSender(defaultHttpSender);
             }
         }
 
@@ -123,8 +108,6 @@ namespace AccelByte.Api
         internal static void Initialize()
         {
             Initialize(null, null);
-
-            ValidateCompatibility();
         }
 
         internal static void Initialize(Config inConfig, OAuthConfig inOAuthConfig)
@@ -176,35 +159,6 @@ namespace AccelByte.Api
             initialized = true;
         }
 
-        public static ServiceVersion GetServiceVersion()
-        {
-            if (serviceVersion == null)
-            {
-                CheckPlugin();
-                UserSession session = GetUser().Session;
-                serviceVersion = new ServiceVersion(
-                    new ServiceVersionApi(
-                        httpClient,
-                        Config, // baseUrl==justBaseUrl
-                        session),
-                    coroutineRunner);
-            }
-
-            return serviceVersion;
-        }
-
-        static bool ValidateCompatibility()
-        {
-            string matrixJsonText = Utils.AccelByteFileUtils.ReadTextFileFromResource(AccelByteSettingsV2.ServiceCompatibilityResourcePath());
-            var result = Utils.ServiceVersionUtils.CheckServicesCompatibility(GetServiceVersion(), new AccelByteServiceVersion(matrixJsonText)); ;
-            return result;
-        }
-
-        public static Version GetPluginVersion()
-        {
-            return new Version(AccelByteSettingsV2.AccelByteSDKVersion);
-        }
-
         /// <summary>
         /// Check whether if this static class is need to be refreshed/re-init
         /// </summary>
@@ -254,20 +208,10 @@ namespace AccelByte.Api
 
         private static AccelByteHttpClient CreateHttpClient(OAuthConfig newOAuthConfig, Config newSdkConfig)
         {
-            var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
-            var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSdkConfig.MaximumCacheSize);
-            newHttpClient.SetCacheImplementation(cacheImplementation, newSdkConfig.MaximumCacheLifeTime);
+            var newHttpClient = new AccelByteHttpClient();
             newHttpClient.SetCredentials(newOAuthConfig.ClientId, newOAuthConfig.ClientSecret);
             newHttpClient.SetBaseUri(new Uri(newSdkConfig.BaseUrl));
             return newHttpClient;
-        }
-
-        private static void UpdateHttpClientSender(IHttpRequestSender newSender)
-        {
-            if (httpClient != null && httpClient is AccelByteHttpClient)
-            {
-                (httpClient as AccelByteHttpClient).SetSender(newSender);
-            }
         }
 
         private static GameClient CreateGameClient(OAuthConfig newOAuthConfig, Config newSdkConfig, IHttpClient httpClient)

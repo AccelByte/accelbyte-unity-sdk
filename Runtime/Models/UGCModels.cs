@@ -94,7 +94,6 @@ namespace AccelByte.Models
         [DataMember] public string type { get; set; }
         [DataMember] public string subtype { get; set; }
         [DataMember] public string[] tags { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
     }
 
     [DataContract]
@@ -116,7 +115,6 @@ namespace AccelByte.Models
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string type { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
     }
 
     [DataContract]
@@ -141,7 +139,6 @@ namespace AccelByte.Models
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string type { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
     }
 
     [DataContract]
@@ -283,7 +280,6 @@ namespace AccelByte.Models
         [DataMember] public string type { get; set; }
         [DataMember] public string updatedTime { get; set; }
         [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
     }
 
     [DataContract]

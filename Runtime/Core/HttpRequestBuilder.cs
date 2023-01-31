@@ -14,12 +14,6 @@ namespace AccelByte.Core
 {
     public class HttpRequestBuilder
     {
-        internal const string GetMethod = "GET";
-        internal const string PostMethod = "POST";
-        internal const string PutMethod = "PUT";
-        internal const string PatchMethod = "PATCH";
-        internal const string DeleteMethod = "DELETE";
-
         private readonly StringBuilder formBuilder = new StringBuilder(1024);
         private readonly StringBuilder queryBuilder = new StringBuilder(256);
         private readonly StringBuilder urlBuilder = new StringBuilder(256);
@@ -65,27 +59,27 @@ namespace AccelByte.Core
 
         public static HttpRequestBuilder CreateGet(string url)
         {
-            return HttpRequestBuilder.CreatePrototype(GetMethod, url);
+            return HttpRequestBuilder.CreatePrototype("GET", url);
         }
 
         public static HttpRequestBuilder CreatePost(string url)
         {
-            return HttpRequestBuilder.CreatePrototype(PostMethod, url);
+            return HttpRequestBuilder.CreatePrototype("POST", url);
         }
 
         public static HttpRequestBuilder CreatePut(string url)
         {
-            return HttpRequestBuilder.CreatePrototype(PutMethod, url);
+            return HttpRequestBuilder.CreatePrototype("PUT", url);
         }
 
         public static HttpRequestBuilder CreatePatch(string url)
         {
-            return HttpRequestBuilder.CreatePrototype(PatchMethod, url);
+            return HttpRequestBuilder.CreatePrototype("PATCH", url);
         }
 
         public static HttpRequestBuilder CreateDelete(string url)
         {
-            return HttpRequestBuilder.CreatePrototype(DeleteMethod, url);
+            return HttpRequestBuilder.CreatePrototype("DELETE", url);
         }
 
         /// <summary>

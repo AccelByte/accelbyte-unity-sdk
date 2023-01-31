@@ -15,8 +15,8 @@ namespace AccelByte.Api
     {
         #region private properties
         
-        private WsMessageFragmentProcessor messageFragmentProcessor = new();
-        private Dictionary<string, Action<ErrorCode, string>> responseCallbacks = new();
+        private WsMessageFragmentProcessor messageFragmentProcessor = new WsMessageFragmentProcessor();
+        private Dictionary<string, Action<ErrorCode, string>> responseCallbacks = new Dictionary<string, Action<ErrorCode, string>>();
 
         private const string messageFragmentStart = "CaSr";
         private const string messageFragmentEnd = "CaEd";
@@ -206,7 +206,7 @@ namespace AccelByte.Api
 
         private string CreateRequestMessage<T>(string messageId, ChatMessageMethod method, T request)
         {
-            ChatWsMessage<T> requestEnveloped = new()
+            ChatWsMessage<T> requestEnveloped = new ChatWsMessage<T>()
             {
                 jsonrpc = JsonRpcVer,
                 id = messageId,
@@ -222,7 +222,7 @@ namespace AccelByte.Api
         
         private string CreateRequestMessage(string messageId, ChatMessageMethod method)
         {
-            ChatWsMessage requestEnveloped = new()
+            ChatWsMessage requestEnveloped = new ChatWsMessage()
             {
                 jsonrpc = JsonRpcVer,
                 id = messageId,

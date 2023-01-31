@@ -17,31 +17,6 @@ namespace AccelByte.Core
         //No Error
         None = 0,
 
-        Continue = 100, // Reference: RFC 7231, Section 6.2.1
-        SwitchingProtocols = 101, // Reference: RFC 7231, Section 6.2.2
-        Processing = 102, // Reference: RFC 2518, Section 10.1
-
-        Ok = 200, // Reference: RFC 7231, Section 6.3.1
-        Created = 201, // Reference: RFC 7231, Section 6.3.2
-        Accepted = 202, // Reference: RFC 7231, Section 6.3.3
-        NonAuthoritativeInfo = 203, // Reference: RFC 7231, Section 6.3.4
-        NoContent = 204, // Reference: RFC 7231, Section 6.3.5
-        ResetContent = 205, // Reference: RFC 7231, Section 6.3.6
-        PartialContent = 206, // Reference: RFC 7233, Section 4.1
-        MultiStatus = 207, // Reference: RFC 4918, Section 11.1
-        AlreadyReported = 208, // Reference: RFC 5842, Section 7.1
-        ImUsed = 226, // Reference: RFC 3229, Section 10.4.1
-
-        MultipleChoices = 300, // Reference: RFC 7231, Section 6.4.1
-        MovedPermanently = 301, // Reference: RFC 7231, Section 6.4.2
-        Found = 302, // Reference: RFC 7231, Section 6.4.3
-        SeeOther = 303, // Reference: RFC 7231, Section 6.4.4
-        NotModified = 304, // Reference: RFC 7232, Section 4.1
-        UseProxy = 305, // Reference: RFC 7231, Section 6.4.5
-
-        TemporaryRedirect = 307, // Reference: RFC 7231, Section 6.4.7
-        PermanentRedirect = 308, // Reference: RFC 7538, Section 3
-
         //HTTP Status
         BadRequest = 400,
         Unauthorized = 401,

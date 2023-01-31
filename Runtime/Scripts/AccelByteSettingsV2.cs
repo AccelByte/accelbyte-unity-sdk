@@ -117,11 +117,6 @@ namespace AccelByte.Api
             return System.IO.Path.Combine(ConfigsResourceDirectory, "AccelByteSDKVersion");
         }
 
-        public static string ServiceCompatibilityResourcePath()
-        {
-            return System.IO.Path.Combine(ConfigsResourceDirectory, "CompatibilityMap.json");
-        }
-
         public static MultiOAuthConfigs LoadOAuthFile(string targetPlatform, bool isServerConfig = false)
         {
             var retval = new MultiOAuthConfigs();
@@ -486,7 +481,12 @@ namespace AccelByte.Api
                     break;
                 case RuntimePlatform.Switch:
                     activePlatform = PlatformType.Nintendo.ToString();
-                    break; 
+                    break;
+#if UNITY_2019_3_OR_NEWER
+                case RuntimePlatform.Stadia:
+                    activePlatform = PlatformType.Stadia.ToString();
+                    break;
+#endif
                 default:
                     activePlatform = "";
                     break;

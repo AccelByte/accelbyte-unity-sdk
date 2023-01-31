@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020-2022 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -7,7 +7,6 @@ using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
-using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -40,13 +39,11 @@ namespace AccelByte.Server
         private static ServerMatchmakingV2 _matchmakingV2;
         private static ServerUserAccount userAccount;
         private static ServerSeasonPass seasonPass;
-        private static ServiceVersion serviceVersion;
 
         private static bool initialized = false;
         private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
-        private static IHttpRequestSender defaultHttpSender = new UnityHttpRequestSender();
 
         internal static OAuthConfig OAuthConfig
         {
@@ -63,19 +60,6 @@ namespace AccelByte.Server
             {
                 CheckPlugin();
                 return settings.ServerSdkConfig;
-            }
-        }
-
-        internal static IHttpRequestSender DefaultHttpSender
-        {
-            get
-            {
-                return defaultHttpSender;
-            }
-            set
-            {
-                defaultHttpSender = value;
-                UpdateHttpClientSender(defaultHttpSender);
             }
         }
 
@@ -98,8 +82,6 @@ namespace AccelByte.Server
         {
 #endif
             Initialize(null, null);
-
-            ValidateCompatibility();
         }
 
         internal static void Initialize(ServerConfig inConfig, OAuthConfig inOAuthConfig)
@@ -131,43 +113,11 @@ namespace AccelByte.Server
             HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
 
             coroutineRunner = new CoroutineRunner();
-            var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
-            var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
-            newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
-            httpClient = newHttpClient;
-
+            httpClient = new AccelByteHttpClient();
             session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
             server = CreateDedicatedServerClient(session, coroutineRunner);
 
             initialized = true;
-        }
-
-        public static ServiceVersion GetServiceVersion()
-        {
-            if (serviceVersion == null)
-            {
-                CheckPlugin();
-                serviceVersion = new ServiceVersion(
-                    new ServiceVersionApi(
-                        httpClient,
-                        Config, // baseUrl==justBaseUrl
-                        session),
-                    coroutineRunner);
-            }
-
-            return serviceVersion;
-        }
-
-        static bool ValidateCompatibility()
-        {
-            string matrixJsonText = Utils.AccelByteFileUtils.ReadTextFileFromResource(AccelByteSettingsV2.ServiceCompatibilityResourcePath());
-            var result = Utils.ServiceVersionUtils.CheckServicesCompatibility(GetServiceVersion(), new AccelByteServiceVersion(matrixJsonText)); ;
-            return result;
-        }
-
-        public static Version GetPluginVersion()
-        {
-            return new Version(AccelByteSettingsV2.AccelByteSDKVersion);
         }
 
         private static AccelByteSettingsV2 RetrieveConfigFromJsonFile(string platform, SettingsEnvironment environment)
@@ -677,14 +627,6 @@ namespace AccelByte.Server
         {
             CheckPlugin();
             environmentChanged = null;
-        }
-
-        private static void UpdateHttpClientSender(IHttpRequestSender newSender)
-        {
-            if (httpClient != null && httpClient is AccelByteHttpClient)
-            {
-                (httpClient as AccelByteHttpClient).SetSender(newSender);
-            }
         }
     }
 }

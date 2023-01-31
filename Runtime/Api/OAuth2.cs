@@ -260,7 +260,12 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
+        Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
+
+        if (platformType == PlatformType.Stadia)
+        {
+            platformToken = platformToken.TrimEnd('=');
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformType.ToString().ToLower())
@@ -296,7 +301,12 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
+        Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
+
+        if (platformType == PlatformType.Stadia)
+        {
+            platformToken = platformToken.TrimEnd('=');
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformType.ToString().ToLower())
@@ -827,35 +837,6 @@ public class OAuth2 : ApiBase
         if (!string.IsNullOrEmpty(authTrustId))
         {
             PlayerPrefs.SetString(UserSession.AuthTrustIdKey, authTrustId);
-        }
-    }
-    
-    public IEnumerator GenerateGameToken(string code
-        , ResultCallback callback)
-    {
-        Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(code, "Can't Generate Game Token! Code parameter is null!");
-
-        var request = HttpRequestBuilder
-            .CreatePost(BaseUrl + "/v3/token/exchange")
-            .WithBasicAuth()
-            .WithContentType(MediaType.ApplicationForm)
-            .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("code", code)
-            .GetResult();
-
-        IHttpResponse response = null;
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-        var result = response.TryParseJson<TokenData>();
-        if (!result.IsError)
-        {
-            SaveAuthTrustId(result.Value);
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
         }
     }
 }

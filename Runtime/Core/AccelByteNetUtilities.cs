@@ -9,7 +9,7 @@ using System;
 
 namespace AccelByte.Core
 {
-    static class AccelByteNetUtilities
+    public static class AccelByteNetUtilities
     {
         private static readonly CoroutineRunner coroutineRunner = new CoroutineRunner();
         private static readonly IHttpClient HttpClient = new AccelByteHttpClient();

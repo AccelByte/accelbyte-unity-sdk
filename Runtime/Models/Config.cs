@@ -16,9 +16,6 @@ namespace AccelByte.Models
     [DataContract]
     public class Config
     {
-        private const int defaultCacheSize = 100;
-        private const int defaultCacheLifeTime = 100;
-
         [DataMember] public string Namespace { get; set; } = "";
         [DataMember] public bool UsePlayerPrefs { get; set; } = false;
         [DataMember] public bool EnableDebugLog { get; set; } = true;
@@ -56,8 +53,6 @@ namespace AccelByte.Models
         [DataMember] public string AppId { get; set; } = "";
         [DataMember] public string PublisherNamespace { get; set; } = "";
         [DataMember] public string CustomerName { get; set; } = "";
-        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
-        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
         /// <summary>
         ///  Copy member values
@@ -104,9 +99,7 @@ namespace AccelByte.Models
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace &&
-                   this.CustomerName == anotherConfig.CustomerName &&
-                   this.MaximumCacheSize == anotherConfig.MaximumCacheSize &&
-                   this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime;
+                   this.CustomerName == anotherConfig.CustomerName;
         }
 
         /// <summary>
@@ -246,18 +239,6 @@ namespace AccelByte.Models
             if (CustomerName == null)
             {
                 CustomerName = "";
-            }
-
-            if(MaximumCacheSize <= 0)
-            {
-                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
-                MaximumCacheSize = defaultCacheSize;
-            }
-
-            if (MaximumCacheLifeTime <= 0)
-            {
-                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
-                MaximumCacheLifeTime = defaultCacheLifeTime;
             }
 
             if (!string.IsNullOrEmpty(this.BaseUrl))
