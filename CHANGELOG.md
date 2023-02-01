@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.11.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.2%0D15.11.1) (2023-02-01)
+
+
+### Bug Fixes
+
+* missing NUnit package causes compile error ([7186b5b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7186b5b9772329529cc523315545b0a3135aa53d))
+
 ### [15.11.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.1%0D15.11.0) (2023-01-31)
 
 

@@ -7,7 +7,6 @@ using AccelByte.Core;
 using AccelByte.Models;
 using HybridWebSocket;
 using Newtonsoft.Json;
-using NUnit.Framework;
 
 namespace AccelByte.Api
 {   
@@ -18,10 +17,6 @@ namespace AccelByte.Api
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner)
         {
-            Assert.IsNotNull(inApi, "inApi==null (@ constructor)");
-            Assert.IsNotNull(inSession, "inSession==null (@ constructor)");
-            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner==null (@ constructor)");
-
             session = inSession;
             coroutineRunner = inCoroutineRunner;
             api = inApi;
