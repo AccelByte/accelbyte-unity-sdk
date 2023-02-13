@@ -32,7 +32,7 @@ namespace AccelByte.Core
             {
                 this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
             }
-            
+			            
             this.monoBehaviour.StartCoroutine(this.RunCallbacks());
         }
 

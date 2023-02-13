@@ -21,6 +21,7 @@ namespace AccelByte.Api
                 return instance;
             }
         }
+        private const string windowTitle = "AccelByte Configuration";
         private Texture2D accelByteLogo;
         private int temporaryEnvironmentSetting;
         private int temporaryPlatformSetting;
@@ -32,6 +33,7 @@ namespace AccelByte.Api
         private OAuthConfig editedOAuthConfig;
         private Config editedSdkConfig;
         private Vector2 scrollPos;
+        private bool showCacheConfigs;
         private bool showOtherConfigs;
         private bool showLogConfigs;
         private bool showServiceUrlConfigs;
@@ -47,8 +49,8 @@ namespace AccelByte.Api
             {
                 instance.CloseFinal();
             }
-            
-            instance = (AccelBytePlatformSettingsEditor)EditorWindow.GetWindow(typeof(AccelBytePlatformSettingsEditor));
+
+            instance = EditorWindow.GetWindow<AccelBytePlatformSettingsEditor>(windowTitle, true, System.Type.GetType("UnityEditor.ConsoleWindow,UnityEditor.dll"));
             instance.Show();
         }
 
@@ -59,7 +61,6 @@ namespace AccelByte.Api
                 requiredTextFieldGUIStyle = new GUIStyle();
                 requiredTextFieldGUIStyle.normal.textColor = Color.yellow;
 
-                titleContent = new GUIContent("AccelByte Configuration");
                 accelByteLogo = Resources.Load<Texture2D>("ab-logo");
                 platformList = new List<string>();
                 platformList.Add(PlatformType.Steam.ToString());
@@ -71,7 +72,6 @@ namespace AccelByte.Api
                 platformList.Add(PlatformType.PS5.ToString());
                 platformList.Add(PlatformType.Live.ToString());
                 platformList.Add(PlatformType.Nintendo.ToString());
-                platformList.Add(PlatformType.Stadia.ToString());
                 platformList.Add("Default");
                 this.temporaryPlatformSetting = platformList.Count - 1;
 
@@ -176,6 +176,28 @@ namespace AccelByte.Api
             CreateTextInput((newValue) => editedOAuthConfig.ClientId = newValue, editedOAuthConfig.ClientId, "Client Id", true);
             CreateTextInput((newValue) => editedOAuthConfig.ClientSecret = newValue, editedOAuthConfig.ClientSecret, "Client Secret", true);
 
+            showCacheConfigs = EditorGUILayout.Foldout(showCacheConfigs, "Cache Configs");
+            if (showCacheConfigs)
+            {
+                Action<double> onCacheSizeChanged = (newValue) =>
+                {
+                    if(newValue > 0)
+                    {
+                        editedSdkConfig.MaximumCacheSize = Mathf.FloorToInt((float)newValue);
+                    }
+                };
+                CreateNumberInput(onCacheSizeChanged, editedSdkConfig.MaximumCacheSize, "Cache Size");
+
+                Action<double> onCacheLifeTimeChanged = (newValue) =>
+                {
+                    if (newValue > 0)
+                    {
+                        editedSdkConfig.MaximumCacheLifeTime = Mathf.FloorToInt((float)newValue);
+                    }
+                };
+                CreateNumberInput(onCacheLifeTimeChanged, editedSdkConfig.MaximumCacheLifeTime, "Cache Life Time (Seconds)");
+            }
+
             showOtherConfigs = EditorGUILayout.Foldout(showOtherConfigs, "Other Configs");
             if (showOtherConfigs)
             {
@@ -254,6 +276,23 @@ namespace AccelByte.Api
 
             EditorGUILayout.EndVertical();
 #endif
+        }
+
+        private void CreateNumberInput(Action<double> setter, double defaultValue, string fieldLabel, bool required = false)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(fieldLabel);
+            var newValue = EditorGUILayout.DoubleField(defaultValue);
+            setter?.Invoke(newValue);
+
+            string requiredText = "";
+            if (required)
+            {
+                requiredText = "Required";
+            }
+            EditorGUILayout.LabelField(requiredText, requiredTextFieldGUIStyle);
+
+            EditorGUILayout.EndHorizontal();
         }
 
         private void CreateTextInput(Action<string> setter, string defaultValue, string fieldLabel, bool required = false)

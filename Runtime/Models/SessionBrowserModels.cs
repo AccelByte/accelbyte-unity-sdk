@@ -59,9 +59,9 @@ namespace AccelByte.Models
         [DataMember] public string map_name { get; set; } = "";
         [DataMember] public int num_bot { get; set; } = 0;
         [DataMember] public int max_player { get; set; } = 1;
-        [DataMember] public int current_player { get; set; } = 1;
+        [DataMember] public int current_player { get; set; } = 0;
         [DataMember] public int max_internal_player { get; set; } = 1;
-        [DataMember] public int current_internal_player { get; set; } = 1;
+        [DataMember] public int current_internal_player { get; set; } = 0;
         [DataMember] public bool allow_join_in_progress { get; set; } = true;
         [DataMember] public string password { get; set; } = "";
         [DataMember] public Newtonsoft.Json.Linq.JObject settings { get; set; }

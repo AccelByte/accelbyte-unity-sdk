@@ -348,7 +348,7 @@ namespace AccelByte.Api
         public void Save()
         {
 #if UNITY_EDITOR
-            var configDir = AccelByteSettingsV2.ConfigsDirectoryFullPath();
+            var configDir = AccelByteSettingsV2.GeneratedConfigsDirectoryFullPath();
             if (!System.IO.Directory.Exists(configDir))
             {
                 System.IO.Directory.CreateDirectory(configDir);

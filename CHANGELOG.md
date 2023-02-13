@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.12.0%0D15.11.2) (2023-02-13)
+
+
+### Features
+
+* [JSC-1032] add compatibility matrix check ([4932ee2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4932ee229680a1cc7dfad649d410374d4555bcf3))
+* add ugc custom attributes ([208ac2d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/208ac2d37bb8868f0188df84b033ecc0522f7207))
+* cache config ([14b5985](https://github.com/AccelByte/accelbyte-unity-sdk/commits/14b59855fbd4123573d9be0a58a8cebaccae4e8d))
+* get game token by publisher token ([65901c8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/65901c820d605841489752b9ca353b3d3b974911))
+* http cache ([3fd4194](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3fd4194cce327fd757ff72ac95c88ba67d196117))
+* http cache ([ce6c25c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ce6c25c1d18ac5046955ca23c7dd8bff4b45dbab))
+* **lobby:** add reject match ([ed03ffa](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed03ffafc9c0a5a9afacf52ba1da56a2696bf393))
+* LRU Memory implementation ([eec8b01](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eec8b01f94f671aa43ae95a6329cf3f13ee33e3a))
+* new v2 group api ([cb27b6a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb27b6a9d7ba185561eb651e4b3710bc32f08434))
+* new v2 group api ([19f4675](https://github.com/AccelByte/accelbyte-unity-sdk/commits/19f4675d0789f3972ea1eca16966ab464292c86c))
+* Remove some Stadia enumeration variable, because Google is shutting down Stadia. ([92b3de4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/92b3de4bb33340d7c38f2336bf0c395bf727ef27))
+* **turnmanager:** add api to get turn server credential ([a37e87b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a37e87b241b225c46cf28925d09aad84c616a16d))
+* user ban error response ([18f0eca](https://github.com/AccelByte/accelbyte-unity-sdk/commits/18f0ecafcc45c1a049078438bc372f2832318194))
+* user ban error response ([c359f21](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c359f21dd2ec2f1d3269169f3ce3b5e4df015982))
+
+
+### Bug Fixes
+
+* change default current_player and current_internal_player to 0 ([9e89460](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9e894603c5ec8e47ba8fa75c1b8a455e2f26de19))
+* fix unsupported code in lower version csharp ([b3685b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b3685b258c9315b335c9166d2ea70115062cfd95))
+* generate sdk version metadata file ([3eba075](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3eba0752ede8471033473a701b30cdbe6c02b628))
+* revert default config directory to resource root ([a095a76](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a095a76796640bd67805d7c157f1569362920399))
+* set server flag on save OAuth file ([9858bf9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9858bf97a8850a068663f4fb405407b611e1be35))
+
+
+### Refactors
+
+* add changeable http sender ([197896e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/197896e609e6cb45815b53abe5a846ff52c15b7c))
+
 ### [15.11.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.2%0D15.11.1) (2023-02-01)
 
 

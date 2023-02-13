@@ -17,7 +17,8 @@ namespace AccelByte.Api
 {
     public class AccelByteSettingsV2
     {
-        internal const string DefaultConfigsResourceDirectory = "AccelByteSDK";
+        internal const string DefaultStaticConfigsResourceDirectory = "AccelByteSDK";
+        internal const string DefaultGeneratedConfigsResourceDirectory = "";
         public static string AccelByteSDKVersion
         {
             get
@@ -61,60 +62,87 @@ namespace AccelByte.Api
         private ServerConfig serverSdkConfig;
 
 #if UNITY_EDITOR
-        public static string ConfigsDirectoryFullPath()
+        public static string StaticConfigsDirectoryFullPath()
         {
             var accelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettingsV2).Assembly);
-            string retval = System.IO.Path.Combine(accelBytePackageInfo.resolvedPath, "Configs", "Resources", ConfigsResourceDirectory);
+            string retval = System.IO.Path.Combine(accelBytePackageInfo.resolvedPath, "Configs", "Resources", StaticConfigsResourceDirectory);
+            return retval;
+        }
+
+        public static string GeneratedConfigsDirectoryFullPath()
+        {
+            string retval = System.IO.Path.Combine(Application.dataPath, "Resources", GeneratedConfigsResourceDirectory);
             return retval;
         }
 #endif
 
-        public static string ConfigsResourceDirectory
+        public static string GeneratedConfigsResourceDirectory
         {
             get;
             set;
-        } = DefaultConfigsResourceDirectory;
+        } = DefaultGeneratedConfigsResourceDirectory;
+
+        public static string StaticConfigsResourceDirectory
+        {
+            get;
+            set;
+        } = DefaultStaticConfigsResourceDirectory;
 
 #if UNITY_EDITOR
         public static string SDKConfigFullPath(bool isServer)
         {
             string fileName = isServer ? "AccelByteServerSDKConfig.json" : "AccelByteSDKConfig.json";
-            string retval = System.IO.Path.Combine(ConfigsDirectoryFullPath(), fileName);
+            string retval = System.IO.Path.Combine(GeneratedConfigsDirectoryFullPath(), fileName);
             return retval;
         }
 #endif
+        public static string OldSDKConfigResourcePath(bool isServer = false)
+        {
+            string fileName = isServer ? "AccelByteServerSDKConfig" : "AccelByteSDKConfig";
+            return System.IO.Path.Combine(StaticConfigsResourceDirectory, fileName);
+        }
 
         public static string SDKConfigResourcePath(bool isServer = false)
         {
             string fileName = isServer ? "AccelByteServerSDKConfig" : "AccelByteSDKConfig";
-            return System.IO.Path.Combine(ConfigsResourceDirectory, fileName);
+            return System.IO.Path.Combine(GeneratedConfigsResourceDirectory, fileName);
         }
 
 #if UNITY_EDITOR
         public static string OAuthFullPath(string platform, bool isServer = false)
         {
             string fileName = isServer ? "AccelByteServerSDKOAuthConfig" : "AccelByteSDKOAuthConfig";
-            string retval = System.IO.Path.Combine(ConfigsDirectoryFullPath(), $"{fileName}{platform}.json");
+            string retval = System.IO.Path.Combine(GeneratedConfigsDirectoryFullPath(), $"{fileName}{platform}.json");
             return retval;
         }
 #endif
+        public static string OldOAuthResourcePath(string platform, bool isServer)
+        {
+            string fileName = isServer ? "AccelByteServerSDKOAuthConfig" : "AccelByteSDKOAuthConfig";
+            return System.IO.Path.Combine(StaticConfigsResourceDirectory, $"{fileName}{platform}");
+        }
 
         public static string OAuthResourcePath(string platform, bool isServer)
         {
             string fileName = isServer ? "AccelByteServerSDKOAuthConfig" : "AccelByteSDKOAuthConfig";
-            return System.IO.Path.Combine(ConfigsResourceDirectory, $"{fileName}{platform}");
+            return System.IO.Path.Combine(GeneratedConfigsResourceDirectory, $"{fileName}{platform}");
         }
 
 #if UNITY_EDITOR
         public static string SDKVersionFullPath()
         {
-            return System.IO.Path.Combine(ConfigsDirectoryFullPath(), "AccelByteSDKVersion.json");
+            return System.IO.Path.Combine(GeneratedConfigsDirectoryFullPath(), "AccelByteSDKVersion.json");
         }
 #endif
 
         public static string SDKVersionResourcePath()
         {
-            return System.IO.Path.Combine(ConfigsResourceDirectory, "AccelByteSDKVersion");
+            return System.IO.Path.Combine(GeneratedConfigsResourceDirectory, "AccelByteSDKVersion");
+        }
+
+        public static string ServiceCompatibilityResourcePath()
+        {
+            return System.IO.Path.Combine(StaticConfigsResourceDirectory, "CompatibilityMap.json");
         }
 
         public static MultiOAuthConfigs LoadOAuthFile(string targetPlatform, bool isServerConfig = false)
@@ -122,8 +150,7 @@ namespace AccelByte.Api
             var retval = new MultiOAuthConfigs();
             UnityEngine.Object targetOAuthFile = null;
             bool moveConfigFile = false;
-            var oldOAuthFileName = isServerConfig ? "AccelByteServerSDKOAuthConfig" : "AccelByteSDKOAuthConfig";
-            var oldOAuthFile = Resources.Load($"{oldOAuthFileName}{targetPlatform}");
+            var oldOAuthFile = Resources.Load(OldOAuthResourcePath(targetPlatform, isServerConfig));
             var oAuthFile = Resources.Load(OAuthResourcePath(targetPlatform, isServerConfig));
 
             if (oldOAuthFile != null && oAuthFile == null)
@@ -143,12 +170,6 @@ namespace AccelByte.Api
             }
 
 #if UNITY_EDITOR
-            var projectRootDir = System.IO.Directory.GetCurrentDirectory();
-            var oldOAuthFileFullPath = System.IO.Path.Combine(projectRootDir, "Assets", "Resources", $"{oldOAuthFileName}{targetPlatform}.json");
-            if (oldOAuthFile != null && System.IO.File.Exists(oldOAuthFileFullPath))
-            {
-                System.IO.File.Delete(oldOAuthFileFullPath);
-            }
             if (moveConfigFile)
             {
                 SaveConfig(retval, OAuthFullPath(targetPlatform, isServerConfig));
@@ -214,8 +235,7 @@ namespace AccelByte.Api
             UnityEngine.Object targetConfigFile = null;
             bool moveConfigFile = false;
 
-            var oldConfigFileName = "AccelByteSDKConfig";
-            var oldConfigFile = Resources.Load(oldConfigFileName);
+            var oldConfigFile = Resources.Load(OldSDKConfigResourcePath(false));
             var configFile = Resources.Load(SDKConfigResourcePath(false));
             if (oldConfigFile != null && configFile == null)
             {
@@ -234,13 +254,6 @@ namespace AccelByte.Api
             }
 
 #if UNITY_EDITOR
-            var projectRootDir = System.IO.Directory.GetCurrentDirectory();
-
-            var oldConfigFileFullPath = System.IO.Path.Combine(projectRootDir, "Assets", "Resources", $"{oldConfigFileName}.json");
-            if (oldConfigFile != null && System.IO.File.Exists(oldConfigFileFullPath))
-            {
-                System.IO.File.Delete(oldConfigFileFullPath);
-            }
             if (moveConfigFile)
             {
                 SaveConfig(retval, SDKConfigFullPath(false));
@@ -260,8 +273,7 @@ namespace AccelByte.Api
             UnityEngine.Object targetConfigFile = null;
             bool moveConfigFile = false;
 
-            var oldConfigFileName = "AccelByteServerSDKConfig";
-            var oldConfigFile = Resources.Load(oldConfigFileName);
+            var oldConfigFile = Resources.Load(OldSDKConfigResourcePath(true));
             var configFile = Resources.Load(SDKConfigResourcePath(true));
             if (oldConfigFile != null && configFile == null)
             {
@@ -280,13 +292,6 @@ namespace AccelByte.Api
             }
 
 #if UNITY_EDITOR
-            var projectRootDir = System.IO.Directory.GetCurrentDirectory();
-
-            var oldConfigFileFullPath = System.IO.Path.Combine(projectRootDir, "Assets", "Resources", $"{oldConfigFileName}.json");
-            if (oldConfigFile != null && System.IO.File.Exists(oldConfigFileFullPath))
-            {
-                System.IO.File.Delete(oldConfigFileFullPath);
-            }
             if (moveConfigFile)
             {
                 SaveConfig(retval, SDKConfigFullPath(true));
@@ -382,7 +387,7 @@ namespace AccelByte.Api
         public static void SaveConfig<T>(T savedConfig, string savePath)
         {
 #if UNITY_EDITOR
-            string configPath = ConfigsDirectoryFullPath();
+            string configPath = GeneratedConfigsDirectoryFullPath();
 
             if (!System.IO.Directory.Exists(configPath))
             {
@@ -422,7 +427,7 @@ namespace AccelByte.Api
                 goto endfunction;
             }
 
-            string configPath = ConfigsDirectoryFullPath();
+            string configPath = GeneratedConfigsDirectoryFullPath();
             if (!System.IO.Directory.Exists(configPath))
             {
                 System.IO.Directory.CreateDirectory(configPath);
@@ -430,6 +435,7 @@ namespace AccelByte.Api
 
             string SDKVersionPath = SDKVersionFullPath();
             System.IO.File.WriteAllBytes(SDKVersionPath, Encoding.ASCII.GetBytes(versionTextRaw));
+            UnityEditor.AssetDatabase.Refresh();
 
             endfunction:
             {
@@ -481,12 +487,7 @@ namespace AccelByte.Api
                     break;
                 case RuntimePlatform.Switch:
                     activePlatform = PlatformType.Nintendo.ToString();
-                    break;
-#if UNITY_2019_3_OR_NEWER
-                case RuntimePlatform.Stadia:
-                    activePlatform = PlatformType.Stadia.ToString();
-                    break;
-#endif
+                    break; 
                 default:
                     activePlatform = "";
                     break;
@@ -507,7 +508,7 @@ namespace AccelByte.Api
                 }
             }
 
-            dynamic multiConfigs;
+            IAccelByteMultiConfigs multiConfigs;
             if(!isServer)
             {
                 multiConfigs = AccelByteSettingsV2.LoadSDKConfigFile();
@@ -524,60 +525,28 @@ namespace AccelByte.Api
             }
             if (multiConfigs == null)
             {
-                multiConfigs = new MultiConfigs();
+                if(isServer)
+                {
+                    multiConfigs = new MultiServerConfigs();
+                }
+                else
+                {
+                    multiConfigs = new MultiConfigs();
+                }
                 AccelByteDebug.LogWarning($"{serverFlagLog}SDK Config not found, using empty config");
             }
 
             multiOAuthConfigs.Expand();
             multiConfigs.Expand();
 
-            switch (environment)
+            oAuthConfig = multiOAuthConfigs.GetConfigFromEnvironment(environment);
+            if (isServer)
             {
-                case SettingsEnvironment.Development:
-                    oAuthConfig = multiOAuthConfigs.Development;
-                    if(isServer)
-                    {
-                        serverSdkConfig = multiConfigs.Development;
-                    }
-                    else
-                    {
-                        sdkConfig = multiConfigs.Development;
-                    }
-                    break;
-                case SettingsEnvironment.Certification:
-                    oAuthConfig = multiOAuthConfigs.Certification;
-                    if (isServer)
-                    {
-                        serverSdkConfig = multiConfigs.Certification;
-                    }
-                    else
-                    {
-                        sdkConfig = multiConfigs.Certification;
-                    }
-                    break;
-                case SettingsEnvironment.Production:
-                    oAuthConfig = multiOAuthConfigs.Production;
-                    if (isServer)
-                    {
-                        serverSdkConfig = multiConfigs.Production;
-                    }
-                    else
-                    {
-                        sdkConfig = multiConfigs.Production;
-                    }
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    oAuthConfig = multiOAuthConfigs.Default;
-                    if (isServer)
-                    {
-                        serverSdkConfig = multiConfigs.Default;
-                    }
-                    else
-                    {
-                        sdkConfig = multiConfigs.Default;
-                    }
-                    break;
+                serverSdkConfig = (ServerConfig)multiConfigs.GetConfigFromEnvironment(environment);
+            }
+            else
+            {
+                sdkConfig = (Config)multiConfigs.GetConfigFromEnvironment(environment);
             }
         }
 

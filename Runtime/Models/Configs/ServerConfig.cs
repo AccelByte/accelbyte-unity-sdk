@@ -1,13 +1,16 @@
-// Copyright (c) 2020-2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Core;
 using System.Runtime.Serialization;
 
 namespace AccelByte.Models {
     [DataContract]
-    public class ServerConfig
+    public class ServerConfig : IAccelByteConfig
     {
+        private const int defaultCacheSize = 100;
+        private const int defaultCacheLifeTime = 100;
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
@@ -26,6 +29,8 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl { get; set; }
         [DataMember] public string MatchmakingV2ServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
+        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
+        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
 
         /// <summary>
@@ -70,6 +75,18 @@ namespace AccelByte.Models {
             this.MatchmakingV2ServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingV2ServerUrl, "/match2");
 
             this.SeasonPassServerUrl = this.GetDefaultServerApiUrl(this.SeasonPassServerUrl, "/seasonpass");
+
+            if (MaximumCacheSize <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
+                MaximumCacheSize = defaultCacheSize;
+            }
+
+            if (MaximumCacheLifeTime <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
+                MaximumCacheLifeTime = defaultCacheLifeTime;
+            }
         }
 
         /// <summary>
@@ -147,10 +164,15 @@ namespace AccelByte.Models {
 
             return specificServerUrl;
         }
+
+        public void SanitizeBaseUrl()
+        {
+            this.BaseUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
+        }
     }
 
     [DataContract]
-    public class MultiServerConfigs
+    public class MultiServerConfigs : IAccelByteMultiConfigs
     {
         [DataMember] public ServerConfig Development { get; set; }
         [DataMember] public ServerConfig Certification { get; set; }
@@ -179,6 +201,22 @@ namespace AccelByte.Models {
                 Default = new ServerConfig();
             }
             Default.Expand();
+        }
+
+        IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
+        {
+            switch (targetEnvironment)
+            {
+                case SettingsEnvironment.Development:
+                    return Development;
+                case SettingsEnvironment.Certification:
+                    return Certification;
+                case SettingsEnvironment.Production:
+                    return Production;
+                case SettingsEnvironment.Default:
+                default:
+                    return Default;
+            }
         }
     }
 }

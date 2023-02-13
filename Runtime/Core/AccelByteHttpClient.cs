@@ -33,11 +33,17 @@ namespace AccelByte.Core
 
         public event Action<string> UnauthorizedOccured;
 
+        private AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>> httpCache;
+
         public AccelByteHttpClient(IHttpRequestSender requestSender = null)
         {
             this.sender = requestSender ?? new UnityHttpRequestSender();
             this.SetRetryParameters();
+        }
 
+        internal void SetCacheImplementation(IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>> cacheImplementation, int cacheMaxLifeTime)
+        {
+            httpCache = new AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>>(cacheImplementation, cacheMaxLifeTime);
         }
 
         public void SetCredentials(string clientId, string clientSecret)
@@ -70,6 +76,14 @@ namespace AccelByte.Core
         public void SetBaseUri(Uri baseUri)
         {
             this.baseUri = baseUri;
+        }
+
+        public void SetSender(IHttpRequestSender newRequestSender)
+        {
+            if(newRequestSender != null)
+            {
+                this.sender = newRequestSender;
+            }
         }
 
         public void OnBearerAuthRejected(Action<string> callback)
@@ -109,12 +123,28 @@ namespace AccelByte.Core
             this.maxDelayMs = maxDelayMs;
         }
 
-        public IEnumerator SendRequest(IHttpRequest request, Action<IHttpResponse, Error> callback)
+        public IEnumerator SendRequest(IHttpRequest requestInput, Action<IHttpResponse, Error> callback)
         {
             var rand = new Random();
             uint retryDelayMs = this.initialDelayMs;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            IHttpRequest request = null;
+            HttpCacheRetrieveResult? getHttpCacheResult = null;
+            if (httpCache != null)
+            {
+                getHttpCacheResult = httpCache.TryRetrieving(requestInput);
+            }
+
+            if(getHttpCacheResult != null && getHttpCacheResult.Request != null)
+            {
+                request = getHttpCacheResult.Request;
+            } 
+            else
+            {
+                request = requestInput;
+            }
 
             this.ApplyImplicitAuthorization(request);
             this.ApplyImplicitPathParams(request);
@@ -168,7 +198,15 @@ namespace AccelByte.Core
 
                 int timeoutMs = (int)(this.totalTimeoutMs - stopwatch.ElapsedMilliseconds);
 
-                yield return this.sender.Send(request, (rsp, err) => (httpResponse, error) = (rsp, err), timeoutMs);
+                if (getHttpCacheResult != null && getHttpCacheResult.Response != null)
+                {
+                    httpResponse = getHttpCacheResult.Response;
+                    error = getHttpCacheResult.ResponseError;
+                }
+                else
+                {
+                    yield return this.sender.Send(request, (rsp, err) => (httpResponse, error) = (rsp, err), timeoutMs);
+                }
 
                 if (error != null)
                 {
@@ -179,56 +217,63 @@ namespace AccelByte.Core
                     yield break;
                 }
 
-                switch ((HttpStatusCode) httpResponse.Code)
+                switch ((HttpStatusCode)httpResponse.Code)
                 {
-                case HttpStatusCode.InternalServerError:
-                case HttpStatusCode.BadGateway:
-                case HttpStatusCode.ServiceUnavailable:
-                case HttpStatusCode.GatewayTimeout:
-                    this.ServerErrorOccured?.Invoke(request);
-                    
-                    int jitterMs = rand.Next((int)(-retryDelayMs/4), (int)(retryDelayMs/4));
+                    case HttpStatusCode.InternalServerError:
+                    case HttpStatusCode.BadGateway:
+                    case HttpStatusCode.ServiceUnavailable:
+                    case HttpStatusCode.GatewayTimeout:
+                        this.ServerErrorOccured?.Invoke(request);
 
-                    yield return new WaitForSeconds((retryDelayMs + jitterMs) / 1000f);
+                        int jitterMs = rand.Next((int)(-retryDelayMs / 4), (int)(retryDelayMs / 4));
 
-                    retryDelayMs = Math.Min(retryDelayMs*2, this.maxDelayMs);
+                        yield return new WaitForSeconds((retryDelayMs + jitterMs) / 1000f);
 
-                    break;
-                case HttpStatusCode.Unauthorized:
-                    if (state == RequestState.Resumed || request.AuthType != HttpAuth.Bearer)
-                    {
-                        state = RequestState.Stoped;
-                        callback?.Invoke(httpResponse, error);
-                        UnauthorizedOccured?.Invoke(accessToken);
-                        yield break;
-                    }
-                    else
-                    {
-                        state = RequestState.Paused;
-                        OnBearerAuthRejected(result => { });
-                        yield return new WaitWhile(() => 
-                        { 
-                            return IsBearerAuthRequestPaused() && IsRequestingNewAccessToken();
-                        });
-                        if (IsBearerAuthRequestPaused())
+                        retryDelayMs = Math.Min(retryDelayMs * 2, this.maxDelayMs);
+
+                        break;
+                    case HttpStatusCode.Unauthorized:
+                        if (state == RequestState.Resumed || request.AuthType != HttpAuth.Bearer)
                         {
                             state = RequestState.Stoped;
                             callback?.Invoke(httpResponse, error);
-                            AccelByteDebug.LogWarning("Failed retrieving new access token");
+                            UnauthorizedOccured?.Invoke(accessToken);
                             yield break;
                         }
-                    }
-                    break;
+                        else
+                        {
+                            state = RequestState.Paused;
+                            OnBearerAuthRejected(result => { });
+                            yield return new WaitWhile(() =>
+                            {
+                                return IsBearerAuthRequestPaused() && IsRequestingNewAccessToken();
+                            });
+                            if (IsBearerAuthRequestPaused())
+                            {
+                                state = RequestState.Stoped;
+                                callback?.Invoke(httpResponse, error);
+                                AccelByteDebug.LogWarning("Failed retrieving new access token");
+                                yield break;
+                            }
+                        }
+                        break;
+                    default:
+                        state = RequestState.Stoped;
 
-                default:
-
-                    state = RequestState.Stoped;
-                    callback?.Invoke(httpResponse, null);
-                    yield break;
+                        if (httpCache != null)
+                        {
+                            httpCache.TryStoring(request, httpResponse, error);
+                        }
+                        callback?.Invoke(httpResponse, null);
+                        yield break;
                 }
             }
             while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(this.totalTimeoutMs) || IsBearerAuthRequestPaused());
 
+            if (httpCache != null)
+            {
+                httpCache.TryStoring(request, httpResponse, null);
+            }
             callback?.Invoke(httpResponse, null);
         }
 
@@ -308,7 +353,7 @@ namespace AccelByte.Core
             isRequestingNewAccessToken = isRequesting; 
         }
 
-        private readonly IHttpRequestSender sender;
+        private IHttpRequestSender sender;
         private uint totalTimeoutMs;
         private uint initialDelayMs;
         private uint maxDelayMs;

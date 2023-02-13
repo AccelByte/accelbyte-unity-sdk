@@ -426,7 +426,7 @@ namespace AccelByte.Api
         private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
+            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCodeV3(authCode, cb), callback);
         }
 
         /// <summary>
@@ -1729,6 +1729,30 @@ namespace AccelByte.Api
                 yield break;
             }
             yield return oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
+        }
+        
+        /// <summary>
+        /// Generate publisher user's game token. Required a code from request game token
+        /// </summary>
+        /// <param name="code">code from request game token</param>
+        /// <param name="callback">Return Result via callback when completed</param>
+        public void GenerateGameToken(string code
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(GenerateGameTokenAsync(code, callback));
+        }
+
+        private IEnumerator GenerateGameTokenAsync(string code
+            , ResultCallback callback)
+        {
+            if (userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.InvalidRequest, 
+                    "User is already logged in.");
+                yield break;
+            }
+            yield return oAuth2.GenerateGameToken(code, callback);
         }
     }
 }

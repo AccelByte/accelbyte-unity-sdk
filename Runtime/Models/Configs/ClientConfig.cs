@@ -14,8 +14,11 @@ namespace AccelByte.Models
     /// <para>Looking for runtime settings? See static AccelBytePlugin.Config</para>
     /// </summary>
     [DataContract]
-    public class Config
+    public class Config : IAccelByteConfig
     {
+        private const int defaultCacheSize = 100;
+        private const int defaultCacheLifeTime = 100;
+
         [DataMember] public string Namespace { get; set; } = "";
         [DataMember] public bool UsePlayerPrefs { get; set; } = false;
         [DataMember] public bool EnableDebugLog { get; set; } = true;
@@ -53,6 +56,8 @@ namespace AccelByte.Models
         [DataMember] public string AppId { get; set; } = "";
         [DataMember] public string PublisherNamespace { get; set; } = "";
         [DataMember] public string CustomerName { get; set; } = "";
+        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
+        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
         /// <summary>
         ///  Copy member values
@@ -99,7 +104,9 @@ namespace AccelByte.Models
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace &&
-                   this.CustomerName == anotherConfig.CustomerName;
+                   this.CustomerName == anotherConfig.CustomerName &&
+                   this.MaximumCacheSize == anotherConfig.MaximumCacheSize &&
+                   this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime;
         }
 
         /// <summary>
@@ -239,6 +246,18 @@ namespace AccelByte.Models
             if (CustomerName == null)
             {
                 CustomerName = "";
+            }
+
+            if(MaximumCacheSize <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
+                MaximumCacheSize = defaultCacheSize;
+            }
+
+            if (MaximumCacheLifeTime <= 0)
+            {
+                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
+                MaximumCacheLifeTime = defaultCacheLifeTime;
             }
 
             if (!string.IsNullOrEmpty(this.BaseUrl))
@@ -416,81 +435,12 @@ namespace AccelByte.Models
 
         public void SanitizeBaseUrl()
         {
-            var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
-            if(this.BaseUrl == null)
-            {
-                this.BaseUrl = "";
-            }
-            if (Regex.IsMatch(this.BaseUrl, regexStr))
-            {
-                this.BaseUrl = this.BaseUrl.TrimEnd('/');
-            }
-            else
-            {
-                AccelByteDebug.LogWarning("Invalid URL: " + this.BaseUrl);
-            }
+            this.BaseUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
         }
     }
 
     [DataContract]
-    public class OAuthConfig
-    {
-        [DataMember] public string ClientId { get; set; }
-        [DataMember] public string ClientSecret { get; set; }
-
-        /// <summary>
-        ///  Copy member values
-        /// </summary>
-        public OAuthConfig ShallowCopy()
-        {
-            return (OAuthConfig)MemberwiseClone();
-        }
-
-        public bool Compare(OAuthConfig anotherConfig)
-        {
-            return this.ClientId == anotherConfig.ClientId &&
-                   this.ClientSecret == anotherConfig.ClientSecret;
-        }
-
-        /// <summary>
-        ///  Assign missing config values.
-        /// </summary>
-        public void Expand()
-        {
-            if (this.ClientId == null)
-            {
-                this.ClientId = "";
-            }
-            if (this.ClientSecret == null)
-            {
-                this.ClientSecret = "";
-            }
-        }
-
-        /// <summary>
-        /// Check required config field.
-        /// </summary>
-        public void CheckRequiredField()
-        {
-            if (string.IsNullOrEmpty(this.ClientId))
-            {
-                throw new System.Exception("Init AccelByte SDK failed, Client ID must not null or empty.");
-            }
-        }
-
-        public bool IsRequiredFieldEmpty()
-        {
-            System.Collections.Generic.List<string> checkedStringFields = new System.Collections.Generic.List<string>()
-            {
-                ClientId
-            };
-            var retval = checkedStringFields.Exists((field) => string.IsNullOrEmpty(field));
-            return retval;
-        }
-    }
-
-    [DataContract]
-    public class MultiConfigs
+    public class MultiConfigs : IAccelByteMultiConfigs
     {
         [DataMember] public Config Development { get; set; }
         [DataMember] public Config Certification { get; set; }
@@ -524,38 +474,21 @@ namespace AccelByte.Models
             Default.SanitizeBaseUrl();
             Default.Expand();
         }
-    }
 
-    [DataContract]
-    public class MultiOAuthConfigs
-    {
-        [DataMember] public OAuthConfig Development { get; set; }
-        [DataMember] public OAuthConfig Certification { get; set; }
-        [DataMember] public OAuthConfig Production { get; set; }
-        [DataMember] public OAuthConfig Default { get; set; }
-
-        public void Expand()
+        IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
         {
-            if (Development == null)
+            switch (targetEnvironment)
             {
-                Development = new OAuthConfig();
+                case SettingsEnvironment.Development:
+                    return Development;
+                case SettingsEnvironment.Certification:
+                    return Certification;
+                case SettingsEnvironment.Production:
+                    return Production;
+                case SettingsEnvironment.Default:
+                default:
+                    return Default;
             }
-            Development.Expand();
-            if (Certification == null)
-            {
-                Certification = new OAuthConfig();
-            }
-            Certification.Expand();
-            if (Production == null)
-            {
-                Production = new OAuthConfig();
-            }
-            Production.Expand();
-            if (Default == null)
-            {
-                Default = new OAuthConfig();
-            }
-            Default.Expand();
         }
     }
 
