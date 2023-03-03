@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.13.0%0D15.12.0) (2023-02-28)
+
+
+### Features
+
+* adding global achievements endpoints ([7c5b4cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c5b4cbbb71c34e00386add24a5aafa064303bbc))
+
+
+### Bug Fixes
+
+* fix unsupported code in lower version csharp ([e2bded8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e2bded84704e83e80f7d8a31056abb0ac1ccbf3a))
+
+
+### Refactors
+
+* set app id as non mandatory config field ([535d54d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/535d54de92346e9f3994fc576a8d860302f3eeac))
+
 ## [15.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.12.0%0D15.11.2) (2023-02-13)
 
 

@@ -54,12 +54,15 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains PaginatedPublicAchievement via callback when completed.</param>
         /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
         /// <param name="limit">The limit of the achievement result. Default value is 20.</param>/// 
+        /// <param name="tagBuilder">A query expression consists of tags to query the achievement from.</param>
+        /// <param name="isGlobal">True if the configuration to display global achievements.</param>/// 
         public void QueryAchievements( string language
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedPublicAchievement> callback
             , int offset = 0
-            , int limit = 20 
+            , int limit = 20
             , TagQueryBuilder tagBuilder = null
+            , bool isGlobal = false
             )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -79,7 +82,8 @@ namespace AccelByte.Api
                     sortBy, 
                     callback, 
                     offset, 
-                    limit));
+                    limit,
+                    isGlobal));
         }
 
         /// <summary>
@@ -87,8 +91,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="achievementCode">The code of the expected achievement.</param>
         /// <param name="callback">Returns a Result that contains MultiLanguageAchievement via callback when completed.</param>
-        public void GetAchievement( string achievementCode
-            , ResultCallback<MultiLanguageAchievement> callback )
+        public void GetAchievement(string achievementCode
+            , ResultCallback<MultiLanguageAchievement> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(achievementCode, "Can't get achievement; AchievementCode parameter is null!");
@@ -110,12 +114,13 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains PaginatedUserAchievement via callback when completed.</param>
         /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
         /// <param name="limit">The limit of the achievement result. Default value is 20.</param>
-        /// <param name="PreferUnlocked">True if the configuration to display unlocked achievements first active, the list order should display unlocked achievements first on top of locked achievements, and false otherwise. Default value is true.</param>
+        /// <param name="preferUnlocked">True if the configuration to display unlocked achievements first active, the list order should display unlocked achievements first on top of locked achievements, and false otherwise. Default value is true.</param>
+        /// <param name="tagBuilder">A query expression consists of tags to query the achievement from.</param>
         public void QueryUserAchievements( AchievementSortBy sortBy
             , ResultCallback<PaginatedUserAchievement> callback
             , int offset = 0
             , int limit = 20
-            , bool PreferUnlocked = true 
+            , bool preferUnlocked = true 
             , TagQueryBuilder tagBuilder = null
             )
         {
@@ -136,8 +141,8 @@ namespace AccelByte.Api
                     sortBy, 
                     callback, 
                     offset, 
-                    limit, 
-                    PreferUnlocked));
+                    limit,
+                   preferUnlocked));
         }
 
         /// <summary>
@@ -162,6 +167,144 @@ namespace AccelByte.Api
                 api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, callback));
         }
 
+        /// <summary>
+        /// Query the progress list of global achievements. Include achieved and in-progress.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="achievementStatus">Achievement status for the achievements result.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedUserGlobalAchievement via callback when completed.</param>
+        /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
+        /// <param name="limit">The limit of the achievement result. Default value is 20.</param>
+        /// <param name="tagBuilder">A query expression consists of tags to query the achievement from.</param>
+        public void QueryGlobalAchievements(string achievementCode
+            , GlobalAchievementStatus achievementStatus
+            , GlobalAchievementListSortBy sortBy
+            , ResultCallback<PaginatedUserGlobalAchievement> callback
+            , int offset = 0
+            , int limit = 20
+            , TagQueryBuilder tagBuilder = null
+            )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
+
+            coroutineRunner.Run(
+                api.QueryGlobalAchievements(
+                    achievementCode,
+                    achievementStatus,
+                    sortBy,
+                    callback,
+                    offset,
+                    limit,
+                    tags));
+        }
+
+        /// <summary>
+        /// Query the list of contributors for a global achievement.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedGlobalAchievementContributors via callback when completed.</param>
+        /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
+        /// <param name="limit">The limit of the achievement result. Default value is 20.</param>
+        public void QueryGlobalAchievementContributors(string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , ResultCallback<PaginatedGlobalAchievementContributors> callback
+            , int offset = 0
+            , int limit = 20
+            )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.QueryGlobalAchievementContributors(
+                    achievementCode,
+                    sortBy,
+                    callback,
+                    offset,
+                    limit));
+        }
+
+        /// <summary>
+        /// Query the list of global achievements that have been contributed by the user.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected achievement.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedGlobalAchievementUserContributed via callback when completed.</param>
+        /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
+        /// <param name="limit">The limit of the achievement result. Default value is 20.</param>
+        public void QueryGlobalAchievementUserContributed(string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , ResultCallback<PaginatedGlobalAchievementUserContributed> callback
+            , int offset = 0
+            , int limit = 20
+            )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.QueryGlobalAchievementUserContributed( 
+                    session.UserId,
+                    achievementCode,
+                    sortBy,
+                    callback,
+                    offset,
+                    limit));
+        }
+
+        /// <summary>
+        /// Claim specific global achievement.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void ClaimGlobalAchievement(string achievementCode
+            , ResultCallback callback
+            )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ClaimGlobalAchievement(
+                    session.UserId, 
+                    session.AuthorizationToken, 
+                    achievementCode, 
+                    callback));
+        }
+
+        /// <summary>
+        /// Query all tags for achievements.
+        /// </summary>
+        /// <param name="name">The name of the expected tag</param>
+        /// <param name="sortBy">Sorting method for the achievement tags result.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedPublicTag via callback when completed.</param>
+        /// <param name="offset">The offset of the achievement result. Default value is 0.</param>
+        /// <param name="limit">The limit of the achievement result. Default value is 20.</param>
         public void GetTags(string name
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedPublicTag> callback
@@ -173,6 +316,7 @@ namespace AccelByte.Api
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
             }
             
             coroutineRunner.Run(
