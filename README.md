@@ -9,32 +9,9 @@ The Unity SDK acts as a bridge between your game and AccelByte Cloud services, m
     - If you are using Assembly Definitions in your project, you may need to add the com.accelbyte.UnitySDK assembly as a reference to your relevant definitions.
     - You must have Git installed and configured on your computer in orderfor Unity to use a UPM Package
 
-### Project Settings
-Now that the SDK has been installed in the project, you will need to configure your project settings in order for the SDK to work on your project’s build standalone.
- 1. In Unity Editor, go to **File > Build Settings** and click **Player Settings.**
- 2. Select **Other Settings** to expand the options.
- 3. In **Configurations** section, change the API Compatibility Level to **.NET 4.x** in the drop-down menu.
-
 ## AccelByte Configuration
  1. Go to **AccelByte > Edit Settings** in the menu bar.
- 2. Fill in the AccelByte Configuration field using the information based on your game and click **Save**.
- 3. Alternatively, you can create a file called `AccelByteSDKConfig.json` in your **Assets/Resources** folder and fill it with the appropriate information in the following format:
-
-```json
-{
-	"Default": {
-		"Namespace": "Game Namespace",
-		"UsePlayerPrefs": true,
-		"EnableDebugLog": true,
-		"DebugLogFilter": "Log",
-		"BaseUrl": "<baseURL>",
-		"RedirectUri": "http://127.0.0.1",
-		"AppId": "",
-		"PublisherNamespace": "",
-		"CustomerName": ""
-	}
-}
-```
+ 2. Fill in the AccelByte Configuration required field using the information based on your game and click **Save**.
 
 ### Multi Environment Configuration
 AccelByte enables you to use different environments such as **Production**, **Certification**, **Default**, and **Development**, within one single project, meaning that you only need to build your game once. By using our SDK, you will be able to switch environments even when your build is running. For example, you can run and test your build in the **Certification** environment and then publish your game to the **Production** environment, all without having to rebuild your game for each separate environment

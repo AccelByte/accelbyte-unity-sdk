@@ -1,8 +1,7 @@
-// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-#if !UNITY_SERVER
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -13,6 +12,7 @@ namespace AccelByte.Api
 {
     public class HeartBeatApi : ApiBase
     {
+        public const string HeartBeatUrl = "https://heartbeat.accelbyte.io/add";
         /// <summary>
         /// </summary>
         /// <param name="httpClient"></param>
@@ -25,27 +25,22 @@ namespace AccelByte.Api
         {
         }
 
-        public IEnumerator SendHeartBeatEvent(Dictionary<string, object> heartBeatEvent
+        public async void SendHeartBeatEvent(Dictionary<string, object> heartBeatEvent
             , ResultCallback callback)
         {
             Assert.IsNotNull(heartBeatEvent, nameof(heartBeatEvent) + " is null.");
 
             var request = HttpRequestBuilder
-                .CreatePost("https://heartbeat.accelbyte.io/add")
+                .CreatePost(HeartBeatUrl)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(heartBeatEvent.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
+            HttpSendResult sendResult = await HttpClient.SendRequestAsync(request);
+            IHttpResponse response = sendResult.CallbackResponse;
             var result = response.TryParse();
             callback.Try(result);
         }
-
     }
 }
-#endif

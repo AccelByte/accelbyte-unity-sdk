@@ -27,6 +27,7 @@ namespace AccelByte.Server
         private static TokenData accessToken;
         private static DedicatedServer server;
         private static ServerDSHub dsHub;
+        private static ServerWatchdog watchdog;
         private static DedicatedServerManager dedicatedServerManager;
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
@@ -90,13 +91,17 @@ namespace AccelByte.Server
                 }
 
                 initialized = false;
+                if (watchdog != null)
+                {
+                    watchdog.Disconnect();
+                }
                 ResetApis();
             };
+#endif
         }
 
         private static void Initialize()
         {
-#endif
             Initialize(null, null);
 
             ValidateCompatibility();
@@ -138,6 +143,22 @@ namespace AccelByte.Server
 
             session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
             server = CreateDedicatedServerClient(session, coroutineRunner);
+
+            var dsId = Utils.CommandLineArgs.GetArg("-dsid");
+            var watchdogUrl = Utils.CommandLineArgs.GetArg("-watchdog_url");
+            var watchdogHeartbeatInterval = Utils.CommandLineArgs.GetArg("-heartbeat");
+
+            if (watchdogUrl != null)
+            {
+                settings.ServerSdkConfig.WatchdogServerUrl = watchdogUrl;
+            }
+
+            if(watchdogHeartbeatInterval != null)
+            {
+                settings.ServerSdkConfig.WatchdogHeartbeatInterval = int.Parse(watchdogHeartbeatInterval);
+            }
+
+            watchdog = CreateWatchdogConnection(dsId, settings.ServerSdkConfig, coroutineRunner);
 
             initialized = true;
         }
@@ -195,18 +216,31 @@ namespace AccelByte.Server
             return newServer;
         }
 
+        private static ServerWatchdog CreateWatchdogConnection(string dsId, ServerConfig newSdkConfig, CoroutineRunner taskRunner)
+        {
+            if (dsId == null)
+            {
+                AccelByteDebug.LogWarning("dsid not provided, not connecting to watchdog");
+                return null;
+            }
+
+            var newWatchdog = new ServerWatchdog(
+                newSdkConfig,
+                taskRunner);
+            newWatchdog.Connect(dsId);
+            return newWatchdog;
+        }
+
         /// <summary>
         /// Check whether if this static class is need to be refreshed/re-init
         /// </summary>
         private static void CheckPlugin()
         {
-#if UNITY_EDITOR
             if (!initialized)
             {
                 Initialize();
                 initialized = true;
             }
-#endif
         }
 
         public static DedicatedServer GetDedicatedServer()
@@ -244,6 +278,12 @@ namespace AccelByte.Server
             };
 
             return dsHub;
+        }
+
+        public static ServerWatchdog GetWatchdog()
+        {
+            CheckPlugin();
+            return watchdog;
         }
 
         public static DedicatedServerManager GetDedicatedServerManager()
@@ -654,6 +694,7 @@ namespace AccelByte.Server
             accessToken = null;
             server = null;
             dsHub = null;
+            watchdog = null;
             dedicatedServerManager = null;
             ecommerce = null;
             statistic = null;

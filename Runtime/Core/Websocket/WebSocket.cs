@@ -399,10 +399,17 @@ namespace HybridWebSocket
         {
             try
             {
-                this.webSocket = new WebSocketSharp.WebSocket(url, protocols);
-                this.webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default 
-                    | System.Security.Authentication.SslProtocols.Tls11 
-                    | System.Security.Authentication.SslProtocols.Tls12;
+                if(protocols != null && protocols.Length > 0)
+                {
+                    this.webSocket = new WebSocketSharp.WebSocket(url, protocols);
+                    this.webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default
+                        | System.Security.Authentication.SslProtocols.Tls11
+                        | System.Security.Authentication.SslProtocols.Tls12;
+                }
+                else
+                {
+                    this.webSocket = new WebSocketSharp.WebSocket(url);
+                }
 
                 this.webSocket.CustomHeaders = customHeaders;
 

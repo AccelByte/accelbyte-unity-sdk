@@ -28,9 +28,9 @@ namespace AccelByte.Api
         private static AccelByteSettingsV2 settings;
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
-        
+
         private static GameClient gameClient;
-        
+
         #region Modules with ApiBase
         private static User user;
         private static Categories categories;
@@ -62,9 +62,7 @@ namespace AccelByte.Api
         private static MatchmakingV2 _matchmakingV2;
         private static TurnManager turnManager;
         private static ServiceVersion serviceVersion;
-#if !UNITY_SERVER
         private static HeartBeat heartBeat;
-#endif 
         private static StoreDisplay storeDisplay;
         #endregion /Modules with ApiBase
 
@@ -112,12 +110,23 @@ namespace AccelByte.Api
             {
                 if (state == PlayModeStateChange.ExitingEditMode)
                 {
-                    initialized = false;
-
-                    ResetApis();
+                    Reset();
                 }
             };
 #endif
+        }
+
+        internal static void Reset()
+        {
+            initialized = false;
+
+            ResetApis();
+
+            if(heartBeat != null)
+            {
+                heartBeat.SetHeartBeatEnabled(false);
+                heartBeat = null;
+            }
         }
 
         internal static void Initialize()
@@ -196,7 +205,7 @@ namespace AccelByte.Api
         static bool ValidateCompatibility()
         {
             string matrixJsonText = Utils.AccelByteFileUtils.ReadTextFileFromResource(AccelByteSettingsV2.ServiceCompatibilityResourcePath());
-            var result = Utils.ServiceVersionUtils.CheckServicesCompatibility(GetServiceVersion(), new AccelByteServiceVersion(matrixJsonText)); ;
+            var result = Utils.ServiceVersionUtils.CheckServicesCompatibility(GetServiceVersion(), new AccelByteServiceVersion(matrixJsonText));
             return result;
         }
 
@@ -1112,8 +1121,6 @@ namespace AccelByte.Api
 
             return miscellaneous;
         }
-
-#if !UNITY_SERVER
         public static HeartBeat GetHeartBeat()
         {
             if (heartBeat == null)
@@ -1124,25 +1131,62 @@ namespace AccelByte.Api
                     new HeartBeatApi(
                         httpClient,
                         Config,
-                        session),
-                    coroutineRunner);
+                        session));
+                ProvideHeartbeatData(heartBeat);
 
                 configReset += () =>
                 {
+                    bool isHeartBeatJobEnabled = false;
+                    if(heartBeat != null)
+                    {
+                        isHeartBeatJobEnabled = heartBeat.IsHeartBeatJobEnabled;
+                        heartBeat.SetHeartBeatEnabled(false);
+                    }
                     heartBeat = null;
                     heartBeat = new HeartBeat(
                         new HeartBeatApi(
                             httpClient,
                             Config,
-                            session),
-                        coroutineRunner);
+                            session));
+                    ProvideHeartbeatData(heartBeat);
+                    if(isHeartBeatJobEnabled)
+                    {
+                        heartBeat.SetHeartBeatEnabled(true);
+                    }
                 };
             }
 
             return heartBeat;
         }
-#endif
 
+        private static void ProvideHeartbeatData(HeartBeat targetHeartbeat)
+        {
+            string publisherNamespace = Config.PublisherNamespace;
+            string customerName = !string.IsNullOrEmpty(Config.CustomerName) ? Config.CustomerName : Config.PublisherNamespace;
+            string gameName = Config.Namespace;
+
+            SettingsEnvironment env = GetEnvironment();
+            string envString = string.Empty;
+            switch (env)
+            {
+                case SettingsEnvironment.Development:
+                    envString = "dev";
+                    break;
+                case SettingsEnvironment.Certification:
+                    envString = "cert";
+                    break;
+                case SettingsEnvironment.Production:
+                    envString = "prod";
+                    break;
+                case SettingsEnvironment.Default:
+                    envString = "default";
+                    break;
+            }
+            targetHeartbeat.AddSendData(HeartBeat.CustomerNameKey, customerName);
+            targetHeartbeat.AddSendData(HeartBeat.PublisherNamespaceKey, publisherNamespace);
+            targetHeartbeat.AddSendData(HeartBeat.EnvironmentKey, envString);
+            targetHeartbeat.AddSendData(HeartBeat.GameNameKey, gameName);
+        }
         public static void ConfigureHttpApi<T>(params object[] args) where T : HttpApiBase
         {
             CheckPlugin();

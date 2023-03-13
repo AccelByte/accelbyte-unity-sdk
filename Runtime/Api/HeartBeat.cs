@@ -1,14 +1,11 @@
-// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-#if !UNITY_SERVER
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
-using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -18,31 +15,124 @@ namespace AccelByte.Api
     /// </summary>
     public class HeartBeat : WrapperBase
     {
+        internal const string PublisherNamespaceKey = "pn";
+        internal const string CustomerNameKey = "customer";
+        internal const string EnvironmentKey = "environment";
+        internal const string GameNameKey = "game";
+
+        private const int defaultHeartbeatIntervalSeconds = 60;
+
         private readonly HeartBeatApi api;
-        private readonly CoroutineRunner coroutineRunner;
 
-        private readonly TimeSpan heartBeatInterval = TimeSpan.FromMinutes(1);
-
-        private Coroutine heartBeatCoroutine = null;
-        private bool isHeartBeatJobStarted = false;
-        private bool isHeartBeatEnabled = false;
-        private ResultCallback OnHeartBeatResponse = null;
+        private ResultCallback onHeartBeatResponse = null;
 
         private Dictionary<string, object> heartBeatData = new Dictionary<string, object>();
 
-        internal HeartBeat(HeartBeatApi inApi
-            , CoroutineRunner inCoroutineRunner)
+        private HeartBeatMaintainer maintainer;
+        private int heartBeatIntervalMs = Utils.TimeUtils.SecondsToMilliseconds(defaultHeartbeatIntervalSeconds);
+
+        public bool IsHeartBeatJobRunning
+        {
+            get
+            {
+                if(maintainer == null)
+                {
+                    return false;
+                }
+
+                return maintainer.IsHeartBeatJobRunning;
+            }
+        }
+
+        public bool IsHeartBeatJobEnabled
+        {
+            get
+            {
+                if (maintainer == null)
+                {
+                    return false;
+                }
+
+                return maintainer.IsHeartBeatEnabled;
+            }
+        }
+
+        public ResultCallback OnHeartBeatResponse
+        {
+            get
+            {
+                return onHeartBeatResponse;
+            }
+        }
+
+        public Dictionary<string, object> HeartBeatData 
+        {
+            get
+            {
+                return heartBeatData;
+            }
+        }
+
+        public HeartBeatApi Api
+        {
+            get
+            {
+                return api;
+            }
+        }
+
+        public int HeartBeatIntervalMs
+        {
+            get
+            {
+                return heartBeatIntervalMs;
+            }
+        }
+
+        internal HeartBeat(HeartBeatApi inApi)
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");
-            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner parameter can not be null");
 
             api = inApi;
-            coroutineRunner = inCoroutineRunner;
-            InitializeHeartBeatData();
-            if(isHeartBeatEnabled)
+        }
+
+        public void SetHeartbeatInterval(int newIntervalMs)
+        {
+            if(maintainer != null)
             {
-                StartHeartBeatScheduler();
+                AccelByteDebug.LogWarning("Heartbeat is still running, please stop heartbeat before changing the interval");
+                return;
             }
+            heartBeatIntervalMs = newIntervalMs;
+        }
+
+        /// <summary>
+        /// Add heartbeat send information
+        /// </summary>
+        /// <param name="key">Data key</param>
+        /// <param name="data">Data value</param>
+        public void AddSendData(string key, string data)
+        {
+            if(heartBeatData.ContainsKey(key))
+            {
+                heartBeatData[key] = data;
+            }
+            else
+            {
+                heartBeatData.Add(key, data);
+            }
+        }
+
+        /// <summary>
+        /// Remove heartbeat send information
+        /// </summary>
+        /// <param name="key">Data key</param>
+        /// <returns>true: Successfully removed</returns>
+        /// <returns>false: Key not found removed</returns>
+        public bool RemoveSendData(string key)
+        {
+            var successfullyRemoved = heartBeatData.Remove(key);
+            return successfullyRemoved;
         }
 
         /// <summary>
@@ -50,14 +140,17 @@ namespace AccelByte.Api
         /// </summary>
         public void SetHeartBeatEnabled(bool enable)
         {
-            isHeartBeatEnabled = enable;
-            if(isHeartBeatEnabled)
+            bool enableHeartbeat = false;
+#if !UNITY_SERVER
+            enableHeartbeat = enable;
+#endif
+            if(enableHeartbeat)
             {
-                StartHeartBeatScheduler();
+                StartHeartBeatScheduler(heartBeatIntervalMs);
             }
             else
             {
-                ResetHeartBeatScheduler();
+                StopHeartBeatScheduler();
             }
         }
 
@@ -66,63 +159,80 @@ namespace AccelByte.Api
         /// </summary>
         public void SetHeartBeatCallback(ResultCallback callback)
         {
-            OnHeartBeatResponse = callback;
+            onHeartBeatResponse = callback;
         }
 
-        private IEnumerator RunPeriodicHeartBeat()
+        private void StartHeartBeatScheduler(int intervalMs)
         {
-            while (isHeartBeatEnabled)
+            if(maintainer != null)
             {
-                coroutineRunner.Run(
-                    api.SendHeartBeatEvent(heartBeatData, OnHeartBeatResponse));
-                yield return new WaitForSeconds((float)heartBeatInterval.TotalSeconds);
+                maintainer.Stop();
+            }
+            maintainer = new HeartBeatMaintainer(this, intervalMs);
+            maintainer.Start();
+        }
+
+        private void StopHeartBeatScheduler()
+        {
+            if(maintainer != null)
+            {
+                maintainer.Stop();
+                maintainer = null;
+            }
+        }
+
+        private class HeartBeatMaintainer
+        {
+            private readonly HeartBeat controller;
+
+            private readonly int heartBeatIntervalMs;
+
+            public bool IsHeartBeatEnabled
+            {
+                get;
+                private set;
             }
 
-            ResetHeartBeatScheduler();
-        }
-
-        private void StartHeartBeatScheduler()
-        {
-            heartBeatCoroutine = coroutineRunner.Run(RunPeriodicHeartBeat());
-            isHeartBeatJobStarted = true;
-        }
-
-        private void ResetHeartBeatScheduler()
-        {
-            isHeartBeatJobStarted = false;
-            heartBeatCoroutine = null;
-        }
-
-        private void InitializeHeartBeatData()
-        {
-            string publisherNamespace = AccelBytePlugin.Config.PublisherNamespace;
-            string customerName = AccelBytePlugin.Config.CustomerName;
-            if (customerName == "")
+            public bool IsHeartBeatJobRunning
             {
-                customerName = AccelBytePlugin.Config.PublisherNamespace;
+                get;
+                private set;
             }
-            SettingsEnvironment env = AccelBytePlugin.GetEnvironment();
-            string envString = "";
-            switch(env)
+
+            public HeartBeatMaintainer(HeartBeat controller, int heartBeatIntervalMs)
             {
-                case SettingsEnvironment.Development:
-                    envString = "dev";
-                    break;
-                case SettingsEnvironment.Certification:
-                    envString = "cert";
-                    break;
-                case SettingsEnvironment.Production:
-                    envString = "prod";
-                    break;
-                case SettingsEnvironment.Default:
-                    envString = "default";
-                    break;
+                this.controller = controller;
+                this.heartBeatIntervalMs = heartBeatIntervalMs;
             }
-            heartBeatData.Add("customer", customerName);
-            heartBeatData.Add("pn", publisherNamespace);
-            heartBeatData.Add("environment", envString);
-            heartBeatData.Add("game", AccelBytePlugin.Config.Namespace);
+
+            ~HeartBeatMaintainer()
+            {
+                Stop();
+            }
+
+            public void Start()
+            {
+                RunPeriodicHeartBeat();
+            }
+
+            public void Stop()
+            {
+                IsHeartBeatEnabled = false;
+            }
+
+            private async void RunPeriodicHeartBeat()
+            {
+                IsHeartBeatEnabled = true;
+                IsHeartBeatJobRunning = true;
+
+                while (IsHeartBeatEnabled)
+                {
+                    controller.api.SendHeartBeatEvent(controller.HeartBeatData, controller.OnHeartBeatResponse);
+                    await System.Threading.Tasks.Task.Delay(this.heartBeatIntervalMs);
+                }
+
+                IsHeartBeatJobRunning = false;
+            }
         }
     }
 }
-#endif

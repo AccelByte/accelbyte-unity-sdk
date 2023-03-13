@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -57,9 +57,22 @@ namespace AccelByte.Core {
         }
     }
 
+    public struct HttpSendResult
+    {
+        public readonly IHttpResponse CallbackResponse;
+        public readonly Error CallbackError;
+
+        public HttpSendResult(IHttpResponse callbackResponse, Error callbackError)
+        {
+            CallbackResponse = callbackResponse;
+            CallbackError = callbackError;
+        }
+    }
+
     public interface IHttpRequestSender
     {
         IEnumerator Send(IHttpRequest request, Action<IHttpResponse, Error> callback, int timeoutMs);
+        System.Threading.Tasks.Task<HttpSendResult> SendAsync(IHttpRequest request, int timeoutMs);
         void ClearCookies(Uri baseUri);
     }
 
@@ -68,6 +81,7 @@ namespace AccelByte.Core {
         event Action<IHttpRequest> ServerErrorOccured;
         event Action<IHttpRequest> NetworkErrorOccured;
         IEnumerator SendRequest(IHttpRequest request, Action<IHttpResponse, Error> callback);
+        System.Threading.Tasks.Task<HttpSendResult> SendRequestAsync(IHttpRequest request);
         void SetCredentials(string clientId, string clientSecret);
         void SetImplicitBearerAuth(string accessToken);
         void SetImplicitPathParams(IDictionary<string, string> pathParams);
@@ -81,6 +95,12 @@ namespace AccelByte.Core {
         public static IEnumerator SendRequest(this IHttpClient client, IHttpRequest request, Action<IHttpResponse> callback)
         {
             return client.SendRequest(request, (response, err) => callback?.Invoke(response));
+        }
+        public static async System.Threading.Tasks.Task<IHttpResponse> SendRequestAsync(this IHttpClient client, IHttpRequest request)
+        {
+            var sendTask = client.SendRequestAsync(request);
+            HttpSendResult result = await sendTask;
+            return result.CallbackResponse;
         }
 
         public static IEnumerator Get<T,R>(this IHttpClient client, string url, T queries, ResultCallback<R> callback)

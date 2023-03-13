@@ -6,27 +6,26 @@ using AccelByte.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace AccelByte.Api
 {
     public class AccelByteWebSocket
     {
-        private float pingDelay = 4000;
-        private int totalTimeout = 60000;
-        private int backoffDelay = 1000;
-        private int maxDelay = 30000;
-        private bool reconnectOnClose = false;
+        protected int pingDelay = 4000;
+        protected int totalTimeout = 60000;
+        protected int backoffDelay = 1000;
+        protected int maxDelay = 30000;
 
-        private IWebSocket webSocket;
-        private string webSocketUrl;
-        private string authorizationToken;
+        protected IWebSocket webSocket;
+        protected string webSocketUrl;
+        protected string authorizationToken;
         
-        private CoroutineRunner coroutineRunner;
-        private Coroutine maintainConnectionCoroutine;
-        private WsCloseCode closeCodeCurrent = WsCloseCode.NotSet;
-        private ITokenGenerator tokenGenerator;
-        
+        protected WsCloseCode closeCodeCurrent = WsCloseCode.NotSet;
+        protected ITokenGenerator tokenGenerator;
+        private WebstocketMaintainer maintainer;
+
         public Dictionary<string, string> CustomHeaders { get; set; }
 
         /// <summary>
@@ -56,39 +55,27 @@ namespace AccelByte.Api
 
         private void OnOpenReceived()
         {
-            coroutineRunner.Run(() =>
-            {
-                OnOpen?.Invoke();
-            });
+            OnOpen?.Invoke();
         }
 
         private void OnCloseReceived(ushort closeCode)
         {
-            coroutineRunner.Run(() =>
+            if (!IsReconnectable((WsCloseCode)closeCode))
             {
-                if (!isReconnectable((WsCloseCode)closeCode))
-                {
-                    StopMaintainConnection();
-                }
+                StopMaintainConnection();
+            }
 
-                OnClose?.Invoke(closeCode);
-            });
+            OnClose?.Invoke(closeCode);
         }
 
         private void OnErrorReceived(string errorMessage)
         {
-            coroutineRunner.Run(() =>
-            {
-                OnError?.Invoke(errorMessage);
-            });
+            OnError?.Invoke(errorMessage);
         }
 
         private void OnMessageReceived(string message)
         {
-            coroutineRunner.Run(() =>
-            {
-                OnMessage?.Invoke(message);
-            });
+            OnMessage?.Invoke(message);
         }
 
         private void OnTokenReceived(string token)
@@ -129,12 +116,15 @@ namespace AccelByte.Api
             }
         }
 
-        public AccelByteWebSocket(IWebSocket webSocket, CoroutineRunner coroutineRunner)
+        public AccelByteWebSocket(IWebSocket webSocket)
         {
+            if(webSocket == null)
+            {
+                throw new System.InvalidOperationException("Assigning null websocket");
+            }
             this.closeCodeCurrent = WsCloseCode.NotSet;
 
             this.webSocket = webSocket;
-            this.coroutineRunner = coroutineRunner;
 
             this.webSocket.OnOpen += OnOpenReceived;
             this.webSocket.OnMessage += OnMessageReceived;
@@ -152,7 +142,7 @@ namespace AccelByte.Api
         /// <param name="tokenGenerator"> Token generator for connecting lobby. </param>
         public void SetConnectionTokenGenerator(ITokenGenerator tokenGenerator)
         {
-            if(maintainConnectionCoroutine != null)
+            if(maintainer != null)
             {
                 AccelByteDebug.LogWarning("Can't set connection token generator! Lobby is already connected.");
                 return;
@@ -162,7 +152,7 @@ namespace AccelByte.Api
             this.tokenGenerator.TokenReceivedEvent += OnTokenReceived;
         }
 
-        private bool isReconnectable(WsCloseCode code)
+        private bool IsReconnectable(WsCloseCode code)
         {
 
             switch (code)
@@ -199,7 +189,7 @@ namespace AccelByte.Api
         {
             if(State == WsState.Connecting || State == WsState.Open)
             {
-                AccelByteDebug.Log("[AccelByteWebSocket] is connecting or already connected");
+                AccelByteDebug.LogVerbose("[AccelByteWebSocket] is connecting or already connected");
                 return;
             }
 
@@ -221,11 +211,11 @@ namespace AccelByte.Api
                 customHeaders["Entitlement"] = tokenGenerator.Token;
             }
 
-            AccelByteDebug.Log($"Connecting websocket to {url}");
+            AccelByteDebug.LogVerbose($"Connecting websocket to {url}");
             webSocket.Connect(url, this.authorizationToken, customHeaders);
 
             // check status after connect, only maintain connection when close code is reconnectable
-            if (this.closeCodeCurrent == WsCloseCode.NotSet || isReconnectable(this.closeCodeCurrent))
+            if (this.closeCodeCurrent == WsCloseCode.NotSet || IsReconnectable(this.closeCodeCurrent))
             {
                 StartMaintainConnection();
             }
@@ -247,12 +237,12 @@ namespace AccelByte.Api
         /// <summary>
         /// Change the delay parameters to maintain connection in the websocket.
         /// </summary>
-        /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
-        /// <param name="backoffDelay">Initial delay time</param>
-        /// <param name="maxDelay">Maximum delay time</param>
-        public void SetRetryParameters(int totalTimeout, int backoffDelay, int maxDelay, float pingDelay = 4000)
+        /// <param name="totalTimeout">Time limit until stop to re-attempt (ms)</param>
+        /// <param name="backoffDelay">Initial delay time (ms)</param>
+        /// <param name="maxDelay">Maximum delay time (ms)</param>
+        public void SetRetryParameters(int totalTimeout, int backoffDelay, int maxDelay, int pingDelay = 4000)
         {
-            if (maintainConnectionCoroutine != null)
+            if (maintainer != null)
             {
                 AccelByteDebug.LogWarning("Can't change retry parameters! Lobby is already connected.");
                 return;
@@ -273,107 +263,152 @@ namespace AccelByte.Api
             webSocket.Send(message);
         }
 
-        /// <summary>
-        /// Retrying connection with exponential backoff if disconnected, ping if connected
-        /// </summary>
-        /// <param name="backoffDelay">Initial delay time</param>
-        /// <param name="maxDelay">Maximum delay time</param>
-        /// <param name="totalTimeout">Time limit until stop to re-attempt</param>
-        /// <returns></returns>
-        private IEnumerator MaintainConnection(int backoffDelay, int maxDelay, int totalTimeout)
-        {
-            while (true)
-            {
-                switch (this.webSocket.ReadyState)
-                {
-                    case WsState.Open:
-                        this.webSocket.Ping();
-
-                        yield return new WaitForSeconds(this.pingDelay / 1000f);
-
-                        break;
-                    case WsState.Connecting:
-                        while (this.webSocket.ReadyState == WsState.Connecting)
-                        {
-                            yield return new WaitForSeconds(1f);
-                        }
-
-                        break;
-                    case WsState.Closing:
-                        while (this.webSocket.ReadyState == WsState.Closing)
-                        {
-                            yield return new WaitForSeconds(1f);
-                        }
-
-                        break;
-                    case WsState.Closed:
-                        System.Random rand = new System.Random();
-                        int nextDelay = backoffDelay;
-                        var firstClosedTime = DateTime.Now;
-                        var timeout = TimeSpan.FromSeconds(totalTimeout / 1000f);
-
-                        while (this.reconnectOnClose &&
-                            this.webSocket.ReadyState == WsState.Closed &&
-                            DateTime.Now - firstClosedTime < timeout)
-                        {
-                            // debug ws connection
-#if DEBUG
-                            AccelByteDebug.Log("[WS] Re-Connecting");
-#endif
-                            if (this.tokenGenerator == null)
-                            {
-                                this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, CustomHeaders);
-                            }
-                            else
-                            {
-                                this.tokenGenerator.RequestToken();
-                            }
-
-                            float randomizedDelay = (float)(nextDelay + ((rand.NextDouble() * 0.5) - 0.5));
-#if DEBUG
-                            AccelByteDebug.Log("[WS] Next reconnection in: " + randomizedDelay);
-#endif
-                            yield return new WaitForSeconds(randomizedDelay / 1000f);
-
-                            nextDelay *= 2;
-
-                            if (nextDelay > maxDelay)
-                            {
-                                nextDelay = maxDelay;
-                            }
-                        }
-
-                        if (this.webSocket.ReadyState == WsState.Closed)
-                        {
-                            this.OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
-
-                            yield break;
-                        }
-
-                        break;
-                }
-            }
-        }
-
         private void StartMaintainConnection()
         {
-            if(maintainConnectionCoroutine != null)
+            if(maintainer != null)
             {
                 StopMaintainConnection();
             }
 
-            this.reconnectOnClose = true;
-            this.maintainConnectionCoroutine = this.coroutineRunner.Run(MaintainConnection(backoffDelay, maxDelay, totalTimeout));
+            const bool reconnectOnClose = true;
+            System.Action reconnectAction = () =>
+            {
+                if (this.tokenGenerator == null)
+                {
+                    webSocket.Connect(webSocketUrl, authorizationToken, CustomHeaders);
+                }
+                else
+                {
+                    tokenGenerator.RequestToken();
+                }
+            };
+            System.Action onReconnectFailed = () =>
+            {
+                maintainer = null;
+                OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
+            };
+
+            maintainer = new WebstocketMaintainer(ref webSocket, ref pingDelay, ref backoffDelay, ref maxDelay, ref totalTimeout, reconnectOnClose, reconnectAction, onReconnectFailed);
         }
 
         private void StopMaintainConnection()
         {
-            if (maintainConnectionCoroutine == null)
+            if (maintainer == null)
+            {
                 return;
+            }
 
-            this.reconnectOnClose = false;
-            coroutineRunner.Stop(this.maintainConnectionCoroutine);
-            this.maintainConnectionCoroutine = null;
+            maintainer.ShutDown();
+            maintainer = null;
+        }
+
+        /// <summary>
+        /// Retrying connection with exponential backoff if disconnected, ping if connected
+        /// </summary>
+        private class WebstocketMaintainer
+        {
+            private readonly bool reconnectOnClose;
+            private Action reconnectAction;
+            private Action onReconnectFailed;
+            private readonly IWebSocket webSocket;
+            private readonly int pingDelay;
+            private readonly int backoffDelay;
+            private readonly int maxDelay;
+            private readonly int totalTimeout;
+            bool isMaintaining = false;
+
+            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action reconnectAction, System.Action onReconnectFailed)
+            {
+                this.reconnectOnClose = reconnectOnClose;
+                this.webSocket = webSocket;
+                this.pingDelay = pingDelay;
+                this.backoffDelay = backoffDelay;
+                this.maxDelay = maxDelay;
+                this.totalTimeout = totalTimeout;
+                this.reconnectOnClose = reconnectOnClose;
+                this.reconnectAction = reconnectAction;
+                this.onReconnectFailed = onReconnectFailed;
+                MaintainLoop();
+            }
+
+            ~WebstocketMaintainer()
+            {
+                ShutDown();
+            }
+
+            public void ShutDown()
+            {
+                reconnectAction = null;
+                onReconnectFailed = null;
+                isMaintaining = false;
+            }
+
+            async void MaintainLoop()
+            {
+                isMaintaining = true;
+                while (isMaintaining)
+                {
+                    switch (webSocket.ReadyState)
+                    {
+                        case WsState.Open:
+                            webSocket.Ping();
+
+                            await Task.Delay(pingDelay);
+
+                            break;
+                        case WsState.Connecting:
+                            while (webSocket.ReadyState == WsState.Connecting)
+                            {
+                                await Task.Delay(1000);
+                            }
+
+                            break;
+                        case WsState.Closing:
+                            while (webSocket.ReadyState == WsState.Closing)
+                            {
+                                await Task.Delay(1000);
+                            }
+
+                            break;
+                        case WsState.Closed:
+                            System.Random rand = new System.Random();
+                            int nextDelay = backoffDelay;
+                            var firstClosedTime = DateTime.Now;
+                            var timeout = TimeSpan.FromSeconds(totalTimeout / 1000f);
+
+                            while (reconnectOnClose &&
+                                webSocket.ReadyState == WsState.Closed &&
+                                DateTime.Now - firstClosedTime < timeout)
+                            {
+#if DEBUG
+                                AccelByteDebug.LogVerbose("[WS] Re-Connecting");
+#endif
+                                reconnectAction?.Invoke();
+
+                                var randomizedDelay = Mathf.RoundToInt((float)(nextDelay + ((rand.NextDouble() * 0.5) - 0.5)));
+#if DEBUG
+                                AccelByteDebug.LogVerbose("[WS] Next reconnection in: " + randomizedDelay);
+#endif
+                                await Task.Delay(randomizedDelay);
+
+                                nextDelay *= 2;
+
+                                if (nextDelay > maxDelay)
+                                {
+                                    nextDelay = maxDelay;
+                                }
+                            }
+
+                            if (reconnectOnClose && webSocket.ReadyState == WsState.Closed)
+                            {
+                                onReconnectFailed?.Invoke();
+                                return;
+                            }
+
+                            break;
+                    }
+                }
+            }
         }
     }
 }

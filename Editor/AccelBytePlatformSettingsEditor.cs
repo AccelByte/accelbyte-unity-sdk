@@ -25,7 +25,8 @@ namespace AccelByte.Api
         private Texture2D accelByteLogo;
         private int temporaryEnvironmentSetting;
         private int temporaryPlatformSetting;
-        private List<string> platformList;
+        private string[] environmentList;
+        private string[] platformList;
         private Rect logoRect;
 
         private MultiOAuthConfigs originalOAuthConfigs;
@@ -62,18 +63,29 @@ namespace AccelByte.Api
                 requiredTextFieldGUIStyle.normal.textColor = Color.yellow;
 
                 accelByteLogo = Resources.Load<Texture2D>("ab-logo");
-                platformList = new List<string>();
-                platformList.Add(PlatformType.Steam.ToString());
-                platformList.Add(PlatformType.EpicGames.ToString());
-                platformList.Add(PlatformType.Apple.ToString());
-                platformList.Add(PlatformType.iOS.ToString());
-                platformList.Add(PlatformType.Android.ToString());
-                platformList.Add(PlatformType.PS4.ToString());
-                platformList.Add(PlatformType.PS5.ToString());
-                platformList.Add(PlatformType.Live.ToString());
-                platformList.Add(PlatformType.Nintendo.ToString());
-                platformList.Add("Default");
-                this.temporaryPlatformSetting = platformList.Count - 1;
+
+                platformList = new string[]
+                {
+                    PlatformType.Steam.ToString(),
+                    PlatformType.Apple.ToString(),
+                    PlatformType.iOS.ToString(),
+                    PlatformType.Android.ToString(),
+                    PlatformType.PS4.ToString(),
+                    PlatformType.PS5.ToString(),
+                    PlatformType.Live.ToString(),
+                    PlatformType.Nintendo.ToString(),
+                    "Default"
+                };
+                this.temporaryPlatformSetting = platformList.Length - 1;
+
+                environmentList = new string[]
+                {
+                    "Development",
+                    "Certification",
+                    "Production",
+                    "Default"
+                };
+                temporaryEnvironmentSetting = environmentList.Length - 1;
 
                 logoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
                 initialized = true;
@@ -142,7 +154,7 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Environment");
             EditorGUI.BeginChangeCheck();
-            temporaryEnvironmentSetting = EditorGUILayout.Popup(temporaryEnvironmentSetting, new string[] { "Development", "Certification", "Production", "Default" });
+            temporaryEnvironmentSetting = EditorGUILayout.Popup(temporaryEnvironmentSetting, environmentList);
             if (EditorGUI.EndChangeCheck())
             {
                 editedSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting).ShallowCopy();
@@ -154,7 +166,7 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Platform");
             EditorGUI.BeginChangeCheck();
-            temporaryPlatformSetting = EditorGUILayout.Popup(temporaryPlatformSetting, platformList.ToArray());
+            temporaryPlatformSetting = EditorGUILayout.Popup(temporaryPlatformSetting, platformList);
             if (EditorGUI.EndChangeCheck())
             {
                 string targetPlatform = "";
@@ -341,7 +353,7 @@ namespace AccelByte.Api
             return firstConfig.Compare(secondConfig);
         }
 
-        private string GetPlatformName(List<string> platformList, int index)
+        private string GetPlatformName(string[] platformList, int index)
         {
             string targetPlatform = "";
             if (platformList[index] != "Default")

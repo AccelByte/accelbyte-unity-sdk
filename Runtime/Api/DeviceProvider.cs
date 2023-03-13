@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -38,7 +38,6 @@ namespace AccelByte.Api
         public static DeviceProvider GetFromSystemInfo(string encodeHMACKey)
         {
             string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatforName();
-            string macAddress = GetDeviceMacAddress();
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId")){
@@ -46,24 +45,31 @@ namespace AccelByte.Api
             }
             return new DeviceProvider(
                 "device",
-                identifier + "_" + PlayerPrefs.GetString("AccelByteDeviceUniqueId")); 
+                identifier,
+                PlayerPrefs.GetString("AccelByteDeviceUniqueId")); 
 #else
+            string macAddress = GetDeviceMacAddress();
             return new DeviceProvider(
                 "device",
-                identifier + "_" + EncodeHMAC(macAddress, encodeHMACKey));
+                identifier,
+                EncodeHMAC(macAddress, encodeHMACKey));
 #endif
         }
 
         public readonly string DeviceId;
         public readonly string DeviceType;
+        public readonly string UniqueId;
 
         private DeviceProvider( string deviceType
-            , string deviceId )
+            , string identifier
+            , string uniqueId)
         {
-            Assert.IsNotNull(deviceType, "DeviceType is null!");
-            Assert.IsNotNull(deviceId, "DeviceId is null!");
+            Assert.IsNotNull(deviceType, "Device Type is null!");
+            Assert.IsNotNull(identifier, "Device Id is null!");
+            Assert.IsNotNull(uniqueId, "Unique Id is null!");
             this.DeviceType = deviceType;
-            this.DeviceId = deviceId;
+            this.DeviceId = identifier + "_" + uniqueId;
+            this.UniqueId = uniqueId;
         }   
 
         public static string GetDeviceMacAddress()

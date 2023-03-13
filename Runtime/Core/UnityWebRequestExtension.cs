@@ -54,5 +54,21 @@ namespace AccelByte.Core
             public IDictionary<string, string> Headers { get; set;  }
             public byte[] BodyBytes { get; set; }
         }
+
+        public static System.Runtime.CompilerServices.TaskAwaiter<UnityWebRequest.Result> GetAwaiter(this UnityWebRequestAsyncOperation reqOp)
+        {
+            var taskCompletionSource = new System.Threading.Tasks.TaskCompletionSource<UnityWebRequest.Result>();
+            reqOp.completed += (asyncOp) =>
+            {
+                taskCompletionSource.TrySetResult(reqOp.webRequest.result);
+            };
+
+            if (reqOp.isDone)
+            {
+                taskCompletionSource.TrySetResult(reqOp.webRequest.result);
+            }    
+
+            return taskCompletionSource.Task.GetAwaiter();
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -50,6 +50,49 @@ namespace AccelByte.Core
         public void ClearCookies(Uri uri)
         {
             UnityWebRequest.ClearCookieCache(uri);
+        }
+
+        public async System.Threading.Tasks.Task<HttpSendResult> SendAsync(IHttpRequest request, int timeoutMs)
+        {
+            using UnityWebRequest unityWebRequest = request.GetUnityWebRequest();
+            unityWebRequest.timeout = timeoutMs / 1000;
+
+            Report.GetHttpRequest(request, unityWebRequest);
+
+            await unityWebRequest.SendWebRequest();
+
+            Report.GetHttpResponse(unityWebRequest);
+
+            IHttpResponse callBackResponse = null;
+            Error callBackError = null;
+#if UNITY_2020_3_OR_NEWER
+            switch (unityWebRequest.result)
+            {
+                case UnityWebRequest.Result.Success:
+                case UnityWebRequest.Result.ProtocolError:
+                case UnityWebRequest.Result.DataProcessingError:
+                    callBackResponse = unityWebRequest.GetHttpResponse();
+                    callBackError = null;
+                    break;
+                case UnityWebRequest.Result.ConnectionError:
+                    callBackResponse = null;
+                    callBackError = new Error(ErrorCode.NetworkError);
+                    break;
+            }
+#else
+            if (unityWebRequest.isNetworkError)
+            {
+                callBackResponse = null;
+                callBackError = new Error(ErrorCode.NetworkError);
+            }
+            else
+            {
+                callBackResponse = unityWebRequest.GetHttpResponse();
+                callBackError = null;
+            }
+#endif
+
+            return new HttpSendResult(callBackResponse, callBackError);
         }
     }
 }

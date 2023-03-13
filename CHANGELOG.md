@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.14.0%0D15.13.0) (2023-03-13)
+
+
+### Features
+
+* **DS:** add watchdog api ([c804b17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c804b17de765414c3864cd7c813e12a22d0cd810))
+
+
+### Documentations
+
+* remove documentation of directly creating config files ([69bcbf6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/69bcbf661218e55f82d4936af1f2dcfc6748bc51))
+
+
+### Refactors
+
+* add http send request with async method ([0bad98a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0bad98aef6bd733449d92d951ac43ae3817d93f9))
+* change heartbeat with async ([5233d70](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5233d70dd5ec4f6a36568fc13c5527b6625048cd))
+* change websocket maintainer with async method ([9489bec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9489bec8d8ef198b2f6cb8626b44b4b811c2c7a8))
+* create async method of heartbeat, websocket, http request ([b9246e6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b9246e6c1c64394722b49b2aaa739cf33b2c2416))
+* seperate device identifier and device unique id ([9b9fcd7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9b9fcd7adad5ce32ce9d4046a50a2cf97df22869))
+* set config editor default environment to default ([26bf0eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/26bf0ebbd4e8424aefe1def47568759c4bc856bd))
+
 ## [15.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.13.0%0D15.12.0) (2023-02-28)
 
 

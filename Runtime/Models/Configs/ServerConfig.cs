@@ -11,6 +11,7 @@ namespace AccelByte.Models {
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
+        private const int defaultWatchdogHeartbeatInterval = 15;
         [DataMember] public string Namespace { get; set; }
         [DataMember] public string BaseUrl { get; set; }
         [DataMember] public string IamServerUrl { get; set; }
@@ -29,6 +30,8 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl { get; set; }
         [DataMember] public string MatchmakingV2ServerUrl { get; set; }
         [DataMember] public string SeasonPassServerUrl { get; set; }
+        [DataMember] public string WatchdogServerUrl { get; set; }
+        [DataMember] public int WatchdogHeartbeatInterval { get; set; } = defaultWatchdogHeartbeatInterval;
         [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 

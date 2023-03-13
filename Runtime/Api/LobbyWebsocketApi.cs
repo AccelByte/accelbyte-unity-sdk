@@ -105,7 +105,7 @@ namespace AccelByte.Api
                 webSocket.OnError -= HandleOnError;
             }
             
-            webSocket = new AccelByteWebSocket(inWebSocket, coroutineRunner);
+            webSocket = new AccelByteWebSocket(inWebSocket);
             webSocket.OnOpen += HandleOnOpen;
             webSocket.OnMessage += HandleOnMessage;
             webSocket.OnClose += HandleOnClose;
