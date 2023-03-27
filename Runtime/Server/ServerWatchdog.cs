@@ -15,6 +15,10 @@ namespace AccelByte.Server
 {
     public class ServerWatchdog
     {
+        internal const int DefaulHeatbeatSeconds = 15;
+        internal const string CommandLineWatchdogUrlId = "-watchdog_url";
+        internal const string CommandLineWatchdogHeartbeatId = "-heartbeat";
+
         #region Events
 
         /// <summary>
@@ -58,13 +62,18 @@ namespace AccelByte.Server
         /// </summary>
         public bool IsConnected => websocketApi.IsConnected;
 
-        internal ServerWatchdog(ServerConfig config, CoroutineRunner inCoroutineRunner)
+        internal ServerWatchdog(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.WatchdogServerUrl, config.WatchdogHeartbeatInterval, inCoroutineRunner)
+        { 
+        
+        }
+
+        internal ServerWatchdog(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
-            websocketApi = new ServerWatchdogWebsocketApi(inCoroutineRunner, config.WatchdogServerUrl);
-            heartBeatInterval = TimeSpan.FromSeconds(config.WatchdogHeartbeatInterval);
+            websocketApi = new ServerWatchdogWebsocketApi(inCoroutineRunner, serverUrl);
+            heartBeatInterval = TimeSpan.FromSeconds(heartbeatIntervalSecond);
             websocketApi.OnOpen += HandleOnOpen;
             websocketApi.OnMessage += HandleOnMessage;
             websocketApi.OnClose += HandleOnClose;

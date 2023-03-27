@@ -238,5 +238,25 @@ namespace AccelByte.Server
                 this.api.GetUserByUserId(userId, callback));
         }
 
+        /// <summary>
+        /// This function to List user by user ids. 
+        /// </summary>
+        /// <param name="listUserDataRequest">Struct request containing user ids</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ListUserByUserId(ListUserDataRequest listUserDataRequest
+            , ResultCallback<ListUserDataResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.ListUserByUserId(listUserDataRequest, callback));
+        }
     }
 }

@@ -144,22 +144,6 @@ namespace AccelByte.Server
             session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
             server = CreateDedicatedServerClient(session, coroutineRunner);
 
-            var dsId = Utils.CommandLineArgs.GetArg("-dsid");
-            var watchdogUrl = Utils.CommandLineArgs.GetArg("-watchdog_url");
-            var watchdogHeartbeatInterval = Utils.CommandLineArgs.GetArg("-heartbeat");
-
-            if (watchdogUrl != null)
-            {
-                settings.ServerSdkConfig.WatchdogServerUrl = watchdogUrl;
-            }
-
-            if(watchdogHeartbeatInterval != null)
-            {
-                settings.ServerSdkConfig.WatchdogHeartbeatInterval = int.Parse(watchdogHeartbeatInterval);
-            }
-
-            watchdog = CreateWatchdogConnection(dsId, settings.ServerSdkConfig, coroutineRunner);
-
             initialized = true;
         }
 
@@ -216,7 +200,12 @@ namespace AccelByte.Server
             return newServer;
         }
 
-        private static ServerWatchdog CreateWatchdogConnection(string dsId, ServerConfig newSdkConfig, CoroutineRunner taskRunner)
+        internal static ServerWatchdog CreateWatchdogConnection(string dsId, ServerConfig newSdkConfig)
+        {
+            return CreateWatchdogConnection(dsId, newSdkConfig.WatchdogServerUrl, newSdkConfig.WatchdogHeartbeatInterval);
+        }
+
+        internal static ServerWatchdog CreateWatchdogConnection(string dsId, string watchdogServerUrl, int watchdogHeartbeatIntervalSecond)
         {
             if (dsId == null)
             {
@@ -225,8 +214,9 @@ namespace AccelByte.Server
             }
 
             var newWatchdog = new ServerWatchdog(
-                newSdkConfig,
-                taskRunner);
+                watchdogServerUrl,
+                watchdogHeartbeatIntervalSecond,
+                coroutineRunner);
             newWatchdog.Connect(dsId);
             return newWatchdog;
         }

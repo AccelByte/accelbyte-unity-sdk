@@ -8,6 +8,8 @@ namespace AccelByte.Server
 {
     public class DedicatedServer
     {
+        internal const string CommandLineDsId = "-dsid";
+
         private readonly ServerOauthLoginSession session;
         private readonly CoroutineRunner coroutineRunner;
 

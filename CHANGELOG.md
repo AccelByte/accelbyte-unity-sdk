@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.15.0%0D15.14.0) (2023-03-27)
+
+
+### Features
+
+* added sigterm listener to linux server ([3a1a4eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3a1a4ebd079c81bc32f6e1a086c012ce6b921b4c))
+* admin get bulk user by user id ([8948d7e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8948d7e730deaf27d3edf2dd60040929dbe6f282))
+* **chat:** add notif handler and api (query, update, delete, stats) for system messages ([345a9f0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/345a9f04282fb8dcc7a901d2b14767d621091afa))
+* create connection to Watchdog in SDK Linux Server main ([a626930](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a626930b58dccf6f5d3bc245b2241635d9fe9093))
+* expose Account Linking and Proggresion ([cf26820](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cf26820502ad53be259a58267a8151c137b89b23))
+* mark deprecated since will give security hole issue for other player/user use GetUserProfilePublicInfo instead. function now just only have error message ([a84aa24](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a84aa248f1d74286af9e64ec4de2c8fe6efa04d4))
+
+
+### Refactors
+
+* add log when SDK start ([ebf9149](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebf9149152c87a3ed0a2eaf8211204beaa7e535e))
+
 ## [15.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.14.0%0D15.13.0) (2023-03-13)
 
 

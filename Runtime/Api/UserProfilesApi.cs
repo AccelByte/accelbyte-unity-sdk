@@ -160,27 +160,13 @@ namespace AccelByte.Api
         public IEnumerator GetCustomAttributes( string userId
             , ResultCallback<Dictionary<string, object>> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! userId is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+            var error = new Dictionary<string, object>
+            {
+                { "This endpoint is not able to use since give a security issue for other player/user", "use GetUserProfilePublicInfo instead" }
+            };
+            callback.TryOk(error);
 
-            var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
-                .WithBearerAuth(AuthToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<Dictionary<string, object>>();
-            callback.Try(result);
+            yield break;
         }
 
         public IEnumerator UpdateCustomAttributes( string userId

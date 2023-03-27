@@ -7,6 +7,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using HybridWebSocket;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {   
@@ -75,6 +76,11 @@ namespace AccelByte.Api
         /// Event triggered when user is unbanned from chatting
         /// </summary>
         public event Action<UserBannedNotification> UserChatUnbanned;
+
+        /// <summary>
+        /// Event triggered when user receive new system message
+        /// </summary>
+        public event Action<SystemMessageNotif> NewSystemMessage;
 
         #endregion
 
@@ -261,6 +267,52 @@ namespace AccelByte.Api
             websocketApi.UnblockUser(userId, callback);
         }
 
+        /// <summary>
+        /// Query system messages in user's system inbox
+        /// </summary>
+        /// <param name="callback">Function callback when operation is done.</param>
+        /// <param name="request">Optional request parameter</param>
+        public void QuerySystemMessage(ResultCallback<QuerySystemMessagesResponse> callback
+            , QuerySystemMessageRequest request = default)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.QuerySystemMessage(callback, request);
+        }
+
+        /// <summary>
+        /// Update system message(s) in user system inbox
+        /// </summary>
+        /// <param name="actionUpdateSystemMessages">Array of ActionUpdateSystemMessage containing action to mark read/unread and keep system messages.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void UpdateSystemMessages(HashSet<ActionUpdateSystemMessage> actionUpdateSystemMessages, ResultCallback<UpdateSystemMessagesResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.UpdateSystemMessages(actionUpdateSystemMessages, callback);
+        }
+
+        /// <summary>
+        /// Delete system message(s) in user system inbox
+        /// </summary>
+        /// <param name="messageIds">Array of system message id</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void DeleteSystemMessages(HashSet<string> messageIds, ResultCallback<DeleteSystemMessagesResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.DeleteSystemMessages(messageIds, callback);
+        }
+
+        /// <summary>
+        /// Get system messages stats
+        /// </summary>
+        /// <param name="callback">Function callback when operation is done.</param>
+        /// <param name="request">Optional request parameter</param>
+        public void GetSystemMessagesStats(ResultCallback<GetSystemMessageStatsResponse> callback
+            , GetSystemMessageStatsRequest request = default)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.GetSystemMessagesStats(new GetSystemMessageStatsRequest(), callback);
+        }
+        
         #endregion
         
         #region internal methods
@@ -369,6 +421,9 @@ namespace AccelByte.Api
                 case ChatMessageMethod.eventUnbanChat:
                     HandleUnbanNotification();
                     HandleNotification(message, UserChatUnbanned);
+                    break;
+                case ChatMessageMethod.eventNewSystemMessage:
+                    HandleNotification(message, NewSystemMessage);
                     break;
                 default:
                     bool IsResponse = messageJsonObjectMethod.method.ToString().ToLower().StartsWith("action")

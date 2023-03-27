@@ -1754,5 +1754,43 @@ namespace AccelByte.Api
             }
             yield return oAuth2.GenerateGameToken(code, callback);
         }
+        
+        /// <summary>
+        /// Link headless account to current full account
+        /// </summary>
+        /// <param name="linkHeadlessAccountRequest"> struct that containing chosen namespace and one time link code</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest linkHeadlessAccountRequest
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            coroutineRunner.Run(api.LinkHeadlessAccountToCurrentFullAccount(linkHeadlessAccountRequest, callback));
+        }
+        
+        /// <summary>
+        /// Get conflict result when link headless account to current account by one time code
+        /// </summary>
+        /// <param name="oneTimeLinkCode"> One time link code value</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void GetConflictResultWhenLinkHeadlessAccountToFullAccount(string oneTimeLinkCode
+            , ResultCallback<ConflictLinkHeadlessAccountResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+            coroutineRunner.Run(api.GetConflictResultWhenLinkHeadlessAccountToFullAccount(oneTimeLinkCode, callback));
+        }
     }
 }

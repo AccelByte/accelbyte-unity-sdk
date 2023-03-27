@@ -106,6 +106,7 @@ namespace AccelByte.Api
         /// Get user's own custom attribute profile information. If it doesn't exist, that will be an error
         /// </summary>
         /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
+        [Obsolete("This endpoint is not able to use since give a security issue for other player/user, use GetUserProfilePublicInfo instead")]
         public void GetCustomAttributes( ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);

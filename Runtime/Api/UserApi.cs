@@ -910,5 +910,51 @@ namespace AccelByte.Api
             var result = response.TryParseJson<GetUserInformationResponse>();
             callback.Try(result);
         }
+        
+        public IEnumerator LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest linkHeadlessAccountRequest
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/users/me/headless/linkWithProgression")
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(linkHeadlessAccountRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            Result result = response.TryParse();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetConflictResultWhenLinkHeadlessAccountToFullAccount(string oneTimeLinkCode
+            , ResultCallback<ConflictLinkHeadlessAccountResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/users/me/headless/link/conflict")
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithQueryParam("oneTimeLinkCode", oneTimeLinkCode)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
+            callback.Try(result);
+        }
     }
 }

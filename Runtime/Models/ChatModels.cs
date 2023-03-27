@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using AccelByte.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace AccelByte.Models
 {
@@ -28,6 +30,7 @@ namespace AccelByte.Models
         eventTopicUpdated,
         eventUnbanChat,
         eventUserBanned,
+        eventNewSystemMessage,
         actionAddUserToTopic,
         actionAddUserToTopicResponse,
         actionBlockUser,
@@ -65,7 +68,11 @@ namespace AccelByte.Models
         readChat,
         readChatResponse,
         sendChat,
-        sendChatResponse
+        sendChatResponse,
+        actionQuerySystemMessage,
+        actionUpdateSystemMessages,
+        actionDeleteSystemMessages,
+        actionGetSystemMessageStats
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -242,6 +249,171 @@ namespace AccelByte.Models
         public DateTime processed { get; set; }
 
         [DataMember] public string userId { get; set; }
+    }
+
+    [DataContract]
+    public class SystemMessageNotifMessage
+    {
+        [DataMember(Name = "title")] public string Title;
+        [DataMember(Name = "body")] public string Body;
+        [DataMember(Name = "gift")] public JObject Gift;
+    }
+
+    [DataContract]
+    public class QuerySystemMessageResponseItem
+    {
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "category")] public string Category;
+        [DataMember(Name = "message")] public string Message;
+
+        [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime CreatedAt { get; set; }
+
+        [DataMember(Name = "updatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime UpdatedAt { get; set; }
+
+        [DataMember(Name = "expiredAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime ExpiredAt { get; set; }
+
+        [DataMember(Name = "readAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime ReadAt { get; set; }
+
+        /// <summary>
+        /// Parse Message to SystemMessageNotifMessage
+        /// </summary>
+        /// <param name="outFormattedMessage">Message in SystemMessageNotifMessage</param>
+        /// <returns>true when parsing success</returns>
+        public SystemMessageNotifMessage GetSystemMessageData()
+        {
+            return JsonConvert.DeserializeObject<SystemMessageNotifMessage>(Message);
+        }
+    }
+
+    [DataContract]
+    public class SystemMessageNotif
+    {
+        [DataMember(Name = "messageId")] public string MessageId;
+        [DataMember(Name = "category")] public string Category;
+        [DataMember(Name = "message")] public string Message;
+
+        [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime CreatedAt { get; set; }
+
+        [DataMember(Name = "expiredAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime ExpiredAt { get; set; }
+
+        /// <summary>
+        /// Parse Message to SystemMessageNotifMessage
+        /// </summary>
+        /// <param name="outFormattedMessage">Message in SystemMessageNotifMessage</param>
+        /// <returns>true when parsing success</returns>
+        public SystemMessageNotifMessage GetSystemMessageData()
+        {
+            return JsonConvert.DeserializeObject<SystemMessageNotifMessage>(Message);
+        }
+    }
+
+    /// <summary>
+    /// Optional parameter for query system messages
+    /// </summary>
+    [DataContract]
+    public class QuerySystemMessageRequest
+    {
+        /// <summary>
+        /// Query only unread messages
+        /// </summary>
+        [DataMember(Name = "unreadOnly")]
+        public bool UnreadOnly = false;
+
+        /// <summary>
+        /// Query messages from specified date and time
+        /// </summary>
+        [DataMember(Name = "startCreatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime StartCreatedAt { get; set; } = default;
+
+        /// <summary>
+        /// Query messages up to specified date and time
+        /// </summary>
+        [DataMember(Name = "endCreatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime EndCreatedAt { get; set; } = default;
+        
+        /// <summary>
+        /// Category of system message
+        /// </summary>
+        [DataMember(Name = "category")] public string Category;
+        
+        /// <summary>
+        /// Query only unread messages
+        /// </summary>
+        [DataMember(Name = "offset")] public int Offset { get; set; } = 0;
+
+        /// <summary>
+        /// number of maximum messages to query
+        /// </summary>
+        [DataMember(Name = "limit")] public int Limit { get; set; } = 20;
+    }
+
+    [DataContract]
+    public class QuerySystemMessagesResponse
+    {
+        [DataMember(Name = "data")] public List<QuerySystemMessageResponseItem> Data;
+    }
+
+    [DataContract]
+    public enum OptionalBoolean
+    {
+        [EnumMember(Value = "NONE")] None = 0,
+        [EnumMember(Value = "YES")] Yes = 1,
+        [EnumMember(Value = "NO")] No = 2
+    }
+
+    [DataContract]
+    public class ActionUpdateSystemMessage
+    {
+        [DataMember(Name = "id")] public string Id { get; set; }
+        [DataMember(Name = "read")] public OptionalBoolean Read { get; set; }
+        [DataMember(Name = "keep")] public OptionalBoolean Keep { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateSystemMessagesRequest
+    {
+        [DataMember(Name = "data")] public HashSet<ActionUpdateSystemMessage> Data;
+    }
+
+    [DataContract]
+    public class UpdateSystemMessagesResponse
+    {
+        [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime Processed { get; set; }
+    }
+
+    [DataContract]
+    public class DeleteSystemMessageRequest
+    {
+        [DataMember(Name = "messageIds")] public HashSet<string> MessageIds;
+    }
+
+    [DataContract]
+    public class DeleteSystemMessagesResponse
+    {
+        [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime Processed { get; set; }
+    }
+
+    [DataContract]
+    public class GetSystemMessageStatsRequest
+    {
+        
+    }
+
+    [DataContract]
+    public class GetSystemMessageStatsResponse
+    {
+        [DataMember(Name = "oldestUnread"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime OldestUnread;
+        
+        [DataMember(Name = "unread")] public Int32 Unread;
     }
 
     #region event models

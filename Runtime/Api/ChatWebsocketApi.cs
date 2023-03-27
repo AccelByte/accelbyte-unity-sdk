@@ -185,7 +185,36 @@ namespace AccelByte.Api
         
         
         #endregion
-        
+
+        #region system messages
+
+        public void QuerySystemMessage(ResultCallback<QuerySystemMessagesResponse> callback
+            , QuerySystemMessageRequest request)
+        {
+            SendRequest(ChatMessageMethod.actionQuerySystemMessage, request, callback);
+        }
+
+        public void UpdateSystemMessages(HashSet<ActionUpdateSystemMessage> actionUpdateSystemMessages, ResultCallback<UpdateSystemMessagesResponse> callback)
+        {
+            UpdateSystemMessagesRequest request = new UpdateSystemMessagesRequest { Data = actionUpdateSystemMessages };
+
+            SendRequest(ChatMessageMethod.actionUpdateSystemMessages, request, callback);
+        }
+
+        public void DeleteSystemMessages(HashSet<string> messageIds, ResultCallback<DeleteSystemMessagesResponse> callback)
+        {
+            DeleteSystemMessageRequest request = new DeleteSystemMessageRequest { MessageIds = messageIds };
+
+            SendRequest(ChatMessageMethod.actionDeleteSystemMessages, request, callback);
+        }
+
+        public void GetSystemMessagesStats(GetSystemMessageStatsRequest request, ResultCallback<GetSystemMessageStatsResponse> callback)
+        {
+            SendRequest(ChatMessageMethod.actionGetSystemMessageStats, request, callback);
+        }
+
+        #endregion
+
         #endregion
         
         #region protected methods

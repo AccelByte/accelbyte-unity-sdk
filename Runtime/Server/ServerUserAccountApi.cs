@@ -208,5 +208,26 @@ namespace AccelByte.Server
             var result = response.TryParseJson<UserData>();
             callback.Try(result);
         }
+
+        public IEnumerator ListUserByUserId(ListUserDataRequest listUserDataRequest, ResultCallback<ListUserDataResponse> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(listUserDataRequest, nameof(listUserDataRequest) + " cannot be null");
+
+            var request = HttpRequestBuilder
+               .CreatePost(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/bulk")
+               .WithPathParam("namespace", Namespace_)
+               .WithBearerAuth(AuthToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .WithBody(listUserDataRequest.ToUtf8Json())
+               .GetResult();
+
+            IHttpResponse response = null;
+            yield return HttpClient.SendRequest(request, rsp => response = rsp);
+            var result = response.TryParseJson<ListUserDataResponse>();
+            callback.Try(result);
+        }
     }
 }

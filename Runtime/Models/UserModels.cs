@@ -611,4 +611,51 @@ namespace AccelByte.Models
         [DataMember] public string oneTimeLinkURL { get; set; }
         [DataMember] public int exp { get; set; }
     }
+
+    [DataContract]
+    public class ListUserDataRequest
+    {
+        [DataMember(Name = "userIds")] public string[] UserIds { get; set; }
+    }
+
+    [DataContract]
+    public class UserDataResponse
+    {
+        [DataMember(Name = "displayName")] public string DisplayName { get; set; }
+        [DataMember(Name = "emailAddress")] public string EmailAddress { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember(Name = "userId")] public string UserId { get; set; }
+    }
+
+    [DataContract]
+    public class ListUserDataResponse
+    {
+        [DataMember(Name = "data")] public UserDataResponse[] Data { get; set; }
+    }
+
+    [DataContract]
+    public class LinkHeadlessAccountRequest
+    {
+        [DataMember] public string[] ChosenNamespaces { get; set; }
+        [DataMember] public string OneTimeLinkCode { get; set; }
+    }
+    
+    [DataContract]
+    public class AccountProgressionInfo
+    {
+        [DataMember] public string DisplayName { get; set; }
+        [DataMember] public string Email { get; set; }
+        [DataMember] public string[] LinkedGames { get; set; }
+        [DataMember] public string UserName { get; set; }
+    }
+    
+    [DataContract]
+    public class ConflictLinkHeadlessAccountResult
+    {
+        [DataMember] public AccountProgressionInfo CurrentAccount { get; set; }
+        [DataMember] public AccountProgressionInfo HeadlessAccount { get; set; }
+        [DataMember] public bool PlatformAlreadyLinked { get; set; }
+        [DataMember] public string PlatformId { get; set; }
+        [DataMember] public bool PlatformLinkConflict { get; set; }
+    }
 };
