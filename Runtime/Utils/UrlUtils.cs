@@ -16,7 +16,7 @@ namespace AccelByte.Utils
             string retval = null;
             if (baseURL == null)
             {
-                retval = "";
+                return string.Empty;
             }
             if (Regex.IsMatch(baseURL, regexStr))
             {
