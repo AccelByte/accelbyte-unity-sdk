@@ -59,6 +59,8 @@ namespace AccelByte.Models
         [DataMember] public string display_name { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public bool is_comply { get; set; }
+        [DataMember] public string platform_id { get; set; }
+        [DataMember] public string platform_user_id { get; set; }
     }
 
     [DataContract]
@@ -657,5 +659,11 @@ namespace AccelByte.Models
         [DataMember] public bool PlatformAlreadyLinked { get; set; }
         [DataMember] public string PlatformId { get; set; }
         [DataMember] public bool PlatformLinkConflict { get; set; }
+    }
+    
+    internal class RefreshTokenCache
+    {
+        public string RefreshToken { get; set; }
+        public DateTime ExpiredDate { get; set; }
     }
 };

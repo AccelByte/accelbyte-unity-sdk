@@ -14,7 +14,10 @@ public class OAuth2 : ApiBase
         ISession session)
         : base(HttpClient, config, config.IamServerUrl, session)
     {
-        OnNewTokenObtained = tokenData => session.SetSession(tokenData);
+        OnNewTokenObtained = (tokenData) =>
+        {
+            session.SetSession(tokenData);
+        };
         session.CallRefresh = RefreshSession;
     }
 

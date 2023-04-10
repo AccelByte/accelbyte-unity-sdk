@@ -28,7 +28,8 @@ namespace AccelByte.Api
     {
         //Constants
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
-        private const int ttl = 60;
+
+        internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/";
 
         //Readonly members
         private readonly UserSession userSession;//renamed from LoginSession
@@ -38,6 +39,11 @@ namespace AccelByte.Api
 
         public UserSession Session { get { return userSession; } }
 
+        internal AccelByteFileCacheImplementation PlatformLoginCache
+        {
+            get;
+            private set;
+        }
 
         private UserData userDataCache;
 
@@ -52,7 +58,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         internal User( UserApi inApi
             , UserSession inLoginSession
-            , CoroutineRunner inCoroutineRunner )
+            , CoroutineRunner inCoroutineRunner)
         {
             userSession = inLoginSession;
             api = inApi;
@@ -62,7 +68,7 @@ namespace AccelByte.Api
                 inApi.Config,
                 userSession);
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inLoginSession">
@@ -77,6 +83,21 @@ namespace AccelByte.Api
             : this( inApi, inLoginSession, inCoroutineRunner )
         {
             // Curry this obsolete data to the new overload ->
+        }
+
+        /// <summary>
+        /// Set cache implementation of platform login
+        /// </summary>
+        /// <param name="loginCacheDirectory">Cache directory</param>
+        internal void SetPlatformLoginCache(string loginCacheDirectory)
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_ANDROID || UNITY_IOS
+            if (!string.IsNullOrEmpty(loginCacheDirectory))
+            {
+                PlatformLoginCache = new AccelByteFileCacheImplementation(loginCacheDirectory);
+                PlatformLoginCache.Empty();
+            }
+#endif
         }
 
         /// <summary>
@@ -200,7 +221,15 @@ namespace AccelByte.Api
                 callback.TryError(loginResult.Error);
                 yield break;
             }
+            else if(PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
+            {
+                RefreshTokenCache newRefreshTokenCache = new RefreshTokenCache();
+                newRefreshTokenCache.RefreshToken = loginResult.Value.refresh_token;
 
+                newRefreshTokenCache.ExpiredDate = DateTime.UtcNow + new TimeSpan(0, 0, loginResult.Value.refresh_expires_in);
+
+                PlatformLoginCache.Emplace(GetPlatformRefreshTokenCacheKey(loginResult.Value.platform_id), newRefreshTokenCache.ToJsonString(Newtonsoft.Json.Formatting.Indented));                
+            }
             callback.Try(loginResult);
         }
         
@@ -295,7 +324,60 @@ namespace AccelByte.Api
                 callback,
                 createHeadless));
         }
-        
+
+        public void ReloginWithOtherPlatform(PlatformType platformType
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            ReloginWithOtherPlatform(platformType.ToString(), callback);
+        }
+
+        public void ReloginWithOtherPlatform(string platformId, ResultCallback<TokenData, OAuthError> callback)
+        {
+            string cacheKey = GetPlatformRefreshTokenCacheKey(platformId);
+            if (PlatformLoginCache == null)
+            {
+                var newError = new OAuthError();
+                newError.error = ErrorCode.CachedTokenNotFound.ToString();
+                newError.error_description = "Platform refresh token caching not enabled";
+                callback.TryError(newError);
+                return;
+            }
+            else if (!PlatformLoginCache.Contains(cacheKey))
+            {
+                var newError = new OAuthError();
+                newError.error = ErrorCode.CachedTokenNotFound.ToString();
+                newError.error_description = "Platform refresh token cache not found";
+                callback.TryError(newError);
+                return;
+            }
+
+            string cachedRefreshTokenJson = PlatformLoginCache.Retrieve(cacheKey);
+            RefreshTokenCache cacheRefreshToken = null;
+            try
+            {
+                cacheRefreshToken = cachedRefreshTokenJson.ToObject<RefreshTokenCache>();
+            }
+            catch(Exception e)
+            {
+                var newError = new OAuthError();
+                newError.error = ErrorCode.UnableToSerializeDeserializeCachedToken.ToString();
+                newError.error_description = $"Failed to deserialize token cache file.\n{e.Message}";
+                callback.TryError(newError);
+                return;
+            }
+
+            if(DateTime.UtcNow >= cacheRefreshToken.ExpiredDate)
+            {
+                var newError = new OAuthError();
+                newError.error = ErrorCode.CachedTokenExpired.ToString();
+                newError.error_description = $"Cached token is expired";
+                callback.TryError(newError);
+                return;
+            }    
+
+            LoginWithLatestRefreshToken(cacheRefreshToken.RefreshToken, callback);
+        }
+
         private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
             , string platformToken
             , ResultCallback callback
@@ -586,7 +668,6 @@ namespace AccelByte.Api
             coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
         }
 
-
         /// <summary>
         /// Refresh current login session. Will update current token.
         /// </summary>
@@ -595,6 +676,17 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
+        }
+
+        /// <summary>
+        /// Refresh current login session. Will update current token.
+        /// </summary>
+        /// <param name="refreshToken">Refresh token</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(oAuth2.RefreshSession(refreshToken, callback));
         }
 
         /// <summary>
@@ -1791,6 +1883,11 @@ namespace AccelByte.Api
                 return;
             }
             coroutineRunner.Run(api.GetConflictResultWhenLinkHeadlessAccountToFullAccount(oneTimeLinkCode, callback));
+        }
+        
+        private string GetPlatformRefreshTokenCacheKey(string platformId)
+        {
+            return $"UnityPlatformLoginCache_{platformId}";
         }
     }
 }

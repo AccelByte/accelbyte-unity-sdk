@@ -255,6 +255,11 @@ namespace AccelByte.Api
         public event ResultCallback<SignalingP2P> SignalingP2PNotification;
 
         /// <summary>
+        /// Raised when a general error notification is sent from lobby
+        /// </summary>
+        public event ResultCallback ErrorNotification;
+
+        /// <summary>
         /// Raised when lobby access token succesfully updated
         /// </summary>
         public event Action TokenRefreshed;
@@ -1697,6 +1702,20 @@ namespace AccelByte.Api
                     break;
                 case MessageType.setRejectConsentNotif:
                     websocketApi.HandleNotification(message, MatchRejected);
+                    break;
+                case MessageType.errorNotif:
+                    AwesomeFormat.ReadPayload(message, out ErrorNotif notif);
+                    if (string.IsNullOrEmpty(notif.requestType))
+                    {
+                        if (ErrorNotification != null)
+                        {
+                            ErrorNotification(Result.CreateError((ErrorCode)notif.code, notif.message));
+                        }
+                    }
+                    else
+                    {
+                        websocketApi.HandleResponse(long.Parse(notif.id), message, (ErrorCode)notif.code);
+                    }
                     break;
                 default:
                     websocketApi.HandleResponse(messageId, message, errorCode);

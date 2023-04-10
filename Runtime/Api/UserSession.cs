@@ -23,7 +23,7 @@ namespace AccelByte.Api
     public class UserSession : ISession
     {
         public static readonly string TokenPath = Path.Combine(Application.persistentDataPath, "TokenData");
-        public const string RefreshTokenKey = "accelbyte_refresh_token";
+        public const string RefreshTokenPlayerPrefKey = "accelbyte_refresh_token";
         public const string AuthTrustIdKey = "auth_trust_id";
         public readonly bool usePlayerPrefs;
         private readonly IHttpClient httpClient;
@@ -75,11 +75,13 @@ namespace AccelByte.Api
         {
             // don't schedule refresh token if time is in the past.
             if (time < DateTime.UtcNow)
+            {
                 return;
+            }
 
             nextRefreshTime = time;
 
-            Debug.Log($"set refresh time to {nextRefreshTime}");
+            AccelByteDebug.LogVerbose($"Set token refresh time to {nextRefreshTime}");
 
             if (maintainAccessTokenCoroutine == null)
             {
@@ -244,7 +246,7 @@ namespace AccelByte.Api
 
             if (!usePlayerPrefs) return;
 
-            PlayerPrefs.DeleteKey(RefreshTokenKey);
+            PlayerPrefs.DeleteKey(RefreshTokenPlayerPrefKey);
             PlayerPrefs.Save();
         }
 

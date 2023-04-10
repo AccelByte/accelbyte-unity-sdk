@@ -56,6 +56,7 @@ namespace AccelByte.Models
         [DataMember] public string AppId { get; set; } = "";
         [DataMember] public string PublisherNamespace { get; set; } = "";
         [DataMember] public string CustomerName { get; set; } = "";
+        [DataMember] public bool EnableAuthHandshake { get; set; }
         [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
 
@@ -105,6 +106,7 @@ namespace AccelByte.Models
                    this.AppId == anotherConfig.AppId &&
                    this.PublisherNamespace == anotherConfig.PublisherNamespace &&
                    this.CustomerName == anotherConfig.CustomerName &&
+                   this.EnableAuthHandshake == anotherConfig.EnableAuthHandshake &&
                    this.MaximumCacheSize == anotherConfig.MaximumCacheSize &&
                    this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime;
         }

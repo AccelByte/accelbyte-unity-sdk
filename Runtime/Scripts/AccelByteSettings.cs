@@ -186,6 +186,12 @@ namespace AccelByte.Api
             set { AccelByteSettings.Instance.config.TurnServerPassword = value; }
         }
 
+        public static bool EnableAuthHandshake
+        {
+            get { return AccelByteSettings.Instance.config.EnableAuthHandshake; }
+            set { AccelByteSettings.Instance.config.EnableAuthHandshake = value; }
+        }
+
         public static string ClientId
         {
             get { return AccelByteSettings.Instance.oAuthConfig.ClientId; }

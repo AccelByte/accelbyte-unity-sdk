@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Core;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
@@ -38,22 +39,108 @@ namespace AccelByte.Api
         public static DeviceProvider GetFromSystemInfo(string encodeHMACKey)
         {
             string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatforName();
+            string platformUniqueIdentifier;
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId")){
-                PlayerPrefs.SetString("AccelByteDeviceUniqueId", System.Guid.NewGuid().ToString());
+            Utils.Infoware.InfowareUtils iware;
+
+            switch (Application.platform)
+            {
+                case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXPlayer:
+                    {
+                        iware = new Utils.Infoware.MacOS();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                    {
+                        iware = new Utils.Infoware.Windows();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.LinuxPlayer:
+                    {
+                        iware = new Utils.Infoware.LinuxOS();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.IPhonePlayer:
+                    {
+                        iware = new Utils.Infoware.IOS();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.Android:
+                    {
+                        iware = new Utils.Infoware.Android();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.WebGLPlayer:
+                    {
+                        string newGuid;
+                        if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId"))
+                        {
+                            newGuid = System.Guid.NewGuid().ToString();
+                            PlayerPrefs.SetString("AccelByteDeviceUniqueId", newGuid);
+                        }
+                        else
+                        {
+                            newGuid = PlayerPrefs.GetString("AccelByteDeviceUniqueId");
+                        }
+                        platformUniqueIdentifier = newGuid;
+                        break;
+                    }
+                case RuntimePlatform.GameCoreXboxSeries:
+                    {
+                        iware = new Utils.Infoware.XSX();
+                        platformUniqueIdentifier = iware.GetDeviceID();
+                        break;
+                    }
+                case RuntimePlatform.GameCoreXboxOne:
+                    {
+                        iware = new Utils.Infoware.XB1();
+                        platformUniqueIdentifier = iware.GetDeviceID();
+                        break;
+                    }
+                case RuntimePlatform.PS4:
+                    {
+                        iware = new Utils.Infoware.PlayStation4();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
+                        break;
+                    }
+                case RuntimePlatform.PS5:
+                    {
+                        iware = new Utils.Infoware.PlayStation4();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
+                        break;
+                    }
+                default:
+                    {
+                        iware = new Utils.Infoware.OtherOs();
+                        string uniqueIdentifier = iware.GetMacAddress();
+                        if (string.IsNullOrEmpty(uniqueIdentifier))
+                        {
+                            uniqueIdentifier = iware.GetDeviceID();
+                        }
+                        platformUniqueIdentifier = EncodeHMAC(uniqueIdentifier, encodeHMACKey);
+                        break;
+                    }
             }
+
             return new DeviceProvider(
                 "device",
                 identifier,
-                PlayerPrefs.GetString("AccelByteDeviceUniqueId")); 
-#else
-            string macAddress = GetDeviceMacAddress();
-            return new DeviceProvider(
-                "device",
-                identifier,
-                EncodeHMAC(macAddress, encodeHMACKey));
-#endif
+                platformUniqueIdentifier);
         }
 
         public readonly string DeviceId;

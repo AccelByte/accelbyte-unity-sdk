@@ -301,6 +301,8 @@ namespace AccelByte.Api
                 userSession,
                 taskRunner);
 
+            newUser.SetPlatformLoginCache(User.DefaultPlatformCacheDirectory);
+
             return newUser;
         }
 

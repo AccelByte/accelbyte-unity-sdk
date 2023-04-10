@@ -262,6 +262,7 @@ namespace AccelByte.Api
             if (showTURNconfigs)
             {
                 CreateToggleInput((newValue) => editedSdkConfig.UseTurnManager = newValue, editedSdkConfig.UseTurnManager, "Use TURN Manager");
+                CreateToggleInput((newValue) => editedSdkConfig.EnableAuthHandshake = newValue, editedSdkConfig.EnableAuthHandshake, "Use Secure Handshaking");
                 CreateTextInput((newValue) => editedSdkConfig.TurnServerHost = newValue, editedSdkConfig.TurnServerHost, "TURN Server Host");
                 CreateTextInput((newValue) => editedSdkConfig.TurnServerPort = newValue, editedSdkConfig.TurnServerPort, "TURN Server Port");
                 CreateTextInput((newValue) => editedSdkConfig.TurnManagerServerUrl = newValue, editedSdkConfig.TurnManagerServerUrl, "TURN Manager Server Url");

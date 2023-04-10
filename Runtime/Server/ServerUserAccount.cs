@@ -184,6 +184,31 @@ namespace AccelByte.Server
                     callback));
         }
 
+        /// <summary>
+        /// Get User Ban Information
+        /// Only Moderator that can get the ban information.
+        /// </summary>
+        /// <param name="userId">Banned user's user ID</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetUserBanInfo(string userId
+            , ResultCallback<UserBanPagedList> callback
+            , bool activeOnly = true)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+
+                return;
+            }
+
+            this.coroutineRunner.Run(
+                this.api.GetUserBanInfo(
+                    userId,
+                    activeOnly,
+                    callback));
+        }
 
         /// <summary>
         /// Get User Banned List

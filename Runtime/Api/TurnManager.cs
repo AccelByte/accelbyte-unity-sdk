@@ -111,8 +111,7 @@ namespace AccelByte.Api
             
             foreach (TurnServer server in getResult.Value.servers)
             {
-
-                using (var udpClient = new UdpClient(server.port))
+                using (var udpClient = new UdpClient())
                 {
                     var turnServerEndpoint = new IPEndPoint(IPAddress.Parse(server.ip), server.qos_port);
                     udpClient.Connect(turnServerEndpoint);

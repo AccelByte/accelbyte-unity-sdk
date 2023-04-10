@@ -27,8 +27,6 @@ AccelByte’s Multi-platform Credentials allow you to build your game with diffe
  - Android
  - PS4
  - PS5
- - Live (Xbox build)
  - Nintendo
- - Stadia
 
 To configure multi-platform, go to **AccelByte > Edit Settings** in the menu bar, then change the **Platform** to your desired config and fill in Client Id, Client Secret for the selected platform and click **Save**.

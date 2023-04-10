@@ -162,6 +162,26 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
+        public IEnumerator GetUserBanInfo(string userId, bool activeOnly, ResultCallback<UserBanPagedList> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+
+            var request = HttpRequestBuilder
+               .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/bans")
+               .WithPathParam("namespace", Namespace_)
+               .WithPathParam("userId", userId)
+               .WithQueryParam("activeOnly", activeOnly ? "true" : "false")
+               .WithBearerAuth(AuthToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .GetResult();
+
+            IHttpResponse response = null;
+            yield return HttpClient.SendRequest(request, rsp => response = rsp);
+            var result = response.TryParseJson<UserBanPagedList>();
+            callback.Try(result);
+        }
+
         public IEnumerator GetUserBannedList(bool activeOnly, BanType banType, int offset, int limit, ResultCallback<UserBanPagedList> callback)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");

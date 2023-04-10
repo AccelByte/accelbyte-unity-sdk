@@ -181,6 +181,10 @@ namespace AccelByte.Core
         InvalidSession = 13132,
         FriendListIsEmpty = 11732,
 
+        CachedTokenNotFound = 14301,
+        UnableToSerializeDeserializeCachedToken = 14302,
+        CachedTokenExpired = 14303,
+
         #region SessionErrorCode
 
         SessionInvalidJoinability = 20021,

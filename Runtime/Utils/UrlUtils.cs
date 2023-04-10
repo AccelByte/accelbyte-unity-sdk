@@ -13,18 +13,17 @@ namespace AccelByte.Utils
         public static string SanitizeBaseUrl(string baseURL)
         {
             var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
-            string retval = null;
-            if (baseURL == null)
+            string retval = string.Empty;
+            if (baseURL != null)
             {
-                retval = "";
-            }
-            if (Regex.IsMatch(baseURL, regexStr))
-            {
-                retval = baseURL.TrimEnd('/');
-            }
-            else
-            {
-                AccelByteDebug.LogWarning("Invalid URL: " + baseURL);
+                if (Regex.IsMatch(baseURL, regexStr))
+                {
+                    retval = baseURL.TrimEnd('/');
+                }
+                else
+                {
+                    AccelByteDebug.LogWarning("Invalid URL: " + baseURL);
+                }
             }
             return retval;
         }

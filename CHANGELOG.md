@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.0%0D15.15.0) (2023-04-10)
+
+
+### Features
+
+* **lobby:** ErrorNotif with associated Request will trigger Respond instead ([10ba8cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/10ba8cb21d05e5afdb57a1e609e1d4cba5245c2f))
+* platform relogin ([438ad96](https://github.com/AccelByte/accelbyte-unity-sdk/commits/438ad966679d8a2e8993865aa1496430be64fdd1))
+
+
+### Bug Fixes
+
+* [JSC-1125] fix missing device ID on PSN ([3b240b9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b240b9fb64741e66c4b0db310437d87e560671e))
+* fix base url sanitize when url is null ([b1bcd43](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1bcd436f5fd28e411dd8dbba2eb6f7d03e93c4a))
+* fix linux server error ([e025de1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e025de1c40ee4409f0942dc72e327e0c3673f81c))
+* **turnManager:** change UdpClient instantiation so it doesn't bind to a port ([fa9c990](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fa9c990b861b186608ee1b2e296a504aa5a05796))
+* upload crypto medatada ([13480d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13480d7abf433f9e48549a9ff0a6ce3f0c2a20a2))
+
+
+### Refactors
+
+* add file cache implementation ([20ed219](https://github.com/AccelByte/accelbyte-unity-sdk/commits/20ed2192ddcf1f76aeb55dd46d1ce9bcb624bbaf))
+
 ## [15.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.15.0%0D15.14.0) (2023-03-27)
 
 

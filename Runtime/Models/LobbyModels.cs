@@ -128,7 +128,8 @@ namespace AccelByte.Models
         messageSessionNotif,
         setRejectConsentRequest,
         setRejectConsentResponse,
-        setRejectConsentNotif
+        setRejectConsentNotif,
+        errorNotif
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -184,6 +185,15 @@ namespace AccelByte.Models
         [DataMember] public string topic;
         [DataMember] public string payload;
         [DataMember] public string sentAt;
+    }
+
+    [DataContract]
+    public class ErrorNotif
+    {
+        [DataMember] public string id;
+        [DataMember] public string requestType;
+        [DataMember] public string message;
+        [DataMember] public int code;
     }
 
     #endregion
