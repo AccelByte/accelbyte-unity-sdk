@@ -372,5 +372,30 @@ namespace AccelByte.Server
         }
 
         #endregion
+
+        public IEnumerator GetGameRecords(string key, ResultCallback<GameRecord> callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't get user record! Namespace parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't get user record! AccessToken parameter is null!");
+            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
+
+            string url = "/v1/admin/namespaces/{namespace}/records/{key}";
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + url)
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<GameRecord>();
+            callback.Try(result);
+        }
     }
 }

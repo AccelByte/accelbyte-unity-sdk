@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.16.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.1%0D15.16.0) (2023-04-18)
+
+
+### Features
+
+* server api cloudsave get gamerecord ([0e00b44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0e00b448a54475d10f6455dbcdbc9d652a6a3cea))
+
+
+### Bug Fixes
+
+* sigterm library exposed to all platforms ([aa742c2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa742c2d6868dd7c56c53d97a6dcdf72cb66923a))
+
 ## [15.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.0%0D15.15.0) (2023-04-10)
 
 

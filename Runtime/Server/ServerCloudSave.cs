@@ -374,5 +374,23 @@ namespace AccelByte.Server
             coroutineRunner.Run(
                 api.RetrieveGameRecordsKey(callback, query, offset, limit));
         }
+
+        /// <summary>
+        /// Get a record by its key in namespace-level.
+        /// </summary>
+        /// <param name="key">The key of the record</param>
+        /// <param name="callback"></param>
+        public void GetGameRecords(string key, ResultCallback<GameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetGameRecords(key, callback));
+        }
     }
 }
