@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.16.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.2%0D15.16.1) (2023-04-19)
+
+
+### Bug Fixes
+
+* [ASP-4200] Android null device id ([77726e6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/77726e6882a4df44cded4105c88369b747cda706))
+* add static marshal linking in linux sigterm listener ([7c8cc97](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c8cc9732806ad38286fc1b7fe8a25c73deea3be))
+* fix config setting unable to redirect to default config ([789673d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/789673d1e34ecb0143b067f2aaf8e59908aa1a1f))
+
+
+### Refactors
+
+* add API http client getter ([8b35b18](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8b35b1882a58c7a6243cedbf76574d33536d484e))
+* remove client secret as requirement ([a017120](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a017120476248d561cf7168f092137b37de52bad))
+
 ### [15.16.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.1%0D15.16.0) (2023-04-18)
 
 

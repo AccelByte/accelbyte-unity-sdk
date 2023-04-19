@@ -116,10 +116,6 @@ namespace AccelByte.Server
             {
                 string activePlatform = AccelByteSettingsV2.GetActivePlatform(true);
                 newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
-                if (newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
-                {
-                    newSettings = RetrieveConfigFromJsonFile("", activeEnvironment);
-                }
             }
             else
             {

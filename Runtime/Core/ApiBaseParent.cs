@@ -17,7 +17,7 @@ namespace AccelByte.Core
         /// <summary>
         /// Contains session credential actions
         /// </summary>
-        internal readonly IHttpClient HttpClient;
+        private readonly IHttpClient httpClient;
         
         /// <summary>
         /// Contains AuthorizationToken and related auth
@@ -29,6 +29,14 @@ namespace AccelByte.Core
         /// - Eg, Config.BaseUrl || Config.CloudStorageServerUrl
         /// </summary>
         protected readonly string BaseUrl;
+
+        public IHttpClient HttpClient
+        {
+            get
+            {
+                return httpClient;
+            }
+        }
 
         protected ApiBaseParent( IHttpClient inHttpClient
             , ISession inSession
@@ -43,7 +51,7 @@ namespace AccelByte.Core
             Assert.IsNotNull(inBaseUrl, $"Creating {GetType().Name} failed. " +
                 $"Parameter `inBaseUrl` is null");
             
-            HttpClient = inHttpClient;
+            httpClient = inHttpClient;
             Session = inSession;
             BaseUrl = inBaseUrl;
         }

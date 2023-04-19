@@ -185,7 +185,7 @@ namespace AccelByte.Api
             CreateTextInput((newValue) => editedSdkConfig.Namespace = newValue, editedSdkConfig.Namespace, "Namespace", true);
             CreateTextInput((newValue) => editedSdkConfig.PublisherNamespace = newValue, editedSdkConfig.PublisherNamespace, "Publisher Namespace", true);
             CreateTextInput((newValue) => editedOAuthConfig.ClientId = newValue, editedOAuthConfig.ClientId, "Client Id", true);
-            CreateTextInput((newValue) => editedOAuthConfig.ClientSecret = newValue, editedOAuthConfig.ClientSecret, "Client Secret", true);
+            CreateTextInput((newValue) => editedOAuthConfig.ClientSecret = newValue, editedOAuthConfig.ClientSecret, "Client Secret");
             CreateTextInput((newValue) => editedSdkConfig.AppId = newValue, editedSdkConfig.AppId, "App Id");
 
             showCacheConfigs = EditorGUILayout.Foldout(showCacheConfigs, "Cache Configs");

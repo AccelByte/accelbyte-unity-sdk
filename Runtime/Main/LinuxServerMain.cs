@@ -2,14 +2,26 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-#if (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX) && UNITY_SERVER
+#if (UNITY_STANDALONE_LINUX && UNITY_SERVER) 
 using AccelByte.Server;
 
 namespace AccelByte.Core
 {
     internal class LinuxServerMain : IPlatformMain
     {
-        internal System.Action<int> OnReceivedSignalEvent;
+        private static System.Action<int> onReceivedSignalEvent;
+        internal System.Action<int> OnReceivedSignalEvent
+        {
+            get
+            {
+                return LinuxServerMain.onReceivedSignalEvent;
+            }
+            set
+            {
+                LinuxServerMain.onReceivedSignalEvent = value;
+            }
+        }
+
         private AccelByteSignalHandler signalHandler;
         private ServerWatchdog watchdog;
 
@@ -31,6 +43,11 @@ namespace AccelByte.Core
             {
                 return watchdog;
             }
+        }
+
+        public LinuxServerMain()
+        {
+            ClearSignalCallback();
         }
 
         public void Run()
@@ -66,11 +83,19 @@ namespace AccelByte.Core
 
                     watchdog = CreateServerWatchDog(dsId, watchdogServerUrl, heartbeatInterval);
                 }
+                
+                LinuxServerMain.onReceivedSignalEvent += CheckExitSignal;
             }
         }
 
         public void Stop()
         {
+            LinuxServerMain.onReceivedSignalEvent -= CheckExitSignal;
+        }
+
+        public void ClearSignalCallback()
+        {
+            LinuxServerMain.onReceivedSignalEvent = null;
         }
 
         protected virtual string GetCommandLineArg(string arg)
@@ -78,9 +103,14 @@ namespace AccelByte.Core
             return Utils.CommandLineArgs.GetArg(arg);
         }
 
-        private void OnReceivedSignal(int signalCode)
+        [AOT.MonoPInvokeCallback(typeof(AccelByteSignalHandler.SignalHandlerDelegate))]
+        private static void OnReceivedSignal(int signalCode)
         {
-            OnReceivedSignalEvent?.Invoke(signalCode);
+            onReceivedSignalEvent?.Invoke(signalCode);
+        }
+
+        private void CheckExitSignal(int signalCode)
+        {
             if (signalCode == (int)LinuxSignalCode.SigTerm)
             {
                 ExitGame();

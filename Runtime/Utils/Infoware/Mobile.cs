@@ -12,10 +12,18 @@ namespace AccelByte.Utils.Infoware
     {
         internal override string GetDeviceID()
         {
-            string uniqueIdentifier = SystemInfo.deviceUniqueIdentifier;
-            if (string.IsNullOrEmpty(uniqueIdentifier))
+            string uniqueIdentifier;
+            if (SystemInfo.deviceUniqueIdentifier != SystemInfo.unsupportedIdentifier)
             {
                 uniqueIdentifier = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                uniqueIdentifier = SystemInfo.deviceUniqueIdentifier;
+                if (string.IsNullOrEmpty(uniqueIdentifier))
+                {
+                    uniqueIdentifier = Guid.NewGuid().ToString();
+                }
             }
 
             return uniqueIdentifier;
