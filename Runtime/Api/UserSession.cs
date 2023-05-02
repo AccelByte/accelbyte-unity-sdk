@@ -91,18 +91,16 @@ namespace AccelByte.Api
 
         private IEnumerator BearerAuthRejectRefreshToken( Action<string> callback )
         {
-            Result<TokenData, OAuthError> refreshResult = null;
-            yield return RefreshSession(result => {
-                refreshResult = result;
-            });
-
-            callback?.Invoke(refreshResult.IsError ? null : refreshResult.Value.access_token);
-
-            if (bearerAuthRejectedCoroutine != null)
+            yield return RefreshSession(refreshResult =>
             {
-                coroutineRunner.Stop(bearerAuthRejectedCoroutine);
-                bearerAuthRejectedCoroutine = null;
-            }
+                callback?.Invoke(refreshResult.IsError ? null : refreshResult.Value.access_token);
+
+                if (bearerAuthRejectedCoroutine != null)
+                {
+                    coroutineRunner.Stop(bearerAuthRejectedCoroutine);
+                    bearerAuthRejectedCoroutine = null;
+                }
+            });
         }
 
         private void BearerAuthRejected
@@ -124,20 +122,6 @@ namespace AccelByte.Api
             {
                 ClearSession();
             }
-        }
-
-        private static DateTime ScheduleNormalRefresh( int expiresIn )
-        {
-            return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn - 1) * 0.8);
-        }
-
-        private static TimeSpan CalculateBackoffInterval
-            ( TimeSpan previousRefreshBackoff
-            , int randomNum )
-        {
-            previousRefreshBackoff = TimeSpan.FromSeconds(previousRefreshBackoff.Seconds * 2);
-
-            return previousRefreshBackoff + TimeSpan.FromSeconds(randomNum);
         }
 
         public void LoadRefreshToken()
@@ -223,7 +207,14 @@ namespace AccelByte.Api
 
         public override IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback)
         {
-            yield return CallRefresh(tokenData.refresh_token, callback);
+            bool resreshDone = false;
+            callback += (result) =>
+            {
+                resreshDone = true;
+            };
+
+            CallRefresh?.Invoke(tokenData.refresh_token, callback);
+            yield return new WaitUntil(() => resreshDone);;
         }
 
         public void ClearSession()

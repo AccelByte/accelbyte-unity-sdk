@@ -163,7 +163,7 @@ namespace AccelByte.Api
                 yield return webRequest.SendWebRequest();
 
                 Result<string> result;
-                if (!webRequest.isNetworkError && !webRequest.isHttpError)
+                if (webRequest.result != UnityWebRequest.Result.ConnectionError && webRequest.result != UnityWebRequest.Result.ProtocolError)
                 {
                     result = Result<string>.CreateOk(webRequest.downloadHandler.text);
                 }

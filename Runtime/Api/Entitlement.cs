@@ -406,6 +406,7 @@ namespace AccelByte.Api
         /// <param name="attributes">
         /// Attributes that contain of serverId, serverName, characterId, and characterName</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.")]
         public void CreateDistributionReceiver( string extUserId
             , Attributes attributes
             , ResultCallback callback )
@@ -431,6 +432,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="extUserId"> External User Id that want to be deleted in receiver</param>
         /// <param name="callback"> Returns a Result via callback when completed</param>
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.")]
         public void DeleteDistributionReceiver( string extUserId
             , ResultCallback callback )
         {
@@ -481,6 +483,7 @@ namespace AccelByte.Api
         /// <param name="extUserId">External User Id that has been created before for receiver</param>
         /// <param name="attributes">Attributes that contain of serverId, serverName, characterId, and characterName</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Platform Service version 3.4.0 and above doesn't support this anymore, This feature already removed.")]
         public void UpdateDistributionReceiver( string extUserId
             , Attributes attributes
             , ResultCallback callback )
@@ -738,6 +741,32 @@ namespace AccelByte.Api
                 api.SyncEntitlementPSNStore(
                     session.UserId,
                     psnModel,
+                    callback
+                ));
+        }
+        
+        /// <summary>
+        /// Sell User Entitlement.
+        /// </summary>
+        /// <param name="userEntitlementSoldParams">The user entitlement parameters containing the user ID and entitlement ID to sell.</param>
+        /// <param name="entitlementSoldRequest">The entitlement sold request containing the use count and request ID.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SellUserEntitlement(UserEntitlementSoldParams userEntitlementSoldParams
+            , EntitlementSoldRequest entitlementSoldRequest
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            userEntitlementSoldParams.UserId = session.UserId;
+            coroutineRunner.Run(
+                api.SellUserEntitlement(
+                    userEntitlementSoldParams,
+                    entitlementSoldRequest,
                     callback
                 ));
         }

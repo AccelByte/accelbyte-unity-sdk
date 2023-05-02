@@ -50,6 +50,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="currencyCode">Currency code for the wallet</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This does not support for multiplatform wallet, use GetWalletInfoByCurrencyCodeV2 instead")]
         public void GetWalletInfoByCurrencyCode( string currencyCode
             , ResultCallback<WalletInfo> callback )
         {

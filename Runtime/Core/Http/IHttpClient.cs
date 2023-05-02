@@ -22,6 +22,7 @@ namespace AccelByte.Core {
         HttpAuth AuthType { get; }
         IDictionary<string, string> Headers { get; }
         byte[] BodyBytes { get; }
+        int Priority { get; set; }
     }
 
     public interface IHttpResponse 
@@ -71,8 +72,7 @@ namespace AccelByte.Core {
 
     public interface IHttpRequestSender
     {
-        IEnumerator Send(IHttpRequest request, Action<IHttpResponse, Error> callback, int timeoutMs);
-        System.Threading.Tasks.Task<HttpSendResult> SendAsync(IHttpRequest request, int timeoutMs);
+        void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs);
         void ClearCookies(Uri baseUri);
     }
 

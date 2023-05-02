@@ -502,5 +502,67 @@ namespace AccelByte.Api
             var result = response.TryParseJson<GameRecords>();
             callback.Try(result);
         }
+        
+        public IEnumerator BulkGetOtherPlayerPublicRecordKeys( string userId
+            , ResultCallback<PaginatedBulkGetPublicUserRecordKeys> callback
+            , int offset
+            , int limit)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(userId, "Can't bulk get other player public record keys! UserId parameter is null!");
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/public")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => 
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<PaginatedBulkGetPublicUserRecordKeys>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator BulkGetOtherPlayerPublicRecords( string userId
+            , BulkGetRecordsByKeyRequest data
+            , ResultCallback<UserRecords> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsNotNull(userId, "Can't bulk get other player public record by keys! UserId parameter is null!");
+            Assert.IsFalse(data.keys.Length == 0, "Can't bulk get other player public record by keys! Keys parameter is null!");
+            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get other player public record by keys! keys exceeding {0}!", maxBulkRecords));
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/public/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UserRecords>();
+            callback.Try(result);
+        }
     }
 }

@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.17.0%0D15.16.2) (2023-04-26)
+
+
+### Features
+
+* Add itemName and currencyCode to response of RedeemCampaignCode API ([29a56e3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/29a56e304c6166dda693a56fa0852fcb947165a6))
+* add send verification to email ([3b19774](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b1977488816b2baa39bcd08eeb250b9bbb9b8e7))
+* **cloudsave:** add get bulk user record keys and records ([9e8beb4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9e8beb4a61744084d08e3a07cb184e53b5f4d2a7))
+* ecommerce enable item sellback store ([dbc3498](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dbc3498ab629dded438df39c465814ef675f79c7))
+* **mmv2:** implement get metrics and add queueTime field in create ticket response ([f34b37a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f34b37a6415142ab115c9cd651436c0e69c50e0c))
+* server api cloudsave get gamerecord ([c91da29](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c91da290d29b63fdc607e7cee19c8ecc1c315d0b))
+* **UGC:** new get channels, fix sort by and order by ([9460753](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9460753bd2980034f7ef074d9f0cf1a9e864ca87))
+
+
+### Refactors
+
+* add webrequest scheduler ([5d0296a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5d0296ad7743d35359a480707f3c8b03b2bb05d5))
+* change logger abstraction ([9071cfe](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9071cfe766a0f44db99407773bec130bb151ceb7))
+* refactor user and oauth api structure ([4850aea](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4850aea1e2ad6e2c8a1412380a67d60a78120545))
+* remove sdk warnings ([829557b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/829557b354a040f821af1cb4620181a3aa1dc2b0))
+* revert back user api function names, remove coroutine usage within user interface ([89db768](https://github.com/AccelByte/accelbyte-unity-sdk/commits/89db7689c15cc267a9f558d43945545464dcc9cf))
+* user api using c# async await ([efdd54a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/efdd54ad1b3db997152e4146fdfa839260b24591))
+
 ### [15.16.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.2%0D15.16.1) (2023-04-19)
 
 

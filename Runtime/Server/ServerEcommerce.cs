@@ -88,7 +88,7 @@ namespace AccelByte.Server
                     grantUserEntitlementsRequest,
                     callback));
         }
-        
+
         /// <summary>
         /// Credit a user wallet by currency code, if the wallet does not exist, it will create a new wallet.
         /// </summary>
@@ -96,6 +96,7 @@ namespace AccelByte.Server
         /// <param name="currencyCode">The currency code</param>
         /// <param name="creditUserWalletRequest">The request to credit a user wallet</param>
         /// <param name="callback">Returns Wallet info via callback when completed</param>
+        [Obsolete("This does not support for multiplatform wallet, use CreditUserWalletV2 instead")]
         public void CreditUserWallet( string userId
             , string currencyCode
             , CreditUserWalletRequest creditUserWalletRequest

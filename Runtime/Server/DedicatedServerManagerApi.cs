@@ -153,6 +153,7 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
+        [Obsolete]
         public IEnumerator RegisterLocalServer( uint port
             , string inName
             , ResultCallback callback )

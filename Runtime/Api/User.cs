@@ -35,7 +35,9 @@ namespace AccelByte.Api
         private readonly UserSession userSession;//renamed from LoginSession
         public readonly OAuth2 oAuth2;
         private readonly UserApi api;
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly CoroutineRunner coroutineRunner;
+#pragma warning restore IDE0052 // Remove unread private members
 
         public UserSession Session { get { return userSession; } }
 
@@ -114,8 +116,7 @@ namespace AccelByte.Api
             , bool rememberMe = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithUserNameAsync(
-                username, password, callback, rememberMe));
+            LoginWithUserName(username, password, callback, rememberMe);
         }
 
         /// <summary>
@@ -132,8 +133,7 @@ namespace AccelByte.Api
             , bool rememberMe = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithUserNameAsync(
-                username, password, callback, rememberMe));
+            LoginWithUserName(username, password, callback, rememberMe);
         }
 
         /// <summary>
@@ -143,14 +143,14 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete]
         public void LoginWithUsernameV3( string username
             , string password
             , ResultCallback callback
             , bool rememberMe = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithUserNameAsyncV3(
-                username, password, callback, rememberMe));
+            LoginWithUserNameV3(username, password, callback, rememberMe);
         }
         
         /// <summary>
@@ -166,34 +166,31 @@ namespace AccelByte.Api
             , bool rememberMe = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithUserNameAsyncV3(
-                username, password, callback, rememberMe));
+            LoginWithUserNameV3(username, password, callback, rememberMe);
         }
         
-        private IEnumerator LoginAsync( Func<ResultCallback, IEnumerator> loginMethod
-            ,  ResultCallback callback )
+        private void Login(System.Action<ResultCallback> loginMethod,  ResultCallback callback)
         {
             if (userSession.IsValid())
             {
                 callback.TryError(ErrorCode.InvalidRequest, 
                     "User is already logged in.");
-                yield break;
+                return;
             }
 
-            Result loginResult = null;
-
-            yield return loginMethod(r => loginResult = r);
-
-            if (loginResult.IsError)
+            loginMethod(loginResult =>
             {
-                callback.TryError(loginResult.Error);
-                yield break;
-            }
+                if (loginResult.IsError)
+                {
+                    callback.TryError(loginResult.Error);
+                    return;
+                }
 
-            callback.TryOk();
+                callback.TryOk();
+            });
         }
         
-        private IEnumerator LoginAsync( Func<ResultCallback<TokenData, OAuthError>, IEnumerator> loginMethod
+        private void Login(System.Action<ResultCallback<TokenData, OAuthError>> loginMethod
             , ResultCallback<TokenData, OAuthError> callback )
         {
             if (userSession.IsValid())
@@ -205,32 +202,27 @@ namespace AccelByte.Api
                 };
                 
                 callback.TryError(error);
-                yield break;
+                return;
             }
 
-            Result<TokenData, OAuthError> loginResult = null;
-
-            yield return loginMethod(r =>
+            loginMethod(loginResult =>
+            {
+                if (loginResult.IsError)
                 {
-                    loginResult = r;
+                    callback.TryError(loginResult.Error);
+                    return;
                 }
-            );
+                else if (PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
+                {
+                    RefreshTokenCache newRefreshTokenCache = new RefreshTokenCache();
+                    newRefreshTokenCache.RefreshToken = loginResult.Value.refresh_token;
 
-            if (loginResult.IsError)
-            {
-                callback.TryError(loginResult.Error);
-                yield break;
-            }
-            else if(PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
-            {
-                RefreshTokenCache newRefreshTokenCache = new RefreshTokenCache();
-                newRefreshTokenCache.RefreshToken = loginResult.Value.refresh_token;
+                    newRefreshTokenCache.ExpiredDate = DateTime.UtcNow + new TimeSpan(0, 0, loginResult.Value.refresh_expires_in);
 
-                newRefreshTokenCache.ExpiredDate = DateTime.UtcNow + new TimeSpan(0, 0, loginResult.Value.refresh_expires_in);
-
-                PlatformLoginCache.Emplace(GetPlatformRefreshTokenCacheKey(loginResult.Value.platform_id), newRefreshTokenCache.ToJsonString(Newtonsoft.Json.Formatting.Indented));                
-            }
-            callback.Try(loginResult);
+                    PlatformLoginCache.Emplace(GetPlatformRefreshTokenCacheKey(loginResult.Value.platform_id), newRefreshTokenCache.ToJsonString(Newtonsoft.Json.Formatting.Indented));
+                }
+                callback.Try(loginResult);
+            });
         }
         
         /// <summary>
@@ -240,51 +232,50 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("Instead, use LoginWithUserNameAsyncV3()")]
-        private IEnumerator LoginWithUserNameAsync( string email
+        [Obsolete("Instead, use LoginWithUserNameV3()")]
+        private void LoginWithUserName(string email
             , string password
-            , ResultCallback<TokenData, OAuthError> callback
+            , ResultCallback callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => 
-                oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe),
+            Login(cb => oAuth2.LoginWithUsername(email, password, cb, rememberMe)
+                ,callback);
+        }
+
+        /// <summary>
+        /// Login to AccelByte account with username (e.g. email) and password.
+        /// </summary>
+        /// <param name="email">Could be email or phone (right now, only email supported)</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [Obsolete("Instead, use LoginWithUserNameV3()")]
+        private void LoginWithUserName(string email
+            , string password
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool rememberMe = false)
+        {
+            Login(cb => oAuth2.LoginWithUsername(email, password, cb, rememberMe),
                 callback);
         }
-        
-        /// <summary>
-        /// Login to AccelByte account with username (e.g. email) and password.
-        /// </summary>
-        /// <param name="email">Could be email or phone (right now, only email supported)</param>
-        /// <param name="password">Password to login</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [Obsolete("Instead, use LoginWithUserNameAsync() which use different callback type")]
-        private IEnumerator LoginWithUserNameAsync( string email
+
+        [Obsolete("Instead, use LoginWithUserNameV3() which use different callback type")]
+        private void LoginWithUserNameV3( string email
             , string password
             , ResultCallback callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => oAuth2.LoginWithUsername(
-                email, password, cb, rememberMe), callback);
+            Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
+                , callback);
         }
         
-        [Obsolete("Instead, use LoginWithUserNameAsyncV3() which use different callback type")]
-        private IEnumerator LoginWithUserNameAsyncV3( string email
-            , string password
-            , ResultCallback callback
-            , bool rememberMe = false )
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithUsernameV3(
-                email, password, cb, rememberMe), callback);
-        }
-        
-        private IEnumerator LoginWithUserNameAsyncV3( string email
+        private void LoginWithUserNameV3( string email
             , string password
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
-            yield return LoginAsync(cb => oAuth2.LoginWithUsernameV3(
-                email, password, cb, rememberMe), callback);
+            Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
+                , callback);
         }
 
         /// <summary>
@@ -295,13 +286,16 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform type</param>
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void LoginWithOtherPlatform( PlatformType platformType
             , string platformToken
             , ResultCallback callback
             , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithOtherPlatformAsync(platformType, platformToken, callback, createHeadless));
+
+            Login(cb => oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless)
+                , callback);
         }
 
         /// <summary>
@@ -318,11 +312,8 @@ namespace AccelByte.Api
             , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithOtherPlatformAsync(
-                platformType,
-                platformToken,
-                callback,
-                createHeadless));
+            Login(cb => oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless)
+                , callback);
         }
 
         public void ReloginWithOtherPlatform(PlatformType platformType
@@ -336,17 +327,21 @@ namespace AccelByte.Api
             string cacheKey = GetPlatformRefreshTokenCacheKey(platformId);
             if (PlatformLoginCache == null)
             {
-                var newError = new OAuthError();
-                newError.error = ErrorCode.CachedTokenNotFound.ToString();
-                newError.error_description = "Platform refresh token caching not enabled";
+                var newError = new OAuthError
+                {
+                    error = ErrorCode.CachedTokenNotFound.ToString(),
+                    error_description = "Platform refresh token caching not enabled"
+                };
                 callback.TryError(newError);
                 return;
             }
             else if (!PlatformLoginCache.Contains(cacheKey))
             {
-                var newError = new OAuthError();
-                newError.error = ErrorCode.CachedTokenNotFound.ToString();
-                newError.error_description = "Platform refresh token cache not found";
+                var newError = new OAuthError
+                {
+                    error = ErrorCode.CachedTokenNotFound.ToString(),
+                    error_description = "Platform refresh token cache not found"
+                };
                 callback.TryError(newError);
                 return;
             }
@@ -359,41 +354,27 @@ namespace AccelByte.Api
             }
             catch(Exception e)
             {
-                var newError = new OAuthError();
-                newError.error = ErrorCode.UnableToSerializeDeserializeCachedToken.ToString();
-                newError.error_description = $"Failed to deserialize token cache file.\n{e.Message}";
+                var newError = new OAuthError
+                {
+                    error = ErrorCode.UnableToSerializeDeserializeCachedToken.ToString(),
+                    error_description = $"Failed to deserialize token cache file.\n{e.Message}"
+                };
                 callback.TryError(newError);
                 return;
             }
 
             if(DateTime.UtcNow >= cacheRefreshToken.ExpiredDate)
             {
-                var newError = new OAuthError();
-                newError.error = ErrorCode.CachedTokenExpired.ToString();
-                newError.error_description = $"Cached token is expired";
+                var newError = new OAuthError
+                {
+                    error = ErrorCode.CachedTokenExpired.ToString(),
+                    error_description = $"Cached token is expired"
+                };
                 callback.TryError(newError);
                 return;
             }    
 
             LoginWithLatestRefreshToken(cacheRefreshToken.RefreshToken, callback);
-        }
-
-        private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
-            , string platformToken
-            , ResultCallback callback
-            , bool createHeadless = true )
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatform(
-                platformType, platformToken, cb, createHeadless), callback);
-        }
-        
-        private IEnumerator LoginWithOtherPlatformAsync( PlatformType platformType
-            , string platformToken
-            , ResultCallback<TokenData, OAuthError> callback
-            , bool createHeadless = true )
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatform(
-                platformType, platformToken, cb, createHeadless), callback);
         }
 
         /// <summary>
@@ -405,13 +386,15 @@ namespace AccelByte.Api
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
+        [Obsolete]
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback callback
             , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithOtherPlatformIdAsync(platformId, platformToken, callback, createHeadless));
+            Login(cb => oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless),
+                 callback);
         }
 
         /// <summary>
@@ -429,35 +412,15 @@ namespace AccelByte.Api
             , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithOtherPlatformIdAsync(
-                platformId,
-                platformToken,
-                callback,
-                createHeadless));
-        }
-        
-        private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
-            , string platformToken
-            , ResultCallback callback
-            , bool createHeadless = true)
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatformId(
-                platformId, platformToken, cb, createHeadless), callback);
-        }
-        
-        private IEnumerator LoginWithOtherPlatformIdAsync(string platformId
-            , string platformToken
-            , ResultCallback<TokenData, OAuthError> callback
-            , bool createHeadless = true)
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithOtherPlatformId(
-                platformId, platformToken, cb, createHeadless), callback);
+            Login(cb => oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless)
+            , callback);
         }
 
         /// <summary>
         /// Login With AccelByte Launcher. Use this only if you integrate your game with AccelByte Launcher
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void LoginWithLauncher( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -465,15 +428,11 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(authCode))
             {
-                coroutineRunner.Run(() =>
-                {
-                    callback.TryError(ErrorCode.InvalidArgument, 
-                        "The application was not executed from launcher");
-                });
+                callback.TryError(ErrorCode.InvalidArgument, "The application was not executed from launcher");
                 return;
             }
 
-            coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
+            Login(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
         }
 
         /// <summary>
@@ -496,19 +455,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(LoginWithAuthorizationCodeAsync(authCode, callback));
-        }
-        
-        private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
-            , ResultCallback callback )
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
-        }
-        
-        private IEnumerator LoginWithAuthorizationCodeAsync( string authCode
-            , ResultCallback<TokenData, OAuthError> callback )
-        {
-            yield return LoginAsync(cb => oAuth2.LoginWithAuthorizationCodeV3(authCode, cb), callback);
+            Login(cb => oAuth2.LoginWithAuthorizationCodeV3(authCode, cb), callback);
         }
 
         /// <summary>
@@ -516,10 +463,11 @@ namespace AccelByte.Api
         /// have username yet.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void LoginWithDeviceId( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
+            Login(oAuth2.LoginWithDeviceId, callback);
         }
 
         /// <summary>
@@ -530,27 +478,18 @@ namespace AccelByte.Api
         public void LoginWithDeviceId( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithDeviceIdAsync(callback));
-        }
-        
-        private IEnumerator LoginWithDeviceIdAsync( ResultCallback callback )
-        {
-            yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
-        }
-        
-        private IEnumerator LoginWithDeviceIdAsync( ResultCallback<TokenData, OAuthError> callback )
-        {
-            yield return LoginAsync(oAuth2.LoginWithDeviceId, callback);
+            Login(oAuth2.LoginWithDeviceId, callback);
         }
 
         /// <summary>
         /// Login with the latest refresh token stored on the device. Will returning an error if the token already epired.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void LoginWithLatestRefreshToken( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
+            LoginWithLatestRefreshToken(null, callback);
         }
 
         /// <summary>
@@ -560,7 +499,7 @@ namespace AccelByte.Api
         public void LoginWithLatestRefreshToken( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(null, callback));
+            LoginWithLatestRefreshToken(null, callback);
         }
 
         /// <summary>
@@ -568,33 +507,16 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="refreshToken">The latest user's refresh token</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void LoginWithLatestRefreshToken( string refreshToken
-            , ResultCallback callback )
-        {
-            Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
-        }
-        
-        /// <summary>
-        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
-        /// </summary>
-        /// <param name="refreshToken">The latest user's refresh token</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithLatestRefreshToken( string refreshToken
-            , ResultCallback<TokenData, OAuthError> callback )
-        {
-            Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(LoginWithLatestRefreshTokenAsync(refreshToken, callback));
-        }
-        
         [Obsolete("Instead, use the overload with the extended callback")]
-        private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
+        public void LoginWithLatestRefreshToken( string refreshToken
             , ResultCallback callback )
         {
+            Report.GetFunctionLog(GetType().Name);
+
             if (refreshToken != null)
             {
                 userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
-                yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                oAuth2.RefreshSession(userSession.refreshToken, callback);
             }
             else if (File.Exists(UserSession.TokenPath))
             {
@@ -609,7 +531,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                    oAuth2.RefreshSession(userSession.refreshToken, callback);
                 }
             }
             else
@@ -617,14 +539,21 @@ namespace AccelByte.Api
                 callback.TryError(ErrorCode.InvalidRequest, "Refresh Token is null or PlayerPrefs is disabled!");
             }
         }
-
-        private IEnumerator LoginWithLatestRefreshTokenAsync( string refreshToken
+        
+        /// <summary>
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
+        /// </summary>
+        /// <param name="refreshToken">The latest user's refresh token</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        public void LoginWithLatestRefreshToken( string refreshToken
             , ResultCallback<TokenData, OAuthError> callback )
         {
+            Report.GetFunctionLog(GetType().Name);
+
             if (refreshToken != null)
             {
                 userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
-                yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                oAuth2.RefreshSession(userSession.refreshToken, callback);
             }
             else if (File.Exists(UserSession.TokenPath))
             {
@@ -644,7 +573,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    yield return oAuth2.RefreshSession(userSession.refreshToken, callback);
+                    oAuth2.RefreshSession(userSession.refreshToken, callback);
                 }
             }
             else
@@ -662,10 +591,11 @@ namespace AccelByte.Api
         /// Refresh current login session. Will update current token.
         /// </summary>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void RefreshSession( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
+            oAuth2.RefreshSession(userSession.refreshToken, callback);
         }
 
         /// <summary>
@@ -675,7 +605,7 @@ namespace AccelByte.Api
         public void RefreshSession( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(oAuth2.RefreshSession(userSession.refreshToken, callback));
+            oAuth2.RefreshSession(userSession.refreshToken, callback);
         }
 
         /// <summary>
@@ -686,7 +616,7 @@ namespace AccelByte.Api
         public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(oAuth2.RefreshSession(refreshToken, callback));
+            oAuth2.RefreshSession(refreshToken, callback);
         }
 
         /// <summary>
@@ -703,12 +633,12 @@ namespace AccelByte.Api
             }
 
             userDataCache = null;
-            coroutineRunner.Run(oAuth2.Logout(userSession.AuthorizationToken,
+            oAuth2.Logout(userSession.AuthorizationToken,
                 result=>
             {
                 userSession.ClearSession();
                 callback.Invoke(result);
-            }));
+            });
         }
 
         /// <summary>
@@ -736,7 +666,7 @@ namespace AccelByte.Api
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
-            coroutineRunner.Run(api.Register(registerUserRequest, callback));
+            api.Register(registerUserRequest, callback);
         }
 
         /// <summary>
@@ -769,7 +699,7 @@ namespace AccelByte.Api
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };
 
-            coroutineRunner.Run(api.Registerv2(registerUserRequest, callback));
+            api.RegisterV2(registerUserRequest, callback);
         }
 
         /// <summary>
@@ -777,18 +707,20 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="request">To accept policies, fill acceptedPolicies field</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
-        public void RegisterAndAcceptPolicies( RegisterUserRequestv2 request
+        public void RegisterAndAcceptPolicies(RegisterUserRequestv2 request
             , ResultCallback<RegisterUserResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
             
             //authType other than EMAILPASSWD is not supported
             request.authType = AuthenticationType.EMAILPASSWD;
-            Assert.IsTrue(
-                Regex.IsMatch(request.dateOfBirth, "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$"),
-                "Date of birth format is yyyy-MM-dd");
+            bool regexMatch = Regex.IsMatch(request.dateOfBirth, "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$");
+            if (!regexMatch)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Date of birth format is yyyy-MM-dd"));
+            }
 
-            coroutineRunner.Run(api.Registerv2(request, callback));
+            api.RegisterV2(request, callback);
         }
         
         /// <summary>
@@ -798,12 +730,6 @@ namespace AccelByte.Api
         public void GetData( ResultCallback<UserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(GetDataAsync(callback));
-        }
-        
-        private IEnumerator GetDataAsync( ResultCallback<UserData> callback )
-        {
-            Report.GetFunctionLog(GetType().Name);
 
             if (userDataCache != null)
             {
@@ -811,7 +737,7 @@ namespace AccelByte.Api
             }
             else
             {
-                yield return RefreshDataAsync(callback);
+                RefreshData(callback);
             }
         }
 
@@ -824,25 +750,17 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             userDataCache = null;
 
-            coroutineRunner.Run(RefreshDataAsync(callback));
-        }
-        
-        private IEnumerator RefreshDataAsync( ResultCallback<UserData> callback )
-        {
-            Result<UserData> result = null;
-
-            yield return api.GetData(r => result = r);
-
-            if (!result.IsError)
+            api.GetData(result =>
             {
-                userDataCache = result.Value;
+                if (!result.IsError)
+                {
+                    userDataCache = result.Value;
+                    callback.TryOk(userDataCache);
+                    return;
+                }
 
-                callback.TryOk(userDataCache);
-
-                yield break;
-            }
-
-            callback.Try(result);
+                callback.Try(result);
+            });
         }
 
         /// <summary>
@@ -854,22 +772,15 @@ namespace AccelByte.Api
             , ResultCallback<UserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(UpdateAsync(updateRequest, callback));
-        }
 
-        private IEnumerator UpdateAsync( UpdateUserRequest updateRequest
-            , ResultCallback<UserData> callback )        
-        {
-            Result<UserData> updateResult = null;
+            api.Update(updateRequest, updateResult => {
+                if (!updateResult.IsError)
+                {
+                    userDataCache = updateResult.Value;
+                }
 
-            yield return api.Update(updateRequest, result => updateResult = result);
-
-            if (!updateResult.IsError)
-            {
-                userDataCache = updateResult.Value;
-            }
-
-            callback.Try(updateResult);
+                callback.Try(updateResult);
+            });
         }
 
         /// <summary>
@@ -881,7 +792,7 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.UpdateEmail(updateEmailRequest, callback));
+            api.UpdateEmail(updateEmailRequest, callback);
         }
 
         /// <summary>
@@ -890,29 +801,33 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userName">Username the user is upgraded to</param>
         /// <param name="password">Password to login with username</param>
+        /// <param name="needVerificationCode">Will send verification code to email if true, default false</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
         public void Upgrade( string userName
             , string password
-            , ResultCallback<UserData> callback )
+            , ResultCallback<UserData> callback
+            , bool needVerificationCode = false)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(UpgradeAsync(userName, password, callback));
-        }
-
-        private IEnumerator UpgradeAsync( string username
-            , string password
-            , ResultCallback<UserData> callback )
-        {
-            Result<UserData> result = null;
-
-            yield return api.Upgrade(username, password, r => result = r);
-
-            if (!result.IsError)
+            var requestModel = new UpgradeRequest
             {
-                userDataCache = result.Value;
-            }
+                EmailAddress = userName,
+                Password = password
+            };
+            var requestParameter = new UpgradeParameter
+            {
+                NeedVerificationCode = needVerificationCode
+            };
 
-            callback.Try(result);
+            api.Upgrade(requestModel, requestParameter, result =>
+            {
+                if (!result.IsError)
+                {
+                    userDataCache = result.Value;
+                }
+
+                callback.Try(result);
+            });
         }
 
         /// <summary>
@@ -929,24 +844,23 @@ namespace AccelByte.Api
             , ResultCallback<UserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(Upgradev2Async(emailAddress, userName, password, callback));
-        }
 
-        private IEnumerator Upgradev2Async( string emailAddress
-            , string username
-            , string password
-            , ResultCallback<UserData> callback )
-        {
-            Result<UserData> result = null;
-
-            yield return api.Upgradev2(emailAddress, username, password, r => result = r);
-
-            if (!result.IsError)
+            var requestModel = new UpgradeV2Request
             {
-                userDataCache = result.Value;
-            }
+                EmailAddress = emailAddress,
+                Password = password,
+                Username = userName
+            };
 
-            callback.Try(result);
+            api.UpgradeV2(requestModel, result =>
+            {
+                if (!result.IsError)
+                {
+                    userDataCache = result.Value;
+                }
+
+                callback.Try(result);
+            });
         }
 
         /// <summary>
@@ -959,7 +873,7 @@ namespace AccelByte.Api
             , ResultCallback<UserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback));
+            api.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback);
         }
 
         /// <summary>
@@ -972,10 +886,13 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.SendVerificationCode(
-                VerificationContext.upgradeHeadlessAccount,
-                emailAddress,
-                callback));
+
+            var requestModel = new SendVerificationCodeRequest
+            {
+                EmailAddress = emailAddress,
+                Context = VerificationContext.upgradeHeadlessAccount.ToString()
+            };
+            api.SendVerificationCode(requestModel, callback);
         }
 
         /// <summary>
@@ -986,7 +903,7 @@ namespace AccelByte.Api
         public void SendVerificationCode( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(SendVerificationCodeAsync(VerificationContext.UserAccountRegistration, callback));
+            SendVerificationCode(VerificationContext.UserAccountRegistration, callback);
         }
 
         /// <summary>
@@ -994,36 +911,30 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="verifyContext">The context of what verification request</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        public void SendVerificationCode( VerificationContext verificationContext
-            , ResultCallback callback )
+        public void SendVerificationCode(VerificationContext verificationContext, ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(SendVerificationCodeAsync(verificationContext, callback));
-        }
 
-        private IEnumerator SendVerificationCodeAsync( VerificationContext verificationContext
-            , ResultCallback callback )
-        {
-            Result<UserData> userDataResult = null;
-
-            yield return GetDataAsync(r => userDataResult = r);
-
-            if (userDataResult.IsError)
+            GetData(userDataResult =>
             {
-                callback.TryError(
-                    new Error(
-                        ErrorCode.GeneralClientError,
-                        "Failed when trying to get username",
-                        "",
-                        userDataResult.Error));
+                if (userDataResult.IsError)
+                {
+                    callback.TryError(
+                        new Error(
+                            ErrorCode.GeneralClientError,
+                            "Failed when trying to get username",
+                            "",
+                            userDataResult.Error));
+                    return;
+                }
 
-                yield break;
-            }
-
-            yield return api.SendVerificationCode(
-                verificationContext,
-                userDataCache.emailAddress,
-                callback);
+                var requestModel = new SendVerificationCodeRequest
+                {
+                    EmailAddress = userDataCache.emailAddress,
+                    Context = verificationContext.ToString()
+                };
+                api.SendVerificationCode(requestModel, callback);
+            });
         }
 
         /// <summary>
@@ -1035,7 +946,15 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.Verify(verificationCode, "email", callback));
+
+            const string contactType = "email";
+            var requestModel = new VerifyRequest
+            {
+                VerificationCode = verificationCode,
+                ContactType = contactType
+            };
+
+            api.Verify(requestModel, callback);
         }
 
         /// <summary>
@@ -1046,7 +965,12 @@ namespace AccelByte.Api
         public void SendResetPasswordCode(string userName, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.SendPasswordResetCode(userName, callback));
+
+            var requestModel = new SendPasswordResetCodeRequest
+            {
+                EmailAddress = userName
+            };
+            api.SendPasswordResetCode(requestModel, callback);
         }
 
         /// <summary>
@@ -1062,7 +986,14 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.ResetPassword(resetCode, userName, newPassword, callback));
+
+            var requestModel = new ResetPasswordRequest
+            {
+                ResetCode = resetCode,
+                EmailAddress = userName,
+                NewPassword = newPassword
+            };
+            api.ResetPassword(requestModel, callback);
         }
 
         /// <summary>
@@ -1083,7 +1014,16 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.LinkOtherPlatform(platformType, platformTicket, callback));
+            var requestModel = new LinkOtherPlatformRequest
+            {
+                PlatformId = platformType.ToString().ToLower(),
+            };
+
+            var requestParameter = new LinkOtherPlatformParameter
+            {
+                Ticket = platformTicket
+            };
+            api.LinkOtherPlatform(requestModel, requestParameter, callback);
         }
 
         /// <summary>
@@ -1104,7 +1044,27 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.ForcedLinkOtherPlatform(platformType, platformUserId, callback));
+            api.GetData(getUserDataResult =>
+            {
+                if (getUserDataResult.IsError)
+                {
+                    callback.TryError(getUserDataResult.Error);
+                    return;
+                }
+
+                var requestModel = new LinkPlatformAccountRequest
+                {
+                    platformId = platformType.ToString().ToLower(),
+                    platformUserId = platformUserId
+                };
+
+                var requestParameter = new LinkPlatformAccountParameter
+                {
+                    UserId = getUserDataResult.Value.userId
+                };
+
+                api.ForcedLinkOtherPlatform(requestModel, requestParameter, callback);
+            });
         }
 
         /// <summary>
@@ -1124,7 +1084,16 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.UnlinkOtherPlatform(platformType, callback));
+            var requestModel = new UnlinkPlatformAccountRequest
+            {
+                platformNamespace = string.Empty
+            };
+
+            var requestParameter = new UnlinkPlatformAccountParameter
+            {
+                PlatformId = platformType.ToString().ToLower()
+            };
+            api.UnlinkOtherPlatform(requestModel, requestParameter, callback);
         }
 
         /// <summary>
@@ -1142,7 +1111,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetPlatformLinks(userSession.UserId, callback));
+            var requestModel = new GetPlatformLinkRequest
+            {
+                UserId = userSession.UserId
+            };
+            api.GetPlatformLinks(requestModel, callback);
         }
 
         /// <summary>
@@ -1167,7 +1140,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.SearchUsers(query, by, callback, offset, limit));
+            var requestModel = new SearchUsersRequest
+            {
+                Query = query,
+                SearchBy = by,
+                Offset = offset,
+                Limit = limit
+            };
+            api.SearchUsers(requestModel, callback);
         }
 
         /// <summary>
@@ -1201,7 +1181,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetUserByUserId(userId, callback));
+            var requestModel = new GetUserByUserIdRequest
+            {
+                UserId = userId
+            };
+            api.GetUserByUserId(requestModel, callback);
         }
 
         /// <summary>
@@ -1223,8 +1207,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserByOtherPlatformUserId(platformType, otherPlatformUserId, callback));
+            var requestModel = new GetUserByOtherPlatformUserIdRequest
+            {
+                PlatformId = platformType.ToString().ToLower(),
+                PlatformUserId = otherPlatformUserId
+            };
+            api.GetUserByOtherPlatformUserId(requestModel, callback);
         }
 
         /// <summary>
@@ -1245,9 +1233,18 @@ namespace AccelByte.Api
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-            BulkPlatformUserIdRequest platformUserIds = new BulkPlatformUserIdRequest { platformUserIDs = otherPlatformUserId };
-            coroutineRunner.Run(
-                api.BulkGetUserByOtherPlatformUserIds(platformType, platformUserIds, callback));
+
+            var requestModel = new BulkPlatformUserIdRequest
+            {
+                platformUserIDs = otherPlatformUserId,
+            };
+
+            var requestParameter = new BulkPlatformUserIdParameter
+            {
+                PlatformId = platformType.ToString().ToLower()
+            };
+
+            api.BulkGetUserByOtherPlatformUserIds(requestModel, requestParameter, callback);
         }
         
         /// <summary>
@@ -1257,39 +1254,39 @@ namespace AccelByte.Api
         public void GetCountryFromIP( ResultCallback<CountryInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(api.GetCountryFromIP(callback));
+            api.GetCountryFromIP(callback);
         }
 
         /// <summary>
         /// Check if user has purchased the subscription and eligible to play
         /// </summary>
         /// <param name="callback"> Returns the boolean result whether the user is subscribed and eligible to play the game via callback when the operation is completed</param>
-        public void GetUserEligibleToPlay( ResultCallback<bool> callback )
+        public void GetUserEligibleToPlay(ResultCallback<bool> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
             ResultCallback<ItemInfo> onGotItemInfo = itemInfoResult =>
+            {
+                if(itemInfoResult.IsError)
                 {
-                    if(itemInfoResult.IsError)
+                    callback.TryError(itemInfoResult.Error.Code);
+                    return;
+                }
+
+                string[] skus = itemInfoResult.Value.features;
+                string[] appIds = { AccelBytePlugin.Config.AppId };
+
+                AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, ownershipResult =>
+                {
+                    if (ownershipResult.IsError)
                     {
-                        callback.TryError(itemInfoResult.Error.Code);
+                        callback.TryError(ownershipResult.Error.Code);
                         return;
                     }
 
-                    string[] skus = itemInfoResult.Value.features;
-                    string[] appIds = { AccelBytePlugin.Config.AppId };
-
-                    AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, ownershipResult =>
-                    {
-                        if (ownershipResult.IsError)
-                        {
-                            callback.TryError(ownershipResult.Error.Code);
-                            return;
-                        }
-
-                        callback.TryOk(ownershipResult.Value.owned);
-                    });
-                };
+                    callback.TryOk(ownershipResult.Value.owned);
+                });
+            };
 
             AccelBytePlugin.GetItems().GetItemByAppId(AccelBytePlugin.Config.AppId, onGotItemInfo);
         }
@@ -1315,7 +1312,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.BulkGetUserInfo(userIds, callback));
+            ListBulkUserInfoRequest requestModel = new ListBulkUserInfoRequest
+            {
+                userIds = userIds
+            };
+            api.BulkGetUserInfo(requestModel, callback);
         }
 
         /// <summary>
@@ -1333,15 +1334,7 @@ namespace AccelByte.Api
             , bool rememberDevice = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(Verify2FACodeAsync(mfaToken, factor, code, callback, rememberDevice));
-        }
 
-        private IEnumerator Verify2FACodeAsync( string mfaToken
-            , TwoFAFactorType factor
-            , string code
-            , ResultCallback<TokenData, OAuthError> callback
-            , bool rememberDevice = false )
-        {
             if (userSession.IsValid())
             {
                 OAuthError error = new OAuthError()
@@ -1350,11 +1343,10 @@ namespace AccelByte.Api
                     error_description = "User is already logged in."
                 };
                 callback.TryError(error);
-
-                yield break;
+                return;
             }
 
-            yield return oAuth2.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
+            oAuth2.Verify2FACode(mfaToken, factor, code, callback, rememberDevice);
         }
 
         /// <summary>
@@ -1364,18 +1356,15 @@ namespace AccelByte.Api
         public void VerifyToken(ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(VerifyTokenAsync(callback));
-        }
 
-        private IEnumerator VerifyTokenAsync(ResultCallback callback)
-        {
             if (!userSession.IsValid())
             {
                 const string errorMessage = "User is not log in.";
                 callback.TryError(new Error(ErrorCode.InvalidRequest, errorMessage));
-                yield break;
+                return;
             }
-            yield return oAuth2.VerifyToken(Session.AuthorizationToken, callback);
+
+            oAuth2.VerifyToken(Session.AuthorizationToken, callback);
         }
 
         /// <summary>
@@ -1396,7 +1385,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.Change2FAFactor(mfaToken, factor, callback));
+            var requestModel = new Change2FAFactorParameter
+            {
+                MfaToken = mfaToken,
+                Factor = factor.GetString()
+            };
+            api.Change2FAFactor(requestModel, callback);
         }
 
         /// <summary>
@@ -1415,7 +1409,7 @@ namespace AccelByte.Api
             }
 
             TwoFAEnable = false;
-            coroutineRunner.Run(api.Disable2FAAuthenticator(callback));
+            api.Disable2FAAuthenticator(callback);
         }
 
         /// <summary>
@@ -1436,7 +1430,12 @@ namespace AccelByte.Api
             }
 
             TwoFAEnable = true;
-            coroutineRunner.Run(api.Enable2FAAuthenticator(code, callback));
+
+            var requestModel = new Enable2FAAuthenticatorParameter
+            {
+                Code = code
+            };
+            api.Enable2FAAuthenticator(requestModel, callback);
         }
 
         /// <summary>
@@ -1454,7 +1453,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GenerateSecretKeyFor3rdPartyAuthenticateApp(callback));
+            api.GenerateSecretKeyFor3rdPartyAuthenticateApp(callback);
         }
 
         /// <summary>
@@ -1470,9 +1469,9 @@ namespace AccelByte.Api
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
-            } 
+            }
 
-            coroutineRunner.Run(api.GenerateBackUpCode(callback));
+            api.GenerateBackUpCode(callback);
         }
 
         /// <summary>
@@ -1491,7 +1490,7 @@ namespace AccelByte.Api
             }
 
 			TwoFAEnable = false;
-            coroutineRunner.Run(api.Disable2FABackupCodes(callback));
+            api.Disable2FABackupCodes(callback);
         }
 
         /// <summary>
@@ -1510,7 +1509,7 @@ namespace AccelByte.Api
             }
 
 			TwoFAEnable = true;
-            coroutineRunner.Run(api.Enable2FABackupCodes(callback));
+            api.Enable2FABackupCodes(callback);
         }
 
         /// <summary>
@@ -1528,7 +1527,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetBackUpCode(callback));
+            api.GetBackUpCode(callback);
         }
 
         /// <summary>
@@ -1546,7 +1545,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetUserEnabledFactors(callback));
+            api.GetUserEnabledFactors(callback);
         }
 
         /// <summary>
@@ -1566,7 +1565,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.Make2FAFactorDefault(factor, callback));
+            var requestModel = new Make2FAFactorDefaultParameter
+            {
+                FactorType = factor.GetString()
+            };
+            api.Make2FAFactorDefault(requestModel, callback);
         }
 
         /// <summary>
@@ -1588,7 +1591,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetInputValidations(languageCode, callback, defaultOnEmpty));
+            var requestModel = new GetInputValidationsParameter
+            {
+                LanguageCode = languageCode,
+                DefaultOnEmpty = defaultOnEmpty
+            };
+            api.GetInputValidations(requestModel, callback);
         }
 
         /// <summary>
@@ -1607,7 +1615,8 @@ namespace AccelByte.Api
 
                 return;
             }
-            coroutineRunner.Run(api.UpdateUser(updateUserRequest, callback));
+
+            api.UpdateUser(updateUserRequest, callback);
         }
 
         /// <summary>
@@ -1615,12 +1624,14 @@ namespace AccelByte.Api
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void CreateHeadlessAccountAndResponseToken(string linkingToken
             , bool extendExp
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(CreateHeadlessAccountAndResponseTokenAsync(linkingToken, extendExp, callback));
+            Login(cb => oAuth2.CreateHeadlessAccountAndResponseToken(linkingToken, extendExp, cb)
+            , callback);
         }
 
         /// <summary>
@@ -1634,33 +1645,8 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(CreateHeadlessAccountAndResponseTokenAsync(
-                linkingToken,
-                extendExp,
-                callback));
-        }
-
-        /// <summary>
-        /// Create Headless Account for Account Linking
-        /// </summary>
-        /// <param name="linkingToken">Token for platfrom type</param>
-        /// <param name="extendExp">Token for other platfrom type</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        /// <returns></returns>
-        private IEnumerator CreateHeadlessAccountAndResponseTokenAsync(string linkingToken
-            , bool extendExp
-            , ResultCallback callback)
-        {
-            yield return LoginAsync(cb => oAuth2.CreateHeadlessAccountAndResponseToken(
-                linkingToken, extendExp, cb), callback);
-        }
-
-        private IEnumerator CreateHeadlessAccountAndResponseTokenAsync(string linkingToken
-            , bool extendExp
-            , ResultCallback<TokenData, OAuthError> callback)
-        {
-            yield return LoginAsync(cb => oAuth2.CreateHeadlessAccountAndResponseToken(
-                linkingToken, extendExp, cb), callback);
+            Login(cb => oAuth2.CreateHeadlessAccountAndResponseToken(linkingToken, extendExp, cb)
+             , callback);
         }
 
         /// <summary>
@@ -1671,13 +1657,15 @@ namespace AccelByte.Api
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
+        [Obsolete]
         public void AuthenticationWithPlatformLink(string username
             , string password
             , string linkingToken
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(AuthenticationWithPlatformLinkAsync(username, password, linkingToken, callback));
+            Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
+            , callback);
         }
 
         /// <summary>
@@ -1693,11 +1681,8 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(AuthenticationWithPlatformLinkAsync(
-                username,
-                password,
-                linkingToken,
-                callback));
+            Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
+            , callback);
         }
 
         /// <summary>
@@ -1731,34 +1716,9 @@ namespace AccelByte.Api
                     {
                         callback.TryError(new Error(ErrorCode.GameRecordNotFound, "avatarUrl value is null or empty"));
                     }
-                    coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
+                    ABUtilities.DownloadTexture2DAsync(result.Value.avatarUrl, callback);
                 }
             });
-        }
-
-        /// <summary>
-        /// Authentication With PlatformLink for Account Linking
-        /// </summary>
-        /// <param name="username">Username to login</param>
-        /// <param name="password">Password to login</param>
-        /// /// <param name="linkingToken">Token for platfrom type</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        private IEnumerator AuthenticationWithPlatformLinkAsync(string username
-            , string password
-            , string linkingToken
-            , ResultCallback callback)
-        {
-            yield return LoginAsync(cb => oAuth2.AuthenticationWithPlatformLink(
-                username, password, linkingToken, cb), callback);
-        }
-
-        private IEnumerator AuthenticationWithPlatformLinkAsync(string username
-            , string password
-            , string linkingToken
-            , ResultCallback<TokenData, OAuthError> callback)
-        {
-            yield return LoginAsync(cb => oAuth2.AuthenticationWithPlatformLink(
-                username, password, linkingToken, cb), callback);
         }
         
         /// <summary>
@@ -1774,10 +1734,14 @@ namespace AccelByte.Api
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
-            coroutineRunner.Run(api.GetPublisherUser(userId, callback));
+
+            var requestModel = new GetPublisherUserParameter
+            {
+                UserId = userId
+            };
+            api.GetPublisherUser(requestModel, callback);
         }
         
         /// <summary>
@@ -1793,10 +1757,14 @@ namespace AccelByte.Api
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
-            coroutineRunner.Run(api.GetUserInformation(userId, callback));
+
+            var requestModel = new GetUserInformationParameter
+            {
+                UserId = userId
+            };
+            api.GetUserInformation(requestModel, callback);
         }
         
         /// <summary>
@@ -1808,19 +1776,13 @@ namespace AccelByte.Api
             , ResultCallback<GeneratedOneTimeCode> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(GenerateOneTimeCodeAsync(platformId, callback));
-        }
-
-        private IEnumerator GenerateOneTimeCodeAsync(PlatformType platformId
-            , ResultCallback<GeneratedOneTimeCode> callback)
-        {
             if (!userSession.IsValid())
             {
                 const string errorMessage = "User is not log in.";
                 callback.TryError(new Error(ErrorCode.InvalidRequest, errorMessage));
-                yield break;
+                return;
             }
-            yield return oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
+            oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
         }
         
         /// <summary>
@@ -1832,19 +1794,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            coroutineRunner.Run(GenerateGameTokenAsync(code, callback));
-        }
-
-        private IEnumerator GenerateGameTokenAsync(string code
-            , ResultCallback callback)
-        {
             if (userSession.IsValid())
             {
-                callback.TryError(ErrorCode.InvalidRequest, 
+                callback.TryError(ErrorCode.InvalidRequest,
                     "User is already logged in.");
-                yield break;
+                return;
             }
-            yield return oAuth2.GenerateGameToken(code, callback);
+
+            oAuth2.GenerateGameToken(code, callback);
         }
         
         /// <summary>
@@ -1860,10 +1817,9 @@ namespace AccelByte.Api
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
-            coroutineRunner.Run(api.LinkHeadlessAccountToCurrentFullAccount(linkHeadlessAccountRequest, callback));
+            api.LinkHeadlessAccountToCurrentFullAccount(linkHeadlessAccountRequest, callback);
         }
         
         /// <summary>
@@ -1882,7 +1838,12 @@ namespace AccelByte.Api
 
                 return;
             }
-            coroutineRunner.Run(api.GetConflictResultWhenLinkHeadlessAccountToFullAccount(oneTimeLinkCode, callback));
+
+            var requestModel = new GetConflictResultWhenLinkHeadlessAccountToFullAccountRequest
+            {
+                OneTimeLinkCode = oneTimeLinkCode
+            };
+            api.GetConflictResultWhenLinkHeadlessAccountToFullAccount(requestModel, callback);
         }
         
         private string GetPlatformRefreshTokenCacheKey(string platformId)

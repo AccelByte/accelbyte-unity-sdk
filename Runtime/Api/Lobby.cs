@@ -1598,7 +1598,7 @@ namespace AccelByte.Api
                     if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
                             out MultiplayerV2NotifType sessionV2NotificationType))
                     {
-                        AccelByteDebug.LogError(
+                        AccelByteDebug.LogWarning(
                             $"Error {ErrorCode.ErrorFromException}: SessionV2 notification topic not recognized: {sessionNotification.topic}");
                         return;
                     }
@@ -1762,7 +1762,7 @@ namespace AccelByte.Api
 
             if (errorCode != ErrorCode.None)
             {
-                Debug.LogError($"Error {errorCode}: Failed to read payload of MultiplayerV2 notification");
+                AccelByteDebug.LogWarning($"Error {errorCode}: Failed to read payload of MultiplayerV2 notification");
                 return;
             }
 
@@ -1780,9 +1780,9 @@ namespace AccelByte.Api
             {
                 payloadBytes = Convert.FromBase64String(notificationPayload);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.LogError(
+                AccelByteDebug.LogWarning(
                     $"Error {ErrorCode.ErrorFromException}: Failed to decode MultiplayerV2 notification from Base64: {notificationPayload}");
                 return;
             }
@@ -1888,7 +1888,7 @@ namespace AccelByte.Api
                         MatchmakingV2TicketExpired);
                     break;
                 default:
-                    Debug.LogError($"MultiplayerV2 notification type {notificationType} not supported");
+                    AccelByteDebug.LogWarning($"MultiplayerV2 notification type {notificationType} not supported");
                     return;
             }
         }

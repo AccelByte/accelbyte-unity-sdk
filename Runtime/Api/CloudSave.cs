@@ -735,5 +735,51 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.BulkGetGameRecords(bulkGetRecordsByKeyRequest, callback));
         }
+
+        /// <summary>
+        /// Bulk get other user public record keys.
+        /// </summary>
+        /// <param name="userId">UserId of the record owner</param>
+        /// <param name="callback">Returns a Result that contains GameRecords via callback when completed</param>
+        /// <param name="offset">The offset of the public record keys. Default value is 0.</param>
+        /// <param name="limit">The limit of the public record keys. Default value is 20.</param>
+        public void BulkGetOtherPlayerPublicRecordKeys(string userId
+            , ResultCallback<PaginatedBulkGetPublicUserRecordKeys> callback
+            , int offset = 0
+            , int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetOtherPlayerPublicRecordKeys(userId, callback, offset, limit));
+        }
+
+        /// <summary>
+        /// Bulk get other user public records by keys.
+        /// </summary>
+        /// <param name="userId">UserId of the record owner</param>
+        /// <param name="data">Data struct to list Key of record</param>
+        /// <param name="callback">Returns a Result that contains GameRecords via callback when completed</param>
+        public void BulkGetOtherPlayerPublicRecords(string userId
+            , BulkGetRecordsByKeyRequest data
+            , ResultCallback<UserRecords> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetOtherPlayerPublicRecords(userId, data, callback));
+        }
     }
 }

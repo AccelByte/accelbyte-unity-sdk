@@ -126,12 +126,17 @@ namespace AccelByte.Server
         /// </summary>
         public void SendReadyMessage()
         {
+            SendReadyMessageImplementation();
+        }
+
+        protected virtual void SendReadyMessageImplementation()
+        {
             websocketApi.SendReadyMessage();
             StartHeartBeatScheduler();
         }
 
-        #region private methods
-        private void HandleOnOpen()
+        #region protected/private methods
+        protected void HandleOnOpen()
         {
             // debug ws connection
 #if DEBUG
@@ -145,7 +150,7 @@ namespace AccelByte.Server
             }
         }
 
-        private void HandleOnClose(ushort closecode)
+        protected void HandleOnClose(ushort closecode)
         {
             // debug ws connection
 #if DEBUG
@@ -155,7 +160,7 @@ namespace AccelByte.Server
             Disconnected?.Invoke(code);
         }
 
-        private void HandleOnMessage(string message)
+        protected void HandleOnMessage(string message)
         {
             Report.GetWebSocketResponse(message);
 
@@ -164,14 +169,39 @@ namespace AccelByte.Server
                 var command = JsonConvert.DeserializeObject<JObject>(message);
                 if (command.ContainsKey("drain"))
                 {
-                    // enter drain mode
-                    AccelByteDebug.LogWarning("Enter drain mode");
-                    OnDrainReceived?.Invoke();
+                    HandleDrain();
+                    return;
+                }
+
+                AwesomeFormat.ReadHeader(message, out MessageType messageType, out long messageId);
+                if (messageType == MessageType.disconnectNotif)
+                {
+                    ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out DisconnectNotif payload);
+                    HandleDisconnecting(payload, errorCode);
+                    return;
                 }
             }
             catch (Exception ex)
             {
                 AccelByteDebug.LogWarning(ex.Message);
+            }
+        }
+
+        protected void HandleDrain()
+        {
+            AccelByteDebug.LogWarning("Enter drain mode");
+            OnDrainReceived?.Invoke();
+        }
+
+        protected void HandleDisconnecting(DisconnectNotif payload, ErrorCode errorCode)
+        {
+            if (errorCode != ErrorCode.None)
+            {
+                coroutineRunner.Run(() => Disconnecting(Result<DisconnectNotif>.CreateError(errorCode)));
+            }
+            else
+            {
+                coroutineRunner.Run(() => Disconnecting(Result<DisconnectNotif>.CreateOk(payload)));
             }
         }
 

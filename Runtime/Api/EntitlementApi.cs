@@ -720,5 +720,43 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+        
+        public IEnumerator SellUserEntitlement(UserEntitlementSoldParams userEntitlementSoldParams
+            , EntitlementSoldRequest entitlementSoldRequest
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't sell user entitlement! Namespace_ from parent  is null!");
+            Assert.IsNotNull(AuthToken, "Can't sell user entitlement! AccessToken from parent is null!");
+            Assert.IsNotNull(userEntitlementSoldParams.UserId, "Can't sell user entitlement! userId parameter is null!");
+            Assert.IsNotNull(userEntitlementSoldParams.EntitlementId, "Can't sell user entitlement! entitlementId parameter is null!");
+
+            EntitlementSoldRequest entitlementSoldRequestBody = new EntitlementSoldRequest
+            {
+                UseCount = entitlementSoldRequest.UseCount,
+                RequestId = string.IsNullOrEmpty(entitlementSoldRequest.RequestId) ? null : entitlementSoldRequest.RequestId
+            };
+            
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/{entitlementId}/sell")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userEntitlementSoldParams.UserId)
+                .WithPathParam("entitlementId", userEntitlementSoldParams.EntitlementId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(entitlementSoldRequestBody.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<SellItemEntitlementInfo>();
+            callback.Try(result);
+        }
     }
 }

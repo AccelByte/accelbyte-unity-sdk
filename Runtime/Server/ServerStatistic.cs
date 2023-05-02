@@ -70,8 +70,14 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="userId">UserId of a user</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional, default = 20) </param>
+        /// <param name="sortBy">The sorting method of item on page (optional, default = updated at and ascending) </param>
         public void GetAllUserStatItems( string userId
-            , ResultCallback<PagedStatItems> callback )
+            , ResultCallback<PagedStatItems> callback
+            , int offset = 0
+            , int limit = 20
+            , StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -82,7 +88,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetUserStatItems(userId, null, null, callback));
+                api.GetUserStatItems(userId, null, null, callback, offset, limit, sortBy));
         }
 
         /// <summary>
@@ -92,10 +98,16 @@ namespace AccelByte.Server
         /// <param name="statCodes">List of statCodes that will be included in the result</param>
         /// <param name="tags">List of tags that will be included in the result</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional, default = 20) </param>
+        /// <param name="sortBy">The sorting method of item on page (optional, default = updated at and ascending) </param>
         public void GetUserStatItems( string userId
             , ICollection<string> statCodes
             , ICollection<string> tags
-            , ResultCallback<PagedStatItems> callback )
+            , ResultCallback<PagedStatItems> callback
+            , int offset = 0
+            , int limit = 20
+            , StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -106,7 +118,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetUserStatItems(userId, statCodes, tags, callback));
+                api.GetUserStatItems(userId, statCodes, tags, callback, offset, limit, sortBy));
         }
 
         /// <summary>
@@ -291,6 +303,28 @@ namespace AccelByte.Server
         }
 
         /// <summary>
+        /// Bulk fetch multiple user's stat item values for a given namespace and statCode.
+        /// </summary>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="userIds"> This is the UserId array that will be stored in the slot.</param>
+        /// <param name="callback">Returns an array of FetchUserStatistic via callback when completed</param>
+        public void BulkFetchStatItemsValue(string statCode
+           , string[] userIds
+           , ResultCallback<FetchUserStatistic> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkFetchStatItemsValue(statCode, userIds, callback));
+        }
+
+        /// <summary>
         /// Bulk update multiple user's statitems value with specific update strategy.
         /// </summary>
         /// <param name="bulkUpdateMultipleUserStatItem">This is the BulkUpdateMultipleUserStatItem array that will be stored in the slot.</param>
@@ -428,6 +462,33 @@ namespace AccelByte.Server
                     statCode, 
                     callback)
             );
+        }
+
+        /// <summary>
+        /// Get list of statistic cycle config
+        /// </summary>
+        /// <param name="callback">Returns PagedStatCycleConfigs via callback</param>
+        /// <param name="type">Statistic cycle type</param>
+        /// <param name="status">Statistic cycle status</param>
+        /// <param name="offset">
+        /// Offset of the list that has been sliced based on Limit parameter (optional, default = 0)
+        /// </param>
+        /// <param name="limit">The limit of item on page (optional) </param>
+        public void GetListStatCycleConfigs(ResultCallback<PagedStatCycleConfigs> callback,
+            StatisticCycleType type = StatisticCycleType.None,
+            StatisticCycleStatus status = StatisticCycleStatus.None,
+            int offset = 0,
+            int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetListStatCycleConfigs(type, status, callback, offset, limit));
         }
     }
 }

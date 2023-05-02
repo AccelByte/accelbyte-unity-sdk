@@ -1,18 +1,17 @@
-// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
 namespace AccelByte.Models
 {
-	#region enum
+    #region enum
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
@@ -263,7 +262,12 @@ namespace AccelByte.Models
     [DataContract]
     public class BulkPlatformUserIdRequest
     {
-        [DataMember] public  string[] platformUserIDs { get; set; }
+        [DataMember] public string[] platformUserIDs { get; set; }
+    }
+
+    public class BulkPlatformUserIdParameter
+    {
+        public string PlatformId { get; set; }
     }
 
     [DataContract]
@@ -294,12 +298,6 @@ namespace AccelByte.Models
     }
 
     [DataContract]
-    public class UpgradeUserRequest
-    {
-        [DataMember] public string temporary_session_id { get; set; }
-    }
-
-    [DataContract]
     public class UpgradeAndVerifyHeadlessRequest
     {
         [DataMember] public string code { get; set; }
@@ -326,6 +324,11 @@ namespace AccelByte.Models
         [DataMember] public string platformNamespace { get; set; }
     }
 
+    public class UnlinkPlatformAccountParameter
+    {
+        public string PlatformId { get; set; }
+    }
+
     [DataContract]
     public class AccountLinkPublisherAccount
     {
@@ -349,11 +352,106 @@ namespace AccelByte.Models
         [DataMember] public string platformUserId { get; set; }
     }
 
+    public class LinkPlatformAccountParameter
+    {
+        public string UserId { get; set; }
+    }
+
     [DataContract]
     public class UpdateEmailRequest
     {
         [DataMember] public string code;
         [DataMember] public string emailAddress;
+    }
+
+    [DataContract]
+    public class UpgradeRequest
+    {
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+        [DataMember(Name = "password")] public string Password;
+    }
+
+    public class UpgradeParameter
+    {
+        public bool NeedVerificationCode;
+    }
+
+    [DataContract]
+    public class UpgradeV2Request
+    {
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+        [DataMember(Name = "password")] public string Password;
+        [DataMember(Name = "username")] public string Username;
+    }
+
+    [DataContract]
+    public class SendVerificationCodeRequest
+    {
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+        [DataMember(Name = "context")] public string Context;
+    }
+
+    [DataContract]
+    public class VerifyRequest
+    {
+        [DataMember(Name = "code")] public string VerificationCode;
+        [DataMember(Name = "contactType")] public string ContactType;
+    }
+
+    [DataContract]
+    public class SendPasswordResetCodeRequest
+    {
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+    }
+
+
+    [DataContract]
+    public class ResetPasswordRequest
+    {
+        [DataMember(Name = "code")] public string ResetCode;
+        [DataMember(Name = "newPassword")] public string NewPassword;
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+    }
+
+    [DataContract]
+    public class LinkOtherPlatformRequest
+    {
+        [DataMember(Name = "platformId")] public string PlatformId;
+    }
+
+    public class LinkOtherPlatformParameter
+    {
+        public string Ticket { get; set; }
+    }
+
+    [DataContract]
+    public class GetPlatformLinkRequest
+    {
+        public string UserId { get; set; }
+    }
+
+    [DataContract]
+    public class SearchUsersRequest
+    {
+        public string Query { get; set; }
+        public SearchType SearchBy { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+
+        public readonly string[] FilterType = { "", "displayName", "username" };
+    }
+
+    [DataContract]
+    public class GetUserByUserIdRequest
+    {
+        public string UserId { get; set; }
+    }
+
+    [DataContract]
+    public class GetUserByOtherPlatformUserIdRequest
+    {
+        public string PlatformId { get; set; }
+        public string PlatformUserId { get; set; }
     }
 
     #region Ban
@@ -448,6 +546,38 @@ namespace AccelByte.Models
     public class ListBulkUserInfoRequest
     {
         [DataMember] public string[] userIds;
+    }
+
+    public class Change2FAFactorParameter
+    {
+        public string MfaToken { get; set; }
+        public string Factor { get; set; }
+    }
+
+    public class Enable2FAAuthenticatorParameter
+    {
+        public string Code { get; set; }
+    }
+
+    public class Make2FAFactorDefaultParameter
+    {
+        public string FactorType { get; set; }
+    }
+
+    public class GetInputValidationsParameter
+    {
+        public string LanguageCode { get; set; }
+        public bool DefaultOnEmpty { get; set; }
+    }
+
+    public class GetPublisherUserParameter
+    {
+        public string UserId { get; set; }
+    }
+
+    public class GetUserInformationParameter
+    {
+        public string UserId { get; set; }
     }
 
     [DataContract]
@@ -641,7 +771,13 @@ namespace AccelByte.Models
         [DataMember] public string[] ChosenNamespaces { get; set; }
         [DataMember] public string OneTimeLinkCode { get; set; }
     }
-    
+
+    [DataContract]
+    public class GetConflictResultWhenLinkHeadlessAccountToFullAccountRequest
+    {
+        public string OneTimeLinkCode { get; set; }
+    }
+
     [DataContract]
     public class AccountProgressionInfo
     {
@@ -665,5 +801,11 @@ namespace AccelByte.Models
     {
         public string RefreshToken { get; set; }
         public DateTime ExpiredDate { get; set; }
+    }
+
+    public static class MaximumUserIds
+    {
+        /** Attributes that limit the user ids allowed to proceed with the request */
+        public const int UserIdsLimit = 40;
     }
 };

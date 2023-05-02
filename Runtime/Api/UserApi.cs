@@ -1,8 +1,6 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
-using System;
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -23,58 +21,67 @@ namespace AccelByte.Api
         /// BaseUrl==IamServerUrl
         /// (!) This will soon be replaced with ISession instead of UserSession
         /// </param>
-        public UserApi( IHttpClient httpClient
+        public UserApi(IHttpClient httpClient
             , Config config
-            , ISession session ) 
-            : base( httpClient, config, config.IamServerUrl, session )
+            , ISession session)
+            : this(httpClient, config, session, null)
         {
         }
 
-        public IEnumerator Register(RegisterUserRequest registerUserRequest
-            , ResultCallback<RegisterUserResponse> callback )
+        public UserApi( IHttpClient httpClient
+            , Config config
+            , ISession session
+            , HttpOperator httpOperator) 
+            : base( httpClient, config, config.IamServerUrl, session , httpOperator)
+        {
+        }
+
+        public void Register(RegisterUserRequest requestModel, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(registerUserRequest, "Register failed. registerUserRequest is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Register failed. registerUserRequest is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users";
-            
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(registerUserRequest.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<RegisterUserResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response => 
+            {
+                var result = response.TryParseJson<RegisterUserResponse>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Registerv2( RegisterUserRequestv2 registerUserRequest
-            , ResultCallback<RegisterUserResponse> callback )
+        public void RegisterV2(RegisterUserRequestv2 requestModel, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(registerUserRequest, "Register failed. registerUserRequest is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Register failed. registerUserRequest is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/public/namespaces/{namespace}/users")
-                .WithPathParam("namespace", Namespace_)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(registerUserRequest.ToUtf8Json())
-                .GetResult();
+                 .WithPathParam("namespace", Namespace_)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBody(requestModel.ToUtf8Json())
+                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<RegisterUserResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<RegisterUserResponse>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetData( ResultCallback<UserData> callback )
+        public void GetData(ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/users/me")
@@ -82,25 +89,25 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Update( UpdateUserRequest updateUserRequest
-            , ResultCallback<UserData> callback )
+        public void Update(UpdateUserRequest updateUserRequest, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(updateUserRequest, "Update failed. updateUserRequest is null!");
+            if (updateUserRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Update failed. updateUserRequest is null!"));
+                return;
+            }
             if (!string.IsNullOrEmpty(updateUserRequest.emailAddress))
             {
-                Error error = new Error(ErrorCode.BadRequest, 
-                    "Cannot update user email using this function. Use UpdateEmail instead.");
-                callback.TryError(error);
+                callback.TryError(new Error(ErrorCode.BadRequest,"Cannot update user email using this function. Use UpdateEmail instead."));
+                return;
             }
 
             var request = HttpRequestBuilder.CreatePatch(BaseUrl + "/v4/public/namespaces/{namespace}/users/me")
@@ -111,20 +118,21 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator UpdateEmail( UpdateEmailRequest updateEmailRequest
-            , ResultCallback callback )
+        public void UpdateEmail(UpdateEmailRequest updateEmailRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(updateEmailRequest, "Update failed. updateEmailRequest is null!");
+            if (updateEmailRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Update failed. updateEmailRequest is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder.CreatePut(BaseUrl + "/v4/public/namespaces/{namespace}/users/me/email")
                 .WithPathParam("namespace", Namespace_)
@@ -134,459 +142,568 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Upgrade( string username
-            , string password
-            , ResultCallback<UserData> callback )
+        public void Upgrade(UpgradeRequest requestModel, UpgradeParameter requestParameter, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(username, "Can't upgrade headless account! UserName parameter is null!");
-            Assert.IsNotNull(password, "Can't upgrade headless account! Password parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! request is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.EmailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! Email address/username parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.Password))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! password parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/me/headless/verify")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"password\": \"{1}\"}}", 
-                    username, 
-                    password))
+                .WithQueryParam("needVerificationCode", requestParameter.NeedVerificationCode ? "true" : "false")
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Upgradev2( string emailAddress
-            , string username
-            , string password
-            , ResultCallback<UserData> callback )
+        public void UpgradeV2(UpgradeV2Request requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(emailAddress, "Can't upgrade headless account! EmailAddress parameter is null!");
-            Assert.IsNotNull(username, "Can't upgrade headless account! UserName parameter is null!");
-            Assert.IsNotNull(password, "Can't upgrade headless account! Password parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! request is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.EmailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! EmailAddress parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.Password))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! password parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.Username))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! UserName parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v4/public/namespaces/{namespace}/users/me/headless/verify")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"password\": \"{1}\", \"username\": \"{2}\"}}", 
-                    emailAddress, 
-                    password, 
-                    username))
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator UpgradeAndVerifyHeadlessAccount( UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest
-            , ResultCallback<UserData> callback )
+        public void UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.code, 
-                "Can't upgrade the user! code parameter is null!");
-            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.emailAddress, 
-                "Can't upgrade the user! emailAddress parameter is null!");
-            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.password, 
-                "Can't upgrade the user! password parameter is null!");
-            Assert.IsNotNull(upgradeAndVerifyHeadlessRequest.username, 
-                "Can't upgrade the user! username parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! request is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.code))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! code parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.emailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! emailAddress parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.password))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! password parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.username))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! username parameter is null!"));
+            }
 
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/headless/code/verify";
-            
+
             var request = HttpRequestBuilder
                 .CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(upgradeAndVerifyHeadlessRequest.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator SendVerificationCode( VerificationContext context
-            , string emailAddress
-            , ResultCallback callback )
+        public void SendVerificationCode(SendVerificationCodeRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(emailAddress, 
-                "Can't send verification code! Username parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't send verification code! request is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(requestModel.EmailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't send verification code! Username parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/me/code/request")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"emailAddress\": \"{0}\", \"context\": \"{1:G}\"}}", 
-                    emailAddress, 
-                    context))
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Verify( string verificationCode
-            , string contactType
-            , ResultCallback callback )
+        public void Verify(VerifyRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(verificationCode, 
-                "Can't post verification code! VerificationCode parameter is null!");
-            Assert.IsNotNull(contactType, 
-                "Can't post verification code! ContactType parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't post verification code! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.VerificationCode))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't post verification code! Verification Code parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.ContactType))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't post verification code! Contact Type parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/me/code/verify")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(
-                    string.Format(
-                        "{{" + "\"code\": \"{0}\", " + "\"contactType\": \"{1}\"" + "}}",
-                        verificationCode,
-                        contactType))
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator SendPasswordResetCode( string emailAddress
-            , ResultCallback callback )
+        public void SendPasswordResetCode(SendPasswordResetCodeRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(emailAddress, 
-                "Can't request reset password code! emailAddress parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't request reset password code! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.EmailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't request reset password code! emailAddress parameter is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/forgot";
-            
+
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(string.Format("{{\"emailAddress\": \"{0}\"}}", emailAddress))
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator ResetPassword( string resetCode
-            , string emailAddress
-            , string newPassword
-            , ResultCallback callback )
+        public void ResetPassword(ResetPasswordRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            string jsonResetRequest = string.Format(
-                "{{" + "\"code\": \"{0}\"," + "\"emailAddress\": \"{1}\"," + "\"newPassword\": \"{2}\"" + "}}",
-                resetCode,
-                emailAddress,
-                newPassword);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't reset password! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.ResetCode))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't reset password! Reset Code parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.EmailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't reset password! Email address parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.NewPassword))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't reset password! New password parameter is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/reset";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(jsonResetRequest)
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator LinkOtherPlatform( PlatformType platformType
-            , string ticket
-            , ResultCallback callback )
+        public void LinkOtherPlatform(LinkOtherPlatformRequest requestModel, LinkOtherPlatformParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(ticket, 
-                "Can't link platform account! Password parameter is null!"); 
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.PlatformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! Platform Id parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.Ticket))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! Password parameter is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}";
-            
+
             var request = HttpRequestBuilder
                 .CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("platformId", platformType.ToString().ToLower())
-                .WithFormParam("ticket", ticket)
+                .WithPathParam("platformId", requestModel.PlatformId)
+                .WithFormParam("ticket", requestParameter.Ticket)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationForm)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }
-
-        public IEnumerator ForcedLinkOtherPlatform( PlatformType platformType
-            , string platformUserId
-            , ResultCallback callback )
-        {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(platformUserId, 
-                "Can't link platform account! platformUserId parameter is null!");
-
-            var linkedPlatformRequest = new LinkPlatformAccountRequest
+            httpOperator.SendRequest(request, response =>
             {
-                platformId = platformType.ToString().ToLower(),
-                platformUserId = platformUserId,
-            };
-
-            Result<UserData> userDataResult = null;
-            yield return GetData(r =>
-            {
-                userDataResult = r;
+                var result = response.TryParse();
+                callback.Try(result);
             });
-
-            var request = HttpRequestBuilder
-                .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/platforms/link")
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userDataResult.Value.userId)
-                .WithBearerAuth(Session.AuthorizationToken)
-                .Accepts(MediaType.ApplicationJson)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(linkedPlatformRequest.ToUtf8Json())
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
         }
 
         /// <summary>
         /// </summary>
-        /// <param name="platformType"></param>
+        /// <param name="requestModel"></param>
         /// <param name="callback"></param>
-        /// <param name="inNamespace">Potentially different than base.Namespace_</param>
         /// <returns></returns>
-        public IEnumerator UnlinkOtherPlatform( PlatformType platformType
-            , ResultCallback callback
-            , string inNamespace = "" )
+        public void ForcedLinkOtherPlatform(LinkPlatformAccountRequest requestModel, LinkPlatformAccountParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.platformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! Platform Id parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.platformUserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! Platform User Id parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.UserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! User Id parameter is null!"));
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/platforms/link")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", requestParameter.UserId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestModel.ToUtf8Json())
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
+        }
+
+        public void UnlinkOtherPlatform(UnlinkPlatformAccountRequest requestModel, UnlinkPlatformAccountParameter requestParameter, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't unlink platform account! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.PlatformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't unlink platform account! Platform Id parameter is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}";
 
-            inNamespace = string.IsNullOrEmpty( inNamespace ) ? Namespace_ : inNamespace;
+            string inNamespace = string.IsNullOrEmpty(requestModel.platformNamespace) ? Namespace_ : requestModel.platformNamespace;
 
             var builder = HttpRequestBuilder
                 .CreateDelete(url)
                 .WithPathParam("namespace", inNamespace)
-                .WithPathParam("platformId", platformType.ToString().ToLower())
+                .WithPathParam("platformId", requestParameter.PlatformId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson);
 
-            if(!string.IsNullOrEmpty(inNamespace))
+            if (!string.IsNullOrEmpty(requestModel.platformNamespace))
             {
-                UnlinkPlatformAccountRequest unlinkPlatformAccountRequest = new UnlinkPlatformAccountRequest
-                {
-                    platformNamespace = inNamespace,
-                };
-                builder.WithBody(unlinkPlatformAccountRequest.ToUtf8Json());
+                builder.WithBody(requestModel.ToUtf8Json());
             }
 
-            var request = builder.GetResult();
+            IHttpRequest request = builder.GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetPlatformLinks( string userId
-            , ResultCallback<PagedPlatformLinks> callback )
+        public void GetPlatformLinks(GetPlatformLinkRequest requestModel, ResultCallback<PagedPlatformLinks> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get platform link! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.UserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get platform account link! User Id parameter is null!"));
+                return;
+            }
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/platforms")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
+                .WithPathParam("userId", requestModel.UserId)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PagedPlatformLinks>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PagedPlatformLinks>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator SearchUsers( string query
-            , SearchType by
-            , ResultCallback<PagedPublicUsersInfo> callback
-            , int offset
-            , int limit)
+        public void SearchUsers(SearchUsersRequest requestModel, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(query, nameof(query) + " cannot be null.");
 
-            string[] filter = { "", "displayName", "username" };
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.Query))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Query parameter is null!"));
+                return;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("query", query)
-                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
-                .WithQueryParam( "limit", ( limit >= 0 ) ? limit.ToString() : "" )
+                .WithQueryParam("query", requestModel.Query)
+                .WithQueryParam("offset", (requestModel.Offset >= 0) ? requestModel.Offset.ToString() : "")
+                .WithQueryParam("limit", (requestModel.Limit >= 0) ? requestModel.Limit.ToString() : "")
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
+            
+            if (requestModel.SearchBy != SearchType.ALL)
+            {
+                builder.WithQueryParam("by", requestModel.FilterType[(int)requestModel.SearchBy]);
+            }
 
-            if (by != SearchType.ALL) builder.WithQueryParam("by", filter[(int)by]);
+            IHttpRequest request = builder.GetResult();
 
-            var request = builder.GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PagedPublicUsersInfo>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PagedPublicUsersInfo>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetUserByUserId( string userId
-            , ResultCallback<PublicUserData> callback )
+        public void GetUserByUserId(GetUserByUserIdRequest requestModel, ResultCallback<PublicUserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Can't get user data! userId parameter is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.UserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! User Id parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
+                .WithPathParam("userId", requestModel.UserId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<PublicUserData> result = response.TryParseJson<PublicUserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PublicUserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetUserByOtherPlatformUserId( PlatformType platformType
-            , string otherPlatformUserId
-            , ResultCallback<UserData> callback )
+        public void GetUserByOtherPlatformUserId(GetUserByOtherPlatformUserIdRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(otherPlatformUserId, nameof(otherPlatformUserId) + " cannot be null.");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.PlatformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform Id is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.PlatformUserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform User Ids is null!"));
+                return;
+            }
 
             string url = BaseUrl + "/v3/public/namespaces/{namespace}/platforms/{platformId}/users/{platformUserId}";
-                
+
             var request = HttpRequestBuilder
                 .CreateGet(url)
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("platformId", platformType.ToString().ToLower())
-                .WithPathParam("platformUserId", otherPlatformUserId)
+                .WithPathParam("platformId", requestModel.PlatformId)
+                .WithPathParam("platformUserId", requestModel.PlatformUserId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<UserData> result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator BulkGetUserByOtherPlatformUserIds( PlatformType platformType
-            , BulkPlatformUserIdRequest otherPlatformUserId
-            , ResultCallback<BulkPlatformUserIdResponse> callback )
+        public void BulkGetUserByOtherPlatformUserIds(BulkPlatformUserIdRequest requestModel, BulkPlatformUserIdParameter requestParameter, ResultCallback<BulkPlatformUserIdResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(otherPlatformUserId, nameof(otherPlatformUserId) + " cannot be null.");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.PlatformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform Id is null!"));
+                return;
+            }
+            if (requestModel.platformUserIDs == null || requestModel.platformUserIDs.Length == 0)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform User Ids are null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/platforms/{platformId}/users")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("platformId", platformType.ToString().ToLower())
+                .WithPathParam("platformId", requestParameter.PlatformId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(otherPlatformUserId.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<BulkPlatformUserIdResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<BulkPlatformUserIdResponse>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetCountryFromIP( ResultCallback<CountryInfo> callback )
+        public void GetCountryFromIP(ResultCallback<CountryInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -594,121 +711,144 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v3/location/country")
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<CountryInfo>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<CountryInfo>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator BulkGetUserInfo( string[] userIds
-            , ResultCallback<ListBulkUserInfoResponse> callback )
+        public void BulkGetUserInfo(ListBulkUserInfoRequest requestModel, ResultCallback<ListBulkUserInfoResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userIds, "userIds cannot be null.");
-
-            ListBulkUserInfoRequest bulkUserInfoRequest = new ListBulkUserInfoRequest
+            if (requestModel == null)
             {
-                userIds = userIds,
-            };
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (requestModel.userIds == null || requestModel.userIds.Length == 0)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! User Ids are null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/bulk/basic")
                 .WithPathParam("namespace", Namespace_)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(bulkUserInfoRequest.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<ListBulkUserInfoResponse> result = response.TryParseJson<ListBulkUserInfoResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<ListBulkUserInfoResponse>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Change2FAFactor( string mfaToken
-            , TwoFAFactorType factor
-            , ResultCallback<TokenData> callback )
+        public void Change2FAFactor(Change2FAFactorParameter requestModel, ResultCallback<TokenData> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't change MFA Factor! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.MfaToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't change MFA Factor! Mfa Token parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.Factor))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't change MFA Factor! Factor parameter is null!"));
+                return;
+            }
+
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/mfa/factor/change")
                 .WithBearerAuth(AuthToken)
-                .WithFormParam("mfaToken", mfaToken)
-                .WithFormParam("factor", factor.GetString())
+                .WithFormParam("mfaToken", requestModel.MfaToken)
+                .WithFormParam("factor", requestModel.Factor)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<TokenData> result = response.TryParseJson<TokenData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<TokenData>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Disable2FAAuthenticator( ResultCallback callback )
+        public void Disable2FAAuthenticator(ResultCallback callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/disable";
             var request = HttpRequestBuilder.CreateDelete(url)
                 .WithPathParam("namespace", Namespace_)
-                .WithBearerAuth(AuthToken) 
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Enable2FAAuthenticator( string code
-            , ResultCallback callback )
+        public void Enable2FAAuthenticator(Enable2FAAuthenticatorParameter requestModel, ResultCallback callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't enable MFA! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.Code))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't enable MFA! Code parameter is null!"));
+                return;
+            }
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/enable";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
-                .WithFormParam("code", code)
+                .WithFormParam("code", requestModel.Code)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GenerateSecretKeyFor3rdPartyAuthenticateApp( ResultCallback<SecretKey3rdPartyApp> callback )
+        public void GenerateSecretKeyFor3rdPartyAuthenticateApp(ResultCallback<SecretKey3rdPartyApp> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/key";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
-                .WithBearerAuth(AuthToken) 
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result< SecretKey3rdPartyApp> result = response.TryParseJson<SecretKey3rdPartyApp>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SecretKey3rdPartyApp>();
+                callback.Try(result);
+            });
         }
-        
-        public IEnumerator GenerateBackUpCode( ResultCallback<TwoFACode> callback )
+
+        public void GenerateBackUpCode(ResultCallback<TwoFACode> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
@@ -716,17 +856,17 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result); 
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<TwoFACode>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator Disable2FABackupCodes( ResultCallback callback )
+        public void Disable2FABackupCodes(ResultCallback callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/disable";
             var request = HttpRequestBuilder.CreateDelete(url)
                 .WithPathParam("namespace", Namespace_)
@@ -734,17 +874,17 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
-        
-        public IEnumerator Enable2FABackupCodes( ResultCallback<TwoFACode> callback )
+
+        public void Enable2FABackupCodes(ResultCallback<TwoFACode> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/enable";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
@@ -752,209 +892,247 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result); 
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<TwoFACode>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetBackUpCode( ResultCallback<TwoFACode> callback )
+        public void GetBackUpCode(ResultCallback<TwoFACode> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode";
             var request = HttpRequestBuilder.CreateGet(url)
                 .WithPathParam("namespace", Namespace_)
-                .WithBearerAuth(AuthToken) 
+                .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<TwoFACode> result = response.TryParseJson<TwoFACode>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<TwoFACode>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator GetUserEnabledFactors( ResultCallback<Enable2FAFactors> callback )
+        public void GetUserEnabledFactors(ResultCallback<Enable2FAFactors> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/factor";
-            
+
             var request = HttpRequestBuilder.CreateGet(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result<Enable2FAFactors> result = response.TryParseJson<Enable2FAFactors>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<Enable2FAFactors>();
+                callback.Try(result);
+            });
         }
-        
-        public IEnumerator Make2FAFactorDefault( TwoFAFactorType factor
-            , ResultCallback callback )
+
+        public void Make2FAFactorDefault(Make2FAFactorDefaultParameter requestModel, ResultCallback callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't set default MFA! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.FactorType))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't set default MFA! Factor Type parameter is null!"));
+                return;
+            }
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/factor";
-            
+
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
-                .WithFormParam("factor", factor.GetString())
+                .WithFormParam("factor", requestModel.FactorType)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
+        }
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            Result result = response.TryParse();
-            callback.Try(result);
-        }      
-
-        public IEnumerator GetInputValidations( string languageCode
-            , ResultCallback<InputValidation> callback
-            , bool defaultOnEmpty = true )
+        public void GetInputValidations(GetInputValidationsParameter requestModel, ResultCallback<InputValidation> callback)
         {
-            Assert.IsNotNull(languageCode, nameof(languageCode) + " cannot be null");
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't request input validation! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.LanguageCode))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't request input validation! Language Code parameter is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder
                .CreateGet(BaseUrl + "/v3/public/inputValidations")
-               .WithQueryParam("languageCode", languageCode)
-               .WithQueryParam("defaultOnEmpty", defaultOnEmpty ? "true" : "false")
+               .WithQueryParam("languageCode", requestModel.LanguageCode)
+               .WithQueryParam("defaultOnEmpty", requestModel.DefaultOnEmpty ? "true" : "false")
                .WithBearerAuth(AuthToken)
                .Accepts(MediaType.ApplicationJson)
                .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<InputValidation>();
-
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<InputValidation>();
+                callback.Try(result);
+            });
         }
 
-        public IEnumerator UpdateUser(UpdateUserRequest updateUserRequest
-            , ResultCallback<UserData> callback)
+        public void UpdateUser(UpdateUserRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(updateUserRequest, "Update failed. updateEmailRequest is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't update user! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.emailAddress))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Cannot update user email using this function. Use UpdateEmail instead."));
+                return;
+            }
 
             var request = HttpRequestBuilder.CreatePut(BaseUrl + "/v3/public/namespaces/{namespace}/users/me")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(updateUserRequest.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback.Try(result);
+            });
         }
-        
-        public IEnumerator GetPublisherUser(string userId
-            , ResultCallback<GetPublisherUserResponse> callback)
+
+        public void GetPublisherUser(GetPublisherUserParameter requestModel, ResultCallback<GetPublisherUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Get Publisher User failed. userId is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Get Publisher User failed! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.UserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Get Publisher User failed. User Id is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/publisher")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
+                .WithPathParam("userId", requestModel.UserId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<GetPublisherUserResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetPublisherUserResponse>();
+                callback.Try(result);
+            });
         }
-        public IEnumerator GetUserInformation(string userId
-            , ResultCallback<GetUserInformationResponse> callback)
+
+        public void GetUserInformation(GetUserInformationParameter requestModel, ResultCallback<GetUserInformationResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Get User Information failed. userId is null!");
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Get User Information failed! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.UserId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Get User Information failed. User Id is null!"));
+                return;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}/information")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
+                .WithPathParam("userId", requestModel.UserId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<GetUserInformationResponse>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetUserInformationResponse>();
+                callback.Try(result);
+            });
         }
-        
-        public IEnumerator LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest linkHeadlessAccountRequest
-            , ResultCallback callback)
+
+        public void LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't link account! request is null!"));
+                return;
+            }
+
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/users/me/headless/linkWithProgression")
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(linkHeadlessAccountRequest.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            httpOperator.SendRequest(request, response =>
             {
-                response = rsp;
+                var result = response.TryParse();
+                callback.Try(result);
             });
-
-            Result result = response.TryParse();
-            callback.Try(result);
         }
-        
-        public IEnumerator GetConflictResultWhenLinkHeadlessAccountToFullAccount(string oneTimeLinkCode
-            , ResultCallback<ConflictLinkHeadlessAccountResult> callback)
+
+        public void GetConflictResultWhenLinkHeadlessAccountToFullAccount(
+            GetConflictResultWhenLinkHeadlessAccountToFullAccountRequest requestModel,
+            ResultCallback<ConflictLinkHeadlessAccountResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
+            if (requestModel == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get headless link conflict. request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.OneTimeLinkCode))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't get headless link conflict. One Time Link Code is null!"));
+                return;
+            }
+
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/users/me/headless/link/conflict")
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithQueryParam("oneTimeLinkCode", oneTimeLinkCode)
+                .WithQueryParam("oneTimeLinkCode", requestModel.OneTimeLinkCode)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            httpOperator.SendRequest(request, response =>
             {
-                response = rsp;
+                var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
+                callback.Try(result);
             });
-
-            var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
-            callback.Try(result);
         }
     }
 }

@@ -19,11 +19,7 @@ namespace AccelByte.Server
 
         private string serverName = "";
         private string matchSessionId = "";
-        private bool isHeartBeatAutomatic;
-        private float heartbeatTimeoutSeconds;
-        private uint heartbeatErrorRetry;
         private Coroutine heartBeatCoroutine;
-        private uint heartbeatRetryCount = 0;
 
         internal DedicatedServerManager( DedicatedServerManagerApi inApi
             , ISession inSession

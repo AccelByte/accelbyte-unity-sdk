@@ -32,6 +32,58 @@ namespace AccelByte.Models
         MIN,
         MAX
     }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum StatisticCycleType
+    {
+        None,
+        [EnumMember(Value= "DAILY")]
+        Daily,
+        [EnumMember(Value= "WEEKLY")]
+        Weekly,
+        [EnumMember(Value= "MONTHLY")]
+        Monthly,
+        [EnumMember(Value= "ANNUALLY")]
+        Annually,
+        [EnumMember(Value= "SEASONAL")]
+        Seasonal
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum StatisticCycleStatus
+    {
+        None,
+        [EnumMember(Value = "INIT")]
+        Init,
+        [EnumMember(Value = "ACTIVE")]
+        Active,
+        [EnumMember(Value = "STOPPED")]
+        Stopped
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum StatisticSortBy
+    {
+        None,
+        [EnumMember(Value = "STAT_CODE")]
+        StatCode,
+        [EnumMember(Value = "STAT_CODE_ASC")]
+        StatCodeAsc,
+        [EnumMember(Value = "STAT_CODE_DESC")]
+        StatCodeDesc,
+        [EnumMember(Value = "CREATED_AT")]
+        CreatedAt,
+        [EnumMember(Value = "CREATED_AT_ASC")]
+        CreatedAtAsc,
+        [EnumMember(Value = "CREATED_AT_DESC")]
+        CreatedAtDesc,
+        [EnumMember(Value = "UPDATED_AT")]
+        UpdatedAt,
+        [EnumMember(Value = "UPDATED_AT_ASC")]
+        UpdatedAtAsc,
+        [EnumMember(Value = "UPDATED_AT_DESC")]
+        UpdatedAtDesc,
+    }
 
     [DataContract]
     public class StatConfig
@@ -49,6 +101,8 @@ namespace AccelByte.Models
         [DataMember] public string statCode { get; set; }
         [DataMember] public StatisticStatus status { get; set; }
         [DataMember] public string updatedAt { get; set; }
+        [DataMember] public string[] cycleIds { get; set; }
+        [DataMember] public string[] tags { get; set; }
     }
 
     [DataContract]
@@ -62,6 +116,7 @@ namespace AccelByte.Models
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string updatedAt { get; set; }
         [DataMember] public float value { get; set; }
+        [DataMember] public Dictionary<string, object> additionalData { get; set; }
     }
 
     [DataContract]
@@ -140,6 +195,25 @@ namespace AccelByte.Models
         [DataMember] public float value { get; set; }
     }
 
+    public class StatItemValue
+    {
+        [DataMember] public string StatCode { get; set; }
+        [DataMember] public string StatName { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public float Value { get; set; }
+        [DataMember] public string[] Tags { get; set; }
+        [DataMember] public string CreatedAt { get; set; }
+        [DataMember] public string UpdatedAt { get; set; }
+        [DataMember] public Dictionary<string, object> AdditionalData { get; set; }
+        [DataMember] public string UserId { get; set; }
+    }
+
+    public class FetchUserStatistic
+    {
+        [DataMember] public StatItemValue[] UserStatistic { get; set; }
+        [DataMember] public string[] NotProcessedUserIds { get; set; }
+    }
+
     public class UpdateUserStatItem
     {
         [DataMember] public string userId { get; set; }
@@ -193,5 +267,58 @@ namespace AccelByte.Models
         [DataMember] public string[] tags { get; set; }
         [DataMember] public string createdAt { get; set; }
         [DataMember] public string updatedAt { get; set; }
+    }
+    
+    
+    [DataContract]
+    public class StatCycleConfig
+    {
+        [DataMember] public string Id { get; set; }
+        [DataMember] public string Namespace { get; set; }
+        [DataMember] public StatisticCycleType CycleType { get; set; } 
+        [DataMember] public string Name { get; set; }
+        [DataMember] public string Description { get; set; }
+        [DataMember] public string ResetTime { get; set; }
+        [DataMember] public int ResetDay { get; set; }
+        [DataMember] public int ResetDate { get; set; }
+        [DataMember] public int ResetMonth { get; set; }
+        [DataMember] public int SeasonPeriod { get; set; }
+        [DataMember] public int CurrentVersion { get; set; }
+        [DataMember] public StatisticCycleStatus Status { get; set; }
+        [DataMember] public string NextReset { get; set; }
+        [DataMember] public string Start { get; set; }
+        [DataMember] public string End { get; set; }
+        [DataMember] public string CreatedAt { get; set; }
+        [DataMember] public string UpdatedAt { get; set; }
+    }
+
+    [DataContract]
+    public class PagedStatCycleConfigs
+    {
+        [DataMember] public StatCycleConfig[] Data { get; set; }
+        [DataMember] public Paging Paging { get; set; }
+    }
+    
+    [DataContract]
+    public class StatCycleItem
+    {
+        [DataMember] public string CreatedAt { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember] public string UserId { get; set; }
+        [DataMember] public string StatCode { get; set; }
+        [DataMember] public string StatName { get; set; }
+        [DataMember] public string[] Tags { get; set; }
+        [DataMember] public string UpdatedAt { get; set; }
+        [DataMember] public float Value { get; set; }
+        [DataMember] public string CycleId { get; set; }
+        [DataMember] public string CycleName { get; set; }
+        [DataMember] public int CycleVersion { get; set; }
+    }
+
+    [DataContract]
+    public class PagedStatCycleItem
+    {
+        [DataMember] public StatCycleItem[] Data { get; set; }
+        [DataMember] public Paging Paging { get; set; }
     }
 }

@@ -19,16 +19,19 @@ namespace AccelByte.Core
         /// TODO: Do we want this private, then just make protected Getters() for Config.x?
         /// </summary>
         internal readonly Config Config;
-        
+        protected HttpOperator httpOperator;
+
         protected ApiBase( IHttpClient inHttpClient
             , Config inConfig
             , string inBaseUrl
-            , ISession inSession )
+            , ISession inSession
+            , HttpOperator httpOperator = null)
             : base( inHttpClient, inSession, inBaseUrl )
         {
             Assert.IsNotNull(inConfig, $"Creating {GetType().Name} failed. " +
                 "Parameter `inConfig` is null");
             Config = inConfig;
+            this.httpOperator = httpOperator != null ? httpOperator : new HttpAsyncOperator(inHttpClient);
         }
         #endregion /Constructor
 

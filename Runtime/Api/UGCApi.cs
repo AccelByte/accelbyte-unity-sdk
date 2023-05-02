@@ -28,6 +28,92 @@ namespace AccelByte.Api
         {
         }
 
+        /// <summary>
+        /// Convert UGC Sort By Enum to String Value
+        /// </summary>
+        private string ConvertUGCSortByToString(UGCSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case UGCSortBy.NAME:
+                    return "name";
+                case UGCSortBy.DATE:
+                    return "date";
+                case UGCSortBy.DOWNLOAD:
+                    return "download";
+                case UGCSortBy.LIKE:
+                    return "like";
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Convert UGC Order By Enum to String Value
+        /// </summary>
+        private string ConvertUGCOrderByToString(UGCOrderBy orderBy)
+        {
+            switch (orderBy)
+            {
+                case UGCOrderBy.ASC:
+                    return "name";
+                case UGCOrderBy.DESC:
+                    return "date";
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Convert Get UGC Contents Sort From Enum to String Value
+        /// </summary>
+        private string ConvertGetUGCContentsSortByToString(UGCContentSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case UGCContentSortBy.Name:
+                    return "name";
+                case UGCContentSortBy.NameAsc:
+                    return "name:asc";
+                case UGCContentSortBy.NameDesc:
+                    return "name:desc";
+                case UGCContentSortBy.Download:
+                    return "download";
+                case UGCContentSortBy.DownloadAsc:
+                    return "download:asc";
+                case UGCContentSortBy.DownloadDesc:
+                    return "download:desc";
+                case UGCContentSortBy.Like:
+                    return "like";
+                case UGCContentSortBy.LikeAsc:
+                    return "like:asc";
+                case UGCContentSortBy.LikeDesc:
+                    return "like:desc";
+                case UGCContentSortBy.CreatedTime:
+                    return "createdTime";
+                case UGCContentSortBy.CreatedTimeAsc:
+                    return "createdTime:asc";
+                case UGCContentSortBy.CreatedTimeDesc:
+                    return "createdTime:desc";
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Convert Get UGC Downloader Sort From Enum to String Value
+        /// </summary>
+        private string ConvertGetUGCDownloaderSortByToString(UGCContentDownloaderSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case UGCContentDownloaderSortBy.CreatedTime:
+                    return "createdTime";
+                case UGCContentDownloaderSortBy.CreatedTimeAsc:
+                    return "createdTime:asc";
+                case UGCContentDownloaderSortBy.CreatedTimeDesc:
+                    return "createdTime:desc";
+            }
+            return "";
+        }
+
         public IEnumerator CreateContent( string userId
             , string channelId
             , UGCRequest createRequest
@@ -105,7 +191,7 @@ namespace AccelByte.Api
         public IEnumerator ModifyContent( string userId
             , string channelId
             , string contentId
-            , UGCRequest modifyRequest
+            , UGCUpdateRequest modifyRequest
             , ResultCallback<UGCResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -116,10 +202,10 @@ namespace AccelByte.Api
             Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
             Assert.IsNotNull(modifyRequest, "Can't modify content! type parameter is null!");
 
-            UGCRequest Req = modifyRequest;
-            if (string.IsNullOrEmpty(Req.contentType))
+            UGCUpdateRequest Req = modifyRequest;
+            if (string.IsNullOrEmpty(Req.ContentType))
             {
-                Req.contentType = "application/octet-stream";
+                Req.ContentType = "application/octet-stream";
             }
 
             var request = HttpRequestBuilder
@@ -141,6 +227,37 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<UGCResponse>();
             callback.Try(result);
+        }
+
+        public IEnumerator ModifyContent( string userId
+            , string channelId
+            , string contentId
+            , UGCRequest modifyRequest
+            , ResultCallback<UGCResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
+            Assert.IsNotNull(userId, "Can't modify content! UserId parameter is null!");
+            Assert.IsNotNull(AuthToken, "Can't modify content! AccessToken parameter is null!");
+            Assert.IsNotNull(channelId, "Can't modify content! channelId parameter is null!");
+            Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
+            Assert.IsNotNull(modifyRequest, "Can't modify content! type parameter is null!");
+
+            UGCUpdateRequest Req = new UGCUpdateRequest
+            {
+                Name = modifyRequest.name,
+                Type = modifyRequest.type,
+                Subtype = modifyRequest.subtype,
+                Tags = modifyRequest.tags,
+                Preview = modifyRequest.preview,
+                FileExtension = modifyRequest.fileExtension,
+                ContentType = modifyRequest.contentType,
+                PreviewMetadata = modifyRequest.PreviewMetadata,
+                CustomAttributes = modifyRequest.customAttributes,
+                UpdateContentFile = true
+            };
+
+            yield return ModifyContent(userId, channelId, contentId, Req, callback);
         }
 
         public IEnumerator ModifyContent( string userId
@@ -198,8 +315,8 @@ namespace AccelByte.Api
                  .WithQueryParam("subtype", searchContentRequest.subtype)
                  .WithQueryParam("tags", string.Join(",", searchContentRequest.tags))
                  .WithQueryParam("isOfficial", searchContentRequest.isOfficial ? "true" : "false")
-                 .WithQueryParam("sortBy", searchContentRequest.sortBy.ToString())
-                 .WithQueryParam("orderBy", searchContentRequest.orderBy.ToString())
+                 .WithQueryParam("sortBy", ConvertUGCSortByToString(searchContentRequest.sortBy))
+                 .WithQueryParam("orderBy", ConvertUGCOrderByToString(searchContentRequest.orderBy))
                  .WithQueryParam("offset", searchContentRequest.offset >= 0 ? searchContentRequest.offset.ToString() : string.Empty)
                  .WithQueryParam("limit", searchContentRequest.limit >= 0 ? searchContentRequest.limit.ToString() : string.Empty)
                  .WithQueryParam("userId", userId)
@@ -235,8 +352,8 @@ namespace AccelByte.Api
                  .WithQueryParam("subtype", searchContentRequest.subtype)
                  .WithQueryParam("tags", string.Join(",", searchContentRequest.tags))
                  .WithQueryParam("isOfficial", searchContentRequest.isOfficial ? "true" : "false")
-                 .WithQueryParam("sortBy", searchContentRequest.sortBy.ToString())
-                 .WithQueryParam("orderBy", searchContentRequest.orderBy.ToString())
+                 .WithQueryParam("sortBy", ConvertUGCSortByToString(searchContentRequest.sortBy))
+                 .WithQueryParam("orderBy", ConvertUGCOrderByToString(searchContentRequest.orderBy))
                  .WithQueryParam("offset", searchContentRequest.offset >= 0 ? searchContentRequest.offset.ToString() : string.Empty)
                  .WithQueryParam("limit", searchContentRequest.limit >= 0 ? searchContentRequest.limit.ToString() : string.Empty)
                  .WithQueryParam("userId", userId)
@@ -782,8 +899,8 @@ namespace AccelByte.Api
                 .WithQueryParam("isOfficial", getLikedContentRequest.isOfficial ? "true" : "false")
                 .WithQueryParam("limit", getLikedContentRequest.limit >= 0 ? getLikedContentRequest.limit.ToString() : string.Empty)
                 .WithQueryParam("offset", getLikedContentRequest.offset >= 0 ? getLikedContentRequest.offset.ToString() : string.Empty)
-                .WithQueryParam("sortBy", getLikedContentRequest.sortBy.ToString())
-                .WithQueryParam("orderBy", getLikedContentRequest.orderBy.ToString())
+                .WithQueryParam("sortBy", ConvertUGCSortByToString(getLikedContentRequest.sortBy))
+                .WithQueryParam("orderBy", ConvertUGCOrderByToString(getLikedContentRequest.orderBy))
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

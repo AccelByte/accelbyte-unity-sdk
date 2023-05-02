@@ -389,13 +389,14 @@ namespace AccelByte.Api
 
         private string GetHashSessionPassword(string password)
         {
+            string retval = string.Empty;
             using (MD5 md5 = MD5.Create())
             {
                 var bytesPassword = Encoding.UTF8.GetBytes(password);
                 byte[] computeHash = md5.ComputeHash(bytesPassword);
-                return System.BitConverter.ToString(computeHash);
+                retval = System.BitConverter.ToString(computeHash);
             }
-            return "";
+            return retval;
         }
     }
 }

@@ -30,9 +30,9 @@ namespace AccelByte.Models
         ASC = 0,
         DESC
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum UGCFileExtension 
+    public enum UGCFileExtension
     {
         PJP,
         JPG,
@@ -40,6 +40,31 @@ namespace AccelByte.Models
         JFIF,
         BMP,
         PNG
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCContentSortBy
+    {
+        Name,
+        NameAsc,
+        NameDesc,
+        Download,
+        DownloadAsc,
+        DownloadDesc,
+        Like,
+        LikeAsc,
+        LikeDesc,
+        CreatedTime,
+        CreatedTimeAsc,
+        CreatedTimeDesc
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCContentDownloaderSortBy
+    {
+        CreatedTime,
+        CreatedTimeAsc,
+        CreatedTimeDesc
     }
 
     #endregion
@@ -85,6 +110,13 @@ namespace AccelByte.Models
     }
 
     [DataContract]
+    public class UGCPreviewMetadata
+    {
+        [DataMember] public string PreviewContentType { get; set; }
+        [DataMember] public string PreviewFileExtension { get; set; }
+    }
+
+    [DataContract]
     public class UGCRequest
     {
         [DataMember] public string contentType { get; set; }
@@ -95,6 +127,22 @@ namespace AccelByte.Models
         [DataMember] public string subtype { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public UGCPreviewMetadata PreviewMetadata { get; set; }
+    }
+
+    [DataContract]
+    public class UGCUpdateRequest
+    {
+        [DataMember] public string ContentType { get; set; }
+        [DataMember] public string FileExtension { get; set; }
+        [DataMember] public string Name { get; set; }
+        [DataMember] public string Preview { get; set; }
+        [DataMember] public string Type { get; set; }
+        [DataMember] public string Subtype { get; set; }
+        [DataMember] public string[] Tags { get; set; }
+        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
+        [DataMember] public UGCPreviewMetadata PreviewMetadata { get; set; }
+        [DataMember] public bool UpdateContentFile { get; set; }
     }
 
     [DataContract]
@@ -177,7 +225,7 @@ namespace AccelByte.Models
         [DataMember] public bool state { get; set; }
         [DataMember] public string userId { get; set; }
     }
-    
+
     [DataContract]
     public class UGCGetCreatorStatsResponse
     {
@@ -195,7 +243,7 @@ namespace AccelByte.Models
         [DataMember] public string source { get; set; }
         [DataMember] public string url { get; set; }
     }
-    
+
     [DataContract]
     public class ScreenshotRequest
     {
@@ -203,7 +251,7 @@ namespace AccelByte.Models
         [DataMember] public string description { get; set; }
         [DataMember] public UGCFileExtension fileExtension { get; set; }
     }
-    
+
     [DataContract]
     public class ScreenshotsRequest
     {
@@ -220,7 +268,7 @@ namespace AccelByte.Models
         [DataMember] public string source { get; set; }
         [DataMember] public string url { get; set; }
     }
-    
+
     [DataContract]
     public class ScreenshotsResponse
     {
@@ -236,12 +284,12 @@ namespace AccelByte.Models
         [DataMember] public string subtype { get; set; }
         [DataMember] public string[] tags { get; set; }
         [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; //default to sorting criteria = date
-        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; //default to sorting order = desc
+        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; // Default to sorting criteria = date
+        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; // Default to sorting order = desc
         [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
-        [DataMember] public int offset { get; set; } = 0; //Default value = 0
+        [DataMember] public int offset { get; set; } = 0; // Default value = 0
     }
-    
+
     [DataContract]
     public class GetLikedContentRequest
     {
@@ -251,9 +299,9 @@ namespace AccelByte.Models
         [DataMember] public string subtype { get; set; }
         [DataMember] public bool isOfficial { get; set; }
         [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
-        [DataMember] public int offset { get; set; } = 0; //Default value = 0
-        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; //default to sorting criteria = date
-        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; //default to sorting order = desc
+        [DataMember] public int offset { get; set; } = 0; // Default value = 0
+        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; // Default to sorting criteria = date
+        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; // Default to sorting order = desc
     }
 
     [DataContract]
@@ -292,7 +340,7 @@ namespace AccelByte.Models
         [DataMember] public UGCModelsContentsResponse[] data { get; set; }
         [DataMember] public Paging paging { get; set; }
     }
-    
+
     [DataContract]
     public class UGCContentsPagingResponse
     {
@@ -330,7 +378,7 @@ namespace AccelByte.Models
         [DataMember] public bool followStatus { get; set; }
         [DataMember] public string userId { get; set; }
     }
-    
+
     [DataContract]
     public class UGCGetUserGroupsResponse
     {
@@ -341,7 +389,7 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string userId { get; set; }
     }
-    
+
     [DataContract]
     public class UGCGetUserGroupsPagingResponse
     {

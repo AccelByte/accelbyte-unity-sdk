@@ -28,7 +28,7 @@ namespace AccelByte.Core
         bool twoFAEnable { get; set; } = false; //Set false for DSSession
 
         // To be set by OAuth and allow UserSession call the Refresh API call
-        internal Func<string, ResultCallback<TokenData, OAuthError>, IEnumerator> CallRefresh;
+        internal System.Action<string, ResultCallback<TokenData, OAuthError>> CallRefresh;
 
         //Token Related Functions
 

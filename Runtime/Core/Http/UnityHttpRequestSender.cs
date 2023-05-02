@@ -4,47 +4,42 @@
 
 using System;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace AccelByte.Core
 {
     internal class UnityHttpRequestSender : IHttpRequestSender
     {
-        public IEnumerator Send(IHttpRequest request, Action<IHttpResponse, Error> callback, int timeoutMs)
+        WebRequestScheduler httpTaskScheduler;
+        public UnityHttpRequestSender(WebRequestScheduler httpTaskScheduler)
         {
-            using (UnityWebRequest unityWebRequest = request.GetUnityWebRequest())
+            this.httpTaskScheduler = httpTaskScheduler;
+        }
+
+        public void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs = 0)
+        {
+            System.Action<float> onGameUpdate = null;
+
+            onGameUpdate = (deltaTime) =>
             {
+                AccelByteSDKMain.OnGameUpdate -= onGameUpdate;
+
+                UnityWebRequest unityWebRequest = request.GetUnityWebRequest();
                 unityWebRequest.timeout = timeoutMs / 1000;
 
-                Report.GetHttpRequest(request, unityWebRequest);
-
-                yield return unityWebRequest.SendWebRequest();
-
-                Report.GetHttpResponse(unityWebRequest);
-
-#if UNITY_2020_3_OR_NEWER
-                switch (unityWebRequest.result)
+                WebRequestTask newTask = new WebRequestTask(request, unityWebRequest, delayTimeMs)
                 {
-                case UnityWebRequest.Result.Success:
-                case UnityWebRequest.Result.ProtocolError:
-                case UnityWebRequest.Result.DataProcessingError:
-                    callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
-                    break;
-                case UnityWebRequest.Result.ConnectionError:
-                    callback?.Invoke(null, new Error(ErrorCode.NetworkError));
-                    break;
-                }
-#else
-                if (unityWebRequest.isNetworkError)
-                {
-                    callback?.Invoke(null, new Error(ErrorCode.NetworkError));
-                }
-                else
-                {
-                    callback?.Invoke(unityWebRequest.GetHttpResponse(), null);
-                }
-#endif
-            }
+                    OnComplete = (sentWebRequest) =>
+                    {
+                        HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
+                        callback?.Invoke(responseResult);
+                    }
+                };
+                httpTaskScheduler.AddTask(newTask);
+            };
+
+            AccelByteSDKMain.OnGameUpdate += onGameUpdate;
         }
 
         public void ClearCookies(Uri uri)
@@ -52,17 +47,8 @@ namespace AccelByte.Core
             UnityWebRequest.ClearCookieCache(uri);
         }
 
-        public async System.Threading.Tasks.Task<HttpSendResult> SendAsync(IHttpRequest request, int timeoutMs)
+        private HttpSendResult ParseWebRequestResult(UnityWebRequest unityWebRequest)
         {
-            using UnityWebRequest unityWebRequest = request.GetUnityWebRequest();
-            unityWebRequest.timeout = timeoutMs / 1000;
-
-            Report.GetHttpRequest(request, unityWebRequest);
-
-            await unityWebRequest.SendWebRequest();
-
-            Report.GetHttpResponse(unityWebRequest);
-
             IHttpResponse callBackResponse = null;
             Error callBackError = null;
 #if UNITY_2020_3_OR_NEWER
@@ -91,8 +77,8 @@ namespace AccelByte.Core
                 callBackError = null;
             }
 #endif
-
             return new HttpSendResult(callBackResponse, callBackError);
         }
+
     }
 }

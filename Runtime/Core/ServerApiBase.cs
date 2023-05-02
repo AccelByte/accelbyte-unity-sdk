@@ -18,8 +18,8 @@ namespace AccelByte.Core
         /// Contains namespace, baseUrl's
         /// TODO: Do we want this private, then just make protected Getters() for Config.x?
         ///</summary>
-        protected readonly ServerConfig ServerConfig;
-        
+        protected readonly ServerConfig serverConfig;
+
         protected ServerApiBase( IHttpClient inHttpClient
             , ServerConfig inServerConfig
             , string inBaseUrl
@@ -28,14 +28,14 @@ namespace AccelByte.Core
         {
             Assert.IsNotNull(inServerConfig, $"Creating {GetType().Name} failed. " +
                 "Parameter `_serverConfig` is null");
-            ServerConfig = inServerConfig;
+            serverConfig = inServerConfig;
         }
         #endregion /Constructor
 
         
         #region High-Level Shortcuts
         /// <summary>ServerConfig.Namespace wrapper</summary>
-        protected string Namespace_ => ServerConfig.Namespace;
+        protected string Namespace_ => serverConfig.Namespace;
         #endregion /High-Level Shortcuts
     }
 }

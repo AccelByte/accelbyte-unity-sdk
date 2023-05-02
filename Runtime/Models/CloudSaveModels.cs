@@ -96,4 +96,18 @@ namespace AccelByte.Models
     {
         [DataMember] public GameRecord[] data { get; set; }
     }
+
+    [DataContract]
+    public class PublicUserRecordKeys
+    {
+        [DataMember] public string Key { get; set; }
+        [DataMember(Name = "User_id")] public string UserId { get; set; }
+    }
+
+    [DataContract]
+    public class PaginatedBulkGetPublicUserRecordKeys
+    {
+        [DataMember] public PublicUserRecordKeys[] Data { get; set; }
+        [DataMember] public Paging Paging { get; set; }
+    }
 }

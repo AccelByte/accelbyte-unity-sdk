@@ -9,10 +9,18 @@ using AccelByte.Api;
 
 public class OAuth2 : ApiBase
 {
-    public OAuth2(IHttpClient HttpClient,
+    public OAuth2(IHttpClient httpClient,
+           Config config,
+           ISession session)
+           : this(httpClient, config, session, null)
+    {
+    }
+
+    public OAuth2(IHttpClient httpClient,
         Config config,
-        ISession session)
-        : base(HttpClient, config, config.IamServerUrl, session)
+        ISession session,
+        HttpOperator httpOperator)
+        : base(httpClient, config, config.IamServerUrl, session, httpOperator)
     {
         OnNewTokenObtained = (tokenData) =>
         {
@@ -25,7 +33,7 @@ public class OAuth2 : ApiBase
     private Action<TokenData> OnNewTokenObtained = null;
 
     [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
-    public IEnumerator LoginWithUsername
+    public void LoginWithUsername
         (string username
         , string password
         , ResultCallback callback
@@ -46,25 +54,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
-    public IEnumerator LoginWithUsername
+    public void LoginWithUsername
         (string username
         , string password
         , ResultCallback<TokenData, OAuthError> callback
@@ -85,26 +92,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.Try(result);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.Try(result);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator LoginWithUsernameV3
+    public void LoginWithUsernameV3
         (string username
         , string password
         , ResultCallback callback
@@ -125,25 +130,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            SaveAuthTrustId(result.Value);
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                SaveAuthTrustId(result.Value);
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator LoginWithUsernameV3
+    public void LoginWithUsernameV3
         (string username
         , string password
         , ResultCallback<TokenData, OAuthError> callback
@@ -164,32 +168,26 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
+        httpOperator.SendRequest(request, response =>
+        {
+            Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
-        yield return HttpClient.SendRequest(request,
-            rsp =>
+            if (!result.IsError)
             {
-                response = rsp;
+                SaveAuthTrustId(result.Value);
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+
             }
-        );
-
-        Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
-        {
-            SaveAuthTrustId(result.Value);
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator LoginWithDeviceId(ResultCallback callback)
+    public void LoginWithDeviceId(ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
         DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
@@ -203,24 +201,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
+    public void LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
         DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
@@ -234,29 +231,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .GetResult();
 
-        IHttpResponse response = null;
+        httpOperator.SendRequest(request, response =>
+        {
+            var result = response.TryParseJson<TokenData, OAuthError>();
 
-        yield return HttpClient.SendRequest(request, rsp =>
+            if (!result.IsError)
             {
-                response = rsp;
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
             }
-        );
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
-        {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator LoginWithOtherPlatform
+    public void LoginWithOtherPlatform
         (PlatformType platformType
         , string platformToken
         , ResultCallback callback
@@ -275,24 +267,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator LoginWithOtherPlatform
+    public void LoginWithOtherPlatform
         (PlatformType platformType
         , string platformToken
         , ResultCallback<TokenData, OAuthError> callback
@@ -311,26 +302,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator LoginWithOtherPlatformId
+    public void LoginWithOtherPlatformId
         (string platformId
         , string platformToken
         , ResultCallback callback
@@ -350,24 +339,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator LoginWithOtherPlatformId
+    public void LoginWithOtherPlatformId
         (string platformId
         , string platformToken
         , ResultCallback<TokenData, OAuthError> callback
@@ -387,26 +375,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator CreateHeadlessAccountAndResponseToken
+    public void CreateHeadlessAccountAndResponseToken
         (string linkingToken
         , bool extendExp
         , ResultCallback callback)
@@ -422,24 +408,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator CreateHeadlessAccountAndResponseToken
+    public void CreateHeadlessAccountAndResponseToken
         (string linkingToken
         , bool extendExp
         , ResultCallback<TokenData, OAuthError> callback)
@@ -455,26 +440,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator AuthenticationWithPlatformLink
+    public void AuthenticationWithPlatformLink
         (string username
         , string password
         , string linkingToken
@@ -493,24 +476,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator AuthenticationWithPlatformLink
+    public void AuthenticationWithPlatformLink
         (string username
         , string password
         , string linkingToken
@@ -529,26 +511,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("This end point is going to be deprecated, use LoginWithAuthorizationCodeV3 instead")]
-    public IEnumerator LoginWithAuthorizationCode
+    public void LoginWithAuthorizationCode
         (string code
         , ResultCallback callback)
     {
@@ -564,25 +544,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
     [Obsolete("This end point is going to be deprecated, use LoginWithAuthorizationCodeV3 instead")]
-    public IEnumerator LoginWithAuthorizationCode
+    public void LoginWithAuthorizationCode
         (string code
         , ResultCallback<TokenData, OAuthError> callback)
     {
@@ -598,25 +577,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator LoginWithAuthorizationCodeV3
+    public void LoginWithAuthorizationCodeV3
             (string code
             , ResultCallback<TokenData, OAuthError> callback)
     {
@@ -632,25 +609,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator Logout(string Bearer, ResultCallback callback)
+    public void Logout(string Bearer, ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
 
@@ -659,17 +634,15 @@ public class OAuth2 : ApiBase
             .WithContentType(MediaType.TextPlain)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParse();
-        callback.Try(result);
+        httpOperator.SendRequest(request, response =>
+        {
+            var result = response.TryParse();
+            callback.Try(result);
+        });
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
-    public IEnumerator RefreshSession(string refreshToken, ResultCallback callback)
+    public void RefreshSession(string refreshToken, ResultCallback callback)
     {
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuth()
@@ -679,23 +652,24 @@ public class OAuth2 : ApiBase
             .WithFormParam("refresh_token", refreshToken)
             .GetResult();
 
-        IHttpResponse response = null;
+        request.Priority = 0;
 
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-            yield break;
-        }
+            var result = response.TryParseJson<TokenData>();
 
-        callback.TryError(result.Error);
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+                return;
+            }
+
+            callback.TryError(result.Error);
+        });
     }
 
-    public IEnumerator RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
+    public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
     {
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuthWithCookie(Config.PublisherNamespace)
@@ -705,25 +679,25 @@ public class OAuth2 : ApiBase
             .WithFormParam("refresh_token", refreshToken)
             .GetResult();
 
-        IHttpResponse response = null;
+        request.Priority = 0;
 
-        yield return HttpClient.SendRequest(request,
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-            yield break;
-        }
+            var result = response.TryParseJson<TokenData, OAuthError>();
 
-        callback.TryError(result.Error);
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+                return;
+            }
+
+            callback.TryError(result.Error);
+        });
     }
 
 
-    public IEnumerator Verify2FACode
+    public void Verify2FACode
         (string mfaToken
         , TwoFAFactorType factor
         , string code
@@ -744,24 +718,23 @@ public class OAuth2 : ApiBase
             .WithFormParam("rememberDevice", rememberDevice ? "true" : "false")
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk(result.Value);
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
+
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk(result.Value);
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 
-    public IEnumerator VerifyToken(string token
+    public void VerifyToken(string token
        , ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
@@ -775,31 +748,30 @@ public class OAuth2 : ApiBase
             .WithFormParam("token", token)
             .GetResult();
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-
-        Result<TokenData> result = response.TryParseJson<TokenData>();
-
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            if (token.Equals(result.Value.access_token))
+            Result<TokenData> result = response.TryParseJson<TokenData>();
+
+            if (!result.IsError)
             {
-                callback.TryOk();
+                if (token.Equals(result.Value.access_token))
+                {
+                    callback.TryOk();
+                }
+                else
+                {
+                    const string errorMessage = "Access Token is not valid, different value between input token and obtained token.";
+                    callback.TryError(new Error(ErrorCode.InvalidResponse, errorMessage));
+                }
             }
             else
             {
-                const string errorMessage = "Access Token is not valid, different value between input token and obtained token.";
-                callback.TryError(new Error(ErrorCode.InvalidResponse, errorMessage));
+                callback.TryError(result.Error);
             }
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+        });
     }
     
-    public IEnumerator GenerateOneTimeCode(string AccessToken
+    public void GenerateOneTimeCode(string AccessToken
         , PlatformType platformId
         , ResultCallback<GeneratedOneTimeCode> callback)
     {
@@ -814,14 +786,12 @@ public class OAuth2 : ApiBase
             .WithFormParam("platformId", platformId.ToString().ToLower())
             .GetResult();
 
-        IHttpResponse response = null;
+        httpOperator.SendRequest(request, response =>
+        {
+            var result = response.TryParseJson<GeneratedOneTimeCode>();
 
-        yield return HttpClient.SendRequest(request, 
-            rsp => response = rsp);
-
-        var result = response.TryParseJson<GeneratedOneTimeCode>();
-
-        callback.Try(result);
+            callback.Try(result);
+        });
     }
 
     private void SaveAuthTrustId(TokenData tokenData)
@@ -833,7 +803,7 @@ public class OAuth2 : ApiBase
         }
     }
     
-    public IEnumerator GenerateGameToken(string code
+    public void GenerateGameToken(string code
         , ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
@@ -847,18 +817,19 @@ public class OAuth2 : ApiBase
             .WithFormParam("code", code)
             .GetResult();
 
-        IHttpResponse response = null;
-        yield return HttpClient.SendRequest(request, rsp => response = rsp);
-        var result = response.TryParseJson<TokenData>();
-        if (!result.IsError)
+        httpOperator.SendRequest(request, response =>
         {
-            SaveAuthTrustId(result.Value);
-            OnNewTokenObtained?.Invoke(result.Value);
-            callback.TryOk();
-        }
-        else
-        {
-            callback.TryError(result.Error);
-        }
+            var result = response.TryParseJson<TokenData>();
+            if (!result.IsError)
+            {
+                SaveAuthTrustId(result.Value);
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback.TryOk();
+            }
+            else
+            {
+                callback.TryError(result.Error);
+            }
+        });
     }
 }

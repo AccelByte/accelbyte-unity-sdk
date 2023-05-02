@@ -202,6 +202,24 @@ namespace AccelByte.Models
         PROBABILITY_GROUP
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SubscribedBy
+    {
+        None,
+        User,
+        Platform
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SubscriptionStatus
+    {
+        None,
+        Init,
+        Active,
+        Cancelled,
+        Expired
+    }
+
     #endregion
 
     #region Wallet
@@ -578,6 +596,7 @@ namespace AccelByte.Models
         [DataMember] public ItemStatus status { get; set; }
         [DataMember] public bool listable { get; set; }
         [DataMember] public bool purchasable { get; set; }
+        [DataMember] public bool SectionExclusive { get; set; }
         [DataMember] public ItemType itemType { get; set; }
         [DataMember] public string targetNamespace { get; set; }
         [DataMember] public string targetCurrencyCode { get; set; }
@@ -786,6 +805,7 @@ namespace AccelByte.Models
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
         [DataMember] public string returnUrl { get; set; }
+        [DataMember(Name = "sectionId")] public string SectionId { get; set; }
     }
 
     [DataContract]
@@ -869,11 +889,13 @@ namespace AccelByte.Models
         [DataMember] public string id { get; set; }
         [DataMember] public string itemId { get; set; }
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember(Name = "name")] public string Name { get; set; }
         [DataMember] public string userId { get; set; }
         [DataMember] public EntitlementClazz clazz { get; set; }
         [DataMember] public EntitlementType type { get; set; }
         [DataMember] public bool stackable { get; set; }
         [DataMember] public int stackedUseCount { get; set; }
+        [DataMember(Name = "storeId")] public int StoreId { get; set; }
         [DataMember] public int stackedQuantity { get; set; }
         [DataMember] public DateTime createdAt { get; set; }
         [DataMember] public DateTime updatedAt { get; set; }
@@ -1025,6 +1047,28 @@ namespace AccelByte.Models
         [DataMember] public string region { get; set; }
         [DataMember] public string language { get; set; }
     }
+    
+    public class UserEntitlementSoldParams
+    {
+        public string UserId { get; set; }
+        public string EntitlementId { get; set; }
+    }
+    
+    [DataContract]
+    public class EntitlementSoldRequest
+    {
+        [DataMember(Name = "useCount")] public int UseCount { get; set; }
+        [DataMember(Name = "requestId")] public string RequestId { get; set; }
+    }
+    
+    [DataContract]
+    public class SellItemEntitlementInfo
+    {
+        [DataMember(Name = "requestId")] public string RequestId { get; set; }
+        [DataMember(Name = "replayed")] public bool Replayed { get; set; }
+        [DataMember(Name = "creditSummaries")] public CreditSummary[] CreditSummaries { get; set; }
+        [DataMember(Name = "entitlementInfo")] public EntitlementInfo EntitlementInfo { get; set; }
+    }
 
     #endregion
 
@@ -1056,7 +1100,22 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace { get; set; }
         [DataMember] public string userId { get; set; }
         [DataMember] public int amount { get; set; }
+        [DataMember(Name = "currencyCode")] public string CurrencyCode { get; set; }
         [DataMember] public int stackedQuantity { get; set; }
+    }
+
+    [DataContract]
+    public class SubscriptionSummary
+    { 
+        [DataMember(Name = "id")] public string Id { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace { get; set; }
+        [DataMember(Name = "userId")] public string UserId { get; set; }
+        [DataMember(Name = "itemId")] public string ItemId { get; set; }
+        [DataMember(Name = "sku")] public string Sku { get; set; }
+        [DataMember(Name = "status")] public SubscriptionStatus Status { get; set; }
+        [DataMember(Name = "currentPeriodStart")] public DateTime CurrentPeriodStart { get; set; }
+        [DataMember(Name = "currentPeriodEnd")] public DateTime CurrentPeriodEnd { get; set; }
+        [DataMember(Name = "subscribedBy")] public SubscribedBy SubscribedBy { get; set; } 
     }
 
     [DataContract]
@@ -1066,6 +1125,7 @@ namespace AccelByte.Models
         [DataMember] public string userId { get; set; }
         [DataMember] public EntitlementSummary[] entitlementSummaries { get; set; }
         [DataMember] public CreditSummary[] creditSummaries { get; set; }
+        [DataMember(Name = "subscriptionSummaries")] public SubscriptionSummary[] subscriptionSummaries { get; set; }
     }
 
     #endregion

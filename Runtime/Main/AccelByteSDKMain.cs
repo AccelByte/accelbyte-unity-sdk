@@ -16,16 +16,36 @@ namespace AccelByte.Core
     internal static class AccelByteSDKMain
     {
         internal static PlatformMain Main;
-        
+
+        private static System.Action<float> onGameUpdate;
+
+        internal static System.Action<float> OnGameUpdate
+        {
+            get
+            {
+                CheckMainThreadSignallerAlive();
+                return onGameUpdate;
+            }
+            set
+            {
+                CheckMainThreadSignallerAlive();
+                onGameUpdate = value;
+            }
+        }
+
         [RuntimeInitializeOnLoadMethod]
         private static void StartAccelByteSDK()
         {
+            AccelByteDebug.LogVerbose("AccelByte API Initialized!");
+
             if (Main == null)
             {
                 Main = new PlatformMain();
             }
 
-            AccelByteDebug.LogVerbose("AccelByte API Initialized!");
+            OnGameUpdate = null;
+            CheckMainThreadSignallerAlive();
+
             Main.Run();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationPlayyModeStateChanged;
@@ -43,6 +63,15 @@ namespace AccelByte.Core
             }
         }
 #endif
+
+        private static void CheckMainThreadSignallerAlive()
+        {
+            AccelByteGameThreadSignaller.Instance.MainThreadSignal = (deltaTime) =>
+            {
+                onGameUpdate?.Invoke(deltaTime);
+            };
+        }
+
         private static void ApplicationQuitting()
         {
             Main.Stop();

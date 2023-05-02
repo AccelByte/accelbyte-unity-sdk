@@ -117,6 +117,33 @@ namespace AccelByte.Api
         /// </param>
         public void ModifyContent(string channelId
             , string contentId
+            , UGCUpdateRequest ModifyRequest
+            , ResultCallback<UGCResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ModifyContent(session.UserId, channelId, contentId, ModifyRequest, callback));
+        }
+
+        /// <summary>
+        /// Modify existing content to update some information with string preview.
+        /// </summary>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="contentId">The id of the content that will be modified.</param>
+        /// <param name="ModifyRequest">Detail information for the content request that will be modified.</param>
+        /// <param name="callback">
+        /// This will be called when the operation succeeded. The result is UGCResponse Model.
+        /// </param>
+        [Obsolete("This method will be deprecated in future, please use ModifyContent(string channelId, string contentId, UGCUpdateRequest ModifyRequest, ResultCallback<UGCResponse> callback)")]
+        public void ModifyContent(string channelId
+            , string contentId
             , UGCRequest ModifyRequest
             , ResultCallback<UGCResponse> callback)
         {
@@ -145,6 +172,7 @@ namespace AccelByte.Api
         /// <param name="fileExtension">FileExtension of the content</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
         /// <param name="contentType">The specific type of the content's modified. Default value is "application/octet-stream"</param>
+        [Obsolete("This method will be deprecated in future, please use ModifyContent(string channelId, string contentId, UGCUpdateRequest ModifyRequest, ResultCallback<UGCResponse> callback)")]
         public void ModifyContent(string channelId
             , string contentId
             , string name
@@ -343,6 +371,30 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.CreateChannel(session.UserId, channelName, callback));
+        }
+
+        /// <summary>
+        /// Get all of the player's channels.
+        /// </summary>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded. The result is UGCChannelsPagingResponse Model.</param>
+        /// <param name="offset">The offset of the channel results. Default value is 0.</param>
+        /// <param name="limit">The limit of the channel results. Default value is 1000.</param>
+        public void GetChannels(string userId
+            , ResultCallback<UGCChannelPagingResponse> callback
+            , int offset = 0
+            , int limit = 1000)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetChannels(userId, callback, offset, limit));
         }
 
         /// <summary>

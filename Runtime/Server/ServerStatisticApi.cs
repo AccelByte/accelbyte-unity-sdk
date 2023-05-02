@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
+using System.Linq;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -23,6 +24,35 @@ namespace AccelByte.Server
             , ISession session)
             : base(httpClient, config, config.StatisticServerUrl, session)
         {
+        }
+
+        /// <summary>
+        /// Convert Statistic Sort By Enum to String Value
+        /// </summary>
+        private string ConvertStatisticSortByToString(StatisticSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case StatisticSortBy.StatCode:
+                    return "StatCode";
+                case StatisticSortBy.StatCodeAsc:
+                    return "StatCode:asc";
+                case StatisticSortBy.StatCodeDesc:
+                    return "StatCode:desc";
+                case StatisticSortBy.CreatedAt:
+                    return "createdAt";
+                case StatisticSortBy.CreatedAtAsc:
+                    return "createdAt:asc";
+                case StatisticSortBy.CreatedAtDesc:
+                    return "createdAt:desc";
+                case StatisticSortBy.UpdatedAt:
+                    return "updatedAt";
+                case StatisticSortBy.UpdatedAtAsc:
+                    return "updatedAt:asc";
+                case StatisticSortBy.UpdatedAtDesc:
+                    return "updatedAt:desc";
+            }
+            return "";
         }
 
         public IEnumerator CreateUserStatItems(string userId
@@ -57,7 +87,10 @@ namespace AccelByte.Server
         public IEnumerator GetUserStatItems(string userId
             , ICollection<string> statCodes
             , ICollection<string> tags
-            , ResultCallback<PagedStatItems> callback)
+            , ResultCallback<PagedStatItems> callback
+            , int offset
+            , int limit
+            , StatisticSortBy sortBy)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
@@ -67,6 +100,8 @@ namespace AccelByte.Server
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
+                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("offset", offset.ToString())
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
@@ -79,6 +114,11 @@ namespace AccelByte.Server
             if (tags != null && tags.Count > 0)
             {
                 builder.WithQueryParam("tags", string.Join(",", tags));
+            }
+
+            if (sortBy != StatisticSortBy.None)
+            {
+                builder.WithQueryParam("sortBy", ConvertStatisticSortByToString(sortBy));
             }
 
             var request = builder.GetResult();
@@ -295,6 +335,69 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
+        public IEnumerator BulkFetchStatItemsValue(string statCode
+           , string[] userIds
+           , ResultCallback<FetchUserStatistic> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
+            Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+
+            string[] processedUserIds = new string[0];
+            string[] notProcessedUserIds = new string[0];
+            if (userIds.Length > MaximumUserIds.UserIdsLimit)
+            {
+                for (int i = 0; i < userIds.Length; i++)
+                {
+                    if (i <= MaximumUserIds.UserIdsLimit)
+                    {
+                        processedUserIds.Append(userIds[i]);
+                    }
+                    else
+                    {
+                        notProcessedUserIds.Append(userIds[i]);
+                    }
+                }
+            }
+            else
+            {
+                processedUserIds = userIds;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/statitems/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithQueryParam("statCode", statCode)
+                .WithQueryParam("userIds", string.Join(",", processedUserIds))
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<StatItemValue[]>();
+
+            FetchUserStatistic finalResult = new FetchUserStatistic
+            {
+                UserStatistic = result.Value,
+                NotProcessedUserIds = notProcessedUserIds
+            };
+
+            if (result.IsError)
+            {
+                callback.Try(Result<FetchUserStatistic>.CreateError(result.Error.Code, result.Error.Message));
+            }
+            else
+            {
+                callback.Try(Result<FetchUserStatistic>.CreateOk(finalResult));
+            }
+        }
+
         public IEnumerator BulkUpdateMultipleUserStatItemsValue(UpdateUserStatItem[] bulkUpdateMultipleUserStatItem
            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
@@ -465,6 +568,44 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GlobalStatItem>();
+
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetListStatCycleConfigs(
+            StatisticCycleType type,
+            StatisticCycleStatus status,
+            ResultCallback<PagedStatCycleConfigs> callback,
+            int offset,
+            int limit )
+        {
+
+            HttpRequestBuilder builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/statCycles")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("offset", offset.ToString())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (type != StatisticCycleType.None)
+            {
+                builder.WithQueryParam("cycleType", type.ToString());
+            }
+
+            if (status != StatisticCycleStatus.None)
+            {
+                builder.WithQueryParam("status", status.ToString());
+            }
+
+            IHttpRequest request = builder.GetResult();
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PagedStatCycleConfigs>();
 
             callback.Try(result);
         }

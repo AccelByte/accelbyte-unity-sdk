@@ -39,6 +39,7 @@ namespace AccelByte.Models
     public class MatchmakingV2CreateTicketResponse
     {
         [DataMember] public string matchTicketId;
+        [DataMember] public int queueTime;
     }
 
     [DataContract]
@@ -52,6 +53,12 @@ namespace AccelByte.Models
     public class MatchmakingV2Ticket
     {
         [DataMember] public string ticketId;
+    }
+
+    [DataContract]
+    public class MatchmakingV2Metrics
+    {
+        [DataMember(Name = "queueTime")] public int QueueTime;
     }
 
     #region Backfill

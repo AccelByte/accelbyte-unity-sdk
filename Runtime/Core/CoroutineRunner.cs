@@ -11,7 +11,6 @@ namespace AccelByte.Core
 {
     public class CoroutineRunner
     {
-        private readonly GameObject gameObject;
         private readonly MonoBehaviour monoBehaviour;
         private readonly Queue<Action> callbacks = new Queue<Action>();
         private readonly object syncToken = new object();
@@ -20,17 +19,12 @@ namespace AccelByte.Core
 
         public CoroutineRunner()
         {
-            this.gameObject = GameObject.Find("AccelByteDummyGameObject");
+            GameObject sdkGameObject = Utils.AccelByteGameObject.GetOrCreateGameObject();
 
-            if (this.gameObject == null)
-            {
-                this.gameObject = new GameObject("AccelByteDummyGameObject");
-            }
-
-            this.monoBehaviour = this.gameObject.GetComponent<DummyBehaviour>();
+            this.monoBehaviour = sdkGameObject.GetComponent<DummyBehaviour>();
             if(this.monoBehaviour == null)
             {
-                this.monoBehaviour = this.gameObject.AddComponent<DummyBehaviour>();
+                this.monoBehaviour = sdkGameObject.AddComponent<DummyBehaviour>();
             }
 			            
             this.monoBehaviour.StartCoroutine(this.RunCallbacks());

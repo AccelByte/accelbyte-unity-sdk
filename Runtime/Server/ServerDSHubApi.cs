@@ -17,6 +17,6 @@ namespace AccelByte.Server
         {
         }
 
-        public ServerConfig ServerConfig => base.ServerConfig;
+        public ServerConfig ServerConfig => base.serverConfig;
     }
 }

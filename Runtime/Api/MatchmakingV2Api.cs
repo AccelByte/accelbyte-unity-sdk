@@ -114,5 +114,30 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+
+        public IEnumerator GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
+        {
+            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            Assert.IsFalse(string.IsNullOrEmpty(matchPool), nameof(matchPool) + " cannot be null or empty");
+            
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/match-pools/{matchPool}/metrics")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("matchPool", matchPool)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<MatchmakingV2Metrics>();
+
+            callback.Try(result);
+        }
     }
 }

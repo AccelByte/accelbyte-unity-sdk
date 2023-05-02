@@ -95,5 +95,25 @@ namespace AccelByte.Api
             _coroutineRunner.Run(
                 _matchmakingV2Api.DeleteMatchmakingTicket(ticketId, callback));
         }
+
+        /// <summary>
+        /// Get matchmaking's match pool metrics
+        /// </summary>
+        /// <param name="matchPool">Name of the match pool</param>
+        /// <param name="callback">Returns a Result that contain MatchmakingV2Metrics via callback when completed</param>
+        public void GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsFalse(string.IsNullOrEmpty(matchPool), nameof(matchPool) + " cannot be null or empty");
+            
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            _coroutineRunner.Run(
+                _matchmakingV2Api.GetMatchmakingMetrics(matchPool, callback));
+        }
     }
 }

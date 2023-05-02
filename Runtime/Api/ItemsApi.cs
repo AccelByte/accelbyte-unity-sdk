@@ -115,11 +115,8 @@ namespace AccelByte.Api
                 {
                     queries.Add("categoryPath", criteria.categoryPath);
                 }
-                
-                if (criteria.includeSubCategoryItem != null)
-                {
-                    queries.Add("includeSubCategoryItem", criteria.includeSubCategoryItem ? "true" : "false");
-                }
+
+                queries.Add("includeSubCategoryItem", criteria.includeSubCategoryItem ? "true" : "false");
 
                 if (criteria.itemType != ItemType.NONE)
                 {

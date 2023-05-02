@@ -183,7 +183,6 @@ namespace AccelByte.Api
                 {
                     platformName = "default";
                 }
-                AccelByteDebug.LogVerbose($"Failed to load OAuth file in {platformName} platform");
             }
 
             if (targetOAuthFile != null)
@@ -504,13 +503,7 @@ namespace AccelByte.Api
                     activePlatform = PlatformType.PS5.ToString();
                     break;
 #endif
-                case RuntimePlatform.XBOX360:
-                case RuntimePlatform.XboxOne:
-                    activePlatform = PlatformType.Live.ToString();
-                    break;
                 case RuntimePlatform.GameCoreXboxOne:
-                    activePlatform = PlatformType.Live.ToString();
-                    break;
                 case RuntimePlatform.GameCoreXboxSeries:
                     activePlatform = PlatformType.Live.ToString();
                     break;

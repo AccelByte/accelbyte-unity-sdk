@@ -109,7 +109,8 @@ namespace AccelByte.Core
             }
 
         }
-        private static Error ParseError(IHttpResponse response)
+
+        internal static Error ParseError(IHttpResponse response)
         {
             if (response == null)
             {
@@ -138,6 +139,19 @@ namespace AccelByte.Core
             {
                 return new Error((ErrorCode)response.Code);
             }
+        }
+
+        internal static bool IsHasServerError(IHttpResponse response)
+        {
+            switch ((HttpStatusCode)response.Code)
+            {
+                case HttpStatusCode.InternalServerError:
+                case HttpStatusCode.BadGateway:
+                case HttpStatusCode.ServiceUnavailable:
+                case HttpStatusCode.GatewayTimeout:
+                    return true;
+            }
+            return false;
         }
 
         private static Error ParseServiceError(IHttpResponse response)

@@ -86,6 +86,7 @@ namespace AccelByte.Models
         [DataMember] public string statCode { get; set; }
         [DataMember] public string createdAt { get; set; }
         [DataMember] public string updateAt { get; set; }
+        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
     }
 
     [DataContract]
@@ -113,6 +114,7 @@ namespace AccelByte.Models
         [DataMember] public string statCode { get; set; }
         [DataMember] public string createdAt { get; set; }
         [DataMember] public string updateAt { get; set; }
+        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
     }
 
     [DataContract]

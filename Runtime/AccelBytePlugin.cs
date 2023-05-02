@@ -70,7 +70,7 @@ namespace AccelByte.Api
         private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
-        private static IHttpRequestSender defaultHttpSender = new UnityHttpRequestSender();
+        private static IHttpRequestSender defaultHttpSender = null;
 
         internal static OAuthConfig OAuthConfig
         {
@@ -94,6 +94,11 @@ namespace AccelByte.Api
         {
             get
             {
+                if(defaultHttpSender == null)
+                {
+                    var httpSenderScheduler = new WebRequestSchedulerAsync();
+                    defaultHttpSender = new UnityHttpRequestSender(httpSenderScheduler);
+                }
                 return defaultHttpSender;
             }
             set

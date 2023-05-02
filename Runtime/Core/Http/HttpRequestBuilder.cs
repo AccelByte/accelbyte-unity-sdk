@@ -421,6 +421,7 @@ namespace AccelByte.Core
             public HttpAuth AuthType { get; set; }
             public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
             public byte[] BodyBytes { get; set; }
+            public int Priority { get; set; } = AccelByteHttpHelper.HttpRequestDefaultPriority;
         }
     }
 }

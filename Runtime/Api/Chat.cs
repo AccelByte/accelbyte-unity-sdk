@@ -19,7 +19,6 @@ namespace AccelByte.Api
             , CoroutineRunner inCoroutineRunner)
         {
             session = inSession;
-            coroutineRunner = inCoroutineRunner;
             api = inApi;
 
             IWebSocket webSocket = new WebSocket();
@@ -339,9 +338,7 @@ namespace AccelByte.Api
 
         private ChatApi api;
         private UserSession session;
-        private CoroutineRunner coroutineRunner;
         private ChatWebsocketApi websocketApi;
-        private bool reconnectsOnBans;
 
         #endregion
 
@@ -470,13 +467,11 @@ namespace AccelByte.Api
         
         private void HandleBanNotification()
         {
-            reconnectsOnBans = true;
+
         }
 
         private void HandleUnbanNotification()
         {
-            reconnectsOnBans = false;
-
             if (session != null)
             {
                 session.RefreshTokenCallback -= OnRefreshTokenCallback_RefreshToken;
