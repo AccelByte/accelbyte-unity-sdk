@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.0%0D15.17.0) (2023-05-08)
+
+
+### Features
+
+* add custom attribute property ([bc230d6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc230d6989648e2acbb5f4c72360f18f3c4d4733))
+* add statistic cycle endpoint along with the models ([a5058b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a5058b26e6b3c074078743208638709db164aabf))
+* Section ID needs to be passed and stored when create order for items that are ‘Section Exclusive’. ([1a10c76](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1a10c76a983a9fc10802a0f91d95e8952496ce87))
+
+
+### Bug Fixes
+
+* add config null check on setting editor ([340ba9a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/340ba9ad3bca87ce93c6adc1f3d2e02ba8a76c43))
+* add multiple constructor in user and oauth api, set all api to public ([b1ef66b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1ef66b1c0a99df65919047cc9277e29d20f4acc))
+* fix config setting unable to redirect to default config ([98b7327](https://github.com/AccelByte/accelbyte-unity-sdk/commits/98b732735ffd2f2043065034adadbfc42fb8f418))
+* fix multiregistry issue ([fc2a18c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fc2a18cd467aa397b3f8dbbf14b5184060400daf))
+* remove url config warning when the value is empty ([7203a2f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7203a2fcac99e5399c3d275e77265171dd25c6a3))
+
+
+### Refactors
+
+* add request task only at game main thread ([4d35de4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d35de497741e0d2595655fde56b9389ba6ce2ad))
+* remove xbox 360 from config ([842090e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/842090e58a2d856bdef1d6162c2fcb601add8966))
+
 ## [15.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.17.0%0D15.16.2) (2023-04-26)
 
 

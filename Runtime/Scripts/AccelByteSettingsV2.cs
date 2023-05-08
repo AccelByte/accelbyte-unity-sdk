@@ -147,7 +147,7 @@ namespace AccelByte.Api
 
         public static MultiOAuthConfigs LoadOAuthFile(string targetPlatform, bool isServerConfig = false)
         {
-            AccelByteDebug.LogVerbose($"Loading OAuth file in \"{GeneratedConfigsResourceDirectory}\" with {targetPlatform} platform");
+            AccelByteDebug.LogVerbose($"Loading OAuth file in \"{GeneratedConfigsResourceDirectory}\" directory with \"{targetPlatform}\" platform");
 
             MultiOAuthConfigs retval = null;
             UnityEngine.Object targetOAuthFile = null;
@@ -207,7 +207,12 @@ namespace AccelByte.Api
 
         public static OAuthConfig GetOAuthByEnvironment(MultiOAuthConfigs multiOAuthConfigs, SettingsEnvironment environment)
         {
-            OAuthConfig retval = null;
+            if(multiOAuthConfigs == null)
+            {
+                return null;
+            }
+
+            OAuthConfig retval;
             switch (environment)
             {
                 case SettingsEnvironment.Development:
@@ -329,7 +334,12 @@ namespace AccelByte.Api
 
         public static Config GetSDKConfigByEnvironment(MultiConfigs multiSDKConfigs, SettingsEnvironment environment)
         {
-            Config retval = null;
+            if(multiSDKConfigs == null)
+            {
+                return null;
+            }
+
+            Config retval;
             switch (environment)
             {
                 case SettingsEnvironment.Development:

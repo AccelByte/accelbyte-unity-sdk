@@ -29,7 +29,7 @@ namespace AccelByte.Api
         //Constants
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
 
-        internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/";
+        internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/" + Application.productName;
 
         //Readonly members
         private readonly UserSession userSession;//renamed from LoginSession
@@ -58,9 +58,11 @@ namespace AccelByte.Api
         /// </param>
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
-        internal User( UserApi inApi
+        /// <param name="platformLoginCacheDirectory">Directory of platform login cache</param>
+        internal User(UserApi inApi
             , UserSession inLoginSession
-            , CoroutineRunner inCoroutineRunner)
+            , CoroutineRunner inCoroutineRunner
+            , string platformLoginCacheDirectory)
         {
             userSession = inLoginSession;
             api = inApi;
@@ -69,6 +71,21 @@ namespace AccelByte.Api
                 inApi.HttpClient,
                 inApi.Config,
                 userSession);
+            SetPlatformLoginCache(platformLoginCacheDirectory);
+        }
+
+        /// <summary>
+        /// User class constructor
+        /// </summary>
+        /// <param name="inLoginSession">
+        /// UserSession; not ISession (unlike similar modules like this)
+        /// </param>
+        /// <param name="inApi"></param>
+        /// <param name="inCoroutineRunner"></param>
+        internal User( UserApi inApi
+            , UserSession inLoginSession
+            , CoroutineRunner inCoroutineRunner) : this(inApi, inLoginSession, inCoroutineRunner, DefaultPlatformCacheDirectory)
+        {
         }
 
         /// <summary>
@@ -82,7 +99,7 @@ namespace AccelByte.Api
         internal User( UserSession inLoginSession
             , UserApi inApi
             , CoroutineRunner inCoroutineRunner )
-            : this( inApi, inLoginSession, inCoroutineRunner )
+            : this( inApi, inLoginSession, inCoroutineRunner, DefaultPlatformCacheDirectory)
         {
             // Curry this obsolete data to the new overload ->
         }
@@ -98,6 +115,10 @@ namespace AccelByte.Api
             {
                 PlatformLoginCache = new AccelByteFileCacheImplementation(loginCacheDirectory);
                 PlatformLoginCache.Empty();
+            }
+            else
+            {
+                PlatformLoginCache = null;
             }
 #endif
         }
@@ -628,7 +649,7 @@ namespace AccelByte.Api
 
             if (!userSession.IsValid())
             {
-                callback.TryOk();
+                callback?.TryOk();
                 return;
             }
 
@@ -637,7 +658,7 @@ namespace AccelByte.Api
                 result=>
             {
                 userSession.ClearSession();
-                callback.Invoke(result);
+                callback?.Invoke(result);
             });
         }
 

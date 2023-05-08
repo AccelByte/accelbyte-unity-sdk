@@ -12,10 +12,10 @@ namespace AccelByte.Utils
     {
         public static string SanitizeBaseUrl(string baseURL)
         {
-            var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
             string retval = string.Empty;
-            if (baseURL != null)
+            if (!string.IsNullOrEmpty(baseURL))
             {
+                var regexStr = "^https?|wss?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$";
                 if (Regex.IsMatch(baseURL, regexStr))
                 {
                     retval = baseURL.TrimEnd('/');

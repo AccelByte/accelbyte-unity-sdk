@@ -33,7 +33,6 @@ namespace AccelByte.Core
                         this.session),
                     this.session,
                     this.coroutineRunner);
-            this.user.SetPlatformLoginCache(User.DefaultPlatformCacheDirectory);
             this.httpApis = new HttpApiContainer(httpClient);
         }
 

@@ -51,6 +51,11 @@ namespace AccelByte.Core
             }
         }
 
+        internal static AccelByteILogger GetLogger()
+        {
+            return logger.Value;
+        }
+
         public static void SetFilterLogType(LogType type)
         {
             string unityLogTypeStr = type.ToString();

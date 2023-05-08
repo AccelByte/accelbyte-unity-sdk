@@ -94,18 +94,28 @@ namespace AccelByte.Api
             if(originalSdkConfigs == null)
             {
                 originalSdkConfigs = AccelByteSettingsV2.LoadSDKConfigFile();
+                if(originalSdkConfigs == null)
+                {
+                    originalSdkConfigs = new MultiConfigs();
+                }
             }
             if (originalOAuthConfigs == null)
             {
                 originalOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(GetPlatformName(platformList, temporaryPlatformSetting));
+                if (originalOAuthConfigs == null)
+                {
+                    originalOAuthConfigs = new MultiOAuthConfigs();
+                }
             }
             if (editedSdkConfig == null)
             {
-                editedSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting).ShallowCopy();
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                editedSdkConfig = originalSdkConfig != null ? originalSdkConfig.ShallowCopy() : new Config();
             }
             if (editedOAuthConfig == null)
             {
-                editedOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting).ShallowCopy();
+                var originalOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                editedOAuthConfig = originalOAuthConfig != null ? originalOAuthConfig.ShallowCopy() : new OAuthConfig();
             }
         }
 
@@ -131,16 +141,18 @@ namespace AccelByte.Api
                 return;
             }
 
-            var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-            var originalOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-            
-            if (CompareOAuthConfig(editedOAuthConfig, originalOAuthConfig) && CompareConfig(editedSdkConfig, originalSdkConfig))
             {
-                EditorGUILayout.HelpBox("All configs has been saved!", MessageType.Info, true);
-            }
-            else
-            {
-                EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+
+                if (CompareOAuthConfig(editedOAuthConfig, originalOAuthConfig) && CompareConfig(editedSdkConfig, originalSdkConfig))
+                {
+                    EditorGUILayout.HelpBox("All configs has been saved!", MessageType.Info, true);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("Unsaved changes", MessageType.Warning, true);
+                }
             }
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
@@ -157,8 +169,11 @@ namespace AccelByte.Api
             temporaryEnvironmentSetting = EditorGUILayout.Popup(temporaryEnvironmentSetting, environmentList);
             if (EditorGUI.EndChangeCheck())
             {
-                editedSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting).ShallowCopy();
-                editedOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting).ShallowCopy();
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+
+                editedSdkConfig = originalSdkConfig != null ? originalSdkConfig.ShallowCopy() : new Config();
+                editedOAuthConfig = originalOAuthConfig != null ? originalOAuthConfig.ShallowCopy() : new OAuthConfig();
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.EndHorizontal();
@@ -175,7 +190,7 @@ namespace AccelByte.Api
                     targetPlatform = platformList[temporaryPlatformSetting];
                 }
                 originalOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(targetPlatform);
-                editedOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                editedOAuthConfig = originalOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting) : new OAuthConfig();
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.EndHorizontal();
