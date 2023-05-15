@@ -14,7 +14,7 @@ namespace AccelByte.Core
         public static UnityWebRequest GetUnityWebRequest(this IHttpRequest request)
         {
             var uri = new Uri(request.Url);
-            var unityWebRequest = new UnityWebRequest(uri, request.Method);
+            using UnityWebRequest unityWebRequest = new UnityWebRequest(uri, request.Method);
 
             if (request.Headers.TryGetValue("Authorization", out string value))
             {
