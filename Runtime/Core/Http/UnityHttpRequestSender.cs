@@ -34,6 +34,8 @@ namespace AccelByte.Core
                     {
                         HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
                         callback?.Invoke(responseResult);
+                        // See https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.Dispose.html
+                        unityWebRequest.Dispose();
                     }
                 };
                 httpTaskScheduler.AddTask(newTask);
