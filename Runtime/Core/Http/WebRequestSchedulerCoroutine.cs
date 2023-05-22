@@ -48,6 +48,7 @@ namespace AccelByte.Core
                     yield return requestTask[0].WebRequest.SendWebRequest();
                     Report.GetHttpResponse(requestTask[0].WebRequest);
                     requestTask[0].SetComplete();
+                    requestTask[0].Dispose();
                     requestTask.RemoveAt(0);
                 }
                 yield return null;

@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace AccelByte.Core
 {
-    internal class WebRequestTask
+    internal class WebRequestTask : IDisposable
     {
         public IHttpRequest HttpRequest
         {
@@ -54,6 +54,11 @@ namespace AccelByte.Core
         public void SetComplete()
         {
             OnComplete?.Invoke(WebRequest);
+        }
+
+        public void Dispose()
+        {
+            WebRequest.Dispose();
         }
     }
 

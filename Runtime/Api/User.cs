@@ -110,7 +110,7 @@ namespace AccelByte.Api
         /// <param name="loginCacheDirectory">Cache directory</param>
         internal void SetPlatformLoginCache(string loginCacheDirectory)
         {
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_ANDROID || UNITY_IOS
+#if !UNITY_WEBGL
             if (!string.IsNullOrEmpty(loginCacheDirectory))
             {
                 PlatformLoginCache = new AccelByteFileCacheImplementation(loginCacheDirectory);

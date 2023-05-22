@@ -447,6 +447,28 @@ namespace AccelByte.Models
         [DataMember] public int? limit { get; set; }
         [DataMember] public string sortBy { get; set; }
     }
+    
+    [DataContract]
+    public class ItemCriteriaV3
+    {
+        [DataMember] public string StoreId { get; set; }
+        [DataMember] public string CategoryPath { get; set; }
+        [DataMember] public bool IncludeSubCategoryItem { get; set; } = false;// Default == false. Can change to "true". Anything != "true" will remain default
+        [DataMember] public ItemType ItemType { get; set; }
+        [DataMember] public EntitlementAppType AppType { get; set; }
+        [DataMember] public string BaseAppId { get; set; }
+        [DataMember] public string[] Tags { get; set; }
+        [DataMember] public string[] Features { get; set; }
+        [DataMember] public ItemStatus ItemStatus { get; set; }
+        [DataMember] public string Region { get; set; }
+        [DataMember] public DateTime AvailableDate { get; set; }
+        [DataMember] public string TargetNamespace { get; set; }
+        [DataMember] public string ItemName { get; set; }
+        [DataMember] public bool SectionExclusive { get; set; }
+        [DataMember] public int? Offset { get; set; }
+        [DataMember] public int? Limit { get; set; }
+        [DataMember] public string[] SortBy { get; set; }
+    }
 
     [DataContract]
     public class Image
@@ -497,6 +519,9 @@ namespace AccelByte.Models
     {
         [DataMember] public string itemId { get; set; }
         [DataMember] public string itemSku { get; set; }
+        [DataMember] public string ItemType { get; set; }
+        [DataMember] public int Duration { get; set; }
+        [DataMember] public DateTime EndDate { get; set; }
         [DataMember] public int count { get; set; }
     }
 
@@ -512,6 +537,8 @@ namespace AccelByte.Models
         [DataMember] public string itemId { get; set; }
         [DataMember] public string itemSku { get; set; }
         [DataMember] public string itemType { get; set; }
+        [DataMember] public int Duration { get; set; }
+        [DataMember] public DateTime EndDate { get; set; }
         [DataMember] public int count { get; set; }
     }
 
@@ -530,6 +557,13 @@ namespace AccelByte.Models
     {
         [DataMember] public int rewardCount { get; set; }
         [DataMember] public ItemRewards[] rewards { get; set; }
+    }
+    
+    [DataContract]
+    public class ItemSaleConfig
+    {
+        [DataMember] public string CurrencyCode { get; set; }
+        [DataMember] public int Price { get; set; }
     }
 
     [DataContract]
@@ -621,6 +655,9 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt { get; set; }
         [DataMember] public ItemPurchaseCondition purchaseCondition { get; set; }
         [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
+        [DataMember] public bool Fresh { get; set; }
+        [DataMember] public bool Sellable { get; set; }
+        [DataMember] public ItemSaleConfig SaleConfig { get; set; }
         [DataMember] public string localExt { get; set; }
         [DataMember] public Dictionary<string, int> itemQty { get; set; }
         [DataMember] public LootBoxConfig lootBoxConfig { get; set; }
@@ -653,6 +690,7 @@ namespace AccelByte.Models
         [DataMember] public ItemStatus status { get; set; }
         [DataMember] public bool listable { get; set; }
         [DataMember] public bool purchasable { get; set; }
+        [DataMember] public bool SectionExclusive { get; set; }
         [DataMember] public ItemType itemType { get; set; }
         [DataMember] public string targetNamespace { get; set; }
         [DataMember] public string targetCurrencyCode { get; set; }
@@ -675,6 +713,8 @@ namespace AccelByte.Models
         [DataMember] public ItemPurchaseCondition purchaseCondition { get; set; }
         [DataMember] public ItemOptionBoxConfig optionBoxConfig { get; set; }
         [DataMember] public LootBoxConfig lootBoxConfig { get; set; }
+        [DataMember] public bool Sellable { get; set; }
+        [DataMember] public ItemSaleConfig SaleConfig { get; set; }
     }
 
     [DataContract]
@@ -1137,6 +1177,8 @@ namespace AccelByte.Models
     {
         [DataMember] public string itemId { get; set; }
         [DataMember] public int quantity { get; set; }
+        [DataMember] public int Duration { get; set; }
+        [DataMember] DateTime EndDate { get; set; }
     }
 
     [DataContract]
@@ -1161,6 +1203,8 @@ namespace AccelByte.Models
         [DataMember] int maxAwardedPerUser { get; set; }
         [DataMember] DateTime createdAt { get; set; }
         [DataMember] DateTime updatedAt { get; set; }
+        [DataMember] public string UserIdExpression { get; set; }
+        [DataMember] public string NamespaceExpression { get; set; }
     }
 
     [DataContract]

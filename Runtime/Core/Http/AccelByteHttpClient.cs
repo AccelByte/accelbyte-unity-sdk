@@ -240,6 +240,11 @@ namespace AccelByte.Core
                     error = sendResult.Value.CallbackError;
                 }
 
+                if (httpResponse == null)
+                {
+                    return new HttpSendResult(httpResponse, error);
+                }
+
                 bool requireToRetry = CheckRequireRetry(request, httpResponse, error, NetworkErrorOccured, ServerErrorOccured);
                 
                 if (requireToRetry)
@@ -392,6 +397,12 @@ namespace AccelByte.Core
                     yield return new WaitUntil(() => sendResult != null);
                     httpResponse = sendResult.Value.CallbackResponse;
                     error = sendResult.Value.CallbackError;
+                }
+
+                if (httpResponse == null)
+                {
+                    callback?.Invoke(httpResponse, error);
+                    yield break;
                 }
 
                 bool requireToRetry = CheckRequireRetry(request, httpResponse, error, NetworkErrorOccured, ServerErrorOccured);

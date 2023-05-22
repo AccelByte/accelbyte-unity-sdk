@@ -68,6 +68,8 @@ namespace AccelByte.Core {
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);
 
+        void SetProxy(string url, string username, string password);
+
         void Ping();
         WsState ReadyState { get; }
         event OnOpenHandler OnOpen;

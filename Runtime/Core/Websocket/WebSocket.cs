@@ -9,6 +9,10 @@ using AccelByte.Core;
 #if !UNITY_WEBGL || UNITY_EDITOR
 using WebSocketSharp;
 #endif
+#if UNITY_WEBGL && !UNITY_EDITOR
+using AOT;
+using System.Runtime.InteropServices;
+#endif
 
 namespace HybridWebSocket
 {
@@ -224,7 +228,13 @@ namespace HybridWebSocket
             }
         }
 
-        public void Connect(string url, string protocols, string sessionId)
+        public void Connect(string url, string protocols, string sessionId, string entitlementToken = null)
+        {
+            Dictionary<string, string> customHeaders = null;
+            Connect(url, protocols, customHeaders, entitlementToken);
+        }
+
+        public void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null)
         {
             this.objectId = JslibInterop.WsCreate(url, protocols);
             JslibInterop.WsOpen(this.objectId.Value);
@@ -252,6 +262,11 @@ namespace HybridWebSocket
             {
                 JslibInterop.WsSend(this.objectId.Value, "");
             }
+        }
+
+        public void SetProxy(string url, string username, string password)
+        {
+
         }
 
         public event OnOpenHandler OnOpen

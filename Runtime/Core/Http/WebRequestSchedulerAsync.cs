@@ -40,6 +40,7 @@ namespace AccelByte.Core
                     await requestTask[0].WebRequest.SendWebRequest();
                     Report.GetHttpResponse(requestTask[0].WebRequest);
                     requestTask[0].SetComplete();
+                    requestTask[0].Dispose();
                     requestTask.RemoveAt(0);
                 }
                 await AccelByteHttpHelper.HttpDelayOneFrame;

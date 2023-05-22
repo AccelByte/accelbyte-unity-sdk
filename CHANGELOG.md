@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [15.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.0%0D15.18.2) (2023-05-22)
+
+
+### Features
+
+* Supporting Expiry Dates for Item Types ([ddfc6dd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ddfc6ddffebd5bcbebe89b639d93fdf2c0ce00c6))
+
+
+### Bug Fixes
+
+* [ASP-4655] add null IHttpResponse condition ([cb69bcf](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb69bcf3ae7a68b920d027a178955cd4613ad32e))
+
+### [15.18.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.2%0D15.18.1) (2023-05-17)
+
+
+### Bug Fixes
+
+* add unityWebRequest dispose for better cleanup ([a58f902](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a58f902a821b4137bd85d43a6ba71870c29185e7))
+* exclude webgl in set platform login cache ([dfe486a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dfe486a7b81f40739521ee499f4c49fa77d25bed))
+
+### [15.18.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.1%0D15.18.0) (2023-05-12)
+
+
+### Bug Fixes
+
+* fix webgl websocket missing implementation ([31c1f44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/31c1f442f8064449e967dd58a9d9be664c6ab7b0))
+
 ## [15.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.0%0D15.17.0) (2023-05-08)
 
 
