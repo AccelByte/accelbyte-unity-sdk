@@ -3,14 +3,15 @@
 // and restrictions contact your company contract manager.
 
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class OAuthConfig
     {
-        [DataMember] public string ClientId { get; set; }
-        [DataMember] public string ClientSecret { get; set; }
+        [DataMember] public string ClientId;
+        [DataMember] public string ClientSecret;
 
         /// <summary>
         ///  Copy member values
@@ -63,13 +64,13 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MultiOAuthConfigs
     {
-        [DataMember] public OAuthConfig Development { get; set; }
-        [DataMember] public OAuthConfig Certification { get; set; }
-        [DataMember] public OAuthConfig Production { get; set; }
-        [DataMember] public OAuthConfig Default { get; set; }
+        [DataMember] public OAuthConfig Development;
+        [DataMember] public OAuthConfig Certification;
+        [DataMember] public OAuthConfig Production;
+        [DataMember] public OAuthConfig Default;
 
         public void Expand()
         {

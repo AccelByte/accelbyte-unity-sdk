@@ -21,6 +21,7 @@ namespace AccelByte.Api
         /// BaseUrl==IamServerUrl
         /// (!) This will soon be replaced with ISession instead of UserSession
         /// </param>
+        [UnityEngine.Scripting.Preserve]
         public UserApi(IHttpClient httpClient
             , Config config
             , ISession session)
@@ -28,6 +29,7 @@ namespace AccelByte.Api
         {
         }
 
+        [UnityEngine.Scripting.Preserve]
         public UserApi( IHttpClient httpClient
             , Config config
             , ISession session

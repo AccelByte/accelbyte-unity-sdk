@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.1%0D15.19.0) (2023-05-24)
+
+
+### Bug Fixes
+
+* preserve SDK models and API ([8c63e9f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8c63e9fb9181cce6e4f2b42e40c43a6d5f54c910))
+
 ## [15.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.0%0D15.18.2) (2023-05-22)
 
 

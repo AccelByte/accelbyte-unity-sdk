@@ -1,13 +1,13 @@
-// Copyright (c) 2018-2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -45,326 +45,328 @@ namespace AccelByte.Models
 
     #endregion enum
 
-    [DataContract]
+    [DataContract, Preserve]
     public class TokenData
     {
-        [DataMember] public string access_token { get; set; }
-        [DataMember] public string auth_trust_id { get; set; }
-        [DataMember] public string refresh_token { get; set; }
-        [DataMember] public int refresh_expires_in { get; set; }
-        [DataMember] public int expires_in { get; set; }
-        [DataMember] public string token_type { get; set; }
-        [DataMember] public string user_id { get; set; }
-        [DataMember] public string display_name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public bool is_comply { get; set; }
-        [DataMember] public string platform_id { get; set; }
-        [DataMember] public string platform_user_id { get; set; }
+        [DataMember] public string access_token;
+        [DataMember] public string auth_trust_id;
+        [DataMember] public string refresh_token;
+        [DataMember] public int refresh_expires_in;
+        [DataMember] public int expires_in;
+        [DataMember] public string token_type;
+        [DataMember] public string user_id;
+        [DataMember] public string display_name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public bool is_comply;
+        [DataMember] public string platform_id;
+        [DataMember] public string platform_user_id;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionData
     {
-        [DataMember] public string session_id { get; set; }
-        [DataMember] public int expires_in { get; set; }
-        [DataMember] public string refresh_id { get; set; }
+        [DataMember] public string session_id;
+        [DataMember] public int expires_in;
+        [DataMember] public string refresh_id;
     }
 
-    [DataContract, Serializable]
+    [DataContract, Preserve, Serializable]
     public class RefreshTokenData
     {
-        [DataMember] public string refresh_token { get; set; }
-        [DataMember] public int expiration_date { get; set; }
+        [DataMember] public string refresh_token;
+        [DataMember] public int expiration_date;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Ban
     {
-        [DataMember] public string ban { get; set; }
-        [DataMember] public string banId { get; set; }
-        [DataMember] public DateTime endDate { get; set; }
+        [DataMember] public string ban;
+        [DataMember] public string banId;
+        [DataMember] public DateTime endDate;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Permission
     {
-        [DataMember] public int action { get; set; }
-        [DataMember] public string resource { get; set; }
-        [DataMember] public int schedAction { get; set; }
-        [DataMember] public string schedCron { get; set; }
-        [DataMember] public string[] schedRange { get; set; }
+        [DataMember] public int action;
+        [DataMember] public string resource;
+        [DataMember] public int schedAction;
+        [DataMember] public string schedCron;
+        [DataMember] public string[] schedRange;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class NamespaceRoles
     {
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string roleId { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string roleId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserData
     {
-        [DataMember] public string authType { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
-        [DataMember] public Ban[] bans { get; set; }
-        [DataMember] public string country { get; set; }
-        [DataMember] public DateTime createdAt { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
-        [DataMember] public bool deletionStatus { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public bool emailVerified { get; set; }
-        [DataMember] public bool enabled { get; set; }
-        [DataMember] public DateTime lastDateOfBirthChangedTime { get; set; }
-        [DataMember] public DateTime lastEnabledChangedTime { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public NamespaceRoles[] namespaceRoles { get; set; }
-        [DataMember] public string newEmailAddress { get; set; }
-        [DataMember] public string oldEmailAddress { get; set; }
-        [DataMember] public Permission[] permissions { get; set; }
-        [DataMember] public string phoneNumber { get; set; }
-        [DataMember] public bool phoneVerified { get; set; }
-        [DataMember] public bool platformAvatarUrl { get; set; }
-        [DataMember] public bool platformDisplayName { get; set; }
-        [DataMember] public string platformId { get; set; }
-        [DataMember] public string platformUserId { get; set; }
-        [DataMember] public string[] roles { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string userName { get; set; }
-        [DataMember] public bool eligible { get; set; } = true;
+        [DataMember] public string authType;
+        [DataMember] public string avatarUrl;
+        [DataMember] public Ban[] bans;
+        [DataMember] public string country;
+        [DataMember] public DateTime createdAt;
+        [DataMember] public string dateOfBirth;
+        [DataMember] public bool deletionStatus;
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public bool emailVerified;
+        [DataMember] public bool enabled;
+        [DataMember] public DateTime lastDateOfBirthChangedTime;
+        [DataMember] public DateTime lastEnabledChangedTime;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public NamespaceRoles[] namespaceRoles;
+        [DataMember] public string newEmailAddress;
+        [DataMember] public string oldEmailAddress;
+        [DataMember] public Permission[] permissions;
+        [DataMember] public string phoneNumber;
+        [DataMember] public bool phoneVerified;
+        [DataMember] public bool platformAvatarUrl;
+        [DataMember] public bool platformDisplayName;
+        [DataMember] public string platformId;
+        [DataMember] public string platformUserId;
+        [DataMember] public string[] roles;
+        [DataMember] public string userId;
+        [DataMember] public string userName;
+        [DataMember] public bool eligible = true;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicUserData
     {
-        [DataMember] public string authType { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
-        [DataMember] public Ban[] bans { get; set; }
-        [DataMember] public DateTime createdAt { get; set; }
-        [DataMember] public bool deletionStatus { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public bool emailVerified { get; set; }
-        [DataMember] public bool enabled { get; set; }
-        [DataMember] public DateTime lastDateOfBirthChangedTime { get; set; }
-        [DataMember] public DateTime lastEnabledChangedTime { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public Permission[] permissions { get; set; }
-        [DataMember] public bool phoneVerified { get; set; }
-        [DataMember] public string platformId { get; set; }
-        [DataMember] public string platformUserId { get; set; }
-        [DataMember] public string[] roles { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string userName { get; set; }
-        [DataMember] public bool eligible { get; set; } = true;
+        [DataMember] public string authType;
+        [DataMember] public string avatarUrl;
+        [DataMember] public Ban[] bans;
+        [DataMember] public DateTime createdAt;
+        [DataMember] public bool deletionStatus;
+        [DataMember] public string displayName;
+        [DataMember] public bool emailVerified;
+        [DataMember] public bool enabled;
+        [DataMember] public DateTime lastDateOfBirthChangedTime;
+        [DataMember] public DateTime lastEnabledChangedTime;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public Permission[] permissions;
+        [DataMember] public bool phoneVerified;
+        [DataMember] public string platformId;
+        [DataMember] public string platformUserId;
+        [DataMember] public string[] roles;
+        [DataMember] public string userId;
+        [DataMember] public string userName;
+        [DataMember] public bool eligible = true;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicUserInfo
     {
-        [DataMember] public DateTime createdAt { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string userName { get; set; }
+        [DataMember] public DateTime createdAt;
+        [DataMember] public string displayName;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string userId;
+        [DataMember] public string userName;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedPublicUsersInfo
     {
-        [DataMember] public PublicUserInfo[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public PublicUserInfo[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PolicyAcceptance
     {
-        [DataMember] public bool isAccepted { get; set; }
-        [DataMember] public string localizedPolicyVersionId { get; set; }
-        [DataMember] public string policyId { get; set; }
-        [DataMember] public string policyVersionId { get; set; }
+        [DataMember] public bool isAccepted;
+        [DataMember] public string localizedPolicyVersionId;
+        [DataMember] public string policyId;
+        [DataMember] public string policyVersionId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RegisterUserRequest
     {
-        [DataMember] public AuthenticationType authType { get; set; }
-        [DataMember] public string country { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string password { get; set; }
-        [DataMember] public List<PolicyAcceptance> acceptedPolicies { get; set; }
+        [DataMember] public AuthenticationType authType;
+        [DataMember] public string country;
+        [DataMember] public string dateOfBirth;
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public string password;
+        [DataMember] public List<PolicyAcceptance> acceptedPolicies;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class RegisterUserRequestv2
     {
-        [DataMember] public AuthenticationType authType { get; set; } = AuthenticationType.EMAILPASSWD;
-        [DataMember] public string country { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string password { get; set; }
-        [DataMember] public string username { get; set; }
-        [DataMember] public List<PolicyAcceptance> acceptedPolicies { get; set; }
+        [DataMember] public AuthenticationType authType = AuthenticationType.EMAILPASSWD;
+        [DataMember] public string country;
+        [DataMember] public string dateOfBirth;
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public string password;
+        [DataMember] public string username;
+        [DataMember] public List<PolicyAcceptance> acceptedPolicies;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RegisterUserResponse
     {
-        [DataMember] public AuthenticationType authType { get; set; }
-        [DataMember] public string country { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string username { get; set; }
+        [DataMember] public AuthenticationType authType;
+        [DataMember] public string country;
+        [DataMember] public string dateOfBirth;
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string userId;
+        [DataMember] public string username;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpdateUserRequest
     {
-        [DataMember] public string country { get; set; } // Country use ISO3166-1 alpha-2 two letter, e.g. US.
-        [DataMember] public string dateOfBirth { get; set; } // Date of Birth format : YYYY-MM-DD, e.g. 2019-04-29.
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; } // Able to be used in publisher namespace 
-        [DataMember] public string languageTag { get; set; } 
-        [DataMember] public string username { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
+        [DataMember] public string country; // Country use ISO3166-1 alpha-2 two letter, e.g. US.
+        [DataMember] public string dateOfBirth; // Date of Birth format : YYYY-MM-DD, e.g. 2019-04-29.
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress; // Able to be used in publisher namespace 
+        [DataMember] public string languageTag; 
+        [DataMember] public string username;
+        [DataMember] public string avatarUrl;
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PlatformType { Steam, EpicGames, PS4, Live, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, 
         Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin, Discord, Snapchat }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PlatformLink
     {
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string linkedAt { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string originNamespace { get; set; }
-        [DataMember] public string platformId { get; set; }
-        [DataMember] public string platformUserId { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public string linkedAt;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string originNamespace;
+        [DataMember] public string platformId;
+        [DataMember] public string platformUserId;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedPlatformLinks
     {
-        [DataMember] public PlatformLink[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public PlatformLink[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BulkPlatformUserIdRequest
     {
-        [DataMember] public string[] platformUserIDs { get; set; }
+        [DataMember] public string[] platformUserIDs;
     }
 
     public class BulkPlatformUserIdParameter
     {
-        public string PlatformId { get; set; }
+        public string PlatformId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PlatformUserIdMap
     {
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BulkPlatformUserIdResponse
     {
-        [DataMember] public PlatformUserIdMap[] userIdPlatforms { get; set; }
+        [DataMember] public PlatformUserIdMap[] userIdPlatforms;
     }
 
+    [DataContract, Preserve]
     public class CountryInfo
     {
-        [DataMember] public string countryCode { get; set; }
-        [DataMember] public string countryName { get; set; }
-        [DataMember] public string state { get; set; }
-        [DataMember] public string city { get; set; }
+        [DataMember] public string countryCode;
+        [DataMember] public string countryName;
+        [DataMember] public string state;
+        [DataMember] public string city;
     }
 
+    [DataContract, Preserve]
     public class Country
     {
-        [DataMember]  public string code { get; set; }
-        [DataMember] public string name { get; set; }
+        [DataMember]  public string code;
+        [DataMember] public string name;
     
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpgradeAndVerifyHeadlessRequest
     {
-        [DataMember] public string code { get; set; }
-        [DataMember] public string country { get; set; } //optional
-        [DataMember] public string dateOfBirth { get; set; } //optional
-        [DataMember] public string displayName { get; set; } //optional
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string password { get; set; }
-        [DataMember] public bool reachMinimumAge { get; set; } = true; //optional. If user input DOB, BE will not check this field
-        [DataMember] public string username { get; set; }
-        [DataMember] public bool validateOnly { get; set; } = false;
+        [DataMember] public string code;
+        [DataMember] public string country; //optional
+        [DataMember] public string dateOfBirth; //optional
+        [DataMember] public string displayName; //optional
+        [DataMember] public string emailAddress;
+        [DataMember] public string password;
+        [DataMember] public bool reachMinimumAge = true; //optional. If user input DOB, BE will not check this field
+        [DataMember] public string username;
+        [DataMember] public bool validateOnly = false;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AccountLinkedPlatform
     {
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string platformUserId { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string platformUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UnlinkPlatformAccountRequest
     {
-        [DataMember] public string platformNamespace { get; set; }
+        [DataMember] public string platformNamespace;
     }
 
     public class UnlinkPlatformAccountParameter
     {
-        public string PlatformId { get; set; }
+        public string PlatformId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AccountLinkPublisherAccount
     {
-        [DataMember] public string userId { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public AccountLinkedPlatform[] linkedPlatforms { get; set; }
+        [DataMember] public string userId;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public AccountLinkedPlatform[] linkedPlatforms;
 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AccountLinkConfictMessageVariables
     {
-        [DataMember] public string platformUserID { get; set; }
-        [DataMember] public AccountLinkPublisherAccount[] publisherAccounts { get; set; }
+        [DataMember] public string platformUserID;
+        [DataMember] public AccountLinkPublisherAccount[] publisherAccounts;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LinkPlatformAccountRequest
     {
-        [DataMember] public string platformId { get; set; }
-        [DataMember] public string platformUserId { get; set; }
+        [DataMember] public string platformId;
+        [DataMember] public string platformUserId;
     }
 
     public class LinkPlatformAccountParameter
     {
-        public string UserId { get; set; }
+        public string UserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpdateEmailRequest
     {
         [DataMember] public string code;
         [DataMember] public string emailAddress;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpgradeRequest
     {
         [DataMember(Name = "emailAddress")] public string EmailAddress;
@@ -376,7 +378,7 @@ namespace AccelByte.Models
         public bool NeedVerificationCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpgradeV2Request
     {
         [DataMember(Name = "emailAddress")] public string EmailAddress;
@@ -384,28 +386,28 @@ namespace AccelByte.Models
         [DataMember(Name = "username")] public string Username;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SendVerificationCodeRequest
     {
         [DataMember(Name = "emailAddress")] public string EmailAddress;
         [DataMember(Name = "context")] public string Context;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class VerifyRequest
     {
         [DataMember(Name = "code")] public string VerificationCode;
         [DataMember(Name = "contactType")] public string ContactType;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SendPasswordResetCodeRequest
     {
         [DataMember(Name = "emailAddress")] public string EmailAddress;
     }
 
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ResetPasswordRequest
     {
         [DataMember(Name = "code")] public string ResetCode;
@@ -413,7 +415,7 @@ namespace AccelByte.Models
         [DataMember(Name = "emailAddress")] public string EmailAddress;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LinkOtherPlatformRequest
     {
         [DataMember(Name = "platformId")] public string PlatformId;
@@ -421,37 +423,33 @@ namespace AccelByte.Models
 
     public class LinkOtherPlatformParameter
     {
-        public string Ticket { get; set; }
+        public string Ticket;
     }
 
-    [DataContract]
     public class GetPlatformLinkRequest
     {
-        public string UserId { get; set; }
+        public string UserId;
     }
 
-    [DataContract]
     public class SearchUsersRequest
     {
-        public string Query { get; set; }
-        public SearchType SearchBy { get; set; }
-        public int Offset { get; set; }
-        public int Limit { get; set; }
+        public string Query;
+        public SearchType SearchBy;
+        public int Offset;
+        public int Limit;
 
         public readonly string[] FilterType = { "", "displayName", "username" };
     }
 
-    [DataContract]
     public class GetUserByUserIdRequest
     {
-        public string UserId { get; set; }
+        public string UserId;
     }
 
-    [DataContract]
     public class GetUserByOtherPlatformUserIdRequest
     {
-        public string PlatformId { get; set; }
-        public string PlatformUserId { get; set; }
+        public string PlatformId;
+        public string PlatformUserId;
     }
 
     #region Ban
@@ -473,7 +471,7 @@ namespace AccelByte.Models
     /// </summary>
     /// <param name="displayName"> display name of the User</param>
     /// <param name="userId"> user ID of the User</param>
-    [DataContract]
+    [DataContract, Preserve]
     public class BannedByV3
     {
         [DataMember] public string displayName;
@@ -488,7 +486,7 @@ namespace AccelByte.Models
     /// <param name="endDate">The date when the ban is lifted with format "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffzzz"</param>
     /// <param name="reason">The reason of Banning</param>
     /// <param name="skipNotif">Notify user via email or not</param>
-    [DataContract]
+    [DataContract, Preserve]
     public class BanCreateRequest
     {
         [DataMember] public string ban;
@@ -512,7 +510,7 @@ namespace AccelByte.Models
     /// <param name="Namespace">Namespace that user got banned</param>
     /// <param name="reason">The reason of Banning</param>
     /// <param name="userId">The user ID that got banned</param>
-    [DataContract]
+    [DataContract, Preserve]
     public class UserBanResponseV3
     {
         [DataMember] public BanType ban;
@@ -528,13 +526,13 @@ namespace AccelByte.Models
         [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserEnableBan
     {
         [DataMember] public bool enabled;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserBanPagedList
     {
         [DataMember] public UserBanResponseV3[] data;
@@ -542,7 +540,7 @@ namespace AccelByte.Models
     }
     #endregion
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ListBulkUserInfoRequest
     {
         [DataMember] public string[] userIds;
@@ -550,257 +548,263 @@ namespace AccelByte.Models
 
     public class Change2FAFactorParameter
     {
-        public string MfaToken { get; set; }
-        public string Factor { get; set; }
+        public string MfaToken;
+        public string Factor;
     }
 
     public class Enable2FAAuthenticatorParameter
     {
-        public string Code { get; set; }
+        public string Code;
     }
 
     public class Make2FAFactorDefaultParameter
     {
-        public string FactorType { get; set; }
+        public string FactorType;
     }
 
     public class GetInputValidationsParameter
     {
-        public string LanguageCode { get; set; }
-        public bool DefaultOnEmpty { get; set; }
+        public string LanguageCode;
+        public bool DefaultOnEmpty;
     }
 
     public class GetPublisherUserParameter
     {
-        public string UserId { get; set; }
+        public string UserId;
     }
 
     public class GetUserInformationParameter
     {
-        public string UserId { get; set; }
+        public string UserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BaseUserInfo
     {
-        [DataMember] public string avatarUrl { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public Dictionary<string, string> platformUserIds { get; set; } 
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string publisherAvatarUrl { get; set; }
-        [DataMember] public string username { get; set; }
+        [DataMember] public string avatarUrl;
+        [DataMember] public string displayName;
+        [DataMember] public Dictionary<string, string> platformUserIds; 
+        [DataMember] public string userId;
+        [DataMember] public string publisherAvatarUrl;
+        [DataMember] public string username;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ListBulkUserInfoResponse
     {
-        [DataMember] public BaseUserInfo[] data { get; set; }
+        [DataMember] public BaseUserInfo[] data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class NamespaceRole
     {
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string roleId { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string roleId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserOtherPlatformInfo
     {
-        [DataMember] public string authType { get; set; }
-        [DataMember] public Ban[] bans { get; set; }
-        [DataMember] public string country { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string dateOfBirth { get; set; }
-        [DataMember] public bool deletionStatus { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public bool emailVerified { get; set; }
-        [DataMember] public bool enabled { get; set; }
-        [DataMember] public string lastDateOfBirthChangedTime { get; set; }
-        [DataMember] public string lastEnabledChangedTime { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public NamespaceRole[] namespaceRoles { get; set; }
-        [DataMember] public string newEmailAddress { get; set; }
-        [DataMember] public string oldEmailAddress { get; set; }
-        [DataMember] public Permission[] permissions { get; set; }
-        [DataMember] public string phoneNumber { get; set; }
-        [DataMember] public bool phoneVerified { get; set; }
-        [DataMember] public string platformDisplayName { get; set; } //optional
-        [DataMember] public string platformId { get; set; } //optional
-        [DataMember] public string platformUserId { get; set; } //optional
-        [DataMember] public string[] roles { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string username { get; set; } //optional
+        [DataMember] public string authType;
+        [DataMember] public Ban[] bans;
+        [DataMember] public string country;
+        [DataMember] public string createdAt;
+        [DataMember] public string dateOfBirth;
+        [DataMember] public bool deletionStatus;
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public bool emailVerified;
+        [DataMember] public bool enabled;
+        [DataMember] public string lastDateOfBirthChangedTime;
+        [DataMember] public string lastEnabledChangedTime;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public NamespaceRole[] namespaceRoles;
+        [DataMember] public string newEmailAddress;
+        [DataMember] public string oldEmailAddress;
+        [DataMember] public Permission[] permissions;
+        [DataMember] public string phoneNumber;
+        [DataMember] public bool phoneVerified;
+        [DataMember] public string platformDisplayName; //optional
+        [DataMember] public string platformId; //optional
+        [DataMember] public string platformUserId; //optional
+        [DataMember] public string[] roles;
+        [DataMember] public string userId;
+        [DataMember] public string username; //optional
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedUserOtherPlatformInfo
     {
-        [DataMember] public UserOtherPlatformInfo[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
-        [DataMember] public int totalData { get; set; }
+        [DataMember] public UserOtherPlatformInfo[] data;
+        [DataMember] public Paging paging;
+        [DataMember] public int totalData;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class TwoFACode
     {
-        [DataMember] public int generatedAt { get; set; }
-        [DataMember] public string[] invalidCode { get; set; }
-        [DataMember] public string[] validCodes { get; set; }
+        [DataMember] public int generatedAt;
+        [DataMember] public string[] invalidCode;
+        [DataMember] public string[] validCodes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SecretKey3rdPartyApp
     {
-        [DataMember] public string secretKey { get; set; }
-        [DataMember] public string uri { get; set; }
+        [DataMember] public string secretKey;
+        [DataMember] public string uri;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Enable2FAFactors
     { 
-        [DataMember(Name = "default")] public string default_ { get; set; }
-        [DataMember] public string[] enabled { get; set; }
+        [DataMember(Name = "default")] public string default_;
+        [DataMember] public string[] enabled;
     }
-    [DataContract]
+
+    [DataContract, Preserve]
     public class ValidationDescription
     {
-        [DataMember] public string language { get; set; }
-        [DataMember] public string[] message { get; set; }
+        [DataMember] public string language;
+        [DataMember] public string[] message;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Validation
     {
-        [DataMember] public bool allowDigit { get; set; }
-        [DataMember] public bool allowLetter { get; set; }
-        [DataMember] public bool allowSpace { get; set; }
-        [DataMember] public bool allowUnicode { get; set; }
-        [DataMember] public ValidationDescription description { get; set; }
-        [DataMember] public bool isCustomRegex { get; set; }
-        [DataMember] public string letterCase { get; set; }
-        [DataMember] public int maxLength { get; set; }
-        [DataMember] public int maxRepeatingAlphaNum { get; set; }
-        [DataMember] public int maxRepeatingSpecialCharacter { get; set; }
-        [DataMember] public int minCharType { get; set; }
-        [DataMember] public int minLength { get; set; }
-        [DataMember] public string regex { get; set; }
-        [DataMember] public string specialCharacterLocation { get; set; }
-        [DataMember] public string[] specialCharacters { get; set; }
+        [DataMember] public bool allowDigit;
+        [DataMember] public bool allowLetter;
+        [DataMember] public bool allowSpace;
+        [DataMember] public bool allowUnicode;
+        [DataMember] public ValidationDescription description;
+        [DataMember] public bool isCustomRegex;
+        [DataMember] public string letterCase;
+        [DataMember] public int maxLength;
+        [DataMember] public int maxRepeatingAlphaNum;
+        [DataMember] public int maxRepeatingSpecialCharacter;
+        [DataMember] public int minCharType;
+        [DataMember] public int minLength;
+        [DataMember] public string regex;
+        [DataMember] public string specialCharacterLocation;
+        [DataMember] public string[] specialCharacters;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DataInputValidation
     {
-        [DataMember] public string field { get; set; }
-        [DataMember] public Validation validation { get; set; }
+        [DataMember] public string field;
+        [DataMember] public Validation validation;
 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class InputValidation
     {
-        [DataMember] public DataInputValidation[] data { get; set; } 
-        [DataMember] public int version { get; set; }
+        [DataMember] public DataInputValidation[] data; 
+        [DataMember] public int version;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class GetPublisherUserResponse
     {
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; } 
-        [DataMember] public string userId { get; set; }
+        [DataMember(Name = "namespace")] public string namespace_; 
+        [DataMember] public string userId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PlatformUserInformation
     {
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string linkedAt { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string platformId { get; set; }
-        [DataMember] public string platformUserId { get; set; }
-        [DataMember] public string xboxUserId { get; set; }
+        [DataMember] public string displayName;
+        [DataMember] public string emailAddress;
+        [DataMember] public string linkedAt;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string platformId;
+        [DataMember] public string platformUserId;
+        [DataMember] public string xboxUserId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class GetUserInformationResponse
     {
-        [DataMember] public string country { get; set; }
-        [DataMember] public string displayName { get; set; }
-        [DataMember] public string[] emailAddresses { get; set; }
-        [DataMember] public string phoneNumber { get; set; }
-        [DataMember] public PlatformUserInformation[] platformUsers { get; set; }
-        [DataMember] public string username { get; set; }
-        [DataMember] public string xboxUserId { get; set; }
+        [DataMember] public string country;
+        [DataMember] public string displayName;
+        [DataMember] public string[] emailAddresses;
+        [DataMember] public string phoneNumber;
+        [DataMember] public PlatformUserInformation[] platformUsers;
+        [DataMember] public string username;
+        [DataMember] public string xboxUserId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class GeneratedOneTimeCode
     {
-        [DataMember] public string oneTimeLinkCode { get; set; }
-        [DataMember] public string oneTimeLinkURL { get; set; }
-        [DataMember] public int exp { get; set; }
+        [DataMember] public string oneTimeLinkCode;
+        [DataMember] public string oneTimeLinkURL;
+        [DataMember] public int exp;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ListUserDataRequest
     {
-        [DataMember(Name = "userIds")] public string[] UserIds { get; set; }
+        [DataMember(Name = "userIds")] public string[] UserIds;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserDataResponse
     {
-        [DataMember(Name = "displayName")] public string DisplayName { get; set; }
-        [DataMember(Name = "emailAddress")] public string EmailAddress { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember(Name = "userId")] public string UserId { get; set; }
+        [DataMember(Name = "displayName")] public string DisplayName;
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "userId")] public string UserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ListUserDataResponse
     {
-        [DataMember(Name = "data")] public UserDataResponse[] Data { get; set; }
+        [DataMember(Name = "data")] public UserDataResponse[] Data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LinkHeadlessAccountRequest
     {
-        [DataMember] public string[] ChosenNamespaces { get; set; }
-        [DataMember] public string OneTimeLinkCode { get; set; }
+        [DataMember] public string[] ChosenNamespaces;
+        [DataMember] public string OneTimeLinkCode;
     }
 
-    [DataContract]
     public class GetConflictResultWhenLinkHeadlessAccountToFullAccountRequest
     {
-        public string OneTimeLinkCode { get; set; }
+        public string OneTimeLinkCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AccountProgressionInfo
     {
-        [DataMember] public string DisplayName { get; set; }
-        [DataMember] public string Email { get; set; }
-        [DataMember] public string[] LinkedGames { get; set; }
-        [DataMember] public string UserName { get; set; }
+        [DataMember] public string DisplayName;
+        [DataMember] public string Email;
+        [DataMember] public string[] LinkedGames;
+        [DataMember] public string UserName;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ConflictLinkHeadlessAccountResult
     {
-        [DataMember] public AccountProgressionInfo CurrentAccount { get; set; }
-        [DataMember] public AccountProgressionInfo HeadlessAccount { get; set; }
-        [DataMember] public bool PlatformAlreadyLinked { get; set; }
-        [DataMember] public string PlatformId { get; set; }
-        [DataMember] public bool PlatformLinkConflict { get; set; }
+        [DataMember] public AccountProgressionInfo CurrentAccount;
+        [DataMember] public AccountProgressionInfo HeadlessAccount;
+        [DataMember] public bool PlatformAlreadyLinked;
+        [DataMember] public string PlatformId;
+        [DataMember] public bool PlatformLinkConflict;
     }
-    
+
+    [Preserve]
     internal class RefreshTokenCache
     {
-        public string RefreshToken { get; set; }
-        public DateTime ExpiredDate { get; set; }
+        public string RefreshToken;
+        public DateTime ExpiredDate;
+
+        public RefreshTokenCache()
+        {
+
+        }
     }
 
     public static class MaximumUserIds

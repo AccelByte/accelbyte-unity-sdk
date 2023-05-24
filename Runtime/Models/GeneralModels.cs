@@ -1,31 +1,31 @@
-// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class Paging
     {
-        [DataMember] public string first { get; set; }
-        [DataMember] public string last { get; set; }
-        [DataMember] public string next { get; set; }
-        [DataMember] public string previous { get; set; }
+        [DataMember] public string first;
+        [DataMember] public string last;
+        [DataMember] public string next;
+        [DataMember] public string previous;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagingCursor
     {
-        [DataMember] public string next { get; set; }
-        [DataMember] public string previous { get; set; }
+        [DataMember] public string next;
+        [DataMember] public string previous;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedResponse<T> where T : class, new()
     {
         [DataMember] public T[] data;

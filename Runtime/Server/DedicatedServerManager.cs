@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -21,6 +20,7 @@ namespace AccelByte.Server
         private string matchSessionId = "";
         private Coroutine heartBeatCoroutine;
 
+        [UnityEngine.Scripting.Preserve]
         internal DedicatedServerManager( DedicatedServerManagerApi inApi
             , ISession inSession
             , CoroutineRunner inCoroutineRunner )

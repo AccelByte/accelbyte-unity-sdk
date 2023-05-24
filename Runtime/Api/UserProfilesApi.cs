@@ -17,6 +17,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==BasicServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal UserProfilesApi( IHttpClient httpClient
             , Config config
             , ISession session ) 
@@ -244,17 +245,15 @@ namespace AccelByte.Api
         }
 
         public IEnumerator CreateUserProfile(string userId
-            , string language
-            , Dictionary<string, object> customAttributes
-            , string timezone
+            , CreateUserProfileRequest createRequest
             , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't create user profile! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
-            Assert.IsNotNull(language, "Can't update user profile! language parameter is null!");
-            Assert.IsNotNull(customAttributes, "Can't update user profile! customAttributes parameter is null!");
-            Assert.IsNotNull(timezone, "Can't update user profile! timezone parameter is null!");
+            Assert.IsNotNull(createRequest.language, "Can't update user profile! language parameter is null!");
+            Assert.IsNotNull(createRequest.customAttributes, "Can't update user profile! customAttributes parameter is null!");
+            Assert.IsNotNull(createRequest.timeZone, "Can't update user profile! timezone parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't create user profile! accessToken parameter is null!"); 
 
             var request = HttpRequestBuilder
@@ -264,11 +263,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
-                .WithBody(new {
-                    language = language,
-                    customAttributes = customAttributes,
-                    timezone = timezone,
-                }.ToUtf8Json())
+                .WithBody(createRequest.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;
@@ -282,19 +277,16 @@ namespace AccelByte.Api
         }
 
         public IEnumerator UpdateUserProfile(string userId
-            , string language 
-            , string timezone
-            , Dictionary<string, object> customAttributes
-            , string zipCode 
+            , UpdateUserProfileRequest updateRequest
             , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
             Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
-            Assert.IsNotNull(language, "Can't update user profile! language parameter is null!");
-            Assert.IsNotNull(timezone, "Can't update user profile! timezone parameter is null!");
-            Assert.IsNotNull(customAttributes, "Can't update user profile! customAttributes parameter is null!");
-            Assert.IsNotNull(zipCode, "Can't update user profile! zipCode parameter is null!");
+            Assert.IsNotNull(updateRequest.language, "Can't update user profile! language parameter is null!");
+            Assert.IsNotNull(updateRequest.timeZone, "Can't update user profile! timezone parameter is null!");
+            Assert.IsNotNull(updateRequest.customAttributes, "Can't update user profile! customAttributes parameter is null!");
+            Assert.IsNotNull(updateRequest.zipCode, "Can't update user profile! zipCode parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
 
             var request = HttpRequestBuilder
@@ -304,12 +296,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
-                .WithBody(new {
-                    language = language,
-                    timezone = timezone,
-                    customAttributes = customAttributes,
-                    zipCode = zipCode
-                }.ToUtf8Json())
+                .WithBody(updateRequest.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;

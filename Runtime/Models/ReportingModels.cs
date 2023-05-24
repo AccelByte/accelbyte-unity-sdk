@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -20,83 +19,83 @@ namespace AccelByte.Models
         CHAT
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingSubmitDataBase
     {
-        [DataMember] public ReportingCategory category { get; set; }
-        [DataMember] public string comment { get; set; }
-        [DataMember] public string objectId { get; set; }
-        [DataMember] public string objectType { get; set; }
-        [DataMember] public string reason { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public ReportingCategory category;
+        [DataMember] public string comment;
+        [DataMember] public string objectId;
+        [DataMember] public string objectType;
+        [DataMember] public string reason;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingAdditionalInfo
     {
-        [DataMember] public string[] screenshots { get; set; }
+        [DataMember] public string[] screenshots;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingSubmitData : ReportingSubmitDataBase
     {
-        [DataMember] public ReportingAdditionalInfo additionalInfo { get; set; }
+        [DataMember] public ReportingAdditionalInfo additionalInfo;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingAdditionalInfoChat
     {
-        [DataMember] public string topicId { get; set; }
+        [DataMember] public string topicId;
         
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime chatCreatedAt { get; set; }
+        public DateTime chatCreatedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingSubmitDataChat : ReportingSubmitDataBase
     {
-        [DataMember] public ReportingAdditionalInfoChat additionalInfo { get; set; }
+        [DataMember] public ReportingAdditionalInfoChat additionalInfo;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingSubmitResponse
     {
-        [DataMember] public ReportingCategory category { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string objectId { get; set; }
-        [DataMember] public string objectType { get; set; }
-        [DataMember] public string status { get; set; }
-        [DataMember] public string ticketId { get; set; }
-        [DataMember] public string updateAt { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public ReportingCategory category;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string objectId;
+        [DataMember] public string objectType;
+        [DataMember] public string status;
+        [DataMember] public string ticketId;
+        [DataMember] public string updateAt;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingReasonItem
     {
-        [DataMember] public string title { get; set; }
-        [DataMember] public string description { get; set; }
+        [DataMember] public string title;
+        [DataMember] public string description;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingReasonsResponse
     {
-        [DataMember] public ReportingReasonItem[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public ReportingReasonItem[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingReasonGroupItem
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public string title { get; set; }
+        [DataMember] public string id;
+        [DataMember] public string title;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReportingReasonGroupsResponse
     {
-        [DataMember] public ReportingReasonGroupItem[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public ReportingReasonGroupItem[] data;
+        [DataMember] public Paging paging;
     }
 
 }

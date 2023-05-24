@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using AccelByte.Core;
 using AccelByte.Models;
 using JetBrains.Annotations;
@@ -15,6 +14,7 @@ namespace AccelByte.Api
         private readonly ISession _session;
         private readonly CoroutineRunner _coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
             , ISession inSession
             , CoroutineRunner inCoroutineRunner)

@@ -16,6 +16,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==LeaderboardServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal LeaderboardApi( IHttpClient httpClient
             , Config config
             , ISession session )

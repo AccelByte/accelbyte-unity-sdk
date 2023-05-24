@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
@@ -14,6 +13,7 @@ namespace AccelByte.Server
         private readonly ServiceVersionApi api;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal ServiceVersion(ServiceVersionApi inApi
             , CoroutineRunner inCoroutineRunner)
         {

@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -18,6 +17,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Wallet( WalletApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -36,7 +36,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal Wallet( WalletApi inApi
             , UserSession inSession
             , string inNamespace

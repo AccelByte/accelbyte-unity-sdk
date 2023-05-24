@@ -399,11 +399,11 @@ namespace AccelByte.Core
             {
                 this.result.Headers["Namespace"] = GetNamespace();
             }
-            if (gameClientVersion.Length > 0)
+            if (!string.IsNullOrEmpty(gameClientVersion))
             {
                 this.result.Headers["Game-Client-Version"] = gameClientVersion;
             }
-            if (sdkVersion.Length > 0)
+            if (!string.IsNullOrEmpty(sdkVersion))
             {
                 this.result.Headers["AccelByte-SDK-Version"] = sdkVersion;
             }

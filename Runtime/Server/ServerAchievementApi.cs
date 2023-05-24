@@ -1,9 +1,7 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections;
-using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -17,6 +15,7 @@ namespace AccelByte.Server
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==AchievementServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ServerAchievementApi( IHttpClient httpClient
             , ServerConfig config
             , ISession session ) 

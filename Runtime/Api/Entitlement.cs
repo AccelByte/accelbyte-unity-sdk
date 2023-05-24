@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Models;
 using AccelByte.Core;
@@ -19,6 +18,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Entitlement( EntitlementApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -37,7 +37,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal Entitlement( EntitlementApi inApi
             , UserSession inSession
             , string inNamespace
@@ -692,11 +692,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.ValidateUserItemPurchaseCondition(
-                    items,
-                    callback
-                    ));
+            var requestModel = new ValidateUserItemPurchaseConditionRequest()
+            {
+                ItemIds = items
+            };
+
+            coroutineRunner.Run(api.ValidateUserItemPurchaseCondition(requestModel, callback));
         }
 
         /// <summary>

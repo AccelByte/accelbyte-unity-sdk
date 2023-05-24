@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -85,240 +84,243 @@ namespace AccelByte.Models
         UpdatedAtDesc,
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatConfig
     {
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public float defaultValue { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public bool incrementOnly { get; set; }
-        [DataMember] public float maximum { get; set; }
-        [DataMember] public float minimum { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public bool setAsGlobal { get; set; }
-        [DataMember] public StatisticSetBy setBy { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public StatisticStatus status { get; set; }
-        [DataMember] public string updatedAt { get; set; }
-        [DataMember] public string[] cycleIds { get; set; }
-        [DataMember] public string[] tags { get; set; }
+        [DataMember] public string createdAt;
+        [DataMember] public float defaultValue;
+        [DataMember] public string description;
+        [DataMember] public bool incrementOnly;
+        [DataMember] public float maximum;
+        [DataMember] public float minimum;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public bool setAsGlobal;
+        [DataMember] public StatisticSetBy setBy;
+        [DataMember] public string statCode;
+        [DataMember] public StatisticStatus status;
+        [DataMember] public string updatedAt;
+        [DataMember] public string[] cycleIds;
+        [DataMember] public string[] tags;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatItem
     {
-        [DataMember] public string createdAt { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public string statName { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string updatedAt { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public Dictionary<string, object> additionalData { get; set; }
+        [DataMember] public string createdAt;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string userId;
+        [DataMember] public string statCode;
+        [DataMember] public string statName;
+        [DataMember] public string[] tags;
+        [DataMember] public string updatedAt;
+        [DataMember] public float value;
+        [DataMember] public Dictionary<string, object> additionalData;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class CreateStatItemRequest
     {
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedStatItems
     {
-        [DataMember] public StatItem[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public StatItem[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserStatItemIncrement
     {
-        [DataMember] public float inc { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public float inc;
+        [DataMember] public string userId;
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatItemIncrement
     {
-        [DataMember] public float inc { get; set; }
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public float inc;
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatItemOperationResult
     {
-        [DataMember] public object details { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public bool success { get; set; }
+        [DataMember] public object details;
+        [DataMember] public string statCode;
+        [DataMember] public bool success;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserStatItemReset
     {
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public string userId;
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatItemReset
     {
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserStatItemUpdate
     {
-        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string additionalKey { get; set; }
-        [DataMember] public Dictionary<string, object> additionalData { get; set; }
+        [DataMember] public StatisticUpdateStrategy updateStrategy;
+        [DataMember] public float value;
+        [DataMember] public string statCode;
+        [DataMember] public string userId;
+        [DataMember] public string additionalKey;
+        [DataMember] public Dictionary<string, object> additionalData;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StatItemUpdate
     {
-        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public Dictionary<string, object> additionalData { get; set; }
+        [DataMember] public StatisticUpdateStrategy updateStrategy;
+        [DataMember] public float value;
+        [DataMember] public string statCode;
+        [DataMember] public Dictionary<string, object> additionalData;
     }
 
+    [DataContract, Preserve]
     public class FetchUser
     {
-        [DataMember] public string profileId { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public float value { get; set; }
+        [DataMember] public string profileId;
+        [DataMember] public string statCode;
+        [DataMember] public float value;
     }
 
+    [DataContract, Preserve]
     public class StatItemValue
     {
-        [DataMember] public string StatCode { get; set; }
-        [DataMember] public string StatName { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public float Value { get; set; }
-        [DataMember] public string[] Tags { get; set; }
-        [DataMember] public string CreatedAt { get; set; }
-        [DataMember] public string UpdatedAt { get; set; }
-        [DataMember] public Dictionary<string, object> AdditionalData { get; set; }
-        [DataMember] public string UserId { get; set; }
+        [DataMember] public string StatCode;
+        [DataMember] public string StatName;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public float Value;
+        [DataMember] public string[] Tags;
+        [DataMember] public string CreatedAt;
+        [DataMember] public string UpdatedAt;
+        [DataMember] public Dictionary<string, object> AdditionalData;
+        [DataMember] public string UserId;
     }
 
     public class FetchUserStatistic
     {
-        [DataMember] public StatItemValue[] UserStatistic { get; set; }
-        [DataMember] public string[] NotProcessedUserIds { get; set; }
+        [DataMember] public StatItemValue[] UserStatistic;
+        [DataMember] public string[] NotProcessedUserIds;
     }
 
     public class UpdateUserStatItem
     {
-        [DataMember] public string userId { get; set; }
-        [DataMember] public string additionalKey { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public object additionalData { get; set; }
+        [DataMember] public string userId;
+        [DataMember] public string additionalKey;
+        [DataMember] public string statCode;
+        [DataMember] public StatisticUpdateStrategy updateStrategy;
+        [DataMember] public float value;
+        [DataMember] public object additionalData;
     }
 
+    [DataContract, Preserve]
     public class UpdateUserStatItemsResponse
     {
-        [DataMember] public bool success { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public object details { get; set; }
+        [DataMember] public bool success;
+        [DataMember] public string statCode;
+        [DataMember] public object details;
     }
 
     public class UserStatItem
     {
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public object additionalData { get; set; }
+        [DataMember] public string statCode;
+        [DataMember] public object additionalData;
     }
 
     public class UpdateUserStatItemWithStatCode
     {
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public object additionalData { get; set; }
+        [DataMember] public string statCode;
+        [DataMember] public StatisticUpdateStrategy updateStrategy;
+        [DataMember] public float value;
+        [DataMember] public object additionalData;
     }
 
     public class PublicUpdateUserStatItem
     {
-        [DataMember] public StatisticUpdateStrategy updateStrategy { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public object additionalData { get; set; }
+        [DataMember] public StatisticUpdateStrategy updateStrategy;
+        [DataMember] public float value;
+        [DataMember] public object additionalData;
     }
 
     public class UpdateUserStatItemValueResponse
     {
-        [DataMember] public float currentValue { get; set; }
+        [DataMember] public float currentValue;
     };
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GlobalStatItem
     {
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public string statName { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public float value { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updatedAt { get; set; }
+        [DataMember] public string statCode;
+        [DataMember] public string statName;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public float value;
+        [DataMember] public string[] tags;
+        [DataMember] public string createdAt;
+        [DataMember] public string updatedAt;
     }
     
     
-    [DataContract]
+    [DataContract, Preserve]
     public class StatCycleConfig
     {
-        [DataMember] public string Id { get; set; }
-        [DataMember] public string Namespace { get; set; }
-        [DataMember] public StatisticCycleType CycleType { get; set; } 
-        [DataMember] public string Name { get; set; }
-        [DataMember] public string Description { get; set; }
-        [DataMember] public string ResetTime { get; set; }
-        [DataMember] public int ResetDay { get; set; }
-        [DataMember] public int ResetDate { get; set; }
-        [DataMember] public int ResetMonth { get; set; }
-        [DataMember] public int SeasonPeriod { get; set; }
-        [DataMember] public int CurrentVersion { get; set; }
-        [DataMember] public StatisticCycleStatus Status { get; set; }
-        [DataMember] public string NextReset { get; set; }
-        [DataMember] public string Start { get; set; }
-        [DataMember] public string End { get; set; }
-        [DataMember] public string CreatedAt { get; set; }
-        [DataMember] public string UpdatedAt { get; set; }
+        [DataMember] public string Id;
+        [DataMember] public string Namespace;
+        [DataMember] public StatisticCycleType CycleType; 
+        [DataMember] public string Name;
+        [DataMember] public string Description;
+        [DataMember] public string ResetTime;
+        [DataMember] public int ResetDay;
+        [DataMember] public int ResetDate;
+        [DataMember] public int ResetMonth;
+        [DataMember] public int SeasonPeriod;
+        [DataMember] public int CurrentVersion;
+        [DataMember] public StatisticCycleStatus Status;
+        [DataMember] public string NextReset;
+        [DataMember] public string Start;
+        [DataMember] public string End;
+        [DataMember] public string CreatedAt;
+        [DataMember] public string UpdatedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedStatCycleConfigs
     {
-        [DataMember] public StatCycleConfig[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public StatCycleConfig[] Data;
+        [DataMember] public Paging Paging;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class StatCycleItem
     {
-        [DataMember] public string CreatedAt { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string UserId { get; set; }
-        [DataMember] public string StatCode { get; set; }
-        [DataMember] public string StatName { get; set; }
-        [DataMember] public string[] Tags { get; set; }
-        [DataMember] public string UpdatedAt { get; set; }
-        [DataMember] public float Value { get; set; }
-        [DataMember] public string CycleId { get; set; }
-        [DataMember] public string CycleName { get; set; }
-        [DataMember] public int CycleVersion { get; set; }
+        [DataMember] public string CreatedAt;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string UserId;
+        [DataMember] public string StatCode;
+        [DataMember] public string StatName;
+        [DataMember] public string[] Tags;
+        [DataMember] public string UpdatedAt;
+        [DataMember] public float Value;
+        [DataMember] public string CycleId;
+        [DataMember] public string CycleName;
+        [DataMember] public int CycleVersion;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagedStatCycleItem
     {
-        [DataMember] public StatCycleItem[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public StatCycleItem[] Data;
+        [DataMember] public Paging Paging;
     }
 }

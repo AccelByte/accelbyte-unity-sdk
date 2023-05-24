@@ -18,6 +18,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Items( ItemsApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -29,14 +30,14 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal Items( ItemsApi inApi
             , UserSession inSession
             , string inNamespace

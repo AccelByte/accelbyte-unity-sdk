@@ -1,7 +1,6 @@
-// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -16,6 +15,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==BasicServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal MiscellaneousApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

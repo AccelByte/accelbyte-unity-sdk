@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,6 +8,7 @@ using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -68,7 +68,7 @@ namespace AccelByte.Models
         OnDSStatusChanged,
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PublicConfiguration
     {
         [DataMember] public string name;
@@ -83,13 +83,13 @@ namespace AccelByte.Models
         [DataMember] public string clientVersion;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2SessionInviteRequest
     {
         [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2MemberData
     {
         [DataMember] public string id;
@@ -99,7 +99,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2Notification
     {
         [DataMember] public string type;
@@ -110,7 +110,7 @@ namespace AccelByte.Models
 
     #region PartySession
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySessionCreateRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
@@ -120,7 +120,7 @@ namespace AccelByte.Models
         [DataMember] public bool textChat;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySession
     {
         [DataMember] public Dictionary<string, string> attributes;
@@ -136,7 +136,7 @@ namespace AccelByte.Models
         [DataMember] public int version;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySessionKickResponse
     {
         [DataMember] public string leaderId;
@@ -144,7 +144,7 @@ namespace AccelByte.Models
         [DataMember] public string partyId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySessionUpdateRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
@@ -157,7 +157,7 @@ namespace AccelByte.Models
         [DataMember] public int version;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySessionPromoteLeaderRequest
     {
         [DataMember] public string leaderId;
@@ -165,21 +165,21 @@ namespace AccelByte.Models
     
     #region Notification
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartyInvitationNotification
     {
         [DataMember] public string partyId;
         [DataMember] public string senderId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartyJoinedNotification
     {
         [DataMember] public string partyId;
         [DataMember] public SessionV2MemberData[] members;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartyMembersChangedNotification
     {
         [DataMember] public SessionV2PartySession session;
@@ -187,7 +187,7 @@ namespace AccelByte.Models
         [DataMember] public string leaderId;
     }    
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartyInvitationRejectedNotification
     {
         [DataMember] public SessionV2MemberData[] members;
@@ -195,13 +195,13 @@ namespace AccelByte.Models
         [DataMember] public string rejectedId;
     }    
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartyUserKickedNotification
     {
         [DataMember] public string partyId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2PartySessionUpdatedNotification
     {
         [DataMember] public string id;
@@ -250,7 +250,7 @@ namespace AccelByte.Models
         updatedAt
     };
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameSessionCreateRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
@@ -273,7 +273,7 @@ namespace AccelByte.Models
         [DataMember] public bool textChat;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameSession
     {
         [DataMember] public SessionV2DsInformation dsInformation;
@@ -294,7 +294,7 @@ namespace AccelByte.Models
         [DataMember] public int version;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameSessionUpdateRequest
     {
         [DataMember] public Dictionary<string, string> attributes;
@@ -314,7 +314,7 @@ namespace AccelByte.Models
         [DataMember] public int version;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2DsInformation
     {
         [DataMember] public SessionV2GameServer server;
@@ -340,10 +340,10 @@ namespace AccelByte.Models
             }
         }
 
-        public DateTime? requestedAt { get; set; }
+        public DateTime? requestedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameServer
     {
         [DataMember(Name = "alternate_ips")] public string[] alternateIps;
@@ -371,7 +371,7 @@ namespace AccelByte.Models
         [DataMember] public string status;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2TeamData
     {
         [DataMember] public string[] userIds;
@@ -379,26 +379,26 @@ namespace AccelByte.Models
 
     #region Notification
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameInvitationNotification
     {
         [DataMember] public string sessionId;
     }    
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameJoinedNotification
     {
         [DataMember] public string sessionId;
         [DataMember] public SessionV2MemberData[] members;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameUserKickedNotification
     {
         [DataMember] public string partyId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameInvitationRejectedNotification
     {
         [DataMember] public SessionV2MemberData[] members;
@@ -406,7 +406,7 @@ namespace AccelByte.Models
         [DataMember] public string rejectedId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameMembersChangedNotification
     {
         [DataMember] public SessionV2GameSession session;
@@ -414,7 +414,7 @@ namespace AccelByte.Models
         [DataMember] public string leaderId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2GameSessionUpdatedNotification
     {
         [DataMember] public string id;
@@ -433,7 +433,7 @@ namespace AccelByte.Models
         [DataMember(Name = "ticket_ids")] public string[] ticketIds;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class SessionV2DsStatusUpdatedNotification
     {
         [DataMember] public SessionV2GameSession session;

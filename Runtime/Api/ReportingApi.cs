@@ -16,6 +16,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==ReportingServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ReportingApi( IHttpClient httpClient
             , Config config
             , ISession session )

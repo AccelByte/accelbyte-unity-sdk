@@ -18,6 +18,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==PlatformServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal EntitlementApi( IHttpClient httpClient
             , Config config
             , ISession session ) 
@@ -642,19 +643,19 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator ValidateUserItemPurchaseCondition(string[] items
+        public IEnumerator ValidateUserItemPurchaseCondition(ValidateUserItemPurchaseConditionRequest requestModel
            , ResultCallback<PlatformValidateUserItemPurchaseResponse[]> callback)
         {
             Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
             Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
-            Assert.IsNotNull(items, "Can't validate user item purchase condition! items parameter is null!");
+            Assert.IsNotNull(requestModel.ItemIds, "Can't validate user item purchase condition! items parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/items/purchase/conditions/validate")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(new{itemIds = items}.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
             IHttpResponse response = null;

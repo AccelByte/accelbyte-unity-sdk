@@ -59,6 +59,7 @@ namespace AccelByte.Api
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
         /// <param name="platformLoginCacheDirectory">Directory of platform login cache</param>
+        [UnityEngine.Scripting.Preserve]
         internal User(UserApi inApi
             , UserSession inLoginSession
             , CoroutineRunner inCoroutineRunner
@@ -82,6 +83,7 @@ namespace AccelByte.Api
         /// </param>
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
+        [UnityEngine.Scripting.Preserve]
         internal User( UserApi inApi
             , UserSession inLoginSession
             , CoroutineRunner inCoroutineRunner) : this(inApi, inLoginSession, inCoroutineRunner, DefaultPlatformCacheDirectory)
@@ -95,7 +97,7 @@ namespace AccelByte.Api
         /// </param>
         /// <param name="inApi"></param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("For pattern parity, to conform with other classes, use the overload that starts with api param")]
+        [Obsolete("For pattern parity, to conform with other classes, use the overload that starts with api param"), UnityEngine.Scripting.Preserve]
         internal User( UserSession inLoginSession
             , UserApi inApi
             , CoroutineRunner inCoroutineRunner )

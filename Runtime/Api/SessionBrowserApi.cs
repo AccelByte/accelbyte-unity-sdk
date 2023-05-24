@@ -15,6 +15,7 @@ namespace AccelByte.Api
 {
     public class SessionBrowserApi : AccelByte.Core.ApiBase
     {
+        [UnityEngine.Scripting.Preserve]
         public SessionBrowserApi(IHttpClient inHttpClient, Config inConfig, ISession inSession)
             : base(inHttpClient, inConfig, inConfig.SessionBrowserServerUrl, inSession)
         {

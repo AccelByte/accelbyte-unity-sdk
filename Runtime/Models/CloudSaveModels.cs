@@ -1,10 +1,10 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -30,84 +30,84 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserRecord
     {
-        [DataMember] public string key { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string user_id { get; set; }
-        [DataMember] public Dictionary<string, object> value { get; set; }
-        [DataMember] public DateTime created_at { get; set; }
-        [DataMember] public DateTime updated_at { get; set; }
-        [DataMember] public bool is_public { get; set; }
-        [DataMember] public string set_by { get; set; }
+        [DataMember] public string key;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string user_id;
+        [DataMember] public Dictionary<string, object> value;
+        [DataMember] public DateTime created_at;
+        [DataMember] public DateTime updated_at;
+        [DataMember] public bool is_public;
+        [DataMember] public string set_by;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PagingGameRecord
     {
-        [DataMember] public string first { get; set; }
-        [DataMember] public string last { get; set; }
-        [DataMember] public string next { get; set; }
-        [DataMember] public string previous { get; set; }
+        [DataMember] public string first;
+        [DataMember] public string last;
+        [DataMember] public string next;
+        [DataMember] public string previous;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GameRecordList 
     {
-        [DataMember] public string[] data { get; set; }
-        [DataMember] public PagingGameRecord paging { get; set; }
+        [DataMember] public string[] data;
+        [DataMember] public PagingGameRecord paging;
 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GameRecord
     {
-        [DataMember] public string key { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public Dictionary<string, object> value { get; set; }
-        [DataMember] public DateTime created_at { get; set; }
-        [DataMember] public DateTime updated_at { get; set; }
-        [DataMember] public string set_by { get; set; }
+        [DataMember] public string key;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public Dictionary<string, object> value;
+        [DataMember] public DateTime created_at;
+        [DataMember] public DateTime updated_at;
+        [DataMember] public string set_by;
 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ConcurrentReplaceRequest
     {        
-        [DataMember] public DateTime updatedAt { get; set; } // Time format should style: RFC3339
-        [DataMember] public Dictionary<string, object> value { get; set; }
+        [DataMember] public DateTime updatedAt; // Time format should style: RFC3339
+        [DataMember] public Dictionary<string, object> value;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BulkGetRecordsByKeyRequest
     {
-        [DataMember] public string[] keys { get; set; }
+        [DataMember] public string[] keys;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserRecords
     {
-        [DataMember] public UserRecord[] data { get; set; }
+        [DataMember] public UserRecord[] data;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class GameRecords
     {
-        [DataMember] public GameRecord[] data { get; set; }
+        [DataMember] public GameRecord[] data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicUserRecordKeys
     {
-        [DataMember] public string Key { get; set; }
-        [DataMember(Name = "User_id")] public string UserId { get; set; }
+        [DataMember] public string Key;
+        [DataMember(Name = "User_id")] public string UserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedBulkGetPublicUserRecordKeys
     {
-        [DataMember] public PublicUserRecordKeys[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public PublicUserRecordKeys[] Data;
+        [DataMember] public Paging Paging;
     }
 }

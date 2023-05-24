@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2020 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -23,64 +23,64 @@ namespace AccelByte.Models
     }
     #endregion enum
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserPoint
     {
-        [DataMember] public float point { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public bool hidden { get; set; }
-        [DataMember] public Dictionary<string, object> additionalData { get; set; }
+        [DataMember] public float point;
+        [DataMember] public string userId;
+        [DataMember] public bool hidden;
+        [DataMember] public Dictionary<string, object> additionalData;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserRanking
     {
-        [DataMember] public float point { get; set; }
-        [DataMember] public int rank { get; set; }
-        [DataMember] public bool hidden { get; set; }
+        [DataMember] public float point;
+        [DataMember] public int rank;
+        [DataMember] public bool hidden;
         [DataMember] public Dictionary<string, object> additionalData {get; set;}
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserRankingData
     {
-        [DataMember] public UserRanking allTime { get; set; }
-        [DataMember] public UserRanking current { get; set; }
-        [DataMember] public UserRanking daily { get; set; }
-        [DataMember] public UserRanking monthly { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public UserRanking weekly { get; set; }
+        [DataMember] public UserRanking allTime;
+        [DataMember] public UserRanking current;
+        [DataMember] public UserRanking daily;
+        [DataMember] public UserRanking monthly;
+        [DataMember] public string userId;
+        [DataMember] public UserRanking weekly;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LeaderboardRankingResult
     {
-        [DataMember] public UserPoint[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UserPoint[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LeaderboardData
     {
-        [DataMember] public string iconURL { get; set; }
-        [DataMember] public string leaderboardCode { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string statCode { get; set; }
+        [DataMember] public string iconURL;
+        [DataMember] public string leaderboardCode;
+        [DataMember] public string name;
+        [DataMember] public string statCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LeaderboardPaging
     {
-        [DataMember] public string First { get; set; }
-        [DataMember] public string Last { get; set; }
-        [DataMember] public string Next { get; set; }
-        [DataMember] public string Previous { get; set; }
+        [DataMember] public string First;
+        [DataMember] public string Last;
+        [DataMember] public string Next;
+        [DataMember] public string Previous;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LeaderboardPagedList
     {
-        [DataMember] public LeaderboardData[] data { get; set; }
-        [DataMember] public LeaderboardPaging paging { get; set; }
+        [DataMember] public LeaderboardData[] data;
+        [DataMember] public LeaderboardPaging paging;
     }
 }

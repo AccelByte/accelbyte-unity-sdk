@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
+
 namespace AccelByte.Api
 {
     /// <summary>
@@ -18,6 +18,7 @@ namespace AccelByte.Api
         private readonly CoroutineRunner coroutineRunner;
         private readonly UserSession session;
 
+        [UnityEngine.Scripting.Preserve]
         internal CloudSave( CloudSaveApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -36,7 +37,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal CloudSave( CloudSaveApi inApi
             , UserSession inSession
             , string inNamespace

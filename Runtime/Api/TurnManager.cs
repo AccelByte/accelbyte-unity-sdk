@@ -1,11 +1,8 @@
-// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
@@ -26,6 +23,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal TurnManager(TurnManagerApi inApi, UserSession inSession, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, "api parameter can not be null.");

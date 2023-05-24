@@ -32,6 +32,7 @@ namespace AccelByte.Api
         public event Action<string> RefreshTokenCallback;
         private Coroutine bearerAuthRejectedCoroutine;
 
+        [UnityEngine.Scripting.Preserve]
         internal UserSession
             (IHttpClient inHttpClient
             , CoroutineRunner inCoroutineRunner

@@ -1,12 +1,11 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -23,129 +22,129 @@ namespace AccelByte.Models
         sessionTimeout // when joinable session is timed out, and removed from queue
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RegisterServerRequest
     {
-        [DataMember] public string game_version { get; set; }
-        [DataMember] public string ip { get; set; }
-        [DataMember] public string pod_name { get; set; }
-        [DataMember] public int port { get; set; }
-        [DataMember]public string provider { get; set; }
+        [DataMember] public string game_version;
+        [DataMember] public string ip;
+        [DataMember] public string pod_name;
+        [DataMember] public int port;
+        [DataMember]public string provider;
 
-        [DataMember] public string custom_attribute { get; set; }
+        [DataMember] public string custom_attribute;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ShutdownServerRequest
     {
-        [DataMember] public bool kill_me { get; set; }
-        [DataMember] public string pod_name { get; set; }
-        [DataMember] public string session_id { get; set; }
+        [DataMember] public bool kill_me;
+        [DataMember] public string pod_name;
+        [DataMember] public string session_id;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RegisterLocalServerRequest
     {
-        [DataMember] public string ip { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public uint port { get; set; }
-        [DataMember] public string custom_attribute { get; set; }
+        [DataMember] public string ip;
+        [DataMember] public string name;
+        [DataMember] public uint port;
+        [DataMember] public string custom_attribute;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyMember
     {
-        [DataMember] public string user_id { get; set; }
+        [DataMember] public string user_id;
         [DataMember] public Dictionary<string, object> extra_attributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchParty
     {
-        [DataMember] public string party_id { get; set; }
-        [DataMember] public PartyMember[] party_members { get; set; }
-        [DataMember] public Dictionary<string, object> party_attributes { get; set; }
+        [DataMember] public string party_id;
+        [DataMember] public PartyMember[] party_members;
+        [DataMember] public Dictionary<string, object> party_attributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchingAlly
     {
-        [DataMember] public MatchParty[] matching_parties { get; set; }
+        [DataMember] public MatchParty[] matching_parties;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchRequest
     {
-        [DataMember] public string game_mode { get; set; }
-        [DataMember] public MatchingAlly[] matching_allies { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string session_id { get; set; }
+        [DataMember] public string game_mode;
+        [DataMember] public MatchingAlly[] matching_allies;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string session_id;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DSMClient
     {
-        [DataMember] public string host_address { get; set; }
-        [DataMember] public string region { get; set; }
-        [DataMember] public string status { get; set; }
-        [DataMember] public string provider { get; set; }
+        [DataMember] public string host_address;
+        [DataMember] public string region;
+        [DataMember] public string status;
+        [DataMember] public string provider;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PubIp
     {
-        [DataMember] public string ip { get; set; }
+        [DataMember] public string ip;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerInfo
     {
-        [DataMember] public string pod_name { get; set; }
-        [DataMember] public string image_version { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string ip { get; set; }
-        [DataMember] public string[] alternate_ips { get; set; }
-        [DataMember] public int port { get; set; }
-        [DataMember] public string provider { get; set; }
-        [DataMember] public string game_version { get; set; }
-        [DataMember] public string status { get; set; }
-        [DataMember] public string last_update { get; set; }
+        [DataMember] public string pod_name;
+        [DataMember] public string image_version;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string ip;
+        [DataMember] public string[] alternate_ips;
+        [DataMember] public int port;
+        [DataMember] public string provider;
+        [DataMember] public string game_version;
+        [DataMember] public string status;
+        [DataMember] public string last_update;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingResult
     {
-        [DataMember] public string channel { get; set; }
-        [DataMember] public string client_version { get; set; }
-        [DataMember] public string game_mode { get; set; }
-        [DataMember] public bool joinable { get; set; }
-        [DataMember] public string match_id { get; set; }
-        [DataMember] public MatchingAlly[] matching_allies { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public Dictionary<string, object> party_attributes { get; set; }
-        [DataMember] public string party_id { get; set; }
-        [DataMember] public int queued_at { get; set; }
-        [DataMember] public string region { get; set; }
-        [DataMember] public string server_name { get; set; }
-        [DataMember] public MatchmakingStatus status { get; set; }
+        [DataMember] public string channel;
+        [DataMember] public string client_version;
+        [DataMember] public string game_mode;
+        [DataMember] public bool joinable;
+        [DataMember] public string match_id;
+        [DataMember] public MatchingAlly[] matching_allies;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public Dictionary<string, object> party_attributes;
+        [DataMember] public string party_id;
+        [DataMember] public int queued_at;
+        [DataMember] public string region;
+        [DataMember] public string server_name;
+        [DataMember] public MatchmakingStatus status;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AddUserIntoSessionRequest
     {
-        [DataMember] public string user_id { get; set; }
-        [DataMember] public string party_id { get; set; }
+        [DataMember] public string user_id;
+        [DataMember] public string party_id;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DequeueRequest
     {
-        [DataMember] public string match_id { get; set; }
+        [DataMember] public string match_id;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerSessionResponse
     {
-        [DataMember] public string session_id { get; set; }
+        [DataMember] public string session_id;
     }
 }

@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -69,331 +68,371 @@ namespace AccelByte.Models
 
     #endregion
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCPayloadUrl
     {
-        [DataMember] public string source { get; set; }
-        [DataMember] public string url { get; set; }
+        [DataMember] public string source;
+        [DataMember] public string url;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCCreatorState
     {
-        [DataMember] public bool state { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public bool state;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCTagResponse
     {
-        [DataMember] public string id { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string tag { get; set; }
+        [DataMember] public string id;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string tag;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
+    public class UpdateChannelRequest
+    {
+        [DataMember(Name = "name")] public string Name;
+    }
+
+    public class UpdateChannelParameter
+    {
+        public string UserId;
+        public string ChannelId;
+    }
+
+    [DataContract, Preserve]
     public class UGCChannelResponse
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string id;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCTypeResponse
     {
-        [DataMember] public string id { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string[] subtype { get; set; }
-        [DataMember] public string type { get; set; }
+        [DataMember] public string id;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string[] subtype;
+        [DataMember] public string type;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCPreviewMetadata
     {
-        [DataMember] public string PreviewContentType { get; set; }
-        [DataMember] public string PreviewFileExtension { get; set; }
+        [DataMember] public string PreviewContentType;
+        [DataMember] public string PreviewFileExtension;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCRequest
     {
-        [DataMember] public string contentType { get; set; }
-        [DataMember] public string fileExtension { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string preview { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string subtype { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
-        [DataMember] public UGCPreviewMetadata PreviewMetadata { get; set; }
+        [DataMember] public string contentType;
+        [DataMember] public string fileExtension;
+        [DataMember] public string name;
+        [DataMember] public string preview;
+        [DataMember] public string type;
+        [DataMember] public string subtype;
+        [DataMember] public string[] tags;
+        [DataMember] public Dictionary<string, object> customAttributes;
+        [DataMember] public UGCPreviewMetadata PreviewMetadata;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCUpdateRequest
     {
-        [DataMember] public string ContentType { get; set; }
-        [DataMember] public string FileExtension { get; set; }
-        [DataMember] public string Name { get; set; }
-        [DataMember] public string Preview { get; set; }
-        [DataMember] public string Type { get; set; }
-        [DataMember] public string Subtype { get; set; }
-        [DataMember] public string[] Tags { get; set; }
-        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
-        [DataMember] public UGCPreviewMetadata PreviewMetadata { get; set; }
-        [DataMember] public bool UpdateContentFile { get; set; }
+        [DataMember] public string ContentType;
+        [DataMember] public string FileExtension;
+        [DataMember] public string Name;
+        [DataMember] public string Preview;
+        [DataMember] public string Type;
+        [DataMember] public string Subtype;
+        [DataMember] public string[] Tags;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public UGCPreviewMetadata PreviewMetadata;
+        [DataMember] public bool UpdateContentFile;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCResponse
     {
-        [DataMember] public string channelId { get; set; }
-        [DataMember] public string contentType { get; set; }
-        [DataMember] public DateTime createdTime { get; set; }
-        [DataMember] public string creatorName { get; set; }
-        [DataMember] public string fileExtension { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public UGCPayloadUrl[] payloadURL { get; set; }
-        [DataMember] public string preview { get; set; }
-        [DataMember] public string shareCode { get; set; }
-        [DataMember] public string subType { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string channelId;
+        [DataMember] public string contentType;
+        [DataMember] public DateTime createdTime;
+        [DataMember] public string creatorName;
+        [DataMember] public string fileExtension;
+        [DataMember] public string id;
+        [DataMember] public bool isOfficial;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public UGCPayloadUrl[] payloadURL;
+        [DataMember] public string preview;
+        [DataMember] public string shareCode;
+        [DataMember] public string subType;
+        [DataMember] public string[] tags;
+        [DataMember] public string type;
+        [DataMember] public string userId;
+        [DataMember] public Dictionary<string, object> customAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCContentResponse
     {
-        [DataMember] public string channelId { get; set; }
-        [DataMember] public DateTime createdTime { get; set; }
-        [DataMember] public UGCCreatorState creatorFollowState { get; set; }
-        [DataMember] public string creatorName { get; set; }
-        [DataMember] public int downloadCount { get; set; }
-        [DataMember] public string fileExtension { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public int likeCount { get; set; }
-        [DataMember] public UGCCreatorState likeState { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string payload { get; set; }
-        [DataMember] public UGCPayloadUrl[] payloadURL { get; set; }
-        [DataMember] public string shareCode { get; set; }
-        [DataMember] public string subType { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string channelId;
+        [DataMember] public DateTime createdTime;
+        [DataMember] public UGCCreatorState creatorFollowState;
+        [DataMember] public string creatorName;
+        [DataMember] public int downloadCount;
+        [DataMember] public string fileExtension;
+        [DataMember] public string id;
+        [DataMember] public bool isOfficial;
+        [DataMember] public int likeCount;
+        [DataMember] public UGCCreatorState likeState;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string payload;
+        [DataMember] public UGCPayloadUrl[] payloadURL;
+        [DataMember] public string shareCode;
+        [DataMember] public string subType;
+        [DataMember] public string[] tags;
+        [DataMember] public string type;
+        [DataMember] public string userId;
+        [DataMember] public Dictionary<string, object> customAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCTagsPagingResponse
     {
-        [DataMember] public UGCTagResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCTagResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCTypesPagingResponse
     {
-        [DataMember] public UGCTypeResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCTypeResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCChannelPagingResponse
     {
-        [DataMember] public UGCChannelResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCChannelResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCPreview
     {
-        [DataMember] public string preview { get; set; }
+        [DataMember] public string preview;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserIdState
     {
-        [DataMember] public bool state { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public bool state;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCGetCreatorStatsResponse
     {
-        [DataMember] public UserIdState creatorFollowState { get; set; }
-        [DataMember] public int followCount { get; set; }
-        [DataMember] public int followingCount { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public int totalLikedContent { get; set; }
+        [DataMember] public UserIdState creatorFollowState;
+        [DataMember] public int followCount;
+        [DataMember] public int followingCount;
+        [DataMember] public string id;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public int totalLikedContent;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PayLoadUrl
     {
-        [DataMember] public string source { get; set; }
-        [DataMember] public string url { get; set; }
+        [DataMember] public string source;
+        [DataMember] public string url;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ScreenshotRequest
     {
-        [DataMember] public string contentType { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public UGCFileExtension fileExtension { get; set; }
+        [DataMember] public string contentType;
+        [DataMember] public string description;
+        [DataMember] public UGCFileExtension fileExtension;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ScreenshotsRequest
     {
-        [DataMember] public ScreenshotRequest[] screenshots { get; set; }
+        [DataMember] public ScreenshotRequest[] screenshots;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Screenshots
     {
-        [DataMember] public string contentType { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public string fileExtension { get; set; }
-        [DataMember] public string screenshootId { get; set; }
-        [DataMember] public string source { get; set; }
-        [DataMember] public string url { get; set; }
+        [DataMember] public string contentType;
+        [DataMember] public string description;
+        [DataMember] public string fileExtension;
+        [DataMember] public string screenshootId;
+        [DataMember] public string source;
+        [DataMember] public string url;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ScreenshotsResponse
     {
-        [DataMember] public Screenshots[] screenshots { get; set; }
+        [DataMember] public Screenshots[] screenshots;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SearchContentRequest
     {
-        [DataMember] public string name { get; set; }
-        [DataMember] public string creator { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string subtype { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; // Default to sorting criteria = date
-        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; // Default to sorting order = desc
-        [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
-        [DataMember] public int offset { get; set; } = 0; // Default value = 0
+        [DataMember] public string name;
+        [DataMember] public string creator;
+        [DataMember] public string type;
+        [DataMember] public string subtype;
+        [DataMember] public string[] tags;
+        [DataMember] public bool isOfficial;
+        [DataMember] public UGCSortBy sortBy = UGCSortBy.DATE; // Default to sorting criteria = date
+        [DataMember] public UGCOrderBy orderBy = UGCOrderBy.DESC; // Default to sorting order = desc
+        [DataMember] public int limit = 1000; // Default value = 1000
+        [DataMember] public int offset = 0; // Default value = 0
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GetLikedContentRequest
     {
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string subtype { get; set; }
-        [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public int limit { get; set; } = 1000; // Default value = 1000
-        [DataMember] public int offset { get; set; } = 0; // Default value = 0
-        [DataMember] public UGCSortBy sortBy { get; set; } = UGCSortBy.DATE; // Default to sorting criteria = date
-        [DataMember] public UGCOrderBy orderBy { get; set; } = UGCOrderBy.DESC; // Default to sorting order = desc
+        [DataMember] public string[] tags;
+        [DataMember] public string name;
+        [DataMember] public string type;
+        [DataMember] public string subtype;
+        [DataMember] public bool isOfficial;
+        [DataMember] public int limit = 1000; // Default value = 1000
+        [DataMember] public int offset = 0; // Default value = 0
+        [DataMember] public UGCSortBy sortBy = UGCSortBy.DATE; // Default to sorting criteria = date
+        [DataMember] public UGCOrderBy orderBy = UGCOrderBy.DESC; // Default to sorting order = desc
     }
 
-    [DataContract]
+    [DataContract, Preserve]
+    public class GetBulkContentIdRequest
+    {
+        [DataMember(Name = "contentId")] public string[] ContentId;
+    }
+
+    [DataContract, Preserve]
     public class UGCModelsContentsResponse
     {
-        [DataMember] public string channelId { get; set; }
-        [DataMember] public string createdTime { get; set; }
-        [DataMember] public UserIdState creatorFollowState { get; set; }
-        [DataMember] public string creatorName { get; set; }
-        [DataMember] public int downloadCount { get; set; }
-        [DataMember] public string fileExtension { get; set; }
-        [DataMember] public string[] groups { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember] public bool isHidden { get; set; }
-        [DataMember] public bool isOfficial { get; set; }
-        [DataMember] public int likeCount { get; set; }
-        [DataMember] public UserIdState likeState { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string payload { get; set; }
-        [DataMember] public PayLoadUrl[] payloadUrl { get; set; }
-        [DataMember] public PayLoadUrl[] previewUrl { get; set; }
-        [DataMember] public Screenshots[] screenshots { get; set; }
-        [DataMember] public string shareCode { get; set; }
-        [DataMember] public string subType { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public string updatedTime { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, object> customAttributes { get; set; }
+        [DataMember] public string channelId;
+        [DataMember] public string createdTime;
+        [DataMember] public UserIdState creatorFollowState;
+        [DataMember] public string creatorName;
+        [DataMember] public int downloadCount;
+        [DataMember] public string fileExtension;
+        [DataMember] public string[] groups;
+        [DataMember] public string id;
+        [DataMember] public bool isHidden;
+        [DataMember] public bool isOfficial;
+        [DataMember] public int likeCount;
+        [DataMember] public UserIdState likeState;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string payload;
+        [DataMember] public PayLoadUrl[] payloadUrl;
+        [DataMember] public PayLoadUrl[] previewUrl;
+        [DataMember] public Screenshots[] screenshots;
+        [DataMember] public string shareCode;
+        [DataMember] public string subType;
+        [DataMember] public string[] tags;
+        [DataMember] public string type;
+        [DataMember] public string updatedTime;
+        [DataMember] public string userId;
+        [DataMember] public Dictionary<string, object> customAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCSearchContentsPagingResponse
     {
-        [DataMember] public UGCModelsContentsResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCModelsContentsResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCContentsPagingResponse
     {
-        [DataMember] public UGCModelsContentsResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCModelsContentsResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
+    public class UpdateLikeStatusToContentRequest
+    {
+        [DataMember(Name = "likeStatus")] public bool LikeStatus;
+    }
+
+    public class UpdateLikeStatusToContentParameter
+    {
+        public string ContentId;
+    }
+
+    [DataContract, Preserve]
     public class UGCUpdateLikeStatusToContentResponse
     {
-        [DataMember] public string contentId { get; set; }
-        [DataMember] public bool likeStatus { get; set; }
+        [DataMember] public string contentId;
+        [DataMember] public bool likeStatus;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCGetListFollowersResponse
     {
-        [DataMember] public int followCount { get; set; }
-        [DataMember] public int followingCount { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public int totalLikedContent { get; set; }
+        [DataMember] public int followCount;
+        [DataMember] public int followingCount;
+        [DataMember] public string id;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public int totalLikedContent;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCGetListFollowersPagingResponse
     {
-        [DataMember] public UGCGetListFollowersResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCGetListFollowersResponse[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
+    public class UpdateFollowStatusRequest
+    {
+        [DataMember(Name = "followStatus")] public bool FollowStatus;
+    }
+
+    public class UpdateFollowStatusParameter
+    {
+        public string UserId;
+    }
+
+    [DataContract, Preserve]
     public class UGCUpdateFollowStatusToUserResponse
     {
-        [DataMember] public bool followStatus { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public bool followStatus;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCGetUserGroupsResponse
     {
-        [DataMember] public string[] contents { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string[] contents;
+        [DataMember] public string createdAt;
+        [DataMember] public string id;
+        [DataMember] public string name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UGCGetUserGroupsPagingResponse
     {
-        [DataMember] public UGCGetUserGroupsResponse[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public UGCGetUserGroupsResponse[] data;
+        [DataMember] public Paging paging;
     }
 }

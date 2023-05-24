@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -18,7 +18,7 @@ namespace AccelByte.Models
         OnTicketExpired,
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2CreateTicketRequest
     {
         [DataMember] public string matchPool;
@@ -27,7 +27,7 @@ namespace AccelByte.Models
         [DataMember] public string sessionId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2CreateTicketRequestOptionalParams
     {
         [DataMember] public Dictionary<string, object> attributes;
@@ -35,27 +35,27 @@ namespace AccelByte.Models
         [DataMember] public string sessionId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2CreateTicketResponse
     {
         [DataMember] public string matchTicketId;
         [DataMember] public int queueTime;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2MatchTicketStatus
     {
         [DataMember] public string sessionId;
         [DataMember] public bool matchFound;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2Ticket
     {
         [DataMember] public string ticketId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2Metrics
     {
         [DataMember(Name = "queueTime")] public int QueueTime;
@@ -63,14 +63,14 @@ namespace AccelByte.Models
 
     #region Backfill
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerMatchmakingV2BackfillRequest
     {
         [DataMember] public string proposalId;
         [DataMember(Name = "stop")] public bool isStoppingBackfill;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2BackfillProposalNotification
     {
         [DataMember] public string backfillTicketId;
@@ -81,7 +81,7 @@ namespace AccelByte.Models
         [DataMember] public MatchmakingV2Ticket[] addedTickets;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerMatchmakingV2Ticket
     {
         [DataMember] public string ticketId;
@@ -92,14 +92,14 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, int> latencies;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerMatchmakingV2TicketAttributes
     {
         [DataMember(Name = "server_name")] public string serverName;
         [DataMember(Name = "member_attributes")] public Dictionary<string, object> ticketAttributes;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerMatchmakingV2Players
     {
         [DataMember] public string playerId;
@@ -110,7 +110,7 @@ namespace AccelByte.Models
 
     #region Notifications
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2MatchFoundNotification
     {
         [DataMember] public string id;
@@ -121,7 +121,7 @@ namespace AccelByte.Models
         [DataMember] public MatchmakingV2Ticket[] tickets;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2MatchmakingStartedNotification
     {
         [DataMember] public string ticketId;
@@ -131,7 +131,7 @@ namespace AccelByte.Models
         [DataMember] public string matchPool;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingV2TicketExpiredNotification
     {
         [DataMember] public string ticketId;

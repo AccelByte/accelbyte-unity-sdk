@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2019 - 2020 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class Collection
     {
         [DataMember] public Slot[] slots;

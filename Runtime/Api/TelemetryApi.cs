@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections;
 using AccelByte.Core;
@@ -20,6 +19,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==BaseUrl</param> // TODO: Should this be raw BaseUrl?
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         public TelemetryApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

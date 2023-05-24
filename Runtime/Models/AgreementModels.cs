@@ -1,11 +1,10 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -19,98 +18,98 @@ namespace AccelByte.Models
     }
     #endregion enum
 
-    [DataContract]
+    [DataContract, Preserve]
     public class IneligibleUser
     {
-        [DataMember] public string emailAddress { get; set; }
-        [DataMember] public string country { get; set; }
-        [DataMember] public bool eligible { get; set; } = true;
-        [DataMember] public bool deletionStatus { get; set; }
+        [DataMember] public string emailAddress;
+        [DataMember] public string country;
+        [DataMember] public bool eligible = true;
+        [DataMember] public bool deletionStatus;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LocalizedPolicyVersionObject
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updatedAt { get; set; }
-        [DataMember] public string localeCode { get; set; }
-        [DataMember] public string contentType { get; set; }
-        [DataMember] public string attachmentLocation { get; set; }
-        [DataMember] public string attachmentChecksum { get; set; }
-        [DataMember] public string attachmentVersionIdentifier { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public string status { get; set; }
-        [DataMember] public string publishedDate { get; set; }
-        [DataMember] public bool isDefaultSelection { get; set; }
+        [DataMember] public string id;
+        [DataMember] public string createdAt;
+        [DataMember] public string updatedAt;
+        [DataMember] public string localeCode;
+        [DataMember] public string contentType;
+        [DataMember] public string attachmentLocation;
+        [DataMember] public string attachmentChecksum;
+        [DataMember] public string attachmentVersionIdentifier;
+        [DataMember] public string description;
+        [DataMember] public string status;
+        [DataMember] public string publishedDate;
+        [DataMember] public bool isDefaultSelection;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PolicyVersionWithLocalizedVersionObject
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updatedAt { get; set; } 
-        [DataMember] public string displayVersion { get; set; }
-        [DataMember] public string description { get; set; } 
-        [DataMember] public string status { get; set; }
-        [DataMember] public string publishedDate { get; set; } 
-        [DataMember] public LocalizedPolicyVersionObject[] localizedPolicyVersions { get; set; } 
-        [DataMember] public bool isCommitted { get; set; }
-        [DataMember] public bool isCrucial { get; set; }
-        [DataMember] public bool isInEffect { get; set; }
+        [DataMember] public string id;
+        [DataMember] public string createdAt;
+        [DataMember] public string updatedAt; 
+        [DataMember] public string displayVersion;
+        [DataMember] public string description; 
+        [DataMember] public string status;
+        [DataMember] public string publishedDate; 
+        [DataMember] public LocalizedPolicyVersionObject[] localizedPolicyVersions; 
+        [DataMember] public bool isCommitted;
+        [DataMember] public bool isCrucial;
+        [DataMember] public bool isInEffect;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicPolicy
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updatedAt { get; set; }
-        [DataMember] public string readableId { get; set; }
-        [DataMember] public string policyName { get; set; }
-        [DataMember] public string policyType { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string countryCode { get; set; }
-        [DataMember] public string countryGroupCode { get; set; }
-        [DataMember] public string[] baseUrls  { get; set; }
-        [DataMember] public bool shouldNotifyOnUpdate { get; set; }
-        [DataMember] public PolicyVersionWithLocalizedVersionObject[] policyVersions { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public bool isMandatory { get; set; }
-        [DataMember] public bool isDefaultOpted { get; set; }
-        [DataMember] public bool isDefaultSelection { get; set; }
+        [DataMember] public string id;
+        [DataMember] public string createdAt;
+        [DataMember] public string updatedAt;
+        [DataMember] public string readableId;
+        [DataMember] public string policyName;
+        [DataMember] public string policyType;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string countryCode;
+        [DataMember] public string countryGroupCode;
+        [DataMember] public string[] baseUrls ;
+        [DataMember] public bool shouldNotifyOnUpdate;
+        [DataMember] public PolicyVersionWithLocalizedVersionObject[] policyVersions;
+        [DataMember] public string description;
+        [DataMember] public bool isMandatory;
+        [DataMember] public bool isDefaultOpted;
+        [DataMember] public bool isDefaultSelection;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class AcceptAgreementRequest
     {
-        [DataMember] public string localizedPolicyVersionId { get; set; }
-        [DataMember] public string policyVersionId { get; set; }
-        [DataMember] public string policyId { get; set; }
-        [DataMember] public bool isAccepted { get; set; }
+        [DataMember] public string localizedPolicyVersionId;
+        [DataMember] public string policyVersionId;
+        [DataMember] public string policyId;
+        [DataMember] public bool isAccepted;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class AcceptAgreementResponse
     {
-        [DataMember] public bool proceed { get; set; }
+        [DataMember] public bool proceed;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RetrieveUserEligibilitiesResponse
     {
-        [DataMember] public string readableId { get; set; }
-        [DataMember] public string policyName { get; set; }
-        [DataMember] public string policyType { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string countryCode { get; set; }
-        [DataMember] public string countryGroupCode { get; set; }
-        [DataMember] public string[] baseUrls { get; set; }
-        [DataMember] public PolicyVersionWithLocalizedVersionObject[] policyVersions { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public string policyId { get; set; }
-        [DataMember] public bool isMandatory { get; set; }
-        [DataMember] public bool isAccepted { get; set; }
+        [DataMember] public string readableId;
+        [DataMember] public string policyName;
+        [DataMember] public string policyType;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string countryCode;
+        [DataMember] public string countryGroupCode;
+        [DataMember] public string[] baseUrls;
+        [DataMember] public PolicyVersionWithLocalizedVersionObject[] policyVersions;
+        [DataMember] public string description;
+        [DataMember] public string policyId;
+        [DataMember] public bool isMandatory;
+        [DataMember] public bool isAccepted;
     }
 }

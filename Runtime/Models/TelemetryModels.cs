@@ -1,18 +1,18 @@
-﻿// Copyright (c) 2018 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class TelemetryEventTag
     {
-        [DataMember] public uint AppId { get; set; }
-        [DataMember] public uint Id { get; set; }
-        [DataMember] public uint Level { get; set; }
-        [DataMember] public uint Type { get; set; }
-        [DataMember] public uint UX { get; set; }
+        [DataMember] public uint AppId;
+        [DataMember] public uint Id;
+        [DataMember] public uint Level;
+        [DataMember] public uint Type;
+        [DataMember] public uint UX;
     }
 }

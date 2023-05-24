@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using UnityEngine;
 using AccelByte.Core;
 using UnityEngine.Assertions;
@@ -21,6 +20,7 @@ namespace AccelByte.Server
         private ResultCallback<MatchmakingResult> statusPollingCallback;
         private string statusPollingMatchId;
 
+        [UnityEngine.Scripting.Preserve]
         internal ServerMatchmaking( ServerMatchmakingApi inApi
             , ISession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -32,13 +32,14 @@ namespace AccelByte.Server
             session = inSession;
             api = inApi;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="api"></param>
         /// <param name="session"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="coroutineRunner"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ServerMatchmaking( ServerMatchmakingApi inApi
             , ISession inSession
             , string inNamespace

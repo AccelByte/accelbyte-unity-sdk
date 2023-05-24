@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Runtime.Serialization;
 using AccelByte.Core;
@@ -9,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -83,86 +83,86 @@ namespace AccelByte.Models
         group
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatWsMessage
     {
-        [DataMember] public string jsonrpc { get; set; }
-        [DataMember] public ChatMessageMethod method { get; set; }
-        [DataMember] public string id { get; set; }
-        [DataMember] public Error error { get; set; }
+        [DataMember] public string jsonrpc;
+        [DataMember] public ChatMessageMethod method;
+        [DataMember] public string id;
+        [DataMember] public Error error;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatWsMessage<T> : ChatWsMessage
     {
         [DataMember, JsonProperty("params")]
-        public T params_ { get; set; }
+        public T params_;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatWsMessageResponse<T> : ChatWsMessage
     {
         [DataMember]
-        public T result { get; set; }
+        public T result;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RefreshTokenRequest
     {
-        [DataMember] public string token { get; set; }
+        [DataMember] public string token;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatActionTopicRequest
     {
-        [DataMember(Name="namespace")] public string Namespace { get; set; }
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string type { get; set; }
-        [DataMember] public bool isJoinable { get; set; }
-        [DataMember] public bool isChannel { get; set; }
-        [DataMember] public int shardLimit { get; set; }
-        [DataMember] public string[] members { get; set; }
-        [DataMember] public string[] admins { get; set; }
+        [DataMember(Name="namespace")] public string Namespace;
+        [DataMember] public string topicId;
+        [DataMember] public string name;
+        [DataMember] public string type;
+        [DataMember] public bool isJoinable;
+        [DataMember] public bool isChannel;
+        [DataMember] public int shardLimit;
+        [DataMember] public string[] members;
+        [DataMember] public string[] admins;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatActionTopicResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
-        [DataMember] public string topicId { get; set; }
+        public DateTime processed;
+        [DataMember] public string topicId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SendChatRequest
     {
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string message { get; set; }
+        [DataMember] public string topicId;
+        [DataMember] public string message;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SendChatResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string chatId { get; set; }
+        public DateTime processed;
+        [DataMember] public string topicId;
+        [DataMember] public string chatId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicByIdRequest
     {
-        [DataMember] public string topicId { get; set; }
+        [DataMember] public string topicId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicRequest
     {
-        [DataMember(Name="namespace")] public string Namespace { get; set; }
-        [DataMember] public string keyword { get; set; }
-        [DataMember] public int offset { get; set; }
-        [DataMember] public int limit { get; set; }
+        [DataMember(Name="namespace")] public string Namespace;
+        [DataMember] public string keyword;
+        [DataMember] public int offset;
+        [DataMember] public int limit;
     }
     
     public enum TopicType
@@ -172,43 +172,43 @@ namespace AccelByte.Models
         GROUP = 2
     };
     
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicResponseData
     {
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public TopicType type { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string[] members { get; set; }
+        [DataMember] public string topicId;
+        [DataMember] public TopicType type;
+        [DataMember] public string name;
+        [DataMember] public string[] members;
         
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime updatedAt { get; set; }
+        public DateTime updatedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
+        public DateTime processed;
         
-        [DataMember] public QueryTopicResponseData[] data { get; set; } 
+        [DataMember] public QueryTopicResponseData[] data; 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicByIdResponseData : QueryTopicResponseData
     {
-        [DataMember] public bool isChannel { get; set; }
+        [DataMember] public bool isChannel;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryTopicByIdResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
+        public DateTime processed;
         
-        [DataMember] public QueryTopicByIdResponseData[] data { get; set; } 
+        [DataMember] public QueryTopicByIdResponseData[] data; 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryChatRequest
     {
         [DataMember] public string topicId;
@@ -216,7 +216,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime lastChatCreatedAt;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryChatResponseData
     {
         [DataMember] public string chatId;
@@ -224,34 +224,34 @@ namespace AccelByte.Models
         [DataMember] public string topicId;
         [DataMember] public string from;
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime createdAt { get; set; }
+        public DateTime createdAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QueryChatResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
+        public DateTime processed;
         
-        [DataMember] public QueryChatResponseData[] data { get; set; } 
+        [DataMember] public QueryChatResponseData[] data; 
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockUnblockRequest
     {
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockUnblockResponse
     {
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime processed { get; set; }
+        public DateTime processed;
 
-        [DataMember] public string userId { get; set; }
+        [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SystemMessageNotifMessage
     {
         [DataMember(Name = "title")] public string Title;
@@ -259,7 +259,7 @@ namespace AccelByte.Models
         [DataMember(Name = "gift")] public JObject Gift;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QuerySystemMessageResponseItem
     {
         [DataMember(Name = "id")] public string Id;
@@ -267,16 +267,16 @@ namespace AccelByte.Models
         [DataMember(Name = "message")] public string Message;
 
         [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt;
 
         [DataMember(Name = "updatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime UpdatedAt;
 
         [DataMember(Name = "expiredAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime ExpiredAt { get; set; }
+        public DateTime ExpiredAt;
 
         [DataMember(Name = "readAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime ReadAt { get; set; }
+        public DateTime ReadAt;
 
         /// <summary>
         /// Parse Message to SystemMessageNotifMessage
@@ -289,7 +289,7 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SystemMessageNotif
     {
         [DataMember(Name = "messageId")] public string MessageId;
@@ -297,10 +297,10 @@ namespace AccelByte.Models
         [DataMember(Name = "message")] public string Message;
 
         [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt;
 
         [DataMember(Name = "expiredAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime ExpiredAt { get; set; }
+        public DateTime ExpiredAt;
 
         /// <summary>
         /// Parse Message to SystemMessageNotifMessage
@@ -316,7 +316,7 @@ namespace AccelByte.Models
     /// <summary>
     /// Optional parameter for query system messages
     /// </summary>
-    [DataContract]
+    [DataContract, Preserve]
     public class QuerySystemMessageRequest
     {
         /// <summary>
@@ -329,13 +329,13 @@ namespace AccelByte.Models
         /// Query messages from specified date and time
         /// </summary>
         [DataMember(Name = "startCreatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime StartCreatedAt { get; set; } = default;
+        public DateTime StartCreatedAt = default;
 
         /// <summary>
         /// Query messages up to specified date and time
         /// </summary>
         [DataMember(Name = "endCreatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime EndCreatedAt { get; set; } = default;
+        public DateTime EndCreatedAt = default;
         
         /// <summary>
         /// Category of system message
@@ -345,21 +345,21 @@ namespace AccelByte.Models
         /// <summary>
         /// Query only unread messages
         /// </summary>
-        [DataMember(Name = "offset")] public int Offset { get; set; } = 0;
+        [DataMember(Name = "offset")] public int Offset = 0;
 
         /// <summary>
         /// number of maximum messages to query
         /// </summary>
-        [DataMember(Name = "limit")] public int Limit { get; set; } = 20;
+        [DataMember(Name = "limit")] public int Limit = 20;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class QuerySystemMessagesResponse
     {
         [DataMember(Name = "data")] public List<QuerySystemMessageResponseItem> Data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public enum OptionalBoolean
     {
         [EnumMember(Value = "NONE")] None = 0,
@@ -367,47 +367,47 @@ namespace AccelByte.Models
         [EnumMember(Value = "NO")] No = 2
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ActionUpdateSystemMessage
     {
-        [DataMember(Name = "id")] public string Id { get; set; }
-        [DataMember(Name = "read")] public OptionalBoolean Read { get; set; }
-        [DataMember(Name = "keep")] public OptionalBoolean Keep { get; set; }
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "read")] public OptionalBoolean Read;
+        [DataMember(Name = "keep")] public OptionalBoolean Keep;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpdateSystemMessagesRequest
     {
         [DataMember(Name = "data")] public HashSet<ActionUpdateSystemMessage> Data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UpdateSystemMessagesResponse
     {
         [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime Processed { get; set; }
+        public DateTime Processed;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DeleteSystemMessageRequest
     {
         [DataMember(Name = "messageIds")] public HashSet<string> MessageIds;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DeleteSystemMessagesResponse
     {
         [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime Processed { get; set; }
+        public DateTime Processed;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GetSystemMessageStatsRequest
     {
         
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GetSystemMessageStatsResponse
     {
         [DataMember(Name = "oldestUnread"), JsonConverter(typeof(UnixDateTimeConverter))]
@@ -417,52 +417,52 @@ namespace AccelByte.Models
     }
 
     #region event models
-    [DataContract]
+    [DataContract, Preserve]
     public class EventConnected
     {
-        [DataMember] public string sessionId { get; set; }
+        [DataMember] public string sessionId;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class EventTopicUpdated
     {
-        [DataMember] public string name { get; set; }
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string senderId { get; set; }
+        [DataMember] public string name;
+        [DataMember] public string topicId;
+        [DataMember] public string senderId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class EventAddRemoveFromTopic
     {
-        [DataMember] public ChatTopicType type { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string senderId { get; set; }
-        [DataMember] public bool isChannel { get; set; }
+        [DataMember] public ChatTopicType type;
+        [DataMember] public string name;
+        [DataMember] public string topicId;
+        [DataMember] public string senderId;
+        [DataMember] public bool isChannel;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class EventNewChat
     {
-        [DataMember] public string chatId { get; set; }
-        [DataMember] public string message { get; set; }
-        [DataMember] public string topicId { get; set; }
-        [DataMember] public string from { get; set; }
+        [DataMember] public string chatId;
+        [DataMember] public string message;
+        [DataMember] public string topicId;
+        [DataMember] public string from;
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime createdAt { get; set; }
+        public DateTime createdAt;
     }
     
     
     public class EventBanUnban
     {
-        [DataMember] public bool enable { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember] public string reason { get; set; }
-        [DataMember] public string ban { get; set; }
+        [DataMember] public bool enable;
+        [DataMember] public string userId;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember] public string reason;
+        [DataMember] public string ban;
         
         [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
-        public DateTime endDate { get; set; }
+        public DateTime endDate;
     }
     #endregion
 }

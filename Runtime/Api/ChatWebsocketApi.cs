@@ -24,11 +24,11 @@ namespace AccelByte.Api
 
         private JsonSerializerSettings skipNullSerializer = new JsonSerializerSettings()
             { DefaultValueHandling = DefaultValueHandling.Ignore};
-        
+
         #endregion
 
         #region constructor
-
+        [UnityEngine.Scripting.Preserve]
         internal ChatWebsocketApi(CoroutineRunner inCoroutineRunner
             , UserSession inSession
             , IWebSocket inWebSocket

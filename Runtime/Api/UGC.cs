@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -18,6 +17,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal UGC(UGCApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner)
@@ -36,7 +36,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal UGC(UGCApi inApi
             , UserSession inSession
             , string inNamespace
@@ -497,8 +497,17 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UpdateLikeStatusToContent(contentId, likeStatus, callback));
+            var requestModel = new UpdateLikeStatusToContentRequest()
+            {
+                LikeStatus = likeStatus
+            };
+
+            var requestParameter = new UpdateLikeStatusToContentParameter()
+            {
+                ContentId = contentId
+            };
+
+            coroutineRunner.Run(api.UpdateLikeStatusToContent(requestModel, requestParameter, callback));
         }
 
         /// <summary>
@@ -540,8 +549,17 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UpdateFollowStatus(session.UserId, followStatus, callback));
+            var requestModel = new UpdateFollowStatusRequest()
+            {
+                FollowStatus = followStatus
+            };
+
+            var requestParameter = new UpdateFollowStatusParameter()
+            {
+                UserId = session.UserId
+            };
+
+            coroutineRunner.Run(api.UpdateFollowStatus(requestModel, requestParameter, callback));
         }
 
         /// <summary>
@@ -560,8 +578,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetBulkContentId(contentId, callback));
+            var requestModel = new GetBulkContentIdRequest()
+            {
+                ContentId = contentId
+            };
+
+            coroutineRunner.Run(api.GetBulkContentId(requestModel, callback));
         }
 
         /// <summary>
@@ -766,8 +788,18 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UpdateChannel(session.UserId, channelId, name, callback));
+            var requestModel = new UpdateChannelRequest()
+            {
+                Name = name
+            };
+
+            var requestParameter = new UpdateChannelParameter()
+            {
+                UserId = session.UserId,
+                ChannelId = channelId
+            };
+
+            coroutineRunner.Run(api.UpdateChannel(requestModel, requestParameter, callback));
         }
     }
 }

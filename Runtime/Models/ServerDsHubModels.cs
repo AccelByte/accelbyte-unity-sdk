@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -16,25 +16,25 @@ namespace AccelByte.Models
         BACKFILL_PROPOSAL,
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerDSHubWebsocketNotificationTopic
     {
-        [DataMember] public DsHubNotificationTopic topic { get; set; }
+        [DataMember] public DsHubNotificationTopic topic;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerDSHubWebsocketNotification<T> where T : class, new() 
     {
-        [DataMember] public DsHubNotificationTopic topic { get; set; }
-        [DataMember] public T payload { get; set; }
+        [DataMember] public DsHubNotificationTopic topic;
+        [DataMember] public T payload;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerClaimedNotification
     {
-        [DataMember(Name = "game_mode")] public string gameMode { get; set; }
-        [DataMember(Name = "namespace")] public string namespace_ { get; set; }
-        [DataMember(Name = "matching_allies")] public MatchingAlly[] matchingAllies { get; set; }
-        [DataMember(Name = "session_id")] public string sessionId { get; set; }
+        [DataMember(Name = "game_mode")] public string gameMode;
+        [DataMember(Name = "namespace")] public string namespace_;
+        [DataMember(Name = "matching_allies")] public MatchingAlly[] matchingAllies;
+        [DataMember(Name = "session_id")] public string sessionId;
     }
 }

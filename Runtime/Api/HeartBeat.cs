@@ -89,6 +89,7 @@ namespace AccelByte.Api
             }
         }
 
+        [UnityEngine.Scripting.Preserve]
         internal HeartBeat(HeartBeatApi inApi)
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");

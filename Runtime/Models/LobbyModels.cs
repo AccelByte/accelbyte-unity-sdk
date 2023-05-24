@@ -1,12 +1,12 @@
-// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -160,13 +160,13 @@ namespace AccelByte.Models
         OnMatchmakingTicketExpired,
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class DisconnectNotif
     {
         [DataMember] public string message;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LobbySessionId
     {
         [DataMember] public string lobbySessionID;
@@ -176,7 +176,7 @@ namespace AccelByte.Models
 
     #region Notification
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Notification
     {
         [DataMember] public string id;
@@ -187,7 +187,7 @@ namespace AccelByte.Models
         [DataMember] public string sentAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ErrorNotif
     {
         [DataMember] public string id;
@@ -200,7 +200,7 @@ namespace AccelByte.Models
 
     #region Personal Chat
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatMessage
     {
         [DataMember] public string id;
@@ -210,7 +210,7 @@ namespace AccelByte.Models
         [DataMember] public string receivedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PersonalChatRequest
     {
         [DataMember] public string to;
@@ -221,20 +221,20 @@ namespace AccelByte.Models
 
     #region Global Chat
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChatChannelSlug
     {
         [DataMember] public string channelSlug;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChannelChatRequest
     {
         [DataMember] public string channelSlug;
         [DataMember] public string payload;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ChannelChatMessage
     {
         [DataMember] public string from;
@@ -247,13 +247,13 @@ namespace AccelByte.Models
 
     #region Party
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyCreateResponse : PartyInfo
     {
         [DataMember] public string partyCode; // Can be used by another player to join the recently created party
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyInfo
     {
         [DataMember] public string partyID;
@@ -264,7 +264,7 @@ namespace AccelByte.Models
         [DataMember] public string invitationToken;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyDataUpdateNotif
     {
         [DataMember] public long updatedAt;
@@ -275,27 +275,27 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> custom_attribute;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyDataUpdateRequest
     {
         [DataMember] public long updatedAt;
         [DataMember] public Dictionary<string, object> custom_attribute;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PartySendNotifRequest
     {
         [DataMember] public string topic;
         [DataMember] public string payload;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PartySendNotifResponse 
     {
         [DataMember] public string code;
     }
     
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyNotif
     {
         [DataMember] public string sender;
@@ -303,32 +303,32 @@ namespace AccelByte.Models
         [DataMember] public string payload;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SetPartySizeLimitRequest
     {
         [DataMember] public int limit;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ActivePartiesData
     {
         [DataMember] public PartyDataUpdateNotif[] data;
         [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyInviteRequest
     {
         [DataMember] public string friendID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyInviteResponse
     {
         [DataMember] public string inviteeID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyInvitation
     {
         [DataMember] public string from;
@@ -336,38 +336,38 @@ namespace AccelByte.Models
         [DataMember] public string invitationToken;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyChatRequest
     {
         [DataMember] public string payload;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyJoinRequest
     {
         [DataMember] public string partyID;
         [DataMember] public string invitationToken;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyKickRequest
     {
         [DataMember] public string memberID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class KickResponse
     {
         [DataMember] public string userID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class JoinNotification
     {
         [DataMember] public string userID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class KickNotification
     {
         [DataMember] public string leaderID;
@@ -376,7 +376,7 @@ namespace AccelByte.Models
         [DataMember] public string partyID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class LeaveNotification
     {
         [DataMember] public string leaderID;
@@ -384,20 +384,20 @@ namespace AccelByte.Models
         [DataMember] public string userID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyRejectRequest
     {
         [DataMember] public string partyID;
         [DataMember] public string invitationToken;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyRejectResponse
     {
         [DataMember] public string partyID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyRejectNotif
     {
         [DataMember] public string partyID;
@@ -406,13 +406,13 @@ namespace AccelByte.Models
         [DataMember] public string userID;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyPromoteLeaderRequest
     {
         [DataMember] public string newLeaderUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyPromoteLeaderResponse
     {
         [DataMember] public string partyID;
@@ -423,19 +423,19 @@ namespace AccelByte.Models
         [DataMember] public string invitationToken;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyGenerateCodeResponse
     {
         [DataMember] public string partyCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyGetCodeResponse
     {
         [DataMember] public string partyCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PartyJoinViaCodeRequest
     {
         [DataMember] public string partyCode;
@@ -445,7 +445,7 @@ namespace AccelByte.Models
 
     #region Matchmaking
 
-    [DataContract]
+    [DataContract, Preserve]
     public class StartMatchmakingRequest
     {
         [DataMember] public string gameMode;
@@ -462,13 +462,13 @@ namespace AccelByte.Models
         [DataMember] public string extraAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingNotifAllies
     {
         [DataMember] public MatchingAlly[] data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingNotif
     {
         [DataMember] public string status;
@@ -484,7 +484,7 @@ namespace AccelByte.Models
         [DataMember] public int errorCode;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class DsNotif
     {
         [DataMember] public string status;
@@ -498,32 +498,32 @@ namespace AccelByte.Models
         [DataMember] public string isOK;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingCode
     {
         [DataMember] public int code;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReadyConsentRequest
     {
         [DataMember] public string matchId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class ReadyForMatchConfirmation
     {
         [DataMember] public string matchId;
         [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RematchmakingNotification
     {
         [DataMember] public int banDuration;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MatchmakingOptionalParam
     {
         [DataMember] public string serverName;
@@ -536,7 +536,7 @@ namespace AccelByte.Models
         [DataMember] public bool newSessionOnly;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class CustomDsCreateRequest
     {
         [DataMember] public string matchId;
@@ -552,7 +552,7 @@ namespace AccelByte.Models
     #region Friends
 
     [JsonConverter(typeof(StringEnumConverter))]
-    [DataContract]
+    [DataContract, Preserve]
     public enum RelationshipStatusCode
     {
         [EnumMember] NotFriend = 0,
@@ -561,40 +561,40 @@ namespace AccelByte.Models
         [EnumMember] Friend = 3
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class FriendshipStatus
     {
         [DataMember] public RelationshipStatusCode friendshipStatus;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Friends
     {
         [DataMember] public string[] friendsId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Friend
     {
         [DataMember] public string friendId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class FriendByPublicId
     {
         [DataMember] public string friendPublicId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class Acquaintance
     {
         [DataMember] public string userId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BulkFriendsRequest
     {
-        [DataMember] public string[] friendIds { get; set; }
+        [DataMember] public string[] friendIds;
     }
 
     #endregion
@@ -611,7 +611,7 @@ namespace AccelByte.Models
         Away
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class FriendsStatus
     {
         [DataMember] public string[] friendsId;
@@ -620,7 +620,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime[] lastSeenAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class FriendsStatusNotif
     {
         [DataMember] public string userID;
@@ -629,20 +629,20 @@ namespace AccelByte.Models
         [DataMember] public DateTime lastSeenAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SetUserStatusRequest
     {
         [DataMember] public string availability;
         [DataMember] public string activity;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class OnlineFriends
     {
         [DataMember] public string[] onlineFriendsId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserStatusNotif
     {
         [DataMember] public string userID;
@@ -652,7 +652,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime lastSeenAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BulkUserStatusNotif
     {
         [DataMember] public UserStatusNotif[] data;
@@ -667,7 +667,7 @@ namespace AccelByte.Models
 
     #region Block/Unblock
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockPlayerRequest
     {
         [DataMember] public string userId;
@@ -675,13 +675,13 @@ namespace AccelByte.Models
         [DataMember] public string blockedUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockPlayerResponse
     {
         [DataMember] public string blockedUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UnblockPlayerRequest
     {
         [DataMember] public string userId;
@@ -689,47 +689,47 @@ namespace AccelByte.Models
         [DataMember] public string unblockedUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UnblockPlayerResponse
     {
         [DataMember] public string unblockedUserId;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PlayerBlockedNotif
     {
         [DataMember] public string userId; //ID of the blocker
         [DataMember] public string blockedUserId; //ID of the blocked user
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PlayerUnblockedNotif
     {
         [DataMember] public string userId; //ID of user that lift the block
         [DataMember] public string unblockedUserId; // ID of the unblocked user
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockedData
     {
         [DataMember] public string blockedUserId;
         [DataMember] public DateTime blockedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockedList
     {
         [DataMember] public BlockedData[] data;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockerData
     {
         [DataMember] public string userId;
         [DataMember] public DateTime blockedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class BlockerList
     {
         [DataMember] public BlockerData[] data;
@@ -753,7 +753,7 @@ namespace AccelByte.Models
         none
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class SetSessionAttributeRequest
     {
         [DataMember(Name = "namespace")] public string Namespace;
@@ -803,7 +803,7 @@ namespace AccelByte.Models
 
     #region Refresh Access Token
 
-    [DataContract]
+    [DataContract, Preserve]
     public class RefreshAccessTokenRequest
     {
         [DataMember] public string token;
@@ -822,7 +822,7 @@ namespace AccelByte.Models
     /// <param name="endDate">The date when the ban is lifted with format "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffzzz"</param>
     /// <param name="reason">The reason of Banning</param>
     /// <param name="enable">is the ban still going for the user</param>
-    [DataContract]
+    [DataContract, Preserve]
     public class UserBannedNotification
     {
         [DataMember] public string userId;
@@ -844,7 +844,7 @@ namespace AccelByte.Models
     /// </summary>
     /// <param name="destinationId"> The targeted user ID or the sender's UserID</param>
     /// <param name="message"> The content</param>
-    [DataContract]
+    [DataContract, Preserve]
     public class SignalingP2P
     {
         [DataMember] public string destinationId;

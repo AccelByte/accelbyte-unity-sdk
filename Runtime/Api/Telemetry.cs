@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -16,6 +15,7 @@ namespace AccelByte.Api
         private readonly string clientId;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Telemetry( TelemetryApi inApi
             , UserSession inSession
             , string inClientId
@@ -50,12 +50,12 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Send any data with class T to Telemetry service. The data type must be serializable by implementing
-        /// DataContract attribute.
+        /// DataContract, Preserve attribute.
         /// </summary>
         /// <param name="eventTag">Event tag</param>
         /// <param name="eventData">Event data</param>
         /// <param name="callback">Returns a Result via callback when completed.</param>
-        /// <typeparam name="T">A class that implements DataContract and DataMember attribute</typeparam>
+        /// <typeparam name="T">A class that implements DataContract, Preserve and DataMember attribute</typeparam>
         public void SendEvent<T>( TelemetryEventTag eventTag
             , T eventData
             , ResultCallback callback) 

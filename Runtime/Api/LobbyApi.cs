@@ -18,6 +18,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==BaseUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal LobbyApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

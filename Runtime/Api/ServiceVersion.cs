@@ -14,6 +14,7 @@ namespace AccelByte.Api
         private readonly ServiceVersionApi api;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal ServiceVersion(ServiceVersionApi inApi
             , CoroutineRunner inCoroutineRunner)
         {

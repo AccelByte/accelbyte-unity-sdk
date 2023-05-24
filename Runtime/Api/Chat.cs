@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -14,6 +13,7 @@ namespace AccelByte.Api
     public class Chat : WrapperBase
     {
         #region constructor
+        [UnityEngine.Scripting.Preserve]
         internal Chat(ChatApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner)

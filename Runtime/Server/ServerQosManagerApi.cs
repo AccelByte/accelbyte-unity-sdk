@@ -1,7 +1,6 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections;
 using AccelByte.Api;
 using AccelByte.Core;
@@ -19,6 +18,7 @@ namespace AccelByte.Server
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==QosManagerServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ServerQosManagerApi( IHttpClient httpClient
             , ServerConfig config
             , ISession session ) 

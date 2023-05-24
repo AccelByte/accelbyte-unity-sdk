@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -17,6 +16,7 @@ namespace AccelByte.Server
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==MatchmakingV2ServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         public ServerMatchmakingV2Api(IHttpClient httpClient
             , ServerConfig config
             , ISession session)

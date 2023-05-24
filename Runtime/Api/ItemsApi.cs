@@ -18,6 +18,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==PlatformServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ItemsApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -16,6 +15,7 @@ namespace AccelByte.Server
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==BaseUrl</param> // TODO: Should this base BaseUrl?
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal ServerSeasonPassApi( IHttpClient httpClient
             , ServerConfig config
             , ISession session ) 
@@ -207,20 +207,20 @@ namespace AccelByte.Server
             callback.Try(result);
         }
 
-        public IEnumerator BulkGetUserSessionProgression(string[] userIds
+        public IEnumerator BulkGetUserSessionProgression(BulkGetUserSessionProgressionRequest requestModel
             , ResultCallback<UserSeasonInfo[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't check user progression! Namespace parameter is null!");
             Assert.IsNotNull(AuthToken, "Can't check user progression! AccessToken parameter is null!");
-            Assert.IsNotNull(userIds, "Can't check user progression! UserIds parameter is null!");
+            Assert.IsNotNull(requestModel.UserIds, "Can't check user progression! UserIds parameter is null!");
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/seasonpass/admin/namespaces/{namespace}/seasons/current/users/bulk/progression")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(new { userIds = userIds }.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 

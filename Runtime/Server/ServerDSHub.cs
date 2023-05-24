@@ -1,12 +1,10 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
 using Newtonsoft.Json;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -52,6 +50,7 @@ namespace AccelByte.Server
         private readonly ServerDSHubApi _serverDSHubApi;
         private readonly ServerDSHubWebsocketApi _serverDSHubWebsocketApi;
 
+        [UnityEngine.Scripting.Preserve]
         internal ServerDSHub(ServerDSHubApi inApi
             , ISession inSession
             , CoroutineRunner inCoroutineRunner)

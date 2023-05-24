@@ -18,6 +18,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==QosManagerServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal QosManagerApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

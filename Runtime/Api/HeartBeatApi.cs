@@ -18,6 +18,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config"></param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         public HeartBeatApi(IHttpClient httpClient
             , Config config
             , ISession session)

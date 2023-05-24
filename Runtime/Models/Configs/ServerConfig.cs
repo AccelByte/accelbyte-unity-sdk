@@ -4,36 +4,36 @@
 
 using AccelByte.Core;
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models {
-    [DataContract]
+    [DataContract, Preserve]
     public class ServerConfig : IAccelByteConfig
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
         private const int defaultWatchdogHeartbeatInterval = 15;
-        [DataMember] public string Namespace { get; set; }
-        [DataMember] public string BaseUrl { get; set; }
-        [DataMember] public string IamServerUrl { get; set; }
-        
-        [DataMember] public string DSHubServerUrl { get; set; }
-        [DataMember] public string DSMControllerServerUrl { get; set; }
-        [DataMember] public string StatisticServerUrl { get; set; }
-        [DataMember] public string PlatformServerUrl { get; set; }
-        [DataMember] public string QosManagerServerUrl { get; set; }
-        [DataMember] public string GameTelemetryServerUrl { get; set; }
-        [DataMember] public string AchievementServerUrl { get; set; }
-        [DataMember] public string LobbyServerUrl { get; set; }
-        [DataMember] public string SessionServerUrl { get; set; }
-        [DataMember] public string CloudSaveServerUrl { get; set; }
-        [DataMember] public string RedirectUri { get; set; }
-        [DataMember] public string MatchmakingServerUrl { get; set; }
-        [DataMember] public string MatchmakingV2ServerUrl { get; set; }
-        [DataMember] public string SeasonPassServerUrl { get; set; }
-        [DataMember] public string WatchdogServerUrl { get; set; }
-        [DataMember] public int WatchdogHeartbeatInterval { get; set; } = defaultWatchdogHeartbeatInterval;
-        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
-        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
+        [DataMember] public string Namespace;
+        [DataMember] public string BaseUrl;
+        [DataMember] public string IamServerUrl;
+        [DataMember] public string DSHubServerUrl;
+        [DataMember] public string DSMControllerServerUrl;
+        [DataMember] public string StatisticServerUrl;
+        [DataMember] public string PlatformServerUrl;
+        [DataMember] public string QosManagerServerUrl;
+        [DataMember] public string GameTelemetryServerUrl;
+        [DataMember] public string AchievementServerUrl;
+        [DataMember] public string LobbyServerUrl;
+        [DataMember] public string SessionServerUrl;
+        [DataMember] public string CloudSaveServerUrl;
+        [DataMember] public string RedirectUri;
+        [DataMember] public string MatchmakingServerUrl;
+        [DataMember] public string MatchmakingV2ServerUrl;
+        [DataMember] public string SeasonPassServerUrl;
+        [DataMember] public string WatchdogServerUrl;
+        [DataMember] public int WatchdogHeartbeatInterval = defaultWatchdogHeartbeatInterval;
+        [DataMember] public int MaximumCacheSize = defaultCacheSize;
+        [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
 
 
         /// <summary>
@@ -174,13 +174,13 @@ namespace AccelByte.Models {
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MultiServerConfigs : IAccelByteMultiConfigs
     {
-        [DataMember] public ServerConfig Development { get; set; }
-        [DataMember] public ServerConfig Certification { get; set; }
-        [DataMember] public ServerConfig Production { get; set; }
-        [DataMember] public ServerConfig Default { get; set; }
+        [DataMember] public ServerConfig Development;
+        [DataMember] public ServerConfig Certification;
+        [DataMember] public ServerConfig Production;
+        [DataMember] public ServerConfig Default;
 
         public void Expand()
         {

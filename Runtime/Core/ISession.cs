@@ -96,7 +96,10 @@ namespace AccelByte.Core
                 {
                     Result<TokenData, OAuthError> refreshResult = null;
 
-                    yield return RefreshSession(result => refreshResult = result);
+                    yield return RefreshSession(result =>
+                    {
+                        refreshResult = result;
+                    });
 
                     if (!refreshResult.IsError)
                     {

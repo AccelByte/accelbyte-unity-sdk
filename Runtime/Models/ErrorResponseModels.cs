@@ -1,42 +1,45 @@
-﻿using System;
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class ServiceError
     {
-        [DataMember] public long code { get; set; }
-        [DataMember] public long errorCode { get; set; }
-        [DataMember] public int numericErrorCode { get; set; }
-        [DataMember] public string errorMessage { get; set; }
-        [DataMember] public string message { get; set; }
-        [DataMember] public object messageVariables { get; set; }        
-        [DataMember] public string error { get; set; }
-        [DataMember] public string error_description { get; set; }
+        [DataMember] public long code;
+        [DataMember] public long errorCode;
+        [DataMember] public int numericErrorCode;
+        [DataMember] public string errorMessage;
+        [DataMember] public string message;
+        [DataMember] public object messageVariables;        
+        [DataMember] public string error;
+        [DataMember] public string error_description;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserBan
     {
-        [DataMember] public string comment { get; set; }
-        [DataMember] public string endDate { get; set; }
-        [DataMember] public BanReason reason { get; set; }
+        [DataMember] public string comment;
+        [DataMember] public string endDate;
+        [DataMember] public BanReason reason;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class OAuthError
     {
-        [DataMember] public string error { get; set; }
-        [DataMember] public string error_description { get; set; }
-        [DataMember] public string error_uri { get; set; }
-        [DataMember] public string default_factor { get; set; }
-        [DataMember] public string[] factors { get; set; }
-        [DataMember] public string mfa_token { get; set; }
-        [DataMember] public string linkingToken { get; set; }
-        [DataMember] public string clientId { get; set; }
-        [DataMember] public string email { get; set; }
+        [DataMember] public string error;
+        [DataMember] public string error_description;
+        [DataMember] public string error_uri;
+        [DataMember] public string default_factor;
+        [DataMember] public string[] factors;
+        [DataMember] public string mfa_token;
+        [DataMember] public string linkingToken;
+        [DataMember] public string clientId;
+        [DataMember] public string email;
         [DataMember] public object messageVariables { get;set; }
-        [DataMember] public UserBan userBan { get; set; }
+        [DataMember] public UserBan userBan;
     }
 }

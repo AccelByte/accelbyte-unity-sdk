@@ -1,7 +1,6 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -15,6 +14,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Agreement( AgreementApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -33,7 +33,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal Agreement( AgreementApi inApi
             , UserSession inSession
             , string inNamespace
@@ -41,7 +41,6 @@ namespace AccelByte.Api
             : this(inApi, inSession, inCoroutineRunner) // Curry this obsolete data to the new overload ->
         {
         }
-
         
         #region GetLegalPolicies Overloads
         /// <summary>
@@ -100,7 +99,6 @@ namespace AccelByte.Api
             GetLegalPolicies(agreementPolicyType, tags, defaultOnEmpty, callback);
         }
         #endregion /GetLegalPolicies Overloads
-
 
         #region GetLegalPoliciesByCountry Overloads
         /// <summary>
@@ -162,7 +160,6 @@ namespace AccelByte.Api
                     callback));
         }
         #endregion /GetLegalPoliciesByCountry Overloads
-
         
         /// <summary>
         /// Sign multiple user's legal eligibility documents.

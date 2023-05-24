@@ -1,7 +1,6 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,6 +23,7 @@ namespace AccelByte.Api
         private readonly CoroutineRunner coroutineRunner;
         private readonly QosManagerApi api;
 
+        [UnityEngine.Scripting.Preserve]
         internal QosManager( QosManagerApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )

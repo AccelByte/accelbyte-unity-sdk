@@ -1,33 +1,33 @@
-﻿// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [DataContract]
+    [DataContract, Preserve]
     public class GameProfile
     {
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string profileId { get; set; }
-        [DataMember] public string userId { get; set; }
-        [DataMember] public Dictionary<string, string> attributes { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
-        [DataMember] public string label { get; set; }
-        [DataMember] public string profileName { get; set; }
-        [DataMember] public string[] tags { get; set; }
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string profileId;
+        [DataMember] public string userId;
+        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public string avatarUrl;
+        [DataMember] public string label;
+        [DataMember] public string profileName;
+        [DataMember] public string[] tags;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GameProfileRequest
     {
-        [DataMember] public Dictionary<string, string> attributes { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
-        [DataMember] public string label { get; set; }
-        [DataMember] public string profileName { get; set; }
-        [DataMember] public string[] tags { get; set; }
+        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public string avatarUrl;
+        [DataMember] public string label;
+        [DataMember] public string profileName;
+        [DataMember] public string[] tags;
 
         public static implicit operator GameProfileRequest(GameProfile gameProfile)
         {
@@ -42,26 +42,26 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GameProfileAttribute
     {
-        [DataMember] public string name { get; set; }
-        [DataMember] public string value { get; set; }
+        [DataMember] public string name;
+        [DataMember] public string value;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GameProfilePublicInfo
     {
-        [DataMember] public string profileId { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string profileName { get; set; }
-        [DataMember] public string avatarUrl { get; set; }
+        [DataMember] public string profileId;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string profileName;
+        [DataMember] public string avatarUrl;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserGameProfiles
     {
-        [DataMember] public string userId { get; set; }
-        [DataMember] public GameProfilePublicInfo[] gameProfiles { get; set; }
+        [DataMember] public string userId;
+        [DataMember] public GameProfilePublicInfo[] gameProfiles;
     }
 }

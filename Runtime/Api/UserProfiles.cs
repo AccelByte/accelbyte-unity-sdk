@@ -17,6 +17,7 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal UserProfiles( UserProfilesApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner )
@@ -35,7 +36,7 @@ namespace AccelByte.Api
         /// <param name="inSession"></param>
         /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
         /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it")]
+        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal UserProfiles( UserProfilesApi inApi
             , UserSession inSession
             , string inNamespace
@@ -228,8 +229,13 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.CreateUserProfile(userId, language, customAttributes, timezone, callback));
+            var newUserProfile = new CreateUserProfileRequest()
+            {
+                language = language,
+                customAttributes = customAttributes,
+                timeZone = timezone
+            };
+            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, callback));
         }
 
         /// <summary>
@@ -255,8 +261,15 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UpdateUserProfile(userId, language, timezone, customAttributes, zipCode, callback));
+            var newRequest = new UpdateUserProfileRequest()
+            {
+                language = language,
+                timeZone = timezone,
+                customAttributes = customAttributes,
+                zipCode = zipCode
+            };
+
+            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, callback));
         }
 
         /// <summary>

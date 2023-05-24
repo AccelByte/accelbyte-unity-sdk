@@ -1,7 +1,6 @@
-// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -285,6 +284,7 @@ namespace AccelByte.Api
             remove => websocketApi.WebSocket.OnRetryAttemptFailed -= value;
         }
 
+        [UnityEngine.Scripting.Preserve]
         internal Lobby(LobbyApi inApi
             , UserSession inSession
             , CoroutineRunner inCoroutineRunner)

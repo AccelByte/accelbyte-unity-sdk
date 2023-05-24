@@ -21,6 +21,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==UGCServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal UGCApi( IHttpClient httpClient
             , Config config
             , ISession session ) 
@@ -640,8 +641,9 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
-        public IEnumerator UpdateLikeStatusToContent(string contentId
-            , bool likeStatus
+
+        public IEnumerator UpdateLikeStatusToContent(UpdateLikeStatusToContentRequest requestModel
+            , UpdateLikeStatusToContentParameter requestParameter
             , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -650,11 +652,8 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/contents/{contentId}/like")
                  .WithPathParam("namespace", Namespace_)
-                 .WithPathParam("contentId", contentId)
-                 .WithBody(new
-                 {
-                     likeStatus = likeStatus
-                 }.ToUtf8Json())
+                 .WithPathParam("contentId", requestParameter.ContentId)
+                 .WithBody(requestModel.ToUtf8Json())
                  .WithContentType(MediaType.ApplicationJson)
                  .WithBearerAuth(AuthToken)
                  .Accepts(MediaType.ApplicationJson)
@@ -696,8 +695,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator UpdateFollowStatus(string userId
-            , bool followStatus
+        public IEnumerator UpdateFollowStatus(UpdateFollowStatusRequest requestModel
+            , UpdateFollowStatusParameter requestParameter
             , ResultCallback<UGCUpdateFollowStatusToUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -706,8 +705,8 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/follow")
                  .WithPathParam("namespace", Namespace_)
-                 .WithPathParam("userId", userId)
-                 .WithBody(new { followStatus = followStatus }.ToUtf8Json())
+                 .WithPathParam("userId", requestParameter.UserId)
+                 .WithBody(requestModel.ToUtf8Json())
                  .WithContentType(MediaType.ApplicationJson)
                  .WithBearerAuth(AuthToken)
                  .Accepts(MediaType.ApplicationJson)
@@ -722,7 +721,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
         
-        public IEnumerator GetBulkContentId(string[] contentId
+        public IEnumerator GetBulkContentId(GetBulkContentIdRequest requestModel
             , ResultCallback<UGCModelsContentsResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -731,7 +730,7 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/contents/bulk")
                 .WithPathParam("namespace", Namespace_)
-                .WithBody(new{contentIds = contentId}.ToUtf8Json())
+                .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
@@ -967,23 +966,22 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        public IEnumerator UpdateChannel(string userId
-            , string channelId
-            , string name 
+        public IEnumerator UpdateChannel(UpdateChannelRequest requestModel
+            , UpdateChannelParameter requestParameter
             , ResultCallback<UGCChannelResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't UpdateChannel! userId parameter is null!");
-            Assert.IsNotNull(channelId, "Can't UpdateChannel! channelId parameter is null!");
-            Assert.IsNotNull(name, "Can't UpdateChannel! name parameter is null!");
+            Assert.IsNotNull(requestParameter.UserId, "Can't UpdateChannel! userId parameter is null!");
+            Assert.IsNotNull(requestParameter.ChannelId, "Can't UpdateChannel! channelId parameter is null!");
+            Assert.IsNotNull(requestModel.Name, "Can't UpdateChannel! name parameter is null!");
 
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}")
                  .WithPathParam("namespace", Namespace_)
-                 .WithPathParam("userId", userId)
-                 .WithPathParam("channelId", channelId)
-                 .WithBody(new { name = name }.ToUtf8Json())
+                 .WithPathParam("userId", requestParameter.UserId)
+                 .WithPathParam("channelId", requestParameter.ChannelId)
+                 .WithBody(requestModel.ToUtf8Json())
                  .WithContentType(MediaType.ApplicationJson)
                  .WithBearerAuth(AuthToken)
                  .Accepts(MediaType.ApplicationJson)

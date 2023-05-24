@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using AccelByte.Api;
 using AccelByte.Core;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -13,52 +14,52 @@ namespace AccelByte.Models
     /// Primarily used by the Editor for the config in the popup menu.
     /// <para>Looking for runtime settings? See static AccelBytePlugin.Config</para>
     /// </summary>
-    [DataContract]
+    [DataContract, Preserve]
     public class Config : IAccelByteConfig
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
 
-        [DataMember] public string Namespace { get; set; } = "";
-        [DataMember] public bool UsePlayerPrefs { get; set; } = false;
-        [DataMember] public bool EnableDebugLog { get; set; } = true;
-        [DataMember] public string DebugLogFilter { get; set; } = "Verbose";
-        [DataMember] public string BaseUrl { get; set; } = "";
-        [DataMember] public string IamServerUrl { get; set; } = "";
-        [DataMember] public string PlatformServerUrl { get; set; } = "";
-        [DataMember] public string BasicServerUrl { get; set; } = "";
-        [DataMember] public string LobbyServerUrl { get; set; } = "";
-        [DataMember] public string CloudStorageServerUrl { get; set; } = "";
-        [DataMember] public string GameProfileServerUrl { get; set; } = "";
-        [DataMember] public string StatisticServerUrl { get; set; } = "";
-        [DataMember] public string QosManagerServerUrl { get; set; } = "";
-        [DataMember] public string AgreementServerUrl { get; set; } = "";
-        [DataMember] public string LeaderboardServerUrl { get; set; } = "";
-        [DataMember] public string CloudSaveServerUrl { get; set; } = "";
-        [DataMember] public string GameTelemetryServerUrl { get; set; } = "";
-        [DataMember] public string AchievementServerUrl { get; set; } = "";
-        [DataMember] public string UGCServerUrl { get; set; } = "";
-        [DataMember] public string ReportingServerUrl { get; set; } = "";
-        [DataMember] public string SeasonPassServerUrl { get; set; } = "";
-        [DataMember] public string SessionBrowserServerUrl { get; set; } = "";
-        [DataMember] public string SessionServerUrl { get; set; } = "";
-        [DataMember] public string MatchmakingV2ServerUrl { get; set; } = "";
-        [DataMember] public bool UseTurnManager { get; set; } = false;
-        [DataMember] public string TurnManagerServerUrl { get; set; } = "";
-        [DataMember] public string TurnServerHost { get; set; } = "";
-        [DataMember] public string TurnServerPort { get; set; } = "";
-        [DataMember] public string TurnServerPassword { get; set; } = "";
-        [DataMember] public string TurnServerSecret { get; set; } = "";
-        [DataMember] public string TurnServerUsername { get; set; } = "";
-        [DataMember] public string GroupServerUrl { get; set; } = "";
-        [DataMember] public string ChatServerUrl { get; set; } = "";
-        [DataMember] public string RedirectUri { get; set; } = "";
-        [DataMember] public string AppId { get; set; } = "";
-        [DataMember] public string PublisherNamespace { get; set; } = "";
-        [DataMember] public string CustomerName { get; set; } = "";
-        [DataMember] public bool EnableAuthHandshake { get; set; }
-        [DataMember] public int MaximumCacheSize { get; set; } = defaultCacheSize;
-        [DataMember] public int MaximumCacheLifeTime { get; set; } = defaultCacheLifeTime;
+        [DataMember] public string Namespace = "";
+        [DataMember] public bool UsePlayerPrefs = false;
+        [DataMember] public bool EnableDebugLog = true;
+        [DataMember] public string DebugLogFilter = "Verbose";
+        [DataMember] public string BaseUrl = "";
+        [DataMember] public string IamServerUrl = "";
+        [DataMember] public string PlatformServerUrl = "";
+        [DataMember] public string BasicServerUrl = "";
+        [DataMember] public string LobbyServerUrl = "";
+        [DataMember] public string CloudStorageServerUrl = "";
+        [DataMember] public string GameProfileServerUrl = "";
+        [DataMember] public string StatisticServerUrl = "";
+        [DataMember] public string QosManagerServerUrl = "";
+        [DataMember] public string AgreementServerUrl = "";
+        [DataMember] public string LeaderboardServerUrl = "";
+        [DataMember] public string CloudSaveServerUrl = "";
+        [DataMember] public string GameTelemetryServerUrl = "";
+        [DataMember] public string AchievementServerUrl = "";
+        [DataMember] public string UGCServerUrl = "";
+        [DataMember] public string ReportingServerUrl = "";
+        [DataMember] public string SeasonPassServerUrl = "";
+        [DataMember] public string SessionBrowserServerUrl = "";
+        [DataMember] public string SessionServerUrl = "";
+        [DataMember] public string MatchmakingV2ServerUrl = "";
+        [DataMember] public bool UseTurnManager = false;
+        [DataMember] public string TurnManagerServerUrl = "";
+        [DataMember] public string TurnServerHost = "";
+        [DataMember] public string TurnServerPort = "";
+        [DataMember] public string TurnServerPassword = "";
+        [DataMember] public string TurnServerSecret = "";
+        [DataMember] public string TurnServerUsername = "";
+        [DataMember] public string GroupServerUrl = "";
+        [DataMember] public string ChatServerUrl = "";
+        [DataMember] public string RedirectUri = "";
+        [DataMember] public string AppId = "";
+        [DataMember] public string PublisherNamespace = "";
+        [DataMember] public string CustomerName = "";
+        [DataMember] public bool EnableAuthHandshake;
+        [DataMember] public int MaximumCacheSize = defaultCacheSize;
+        [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
 
         /// <summary>
         ///  Copy member values
@@ -441,13 +442,13 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MultiConfigs : IAccelByteMultiConfigs
     {
-        [DataMember] public Config Development { get; set; }
-        [DataMember] public Config Certification { get; set; }
-        [DataMember] public Config Production { get; set; }
-        [DataMember] public Config Default { get; set; }
+        [DataMember] public Config Development;
+        [DataMember] public Config Certification;
+        [DataMember] public Config Production;
+        [DataMember] public Config Default;
 
         public void Expand()
         {
@@ -494,9 +495,9 @@ namespace AccelByte.Models
         }
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class VersionJson
     {
-        [DataMember] public string Version { get; set; }
+        [DataMember] public string Version;
     }
 }

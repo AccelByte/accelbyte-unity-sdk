@@ -17,6 +17,7 @@ namespace AccelByte.Api
         /// <param name="httpClient"></param>
         /// <param name="config">baseUrl==GameProfileServerUrl</param>
         /// <param name="session"></param>
+        [UnityEngine.Scripting.Preserve]
         internal GameProfilesApi( IHttpClient httpClient
             , Config config
             , ISession session ) 

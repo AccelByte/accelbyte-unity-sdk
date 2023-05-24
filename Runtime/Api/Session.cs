@@ -16,6 +16,7 @@ namespace AccelByte.Api
         private readonly ISession _session;
         private readonly CoroutineRunner _coroutineRunner;
 
+        [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
             , ISession inSession
             , CoroutineRunner inCoroutineRunner)

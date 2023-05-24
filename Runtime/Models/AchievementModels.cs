@@ -1,12 +1,11 @@
-// Copyright (c) 2020 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
@@ -61,97 +60,97 @@ namespace AccelByte.Models
         Unlocked = 2
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class AchievementIcon
     {
-        [DataMember] public string url { get; set; }
-        [DataMember] public string slug { get; set; }
+        [DataMember] public string url;
+        [DataMember] public string slug;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicAchievement
     {
-        [DataMember] public string achievementCode { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string name { get; set; }
-        [DataMember] public string description { get; set; }
-        [DataMember] public AchievementIcon[] lockedIcons { get; set; }
-        [DataMember] public AchievementIcon[] unlockedIcons { get; set; }
-        [DataMember] public bool hidden { get; set; }
-        [DataMember] public int listOrder { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public bool incremental { get; set; }
-        [DataMember] public bool global { get; set; }
-        [DataMember] public float goalValue { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updateAt { get; set; }
-        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
+        [DataMember] public string achievementCode;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string name;
+        [DataMember] public string description;
+        [DataMember] public AchievementIcon[] lockedIcons;
+        [DataMember] public AchievementIcon[] unlockedIcons;
+        [DataMember] public bool hidden;
+        [DataMember] public int listOrder;
+        [DataMember] public string[] tags;
+        [DataMember] public bool incremental;
+        [DataMember] public bool global;
+        [DataMember] public float goalValue;
+        [DataMember] public string statCode;
+        [DataMember] public string createdAt;
+        [DataMember] public string updateAt;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedPublicAchievement
     {
-        [DataMember] public PublicAchievement[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public PublicAchievement[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class MultiLanguageAchievement
     {
-        [DataMember] public string achievementCode { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public Dictionary<string, string> name { get; set; }
-        [DataMember] public Dictionary<string, string> description { get; set; }
-        [DataMember] public AchievementIcon[] lockedIcons { get; set; }
-        [DataMember] public AchievementIcon[] unlockedIcons { get; set; }
-        [DataMember] public bool hidden { get; set; }
-        [DataMember] public int listOrder { get; set; }
-        [DataMember] public string[] tags { get; set; }
-        [DataMember] public bool incremental { get; set; }
-        [DataMember] public bool global { get; set; }
-        [DataMember] public float goalValue { get; set; }
-        [DataMember] public string statCode { get; set; }
-        [DataMember] public string createdAt { get; set; }
-        [DataMember] public string updateAt { get; set; }
-        [DataMember] public Dictionary<string, object> CustomAttributes { get; set; }
+        [DataMember] public string achievementCode;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public Dictionary<string, string> name;
+        [DataMember] public Dictionary<string, string> description;
+        [DataMember] public AchievementIcon[] lockedIcons;
+        [DataMember] public AchievementIcon[] unlockedIcons;
+        [DataMember] public bool hidden;
+        [DataMember] public int listOrder;
+        [DataMember] public string[] tags;
+        [DataMember] public bool incremental;
+        [DataMember] public bool global;
+        [DataMember] public float goalValue;
+        [DataMember] public string statCode;
+        [DataMember] public string createdAt;
+        [DataMember] public string updateAt;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class CountInfo
     {
-        [DataMember] public int numberOfAchievements { get; set; }
-        [DataMember] public int numberOfHiddenAchievements { get; set; }
-        [DataMember] public int numberOfVisibleAchievements { get; set; }
+        [DataMember] public int numberOfAchievements;
+        [DataMember] public int numberOfHiddenAchievements;
+        [DataMember] public int numberOfVisibleAchievements;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserAchievement
     {
-        [DataMember] public string id { get; set; }
-        [DataMember] public Dictionary<string, string> name { get; set; }
-        [DataMember] public string achievementCode { get; set; }
-        [DataMember] public string achievedAt { get; set; }
-        [DataMember] public float latestValue { get; set; }
-        [DataMember] public int status { get; set; } // 1: In-Progress, 2: Unlocked
+        [DataMember] public string id;
+        [DataMember] public Dictionary<string, string> name;
+        [DataMember] public string achievementCode;
+        [DataMember] public string achievedAt;
+        [DataMember] public float latestValue;
+        [DataMember] public int status; // 1: In-Progress, 2: Unlocked
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedUserAchievement
     {
-        [DataMember] public CountInfo countInfo { get; set; }
-        [DataMember] public UserAchievement[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public CountInfo countInfo;
+        [DataMember] public UserAchievement[] data;
+        [DataMember] public Paging paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class UserGlobalAchievement
     {
-        [DataMember] public string Id { get; set; }
-        [DataMember] public Dictionary<string, string> Name { get; set; }
-        [DataMember] public string AchievementCode { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] private int Status { get; set; } // 1: In-Progress, 2: Unlocked
+        [DataMember] public string Id;
+        [DataMember] public Dictionary<string, string> Name;
+        [DataMember] public string AchievementCode;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] private int Status; // 1: In-Progress, 2: Unlocked
         [DataMember] public ConvertAchievementStatus StatusCode
         {
             get
@@ -163,69 +162,69 @@ namespace AccelByte.Models
                 Status = (int)value;
             }
         }
-        [DataMember] public float LatestValue { get; set; }
-        [DataMember] public string AchievedAt { get; set; }
-        [DataMember] public string CreatedAt { get; set; }
-        [DataMember] public string UpdatedAt { get; set; }
+        [DataMember] public float LatestValue;
+        [DataMember] public string AchievedAt;
+        [DataMember] public string CreatedAt;
+        [DataMember] public string UpdatedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedUserGlobalAchievement
     {
-        [DataMember] public UserGlobalAchievement[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public UserGlobalAchievement[] Data;
+        [DataMember] public Paging Paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GlobalAchievementContributors
     {
-        [DataMember] public string Id { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string AchievementCode { get; set; }
-        [DataMember] public string UserId { get; set; }
-        [DataMember] public float ContributedValue { get; set; }
-        [DataMember] public string CreatedAt { get; set; }
-        [DataMember] public string UpdatedAt { get; set; }
+        [DataMember] public string Id;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string AchievementCode;
+        [DataMember] public string UserId;
+        [DataMember] public float ContributedValue;
+        [DataMember] public string CreatedAt;
+        [DataMember] public string UpdatedAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedGlobalAchievementContributors
     {
-        [DataMember] public GlobalAchievementContributors[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public GlobalAchievementContributors[] Data;
+        [DataMember] public Paging Paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class GlobalAchievementContributed
     {
-        [DataMember] public string Id { get; set; }
-        [DataMember] public Dictionary<string, string> name { get; set; }
-        [DataMember(Name = "namespace")] public string Namespace { get; set; }
-        [DataMember] public string AchievementCode { get; set; }
-        [DataMember] public string UserId { get; set; }
-        [DataMember] public float ContributedValue { get; set; }
-        [DataMember] public bool CanClaimReward { get; set; }
+        [DataMember] public string Id;
+        [DataMember] public Dictionary<string, string> name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string AchievementCode;
+        [DataMember] public string UserId;
+        [DataMember] public float ContributedValue;
+        [DataMember] public bool CanClaimReward;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedGlobalAchievementUserContributed
     {
-        [DataMember] public GlobalAchievementContributed[] Data { get; set; }
-        [DataMember] public Paging Paging { get; set; }
+        [DataMember] public GlobalAchievementContributed[] Data;
+        [DataMember] public Paging Paging;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PublicTag
     {
-        [DataMember] public string name { get; set; }
-        [DataMember] public string Namespace { get; set; }
-        [DataMember] public string createdAt { get; set; }
+        [DataMember] public string name;
+        [DataMember] public string Namespace;
+        [DataMember] public string createdAt;
     }
 
-    [DataContract]
+    [DataContract, Preserve]
     public class PaginatedPublicTag
     {
-        [DataMember] public PublicTag[] data { get; set; }
-        [DataMember] public Paging paging { get; set; }
+        [DataMember] public PublicTag[] data;
+        [DataMember] public Paging paging;
     }
 }
