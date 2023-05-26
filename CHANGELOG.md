@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [15.19.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.2%0D15.19.1) (2023-05-26)
+
+
+### Features
+
+* **DS:** add DSM heartbeat API ([dd0bba3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dd0bba3e6b6ce3eaaf91c185d86cd8bc4d2eaa71))
+
 ### [15.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.1%0D15.19.0) (2023-05-24)
 
 

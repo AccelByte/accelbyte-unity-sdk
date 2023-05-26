@@ -19,6 +19,9 @@ namespace AccelByte.Server
         private string serverName = "";
         private string matchSessionId = "";
         private Coroutine heartBeatCoroutine;
+        private ResultCallback heartBeatCallback = null;
+        private HeartBeatMaintainer maintainer;
+        private int heartBeatIntervalMs;
 
         [UnityEngine.Scripting.Preserve]
         internal DedicatedServerManager( DedicatedServerManagerApi inApi
@@ -193,6 +196,135 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(api.GetSessionId(callback));
+        }
+
+        /// <summary>
+        /// Get the session timeout that will be used for the DS.
+        /// </summary>
+        /// <param name="callback">Returns a session timeout via callback when completed</param>
+        public void GetSessionTimeout( ResultCallback<ServerSessionTimeoutResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if(!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetSessionTimeout(callback));
+        }
+
+        /// <summary>
+        /// Server heart beat
+        /// </summary>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void ServerHeartBeat(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.ServerHeartBeat(result =>
+            {
+                callback?.Invoke(result);
+            });
+        }
+
+        /// <summary>
+        /// Set heart beat response callback
+        /// </summary>
+        public void SetHeartBeatEventCallback(ResultCallback callback)
+        {
+            heartBeatCallback = callback;
+        }
+
+        /// <summary>
+        /// Set heart beat enabled
+        /// </summary>
+        public void SetHeartBeatEnabled(bool enabled, int intervalInMs = 0)
+        {
+            if (intervalInMs == 0)
+            {
+                intervalInMs = heartBeatIntervalMs;
+            }
+            if (enabled)
+            {
+                StartHeartBeatScheduler(intervalInMs);
+            }
+            else
+            {
+                StopHeartBeatScheduler();
+            }
+        }
+
+        private void StartHeartBeatScheduler(int intervalMs)
+        {
+            if (maintainer != null)
+            {
+                maintainer.Stop();
+            }
+            maintainer = new HeartBeatMaintainer(intervalMs);
+            maintainer.OnHeartBeatTrigger += () => api.ServerHeartBeat(heartBeatCallback);
+            maintainer.Start();
+        }
+
+        private void StopHeartBeatScheduler()
+        {
+            if (maintainer != null)
+            {
+                maintainer.Stop();
+                maintainer = null;
+            }
+        }
+
+        private class HeartBeatMaintainer
+        {
+            private int intervalInMs = 0;
+            internal Action OnHeartBeatTrigger;
+
+            public bool IsHeartBeatEnabled
+            {
+                get;
+                private set;
+            }
+
+            public bool IsHeartBeatJobRunning
+            {
+                get;
+                private set;
+            }
+
+            public HeartBeatMaintainer(int heartBeatIntervalMs, ServerSession session = null)
+            {
+                this.intervalInMs = heartBeatIntervalMs;
+            }
+
+            public void Start()
+            {
+                RunPeriodicHeartBeat();
+            }
+
+            public void Stop()
+            {
+                IsHeartBeatEnabled = false;
+            }
+
+            private async void RunPeriodicHeartBeat()
+            {
+                IsHeartBeatEnabled = true;
+                IsHeartBeatJobRunning = true;
+                while (IsHeartBeatEnabled)
+                {
+                    OnHeartBeatTrigger.Invoke();
+                    await System.Threading.Tasks.Task.Delay(this.intervalInMs);
+                }
+                IsHeartBeatJobRunning = false;
+            }
         }
     }
 }

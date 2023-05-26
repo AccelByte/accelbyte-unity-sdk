@@ -52,6 +52,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class HeartBeatRequest
+    {
+        [DataMember(Name = "podName")] public string PodName;
+    }
+
+    [DataContract, Preserve]
     public class PartyMember
     {
         [DataMember] public string user_id;
@@ -109,6 +115,7 @@ namespace AccelByte.Models
         [DataMember] public string game_version;
         [DataMember] public string status;
         [DataMember] public string last_update;
+        [DataMember] public string Deployment;
     }
 
     [DataContract, Preserve]
@@ -146,5 +153,11 @@ namespace AccelByte.Models
     public class ServerSessionResponse
     {
         [DataMember] public string session_id;
+    }
+
+    [DataContract, Preserve]
+    public class ServerSessionTimeoutResponse
+    {
+        [DataMember(Name = "session_timeout")] public int SessionTimeout;
     }
 }
