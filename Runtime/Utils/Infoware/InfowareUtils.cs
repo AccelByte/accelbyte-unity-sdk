@@ -20,15 +20,10 @@ namespace AccelByte.Utils.Infoware
         internal override string GetDeviceID()
         {
             string uniqueIdentifier = SystemInfo.deviceUniqueIdentifier;
-            if (string.IsNullOrEmpty(uniqueIdentifier))
+            if(string.IsNullOrEmpty(uniqueIdentifier))
             {
-                uniqueIdentifier = Guid.NewGuid().ToString();
-                if (string.IsNullOrEmpty(uniqueIdentifier))
-                {
-                    uniqueIdentifier = "OtherOS";
-                }
+                throw new Exception("Unable to retrieve device id");
             }
-
             return uniqueIdentifier;
         }
 

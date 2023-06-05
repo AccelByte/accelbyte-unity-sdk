@@ -141,11 +141,13 @@ namespace AccelByte.Api
         /// <param name="callback">
         /// This will be called when the operation succeeded. The result is UGCResponse Model.
         /// </param>
+        /// <param name="updateContent">This will be used to update the content too or only content information . Default value is false.</param>
         [Obsolete("This method will be deprecated in future, please use ModifyContent(string channelId, string contentId, UGCUpdateRequest ModifyRequest, ResultCallback<UGCResponse> callback)")]
         public void ModifyContent(string channelId
             , string contentId
             , UGCRequest ModifyRequest
-            , ResultCallback<UGCResponse> callback)
+            , ResultCallback<UGCResponse> callback
+            , bool updateContent = false)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -156,7 +158,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.ModifyContent(session.UserId, channelId, contentId, ModifyRequest, callback));
+                api.ModifyContent(session.UserId, channelId, contentId, ModifyRequest, callback, updateContent));
         }
 
         /// <summary>
@@ -172,6 +174,7 @@ namespace AccelByte.Api
         /// <param name="fileExtension">FileExtension of the content</param>
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCResponse Model.</param>
         /// <param name="contentType">The specific type of the content's modified. Default value is "application/octet-stream"</param>
+        /// <param name="updateContent">This will be used to update the content too or only content information . Default value is false.</param>
         [Obsolete("This method will be deprecated in future, please use ModifyContent(string channelId, string contentId, UGCUpdateRequest ModifyRequest, ResultCallback<UGCResponse> callback)")]
         public void ModifyContent(string channelId
             , string contentId
@@ -182,7 +185,8 @@ namespace AccelByte.Api
             , byte[] preview
             , string fileExtension
             , ResultCallback<UGCResponse> callback
-            , string contentType = "application/octet-stream")
+            , string contentType = "application/octet-stream"
+            , bool updateContent = false)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -204,7 +208,8 @@ namespace AccelByte.Api
                     preview,
                     fileExtension,
                     callback,
-                    contentType));
+                    contentType,
+                    updateContent));
         }
 
         /// <summary>

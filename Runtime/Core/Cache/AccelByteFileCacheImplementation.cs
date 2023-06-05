@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_ANDROID || UNITY_IOS
+#if !UNITY_WEBGL
 using System.Text;
 #endif
 
@@ -9,7 +9,7 @@ namespace AccelByte.Core
 {
     internal class AccelByteFileCacheImplementation : IAccelByteCacheImplementation<string>
     {
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_ANDROID || UNITY_IOS
+#if !UNITY_WEBGL
         readonly string cacheDirectory = string.Empty;
         public AccelByteFileCacheImplementation(string cacheDirectory)
         {

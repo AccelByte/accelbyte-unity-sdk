@@ -234,7 +234,8 @@ namespace AccelByte.Api
             , string channelId
             , string contentId
             , UGCRequest modifyRequest
-            , ResultCallback<UGCResponse> callback )
+            , ResultCallback<UGCResponse> callback 
+            , bool updateContent)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
@@ -255,7 +256,7 @@ namespace AccelByte.Api
                 ContentType = modifyRequest.contentType,
                 PreviewMetadata = modifyRequest.PreviewMetadata,
                 CustomAttributes = modifyRequest.customAttributes,
-                UpdateContentFile = true
+                UpdateContentFile = updateContent
             };
 
             yield return ModifyContent(userId, channelId, contentId, Req, callback);
@@ -271,7 +272,8 @@ namespace AccelByte.Api
             , byte[] preview
             , string fileExtension
             , ResultCallback<UGCResponse> callback
-            , string contentType )
+            , string contentType 
+            , bool updateContent)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
@@ -297,7 +299,7 @@ namespace AccelByte.Api
                 contentType = contentType
             };
 
-            yield return ModifyContent(userId, channelId, contentId, modifyRequest, callback);
+            yield return ModifyContent(userId, channelId, contentId, modifyRequest, callback, updateContent);
         }
 
         public IEnumerator SearchContent( SearchContentRequest searchContentRequest

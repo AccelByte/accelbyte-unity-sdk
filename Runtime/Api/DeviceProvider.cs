@@ -14,6 +14,13 @@ namespace AccelByte.Api
 {
     public class DeviceProvider
     {
+        public readonly string DeviceId;
+        public readonly string DeviceType;
+        public readonly string UniqueId;
+
+        public static string DefaultGeneratedIdCacheFileDir = $"{Application.persistentDataPath}/AccelByte/{Application.productName}/";
+        public static string CacheFileName = "DeviceId";
+
         public static string EncodeHMAC(string macAddress, string key)
         {
             try
@@ -31,135 +38,7 @@ namespace AccelByte.Api
             }
         }
 
-        public static DeviceProvider GetFromSystemInfo()
-        {
-            return GetFromSystemInfo(AccelBytePlugin.Config.PublisherNamespace);
-        }
-
-        public static DeviceProvider GetFromSystemInfo(string encodeHMACKey)
-        {
-            string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatforName();
-            string platformUniqueIdentifier;
-
-            Utils.Infoware.InfowareUtils iware;
-
-            try
-            {
-                switch (Application.platform)
-                {
-                    case RuntimePlatform.OSXEditor:
-                    case RuntimePlatform.OSXPlayer:
-                        {
-                            iware = new Utils.Infoware.MacOS();
-                            string macAddress = iware.GetMacAddress();
-                            platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.WindowsEditor:
-                    case RuntimePlatform.WindowsPlayer:
-                        {
-                            iware = new Utils.Infoware.Windows();
-                            string macAddress = iware.GetMacAddress();
-                            platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.LinuxEditor:
-                    case RuntimePlatform.LinuxPlayer:
-                        {
-                            iware = new Utils.Infoware.LinuxOS();
-                            string macAddress = iware.GetMacAddress();
-                            platformUniqueIdentifier = EncodeHMAC(macAddress, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.IPhonePlayer:
-                        {
-                            iware = new Utils.Infoware.IOS();
-                            string deviceId = iware.GetDeviceID();
-                            platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.Android:
-                        {
-                            iware = new Utils.Infoware.Android();
-                            string deviceId = iware.GetDeviceID();
-                            platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.WebGLPlayer:
-                        {
-                            string newGuid;
-                            if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId"))
-                            {
-                                newGuid = System.Guid.NewGuid().ToString();
-                                PlayerPrefs.SetString("AccelByteDeviceUniqueId", newGuid);
-                            }
-                            else
-                            {
-                                newGuid = PlayerPrefs.GetString("AccelByteDeviceUniqueId");
-                            }
-                            platformUniqueIdentifier = newGuid;
-                            break;
-                        }
-                    case RuntimePlatform.GameCoreXboxSeries:
-                        {
-                            iware = new Utils.Infoware.XSX();
-                            platformUniqueIdentifier = iware.GetDeviceID();
-                            break;
-                        }
-                    case RuntimePlatform.GameCoreXboxOne:
-                        {
-                            iware = new Utils.Infoware.XB1();
-                            platformUniqueIdentifier = iware.GetDeviceID();
-                            break;
-                        }
-                    case RuntimePlatform.PS4:
-                        {
-                            iware = new Utils.Infoware.PlayStation4();
-                            string deviceId = iware.GetDeviceID();
-                            platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
-                            break;
-                        }
-                    case RuntimePlatform.PS5:
-                        {
-                            iware = new Utils.Infoware.PlayStation4();
-                            string deviceId = iware.GetDeviceID();
-                            platformUniqueIdentifier = EncodeHMAC(deviceId, encodeHMACKey);
-                            break;
-                        }
-                    default:
-                        {
-                            iware = new Utils.Infoware.OtherOs();
-                            string uniqueIdentifier = iware.GetMacAddress();
-                            if (string.IsNullOrEmpty(uniqueIdentifier))
-                            {
-                                uniqueIdentifier = iware.GetDeviceID();
-                            }
-                            platformUniqueIdentifier = EncodeHMAC(uniqueIdentifier, encodeHMACKey);
-                            break;
-                        }
-                }
-            }
-            catch (System.Exception)
-            {
-                platformUniqueIdentifier = null;
-            }
-
-            if (string.IsNullOrEmpty(platformUniqueIdentifier))
-            {
-                platformUniqueIdentifier = System.Guid.NewGuid().ToString();
-            }
-
-            return new DeviceProvider(
-                "device",
-                identifier,
-                platformUniqueIdentifier);
-        }
-
-        public readonly string DeviceId;
-        public readonly string DeviceType;
-        public readonly string UniqueId;
-
-        private DeviceProvider( string deviceType
+        public DeviceProvider(string deviceType
             , string identifier
             , string uniqueId)
         {
@@ -169,7 +48,172 @@ namespace AccelByte.Api
             this.DeviceType = deviceType;
             this.DeviceId = identifier + "_" + uniqueId;
             this.UniqueId = uniqueId;
-        }   
+        }
+
+        public static DeviceProvider GetFromSystemInfo(string encodeKey, string generatedIdCacheFileDir = null)
+        {
+            string platformUniqueIdentifier = GetDeviceId(encodeKey);
+
+            if (string.IsNullOrEmpty(platformUniqueIdentifier))
+            {
+#if !UNITY_WEBGL
+                try
+                {
+                    if (string.IsNullOrEmpty(generatedIdCacheFileDir))
+                    {
+                        generatedIdCacheFileDir = DefaultGeneratedIdCacheFileDir;
+                    }
+                    AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir);
+                    if (fileCache.Contains(CacheFileName))
+                    {
+                        platformUniqueIdentifier = fileCache.Retrieve(CacheFileName);
+                        AccelByteDebug.LogVerbose($"Retrieve cached device id: {platformUniqueIdentifier}");
+                    }
+                    else
+                    {
+                        platformUniqueIdentifier = GenerateDeviceId();
+                        fileCache.Emplace(CacheFileName, platformUniqueIdentifier);
+                        AccelByteDebug.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
+                    }
+                } 
+                catch(System.Exception exception)
+                {
+                    AccelByteDebug.LogWarning($"Unable to access device id cache, {exception.Message}");
+                    if(string.IsNullOrEmpty(platformUniqueIdentifier))
+                    {
+                        platformUniqueIdentifier = GenerateDeviceId();
+                    }
+                    AccelByteDebug.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
+                }
+#else
+                platformUniqueIdentifier = System.Guid.NewGuid().ToString();
+#endif
+            }
+
+            string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatformName();
+
+            return new DeviceProvider(
+                "device",
+                identifier,
+                platformUniqueIdentifier);
+        }
+
+#if !UNITY_WEBGL
+        public static void CacheDeviceId(string cachedDeviceId, string generatedIdCacheFileDir = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(generatedIdCacheFileDir))
+                {
+                    generatedIdCacheFileDir = DefaultGeneratedIdCacheFileDir;
+                }
+                AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir);
+                fileCache.Emplace(CacheFileName, cachedDeviceId);
+            }
+            catch (System.Exception exception)
+            {
+                AccelByteDebug.LogWarning($"Unable to cache device id, {exception.Message}");
+            }
+        }
+#endif
+
+        private static string GetDeviceId(string encodeKey)
+        {
+            Utils.Infoware.InfowareUtils iware;
+            string platformUniqueIdentifier;
+
+            try
+            {
+                switch (Application.platform)
+                {
+                    case RuntimePlatform.OSXEditor:
+                    case RuntimePlatform.OSXPlayer:
+                    {
+                        iware = new Utils.Infoware.MacOS();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.WindowsEditor:
+                    case RuntimePlatform.WindowsPlayer:
+                    {
+                        iware = new Utils.Infoware.Windows();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.LinuxEditor:
+                    case RuntimePlatform.LinuxPlayer:
+                    {
+                        iware = new Utils.Infoware.LinuxOS();
+                        string macAddress = iware.GetMacAddress();
+                        platformUniqueIdentifier = EncodeHMAC(macAddress, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.IPhonePlayer:
+                    {
+                        iware = new Utils.Infoware.IOS();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.Android:
+                    {
+                        iware = new Utils.Infoware.Android();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.WebGLPlayer:
+                    {
+                        string newGuid;
+                        if (!PlayerPrefs.HasKey("AccelByteDeviceUniqueId"))
+                        {
+                            newGuid = GenerateDeviceId();
+                            PlayerPrefs.SetString("AccelByteDeviceUniqueId", newGuid);
+                        }
+                        else
+                        {
+                            newGuid = PlayerPrefs.GetString("AccelByteDeviceUniqueId");
+                        }
+                        platformUniqueIdentifier = newGuid;
+                        break;
+                    }
+                    case RuntimePlatform.PS4:
+                    {
+                        iware = new Utils.Infoware.PlayStation4();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
+                        break;
+                    }
+                    case RuntimePlatform.PS5:
+                    {
+                        iware = new Utils.Infoware.PlayStation4();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
+                        break;
+                    }
+                    default:
+                    {
+                        iware = new Utils.Infoware.OtherOs();
+                        string uniqueIdentifier = iware.GetMacAddress();
+                        if (string.IsNullOrEmpty(uniqueIdentifier))
+                        {
+                            uniqueIdentifier = iware.GetDeviceID();
+                        }
+                        platformUniqueIdentifier = EncodeHMAC(uniqueIdentifier, encodeKey);
+                        break;
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                AccelByteDebug.LogVerbose(ex.Message);
+                platformUniqueIdentifier = null;
+            }
+
+            return platformUniqueIdentifier;
+        }
 
         public static string GetDeviceMacAddress()
         {
@@ -196,9 +240,15 @@ namespace AccelByte.Api
             return macAddressArray;
         }
 
-        public static string GetPlatforName()
+        private static string GetPlatformName()
         {
             return Application.platform.ToString();
+        }
+
+        private static string GenerateDeviceId()
+        {
+            string newGuid = System.Guid.NewGuid().ToString();
+            return newGuid;
         }
     }
 }

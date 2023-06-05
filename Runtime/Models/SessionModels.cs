@@ -113,7 +113,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2PartySessionCreateRequest
     {
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public string configurationName;
         [DataMember(Name = "joinType")] public SessionV2Joinability joinability;
         [DataMember] public SessionV2MemberData[] members;
@@ -123,7 +123,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2PartySession
     {
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public SessionV2PublicConfiguration configuration;
         [DataMember] public DateTime createdAt;
         [DataMember] public string createdBy;
@@ -147,7 +147,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2PartySessionUpdateRequest
     {
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public int inactiveTimeout;
         [DataMember] public int inviteTimeout;
         [DataMember] public SessionV2Joinability joinability;
@@ -207,7 +207,7 @@ namespace AccelByte.Models
         [DataMember] public string id;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public SessionV2MemberData[] members;
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
         [DataMember] public SessionV2PublicConfiguration configuration;
@@ -253,7 +253,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2GameSessionCreateRequest
     {
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public string backfillTicketId;
         [DataMember] public string clientVersion;
         [DataMember] public string configurationName;
@@ -277,7 +277,7 @@ namespace AccelByte.Models
     public class SessionV2GameSession
     {
         [DataMember] public SessionV2DsInformation dsInformation;
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public string backfillTicketId;
         [DataMember] public SessionV2PublicConfiguration configuration;
         [DataMember] public DateTime createdAt;
@@ -297,7 +297,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2GameSessionUpdateRequest
     {
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public string backfillTicketId;
         [DataMember] public string clientVersion;
         [DataMember] public string deployment;
@@ -420,7 +420,7 @@ namespace AccelByte.Models
         [DataMember] public string id;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public SessionV2MemberData[] members;
-        [DataMember] public Dictionary<string, string> attributes;
+        [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
         [DataMember] public SessionV2PublicConfiguration configuration;
