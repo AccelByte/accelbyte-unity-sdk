@@ -26,7 +26,7 @@ namespace AccelByte.Server
         private static IHttpClient httpClient;
         private static DedicatedServer server;
         private static ServerDSHub dsHub;
-        private static ServerWatchdog watchdog;
+        private static ServerAMS ams;
         private static DedicatedServerManager dedicatedServerManager;
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
@@ -95,9 +95,9 @@ namespace AccelByte.Server
                 }
 
                 initialized = false;
-                if (watchdog != null)
+                if (ams != null)
                 {
-                    watchdog.Disconnect();
+                    ams.Disconnect();
                 }
                 ResetApis();
             };
@@ -200,25 +200,25 @@ namespace AccelByte.Server
             return newServer;
         }
 
-        internal static ServerWatchdog CreateWatchdogConnection(string dsId, ServerConfig newSdkConfig)
+        internal static ServerAMS CreateAMSConnection(string dsId, ServerConfig newSdkConfig)
         {
-            return CreateWatchdogConnection(dsId, newSdkConfig.WatchdogServerUrl, newSdkConfig.WatchdogHeartbeatInterval);
+            return CreateAMSConnection(dsId, newSdkConfig.AMSServerUrl, newSdkConfig.AMSHeartbeatInterval);
         }
 
-        internal static ServerWatchdog CreateWatchdogConnection(string dsId, string watchdogServerUrl, int watchdogHeartbeatIntervalSecond)
+        internal static ServerAMS CreateAMSConnection(string dsId, string amsServerUrl, int amsHeartbeatIntervalSecond)
         {
             if (dsId == null)
             {
-                AccelByteDebug.LogWarning("dsid not provided, not connecting to watchdog");
+                AccelByteDebug.LogWarning("dsid not provided, not connecting to ams");
                 return null;
             }
 
-            var newWatchdog = new ServerWatchdog(
-                watchdogServerUrl,
-                watchdogHeartbeatIntervalSecond,
+            var newAMS = new ServerAMS(
+                amsServerUrl,
+                amsHeartbeatIntervalSecond,
                 coroutineRunner);
-            newWatchdog.Connect(dsId);
-            return newWatchdog;
+            newAMS.Connect(dsId);
+            return newAMS;
         }
 
         /// <summary>
@@ -270,10 +270,10 @@ namespace AccelByte.Server
             return dsHub;
         }
 
-        public static ServerWatchdog GetWatchdog()
+        public static ServerAMS GetAMS()
         {
             CheckPlugin();
-            return watchdog;
+            return ams;
         }
 
         public static DedicatedServerManager GetDedicatedServerManager()
@@ -683,7 +683,7 @@ namespace AccelByte.Server
         {
             server = null;
             dsHub = null;
-            watchdog = null;
+            ams = null;
             dedicatedServerManager = null;
             ecommerce = null;
             statistic = null;

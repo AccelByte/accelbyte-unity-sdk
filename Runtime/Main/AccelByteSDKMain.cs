@@ -17,6 +17,8 @@ namespace AccelByte.Core
     {
         internal static PlatformMain Main;
 
+        private static IAccelByteGameThreadSignaller gameThreadSignaller;
+
         private static System.Action<float> onGameUpdate;
 
         internal static System.Action<float> OnGameUpdate
@@ -43,8 +45,7 @@ namespace AccelByte.Core
                 Main = new PlatformMain();
             }
 
-            OnGameUpdate = null;
-            CheckMainThreadSignallerAlive();
+            onGameUpdate = null;
 
             Main.Run();
 #if UNITY_EDITOR
@@ -64,12 +65,43 @@ namespace AccelByte.Core
         }
 #endif
 
+        public static void AttachGameUpdateSignaller(IAccelByteGameThreadSignaller newSignaller)
+        {
+            if(gameThreadSignaller != null)
+            {
+                gameThreadSignaller.GameThreadSignal -= OnGameThreadUpdate;
+            }
+
+            gameThreadSignaller = newSignaller;
+
+            if (gameThreadSignaller != null)
+            {
+                gameThreadSignaller.GameThreadSignal -= OnGameThreadUpdate;
+                gameThreadSignaller.GameThreadSignal += OnGameThreadUpdate;
+            }
+            else
+            {
+                AccelByteDebug.LogWarning("AccelByte update signaller set to null.");
+            }
+        }
+
         private static void CheckMainThreadSignallerAlive()
         {
-            AccelByteGameThreadSignaller.Instance.MainThreadSignal = (deltaTime) =>
+            if(gameThreadSignaller == null)
             {
-                onGameUpdate?.Invoke(deltaTime);
-            };
+                GameObject signallerGameObject = Utils.AccelByteGameObject.GetOrCreateGameObject();
+                var accelByteSignaller = signallerGameObject.GetComponent<AccelByteGameThreadSignaller>();
+                if(accelByteSignaller == null)
+                {
+                    accelByteSignaller = signallerGameObject.AddComponent<AccelByteGameThreadSignaller>();
+                }
+                AttachGameUpdateSignaller(accelByteSignaller);
+            }
+        }
+
+        private static void OnGameThreadUpdate(float deltaTime)
+        {
+            onGameUpdate?.Invoke(deltaTime);
         }
 
         private static void ApplicationQuitting()

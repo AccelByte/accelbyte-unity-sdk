@@ -274,6 +274,17 @@ public class OAuth2 : ApiBase
 
             if (!result.IsError)
             {
+#if UNITY_GAMECORE
+                if(result.Value != null)
+                {
+                    string fetchedDeviceId = result.Value.DeviceId;
+                    if (!string.IsNullOrEmpty(fetchedDeviceId))
+                    {
+                        DeviceProvider.CacheDeviceId(result.Value.DeviceId);
+                    }
+                }
+#endif
+
                 OnNewTokenObtained?.Invoke(result.Value);
                 callback.TryOk();
             }
@@ -309,7 +320,18 @@ public class OAuth2 : ApiBase
 
             if (!result.IsError)
             {
-                OnNewTokenObtained?.Invoke(result.Value);
+#if UNITY_GAMECORE
+                if(result.Value != null)
+                {
+                    string fetchedDeviceId = result.Value.DeviceId;
+                    if (!string.IsNullOrEmpty(fetchedDeviceId))
+                    {
+                        DeviceProvider.CacheDeviceId(result.Value.DeviceId);
+                    }
+                }
+#endif
+
+            OnNewTokenObtained?.Invoke(result.Value);
                 callback.TryOk(result.Value);
             }
             else

@@ -146,8 +146,6 @@ namespace AccelByte.Api
 
         public static MultiOAuthConfigs LoadOAuthFile(string targetPlatform, bool isServerConfig = false)
         {
-            AccelByteDebug.LogVerbose($"Loading OAuth file in \"{GeneratedConfigsResourceDirectory}\" directory with \"{targetPlatform}\" platform");
-
             MultiOAuthConfigs retval = null;
             UnityEngine.Object targetOAuthFile = null;
             bool moveConfigFile = false;
@@ -171,14 +169,10 @@ namespace AccelByte.Api
                 targetOAuthFile = oAuthFile;
             }
 
-            if (!string.IsNullOrEmpty(usedPath))
-            {
-                AccelByteDebug.LogVerbose($"Loading AccelByte OAuth file from {usedPath}");
-            }
-            else
+            if (string.IsNullOrEmpty(usedPath))
             {
                 string platformName = targetPlatform;
-                if(string.IsNullOrEmpty(platformName))
+                if (string.IsNullOrEmpty(platformName))
                 {
                     platformName = "default";
                 }

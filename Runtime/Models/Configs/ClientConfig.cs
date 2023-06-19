@@ -44,13 +44,16 @@ namespace AccelByte.Models
         [DataMember] public string SessionBrowserServerUrl = "";
         [DataMember] public string SessionServerUrl = "";
         [DataMember] public string MatchmakingV2ServerUrl = "";
-        [DataMember] public bool UseTurnManager = false;
+        [DataMember] public bool UseTurnManager = true;
         [DataMember] public string TurnManagerServerUrl = "";
         [DataMember] public string TurnServerHost = "";
         [DataMember] public string TurnServerPort = "";
         [DataMember] public string TurnServerPassword = "";
         [DataMember] public string TurnServerSecret = "";
         [DataMember] public string TurnServerUsername = "";
+        [DataMember] public int PeerMonitorIntervalMs = 200;
+        [DataMember] public int PeerMonitorTimeoutMs = 2000;
+        [DataMember] public int HostCheckTimeoutInSeconds = 60;
         [DataMember] public string GroupServerUrl = "";
         [DataMember] public string ChatServerUrl = "";
         [DataMember] public string RedirectUri = "";
@@ -109,7 +112,10 @@ namespace AccelByte.Models
                    this.CustomerName == anotherConfig.CustomerName &&
                    this.EnableAuthHandshake == anotherConfig.EnableAuthHandshake &&
                    this.MaximumCacheSize == anotherConfig.MaximumCacheSize &&
-                   this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime;
+                   this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime &&
+                   this.PeerMonitorIntervalMs == anotherConfig.PeerMonitorIntervalMs &&
+                   this.PeerMonitorTimeoutMs == anotherConfig.PeerMonitorTimeoutMs &&
+                   this.HostCheckTimeoutInSeconds == anotherConfig.HostCheckTimeoutInSeconds;
         }
 
         /// <summary>
@@ -311,13 +317,13 @@ namespace AccelByte.Models
                 this.ReportingServerUrl = GetDefaultApiUrl(this.ReportingServerUrl, "/reporting");
 
                 this.SeasonPassServerUrl = GetDefaultApiUrl(this.SeasonPassServerUrl, "/seasonpass");
-                
+
                 this.SessionBrowserServerUrl = GetDefaultApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser");
-                
+
                 this.SessionServerUrl = GetDefaultApiUrl(this.SessionServerUrl, "/session");
-                
+
                 this.MatchmakingV2ServerUrl = GetDefaultApiUrl(this.MatchmakingV2ServerUrl, "/match2");
-                
+
                 this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
 
                 if (string.IsNullOrEmpty(this.ChatServerUrl))
@@ -361,13 +367,13 @@ namespace AccelByte.Models
                 if (this.AgreementServerUrl == httpsBaseUrl + "/agreement") this.AgreementServerUrl = null;
 
                 if (this.LeaderboardServerUrl == httpsBaseUrl + "/leaderboard") this.LeaderboardServerUrl = null;
-                
+
                 if (this.CloudSaveServerUrl == httpsBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
 
                 if (this.GameTelemetryServerUrl == httpsBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
 
                 if (this.AchievementServerUrl == httpsBaseUrl + "/achievement") this.AchievementServerUrl = null;
-                
+
                 if (this.GroupServerUrl == httpsBaseUrl + "/group") this.GroupServerUrl = null;
 
                 if (this.UGCServerUrl == httpsBaseUrl + "/ugc") this.UGCServerUrl = null;
@@ -377,13 +383,13 @@ namespace AccelByte.Models
                 if (this.SeasonPassServerUrl == httpsBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
 
                 if (this.SessionBrowserServerUrl == httpsBaseUrl + "/sessionbrowser") this.SessionBrowserServerUrl = null;
-                
+
                 if (this.SessionServerUrl == httpsBaseUrl + "/session") this.SessionServerUrl = null;
-                
+
                 if (this.MatchmakingV2ServerUrl == httpsBaseUrl + "/match2") this.MatchmakingV2ServerUrl = null;
 
                 if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
-              
+
                 if (this.ChatServerUrl == wssBaseUrl + "/chat/") this.ChatServerUrl = null;
 
             }
@@ -438,7 +444,16 @@ namespace AccelByte.Models
 
         public void SanitizeBaseUrl()
         {
-            this.BaseUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
+            string sanitizedUrl = string.Empty;
+            try
+            {
+                sanitizedUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
+            }
+            catch (System.Exception ex)
+            {
+                AccelByteDebug.LogWarning("Invalid Client Config BaseUrl: " + ex.Message);
+            }
+            this.BaseUrl = sanitizedUrl;
         }
     }
 

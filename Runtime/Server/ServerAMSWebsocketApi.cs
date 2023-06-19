@@ -9,7 +9,7 @@ using AccelByte.Api;
 
 namespace AccelByte.Server
 {
-    class ServerWatchdogWebsocketApi
+    class ServerAMSWebsocketApi
     {
         #region Events
 
@@ -30,15 +30,15 @@ namespace AccelByte.Server
         private AccelByteWebSocket webSocket;
         private readonly CoroutineRunner coroutineRunner;
 
-        private string watchdogUrl;
+        private string amsWatchdogUrl;
         private string dsId = string.Empty;
 
-        public ServerWatchdogWebsocketApi(CoroutineRunner inCoroutineRunner, string inWatchdogUrl)
+        public ServerAMSWebsocketApi(CoroutineRunner inCoroutineRunner, string inAMSWatchdogUrl)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
-            watchdogUrl = inWatchdogUrl;
+            amsWatchdogUrl = inAMSWatchdogUrl;
             IWebSocket webSocket = new WebSocket();
             OverrideWebsocket(webSocket);
         }
@@ -61,25 +61,25 @@ namespace AccelByte.Server
         public void Connect(string id)
         {
             dsId = id;
-            AccelByteDebug.Log(string.Format("Connecting to watchdog with id: {0}", dsId));
+            AccelByteDebug.Log(string.Format("Connecting to AMS with id: {0}", dsId));
 
             if (IsConnected)
             {
-                AccelByteDebug.Log("[Watchdog] already connected");
+                AccelByteDebug.Log("[AMS] already connected");
                 return;
             }
 
             if (webSocket.IsConnecting)
             {
-                AccelByteDebug.Log("[Watchdog] connecting to watchdog");
+                AccelByteDebug.Log("[AMS] connecting to AMS");
                 return;
             }
 
-            webSocket.Connect(watchdogUrl, string.Empty);
+            webSocket.Connect(amsWatchdogUrl, string.Empty);
         }
 
         /// <summary>
-        /// Change the delay parameters to maintain connection to Watchdog.
+        /// Change the delay parameters to maintain connection to AMS.
         /// </summary>
         /// <param name="inTotalTimeout">Time limit until stop to re-attempt</param>
         /// <param name="inBackoffDelay">Initial delay time</param>

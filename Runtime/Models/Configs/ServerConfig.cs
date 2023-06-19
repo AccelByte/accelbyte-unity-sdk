@@ -12,7 +12,7 @@ namespace AccelByte.Models {
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
-        private const int defaultWatchdogHeartbeatInterval = 15;
+        private const int defaultAMSHeartbeatInterval = 15;
         [DataMember] public string Namespace;
         [DataMember] public string BaseUrl;
         [DataMember] public string IamServerUrl;
@@ -30,8 +30,8 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
         [DataMember] public string SeasonPassServerUrl;
-        [DataMember] public string WatchdogServerUrl;
-        [DataMember] public int WatchdogHeartbeatInterval = defaultWatchdogHeartbeatInterval;
+        [DataMember] public string AMSServerUrl;
+        [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
 
@@ -170,7 +170,16 @@ namespace AccelByte.Models {
 
         public void SanitizeBaseUrl()
         {
-            this.BaseUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
+            string sanitizedUrl = string.Empty;
+            try
+            {
+                sanitizedUrl = Utils.UrlUtils.SanitizeBaseUrl(this.BaseUrl);
+            }
+            catch (System.Exception ex)
+            {
+                AccelByteDebug.LogWarning("Invalid Server Config BaseUrl: " + ex.Message);
+            }
+            this.BaseUrl = sanitizedUrl;
         }
     }
 

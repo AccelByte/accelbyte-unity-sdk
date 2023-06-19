@@ -23,7 +23,7 @@ namespace AccelByte.Core
         }
 
         private AccelByteSignalHandler signalHandler;
-        private ServerWatchdog watchdog;
+        private ServerAMS ams;
 
         protected virtual AccelByteSignalHandler SignalHandler
         {
@@ -37,11 +37,11 @@ namespace AccelByte.Core
             }
         }
 
-        protected ServerWatchdog Watchdog
+        protected ServerAMS AMS
         {
             get
             {
-                return watchdog;
+                return ams;
             }
         }
 
@@ -58,30 +58,30 @@ namespace AccelByte.Core
                 SignalHandler.SetSignalHandlerAction(OnReceivedSignal);
             }
 
-            if(Watchdog == null)
+            if(AMS == null)
             {
                 string dsId = GetCommandLineArg(DedicatedServer.CommandLineDsId);
-                string watchdogServerUrl = GetCommandLineArg(ServerWatchdog.CommandLineWatchdogUrlId);
-                string watchdogHeartbeatInterval = GetCommandLineArg(ServerWatchdog.CommandLineWatchdogHeartbeatId);
+                string amsServerUrl = GetCommandLineArg(ServerAMS.CommandLineAMSWatchdogUrlId);
+                string amsHeartbeatInterval = GetCommandLineArg(ServerAMS.CommandLineAMSHeartbeatId);
 
-                if(!string.IsNullOrEmpty(dsId) && !string.IsNullOrEmpty(watchdogServerUrl))
+                if(!string.IsNullOrEmpty(dsId) && !string.IsNullOrEmpty(amsServerUrl))
                 {
                     int heartbeatInterval = 0;
 
-                    if (!string.IsNullOrEmpty(watchdogHeartbeatInterval))
+                    if (!string.IsNullOrEmpty(amsHeartbeatInterval))
                     {
-                        if(!int.TryParse(watchdogHeartbeatInterval, out heartbeatInterval))
+                        if(!int.TryParse(amsHeartbeatInterval, out heartbeatInterval))
                         {
-                            heartbeatInterval = AccelByteServerPlugin.Config.WatchdogHeartbeatInterval;
+                            heartbeatInterval = AccelByteServerPlugin.Config.AMSHeartbeatInterval;
                         }
                     }
 
                     if (heartbeatInterval == 0)
                     {
-                        heartbeatInterval = ServerWatchdog.DefaulHeatbeatSeconds;
+                        heartbeatInterval = ServerAMS.DefaulHeatbeatSeconds;
                     }
 
-                    watchdog = CreateServerWatchDog(dsId, watchdogServerUrl, heartbeatInterval);
+                    ams = CreateServerAMS(dsId, amsServerUrl, heartbeatInterval);
                 }
                 
                 LinuxServerMain.onReceivedSignalEvent += CheckExitSignal;
@@ -131,9 +131,9 @@ namespace AccelByte.Core
             SignalHandler = new AccelByteSignalHandler();
         }
 
-        protected virtual ServerWatchdog CreateServerWatchDog(string dsId, string watchdogServerUrl, int watchdogIntervalSeconds)
+        protected virtual ServerAMS CreateServerAMS(string dsId, string amsServerUrl, int amsIntervalSeconds)
         {
-            ServerWatchdog retval = AccelByteServerPlugin.CreateWatchdogConnection(dsId, watchdogServerUrl, watchdogIntervalSeconds);
+            ServerAMS retval = AccelByteServerPlugin.CreateAMSConnection(dsId, amsServerUrl, amsIntervalSeconds);
             return retval;
         }
     }

@@ -13,16 +13,16 @@ using Newtonsoft.Json.Linq;
 
 namespace AccelByte.Server
 {
-    public class ServerWatchdog
+    public class ServerAMS
     {
         internal const int DefaulHeatbeatSeconds = 15;
-        internal const string CommandLineWatchdogUrlId = "-watchdog_url";
-        internal const string CommandLineWatchdogHeartbeatId = "-heartbeat";
+        internal const string CommandLineAMSWatchdogUrlId = "-watchdog_url";
+        internal const string CommandLineAMSHeartbeatId = "-heartbeat";
 
         #region Events
 
         /// <summary>
-        /// Raised when DS is connected to watchdog
+        /// Raised when DS is connected to AMS
         /// </summary>
         public event Action OnOpen;
 
@@ -32,7 +32,7 @@ namespace AccelByte.Server
         public event ResultCallback<DisconnectNotif> Disconnecting;
 
         /// <summary>
-        /// Raised when DS is disconnected from watchdog
+        /// Raised when DS is disconnected from AMS
         /// </summary>
         public event Action<WsCloseCode> Disconnected;
 
@@ -43,7 +43,7 @@ namespace AccelByte.Server
 
         #endregion
 
-        private ServerWatchdogWebsocketApi websocketApi;
+        private ServerAMSWebsocketApi websocketApi;
         private readonly CoroutineRunner coroutineRunner;
         private Coroutine heartBeatCoroutine;
         private TimeSpan heartBeatInterval = TimeSpan.FromSeconds(15);
@@ -58,21 +58,21 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Watchdog connection status
+        /// AMS connection status
         /// </summary>
         public bool IsConnected => websocketApi.IsConnected;
 
-        internal ServerWatchdog(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.WatchdogServerUrl, config.WatchdogHeartbeatInterval, inCoroutineRunner)
+        internal ServerAMS(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.AMSServerUrl, config.AMSHeartbeatInterval, inCoroutineRunner)
         { 
         
         }
 
-        internal ServerWatchdog(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner)
+        internal ServerAMS(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
-            websocketApi = new ServerWatchdogWebsocketApi(inCoroutineRunner, serverUrl);
+            websocketApi = new ServerAMSWebsocketApi(inCoroutineRunner, serverUrl);
             heartBeatInterval = TimeSpan.FromSeconds(heartbeatIntervalSecond);
             websocketApi.OnOpen += HandleOnOpen;
             websocketApi.OnMessage += HandleOnMessage;
@@ -80,7 +80,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Connect to Watchdog with provided ds id.
+        /// Connect to AMS with provided ds id.
         /// The token generator need to be set for connection with entitlement verification.
         /// </summary>
         public virtual void Connect(string dsId)
@@ -89,7 +89,7 @@ namespace AccelByte.Server
 
             if (dsId == null || dsId.Length == 0)
             {
-                AccelByteDebug.LogWarning("dsid not provided, not connecting to watchdog");
+                AccelByteDebug.LogWarning("dsid not provided, not connecting to AMS");
             }
             else
             {
@@ -98,7 +98,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Change the delay parameters to maintain connection to Watchdog.
+        /// Change the delay parameters to maintain connection to AMS.
         /// </summary>
         /// <param name="inTotalTimeout">Time limit until stop to re-attempt</param>
         /// <param name="inBackoffDelay">Initial delay time</param>
@@ -111,7 +111,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Disconnect from Watchdog.
+        /// Disconnect from AMS.
         /// </summary>
         public virtual void Disconnect()
         {
@@ -122,7 +122,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Send ready message to Watchdog.
+        /// Send ready message to AMS.
         /// </summary>
         public void SendReadyMessage()
         {

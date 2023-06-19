@@ -284,6 +284,9 @@ namespace AccelByte.Api
                 CreateTextInput((newValue) => editedSdkConfig.TurnServerUsername = newValue, editedSdkConfig.TurnServerUsername, "TURN Server Username");
                 CreateTextInput((newValue) => editedSdkConfig.TurnServerSecret = newValue, editedSdkConfig.TurnServerSecret, "TURN Server Secret");
                 CreateTextInput((newValue) => editedSdkConfig.TurnServerPassword = newValue, editedSdkConfig.TurnServerPassword, "TURN Server Password");
+                CreateNumberInput((newvalue) => editedSdkConfig.PeerMonitorIntervalMs = (int)newvalue, editedSdkConfig.PeerMonitorIntervalMs, "Peer Monitor Interval in Milliseconds");
+                CreateNumberInput((newvalue) => editedSdkConfig.PeerMonitorTimeoutMs = (int)newvalue, editedSdkConfig.PeerMonitorTimeoutMs, "Peer Monitor Timeout in Milliseconds");
+                CreateNumberInput((newvalue) => editedSdkConfig.HostCheckTimeoutInSeconds = (int)newvalue, editedSdkConfig.HostCheckTimeoutInSeconds, "Host Check Timeout in Seconds");
             }
 
             EditorGUILayout.EndScrollView();

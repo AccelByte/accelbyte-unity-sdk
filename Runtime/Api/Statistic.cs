@@ -427,5 +427,84 @@ namespace AccelByte.Api
             coroutineRunner.Run(api.GetListUserStatCycleItem(cycleId, statCodes, this.session.UserId,
                 this.session.AuthorizationToken, callback, offset, limit));
         }
+        
+        /// <summary>
+        /// Get user's own statistic item
+        /// </summary>
+        /// <param name="statCodes">Array of statistic codes to be retrieved</param>
+        /// <param name="tags">Array of tags which the statistic items to be retrieved have</param>
+        /// <param name="callback">Returns PagedStatItems via callback</param>
+        /// <param name="limit">The limit of item on page (optional)</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        public void GetMyStatItems(
+            IEnumerable<string> statCodes,
+            IEnumerable<string> tags,
+            ResultCallback<PagedStatItems> callback,
+            int limit = 20,
+            int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetMyStatItems(statCodes, tags, session.AuthorizationToken, callback, limit, offset));
+        }
+
+        /// <summary>
+        /// Get user's own statistic value
+        /// </summary>
+        /// <param name="statCodes">Array of statistic codes of statistic value to be retrieved</param>
+        /// <param name="tags">Array of tags that statistic item to be retrieved has</param>
+        /// <param name="additionalKey"></param>
+        /// <param name="callback">Returns FetchUser[] via callback</param>
+        public void GetMyStatItemValues(
+            string[] statCodes,
+            string[] tags,
+            string additionalKey,
+            ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetMyStatItemValues(statCodes, tags, additionalKey,session.AuthorizationToken, callback));
+        }
+
+        /// <summary>
+        /// Get user's own statistic cycle item
+        /// </summary>
+        /// <param name="cycleId">The cycle id to which the stat item belong</param>
+        /// <param name="statCodes">Array of statistic codes for statistic cycle items to be retrieved</param>
+        /// <param name="callback">Returns PagedStatCycleItem via callback</param>
+        /// <param name="limit">The limit of item on page (optional)</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        public void GetMyStatCycleItems(
+            string cycleId,
+            IEnumerable<string> statCodes,
+            ResultCallback<PagedStatCycleItem> callback,
+            int limit = 20,
+            int offset = 0
+        )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetMyStatCycleItems(cycleId, statCodes, session.AuthorizationToken, limit, offset, callback));
+        }
     }
 }

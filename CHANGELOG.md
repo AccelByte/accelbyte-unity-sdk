@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.1.0%0D16.0.0) (2023-06-19)
+
+
+### Features
+
+* [JSC-1125] Get device Id for Xbox ([7867c26](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7867c262bce9f2b95741ab2c5518f2e2394a3204))
+* add new config member for P2P and assign reasonable default value ([b622e09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b622e096310f5f5efadd11939424b2c3fd4283de))
+* custom game thread signaller support ([e8ace94](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8ace94628e9318025ff5ce09163c2d6ece4014d))
+* leaderboard v3 endpoints ([7b911ad](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7b911ad49989ebf0c4a53edcbb53e166771014b1))
+* new statistic endpoint ([f29d963](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f29d963b43b873b0c86ba77519e62f572c9aa711))
+
+
+### Refactors
+
+* **AMS:** change ServerWatchdog to ServerAMS ([3a167db](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3a167dba7f4babfbc461e96fa8aa461314b80a31))
+
+
+### Documentations
+
+* redirect readme to doc portal ([37d08b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/37d08b80532ec6f680973714fefa2d27d717d385))
+
 ## [16.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.0.0%0D15.19.2) (2023-06-05)
 
 

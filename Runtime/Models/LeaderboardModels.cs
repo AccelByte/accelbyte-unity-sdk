@@ -83,4 +83,47 @@ namespace AccelByte.Models
         [DataMember] public LeaderboardData[] data;
         [DataMember] public LeaderboardPaging paging;
     }
+
+    [DataContract, Preserve]
+    public class LeaderboardDataV3
+    {
+        [DataMember] public bool Descending;
+        [DataMember] public string IconUrl;
+        [DataMember] public bool IsDeleted;
+        [DataMember] public string LeaderboardCode;
+        [DataMember] public string Name;
+        [DataMember] public string Description;
+        [DataMember] public string StatCode;
+        [DataMember] public string[] CycleIds;
+        [DataMember] public bool AllTime;
+        [DataMember] public string CreatedAt;
+        [DataMember] public string UpdatedAt;
+        [DataMember] public string DeletedAt;
+    }
+
+    [DataContract, Preserve]
+    public class LeaderboardPagedListV3
+    {
+        [DataMember] public LeaderboardDataV3[] Data;
+        [DataMember] public Paging Paging;
+    }
+    
+    [DataContract, Preserve]
+    public class UserCycleRanking
+    {
+        [DataMember] public float Point;
+        [DataMember] public int Rank;
+        [DataMember] public bool Hidden;
+        [DataMember] public Dictionary<string, object> AdditionalData;
+        [DataMember] public string CycleId;
+    }
+    
+    [DataContract, Preserve]
+    public class UserRankingDataV3
+    {
+        [DataMember] public UserRanking AllTime;
+        [DataMember] public UserCycleRanking[] Cycles;
+        [DataMember] public string UserId;
+    }
+
 }

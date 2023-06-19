@@ -22,7 +22,7 @@ namespace AccelByte.Utils
                 }
                 else
                 {
-                    AccelByteDebug.LogWarning("Invalid URL: " + baseURL);
+                    throw new System.ArgumentException(baseURL);
                 }
             }
             return retval;

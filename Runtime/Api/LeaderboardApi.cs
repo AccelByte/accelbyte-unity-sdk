@@ -132,5 +132,120 @@ namespace AccelByte.Api
             callback.Try( result );
         }
 
+        public IEnumerator GetLeaderboardListV3(int offset, int limit, ResultCallback<LeaderboardPagedListV3> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            IHttpRequest request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
+                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
+                .WithBearerAuth( AuthToken )
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest( request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            Result<LeaderboardPagedListV3> result = response.TryParseJson<LeaderboardPagedListV3>();
+
+            callback.Try( result );
+        }
+
+        public IEnumerator GetRangkingsV3(string leaderboardCode, int offset, int limit,
+            ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            IHttpRequest request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/alltime")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("leaderboardCode", leaderboardCode)
+                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
+                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
+                .WithBearerAuth( AuthToken )
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest( request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
+
+            callback.Try( result );
+        }
+
+        public IEnumerator GetRankingsByCycle(string leaderboardCode, string cycleId, int offset, int limit,
+            ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            IHttpRequest request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/cycles/{cycleId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("leaderboardCode", leaderboardCode)
+                .WithPathParam("cycleId", cycleId)
+                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
+                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
+                .WithBearerAuth( AuthToken )
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest( request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
+
+            callback.Try( result );
+        }
+        
+        public IEnumerator GetUserRankingV3( string leaderboardCode
+            , string userId
+            , ResultCallback<UserRankingDataV3> callback )
+        {
+            Report.GetFunctionLog( GetType().Name );
+            Assert.IsNotNull( Namespace_, "Can't get item! Namespace parameter is null!" );
+            Assert.IsNotNull( AuthToken, "Can't get item! AccessToken parameter is null!" );
+            Assert.IsNotNull( leaderboardCode, "Can't get item! Leaderboard Code parameter is null!" );
+            Assert.IsNotNull( userId, "Can't get item! UserId parameter is null!" );
+
+            var builder = HttpRequestBuilder
+                .CreateGet( BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/users/{userId}" )
+                .WithPathParam( "namespace", Namespace_ )
+                .WithPathParam( "leaderboardCode", leaderboardCode )
+                .WithPathParam( "userId", userId )
+                .WithBearerAuth( AuthToken )
+                .Accepts( MediaType.ApplicationJson );
+
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest( request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UserRankingDataV3>();
+
+            callback.Try( result );
+        }
     }
 }

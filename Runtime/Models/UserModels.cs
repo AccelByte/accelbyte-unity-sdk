@@ -60,6 +60,7 @@ namespace AccelByte.Models
         [DataMember] public bool is_comply;
         [DataMember] public string platform_id;
         [DataMember] public string platform_user_id;
+        [DataMember(Name = "device_id")] public string DeviceId;
     }
 
     [DataContract, Preserve]

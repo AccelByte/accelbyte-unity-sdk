@@ -500,5 +500,114 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+        
+        public IEnumerator GetMyStatItems(
+            IEnumerable<string> statCodes, 
+            IEnumerable<string> tags, 
+            string accessToken, 
+            ResultCallback<PagedStatItems> callback,
+            int limit, 
+            int offset)
+        {
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statitems")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("limit", limit == 0 ? string.Empty : limit.ToString())
+                .WithQueryParam("offset", offset < 0 ? string.Empty : offset.ToString())
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+            
+            foreach (string statCode in statCodes)
+            {
+                requestBuilder.WithQueryParam("statCodes", statCode);
+            }
+
+            foreach (string tag in tags)
+            {
+                requestBuilder.WithQueryParam("tags", tag);
+            }
+
+            IHttpRequest request = requestBuilder.GetResult();
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PagedStatItems>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetMyStatItemValues(
+            IEnumerable<string> statCodes,
+            IEnumerable<string> tags,
+            string additionalKey,
+            string accessToken,
+            ResultCallback<FetchUser[]> callback)
+        {
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statitems/value/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("additionalKey", additionalKey)
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            foreach (string statCode in statCodes)
+            {
+                requestBuilder.WithQueryParam("statCodes", statCode);
+            }
+
+            foreach (string tag in tags)
+            {
+                requestBuilder.WithQueryParam("tags", tag);
+            }
+
+            IHttpRequest request = requestBuilder.GetResult();
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<FetchUser[]>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetMyStatCycleItems(
+            string cycleId,
+            IEnumerable<string> statCodes,
+            string accessToken,
+            int limit,
+            int offset,
+            ResultCallback<PagedStatCycleItem> callback
+        )
+        {
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statCycles/{cycleId}/statCycleitems")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("cycleId", cycleId)
+                .WithQueryParam("limit", limit == 0 ? string.Empty : limit.ToString())
+                .WithQueryParam("offset", offset < 0 ? string.Empty : offset.ToString())
+                .WithBearerAuth(accessToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            foreach (string statCode in statCodes)
+            {
+                requestBuilder.WithQueryParam("statCodes", statCode);
+            }
+            
+            IHttpRequest request = requestBuilder.GetResult();
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp => response = rsp);
+
+            var result = response.TryParseJson<PagedStatCycleItem>();
+
+            callback.Try(result);
+        }
     }
 }

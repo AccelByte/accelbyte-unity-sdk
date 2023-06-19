@@ -174,5 +174,88 @@ namespace AccelByte.Api
                     limit,
                     callback));
         }
+
+        /// <summary>
+        /// List all leaderboard by given namespace
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains LeaderboardPagedListV3 via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional) </param>
+        public void GetLeaderboardListV3(ResultCallback<LeaderboardPagedListV3> callback, int offset = 0, int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetLeaderboardListV3(offset, limit, callback));
+        }
+
+        /// <summary>
+        /// Get leaderboard ranking data from the beginning.
+        /// </summary>
+        /// <param name="leaderboardCode">The id of the leaderboard</param>
+        /// <param name="callback">Returns a Result that contains LeaderboardRankingResult via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional)</param>
+        public void GetRangkingsV3(string leaderboardCode, ResultCallback<LeaderboardRankingResult> callback,
+            int offset = 0, int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.GetRangkingsV3(leaderboardCode, offset, limit, callback));
+        }
+
+        /// <summary>
+        /// Get leaderboard's ranking list for specific cycle
+        /// </summary>
+        /// <param name="leaderboardCode">The id of the leaderboard</param>
+        /// <param name="cycleId">The id of leaderboard cycle</param>
+        /// <param name="callback">Returns a Result that contains LeaderboardRankingResult via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional)</param>
+        public void GetRankingsByCycle(string leaderboardCode, string cycleId,
+            ResultCallback<LeaderboardRankingResult> callback, int offset = 0, int limit = 20)
+        {
+            coroutineRunner.Run(api.GetRankingsByCycle(leaderboardCode, cycleId, offset, limit, callback));
+        }
+        
+        /// <summary>
+        /// Get user's ranking from leaderboard with additional key. The additional key will be
+        /// suffixed to the userId to access multi level user ranking, such as character ranking. 
+        /// </summary>
+        /// <param name="userId">The id of the user</param>
+        /// <param name="leaderboardCode">The id of the leaderboard</param>
+        /// <param name="callback">Returns a Result that contains LeaderboardRankingResult via callback when completed</param>
+        public void GetUserRankingV3( string userId
+            , string leaderboardCode
+            , ResultCallback<UserRankingDataV3> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(leaderboardCode, 
+                "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
+            Assert.IsNotNull(userId, 
+                "Can't query all time leaderboard ranking data! userId parameter is null!");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserRankingV3(
+                    leaderboardCode,
+                    userId,
+                    callback));
+        }
     }
 }
