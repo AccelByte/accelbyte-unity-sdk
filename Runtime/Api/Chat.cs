@@ -7,6 +7,7 @@ using AccelByte.Models;
 using HybridWebSocket;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {   
@@ -20,12 +21,13 @@ namespace AccelByte.Api
         {
             session = inSession;
             api = inApi;
+            coroutineRunner = inCoroutineRunner;
 
             IWebSocket webSocket = new WebSocket();
             websocketApi = new ChatWebsocketApi(inCoroutineRunner
                 , inSession
                 , webSocket
-                , api.GetConfig().ChatServerUrl
+                , api.GetConfig().ChatServerWsUrl
                 , api.GetConfig().Namespace);
 
             websocketApi.OnOpen += HandleOnOpen;
@@ -80,6 +82,16 @@ namespace AccelByte.Api
         /// Event triggered when user receive new system message
         /// </summary>
         public event Action<SystemMessageNotif> NewSystemMessage;
+
+        /// <summary>
+        /// Event triggered when user muted from group chat
+        /// </summary>
+        public event Action<ChatMutedNotif> ChatMuted;
+
+        /// <summary>
+        /// Event triggered when user unmuted from group chat
+        /// </summary>
+        public event Action<ChatUnmutedNotif> ChatUnmuted;
 
         #endregion
 
@@ -311,6 +323,101 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             websocketApi.GetSystemMessagesStats(new GetSystemMessageStatsRequest(), callback);
         }
+
+        /// <summary>
+        /// Delete a message from group chat (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="chatId">Id of message to delete.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void DeleteGroupChat(string groupId, string chatId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.DeleteGroupChat(groupId, chatId, callback));
+        }
+
+        /// <summary>
+        /// Mute user from group chat (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="userId">Id of the user to be muted.</param>
+        /// <param name="durationInSeconds">Duration of mute in seconds.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void MuteGroupUserChat(string groupId, string userId, int durationInSeconds, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            MuteGroupChatRequest req = new MuteGroupChatRequest
+            {
+                UserId = userId,
+                Duration = durationInSeconds
+            };
+
+            coroutineRunner.Run(api.MuteGroupUserChat(groupId, req, callback));
+        }
+
+        /// <summary>
+        /// Unmute user from group chat (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="userId">Id of the user to be muted.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void UnmuteGroupUserChat(string groupId, string userId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            UnmuteGroupChatRequest req = new UnmuteGroupChatRequest { UserId = userId };
+
+            coroutineRunner.Run(api.UnmuteGroupUserChat(groupId, req, callback));
+        }
+
+        /// <summary>
+        /// Get chat snapshot (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="chatId">Id of message.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void GetGroupChatSnapshot(string groupId, string chatId, ResultCallback<ChatSnapshotResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            coroutineRunner.Run(api.GetGroupChatSnapshot(groupId, chatId, callback));
+        }
+
+        /// <summary>
+        /// Ban users from group chat (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="userIds">List of user ids to ban.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void BanGroupUserChat(string groupId, List<string> userIds, ResultCallback<BanGroupChatResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            BanGroupChatRequest req = new BanGroupChatRequest
+            {
+                UserIds = userIds
+            };
+
+            coroutineRunner.Run(api.BanGroupUserChat(groupId, req, callback));
+        }
+
+        /// <summary>
+        /// Unban users from group chat (used by group moderator).
+        /// </summary>
+        /// <param name="groupId">Id of group from group service.</param>
+        /// <param name="userIds">List of user ids to ban.</param>
+        /// <param name="callback">Function callback when operation is done.</param>
+        public void UnbanGroupUserChat(string groupId, List<string> userIds, ResultCallback<UnbanGroupChatResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            UnbanGroupChatRequest req = new UnbanGroupChatRequest
+            {
+                UserIds = userIds
+            };
+
+            coroutineRunner.Run(api.UnbanGroupUserChat(groupId, req, callback));
+        }
         
         #endregion
         
@@ -339,6 +446,7 @@ namespace AccelByte.Api
         private ChatApi api;
         private UserSession session;
         private ChatWebsocketApi websocketApi;
+        private readonly CoroutineRunner coroutineRunner;
 
         #endregion
 
@@ -421,6 +529,12 @@ namespace AccelByte.Api
                     break;
                 case ChatMessageMethod.eventNewSystemMessage:
                     HandleNotification(message, NewSystemMessage);
+                    break;
+                case ChatMessageMethod.eventUserMuted:
+                    HandleNotification(message, ChatMuted);
+                    break;
+                case ChatMessageMethod.eventUserUnmuted:
+                    HandleNotification(message, ChatUnmuted);
                     break;
                 default:
                     bool IsResponse = messageJsonObjectMethod.method.ToString().ToLower().StartsWith("action")

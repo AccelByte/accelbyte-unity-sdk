@@ -28,7 +28,7 @@ namespace AccelByte.Api
 
         private Dictionary<string, object> heartBeatData = new Dictionary<string, object>();
 
-        private HeartBeatMaintainer maintainer;
+        private AccelByteHeartBeat maintainer;
         private int heartBeatIntervalMs = Utils.TimeUtils.SecondsToMilliseconds(defaultHeartbeatIntervalSeconds);
 
         public bool IsHeartBeatJobRunning
@@ -57,27 +57,11 @@ namespace AccelByte.Api
             }
         }
 
-        public ResultCallback OnHeartBeatResponse
-        {
-            get
-            {
-                return onHeartBeatResponse;
-            }
-        }
-
         public Dictionary<string, object> HeartBeatData 
         {
             get
             {
                 return heartBeatData;
-            }
-        }
-
-        public HeartBeatApi Api
-        {
-            get
-            {
-                return api;
             }
         }
 
@@ -169,7 +153,11 @@ namespace AccelByte.Api
             {
                 maintainer.Stop();
             }
-            maintainer = new HeartBeatMaintainer(this, intervalMs);
+            maintainer = new AccelByteHeartBeat(intervalMs);
+            maintainer.OnHeartbeatTrigger += () =>
+            {
+                api.SendHeartBeatEvent(HeartBeatData, onHeartBeatResponse);
+            };
             maintainer.Start();
         }
 
@@ -179,60 +167,6 @@ namespace AccelByte.Api
             {
                 maintainer.Stop();
                 maintainer = null;
-            }
-        }
-
-        private class HeartBeatMaintainer
-        {
-            private readonly HeartBeat controller;
-
-            private readonly int heartBeatIntervalMs;
-
-            public bool IsHeartBeatEnabled
-            {
-                get;
-                private set;
-            }
-
-            public bool IsHeartBeatJobRunning
-            {
-                get;
-                private set;
-            }
-
-            public HeartBeatMaintainer(HeartBeat controller, int heartBeatIntervalMs)
-            {
-                this.controller = controller;
-                this.heartBeatIntervalMs = heartBeatIntervalMs;
-            }
-
-            ~HeartBeatMaintainer()
-            {
-                Stop();
-            }
-
-            public void Start()
-            {
-                RunPeriodicHeartBeat();
-            }
-
-            public void Stop()
-            {
-                IsHeartBeatEnabled = false;
-            }
-
-            private async void RunPeriodicHeartBeat()
-            {
-                IsHeartBeatEnabled = true;
-                IsHeartBeatJobRunning = true;
-
-                while (IsHeartBeatEnabled)
-                {
-                    controller.api.SendHeartBeatEvent(controller.HeartBeatData, controller.OnHeartBeatResponse);
-                    await System.Threading.Tasks.Task.Delay(this.heartBeatIntervalMs);
-                }
-
-                IsHeartBeatJobRunning = false;
             }
         }
     }

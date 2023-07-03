@@ -64,6 +64,9 @@ namespace AccelByte.Api
         private static ServiceVersion serviceVersion;
         private static HeartBeat heartBeat;
         private static StoreDisplay storeDisplay;
+        private static PresenceBroadcastEvent presenceBroadcastEvent;
+        private static PresenceBroadcastEventController presenceBroadcastEventController;
+        private static Gdpr gdpr;
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
@@ -1122,6 +1125,86 @@ namespace AccelByte.Api
 
             return miscellaneous;
         }
+        
+        public static Gdpr GetGdpr()
+        {
+            if (reporting == null)
+            {
+                CheckPlugin();
+                UserSession session = GetUser().Session;
+                gdpr = new Gdpr(
+                    new GdprApi(
+                        httpClient,
+                        Config, // baseUrl==GdprServerUrl
+                        session),
+                    session,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    gdpr = null;
+                    gdpr = new Gdpr(
+                        new GdprApi(
+                            httpClient,
+                            Config, // baseUrl==GdprServerUrl
+                            session),
+                        session,
+                        coroutineRunner);
+                };
+            }
+
+            return gdpr;
+        }
+
+        public static PresenceBroadcastEvent GetPresenceBroadcastEvent()
+        {
+            if (presenceBroadcastEvent == null)
+            {
+                CheckPlugin();
+                UserSession session = GetUser().Session;
+                presenceBroadcastEvent = new PresenceBroadcastEvent(
+                new PresenceBroadcastEventApi(
+                    httpClient,
+                    Config,
+                    session),
+                session,
+                coroutineRunner);
+
+                configReset += () =>
+                {
+                    presenceBroadcastEvent = null;
+                    presenceBroadcastEvent = new PresenceBroadcastEvent(
+                        new PresenceBroadcastEventApi(
+                            httpClient,
+                            Config,
+                            session),
+                        session,
+                        coroutineRunner);
+                };
+            }
+
+            return presenceBroadcastEvent;
+        }
+
+        public static PresenceBroadcastEventController GetPresenceBroadcastEventController()
+        {
+            if (presenceBroadcastEventController == null)
+            {
+                CheckPlugin();
+
+                PresenceBroadcastEvent presenceBroadcastEvent = GetPresenceBroadcastEvent();
+                presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
+
+                configReset += () =>
+                {
+                    presenceBroadcastEventController = null;
+                    presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
+                };
+            }
+
+            return presenceBroadcastEventController;
+        }
+
         public static HeartBeat GetHeartBeat()
         {
             if (heartBeat == null)
@@ -1224,6 +1307,8 @@ namespace AccelByte.Api
             turnManager = null;
             configReset = null;
             environmentChanged = null;
+            presenceBroadcastEvent = null;
+            presenceBroadcastEventController = null;
         }
 
         public static void SetEnvironment(SettingsEnvironment environment)

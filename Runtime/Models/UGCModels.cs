@@ -318,7 +318,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class GetBulkContentIdRequest
     {
-        [DataMember(Name = "contentId")] public string[] ContentId;
+        [DataMember(Name = "contentIds")] public string[] ContentId;
     }
 
     [DataContract, Preserve]

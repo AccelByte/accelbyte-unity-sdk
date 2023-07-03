@@ -385,10 +385,12 @@ namespace AccelByte.Api
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCChannelsPagingResponse Model.</param>
         /// <param name="offset">The offset of the channel results. Default value is 0.</param>
         /// <param name="limit">The limit of the channel results. Default value is 1000.</param>
+        /// <param name="channelName">The name of the channel you want to query.</param>
         public void GetChannels(string userId
             , ResultCallback<UGCChannelPagingResponse> callback
             , int offset = 0
-            , int limit = 1000)
+            , int limit = 1000
+            , string channelName = "")
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -399,7 +401,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetChannels(userId, callback, offset, limit));
+                api.GetChannels(userId, callback, offset, limit, channelName));
         }
 
         /// <summary>
@@ -408,9 +410,11 @@ namespace AccelByte.Api
         /// <param name="callback">This will be called when the operation succeeded. The result is UGCChannelsPagingResponse Model.</param>
         /// <param name="offset">The offset of the channel results. Default value is 0.</param>
         /// <param name="limit">The limit of the channel results. Default value is 1000.</param>
+        /// <param name="channelName">The name of the channel you want to query.</param>
         public void GetChannels(ResultCallback<UGCChannelPagingResponse> callback
             , int offset = 0
-            , int limit = 1000)
+            , int limit = 1000
+            , string channelName = "")
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -421,7 +425,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetChannels(session.UserId, callback, offset, limit));
+                api.GetChannels(session.UserId, callback, offset, limit, channelName));
         }
 
         /// <summary>

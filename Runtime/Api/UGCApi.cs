@@ -590,7 +590,8 @@ namespace AccelByte.Api
         public IEnumerator GetChannels( string userId
             , ResultCallback<UGCChannelPagingResponse> callback
             , int offset
-            , int limit )
+            , int limit 
+            , string channelName)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't get channels! Namespace parameter is null!");
@@ -603,6 +604,7 @@ namespace AccelByte.Api
                 .WithPathParam("userId", userId)
                 .WithQueryParam("offset", offset.ToString())
                 .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("name", channelName)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

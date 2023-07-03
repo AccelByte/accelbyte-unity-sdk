@@ -25,8 +25,10 @@ namespace AccelByte.Api
         private Texture2D accelByteLogo;
         private int temporaryEnvironmentSetting;
         private int temporaryPlatformSetting;
+        private int temporaryPresenceBroadcastEventGameStateSetting;
         private string[] environmentList;
         private string[] platformList;
+        private string[] presenceBroadcastEventGameStateList;
         private Rect logoRect;
 
         private MultiOAuthConfigs originalOAuthConfigs;
@@ -39,6 +41,7 @@ namespace AccelByte.Api
         private bool showLogConfigs;
         private bool showServiceUrlConfigs;
         private bool showTURNconfigs;
+        private bool showPresenceBroadcastEventConfig;
         private GUIStyle requiredTextFieldGUIStyle;
         private bool initialized;
 
@@ -86,6 +89,17 @@ namespace AccelByte.Api
                     "Default"
                 };
                 temporaryEnvironmentSetting = environmentList.Length - 1;
+
+                presenceBroadcastEventGameStateList = new string[]
+                {
+                    AccelByte.Utils.JsonUtils.SerializeWithStringEnum(
+                        PresenceBroadcastEventGameState.OutOfGameplay),
+                    AccelByte.Utils.JsonUtils.SerializeWithStringEnum(
+                        PresenceBroadcastEventGameState.InGameplay),
+                    AccelByte.Utils.JsonUtils.SerializeWithStringEnum(
+                        PresenceBroadcastEventGameState.Store),
+                };
+                temporaryPresenceBroadcastEventGameStateSetting = 0;
 
                 logoRect = new Rect((this.position.width - 300) / 2, 10, 300, 86);
                 initialized = true;
@@ -287,6 +301,33 @@ namespace AccelByte.Api
                 CreateNumberInput((newvalue) => editedSdkConfig.PeerMonitorIntervalMs = (int)newvalue, editedSdkConfig.PeerMonitorIntervalMs, "Peer Monitor Interval in Milliseconds");
                 CreateNumberInput((newvalue) => editedSdkConfig.PeerMonitorTimeoutMs = (int)newvalue, editedSdkConfig.PeerMonitorTimeoutMs, "Peer Monitor Timeout in Milliseconds");
                 CreateNumberInput((newvalue) => editedSdkConfig.HostCheckTimeoutInSeconds = (int)newvalue, editedSdkConfig.HostCheckTimeoutInSeconds, "Host Check Timeout in Seconds");
+            }
+
+            showPresenceBroadcastEventConfig = EditorGUILayout.Foldout(showPresenceBroadcastEventConfig, "Presence Broadcast Event Configs");
+            if (showPresenceBroadcastEventConfig)
+            {
+                CreateToggleInput((newValue) => editedSdkConfig.EnablePresenceBroadcastEvent = newValue, editedSdkConfig.EnablePresenceBroadcastEvent, "Enable Presence Broadcast Event");
+                CreateNumberInput((newValue) => editedSdkConfig.PresenceBroadcastEventInterval = (int)newValue, editedSdkConfig.PresenceBroadcastEventInterval, "Set Interval In Seconds");
+
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("Game State");
+                EditorGUI.BeginChangeCheck();
+                temporaryPresenceBroadcastEventGameStateSetting = EditorGUILayout.Popup(temporaryPresenceBroadcastEventGameStateSetting, presenceBroadcastEventGameStateList);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    int gameState = 0;
+                    if (presenceBroadcastEventGameStateList[temporaryPresenceBroadcastEventGameStateSetting] !=
+                        AccelByte.Utils.JsonUtils.SerializeWithStringEnum(
+                        PresenceBroadcastEventGameState.OutOfGameplay))
+                    {
+                        gameState = temporaryPresenceBroadcastEventGameStateSetting;
+                    }
+                    editedSdkConfig.PresenceBroadcastEventGameState = gameState;
+                }
+                EditorGUILayout.LabelField("");
+                EditorGUILayout.EndHorizontal();
+
+                CreateTextInput((newValue) => editedSdkConfig.PresenceBroadcastEventGameStateDescription = newValue, editedSdkConfig.PresenceBroadcastEventGameStateDescription, "Set Game State description");
             }
 
             EditorGUILayout.EndScrollView();

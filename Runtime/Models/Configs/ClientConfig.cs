@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -19,6 +19,9 @@ namespace AccelByte.Models
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
+        private const bool defaultPresenceBroadcastEvent = true;
+        private const int defaultPresenceBroadcastEvetntIntervalInSecond = 600;
+        private const int defaultPresenceBroadcastEventGameState = 0;
 
         [DataMember] public string Namespace = "";
         [DataMember] public bool UsePlayerPrefs = false;
@@ -55,7 +58,9 @@ namespace AccelByte.Models
         [DataMember] public int PeerMonitorTimeoutMs = 2000;
         [DataMember] public int HostCheckTimeoutInSeconds = 60;
         [DataMember] public string GroupServerUrl = "";
+        [DataMember] public string ChatServerWsUrl = "";
         [DataMember] public string ChatServerUrl = "";
+        [DataMember] public string GdprServerUrl = "";
         [DataMember] public string RedirectUri = "";
         [DataMember] public string AppId = "";
         [DataMember] public string PublisherNamespace = "";
@@ -63,6 +68,10 @@ namespace AccelByte.Models
         [DataMember] public bool EnableAuthHandshake;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
+        [DataMember] public bool EnablePresenceBroadcastEvent = defaultPresenceBroadcastEvent;
+        [DataMember] public int PresenceBroadcastEventInterval = defaultPresenceBroadcastEvetntIntervalInSecond;
+        [DataMember] public int PresenceBroadcastEventGameState = defaultPresenceBroadcastEventGameState;
+        [DataMember] public string PresenceBroadcastEventGameStateDescription = "";
 
         /// <summary>
         ///  Copy member values
@@ -105,6 +114,7 @@ namespace AccelByte.Models
                    this.TurnServerUsername == anotherConfig.TurnServerUsername &&
                    this.TurnServerPassword == anotherConfig.TurnServerPassword &&
                    this.TurnServerSecret == anotherConfig.TurnServerSecret &&
+                   this.ChatServerWsUrl == anotherConfig.ChatServerWsUrl &&
                    this.ChatServerUrl == anotherConfig.ChatServerUrl &&
                    this.RedirectUri == anotherConfig.RedirectUri &&
                    this.AppId == anotherConfig.AppId &&
@@ -115,7 +125,11 @@ namespace AccelByte.Models
                    this.MaximumCacheLifeTime == anotherConfig.MaximumCacheLifeTime &&
                    this.PeerMonitorIntervalMs == anotherConfig.PeerMonitorIntervalMs &&
                    this.PeerMonitorTimeoutMs == anotherConfig.PeerMonitorTimeoutMs &&
-                   this.HostCheckTimeoutInSeconds == anotherConfig.HostCheckTimeoutInSeconds;
+                   this.HostCheckTimeoutInSeconds == anotherConfig.HostCheckTimeoutInSeconds &&
+                   this.EnablePresenceBroadcastEvent == anotherConfig.EnablePresenceBroadcastEvent &&
+                   this.PresenceBroadcastEventInterval == anotherConfig.PresenceBroadcastEventInterval &&
+                   this.PresenceBroadcastEventGameState == anotherConfig.PresenceBroadcastEventGameState &&
+                   this.PresenceBroadcastEventGameStateDescription == anotherConfig.PresenceBroadcastEventGameStateDescription;
         }
 
         /// <summary>
@@ -235,7 +249,10 @@ namespace AccelByte.Models
             {
                 GroupServerUrl = "";
             }
-
+            if (ChatServerWsUrl == null)
+            {
+                ChatServerWsUrl = "";
+            }
             if (ChatServerUrl == null)
             {
                 ChatServerUrl = "";
@@ -326,10 +343,14 @@ namespace AccelByte.Models
 
                 this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
 
-                if (string.IsNullOrEmpty(this.ChatServerUrl))
+                this.ChatServerUrl = GetDefaultApiUrl(this.ChatServerUrl, "/chat");
+
+                if (string.IsNullOrEmpty(this.ChatServerWsUrl))
                 {
-                    this.ChatServerUrl = wssBaseUrl + "/chat/";
+                    this.ChatServerWsUrl = wssBaseUrl + "/chat";
                 }
+
+                this.GdprServerUrl = GetDefaultApiUrl(this.GdprServerUrl, "/gdpr");
             }
         }
 
@@ -390,8 +411,9 @@ namespace AccelByte.Models
 
                 if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
 
-                if (this.ChatServerUrl == wssBaseUrl + "/chat/") this.ChatServerUrl = null;
+                if (this.ChatServerWsUrl == wssBaseUrl + "/chat") this.ChatServerWsUrl = null;
 
+                if (this.ChatServerUrl == httpsBaseUrl + "chat") this.ChatServerUrl = null;
             }
         }
 

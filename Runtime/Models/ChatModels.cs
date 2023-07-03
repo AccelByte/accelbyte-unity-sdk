@@ -72,7 +72,9 @@ namespace AccelByte.Models
         actionQuerySystemMessage,
         actionUpdateSystemMessages,
         actionDeleteSystemMessages,
-        actionGetSystemMessageStats
+        actionGetSystemMessageStats,
+        eventUserMuted,
+        eventUserUnmuted
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -465,4 +467,117 @@ namespace AccelByte.Models
         public DateTime endDate;
     }
     #endregion
+
+    #region Group Chat As Moderator
+
+    [DataContract, Preserve]
+    public class MuteGroupChatRequest
+    {
+        [DataMember(Name = "userId")]
+        public string UserId;
+
+        [DataMember(Name = "duration")]
+        public int Duration;
+    }
+
+    [DataContract, Preserve]
+    public class UnmuteGroupChatRequest
+    {
+        [DataMember(Name = "userId")]
+        public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class SnapshotMessage
+    {
+        [DataMember(Name = "chatId")]
+        public string ChatId;
+
+        [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime CreatedAt;
+
+        [DataMember(Name = "message")]
+        public string Message;
+
+        [DataMember(Name = "senderId")]
+        public string SenderId;
+    }
+
+    [DataContract, Preserve]
+    public class ChatSnapshotResponse
+    {
+        [DataMember(Name = "chatId")]
+        public string ChatId;
+
+        [DataMember(Name = "createdAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime CreatedAt;
+
+        [DataMember(Name = "joinedTopics")]
+        public List<string> JoinedTopics;
+
+        [DataMember(Name = "messages")]
+        public List<SnapshotMessage> Messages;
+
+        [DataMember(Name = "namespace")]
+        public string Namespace;
+
+        [DataMember(Name = "senderId")]
+        public string SenderId;
+
+        [DataMember(Name = "ticketId")]
+        public string TicketId;
+
+        [DataMember(Name = "topicId")]
+        public string TopicId;
+    }
+
+    [DataContract, Preserve]
+    public class BanGroupChatRequest
+    {
+        [DataMember(Name = "userIDs")]
+        public List<string> UserIds;
+    }
+
+    [DataContract, Preserve]
+    public class BanGroupChatResponse
+    {
+        [DataMember(Name = "userIDs")]
+        public List<string> UserIds;
+    }
+
+    [DataContract, Preserve]
+    public class UnbanGroupChatRequest
+    {
+        [DataMember(Name = "userIDs")]
+        public List<string> UserIds;
+    }
+
+    [DataContract, Preserve]
+    public class UnbanGroupChatResponse
+    {
+        [DataMember(Name = "userIDs")]
+        public List<string> UserIds;
+    }
+
+    #endregion
+
+    [DataContract, Preserve]
+    public class ChatMutedNotif
+    {
+        [DataMember(Name = "topicId")]
+        public string TopicId;
+
+        [DataMember(Name = "remainingTime")]
+        public int RemainingTime;
+
+        [DataMember(Name = "expiredAt"), JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime ExpiredAt;
+    }
+
+    [DataContract, Preserve]
+    public class ChatUnmutedNotif
+    {
+        [DataMember(Name = "topicId")]
+        public string TopicId;
+    }
 }

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.0%0D16.1.0) (2023-07-03)
+
+
+### Features
+
+* [JSC-1199] add presence broadcast event UI and mechanism ([e45e805](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e45e805c1cb2b5abbd05d094ceaf22f7860414c9))
+* added missing metafile for gdpr api ([369801a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/369801ace3f643af3042b2d4396075b78e74083d))
+* **chat:** add group chat moderator api ([fb8fcf0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb8fcf003bc9246c0f11d9465ba6f87314443d73))
+* Provide methods for end users to request account deletion for own headless accounts in game ([98b0109](https://github.com/AccelByte/accelbyte-unity-sdk/commits/98b01094dd2bd084c852dbc122e981237154e6cf))
+
+
+### Bug Fixes
+
+* [JSC-1278] remove unwanted warning while adding unity sdk through git ([c474325](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c47432500a4af43dfa514fc89c7b345362dab123))
+
 ## [16.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.1.0%0D16.0.0) (2023-06-19)
 
 

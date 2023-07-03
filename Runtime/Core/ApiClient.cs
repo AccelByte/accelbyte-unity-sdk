@@ -84,6 +84,7 @@ namespace AccelByte.Core
         /// <item><term>SeasonPass</term></item>
         /// <item><term>Miscellaneous</term></item>
         /// <item><term>Reward</term></item> 
+        /// <item><term>PresenceBroadcastEvent</term></item> 
         /// </list>
         /// 
         /// <typeparam name="TWrapper">WrapperBase child - eg, "Group"</typeparam>
@@ -173,6 +174,8 @@ namespace AccelByte.Core
         public Session GetSession() { return GetApi<Session, SessionApi>(); }
         public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
         public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
+        public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
+        public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
 #endregion
 
 

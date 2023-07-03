@@ -240,7 +240,7 @@ namespace AccelByte.Api
             return macAddressArray;
         }
 
-        private static string GetPlatformName()
+        internal static string GetPlatformName()
         {
             return Application.platform.ToString();
         }
