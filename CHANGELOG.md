@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.2.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.1%0D16.2.0) (2023-07-17)
+
+
+### Refactors
+
+* set AccelByteSDKMain to public ([d38cf3d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d38cf3ddbfc51c3ab64a2eb2c9abb0edc16af49b))
+
 ## [16.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.0%0D16.1.0) (2023-07-03)
 
 

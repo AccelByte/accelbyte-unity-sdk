@@ -13,7 +13,7 @@ namespace AccelByte.Core
 #else
     using PlatformMain = NullMain;
 #endif
-    internal static class AccelByteSDKMain
+    public static class AccelByteSDKMain
     {
         internal static PlatformMain Main;
 
