@@ -675,6 +675,29 @@ namespace AccelByte.Api
                     callback
                     ));
         }
+        
+        /// <summary>
+        /// Synchronize with dlc entitlements in PSN Store with multiple service labels.
+        /// </summary>
+        /// <param name="playStationDlcSyncMultipleService">Contains ServiceLabel needed for PlayStation DLC Multiple Service sync</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncPSNDLCMultipleService( PlayStationDLCSyncMultipleService playStationDlcSyncMultipleService
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncPSNDLCMultipleService(
+                    session.UserId,
+                    playStationDlcSyncMultipleService,
+                    callback
+                ));
+        }
 
         /// <summary>
         /// Validate User Item Purchase Condition.
@@ -742,6 +765,52 @@ namespace AccelByte.Api
                 api.SyncEntitlementPSNStore(
                     session.UserId,
                     psnModel,
+                    callback
+                ));
+        }
+
+        /// <summary>
+        /// Synchronize Comsumable Entitlement in XBOX Inventory.
+        /// </summary>
+        /// <param name="model"> XBOX's Consumable Entitlement Model Sync Request</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncXboxInventory(XboxInventoryRequest model
+            , ResultCallback<XboxInventoryResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncXboxInventory(
+                    session.UserId,
+                    model,
+                    callback
+                ));
+        }
+
+        /// <summary>
+        /// Synchronize with entitlements in PSN Store with multiple service labels.
+        /// </summary>
+        /// <param name="playStationMultipleServiceRequest"> Playstation's Multiple Service Labels Model Sync Request</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncEntitlementPSNMultipleService(PlayStationMultipleServiceRequest playStationMultipleServiceRequest
+            , ResultCallback<PlayStationMultipleServiceResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncEntitlementPSNMultipleService(
+                    session.UserId,
+                    playStationMultipleServiceRequest,
                     callback
                 ));
         }

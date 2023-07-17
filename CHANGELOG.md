@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.0%0D16.2.1) (2023-07-17)
+
+
+### Features
+
+* exposed sync consumable entitlement ([52c8206](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52c8206270fc5506945c4dc9db888bc5c93d371e))
+* exposing missing psn sync entitlement multiple service ([507ae71](https://github.com/AccelByte/accelbyte-unity-sdk/commits/507ae71fc95b43affbe7eb7260d02a399f6d9c9a))
+
+
+### Bug Fixes
+
+* adjust typo in IAPOrderStatus enum ([d1336c9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d1336c91383b332049ea5d62bfac688139476f08))
+
+
+### Refactors
+
+* set AccelByteSDKMain to public ([dcecf1d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dcecf1d4733e6a405bdedf8d29b1180166fbe451))
+
 ### [16.2.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.1%0D16.2.0) (2023-07-17)
 
 

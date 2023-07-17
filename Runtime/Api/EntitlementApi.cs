@@ -642,6 +642,48 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+        
+        public IEnumerator SyncPSNDLCMultipleService(string userId 
+            , PlayStationDLCSyncMultipleService playStationDlcSyncMultipleService
+            , ResultCallback callback )
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/dlc/psn/sync/multiServiceLabels")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(playStationDlcSyncMultipleService.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
 
         public IEnumerator ValidateUserItemPurchaseCondition(ValidateUserItemPurchaseConditionRequest requestModel
            , ResultCallback<PlatformValidateUserItemPurchaseResponse[]> callback)
@@ -719,6 +761,75 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncXboxInventory(string userId
+           , XboxInventoryRequest model
+           , ResultCallback<XboxInventoryResponse[]> callback)
+        {
+            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
+            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
+
+            var builder = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/xbl/sync")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(model.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp => 
+            {
+                response = rsp; 
+            });
+
+            var result = response.TryParseJson<XboxInventoryResponse[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SyncEntitlementPSNMultipleService(string userId
+            , PlayStationMultipleServiceRequest playStationMultipleServiceRequest
+            , ResultCallback<PlayStationMultipleServiceResponse[]> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var builder = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/psn/sync/multiServiceLabels")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(playStationMultipleServiceRequest.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+            
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<PlayStationMultipleServiceResponse[]>();
             callback.Try(result);
         }
         

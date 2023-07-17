@@ -218,6 +218,14 @@ namespace AccelByte.Models
         Cancelled,
         Expired
     }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum IAPOrderStatus
+    {
+        Verified,
+        Fulfilled,
+        Failed
+    }
 
     #endregion
 
@@ -446,7 +454,7 @@ namespace AccelByte.Models
         [DataMember] public int? limit;
         [DataMember] public string sortBy;
     }
-    
+
     [DataContract, Preserve]
     public class ItemCriteriaV3
     {
@@ -557,7 +565,7 @@ namespace AccelByte.Models
         [DataMember] public int rewardCount;
         [DataMember] public ItemRewards[] rewards;
     }
-    
+
     [DataContract, Preserve]
     public class ItemSaleConfig
     {
@@ -1078,6 +1086,31 @@ namespace AccelByte.Models
         [DataMember] public string currencyCode;
         [DataMember] public int serviceLabel;
     }
+    
+    [DataContract, Preserve]
+    public class PlayStationDLCSyncMultipleService
+    {
+        [DataMember(Name = "serviceLabel")] public int[] ServiceLabel;
+    }
+    
+    [DataContract, Preserve]
+    public class PlayStationMultipleServiceRequest
+    {
+        [DataMember(Name = "productId")] public string ProductId;
+        [DataMember(Name = "price")] public int Price;
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+        [DataMember(Name = "serviceLabel")] public int[] ServiceLabel;
+    }
+    
+    [DataContract, Preserve]
+    public class PlayStationMultipleServiceResponse
+    {
+        [DataMember(Name = "transactionId")] public string TransactionId;
+        [DataMember(Name = "psnItemId")] public string PsnItemId;
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "sku")] public string Sku;
+        [DataMember(Name = "status")] public IAPOrderStatus Status;
+    }
 
     [DataContract, Preserve]
     public class TwitchDropSync
@@ -1086,20 +1119,20 @@ namespace AccelByte.Models
         [DataMember] public string region;
         [DataMember] public string language;
     }
-    
+
     public class UserEntitlementSoldParams
     {
         public string UserId;
         public string EntitlementId;
     }
-    
+
     [DataContract, Preserve]
     public class EntitlementSoldRequest
     {
         [DataMember(Name = "useCount")] public int UseCount;
         [DataMember(Name = "requestId")] public string RequestId;
     }
-    
+
     [DataContract, Preserve]
     public class SellItemEntitlementInfo
     {
@@ -1145,7 +1178,7 @@ namespace AccelByte.Models
 
     [DataContract, Preserve]
     public class SubscriptionSummary
-    { 
+    {
         [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "userId")] public string UserId;
@@ -1154,7 +1187,7 @@ namespace AccelByte.Models
         [DataMember(Name = "status")] public SubscriptionStatus Status;
         [DataMember(Name = "currentPeriodStart")] public DateTime CurrentPeriodStart;
         [DataMember(Name = "currentPeriodEnd")] public DateTime CurrentPeriodEnd;
-        [DataMember(Name = "subscribedBy")] public SubscribedBy SubscribedBy; 
+        [DataMember(Name = "subscribedBy")] public SubscribedBy SubscribedBy;
     }
 
     [DataContract, Preserve]
@@ -1306,5 +1339,24 @@ namespace AccelByte.Models
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
         [DataMember] public object localExt;
+    }
+
+    [DataContract, Preserve]
+    public class XboxInventoryRequest
+    {
+        [DataMember(Name = "xstsToken")] public string XstsToken;
+        [DataMember(Name = "productId")] public string ProductId;
+        [DataMember(Name = "price")] public int Price;
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+    }
+    
+    [DataContract, Preserve]
+    public class XboxInventoryResponse
+    {
+        [DataMember(Name = "transactionId")] public string TransactionId;
+        [DataMember(Name = "xboxProductId")] public string XboxProductId;
+        [DataMember(Name = "itemId")] public int ItemId;
+        [DataMember(Name = "sku")] public string Sku;
+        [DataMember(Name = "status")] public IAPOrderStatus Status;
     }
 }
