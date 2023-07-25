@@ -350,6 +350,8 @@ namespace AccelByte.Api
                 {
                     switch (webSocket.ReadyState)
                     {
+                        case WsState.New:
+                            break;
                         case WsState.Open:
                             webSocket.Ping();
 

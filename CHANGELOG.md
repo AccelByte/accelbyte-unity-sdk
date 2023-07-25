@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.3.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.1%0D16.3.0) (2023-07-25)
+
+
+### Bug Fixes
+
+* use connect async to avoid blocking game thread ([3d81829](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3d81829c66c11fd2bbecc25661c076da90a755c9))
+
 ## [16.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.0%0D16.2.1) (2023-07-17)
 
 

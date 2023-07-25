@@ -382,6 +382,7 @@ namespace HybridWebSocket
                     case WebSocketState.Closed: return WsState.Closed;
                     case WebSocketState.Closing: return WsState.Closing;
                     case WebSocketState.Connecting: return WsState.Connecting;
+                    case WebSocketState.New: return WsState.New;
                     default: throw new WebSocketInvalidStateException("Unrecognized websocket ready state.");
                 }
             }
@@ -496,7 +497,7 @@ namespace HybridWebSocket
 
                 try
                 {
-                    this.webSocket.Connect();
+                    this.webSocket.ConnectAsync();
                 }
                 catch (Exception e)
                 {

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace AccelByte.Core {
     public delegate void OnOpenHandler();
@@ -15,7 +14,7 @@ namespace AccelByte.Core {
 
     public delegate void OnCloseHandler(ushort closeCode);
 
-    public enum WsState { Connecting, Open, Closing, Closed }
+    public enum WsState { New, Connecting, Open, Closing, Closed }
 
     public enum WsCloseCode
     {
