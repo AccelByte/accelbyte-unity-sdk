@@ -840,5 +840,45 @@ namespace AccelByte.Api
                     callback
                 ));
         }
+
+        /// <summary>
+        /// Synchronize Oculus Consumable Entitlement/IAP.
+        /// </summary>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncOculusConsumableEntitlements(ResultCallback<SyncOculusConsumableEntitlementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncOculusConsumableEntitlements(
+                    session.UserId,
+                    callback
+                ));
+        }
+
+        /// <summary>
+        /// Synchronize Oculus Downloadable Content/DLC.
+        /// </summary>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncOculusDLC(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncOculusDLC(
+                    session.UserId,
+                    callback
+                ));
+        }
     }
 }

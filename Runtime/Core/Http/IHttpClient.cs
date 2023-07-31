@@ -76,6 +76,18 @@ namespace AccelByte.Core {
         void ClearCookies(Uri baseUri);
     }
 
+    public struct HttpCredential
+    {
+        public string ClientId;
+        public string ClientSecret;
+
+        public HttpCredential(string clientId, string clientSecret)
+        {
+            ClientId = clientId;
+            ClientSecret = clientSecret;
+        }
+    }
+
     public interface IHttpClient
     {
         event Action<IHttpRequest> ServerErrorOccured;
@@ -83,6 +95,7 @@ namespace AccelByte.Core {
         IEnumerator SendRequest(IHttpRequest request, Action<IHttpResponse, Error> callback);
         System.Threading.Tasks.Task<HttpSendResult> SendRequestAsync(IHttpRequest request);
         void SetCredentials(string clientId, string clientSecret);
+        HttpCredential GetCredentials();
         void SetImplicitBearerAuth(string accessToken);
         void SetImplicitPathParams(IDictionary<string, string> pathParams);
         void ClearImplicitPathParams();

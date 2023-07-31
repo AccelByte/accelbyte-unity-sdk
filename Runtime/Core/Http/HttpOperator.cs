@@ -9,12 +9,27 @@ namespace AccelByte.Core
 {
     public abstract class HttpOperator
     {
+        public abstract IHttpClient HttpClient
+        {
+            get;
+        }
+
         public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse> response);
+
+        public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response);
     }
 
     public class HttpAsyncOperator : HttpOperator
     {
         IHttpClient httpClient;
+        public override IHttpClient HttpClient
+        {
+            get
+            {
+                return httpClient;
+            }
+        }
+
         public HttpAsyncOperator(IHttpClient httpClient)
         {
             this.httpClient = httpClient;
@@ -25,12 +40,26 @@ namespace AccelByte.Core
             HttpSendResult result = await httpClient.SendRequestAsync(request);
             response?.Invoke(result.CallbackResponse);
         }
+
+        public async override void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response)
+        {
+            HttpSendResult result = await httpClient.SendRequestAsync(request);
+            response?.Invoke(result.CallbackResponse, result.CallbackError);
+        }
     }
 
     public class HttpCoroutineOperator : HttpOperator
     {
         IHttpClient httpClient;
         CoroutineRunner runner;
+
+        public override IHttpClient HttpClient
+        {
+            get
+            {
+                return httpClient;
+            }
+        }
 
         public HttpCoroutineOperator(IHttpClient httpClient, CoroutineRunner runner)
         {
@@ -39,6 +68,11 @@ namespace AccelByte.Core
         }
 
         public override void SendRequest(IHttpRequest request, System.Action<IHttpResponse> response)
+        {
+            runner.Run(httpClient.SendRequest(request, response));
+        }
+
+        public override void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response)
         {
             runner.Run(httpClient.SendRequest(request, response));
         }

@@ -93,7 +93,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -104,7 +104,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -169,7 +170,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -182,7 +183,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -223,7 +225,8 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name);
         DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
 
-        IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/device/token")
+        string targetUri = BaseUrl + "/v3/oauth/platforms/device/token";
+        IHttpRequest request = HttpRequestBuilder.CreatePost(targetUri)
             .WithPathParam("platformId", deviceProvider.DeviceType)
             .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
@@ -232,7 +235,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -243,7 +246,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -314,7 +318,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -336,7 +340,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -398,7 +403,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -409,7 +414,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -463,7 +469,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -474,7 +480,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -534,7 +541,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -545,7 +552,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -600,7 +608,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -611,7 +619,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -632,7 +641,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -643,7 +652,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -704,7 +714,7 @@ public class OAuth2 : ApiBase
 
         request.Priority = 0;
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -712,10 +722,12 @@ public class OAuth2 : ApiBase
             {
                 OnNewTokenObtained?.Invoke(result.Value);
                 callback.TryOk(result.Value);
-                return;
             }
-
-            callback.TryError(result.Error);
+            else
+            {
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
+            }
         });
     }
 
@@ -741,7 +753,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("rememberDevice", rememberDevice ? "true" : "false")
             .GetResult();
 
-        httpOperator.SendRequest(request, response =>
+        httpOperator.SendRequest(request, (response, error) =>
         {
             Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
 
@@ -752,7 +764,8 @@ public class OAuth2 : ApiBase
             }
             else
             {
-                callback.TryError(result.Error);
+                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
+                callback.TryError(errorResult);
             }
         });
     }
@@ -854,5 +867,24 @@ public class OAuth2 : ApiBase
                 callback.TryError(result.Error);
             }
         });
+    }
+
+    private OAuthError GenerateOAuthError(OAuthError authError, IHttpRequest request , Error requestError, HttpOperator targetHttpOperator)
+    {
+        OAuthError errorResult = authError;
+        if (string.IsNullOrEmpty(errorResult.error_uri) && request != null)
+        {
+            errorResult.error_uri = request.Url;
+        }
+        if (string.IsNullOrEmpty(errorResult.clientId) && targetHttpOperator != null)
+        {
+            errorResult.clientId = targetHttpOperator.HttpClient.GetCredentials().ClientId;
+        }
+        if ((string.IsNullOrEmpty(errorResult.error) || string.IsNullOrEmpty(errorResult.error_description)) && requestError != null)
+        {
+            errorResult.error = requestError.Code.ToString();
+            errorResult.error_description = requestError.Message;
+        }
+        return errorResult;
     }
 }

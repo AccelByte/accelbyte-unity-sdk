@@ -225,6 +225,28 @@ namespace AccelByte.Models
         Verified,
         Fulfilled,
         Failed
+    }     
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum EntitlementItemIdentityType
+    {
+        None = 0,
+        [EnumMember(Value = "ITEM_ID")]
+        ItemId,
+        [EnumMember(Value = "ITEM_SKU")]
+        ItemSku, 
+    }     
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum EntitlementIAPOrderStatus
+    {
+        None = 0,
+        [EnumMember(Value = "VERIFIED")]
+        Verified,
+        [EnumMember(Value = "FULFILLED")]
+        Fulfilled,
+        [EnumMember(Value = "FAILED")]
+        Failed
     }
 
     #endregion
@@ -1140,6 +1162,16 @@ namespace AccelByte.Models
         [DataMember(Name = "replayed")] public bool Replayed;
         [DataMember(Name = "creditSummaries")] public CreditSummary[] CreditSummaries;
         [DataMember(Name = "entitlementInfo")] public EntitlementInfo EntitlementInfo;
+    }
+
+    [DataContract, Preserve]
+    public class SyncOculusConsumableEntitlementResponse
+    {
+        [DataMember(Name = "transactionId")] public string TransactionId;
+        [DataMember(Name = "oculusItemSku")] public string OculusItemSku;
+        [DataMember(Name = "itemIdentityType")] public EntitlementItemIdentityType ItemIdentityType;
+        [DataMember(Name = "itemIdentity")] public string ItemIdentity;
+        [DataMember(Name = "iapOrderStatus")] public EntitlementIAPOrderStatus IapOrderStatus;
     }
 
     #endregion

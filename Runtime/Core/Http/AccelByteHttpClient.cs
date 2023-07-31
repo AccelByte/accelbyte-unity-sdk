@@ -61,6 +61,12 @@ namespace AccelByte.Core
             this.clientSecret = clientSecret;
         }
 
+        public HttpCredential GetCredentials()
+        {
+            HttpCredential retval = new HttpCredential(this.clientId, this.clientSecret);
+            return retval;
+        }
+
         public void SetImplicitPathParams(IDictionary<string, string> pathParams)
         {
             foreach (var param in pathParams)

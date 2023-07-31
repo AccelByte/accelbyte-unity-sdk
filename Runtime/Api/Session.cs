@@ -5,16 +5,15 @@
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using Newtonsoft.Json.Linq;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
     public class Session : WrapperBase
     {
-        private readonly SessionApi _sessionApi;
-        private readonly ISession _session;
-        private readonly CoroutineRunner _coroutineRunner;
+        private readonly SessionApi sessionApi;
+        private readonly ISession session;
+        private readonly CoroutineRunner coroutineRunner;
 
         [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
@@ -23,9 +22,9 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(inCoroutineRunner);
 
-            _sessionApi = inApi;
-            _session = inSession;
-            _coroutineRunner = inCoroutineRunner;
+            sessionApi = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
         }
 
         #region PartySession
@@ -43,14 +42,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(partyId),
                 "Party ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.GetPartyDetails(
+            coroutineRunner.Run(
+                sessionApi.GetPartyDetails(
                     partyId,
                     callback));
         }
@@ -75,14 +74,14 @@ namespace AccelByte.Api
             Assert.IsNotNull(request, "SessionV2PartySessionUpdateRequest cannot be null");
 
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.UpdateParty(
+            coroutineRunner.Run(
+                sessionApi.UpdateParty(
                     partyId,
                     request,
                     callback));
@@ -107,14 +106,14 @@ namespace AccelByte.Api
                 "Party ID cannot be null.");
             Assert.IsNotNull(request, "SessionV2PartySessionUpdateRequest cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.PatchUpdateParty(
+            coroutineRunner.Run(
+                sessionApi.PatchUpdateParty(
                     partyId,
                     request,
                     callback));
@@ -135,14 +134,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(userId),
                 "Party ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.InviteUserToParty(
+            coroutineRunner.Run(
+                sessionApi.InviteUserToParty(
                     partyId,
                     userId,
                     callback));
@@ -163,14 +162,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(leaderId),
                 "Leader ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.PromoteUserToPartyLeader(
+            coroutineRunner.Run(
+                sessionApi.PromoteUserToPartyLeader(
                     partyId,
                     leaderId,
                     callback));
@@ -189,14 +188,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(partyId),
                 "Party ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.JoinParty(
+            coroutineRunner.Run(
+                sessionApi.JoinParty(
                     partyId,
                     callback));
         }
@@ -212,14 +211,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(partyId),
                 "Party ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.LeaveParty(
+            coroutineRunner.Run(
+                sessionApi.LeaveParty(
                     partyId,
                     callback));
         }
@@ -235,14 +234,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(partyId),
                 "Party ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.RejectPartyInvitation(
+            coroutineRunner.Run(
+                sessionApi.RejectPartyInvitation(
                     partyId,
                     callback));
         }
@@ -265,14 +264,14 @@ namespace AccelByte.Api
             Assert.IsFalse(string.IsNullOrEmpty(partyId),
                 "User ID cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.KickUserFromParty(
+            coroutineRunner.Run(
+                sessionApi.KickUserFromParty(
                     partyId,
                     userId,
                     callback));
@@ -293,14 +292,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(request, "SessionV2PartySessionCreateRequest cannot be null.");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.CreateParty(
+            coroutineRunner.Run(
+                sessionApi.CreateParty(
                     request,
                     callback));
         }
@@ -315,15 +314,78 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.GetUserParties(
+            coroutineRunner.Run(
+                sessionApi.GetUserParties(
                     callback));
+        }
+
+        /// <summary>
+        /// Join a party using a code.
+        /// </summary>
+        /// <param name="code">Party code.</param>
+        /// <param name="callback">Returns a result of SessionV2PartySession via callback when completed.</param>
+        public void JoinPartyByCode(string code
+            , ResultCallback<SessionV2PartySession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(code, "code cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.JoinPartyByCode(code, callback));
+        }
+
+        /// <summary>
+        /// Generate new code for a party.
+        /// </summary>
+        /// <param name="partyId">Party ID.</param>
+        /// <param name="callback">Returns a result of SessionV2PartySession via callback when completed.</param>
+        public void GenerateNewPartyCode(string partyId
+            , ResultCallback<SessionV2PartySession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(partyId, "partyId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.GenerateNewPartyCode(partyId, callback));
+        }
+
+        /// <summary>
+        /// Revoke party code.
+        /// </summary>
+        /// <param name="sessionId">Party ID.</param>
+        /// <param name="callback">Returns a result of SessionV2PartySession via callback when completed.</param>
+        public void RevokePartyCode(string sessionId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.RevokePartyCode(sessionId, callback));
         }
 
         #endregion
@@ -344,14 +406,14 @@ namespace AccelByte.Api
             Assert.IsNotNull(request, "SessionV2GameSessionCreateRequest cannot be null");
             Assert.IsNotNull(request.configurationName, "configurationName cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.CreateGameSession(
+            coroutineRunner.Run(
+                sessionApi.CreateGameSession(
                     request,
                     callback));
         }
@@ -373,14 +435,14 @@ namespace AccelByte.Api
                 request = new Dictionary<string, object>();
             }
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.QueryGameSession(
+            coroutineRunner.Run(
+                sessionApi.QueryGameSession(
                     request,
                     callback));
         }
@@ -399,14 +461,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(podName, "podName cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.GetGameSessionDetailsByPodName(
+            coroutineRunner.Run(
+                sessionApi.GetGameSessionDetailsByPodName(
                     podName,
                     callback));
         }
@@ -425,14 +487,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.GetGameSessionDetailsBySessionId(
+            coroutineRunner.Run(
+                sessionApi.GetGameSessionDetailsBySessionId(
                     sessionId,
                     callback));
         }
@@ -450,14 +512,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.DeleteGameSession(
+            coroutineRunner.Run(
+                sessionApi.DeleteGameSession(
                     sessionId,
                     callback));
         }
@@ -477,14 +539,14 @@ namespace AccelByte.Api
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
             Assert.IsNotNull(request, "SessionV2GameSessionUpdateRequest cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.PatchGameSession(
+            coroutineRunner.Run(
+                sessionApi.PatchGameSession(
                     sessionId,
                     request,
                     callback));
@@ -494,7 +556,7 @@ namespace AccelByte.Api
         /// Invite a user to a game session.
         /// </summary>
         /// <param name="sessionId">Targeted game session's sessionId</param>
-        /// <param name="sessionId">Targeted user's userId</param>
+        /// <param name="userId">Targeted user's userId</param>
         /// <param name="callback">
         /// Returns a result of SessionV2GameSession via callback when completed.
         /// </param>
@@ -505,14 +567,14 @@ namespace AccelByte.Api
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
             Assert.IsNotNull(userId, "userId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.InviteUserToGameSession(
+            coroutineRunner.Run(
+                sessionApi.InviteUserToGameSession(
                     sessionId,
                     userId,
                     callback));
@@ -531,14 +593,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.JoinGameSession(
+            coroutineRunner.Run(
+                sessionApi.JoinGameSession(
                     sessionId,
                     callback));
         }
@@ -556,14 +618,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.LeaveGameSession(
+            coroutineRunner.Run(
+                sessionApi.LeaveGameSession(
                     sessionId,
                     callback));
         }
@@ -581,14 +643,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "sessionId cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.RejectGameSessionInvitation(
+            coroutineRunner.Run(
+                sessionApi.RejectGameSessionInvitation(
                     sessionId,
                     callback));
         }
@@ -610,18 +672,81 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _sessionApi.GetUserGameSessions(
+            coroutineRunner.Run(
+                sessionApi.GetUserGameSessions(
                     statusFilter,
                     orderBy,
                     sortDesc,
                     callback));
+        }
+
+        /// <summary>
+        /// Join a game session using a code.
+        /// </summary>
+        /// <param name="code">Game session code.</param>
+        /// <param name="callback">Returns a result of SessionV2GameSession via callback when completed.</param>
+        public void JoinGameSessionByCode(string code
+            , ResultCallback<SessionV2GameSession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(code, "code cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.JoinGameSessionByCode(code, callback));
+        }
+
+        /// <summary>
+        /// Generate new code for a game session.
+        /// </summary>
+        /// <param name="sessionId">Game session ID.</param>
+        /// <param name="callback">Returns a result of SessionV2GameSession via callback when completed.</param>
+        public void GenerateNewGameSessionCode(string sessionId
+            , ResultCallback<SessionV2GameSession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.GenerateNewGameSessionCode(sessionId, callback));
+        }
+
+        /// <summary>
+        /// Revoke game session code.
+        /// </summary>
+        /// <param name="sessionId">Game session ID.</param>
+        /// <param name="callback">Returns a result of SessionV2GameSession via callback when completed.</param>
+        public void RevokeGameSessionCode(string sessionId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.RevokeGameSessionCode(sessionId, callback));
         }
 
         #endregion

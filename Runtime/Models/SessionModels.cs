@@ -125,6 +125,7 @@ namespace AccelByte.Models
     {
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public SessionV2PublicConfiguration configuration;
+        [DataMember(Name = "code")] public string Code;
         [DataMember] public DateTime createdAt;
         [DataMember] public string createdBy;
         [DataMember] public string id;
@@ -279,6 +280,7 @@ namespace AccelByte.Models
         [DataMember] public SessionV2DsInformation dsInformation;
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public string backfillTicketId;
+        [DataMember(Name = "code")] public string Code;
         [DataMember] public SessionV2PublicConfiguration configuration;
         [DataMember] public DateTime createdAt;
         [DataMember] public string createdBy;
@@ -375,6 +377,12 @@ namespace AccelByte.Models
     public class SessionV2TeamData
     {
         [DataMember] public string[] userIds;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2JoinByCodeRequest
+    {
+        [DataMember(Name = "code")] public string Code;
     }
 
     #region Notification

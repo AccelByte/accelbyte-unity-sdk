@@ -139,5 +139,43 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
+
+        public IEnumerator GetUserMatchmakingTickets(ResultCallback<MatchmakingV2ActiveTickets> callback
+            , string matchPool, int offset, int limit)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(ErrorCode.NamespaceNotFound);
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(ErrorCode.UnauthorizedAccess);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/match-tickets/me")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("matchPool", matchPool)
+                .WithQueryParam("offset", offset.ToString())
+                .WithQueryParam("limit", limit.ToString())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<MatchmakingV2ActiveTickets>();
+
+            callback.Try(result);
+        }
     }
 }

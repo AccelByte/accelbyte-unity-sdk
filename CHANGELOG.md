@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.0%0D16.3.1) (2023-07-31)
+
+
+### Features
+
+* Expose Oculus IAP Sync Endpoint ([e4f7608](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e4f76087aef5e4e8283409542ef399b07017e678))
+* **MPv2:** add api to query active matchmaking ticket ([cb73a0a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb73a0a7071add559a0e408a3504a2713d88a221))
+* **sessionV2:** add API for joining game session and party by code ([c72309e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c72309e8090f37a01ad503aad48579e02a20661b))
+
+
+### Bug Fixes
+
+* add missing field on user models ([0e80013](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0e800130e3be6d0c6968b178c8d10e36234c0a0d))
+* adjust typo in IAPOrderStatus enum ([db513b5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db513b5e830f8528dac023f5579b2d4618399f6d))
+* complete user service url error information ([ecaf71f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ecaf71fd4aad9dffc4f0948aeccb2f79e062916c))
+* **UGC:** Expose the target user id so player didn't folloow themselves ([4ad284b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4ad284b126149b09fb1b936f860dc823cad782d4))
+
 ### [16.3.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.1%0D16.3.0) (2023-07-25)
 
 

@@ -10,9 +10,9 @@ namespace AccelByte.Api
 {
     public class MatchmakingV2 : WrapperBase
     {
-        private readonly MatchmakingV2Api _matchmakingV2Api;
-        private readonly ISession _session;
-        private readonly CoroutineRunner _coroutineRunner;
+        private readonly MatchmakingV2Api matchmakingV2Api;
+        private readonly ISession session;
+        private readonly CoroutineRunner coroutineRunner;
 
         [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
@@ -21,9 +21,9 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(inCoroutineRunner);
 
-            _matchmakingV2Api = inApi;
-            _session = inSession;
-            _coroutineRunner = inCoroutineRunner;
+            matchmakingV2Api = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
         }
 
         /// <summary>
@@ -41,14 +41,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(matchPoolName, nameof(matchPoolName) + " cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, callback));
+            coroutineRunner.Run(
+                matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, callback));
         }
         
         /// <summary>
@@ -64,14 +64,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _matchmakingV2Api.GetMatchmakingTicket(ticketId, callback));
+            coroutineRunner.Run(
+                matchmakingV2Api.GetMatchmakingTicket(ticketId, callback));
         }
         
         /// <summary>
@@ -86,14 +86,14 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
 
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _matchmakingV2Api.DeleteMatchmakingTicket(ticketId, callback));
+            coroutineRunner.Run(
+                matchmakingV2Api.DeleteMatchmakingTicket(ticketId, callback));
         }
 
         /// <summary>
@@ -106,14 +106,36 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsFalse(string.IsNullOrEmpty(matchPool), nameof(matchPool) + " cannot be null or empty");
             
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            _coroutineRunner.Run(
-                _matchmakingV2Api.GetMatchmakingMetrics(matchPool, callback));
+            coroutineRunner.Run(
+                matchmakingV2Api.GetMatchmakingMetrics(matchPool, callback));
+        }
+
+        /// <summary>
+        /// Get active matchmaking tickets for current user.
+        /// </summary>
+        /// <param name="callback">Returns a result that contain all active tickets of current user.</param>
+        /// <param name="matchPool">Optional if filled it will return only ticket from specified matchpool</param>
+        /// <param name="offset">The offset of the types and/or subtypes paging data result. Default value is 0.</param>
+        /// <param name="limit">The limit of the types and subtypes results. Default value is 20.</param>
+        public void GetUserMatchmakingTickets(ResultCallback<MatchmakingV2ActiveTickets> callback
+            , string matchPool = "", int offset = 0, int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                matchmakingV2Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
         }
     }
 }

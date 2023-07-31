@@ -572,6 +572,37 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Update follow/unfollow status to user.
+        /// </summary>
+        /// <param name="followStatus">The new follow status value.</param>
+        /// <param name="userId">The userId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateFollowStatus(bool followStatus
+            , string userId
+            , ResultCallback<UGCUpdateFollowStatusToUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestModel = new UpdateFollowStatusRequest()
+            {
+                FollowStatus = followStatus
+            };
+
+            var requestParameter = new UpdateFollowStatusParameter()
+            {
+                UserId = userId
+            };
+
+            coroutineRunner.Run(api.UpdateFollowStatus(requestModel, requestParameter, callback));
+        }
+
+        /// <summary>
         /// Get Bulk ContentId.
         /// </summary>
         /// <param name="contentId">The content Ids.</param>

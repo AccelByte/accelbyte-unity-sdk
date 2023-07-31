@@ -112,6 +112,7 @@ namespace AccelByte.Models
         [DataMember] public string country;
         [DataMember] public DateTime createdAt;
         [DataMember] public string dateOfBirth;
+        [DataMember(Name = "deletionDate")] public string DeletionDate;
         [DataMember] public bool deletionStatus;
         [DataMember] public string displayName;
         [DataMember] public string emailAddress;
@@ -607,10 +608,12 @@ namespace AccelByte.Models
     public class UserOtherPlatformInfo
     {
         [DataMember] public string authType;
+        [DataMember(Name = "avatarUrl")] public string AvatarUrl;
         [DataMember] public Ban[] bans;
         [DataMember] public string country;
         [DataMember] public string createdAt;
         [DataMember] public string dateOfBirth;
+        [DataMember(Name = "deletionDate")] public string DeletionDate;
         [DataMember] public bool deletionStatus;
         [DataMember] public string displayName;
         [DataMember] public string emailAddress;
@@ -625,6 +628,7 @@ namespace AccelByte.Models
         [DataMember] public Permission[] permissions;
         [DataMember] public string phoneNumber;
         [DataMember] public bool phoneVerified;
+        [DataMember(Name = "platformAvatarUrl")] public string PlatformAvatarUrl;
         [DataMember] public string platformDisplayName; //optional
         [DataMember] public string platformId; //optional
         [DataMember] public string platformUserId; //optional

@@ -61,6 +61,32 @@ namespace AccelByte.Models
         [DataMember(Name = "queueTime")] public int QueueTime;
     }
 
+    [DataContract, Preserve]
+    public class MatchmakingV2ProposedProposal
+    {
+        [DataMember(Name = "backfillID")] public string BackfillID;
+        [DataMember(Name = "proposalID")] public string ProposalID;
+        [DataMember(Name = "status")] public string Status;
+    }
+
+    [DataContract, Preserve]
+    public class MatchmakingV2ActiveTicket
+    {
+        [DataMember(Name = "matchFound")] public bool MatchFound;
+        [DataMember(Name = "matchPool")] public string MatchPool;
+        [DataMember(Name = "matchTicketID")] public string MatchTicketID;
+        [DataMember(Name = "proposedProposal")]
+        public MatchmakingV2ProposedProposal ProposedProposal;
+        [DataMember(Name = "sessionID")] public string SessionID;
+    }
+
+    [DataContract, Preserve]
+    public class MatchmakingV2ActiveTickets
+    {
+        [DataMember(Name = "data")] public MatchmakingV2ActiveTicket[] Data;
+        [DataMember(Name = "pagination")] public Paging Paging;
+    }
+
     #region Backfill
 
     [DataContract, Preserve]
