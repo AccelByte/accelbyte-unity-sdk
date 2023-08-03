@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.4.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.1%0D16.4.0) (2023-08-03)
+
+
+### Bug Fixes
+
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([3e4528a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3e4528a5bbb0bc363579856bb5815b553159d971))
+
 ## [16.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.0%0D16.3.1) (2023-07-31)
 
 

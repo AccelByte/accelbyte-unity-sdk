@@ -272,11 +272,15 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/locale/byIds")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("storeId", storeId)
-                .WithQueryParam("itemIds", itemIds)
                 .WithQueryParam("region", region)
                 .WithQueryParam("language", language)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
+
+            if (itemIds != null && itemIds.Length > 0)
+            {
+                builder.WithQueryParam("itemIds", string.Join(",", itemIds));
+            }
 
             var request = builder.GetResult();
 
