@@ -1,14 +1,11 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
-using Random = System.Random;
 
 namespace AccelByte.Server
 {
@@ -39,8 +36,8 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
         }
 
-        public override string AuthorizationToken 
-        { 
+        public override string AuthorizationToken
+        {
             get { return tokenData != null ? tokenData.access_token : null; }
             set { tokenData.access_token = value; }
         }
@@ -78,7 +75,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return httpClient.SendRequest(request, 
+            yield return httpClient.SendRequest(request,
                 rsp => response = rsp);
 
             Result<TokenData> result = response.TryParseJson<TokenData>();
@@ -96,7 +93,7 @@ namespace AccelByte.Server
 
             IHttpResponse response = null;
 
-            yield return httpClient.SendRequest(request, 
+            yield return httpClient.SendRequest(request,
                 rsp => response = rsp);
 
             tokenData = null;
@@ -123,6 +120,24 @@ namespace AccelByte.Server
                     callback.TryOk(result.Value);
                 }
             });
+        }
+
+        public IEnumerator GetJwks(ResultCallback<JwkSet> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            var request = HttpRequestBuilder.CreateGet(baseUrl + "/v3/oauth/jwks")
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return httpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<JwkSet>();
+            callback.Try(result);
         }
 
         public override void SetSession(TokenData loginResponse)

@@ -760,6 +760,18 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             websocketApi.ListOutgoingFriends(callback);
         }
+        
+        /// <summary>
+        /// Send list of outgoing friends request with added timestamp.
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contains FriendsWithTimestamp via callback when completed.
+        /// </param>
+        public void ListOutgoingFriendsWithTime(ResultCallback<FriendsWithTimestamp> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.ListOutgoingFriendsWithTime(callback);
+        }
 
         /// <summary>
         /// Send cancel friend request.
@@ -783,6 +795,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             websocketApi.ListIncomingFriends(callback);
+        }
+        
+        /// <summary>
+        /// Send list of incoming friends request with added timestamp
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contains FriendsWithTimestamp via callback when completed.
+        /// </param>
+        public void ListIncomingFriendsWithTime(ResultCallback<FriendsWithTimestamp> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.ListIncomingFriendsWithTime(callback);
         }
 
         /// <summary>

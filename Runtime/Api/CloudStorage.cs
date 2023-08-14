@@ -48,6 +48,7 @@ namespace AccelByte.Api
         /// <param name="callback">
         /// Returns a Result that contains Slot info array via callback when completed.
         /// </param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void GetAllSlots( ResultCallback<Slot[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -66,6 +67,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="slotId">Slot Id, generated when a new slot is created</param>
         /// <param name="callback">Returns a Result that contains data via callback when completed.</param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void GetSlot( string slotId
             , ResultCallback<byte[]> callback )
         {
@@ -86,6 +88,7 @@ namespace AccelByte.Api
         /// <param name="data">Data to fill the slot</param>
         /// <param name="dataName">Data name</param>
         /// <param name="callback">Returns a Result that contains Slot info via callback when completed.</param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void CreateSlot( byte[] data
             , string dataName
             , ResultCallback<Slot> callback )
@@ -108,6 +111,7 @@ namespace AccelByte.Api
         /// <param name="data">Data to replace data already in slot</param>
         /// <param name="dataName">Data name</param>
         /// <param name="callback">Returns a Result that contains Slot info via callback when completed.</param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void UpdateSlot( string slotId
             , byte[] data
             , string dataName
@@ -137,6 +141,7 @@ namespace AccelByte.Api
         /// <param name="label">label to be updated/added</param>
         /// <param name="customMetadata">custom attribute tu be updated/added</param>
         /// <param name="callback">return a result that contain updated slot metadata after completed</param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void UpdateSlotMetadata( string slotId
             , string[] tags
             , string label
@@ -166,6 +171,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="slotId">Slot Id to be deleted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Cloud Storage is deprecated - please use Binary Cloudsave for the replacement")]
         public void DeleteSlot( string slotId
             , ResultCallback callback )
         {

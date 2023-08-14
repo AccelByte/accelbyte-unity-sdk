@@ -194,46 +194,64 @@ namespace AccelByte.Core
 
                 if (fieldInfo.FieldType.IsArray)
                 {
-                    var trimmedString = fieldValue.Trim('[', ']', ',', ' ');
-
-                    if (String.IsNullOrEmpty(trimmedString))
+                    if (fieldValue.StartsWith("[{"))
                     {
-                        fieldInfo.SetValue(payload, Array.CreateInstance(fieldInfo.FieldType.GetElementType(), 0));
-                    }
-                    else
-                    {
-                        var strItems = trimmedString.Split(',');
-                        var array = Array.CreateInstance(fieldInfo.FieldType.GetElementType(), strItems.Length);
-
+                        // element is a json array, just deserialize it and pass it.
                         try
-                        {
-                            for (int i = 0; i < array.Length; i++)
-                            {
-                                if (fieldInfo.FieldType.GetElementType().IsEnum)
-                                {
-                                    var obj = Activator.CreateInstance(fieldInfo.FieldType.GetElementType());
-                                    obj = Enum.Parse(fieldInfo.FieldType.GetElementType(), Uri.UnescapeDataString((string)strItems[i]), true);
-                                    array.SetValue(obj, i);
-                                }
-                                else
-                                {
-                                    var parsedValue = Convert.ChangeType(strItems[i].Trim(' '), fieldInfo.FieldType.GetElementType());
-                                    if (fieldInfo.FieldType.GetElementType() == typeof(string))
-                                    {
-                                        array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
-                                    }
-                                    else
-                                    {
-                                        array.SetValue(parsedValue, i);
-                                    }
-                                }
-                            }
-
-                            fieldInfo.SetValue(payload, array);
+                        { 
+                            var convertedValue = Newtonsoft.Json.JsonConvert.DeserializeObject(fieldValue, fieldInfo.FieldType);
+                            fieldInfo.SetValue(payload, convertedValue);
                         }
                         catch (Exception)
                         {
                             return ErrorCode.MessageFieldConversionFailed;
+                        }
+                    }
+                    else
+                    {
+                        var trimmedString = fieldValue.Trim('[', ']', ',', ' ');
+
+                        if (String.IsNullOrEmpty(trimmedString))
+                        {
+                            fieldInfo.SetValue(payload, Array.CreateInstance(fieldInfo.FieldType.GetElementType(), 0));
+                        }
+                        else
+                        {
+                            var strItems = trimmedString.Split(',');
+                            var array = Array.CreateInstance(fieldInfo.FieldType.GetElementType(), strItems.Length);
+
+                            try
+                            {
+                                for (int i = 0; i < array.Length; i++)
+                                {
+                                    if (fieldInfo.FieldType.GetElementType().IsEnum)
+                                    {
+                                        var obj = Activator.CreateInstance(fieldInfo.FieldType.GetElementType());
+                                        obj = Enum.Parse(fieldInfo.FieldType.GetElementType(),
+                                            Uri.UnescapeDataString((string)strItems[i]), true);
+                                        array.SetValue(obj, i);
+                                    }
+                                    else
+                                    {
+                                        var parsedValue = Convert.ChangeType(strItems[i].Trim(' '),
+                                            fieldInfo.FieldType.GetElementType());
+                                        if (fieldInfo.FieldType.GetElementType() == typeof(string))
+                                        {
+                                            array.SetValue(Uri.UnescapeDataString((string)parsedValue), i);
+                                        }
+                                        else
+                                        {
+                                            array.SetValue(parsedValue, i);
+                                        }
+                                    }
+                                }
+
+                                fieldInfo.SetValue(payload, array);
+                            }
+                            catch (Exception)
+                            {
+                                return ErrorCode.MessageFieldConversionFailed;
+                            }
                         }
                     }
                 }

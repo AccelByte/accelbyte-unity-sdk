@@ -748,6 +748,17 @@ namespace AccelByte.Api
         {
             SendRequest(MessageType.listOutgoingFriendsRequest, callback);
         }
+        
+        /// <summary>
+        /// Send list of outgoing friends request with additional timestamp.
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contains FriendsWithTimestamp via callback when completed.
+        /// </param>
+        public void ListOutgoingFriendsWithTime( ResultCallback<FriendsWithTimestamp> callback )
+        {
+            SendRequest(MessageType.listOutgoingFriendsWithTimeRequest, callback);
+        }
 
         /// <summary>
         /// Send cancel friend request.
@@ -770,6 +781,17 @@ namespace AccelByte.Api
         public void ListIncomingFriends( ResultCallback<Friends> callback )
         {
             SendRequest(MessageType.listIncomingFriendsRequest, callback);
+        }
+        
+        /// <summary>
+        /// Send list of incoming friends request with additional timestamp.
+        /// </summary>
+        /// <param name="callback">
+        /// Returns a Result that contains FriendsWithTimestamp via callback when completed.
+        /// </param>
+        public void ListIncomingFriendsWithTime( ResultCallback<FriendsWithTimestamp> callback )
+        {
+            SendRequest(MessageType.listIncomingFriendsWithTimeRequest, callback);
         }
 
         /// <summary>

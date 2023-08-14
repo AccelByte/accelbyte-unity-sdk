@@ -73,10 +73,14 @@ namespace AccelByte.Models
         unfriendResponse,
         listOutgoingFriendsRequest,
         listOutgoingFriendsResponse,
+        listOutgoingFriendsWithTimeRequest,
+        listOutgoingFriendsWithTimeResponse,
         cancelFriendsRequest,
         cancelFriendsResponse,
         listIncomingFriendsRequest,
         listIncomingFriendsResponse,
+        listIncomingFriendsWithTimeRequest,
+        listIncomingFriendsWithTimeResponse,
         acceptFriendsRequest,
         acceptFriendsResponse,
         rejectFriendsRequest,
@@ -482,6 +486,7 @@ namespace AccelByte.Models
         [DataMember] public string message;
         // rejected status error code
         [DataMember] public int errorCode;
+        [DataMember] public string region;
     }
 
     [DataContract, Preserve]
@@ -571,6 +576,19 @@ namespace AccelByte.Models
     public class Friends
     {
         [DataMember] public string[] friendsId;
+    }
+    
+    [DataContract, Preserve]
+    public class FriendWithTimestampData
+    {
+        [DataMember] public string friendId;
+        [DataMember] public DateTime requestedAt;
+    }
+    
+    [DataContract, Preserve]
+    public class FriendsWithTimestamp
+    {
+        [DataMember] public FriendWithTimestampData[] data;
     }
 
     [DataContract, Preserve]

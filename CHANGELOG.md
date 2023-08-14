@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.5.0%0D16.4.1) (2023-08-14)
+
+
+### Features
+
+* [JSC-1519] add client timestamp as datamember ([fb937f3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb937f3d710256406cfe73bd3808f7b1399e4683))
+* **lobby:** implement lobby API outgoing and incoming friend request with timestamp ([f2fee80](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f2fee80bebd54fa7612978e4f8ff1cd7d390625c))
+* **MPv1:** add region in MatchmakingNotif data model ([d926758](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d926758bf9b92286065b30424ed5a1b9da3dece4))
+* **sessionV2:** add API for joining game session and party by code ([0633843](https://github.com/AccelByte/accelbyte-unity-sdk/commits/063384314e8172f9d6d5fbb0518184dda4f6f80a))
+
+
+### Bug Fixes
+
+* [none] set presence broadcast enabled after plugin is running ([a8eedf2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8eedf2cdf759e908ea566a0aea32de7e0a75312))
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([b5b040e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b5b040e37ea2e007f5db9f4a4aae2d7a7b1a1af8))
+
 ### [16.4.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.1%0D16.4.0) (2023-08-03)
 
 

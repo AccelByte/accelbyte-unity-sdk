@@ -135,6 +135,12 @@ namespace AccelByte.Api
                 heartBeat.SetHeartBeatEnabled(false);
                 heartBeat = null;
             }
+
+            if (presenceBroadcastEventController != null)
+            {
+                presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
+                presenceBroadcastEventController = null;
+            }
         }
 
         internal static void Initialize()
@@ -1197,8 +1203,20 @@ namespace AccelByte.Api
 
                 configReset += () =>
                 {
+                    bool presenceBroadcastEventJobEnabled = false;
+                    if (presenceBroadcastEventController != null)
+                    {
+                        presenceBroadcastEventJobEnabled = presenceBroadcastEventController.IsPresenceBroadcastEventJobEnabled;
+                        presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
+                    }
+                    
                     presenceBroadcastEventController = null;
                     presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
+
+                    if (presenceBroadcastEventJobEnabled)
+                    {
+                        presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(true);
+                    }
                 };
             }
 

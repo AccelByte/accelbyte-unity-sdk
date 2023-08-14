@@ -26,7 +26,7 @@ namespace AccelByte.Server
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -55,7 +55,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// This function will search user by their third party Display Name. 
+        /// This function will search user by their third party Display Name.
         /// The query will be used to find the user with the most approximate display name.
         /// </summary>
         /// <param name="platformDisplayName">Targeted user's third party by Display Name.</param>
@@ -148,7 +148,7 @@ namespace AccelByte.Server
             };
 
             this.coroutineRunner.Run(
-                this.api.BanUser( 
+                this.api.BanUser(
                     userId,
                     banRequest,
                     callback));
@@ -177,7 +177,7 @@ namespace AccelByte.Server
             }
 
             this.coroutineRunner.Run(
-                this.api.ChangeUserBanStatus( 
+                this.api.ChangeUserBanStatus(
                     userId,
                     banId,
                     enabled,
@@ -235,7 +235,7 @@ namespace AccelByte.Server
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserBannedList( 
+                this.api.GetUserBannedList(
                     activeOnly,
                     banType,
                     offset,
@@ -246,7 +246,7 @@ namespace AccelByte.Server
         /// <summary>
         /// Get user data from another user by user id
         /// </summary>
-        /// <param name="userId"> user id that needed to get user data</param> 
+        /// <param name="userId"> user id that needed to get user data</param>
         public void GetUserByUserId(string userId
             , ResultCallback<UserData> callback)
         {
@@ -264,7 +264,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// This function to List user by user ids. 
+        /// This function to List user by user ids.
         /// </summary>
         /// <param name="listUserDataRequest">Struct request containing user ids</param>
         /// <param name="callback">Returns a result via callback when completed</param>
