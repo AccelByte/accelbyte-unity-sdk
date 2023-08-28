@@ -6,10 +6,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSteam")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS4")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
 namespace AccelByte.Core
 {
 #if (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX) && UNITY_SERVER
     using PlatformMain = LinuxServerMain;
+#elif !UNITY_EDITOR && UNITY_PS4
+    using PlatformMain = PS4Main;
+#elif !UNITY_EDITOR && UNITY_PS5
+    using PlatformMain = PS5Main;
+#elif !UNITY_EDITOR && UNITY_GAMECORE
+    using PlatformMain = GameCoreMain;
 #else
     using PlatformMain = NullMain;
 #endif

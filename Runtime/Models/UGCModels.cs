@@ -19,6 +19,17 @@ namespace AccelByte.Models
         NAME = 0,
         DOWNLOAD,
         LIKE,
+        DATE,
+        UPDATED_TIME
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCLikedContentSortBy
+    {
+        NONE,
+        NAME = 0,
+        DOWNLOAD,
+        LIKE,
         DATE
     }
 
@@ -313,6 +324,20 @@ namespace AccelByte.Models
         [DataMember] public int offset = 0; // Default value = 0
         [DataMember] public UGCSortBy sortBy = UGCSortBy.DATE; // Default to sorting criteria = date
         [DataMember] public UGCOrderBy orderBy = UGCOrderBy.DESC; // Default to sorting order = desc
+    }
+
+    [DataContract, Preserve]
+    public class GetAllLikedContentRequest
+    {
+        [DataMember] public string[] Tags;
+        [DataMember] public string Name;
+        [DataMember] public string Type;
+        [DataMember] public string Subtype;
+        [DataMember] public bool IsOfficial;
+        [DataMember] public int Limit = 1000; // Default value = 1000
+        [DataMember] public int Offset = 0; // Default value = 0
+        [DataMember] public UGCLikedContentSortBy SortBy = UGCLikedContentSortBy.DATE; // Default to sorting criteria = date
+        [DataMember] public UGCOrderBy OrderBy = UGCOrderBy.DESC; // Default to sorting order = desc
     }
 
     [DataContract, Preserve]

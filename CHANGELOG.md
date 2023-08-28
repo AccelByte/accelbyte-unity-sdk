@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.0%0D16.5.0) (2023-08-28)
+
+
+### Features
+
+* **MPv2:** add data model for create match ticket error ([7f47229](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f472293b58e0ea89731f65b8ad3c8b470b1bf1d))
+* **UGC:** add a new sort by value and devide liked content endpoint ([9291557](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9291557a1104d7c22e6f13f5e31ebab348bfd581))
+
+
+### Bug Fixes
+
+* add error callback when the auth token is empty ([d264cd8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d264cd8534ac099413816cb8742d3a7fec25a998))
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([6e3ceab](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e3ceab8c03ad3779782e33095ba8d1a625eaaae))
+
+
+### Refactors
+
+* add playstation 4 main ([55977a9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55977a973af01de3a16486b9becd8bdbd6f8f854))
+* add playstation 5 main ([9f584d6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f584d6103c27cf7b83d31ab0b4079b1b8a44a2e))
+* add steam wrapper abstraction ([c84bb64](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c84bb642f105908e3e77806d87cb66efa3433172))
+* add xbox game core main ([664b684](https://github.com/AccelByte/accelbyte-unity-sdk/commits/664b68432808a7aaed597e3d4ffb331b06a303e2))
+* refactor platform infoware ([51a77cc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/51a77cc28b692e215532d82921645923d5ec6ab2))
+
 ## [16.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.5.0%0D16.4.1) (2023-08-14)
 
 

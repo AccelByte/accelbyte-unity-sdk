@@ -181,14 +181,14 @@ namespace AccelByte.Api
                     }
                     case RuntimePlatform.PS4:
                     {
-                        iware = new Utils.Infoware.PlayStation4();
+                        iware = new Utils.Infoware.PlayStation4Infoware();
                         string deviceId = iware.GetDeviceID();
                         platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
                         break;
                     }
                     case RuntimePlatform.PS5:
                     {
-                        iware = new Utils.Infoware.PlayStation4();
+                        iware = new Utils.Infoware.PlayStation5Infoware();
                         string deviceId = iware.GetDeviceID();
                         platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
                         break;

@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using UnityEngine.Scripting;
+using AccelByte.Core;
 
 namespace AccelByte.Models
 {
@@ -40,6 +41,19 @@ namespace AccelByte.Models
     {
         [DataMember] public string matchTicketId;
         [DataMember] public int queueTime;
+    }
+
+    [DataContract, Preserve]
+    public class MatchmakingV2CreateTicketError
+    {
+        [DataMember(Name = "ticketID")] public string TicketId;
+
+        public static MatchmakingV2CreateTicketError GetFromError(Error error)
+        {
+            string jsonString = error.messageVariables.ToJsonString();
+
+            return JsonConvert.DeserializeObject<MatchmakingV2CreateTicketError>(jsonString);
+        }
     }
 
     [DataContract, Preserve]

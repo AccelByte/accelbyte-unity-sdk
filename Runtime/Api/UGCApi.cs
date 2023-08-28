@@ -44,6 +44,27 @@ namespace AccelByte.Api
                     return "download";
                 case UGCSortBy.LIKE:
                     return "like";
+                case UGCSortBy.UPDATED_TIME:
+                    return "updatedTime";
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Convert UGC Liked Content Sort By Enum to String Value
+        /// </summary>
+        private string ConvertUGCLikedContentSortByToString(UGCLikedContentSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case UGCLikedContentSortBy.NAME:
+                    return "name";
+                case UGCLikedContentSortBy.DATE:
+                    return "date";
+                case UGCLikedContentSortBy.DOWNLOAD:
+                    return "download";
+                case UGCLikedContentSortBy.LIKE:
+                    return "like";
             }
             return "";
         }
@@ -912,6 +933,46 @@ namespace AccelByte.Api
 
             yield return HttpClient.SendRequest(request,
                 rsp => response = rsp);
+
+            var result = response.TryParseJson<UGCContentsPagingResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator GetLikedContents( GetAllLikedContentRequest getLikedContentRequest
+            , ResultCallback<UGCContentsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            string tags = "";
+            if(getLikedContentRequest.Tags.Length > 0 && getLikedContentRequest.Tags != null)
+            {
+                tags = string.Join(",", getLikedContentRequest.Tags);
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/liked")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("tags", tags)
+                .WithQueryParam("name", getLikedContentRequest.Name)
+                .WithQueryParam("type", getLikedContentRequest.Type)
+                .WithQueryParam("subtype", getLikedContentRequest.Subtype)
+                .WithQueryParam("isOfficial", getLikedContentRequest.IsOfficial ? "true" : "false")
+                .WithQueryParam("limit", getLikedContentRequest.Limit >= 0 ? getLikedContentRequest.Limit.ToString() : string.Empty)
+                .WithQueryParam("offset", getLikedContentRequest.Offset >= 0 ? getLikedContentRequest.Offset.ToString() : string.Empty)
+                .WithQueryParam("sortBy", ConvertUGCLikedContentSortByToString(getLikedContentRequest.SortBy))
+                .WithQueryParam("orderBy", ConvertUGCOrderByToString(getLikedContentRequest.OrderBy))
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => 
+                {
+                    response = rsp;
+                });
 
             var result = response.TryParseJson<UGCContentsPagingResponse>();
             callback.Try(result);

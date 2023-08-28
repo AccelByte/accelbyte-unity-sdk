@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace AccelByte.Utils.Infoware
 {
-    internal abstract class InfowareUtils
+    public abstract class InfowareUtils
     {
         internal abstract string GetDeviceID();
         internal abstract string GetMacAddress();
