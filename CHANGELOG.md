@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.6.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.2%0D16.6.1) (2023-09-04)
+
+
+### Bug Fixes
+
+* fix error on analytics dispose failure on unity close ([4f46e26](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4f46e261eca851437670c036b4057f8a28127ebd))
+
 ### [16.6.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.1%0D16.6.0) (2023-09-04)
 
 

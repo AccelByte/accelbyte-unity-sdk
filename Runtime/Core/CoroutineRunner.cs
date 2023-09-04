@@ -34,7 +34,10 @@ namespace AccelByte.Core
             this.isRunning = false; 
         }
 
-        public Coroutine Run(IEnumerator coroutine) { return this.monoBehaviour.StartCoroutine(coroutine); }
+        public Coroutine Run(IEnumerator coroutine)
+        { 
+            return this.monoBehaviour != null ? this.monoBehaviour.StartCoroutine(coroutine) : null;
+        }
         
         public void Stop(Coroutine coroutine) { this.monoBehaviour.StopCoroutine(coroutine); }
 

@@ -190,7 +190,10 @@ namespace AccelByte.Core
 
         internal void DisposeScheduler()
         {
-            analyticsControllerEventScheduler.Dispose();
+            if (analyticsControllerEventScheduler != null)
+            {
+                analyticsControllerEventScheduler.Dispose();
+            }
         }
 
         protected virtual internal void AutoLogin(Server.ServerOauthLoginSession oAuth2, ResultCallback<TokenData> resultCallback)
