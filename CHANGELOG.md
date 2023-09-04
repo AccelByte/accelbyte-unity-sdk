@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.6.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.1%0D16.6.0) (2023-09-04)
+
+
+### Features
+
+* add analytic config editor ([1ccfb15](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1ccfb1532034b8e8ab57718db594e3bded0b0c48))
+* add client telemetry feature ([25a6655](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25a6655d6b9c465f538750a486b78eb664c2372a))
+* add GetTokenWithClientCredentials oauth api ([49e124a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/49e124a3eb4a64c24fdefb4cd145a9e318135af7))
+* analytics core ([bd45420](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bd454206df4c9963162e21c2b9803449c37cf15e))
+* change client and server environment pointing into a same target ([73772fb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73772fbaa83586d066caa7a9974bdc1e1dae19c6))
+
+
+### Refactors
+
+* refactor for testability ([bb4e99b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bb4e99b0e9baf1b207ccde87777896c425e26b11))
+
 ## [16.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.0%0D16.5.0) (2023-08-28)
 
 

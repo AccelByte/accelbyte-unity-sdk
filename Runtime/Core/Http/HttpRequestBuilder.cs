@@ -234,9 +234,9 @@ namespace AccelByte.Core
             return this;
         }
 
-        public HttpRequestBuilder WithBasicAuth(string username, string password)
+        public HttpRequestBuilder WithBasicAuth(string username, string password, bool passwordIsRequired = true)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(username) || (passwordIsRequired && string.IsNullOrEmpty(password)))
             {
                 throw new ArgumentException("username and password for Basic Authorization shouldn't be empty or null");
             }

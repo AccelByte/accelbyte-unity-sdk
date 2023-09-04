@@ -15,9 +15,16 @@ namespace AccelByte.Models
         [DataMember] public object Payload;
         [DataMember] public DateTime ClientTimestamp;
 
-        public TelemetryBody() 
+        public TelemetryBody()
         {
             ClientTimestamp = DateTime.Now;
+        }
+
+        public TelemetryBody(Core.IAccelByteTelemetryEvent telemetryEvent)
+        {
+            EventName = telemetryEvent.EventName;
+            Payload = telemetryEvent.Payload;
+            ClientTimestamp = telemetryEvent.CreatedTimestamp;
         }
     }
 }

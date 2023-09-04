@@ -43,7 +43,6 @@ namespace AccelByte.Server
         private static ServiceVersion serviceVersion;
 
         private static bool initialized = false;
-        private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
@@ -114,6 +113,8 @@ namespace AccelByte.Server
         internal static void Initialize(ServerConfig inConfig, OAuthConfig inOAuthConfig)
         {
             ResetApis();
+            
+            var activeEnvironment = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
 
             AccelByteSettingsV2 newSettings;
             if (inConfig == null && inOAuthConfig == null)
@@ -126,25 +127,38 @@ namespace AccelByte.Server
                 newSettings = new AccelByteSettingsV2(inOAuthConfig, inConfig);
             }
 
-            newSettings.OAuthConfig.CheckRequiredField();
-            newSettings.ServerSdkConfig.CheckRequiredField();
+            try
+            {
+                newSettings.OAuthConfig.CheckRequiredField();
+                newSettings.ServerSdkConfig.CheckRequiredField();
 
-            settings = newSettings;
+                settings = newSettings;
 
-            HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
-            HttpRequestBuilder.SetGameClientVersion(Application.version);
-            HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
+                HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
+                HttpRequestBuilder.SetGameClientVersion(Application.version);
+                HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
 
-            coroutineRunner = new CoroutineRunner();
-            var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
-            var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
-            newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
-            httpClient = newHttpClient;
+                coroutineRunner = new CoroutineRunner();
+                var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
+                var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
+                newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
+                httpClient = newHttpClient;
 
-            session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
-            server = CreateDedicatedServerClient(session, coroutineRunner);
+                session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
+                server = CreateDedicatedServerClient(session, coroutineRunner);
 
-            initialized = true;
+                if (AccelByteSDK.Environment != null)
+                {
+                    AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
+                    AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
+                }
+
+                initialized = true;
+            }
+            catch(Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
         }
 
         public static ServiceVersion GetServiceVersion()
@@ -647,37 +661,59 @@ namespace AccelByte.Server
                 session,
                 coroutineRunner));
         }
-
-        public static void SetEnvironment(SettingsEnvironment environment)
+        
+        #region Environment
+        [Obsolete("Use AccelByteSDK.Environment.Set() to update environment target")]
+        public static void SetEnvironment(SettingsEnvironment newEnvironment)
         {
             CheckPlugin();
-            activeEnvironment = environment;
-            string activePlatform = AccelByteSettingsV2.GetActivePlatform(true);
-            var newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
-            if (newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
-            {
-                activeEnvironment = SettingsEnvironment.Default;
-                newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
-            }
-            if (newSettings.OAuthConfig.IsRequiredFieldEmpty())
-            {
-                newSettings = RetrieveConfigFromJsonFile("", activeEnvironment);
-            }
-            settings = newSettings;
 
-            HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
-
-            session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
-            server = CreateDedicatedServerClient(session, coroutineRunner);
-            if (configReset != null) 
-            { 
-                configReset.Invoke(); 
+            if (AccelByteSDK.Environment != null)
+            {
+                AccelByteSDK.Environment.Set(newEnvironment);
             }
-            if (environmentChanged != null) 
-            { 
-                environmentChanged.Invoke(activeEnvironment); 
+            else
+            {
+                UpdateEnvironment(newEnvironment);
             }
         }
+
+        [Obsolete("Use AccelByteSDK.Environment.Current to get current environment target")]
+        public static SettingsEnvironment GetEnvironment()
+        {
+            return AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
+        }
+
+        static void UpdateEnvironment(SettingsEnvironment newEnvironment)
+        {
+            try
+            {
+                string activePlatform = AccelByteSettingsV2.GetActivePlatform(true);
+                var newSettings = RetrieveConfigFromJsonFile(activePlatform, newEnvironment);
+                if (newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
+                {
+                    newEnvironment = SettingsEnvironment.Default;
+                    newSettings = RetrieveConfigFromJsonFile(activePlatform, newEnvironment);
+                }
+                if (newSettings.OAuthConfig.IsRequiredFieldEmpty())
+                {
+                    newSettings = RetrieveConfigFromJsonFile("", newEnvironment);
+                }
+                settings = newSettings;
+
+                HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
+
+                session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
+                server = CreateDedicatedServerClient(session, coroutineRunner);
+
+                configReset?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
+        }
+        #endregion
 
         private static void ResetApis()
         {
@@ -695,12 +731,6 @@ namespace AccelByte.Server
             seasonPass = null;
             configReset = null;
             environmentChanged = null;
-        }
-
-        public static SettingsEnvironment GetEnvironment()
-        {
-            CheckPlugin();
-            return activeEnvironment;
         }
 
         public static void ClearEnvironmentChangedEvent()

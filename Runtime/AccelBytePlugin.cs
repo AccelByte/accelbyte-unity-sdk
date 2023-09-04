@@ -70,7 +70,6 @@ namespace AccelByte.Api
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
-        private static SettingsEnvironment activeEnvironment = SettingsEnvironment.Default;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
@@ -97,7 +96,7 @@ namespace AccelByte.Api
         {
             get
             {
-                if(defaultHttpSender == null)
+                if (defaultHttpSender == null)
                 {
                     var httpSenderScheduler = new WebRequestSchedulerAsync();
                     defaultHttpSender = new UnityHttpRequestSender(httpSenderScheduler);
@@ -130,7 +129,7 @@ namespace AccelByte.Api
 
             ResetApis();
 
-            if(heartBeat != null)
+            if (heartBeat != null)
             {
                 heartBeat.SetHeartBeatEnabled(false);
                 heartBeat = null;
@@ -154,6 +153,8 @@ namespace AccelByte.Api
         {
             ResetApis();
 
+            var activeEnvironment = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
+
             AccelByteSettingsV2 newSettings;
             if (inConfig == null && inOAuthConfig == null)
             {
@@ -165,34 +166,47 @@ namespace AccelByte.Api
                 newSettings = new AccelByteSettingsV2(inOAuthConfig, inConfig);
             }
 
-            newSettings.OAuthConfig.CheckRequiredField();
-            newSettings.SDKConfig.CheckRequiredField();
-
-            settings = newSettings;
-
-            coroutineRunner = new CoroutineRunner();
-
-            AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
-            AccelByteLogType logTypeEnum;
-            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+            try
             {
-                AccelByteDebug.SetFilterLogType(logTypeEnum);
+                newSettings.OAuthConfig.CheckRequiredField();
+                newSettings.SDKConfig.CheckRequiredField();
+    
+                settings = newSettings;
+    
+                coroutineRunner = new CoroutineRunner();
+    
+                AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
+                AccelByteLogType logTypeEnum;
+                if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+                {
+                    AccelByteDebug.SetFilterLogType(logTypeEnum);
+                }
+                else
+                {
+                    AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
+                }
+    
+                httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
+                gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
+                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+    
+                HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
+                HttpRequestBuilder.SetGameClientVersion(Application.version);
+                HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
+                ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
+    
+                if (AccelByteSDK.Environment != null)
+                {
+                    AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
+                    AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
+                }
+    
+                initialized = true;
             }
-            else
+            catch(Exception ex)
             {
-                AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
+                AccelByteDebug.LogWarning(ex.Message);
             }
-
-            httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
-            gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
-
-            HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
-            HttpRequestBuilder.SetGameClientVersion(Application.version);
-            HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
-            ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
-
-            initialized = true;
         }
 
         public static ServiceVersion GetServiceVersion()
@@ -328,7 +342,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 userProfiles = new UserProfiles(
                     new UserProfilesApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==BasicServerUrl 
                         session),
                     session,
@@ -388,7 +402,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 items = new Items(
                     new ItemsApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl 
                         session),
                     session,
@@ -418,7 +432,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 currencies = new Currencies(
                     new CurrenciesApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl 
                         session),
                     session,
@@ -448,7 +462,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 orders = new Orders(
                     new OrdersApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl
                         session),
                     session,
@@ -508,7 +522,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 wallet = new Wallet(
                     new WalletApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl 
                         session),
                     session,
@@ -538,7 +552,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 lobby = new Lobby(
                     new LobbyApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==LobbyServerUrl
                         session),
                     session,
@@ -559,7 +573,7 @@ namespace AccelByte.Api
 
             return lobby;
         }
-        
+
         public static Session GetSession()
         {
             if (_session == null)
@@ -568,7 +582,7 @@ namespace AccelByte.Api
                 ISession session = GetUser().Session;
                 _session = new Session(
                     new SessionApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==SessionServerUrl
                         session),
                     session,
@@ -589,7 +603,7 @@ namespace AccelByte.Api
 
             return _session;
         }
-        
+
         public static MatchmakingV2 GetMatchmaking()
         {
             if (_matchmakingV2 == null)
@@ -598,7 +612,7 @@ namespace AccelByte.Api
                 ISession session = GetUser().Session;
                 _matchmakingV2 = new MatchmakingV2(
                     new MatchmakingV2Api(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==MatchmakingV2ServerUrl
                         session),
                     session,
@@ -628,12 +642,12 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 cloudStorage = new CloudStorage(
                     new CloudStorageApi(
-                        httpClient, 
-                        Config, 
+                        httpClient,
+                        Config,
                         session),
                     session,
                     coroutineRunner);
-                
+
                 configReset += () =>
                 {
                     cloudStorage = null;
@@ -658,12 +672,12 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 gameProfiles = new GameProfiles(
                     new GameProfilesApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==GameProfileServerUrl
                         session),
                     session,
                     coroutineRunner);
-             
+
                 configReset += () =>
                 {
                     gameProfiles = null;
@@ -688,12 +702,12 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 entitlement = new Entitlement(
                     new EntitlementApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl
                         session),
                     session,
                     coroutineRunner);
-            
+
                 configReset += () =>
                 {
                     entitlement = null;
@@ -718,7 +732,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 fulfillment = new Fulfillment(
                     new FulfillmentApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==PlatformServerUrl
                         session),
                     session,
@@ -748,7 +762,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 statistic = new Statistic(
                     new StatisticApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==StatisticServerUrl
                         session),
                     session,
@@ -778,7 +792,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 _qosManager = new QosManager(
                     new QosManagerApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==QosManagerServerUrl 
                         session),
                     session,
@@ -808,7 +822,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 agreement = new Agreement(
                     new AgreementApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==AgreementServerUrl
                         session),
                     session,
@@ -838,7 +852,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 leaderboard = new Leaderboard(
                     new LeaderboardApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==LeaderboardServerUrl
                         session),
                     session,
@@ -868,7 +882,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 cloudSave = new CloudSave(
                     new CloudSaveApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==CloudSaveServerUrl
                         session),
                     session,
@@ -898,7 +912,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 gameTelemetry = new GameTelemetry(
                     new GameTelemetryApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==GameTelemetryServerUrl 
                         session),
                     session,
@@ -958,7 +972,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 group = new Group(
                     new GroupApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==GroupServerUrl
                         session),
                     session,
@@ -988,7 +1002,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 ugc = new UGC(
                     new UGCApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==UGCServerUrl
                         session),
                     session,
@@ -1018,7 +1032,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 reporting = new Reporting(
                     new ReportingApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==ReportingServerUrl
                         session),
                     session,
@@ -1048,7 +1062,7 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 seasonPass = new SeasonPass(
                     new SeasonPassApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==SeasonPassServerUrl
                         session),
                     session,
@@ -1110,9 +1124,9 @@ namespace AccelByte.Api
                 UserSession session = GetUser().Session;
                 miscellaneous = new Miscellaneous(
                     new MiscellaneousApi(
-                        httpClient, 
+                        httpClient,
                         Config, // baseUrl==BasicServerUrl
-                        session), 
+                        session),
                     session,
                     coroutineRunner);
 
@@ -1131,7 +1145,7 @@ namespace AccelByte.Api
 
             return miscellaneous;
         }
-        
+
         public static Gdpr GetGdpr()
         {
             if (reporting == null)
@@ -1209,7 +1223,7 @@ namespace AccelByte.Api
                         presenceBroadcastEventJobEnabled = presenceBroadcastEventController.IsPresenceBroadcastEventJobEnabled;
                         presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
                     }
-                    
+
                     presenceBroadcastEventController = null;
                     presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
 
@@ -1239,7 +1253,7 @@ namespace AccelByte.Api
                 configReset += () =>
                 {
                     bool isHeartBeatJobEnabled = false;
-                    if(heartBeat != null)
+                    if (heartBeat != null)
                     {
                         isHeartBeatJobEnabled = heartBeat.IsHeartBeatJobEnabled;
                         heartBeat.SetHeartBeatEnabled(false);
@@ -1251,7 +1265,7 @@ namespace AccelByte.Api
                             Config,
                             session));
                     ProvideHeartbeatData(heartBeat);
-                    if(isHeartBeatJobEnabled)
+                    if (isHeartBeatJobEnabled)
                     {
                         heartBeat.SetHeartBeatEnabled(true);
                     }
@@ -1267,7 +1281,7 @@ namespace AccelByte.Api
             string customerName = !string.IsNullOrEmpty(Config.CustomerName) ? Config.CustomerName : Config.PublisherNamespace;
             string gameName = Config.Namespace;
 
-            SettingsEnvironment env = GetEnvironment();
+            SettingsEnvironment env = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
             string envString = string.Empty;
             switch (env)
             {
@@ -1324,64 +1338,79 @@ namespace AccelByte.Api
             sessionBrowser = null;
             turnManager = null;
             configReset = null;
-            environmentChanged = null;
             presenceBroadcastEvent = null;
             presenceBroadcastEventController = null;
         }
 
-        public static void SetEnvironment(SettingsEnvironment environment)
+        #region Environment
+        [Obsolete("Use AccelByteSDK.Environment.Set() to update environment target")]
+        public static void SetEnvironment(SettingsEnvironment newEnvironment)
         {
             CheckPlugin();
-            activeEnvironment = environment;
-            string activePlatform = AccelByteSettingsV2.GetActivePlatform(false);
-            var newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
-            if (settings.SDKConfig.IsRequiredFieldEmpty())
-            {
-                activeEnvironment = SettingsEnvironment.Default;
-                newSettings = RetrieveConfigFromJsonFile(activePlatform, activeEnvironment);
-            }
-            if (settings.OAuthConfig.IsRequiredFieldEmpty())
-            {
-                newSettings = RetrieveConfigFromJsonFile("", activeEnvironment);
-            }
-            settings = newSettings;
 
-            AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
-            AccelByteLogType logTypeEnum;
-            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+            if (AccelByteSDK.Environment != null)
             {
-                AccelByteDebug.SetFilterLogType(logTypeEnum);
+                AccelByteSDK.Environment.Set(newEnvironment);
             }
             else
             {
-                AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
+                UpdateEnvironment(newEnvironment);
             }
-
-            httpClient = null;
-            user = null;
-            gameClient = null;
-
-            httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
-            gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
-
-            HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
-
-            configReset?.Invoke();
-            environmentChanged?.Invoke(activeEnvironment);
         }
 
-        public static SettingsEnvironment GetEnvironment()
+        private static void UpdateEnvironment(SettingsEnvironment newEnvironment)
         {
-            CheckPlugin();
-            return activeEnvironment;
+            try
+            {
+                string activePlatform = AccelByteSettingsV2.GetActivePlatform(false);
+                var newSettings = RetrieveConfigFromJsonFile(activePlatform, newEnvironment);
+                if (settings.SDKConfig.IsRequiredFieldEmpty())
+                {
+                    newEnvironment = SettingsEnvironment.Default;
+                    newSettings = RetrieveConfigFromJsonFile(activePlatform, newEnvironment);
+                }
+                if (settings.OAuthConfig.IsRequiredFieldEmpty())
+                {
+                    newSettings = RetrieveConfigFromJsonFile("", newEnvironment);
+                }
+                settings = newSettings;
+
+                AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
+                AccelByteLogType logTypeEnum;
+                if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+                {
+                    AccelByteDebug.SetFilterLogType(logTypeEnum);
+                }
+                else
+                {
+                    AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
+                }
+
+                httpClient = null;
+                user = null;
+                gameClient = null;
+
+                httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
+                gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
+                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+
+                HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
+
+                configReset?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
         }
+        #endregion
 
         public static void ClearEnvironmentChangedEvent()
         {
             CheckPlugin();
             environmentChanged = null;
         }
+
         public static StoreDisplay GetStoreDisplay()
         {
             if (storeDisplay == null)

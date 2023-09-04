@@ -57,11 +57,25 @@ namespace AccelByte.Core
 
             onGameUpdate = null;
 
+            ExecuteBootstraps();
+
             Main.Run();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationPlayyModeStateChanged;
 #endif
             Application.quitting += ApplicationQuitting;
+        }
+
+        private static void StopSDK()
+        {
+            ClientAnaylticsBootstrap.Stop();
+            Main.Stop();
+        }
+
+        private static void ExecuteBootstraps()
+        {
+            EnvrionmentBootstrap.Execute();
+            ClientAnaylticsBootstrap.Execute();
         }
 
 #if UNITY_EDITOR
@@ -70,7 +84,7 @@ namespace AccelByte.Core
             if(newState == UnityEditor.PlayModeStateChange.ExitingPlayMode)
             {
                 UnityEditor.EditorApplication.playModeStateChanged -= EditorApplicationPlayyModeStateChanged;
-                Main.Stop();
+                StopSDK();
             }
         }
 #endif
@@ -116,7 +130,7 @@ namespace AccelByte.Core
 
         private static void ApplicationQuitting()
         {
-            Main.Stop();
+            StopSDK();
         }
     }
 }
