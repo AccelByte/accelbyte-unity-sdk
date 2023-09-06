@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.6.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.3%0D16.6.2) (2023-09-06)
+
+
+### Bug Fixes
+
+* fix windows package and linux editor unable to find steam oAuth config ([fb9f60e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb9f60ea287d455fc0e1d15e413e02f8ff41e36e))
+
 ### [16.6.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.2%0D16.6.1) (2023-09-04)
 
 
