@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.6.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.4%0D16.6.3) (2023-09-06)
+
+
+### Features
+
+* add customizable event namespace to client analytics ([543a4f1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/543a4f12eaae673220387e5cdde7ddc388c81e01))
+
+
+### Bug Fixes
+
+* change Nunit import into UnityEngine ([d4698b0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d4698b05fb51b1f23975705b7ee1ac28fbb5a2be))
+
 ### [16.6.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.3%0D16.6.2) (2023-09-06)
 
 

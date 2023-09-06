@@ -65,11 +65,34 @@ namespace AccelByte.Core
         }
 
         /// <summary>
+        /// Set default event namespace
+        /// </summary>
+        /// <param name="newDefaultEventNamespace">New event nampesace</param>
+        public void SetDefaultEventNamespace(string newDefaultEventNamespace)
+        {
+            if(analyticsControllerEventScheduler != null)
+            {
+                analyticsControllerEventScheduler.SetDefaultNamespace(newDefaultEventNamespace);
+            }
+        }
+
+        /// <summary>
         /// Send telemetry event with analytics credential. Not recommended to use for telemetry.
         /// </summary>
         /// <param name="telemetryEvent">Telemetry model</param>
         /// <param name="callback">Callback when event is sent</param>
-        public async void SendEvent(IAccelByteTelemetryPayload newPayload, System.Action<Result> onSent = null)
+        public void SendEvent(IAccelByteTelemetryPayload newPayload, System.Action<Result> onSent = null)
+        {
+            SendEvent(newPayload, null, onSent);
+        }
+
+        /// <summary>
+        /// Send telemetry event with analytics credential. Not recommended to use for telemetry.
+        /// </summary>
+        /// <param name="telemetryEvent">Telemetry model</param>
+        /// <param name="eventNamespace">Custom Event Namespace</param>
+        /// <param name="callback">Callback when event is sent</param>
+        public async void SendEvent(IAccelByteTelemetryPayload newPayload, string eventNamespace, System.Action<Result> onSent = null)
         {
             if (!initializationSuccess)
             {
@@ -97,7 +120,15 @@ namespace AccelByte.Core
             {
                 onSent?.Invoke(result);
             };
-            analyticsControllerEventScheduler.SendEvent(telemetryEvent, onSentApiCallback);
+
+            if (string.IsNullOrEmpty(eventNamespace))
+            {
+                analyticsControllerEventScheduler.SendEvent(telemetryEvent, onSentApiCallback);
+            }
+            else
+            {
+                analyticsControllerEventScheduler.SendEvent(telemetryEvent, eventNamespace, onSentApiCallback);
+            }
         }
 
         private void Initialize(string platform, SettingsEnvironment environment, out Error error)

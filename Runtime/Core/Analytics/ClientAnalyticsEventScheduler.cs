@@ -10,6 +10,8 @@ namespace AccelByte.Core
     {
         internal const string ClientAnalyticMainEventNamespace = "io.accelbyte.intelligence.analyticscontrollerevents";
 
+        private string defaultEventNamespace = ClientAnalyticMainEventNamespace;
+
         protected override int defaultEventIntervalInlMs
         {
             get
@@ -24,13 +26,23 @@ namespace AccelByte.Core
 
         }
 
+        public void SetDefaultNamespace(string newDefaultNamespace)
+        {
+            defaultEventNamespace = newDefaultNamespace;
+        }
+
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
+        {
+            SendEvent(telemetryEvent, defaultEventNamespace, callback);
+        }
+
+        public void SendEvent(IAccelByteTelemetryEvent telemetryEvent, string eventNamespace, ResultCallback callback)
         {
             executeValidator = true;
 
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent)
             {
-                EventNamespace = ClientAnalyticMainEventNamespace
+                EventNamespace = eventNamespace
             };
 
             jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));

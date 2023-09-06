@@ -4,8 +4,8 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
-using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
