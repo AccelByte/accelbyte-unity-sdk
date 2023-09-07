@@ -30,38 +30,6 @@ namespace AccelByte.Core
             }
 
             analyticsSettings = new AccelByteAnalyticsSettings();
-
-            if (AccelByteSDK.Environment != null)
-            {
-                System.Action<SettingsEnvironment> environmentChangedDelegate = (SettingsEnvironment changedTo) =>
-                {
-                    if (analyticsControllerEventScheduler != null)
-                    {
-                        analyticsControllerEventScheduler.SetEventEnabled(false);
-                        analyticsControllerEventScheduler.Dispose();
-                        analyticsControllerEventScheduler = null;
-                    }
-
-                    Error initializationError;
-                    string activePlatform = AccelByteSettingsV2.GetActivePlatform(false);
-                    Initialize(activePlatform, changedTo, out initializationError);
-                    initializationSuccess = initializationError == null;
-                    if (initializationError != null)
-                    {
-                        AccelByteDebug.LogVerbose($"Client analytics initialization failed.\n{initializationError.Message}");
-                    }
-                };
-                AccelByteSDK.Environment.OnEnvironmentChanged += environmentChangedDelegate;
-            }
-
-            string activePlatform = AccelByteSettingsV2.GetActivePlatform(false);
-            Error initializationError;
-            Initialize(activePlatform, GetEnvironment(), out initializationError);
-            initializationSuccess = initializationError == null;
-            if (initializationError != null)
-            {
-                AccelByteDebug.LogVerbose($"Client analytics initialization failed.\n{initializationError.Message}");
-            }
         }
 
         /// <summary>
@@ -131,45 +99,84 @@ namespace AccelByte.Core
             }
         }
 
-        private void Initialize(string platform, SettingsEnvironment environment, out Error error)
+        internal void Initialize()
+        {
+            Action<SettingsEnvironment> executeInitialization = (targetEnvironment) =>
+            {
+                Error initializationError;
+                string activePlatform = AccelByteSettingsV2.GetActivePlatform(false);
+                initializationSuccess = Initialize(activePlatform, targetEnvironment, out initializationError);
+                if (initializationError != null)
+                {
+                    AccelByteDebug.LogVerbose($"Client analytics initialization failed.\n{initializationError.Message}");
+                }
+            };
+
+            if (AccelByteSDK.Environment != null)
+            {
+                System.Action<SettingsEnvironment> environmentChangedDelegate = (SettingsEnvironment newEnvironment) =>
+                {
+                    if (analyticsControllerEventScheduler != null)
+                    {
+                        analyticsControllerEventScheduler.SetEventEnabled(false);
+                        analyticsControllerEventScheduler.Dispose();
+                        analyticsControllerEventScheduler = null;
+                    }
+
+                    executeInitialization.Invoke(newEnvironment);
+                };
+                AccelByteSDK.Environment.OnEnvironmentChanged += environmentChangedDelegate;
+            }
+
+            executeInitialization.Invoke(GetEnvironment());
+        }
+
+        private bool Initialize(string platform, SettingsEnvironment environment, out Error error)
         {
             error = null;
-            Config clientConfig;
-            OAuthConfig oAuthConfig;
 
             try
             {
+                Config clientConfig;
+                OAuthConfig oAuthConfig;
                 clientConfig = LoadClientConfig(environment);
+                if (clientConfig != null && !clientConfig.EnableClientAnalyticsEvent)
+                {
+                    return false;
+                }
+
                 oAuthConfig = LoadOAuthConfig(platform, environment);
+
+                string iAmUrl = clientConfig.IamServerUrl;
+
+                CoroutineRunner taskRunner = new CoroutineRunner();
+
+                Server.ServerOauthLoginSession analyticsControllerSession = new Server.ServerOauthLoginSession(
+                    iAmUrl,
+                    oAuthConfig.ClientId,
+                    oAuthConfig.ClientSecret,
+                    httpClient,
+                    taskRunner);
+
+                AnalyticsApi analyticsApi = new AnalyticsApi(
+                        httpClient,
+                        clientConfig,
+                        analyticsControllerSession);
+
+                AnalyticsService analyticsService = new AnalyticsService(
+                                    analyticsApi,
+                                    analyticsControllerSession,
+                                    taskRunner);
+
+                CreateAnalyticsControllerEventScheduler(analyticsControllerSession, analyticsService, clientConfig.ClientAnalyticsEventInterval);
             }
             catch (Exception ex)
             {
                 error = new Error(ErrorCode.ErrorFromException, ex.Message);
-                return;
+                return false;
             }
 
-            string iAmUrl = clientConfig.IamServerUrl;
-
-            CoroutineRunner taskRunner = new CoroutineRunner();
-
-            Server.ServerOauthLoginSession analyticsControllerSession = new Server.ServerOauthLoginSession(
-                iAmUrl,
-                oAuthConfig.ClientId,
-                oAuthConfig.ClientSecret,
-                httpClient,
-                taskRunner);
-
-            AnalyticsApi analyticsApi = new AnalyticsApi(
-                    httpClient,
-                    clientConfig,
-                    analyticsControllerSession);
-
-            AnalyticsService analyticsService = new AnalyticsService(
-                                analyticsApi,
-                                analyticsControllerSession,
-                                taskRunner);
-
-            CreateAnalyticsControllerEventScheduler(analyticsControllerSession, analyticsService);
+            return true;
         }
 
         protected virtual OAuthConfig LoadOAuthConfig(string platform, SettingsEnvironment environment)
@@ -198,9 +205,10 @@ namespace AccelByte.Core
             return AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
         }
 
-        private void CreateAnalyticsControllerEventScheduler(Server.ServerOauthLoginSession analyticsControllerSession, AnalyticsService analyticsService)
+        private void CreateAnalyticsControllerEventScheduler(Server.ServerOauthLoginSession analyticsControllerSession, AnalyticsService analyticsService, float intervalInMs)
         {
             analyticsControllerEventScheduler = new ClientAnalyticsEventScheduler(analyticsService);
+            analyticsControllerEventScheduler.SetInterval(intervalInMs);
             analyticsControllerEventScheduler.SetEventEnabled(true);
             System.Action<ResultCallback<TokenData>> onAutoLoginDelegate = (callback) =>
             {

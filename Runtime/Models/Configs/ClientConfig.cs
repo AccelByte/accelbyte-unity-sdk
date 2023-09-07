@@ -22,6 +22,7 @@ namespace AccelByte.Models
         private const bool defaultPresenceBroadcastEvent = true;
         private const int defaultPresenceBroadcastEvetntIntervalInSecond = 600;
         private const int defaultPresenceBroadcastEventGameState = 0;
+        private const int defaultClientAnalyticsEventIntervalInSecond = 10;
 
         [DataMember] public string Namespace = "";
         [DataMember] public bool UsePlayerPrefs = false;
@@ -72,6 +73,8 @@ namespace AccelByte.Models
         [DataMember] public int PresenceBroadcastEventInterval = defaultPresenceBroadcastEvetntIntervalInSecond;
         [DataMember] public int PresenceBroadcastEventGameState = defaultPresenceBroadcastEventGameState;
         [DataMember] public string PresenceBroadcastEventGameStateDescription = "";
+        [DataMember] public bool EnableClientAnalyticsEvent = false;
+        [DataMember] public float ClientAnalyticsEventInterval = defaultClientAnalyticsEventIntervalInSecond;
 
         /// <summary>
         ///  Copy member values

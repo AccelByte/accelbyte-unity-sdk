@@ -168,45 +168,53 @@ namespace AccelByte.Api
 
             try
             {
-                newSettings.OAuthConfig.CheckRequiredField();
                 newSettings.SDKConfig.CheckRequiredField();
-    
-                settings = newSettings;
-    
-                coroutineRunner = new CoroutineRunner();
-    
-                AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
-                AccelByteLogType logTypeEnum;
-                if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
-                {
-                    AccelByteDebug.SetFilterLogType(logTypeEnum);
-                }
-                else
-                {
-                    AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
-                }
-    
-                httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
-                gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
-    
-                HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
-                HttpRequestBuilder.SetGameClientVersion(Application.version);
-                HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
-                ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
-    
-                if (AccelByteSDK.Environment != null)
-                {
-                    AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
-                    AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
-                }
-    
-                initialized = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 AccelByteDebug.LogWarning(ex.Message);
             }
+
+            try
+            {
+                newSettings.OAuthConfig.CheckRequiredField();
+            }
+            catch (Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
+
+            settings = newSettings;
+
+            coroutineRunner = new CoroutineRunner();
+
+            AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
+            AccelByteLogType logTypeEnum;
+            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+            {
+                AccelByteDebug.SetFilterLogType(logTypeEnum);
+            }
+            else
+            {
+                AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
+            }
+
+            httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
+            gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
+            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+
+            HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
+            HttpRequestBuilder.SetGameClientVersion(Application.version);
+            HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
+            ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
+
+            if (AccelByteSDK.Environment != null)
+            {
+                AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
+                AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
+            }
+
+            initialized = true;
         }
 
         public static ServiceVersion GetServiceVersion()

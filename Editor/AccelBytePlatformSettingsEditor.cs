@@ -46,6 +46,7 @@ namespace AccelByte.Api
         private bool showServiceUrlConfigs;
         private bool showTURNconfigs;
         private bool showPresenceBroadcastEventConfig;
+        private bool showClientAnalyticsEventConfig;
         private GUIStyle requiredTextFieldGUIStyle;
         private bool initialized;
 
@@ -214,10 +215,12 @@ namespace AccelByte.Api
             if (EditorGUI.EndChangeCheck())
             {
                 var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-                var originalOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
 
                 editedSdkConfig = originalSdkConfig != null ? originalSdkConfig.ShallowCopy() : new Config();
-                editedClientOAuthConfig = originalOAuthConfig != null ? originalOAuthConfig.ShallowCopy() : new OAuthConfig();
+                editedClientOAuthConfig = originalClientOAuthConfig != null ? originalClientOAuthConfig.ShallowCopy() : new OAuthConfig();
+                editedAnalyticsOAuthConfig = originalAnalyticsOAuthConfig != null ? originalAnalyticsOAuthConfig.ShallowCopy() : new OAuthConfig();
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.EndHorizontal();
@@ -234,7 +237,17 @@ namespace AccelByte.Api
                     targetPlatform = platformList[temporaryPlatformSetting];
                 }
                 originalClientOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(targetPlatform);
+                try
+                {
+                    originalAnalyticsOAuthConfigs = analyticsSettings.LoadOAuthFile(targetPlatform, false);
+                }
+                catch (Exception)
+                {
+                    originalAnalyticsOAuthConfigs = null;
+                }
+
                 editedClientOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting) : new OAuthConfig();
+                editedAnalyticsOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting) : new OAuthConfig();
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.EndHorizontal();
@@ -367,6 +380,19 @@ namespace AccelByte.Api
                 CreateTextInput((newValue) => editedSdkConfig.PresenceBroadcastEventGameStateDescription = newValue, editedSdkConfig.PresenceBroadcastEventGameStateDescription, "Set Game State description");
             }
 
+            showClientAnalyticsEventConfig = EditorGUILayout.Foldout(showClientAnalyticsEventConfig, "Client Analytics Event Configs");
+            if (showClientAnalyticsEventConfig)
+            {
+                CreateToggleInput((newValue) => editedSdkConfig.EnableClientAnalyticsEvent = newValue, editedSdkConfig.EnableClientAnalyticsEvent, "Enable Client Analytics Event");
+                CreateNumberInput((newValue) => editedSdkConfig.ClientAnalyticsEventInterval = newValue, editedSdkConfig.ClientAnalyticsEventInterval, "Set Interval In Seconds");
+
+                const float minimalInterval = Core.ClientAnalyticsEventScheduler.ClientAnalyticsMiniumAllowedIntervalInlMs / 1000f;
+                if (editedSdkConfig.ClientAnalyticsEventInterval < minimalInterval)
+                {
+                    editedSdkConfig.ClientAnalyticsEventInterval = minimalInterval;
+                }
+            }
+
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space();
@@ -395,6 +421,23 @@ namespace AccelByte.Api
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(fieldLabel);
             var newValue = EditorGUILayout.DoubleField(defaultValue);
+            setter?.Invoke(newValue);
+
+            string requiredText = "";
+            if (required)
+            {
+                requiredText = "Required";
+            }
+            EditorGUILayout.LabelField(requiredText, requiredTextFieldGUIStyle);
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void CreateNumberInput(Action<float> setter, float defaultValue, string fieldLabel, bool required = false)
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(fieldLabel);
+            var newValue = EditorGUILayout.FloatField(defaultValue);
             setter?.Invoke(newValue);
 
             string requiredText = "";

@@ -69,6 +69,7 @@ namespace AccelByte.Core
         private static void StopSDK()
         {
             ClientAnaylticsBootstrap.Stop();
+            DetachGameUpdateSignaller();
             Main.Stop();
         }
 
@@ -107,6 +108,16 @@ namespace AccelByte.Core
             {
                 AccelByteDebug.LogWarning("AccelByte update signaller set to null.");
             }
+        }
+
+        public static void DetachGameUpdateSignaller()
+        {
+            if (gameThreadSignaller != null)
+            {
+                gameThreadSignaller.GameThreadSignal -= OnGameThreadUpdate;
+            }
+
+            gameThreadSignaller = null;
         }
 
         private static void CheckMainThreadSignallerAlive()

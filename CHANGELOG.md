@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.6.5](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.5%0D16.6.4) (2023-09-07)
+
+
+### Features
+
+* add client analytics interval config ([cf1988d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cf1988d27aba85beb659a9a7a2a8ac0ddf1b23fd))
+
+
+### Bug Fixes
+
+* reset sdk static object on game start ([737f2d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/737f2d7e2c916a4204f01dd90a30318c97c2960f))
+
 ### [16.6.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.4%0D16.6.3) (2023-09-06)
 
 

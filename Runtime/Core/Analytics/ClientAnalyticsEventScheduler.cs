@@ -8,6 +8,8 @@ namespace AccelByte.Core
 {
     public class ClientAnalyticsEventScheduler : AutoLoginAnalyticsEventScheduler
     {
+        public const int ClientAnalyticsMiniumAllowedIntervalInlMs = 1 * 1000;
+
         internal const string ClientAnalyticMainEventNamespace = "io.accelbyte.intelligence.analyticscontrollerevents";
 
         private string defaultEventNamespace = ClientAnalyticMainEventNamespace;
@@ -18,6 +20,14 @@ namespace AccelByte.Core
             {
                 const int defaultIntervalMs = 1 * 60 * 1000;
                 return defaultIntervalMs;
+            }
+        }
+
+        protected override int defaultMinimumEventIntervalInlMs
+        {
+            get
+            {
+                return ClientAnalyticsMiniumAllowedIntervalInlMs;
             }
         }
 

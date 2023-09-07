@@ -113,7 +113,7 @@ namespace AccelByte.Server
         internal static void Initialize(ServerConfig inConfig, OAuthConfig inOAuthConfig)
         {
             ResetApis();
-            
+
             var activeEnvironment = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
 
             AccelByteSettingsV2 newSettings;
@@ -129,36 +129,44 @@ namespace AccelByte.Server
 
             try
             {
-                newSettings.OAuthConfig.CheckRequiredField();
                 newSettings.ServerSdkConfig.CheckRequiredField();
-
-                settings = newSettings;
-
-                HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
-                HttpRequestBuilder.SetGameClientVersion(Application.version);
-                HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
-
-                coroutineRunner = new CoroutineRunner();
-                var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
-                var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
-                newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
-                httpClient = newHttpClient;
-
-                session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
-                server = CreateDedicatedServerClient(session, coroutineRunner);
-
-                if (AccelByteSDK.Environment != null)
-                {
-                    AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
-                    AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
-                }
-
-                initialized = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 AccelByteDebug.LogWarning(ex.Message);
             }
+
+            try
+            {
+                newSettings.OAuthConfig.CheckRequiredField();
+            }
+            catch (Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
+
+            settings = newSettings;
+
+            HttpRequestBuilder.SetNamespace(settings.ServerSdkConfig.Namespace);
+            HttpRequestBuilder.SetGameClientVersion(Application.version);
+            HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
+
+            coroutineRunner = new CoroutineRunner();
+            var newHttpClient = new AccelByteHttpClient(DefaultHttpSender);
+            var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(newSettings.ServerSdkConfig.MaximumCacheSize);
+            newHttpClient.SetCacheImplementation(cacheImplementation, newSettings.ServerSdkConfig.MaximumCacheLifeTime);
+            httpClient = newHttpClient;
+
+            session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
+            server = CreateDedicatedServerClient(session, coroutineRunner);
+
+            if (AccelByteSDK.Environment != null)
+            {
+                AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
+                AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
+            }
+
+            initialized = true;
         }
 
         public static ServiceVersion GetServiceVersion()

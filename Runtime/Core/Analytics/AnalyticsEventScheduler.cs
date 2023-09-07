@@ -11,6 +11,8 @@ namespace AccelByte.Core
 {
     public abstract class AnalyticsEventScheduler : IDisposable
     {
+        public const int MiniumAllowedIntervalInlMs = 5 * 1000;
+
         protected IAccelByteAnalyticsWrapper analyticsWrapper = null;
         protected AccelByteHeartBeat maintainer;
 
@@ -21,8 +23,14 @@ namespace AccelByte.Core
         {
             get;
         }
-        
-        protected const int miniumAllowedIntervalInlMs = 5 * 1000;
+
+        protected virtual int defaultMinimumEventIntervalInlMs
+        {
+            get
+            {
+                return MiniumAllowedIntervalInlMs;
+            }
+        }
 
         protected ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue =
             new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
@@ -100,15 +108,20 @@ namespace AccelByte.Core
 
         internal void SetInterval(int eventIntervalInlMs)
         {
-            if (eventIntervalInlMs < miniumAllowedIntervalInlMs)
+            if (eventIntervalInlMs < defaultMinimumEventIntervalInlMs)
             {
-                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {miniumAllowedIntervalInlMs} ms");
-                this.eventIntervalInlMs = miniumAllowedIntervalInlMs;
+                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInlMs} ms");
+                this.eventIntervalInlMs = defaultMinimumEventIntervalInlMs;
             }
             else
             {
                 this.eventIntervalInlMs = eventIntervalInlMs;
             }
+        }
+
+        public void SetInterval(float newIntervalInS)
+        {
+            SetInterval(UnityEngine.Mathf.RoundToInt(Utils.TimeUtils.SecondsToMilliseconds(newIntervalInS)));
         }
 
         internal void SetEventEnabled(bool enabled, int intervalInMs = 0)

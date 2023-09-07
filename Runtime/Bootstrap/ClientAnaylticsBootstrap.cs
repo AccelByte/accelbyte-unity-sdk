@@ -11,6 +11,7 @@ namespace AccelByte.Core
         internal static void Execute()
         {
             analyticsController = new ClientAnalyticsService();
+            analyticsController.Initialize();
             AccelByteSDK.ClientAnalytics = analyticsController;
 
             analyticsController.StartAcceptEvent();
