@@ -4,6 +4,7 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -16,12 +17,12 @@ namespace AccelByte.Api
         ISession session = null;
         
         private PresenceBroadcastEventPayload presenceBroadcastPayloadModel = null;
-        private PresenceBroadcastEventGatherer gatherer;
+        private PresenceBroadcastEventGatherer gatherer = null;
         private ResultCallback onPresenceBroadcastEventResponse = null;
-        private int presenceBroadcastIntervalInlMs = Utils.TimeUtils.SecondsToMilliseconds(defaultPresenceBroadcastIntervalInlMs);
         private bool keepValidating = true;
-
         private const int defaultPresenceBroadcastIntervalInlMs = 10 * 60 * 1000;
+        
+        internal PresenceEventRuntimeConfig Config = null;
 
         public PresenceBroadcastEventController(PresenceBroadcastEvent pbeWrapper)
         {
@@ -29,14 +30,34 @@ namespace AccelByte.Api
             this.session = pbeWrapper.GetSession();
             ValidateLoginSession();
 
-            gatherer = new PresenceBroadcastEventGatherer(pbeWrapper.GetConfig());
+            if (pbeWrapper.GetConfig().PresenceBroadcastEventInterval <= 0)
+            {
+                pbeWrapper.GetConfig().PresenceBroadcastEventInterval = (int)Utils.TimeUtils.MillisecondsToSeconds(defaultPresenceBroadcastIntervalInlMs);
+            }
+
+            Config = new PresenceEventRuntimeConfig(
+                (PresenceBroadcastEventGameState)pbeWrapper.GetConfig().PresenceBroadcastEventGameState, 
+                pbeWrapper.GetConfig().EnablePresenceBroadcastEvent,
+                Utils.TimeUtils.SecondsToMilliseconds(pbeWrapper.GetConfig().PresenceBroadcastEventInterval),
+                pbeWrapper.GetConfig().PresenceBroadcastEventGameStateDescription);
+
+            gatherer = new PresenceBroadcastEventGatherer();
         }
 
         public int PresenceBroadcastEventIntervalMs
         {
             get
             {
-                return presenceBroadcastIntervalInlMs;
+                bool success = int.TryParse(Config.IntervalInMs.ToString(), out int result);
+                if (success)
+                {
+                    return result;
+                }
+                else
+                {
+                    AccelByteDebug.LogError("Failed to parse PresenceBroadcastEvent interval");
+                    return defaultPresenceBroadcastIntervalInlMs;
+                }
             }
         }
 
@@ -61,7 +82,16 @@ namespace AccelByte.Api
 #endif
             if (intervalInMs == 0)
             {
-                intervalInMs = presenceBroadcastIntervalInlMs;
+                bool success = int.TryParse(Config.IntervalInMs.ToString(), out int result);
+                if (success)
+                {
+                    intervalInMs = result;
+                }
+                else
+                {
+                    AccelByteDebug.LogError("Failed to parse PresenceBroadcastEvent interval");
+                    intervalInMs = defaultPresenceBroadcastIntervalInlMs;
+                }
             }
 
             if (enablePbe)
@@ -113,14 +143,19 @@ namespace AccelByte.Api
             }
         }
 
-        public void SetPresenceBroadcastEventInterval(int newIntervalMs)
+        public void SetPresenceBroadcastEventInterval(int newIntervalInMs)
         {
             if (maintainer != null)
             {
                 AccelByteDebug.LogWarning("Presence Broadcast Event is still running, please stop it before changing the interval");
                 return;
             }
-            presenceBroadcastIntervalInlMs = newIntervalMs;
+            Config.IntervalInMs = newIntervalInMs;
+        }
+
+        public void SetPresenceBroadcastEventInterval(float newIntervalInS)
+        {
+            SetPresenceBroadcastEventInterval(UnityEngine.Mathf.RoundToInt(newIntervalInS) * 1000);
         }
 
         private void StartPresenceBroadcastEventScheduler(int intervalMs)
@@ -209,18 +244,23 @@ namespace AccelByte.Api
             return gatherer.RemoveAdditionalData(key);
         }
 
-        private void ProvidePBEPayloadData()
+        public void Dispose()
         {
-            presenceBroadcastPayloadModel = new PresenceBroadcastEventPayload
-            {
-                FlightId = PresenceBroadcastEventGatherer.GetFlightID(),
-                GameState = gatherer.GetGameState(),
-                GameContext = gatherer.GetGameContext(),
-                PlatformInfo = gatherer.GetPlatformName(),
-                AdditionalData = gatherer.GetAdditionalData()
-            };
+            StopPresenceBroadcastEventScheduler();
+            keepValidating = false;
         }
 
+        public void SetGameState(PresenceBroadcastEventGameState gameState)
+        {
+            Config.GameState = gameState;
+        }
+
+        public void SetGameStateDescription(string gameStateDescription)
+        {
+            Config.GameStateDescription = gameStateDescription;
+        }
+
+        #region Data Preparation
         internal TelemetryBody PrepareData()
         {
             ProvidePBEPayloadData();
@@ -235,10 +275,32 @@ namespace AccelByte.Api
             return body;
         }
 
-        public void Dispose()
+        private void ProvidePBEPayloadData()
         {
-            StopPresenceBroadcastEventScheduler();
-            keepValidating = false;
+            presenceBroadcastPayloadModel = new PresenceBroadcastEventPayload
+            {
+                FlightId = PresenceBroadcastEventGatherer.GetFlightID(),
+                GameState = GetGameState(),
+                GameContext = GetGameContext(),
+                PlatformInfo = gatherer.GetPlatformName(),
+                AdditionalData = gatherer.GetAdditionalData()
+            };
         }
+
+        #endregion
+
+        #region Data Gathering
+        private string GetGameState()
+        {
+            var rawState = Config.GameState;
+            return Utils.JsonUtils.SerializeWithStringEnum(rawState);
+        }
+
+        private string GetGameContext()
+        {
+            return Config.GameStateDescription;
+        }
+
+        #endregion
     }
 }

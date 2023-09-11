@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.7.0%0D16.6.5) (2023-09-11)
+
+
+### Features
+
+* [JSC-1311] add game core and access model ([68664ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/68664ef191c3f61c24d87128761ee1cdad3c207e))
+* [JSC-1311] add ITelemetryEvent interface and constructor ([0416392](https://github.com/AccelByte/accelbyte-unity-sdk/commits/04163927d7ab4670c35c48ea12a86cb8611c1ae3))
+* [JSC-1311] add play and social models ([28f9e4d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28f9e4d1b474a5209739af6a810076b14c3b73aa))
+* [JSC-1311] add predefined event and config ([a90e33e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a90e33e5214a6030b66344e9e7d928ab0f281ea7))
+* [JSC-1311] add storage and monetization ([4f3e1c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4f3e1c5ec2c574e2778d7578918debcc73d00f4d))
+* [JSC-1557] add presence broadcast event runtime config ([31c44c6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/31c44c666e89a6b7c7954a1cdeef435bcf4a60ca))
+* add auto send login telemetry ([a3868c6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3868c6c45b5bb100b001ff41d1950bab99031b8))
+* add server-side predefined event analytics ([e98b49d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e98b49d14fb3d20f8140156a925631e17312ca07))
+* Added version copy flow on engine initialization ([f6484e0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f6484e0f278c4ca3ab8294073b41a8c3b6b8a678))
+* apply sdk initialize and game launch event ([6778f18](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6778f188073b76871527e19ce371893da8e781cd))
+* **MPv2:** add API for session storage and lobby notification for storage changed ([d38bd24](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d38bd2461e93e66421609772e9a8a26c1f268ffd))
+* Refactored debug and default log classes to allow for scalable abstraction, multiple logger types running simultaneously ([ef1d8ec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ef1d8ecbc5fd2e351906a04452c4c16920145f49))
+* toggleable auto generate service url on saving configuration ([28bc9c1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28bc9c18840e351536b979ee0f2649ba8c738621))
+
+
+### Bug Fixes
+
+* add additional info in login method ([13adf0c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13adf0c8f6edbad409cc1f5a817d605e74b55483))
+* Added default logger to logging callbacks ([173ac35](https://github.com/AccelByte/accelbyte-unity-sdk/commits/173ac355dee2c0ba0b679d4da10b7ea38460a29f))
+* change presence broadcast event interval unit ([4c1e057](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4c1e0579105126f663f4c04da66dfa4c4c43e21f))
+* fix accelbyte plugin error ([86698a1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/86698a1d9774a325106bcc0470bec2433304833c))
+* fix enable and disable config ([e81b2d0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e81b2d0ab6893d0025780d2bfc6cd6662843ae1e))
+* fix presence broadcast event enabled logic ([f6a80b7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f6a80b7c20351ebd2c583a96d92cc94608dc080b))
+* **Statistic:** Adjust newest flow to expose which statistic is being updated ([64cb3c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/64cb3c41f6adab39a28baa539ef41ca8afeb1bc7))
+
+
+### Refactors
+
+* add accelbyte telemetry event layer ([7350304](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73503040e218edcab33459b830d66ac1cf559bc7))
+* add analytics api and wrapper ([47b066b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/47b066b55f2c4343a8acd71f16f32d8d9dc303a0))
+* create new analytic event base ([bf79265](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bf79265095be59a0f3b03b47b91803a8ef36cfb1))
+* implement user login event ([24fe95a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/24fe95a22e3ffb884d27a856fa7057743aac9d9a))
+* move and modify predefined event controller ([6de6ace](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6de6ace552dba95fb2ca26b44a163f8ede693c2e))
+* refactor client after adding analytics wrapper and api ([6be910f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6be910fc16c4ef45360b50946d68c88057c61818))
+* refactor game state event ([2cd53cc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cd53cccaac9ec7850930cbbbbc9b5bbb662e2bd))
+* refactor server after adding analytics wrapper and api ([79651e5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/79651e5fc05681456ad26ba2c942b138c133f2a3))
+* rename predefine event controller into predefine event scheduler ([56f65bd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/56f65bdc17ee026c877ac66572d1845e41115c9a))
+
 ### [16.6.5](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.5%0D16.6.4) (2023-09-07)
 
 

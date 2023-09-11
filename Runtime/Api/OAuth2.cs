@@ -632,7 +632,7 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name);
         Assert.IsNotNull(code, "Code parameter is null.");
 
-        var request = HttpRequestBuilder.CreatePost(BaseUrl + "v3/oauth/token")
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)

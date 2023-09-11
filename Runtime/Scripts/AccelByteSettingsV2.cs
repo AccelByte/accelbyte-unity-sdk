@@ -564,7 +564,7 @@ namespace AccelByte.Api
             }
 
             multiOAuthConfigs.Expand();
-            multiConfigs.Expand();
+            multiConfigs.Expand(false);
 
             oAuthConfig = multiOAuthConfigs.GetConfigFromEnvironment(environment);
             if (isServer)

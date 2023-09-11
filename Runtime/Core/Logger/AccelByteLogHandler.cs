@@ -9,22 +9,12 @@ namespace AccelByte.Core
 {
     internal class AccelByteLogHandler : AccelByteILogger
     {
-        public void InvokeException(Exception exception)
-        {
-            Debug.LogException(exception);
-        }
-
-        public void InvokeException(Exception exception, UnityEngine.Object context)
+        public void InvokeException(Exception exception, UnityEngine.Object context=null)
         {
             Debug.LogException(exception, context);
         }
 
-        public void InvokeLog(AccelByteLogType logType, object message)
-        {
-            PrintLog(logType, message, null);
-        }
-
-        public void InvokeLog(AccelByteLogType logType, object message, UnityEngine.Object context)
+        public void InvokeLog(AccelByteLogType logType, object message, UnityEngine.Object context=null)
         {
             PrintLog(logType, message, context);
         }

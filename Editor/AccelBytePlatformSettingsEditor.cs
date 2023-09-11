@@ -46,9 +46,11 @@ namespace AccelByte.Api
         private bool showServiceUrlConfigs;
         private bool showTURNconfigs;
         private bool showPresenceBroadcastEventConfig;
+        private bool showPreDefinedEventConfig;
         private bool showClientAnalyticsEventConfig;
         private GUIStyle requiredTextFieldGUIStyle;
         private bool initialized;
+        private bool generateServiceUrl = true;
 
         [MenuItem("AccelByte/Edit Settings")]
         public static void Edit()
@@ -318,23 +320,24 @@ namespace AccelByte.Api
             showServiceUrlConfigs = EditorGUILayout.Foldout(showServiceUrlConfigs, "Service Url Configs");
             if(showServiceUrlConfigs)
             {
-                CreateTextInput((newValue) => editedSdkConfig.IamServerUrl = newValue, editedSdkConfig.IamServerUrl, "IAM Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.PlatformServerUrl = newValue, editedSdkConfig.PlatformServerUrl, "Platform Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.BasicServerUrl = newValue, editedSdkConfig.BasicServerUrl, "Basic Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.LobbyServerUrl = newValue, editedSdkConfig.LobbyServerUrl, "Lobby Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.CloudStorageServerUrl = newValue, editedSdkConfig.CloudStorageServerUrl, "Cloud Storage Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.GameProfileServerUrl = newValue, editedSdkConfig.GameProfileServerUrl, "Game Profile Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.StatisticServerUrl = newValue, editedSdkConfig.StatisticServerUrl, "Statistic Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.AchievementServerUrl = newValue, editedSdkConfig.AchievementServerUrl, "Achievement Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.CloudSaveServerUrl = newValue, editedSdkConfig.CloudSaveServerUrl, "CloudSave Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.AgreementServerUrl = newValue, editedSdkConfig.AgreementServerUrl, "Agreement Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.LeaderboardServerUrl = newValue, editedSdkConfig.LeaderboardServerUrl, "Leaderboard Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.GameTelemetryServerUrl = newValue, editedSdkConfig.GameTelemetryServerUrl, "Game Telemetry Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.GroupServerUrl = newValue, editedSdkConfig.GroupServerUrl, "Group Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.SeasonPassServerUrl = newValue, editedSdkConfig.SeasonPassServerUrl, "Season Pass Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.SessionBrowserServerUrl = newValue, editedSdkConfig.SessionBrowserServerUrl, "Session BrowserServer Url");
-                CreateTextInput((newValue) => editedSdkConfig.SessionServerUrl = newValue, editedSdkConfig.SessionServerUrl, "Session Server Url");
-                CreateTextInput((newValue) => editedSdkConfig.MatchmakingV2ServerUrl = newValue, editedSdkConfig.MatchmakingV2ServerUrl, "MatchmakingV2 Server Url");
+                CreateToggleInput((newValue) => generateServiceUrl = newValue, generateServiceUrl, "Auto Generate Service Url");
+                CreateTextInput((newValue) => editedSdkConfig.IamServerUrl = newValue, editedSdkConfig.IamServerUrl, "IAM Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.PlatformServerUrl = newValue, editedSdkConfig.PlatformServerUrl, "Platform Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.BasicServerUrl = newValue, editedSdkConfig.BasicServerUrl, "Basic Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.LobbyServerUrl = newValue, editedSdkConfig.LobbyServerUrl, "Lobby Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.CloudStorageServerUrl = newValue, editedSdkConfig.CloudStorageServerUrl, "Cloud Storage Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.GameProfileServerUrl = newValue, editedSdkConfig.GameProfileServerUrl, "Game Profile Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.StatisticServerUrl = newValue, editedSdkConfig.StatisticServerUrl, "Statistic Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.AchievementServerUrl = newValue, editedSdkConfig.AchievementServerUrl, "Achievement Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.CloudSaveServerUrl = newValue, editedSdkConfig.CloudSaveServerUrl, "CloudSave Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.AgreementServerUrl = newValue, editedSdkConfig.AgreementServerUrl, "Agreement Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.LeaderboardServerUrl = newValue, editedSdkConfig.LeaderboardServerUrl, "Leaderboard Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.GameTelemetryServerUrl = newValue, editedSdkConfig.GameTelemetryServerUrl, "Game Telemetry Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.GroupServerUrl = newValue, editedSdkConfig.GroupServerUrl, "Group Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.SeasonPassServerUrl = newValue, editedSdkConfig.SeasonPassServerUrl, "Season Pass Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.SessionBrowserServerUrl = newValue, editedSdkConfig.SessionBrowserServerUrl, "Session BrowserServer Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.SessionServerUrl = newValue, editedSdkConfig.SessionServerUrl, "Session Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.MatchmakingV2ServerUrl = newValue, editedSdkConfig.MatchmakingV2ServerUrl, "MatchmakingV2 Server Url", false, generateServiceUrl);
             }
 
             showTURNconfigs = EditorGUILayout.Foldout(showTURNconfigs, "TURN Configs");
@@ -380,6 +383,12 @@ namespace AccelByte.Api
                 CreateTextInput((newValue) => editedSdkConfig.PresenceBroadcastEventGameStateDescription = newValue, editedSdkConfig.PresenceBroadcastEventGameStateDescription, "Set Game State description");
             }
 
+            showPreDefinedEventConfig = EditorGUILayout.Foldout(showPreDefinedEventConfig, "Pre-Defined Event Configs");
+            if (showPreDefinedEventConfig)
+            {
+                CreateToggleInput((newValue) => editedSdkConfig.EnablePreDefinedEvent = newValue, editedSdkConfig.EnablePreDefinedEvent, "Enable Pre-Defined Game Event");
+            }
+            
             showClientAnalyticsEventConfig = EditorGUILayout.Foldout(showClientAnalyticsEventConfig, "Client Analytics Event Configs");
             if (showClientAnalyticsEventConfig)
             {
@@ -401,7 +410,7 @@ namespace AccelByte.Api
             {
                 editedClientOAuthConfig.Expand();
                 editedSdkConfig.SanitizeBaseUrl();
-                editedSdkConfig.Expand();
+                editedSdkConfig.Expand(generateServiceUrl);
 
                 originalClientOAuthConfigs = AccelByteSettingsV2.SetOAuthByEnvironment(originalClientOAuthConfigs, editedClientOAuthConfig, (SettingsEnvironment) temporaryEnvironmentSetting);
                 originalSdkConfigs = AccelByteSettingsV2.SetSDKConfigByEnvironment(originalSdkConfigs, editedSdkConfig, (SettingsEnvironment)temporaryEnvironmentSetting);
@@ -450,19 +459,28 @@ namespace AccelByte.Api
             EditorGUILayout.EndHorizontal();
         }
 
-        private void CreateTextInput(Action<string> setter, string defaultValue, string fieldLabel, bool required = false)
+        private void CreateTextInput(Action<string> setter, string defaultValue, string fieldLabel, bool required = false, bool @readonly = false)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(fieldLabel);
-            var newValue = EditorGUILayout.TextField(defaultValue);
-            setter?.Invoke(newValue);
 
-            string requiredText = "";
-            if(required && string.IsNullOrEmpty(newValue))
+            if (!@readonly)
             {
-                requiredText = "Required";
+                var newValue = EditorGUILayout.TextField(defaultValue);
+                setter?.Invoke(newValue);
+
+                string requiredText = "";
+                if (required && string.IsNullOrEmpty(newValue))
+                {
+                    requiredText = "Required";
+                }
+                EditorGUILayout.LabelField(requiredText, requiredTextFieldGUIStyle);
             }
-            EditorGUILayout.LabelField(requiredText, requiredTextFieldGUIStyle);
+            else
+            {
+                EditorGUILayout.LabelField(defaultValue);
+                EditorGUILayout.LabelField(string.Empty, requiredTextFieldGUIStyle);
+            }
 
             EditorGUILayout.EndHorizontal();
         }

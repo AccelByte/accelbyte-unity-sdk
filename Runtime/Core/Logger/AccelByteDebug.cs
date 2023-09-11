@@ -2,9 +2,10 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
-using UnityEngine;
 using AccelByte.Api;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace AccelByte.Core
@@ -12,10 +13,16 @@ namespace AccelByte.Core
     public static class AccelByteDebug
     {
         private static Lazy<AccelByteILogger> logger = new Lazy<AccelByteILogger>(() => DefaultLogger);
+
+        private static List<AccelByteILogger> loggers = new List<AccelByteILogger>();
         
         private static AccelByteLogType currentSeverity;
 
         private static readonly AccelByteILogger defaultLogger = new AccelByteLogHandler();
+
+        private static Action<AccelByteLogType, object, Object> onLog;
+
+        private static Action<Exception, Object> onException;
 
         internal static AccelByteILogger DefaultLogger
         {
@@ -31,6 +38,8 @@ namespace AccelByte.Core
         {
             SetEnableLogging(true);
             SetFilterLogType(AccelByteLogType.Verbose);
+
+            AddLogger(logger.Value);
         }
 
         public static void SetEnableLogging(bool enable)
@@ -38,22 +47,73 @@ namespace AccelByte.Core
             logEnabled = enable;
         }
 
-        internal static void SetLogger(AccelByteILogger newLogger)
+        internal static void SetLogger(AccelByteILogger newLogger=null)
         {
             if(newLogger != null)
             {
-                logger = new Lazy<AccelByteILogger>(() => newLogger);
-                SetFilterLogType(currentSeverity);
+                SetLoggers(new AccelByteILogger[] { newLogger });
             }
             else
             {
-                logger = null;
+                ClearLoggers();
             }
         }
 
-        internal static AccelByteILogger GetLogger()
+        internal static void SetLoggers(AccelByteILogger[] newLoggers)
         {
-            return logger.Value;
+            ClearLoggers();
+
+            AddLoggers(newLoggers);
+
+            SetFilterLogType(currentSeverity);
+        }
+
+        private static void ClearLoggers()
+        {
+            onLog = null;
+            onException = null;
+            loggers.Clear();
+        }
+
+        internal static void AddLogger(AccelByteILogger newLogger)
+        {
+            AddLoggers(new AccelByteILogger[] { newLogger });
+        }
+
+        internal static void AddLoggers(AccelByteILogger[] newLoggers)
+        {
+            foreach (var logger in newLoggers)
+            {
+                if (!loggers.Contains(logger))
+                {
+                    onLog += logger.InvokeLog;
+                    onException += logger.InvokeException;
+                    loggers.Add(logger);
+                }
+            }
+        }
+
+        internal static void RemoveLogger(AccelByteILogger loggerToRemove)
+        {
+            RemoveLoggers(new AccelByteILogger[] { loggerToRemove });
+        }
+
+        internal static void RemoveLoggers(AccelByteILogger[] loggersToRemove)
+        {
+            foreach (var logger in loggersToRemove)
+            {
+                if (loggers.Contains(logger))
+                {
+                    onLog -= logger.InvokeLog;
+                    onException -= logger.InvokeException;
+                    loggers.Remove(logger);
+                }
+            }
+        }
+
+        internal static AccelByteILogger[] GetLoggers()
+        {
+            return loggers.ToArray();
         }
 
         public static void SetFilterLogType(LogType type)
@@ -111,22 +171,13 @@ namespace AccelByte.Core
             InvokeLog(AccelByteLogType.Error, message, context);
         }
 
-        public static void LogException(Exception exception)
+        public static void LogException(Exception exception, Object context=null)
         {
-            if (logger == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception) || !logEnabled)
+            if (onException == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception) || !logEnabled)
             {
                 return;
             }
-            logger.Value.InvokeException(exception);
-        }
-
-        public static void LogException(Exception exception, Object context)
-        {
-            if (logger == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception) || !logEnabled)
-            {
-                return;
-            }
-            logger.Value.InvokeException(exception, context);
+            onException?.Invoke(exception, context);
         }
 
         private static object AppendMessageTrailInfo(object message, AccelByteLogType severity)
@@ -146,22 +197,13 @@ namespace AccelByte.Core
             return logSeverity <= activeSeverity;
         }
 
-        private static void InvokeLog(AccelByteLogType logType, object message)
+        private static void InvokeLog(AccelByteLogType logType, object message, Object context=null)
         {
-            if (logger == null || !FilterLogSeverity(currentSeverity, logType) || !logEnabled)
+            if (onLog == null || !FilterLogSeverity(currentSeverity, logType) || !logEnabled)
             {
                 return;
             }
-            logger.Value.InvokeLog(logType, message);
-        }
-
-        private static void InvokeLog(AccelByteLogType logType, object message, Object context)
-        {
-            if (logger == null || !FilterLogSeverity(currentSeverity, logType) || !logEnabled)
-            {
-                return;
-            }
-            logger.Value.InvokeLog(logType, message, context);
+            onLog?.Invoke(logType, message, context);
         }
     }
 }

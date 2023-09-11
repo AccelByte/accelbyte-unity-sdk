@@ -13,6 +13,7 @@ namespace AccelByte.Models {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
         private const int defaultAMSHeartbeatInterval = 15;
+        private const bool defaultPredefinedEvent = false;
         [DataMember] public string Namespace;
         [DataMember] public string BaseUrl;
         [DataMember] public string IamServerUrl;
@@ -34,6 +35,7 @@ namespace AccelByte.Models {
         [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
+        [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
 
 
         /// <summary>
@@ -47,37 +49,37 @@ namespace AccelByte.Models {
         /// <summary>
         ///  Assign missing config values.
         /// </summary>
-        public void Expand()
+        public void Expand(bool forceExpandServiceApiUrl = false)
         {
             if (this.BaseUrl == null) return;
             
-            this.IamServerUrl = this.GetDefaultServerApiUrl(this.IamServerUrl, "/iam");
+            this.IamServerUrl = this.ExpanServiceApiUrl(this.IamServerUrl, "/iam", forceExpandServiceApiUrl);
 
-            this.DSHubServerUrl = this.GetDefaultServerApiUrl(this.DSHubServerUrl, "/dshub");
+            this.DSHubServerUrl = this.ExpanServiceApiUrl(this.DSHubServerUrl, "/dshub", forceExpandServiceApiUrl);
             
-            this.DSMControllerServerUrl = this.GetDefaultServerApiUrl(this.DSMControllerServerUrl, "/dsmcontroller");
+            this.DSMControllerServerUrl = this.ExpanServiceApiUrl(this.DSMControllerServerUrl, "/dsmcontroller", forceExpandServiceApiUrl);
 
-            this.PlatformServerUrl = this.GetDefaultServerApiUrl(this.PlatformServerUrl, "/platform");
+            this.PlatformServerUrl = this.ExpanServiceApiUrl(this.PlatformServerUrl, "/platform", forceExpandServiceApiUrl);
 
-            this.StatisticServerUrl = this.GetDefaultServerApiUrl(this.StatisticServerUrl, "/social");
+            this.StatisticServerUrl = this.ExpanServiceApiUrl(this.StatisticServerUrl, "/social", forceExpandServiceApiUrl);
 
-            this.QosManagerServerUrl = this.GetDefaultServerApiUrl(this.QosManagerServerUrl, "/qosm");
+            this.QosManagerServerUrl = this.ExpanServiceApiUrl(this.QosManagerServerUrl, "/qosm", forceExpandServiceApiUrl);
 
-            this.GameTelemetryServerUrl = this.GetDefaultServerApiUrl(this.GameTelemetryServerUrl, "/game-telemetry");
+            this.GameTelemetryServerUrl = this.ExpanServiceApiUrl(this.GameTelemetryServerUrl, "/game-telemetry", forceExpandServiceApiUrl);
 
-            this.AchievementServerUrl = this.GetDefaultServerApiUrl(this.AchievementServerUrl, "/achievement");
+            this.AchievementServerUrl = this.ExpanServiceApiUrl(this.AchievementServerUrl, "/achievement", forceExpandServiceApiUrl);
 
-            this.LobbyServerUrl = this.GetDefaultServerApiUrl(this.LobbyServerUrl, "/lobby");
+            this.LobbyServerUrl = this.ExpanServiceApiUrl(this.LobbyServerUrl, "/lobby", forceExpandServiceApiUrl);
             
-            this.SessionServerUrl = this.GetDefaultServerApiUrl(this.SessionServerUrl, "/session");
+            this.SessionServerUrl = this.ExpanServiceApiUrl(this.SessionServerUrl, "/session", forceExpandServiceApiUrl);
 
-            this.CloudSaveServerUrl = this.GetDefaultServerApiUrl(this.CloudSaveServerUrl, "/cloudsave");
+            this.CloudSaveServerUrl = this.ExpanServiceApiUrl(this.CloudSaveServerUrl, "/cloudsave", forceExpandServiceApiUrl);
 
-            this.MatchmakingServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingServerUrl, "/matchmaking");
+            this.MatchmakingServerUrl = this.ExpanServiceApiUrl(this.MatchmakingServerUrl, "/matchmaking", forceExpandServiceApiUrl);
             
-            this.MatchmakingV2ServerUrl = this.GetDefaultServerApiUrl(this.MatchmakingV2ServerUrl, "/match2");
+            this.MatchmakingV2ServerUrl = this.ExpanServiceApiUrl(this.MatchmakingV2ServerUrl, "/match2", forceExpandServiceApiUrl);
 
-            this.SeasonPassServerUrl = this.GetDefaultServerApiUrl(this.SeasonPassServerUrl, "/seasonpass");
+            this.SeasonPassServerUrl = this.ExpanServiceApiUrl(this.SeasonPassServerUrl, "/seasonpass", forceExpandServiceApiUrl);
 
             if (MaximumCacheSize <= 0)
             {
@@ -158,9 +160,9 @@ namespace AccelByte.Models {
         /// <param name="specificServerUrl">The specific URL, if empty will be replaced by baseUrl+defaultUrl.</param>
         /// <param name="defaultServerUrl">The default URL, will be used if specific URL is empty.</param>
         /// <returns></returns>
-        private string GetDefaultServerApiUrl(string specificServerUrl, string defaultServerUrl)
+        private string ExpanServiceApiUrl(string specificServerUrl, string defaultServerUrl, bool forceExpand)
         {
-            if (string.IsNullOrEmpty(specificServerUrl))
+            if (string.IsNullOrEmpty(specificServerUrl) || forceExpand)
             {
                 return string.Format("{0}{1}", BaseUrl, defaultServerUrl);
             }
@@ -191,28 +193,28 @@ namespace AccelByte.Models {
         [DataMember] public ServerConfig Production;
         [DataMember] public ServerConfig Default;
 
-        public void Expand()
+        public void Expand(bool forceExpandServiceApiUrl = false)
         {
             if (Development == null)
             {
                 Development = new ServerConfig();
             }
-            Development.Expand();
+            Development.Expand(forceExpandServiceApiUrl);
             if (Certification == null)
             {
                 Certification = new ServerConfig();
             }
-            Certification.Expand();
+            Certification.Expand(forceExpandServiceApiUrl);
             if (Production == null)
             {
                 Production = new ServerConfig();
             }
-            Production.Expand();
+            Production.Expand(forceExpandServiceApiUrl);
             if (Default == null)
             {
                 Default = new ServerConfig();
             }
-            Default.Expand();
+            Default.Expand(forceExpandServiceApiUrl);
         }
 
         IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)

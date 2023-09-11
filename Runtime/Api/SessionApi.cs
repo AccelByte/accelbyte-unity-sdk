@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json.Linq;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -798,6 +799,91 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParse();
+
+            callback.Try(result);
+        }
+
+        #endregion
+
+        #region SessionStorage
+
+        public IEnumerator UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePatch(BaseUrl + "/v1/public/namespaces/{namespace}/sessions/{sessionId}/storage/leader")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(data.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<JObject>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateMemberStorage(string userId, string sessionId, JObject data, ResultCallback<JObject> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePatch(BaseUrl + "/v1/public/namespaces/{namespace}/sessions/{sessionId}/storage/users/{userId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(data.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<JObject>();
 
             callback.Try(result);
         }

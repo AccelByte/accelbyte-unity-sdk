@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using UnityEngine.Scripting;
 
 namespace AccelByte.Models
@@ -162,6 +163,9 @@ namespace AccelByte.Models
         OnMatchFound,
         OnMatchmakingStarted,
         OnMatchmakingTicketExpired,
+
+        // SessionV2Storage
+        OnSessionStorageChanged,
     }
     
     [DataContract, Preserve]
@@ -867,6 +871,20 @@ namespace AccelByte.Models
     {
         [DataMember] public string destinationId;
         [DataMember] public string message;
+    }
+
+    #endregion
+
+    #region SessionStorage
+
+    [DataContract, Preserve]
+    public class SessionStorageChangedNotification
+    {
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "sessionID")] public string SessionID;
+        [DataMember(Name = "actorUserID")] public string ActorUserID;
+        [DataMember(Name = "isLeader")] public bool IsLeader;
+        [DataMember(Name = "storageChanges")] public JObject StorageChanges;
     }
 
     #endregion

@@ -41,11 +41,14 @@ namespace AccelByte.Server
         private static ServerUserAccount userAccount;
         private static ServerSeasonPass seasonPass;
         private static ServiceVersion serviceVersion;
+        private static ServerAnalyticsService serverAnalyticsService;
 
         private static bool initialized = false;
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
+
+        private static PredefinedEventScheduler predefinedEventScheduler = null;
 
         internal static OAuthConfig OAuthConfig
         {
@@ -159,6 +162,11 @@ namespace AccelByte.Server
 
             session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
             server = CreateDedicatedServerClient(session, coroutineRunner);
+
+            serverAnalyticsService = CreateServerAnalyticsService(settings.ServerSdkConfig, httpClient, coroutineRunner, server.Session);
+            predefinedEventScheduler = new PredefinedEventScheduler(serverAnalyticsService);
+            predefinedEventScheduler.SetEventEnabled(settings.ServerSdkConfig.EnablePreDefinedEvent);
+            PredefinedGameStateCommand.GlobalGameStateCommand.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             if (AccelByteSDK.Environment != null)
             {
@@ -669,7 +677,29 @@ namespace AccelByte.Server
                 session,
                 coroutineRunner));
         }
-        
+
+        public static ServerAnalyticsService GetServerAnalyticsService()
+        {
+            CheckPlugin();
+            return serverAnalyticsService;
+        }
+
+        private static ServerAnalyticsService CreateServerAnalyticsService(ServerConfig newSdkConfig,
+            IHttpClient httpClient,
+            CoroutineRunner coroutineRunner,
+            ISession IamSession)
+        {
+            serverAnalyticsService = new ServerAnalyticsService(
+            new ServerAnalyticsApi(
+                httpClient,
+                newSdkConfig,
+                IamSession),
+            IamSession,
+            coroutineRunner);
+
+            return serverAnalyticsService;
+        }
+
         #region Environment
         [Obsolete("Use AccelByteSDK.Environment.Set() to update environment target")]
         public static void SetEnvironment(SettingsEnvironment newEnvironment)
@@ -739,6 +769,14 @@ namespace AccelByte.Server
             seasonPass = null;
             configReset = null;
             environmentChanged = null;
+            serverAnalyticsService = null;
+
+            if (predefinedEventScheduler != null)
+            {
+                predefinedEventScheduler.SetEventEnabled(false);
+                predefinedEventScheduler.Dispose();
+                predefinedEventScheduler = null;
+            }
         }
 
         public static void ClearEnvironmentChangedEvent()

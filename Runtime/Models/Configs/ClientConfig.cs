@@ -22,6 +22,7 @@ namespace AccelByte.Models
         private const bool defaultPresenceBroadcastEvent = true;
         private const int defaultPresenceBroadcastEvetntIntervalInSecond = 600;
         private const int defaultPresenceBroadcastEventGameState = 0;
+        private const bool defaultPredefinedEvent = false;
         private const int defaultClientAnalyticsEventIntervalInSecond = 10;
 
         [DataMember] public string Namespace = "";
@@ -73,6 +74,7 @@ namespace AccelByte.Models
         [DataMember] public int PresenceBroadcastEventInterval = defaultPresenceBroadcastEvetntIntervalInSecond;
         [DataMember] public int PresenceBroadcastEventGameState = defaultPresenceBroadcastEventGameState;
         [DataMember] public string PresenceBroadcastEventGameStateDescription = "";
+        [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
         [DataMember] public bool EnableClientAnalyticsEvent = false;
         [DataMember] public float ClientAnalyticsEventInterval = defaultClientAnalyticsEventIntervalInSecond;
 
@@ -132,13 +134,14 @@ namespace AccelByte.Models
                    this.EnablePresenceBroadcastEvent == anotherConfig.EnablePresenceBroadcastEvent &&
                    this.PresenceBroadcastEventInterval == anotherConfig.PresenceBroadcastEventInterval &&
                    this.PresenceBroadcastEventGameState == anotherConfig.PresenceBroadcastEventGameState &&
-                   this.PresenceBroadcastEventGameStateDescription == anotherConfig.PresenceBroadcastEventGameStateDescription;
+                   this.PresenceBroadcastEventGameStateDescription == anotherConfig.PresenceBroadcastEventGameStateDescription &&
+                   this.EnablePreDefinedEvent == anotherConfig.EnablePreDefinedEvent;
         }
 
         /// <summary>
         ///  Assign missing config values.
         /// </summary>
-        public void Expand()
+        public void Expand(bool forceExpandServiceApiUrl = false)
         {
             if(Namespace == null)
             {
@@ -301,59 +304,59 @@ namespace AccelByte.Models
 
                 string wssBaseUrl = "wss://" + baseUrl;
 
-                this.IamServerUrl = GetDefaultApiUrl(this.IamServerUrl, "/iam");
+                this.IamServerUrl = ExpandServiceApiUrl(this.IamServerUrl, "/iam", forceExpandServiceApiUrl);
 
-                this.PlatformServerUrl = GetDefaultApiUrl(this.PlatformServerUrl, "/platform");
+                this.PlatformServerUrl = ExpandServiceApiUrl(this.PlatformServerUrl, "/platform", forceExpandServiceApiUrl);
 
-                this.BasicServerUrl = GetDefaultApiUrl(this.BasicServerUrl, "/basic");
+                this.BasicServerUrl = ExpandServiceApiUrl(this.BasicServerUrl, "/basic", forceExpandServiceApiUrl);
 
-                if (string.IsNullOrEmpty(this.LobbyServerUrl))
+                if (string.IsNullOrEmpty(this.LobbyServerUrl) || forceExpandServiceApiUrl)
                 {
                     this.LobbyServerUrl = wssBaseUrl + "/lobby/";
                 }
 
-                this.CloudStorageServerUrl = GetDefaultApiUrl(this.CloudStorageServerUrl, "/social");
+                this.CloudStorageServerUrl = ExpandServiceApiUrl(this.CloudStorageServerUrl, "/social", forceExpandServiceApiUrl);
 
-                this.GameProfileServerUrl = GetDefaultApiUrl(this.GameProfileServerUrl, "/social");
+                this.GameProfileServerUrl = ExpandServiceApiUrl(this.GameProfileServerUrl, "/social", forceExpandServiceApiUrl);
 
-                this.StatisticServerUrl = GetDefaultApiUrl(this.StatisticServerUrl, "/social");
+                this.StatisticServerUrl = ExpandServiceApiUrl(this.StatisticServerUrl, "/social", forceExpandServiceApiUrl);
 
-                this.QosManagerServerUrl = GetDefaultApiUrl(this.QosManagerServerUrl, "/qosm");
+                this.QosManagerServerUrl = ExpandServiceApiUrl(this.QosManagerServerUrl, "/qosm", forceExpandServiceApiUrl);
 
-                this.AgreementServerUrl = GetDefaultApiUrl(this.AgreementServerUrl, "/agreement");
+                this.AgreementServerUrl = ExpandServiceApiUrl(this.AgreementServerUrl, "/agreement", forceExpandServiceApiUrl);
 
-                this.LeaderboardServerUrl = GetDefaultApiUrl(this.LeaderboardServerUrl, "/leaderboard");
+                this.LeaderboardServerUrl = ExpandServiceApiUrl(this.LeaderboardServerUrl, "/leaderboard", forceExpandServiceApiUrl);
 
-                this.CloudSaveServerUrl = GetDefaultApiUrl(this.CloudSaveServerUrl, "/cloudsave");
+                this.CloudSaveServerUrl = ExpandServiceApiUrl(this.CloudSaveServerUrl, "/cloudsave", forceExpandServiceApiUrl);
 
-                this.GameTelemetryServerUrl = GetDefaultApiUrl(this.GameTelemetryServerUrl, "/game-telemetry");
+                this.GameTelemetryServerUrl = ExpandServiceApiUrl(this.GameTelemetryServerUrl, "/game-telemetry", forceExpandServiceApiUrl);
 
-                this.AchievementServerUrl = GetDefaultApiUrl(this.AchievementServerUrl, "/achievement");
+                this.AchievementServerUrl = ExpandServiceApiUrl(this.AchievementServerUrl, "/achievement", forceExpandServiceApiUrl);
 
-                this.GroupServerUrl = GetDefaultApiUrl(this.GroupServerUrl, "/group");
+                this.GroupServerUrl = ExpandServiceApiUrl(this.GroupServerUrl, "/group", forceExpandServiceApiUrl);
 
-                this.UGCServerUrl = GetDefaultApiUrl(this.UGCServerUrl, "/ugc");
+                this.UGCServerUrl = ExpandServiceApiUrl(this.UGCServerUrl, "/ugc", forceExpandServiceApiUrl);
 
-                this.ReportingServerUrl = GetDefaultApiUrl(this.ReportingServerUrl, "/reporting");
+                this.ReportingServerUrl = ExpandServiceApiUrl(this.ReportingServerUrl, "/reporting", forceExpandServiceApiUrl);
 
-                this.SeasonPassServerUrl = GetDefaultApiUrl(this.SeasonPassServerUrl, "/seasonpass");
+                this.SeasonPassServerUrl = ExpandServiceApiUrl(this.SeasonPassServerUrl, "/seasonpass", forceExpandServiceApiUrl);
 
-                this.SessionBrowserServerUrl = GetDefaultApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser");
+                this.SessionBrowserServerUrl = ExpandServiceApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser", forceExpandServiceApiUrl);
 
-                this.SessionServerUrl = GetDefaultApiUrl(this.SessionServerUrl, "/session");
+                this.SessionServerUrl = ExpandServiceApiUrl(this.SessionServerUrl, "/session", forceExpandServiceApiUrl);
 
-                this.MatchmakingV2ServerUrl = GetDefaultApiUrl(this.MatchmakingV2ServerUrl, "/match2");
+                this.MatchmakingV2ServerUrl = ExpandServiceApiUrl(this.MatchmakingV2ServerUrl, "/match2", forceExpandServiceApiUrl);
 
-                this.TurnManagerServerUrl = GetDefaultApiUrl(this.TurnManagerServerUrl, "/turnmanager");
+                this.TurnManagerServerUrl = ExpandServiceApiUrl(this.TurnManagerServerUrl, "/turnmanager", forceExpandServiceApiUrl);
 
-                this.ChatServerUrl = GetDefaultApiUrl(this.ChatServerUrl, "/chat");
+                this.ChatServerUrl = ExpandServiceApiUrl(this.ChatServerUrl, "/chat", forceExpandServiceApiUrl);
 
-                if (string.IsNullOrEmpty(this.ChatServerWsUrl))
+                if (string.IsNullOrEmpty(this.ChatServerWsUrl) || forceExpandServiceApiUrl)
                 {
                     this.ChatServerWsUrl = wssBaseUrl + "/chat";
                 }
 
-                this.GdprServerUrl = GetDefaultApiUrl(this.GdprServerUrl, "/gdpr");
+                this.GdprServerUrl = ExpandServiceApiUrl(this.GdprServerUrl, "/gdpr", forceExpandServiceApiUrl);
             }
         }
 
@@ -457,9 +460,9 @@ namespace AccelByte.Models
         /// <param name="specificServerUrl">The specific URL, if empty will be replaced by baseUrl+defaultUrl.</param>
         /// <param name="defaultServerUrl">The default URL, will be used if specific URL is empty.</param>
         /// <returns></returns>
-        private string GetDefaultApiUrl(string specificServerUrl, string defaultServerUrl)
+        private string ExpandServiceApiUrl(string specificServerUrl, string defaultServerUrl, bool forceExpand)
         {
-            if(string.IsNullOrEmpty(specificServerUrl))
+            if(string.IsNullOrEmpty(specificServerUrl) || forceExpand)
             {
                 return $"{this.BaseUrl}{defaultServerUrl}";
             }
@@ -490,32 +493,32 @@ namespace AccelByte.Models
         [DataMember] public Config Production;
         [DataMember] public Config Default;
 
-        public void Expand()
+        public void Expand(bool forceExpandServiceUrl = false)
         {
             if(Development == null)
             {
                 Development = new Config();
             }
             Development.SanitizeBaseUrl();
-            Development.Expand();
+            Development.Expand(forceExpandServiceUrl);
             if (Certification == null)
             {
                 Certification = new Config();
             }
             Certification.SanitizeBaseUrl();
-            Certification.Expand();
+            Certification.Expand(forceExpandServiceUrl);
             if (Production == null)
             {
                 Production = new Config();
             }
             Production.SanitizeBaseUrl();
-            Production.Expand();
+            Production.Expand(forceExpandServiceUrl);
             if (Default == null)
             {
                 Default = new Config();
             }
             Default.SanitizeBaseUrl();
-            Default.Expand();
+            Default.Expand(forceExpandServiceUrl);
         }
 
         IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)

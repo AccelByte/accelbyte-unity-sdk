@@ -16,7 +16,7 @@ namespace AccelByte.Server
     public class ServerAMS
     {
         internal const int DefaulHeatbeatSeconds = 15;
-        internal const string CommandLineAMSWatchdogUrlId = "-watchdog_url";
+        internal const string CommandLineAMSWatchdogUrlId = "-watchdogUrl";
         internal const string CommandLineAMSHeartbeatId = "-heartbeat";
 
         #region Events

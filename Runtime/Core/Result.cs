@@ -197,6 +197,10 @@ namespace AccelByte.Core
         SessionInvitationExpired = 20047,
         SessionUserInParty = 20048,
         SessionVersionMismatch = 20071,
+        SessionStorageNonLeaderUpdateLeaderData = 31001,
+        SessionStorageMemberNotInSession = 30052,
+        SessionUserTokenAndLeaderIdNotMatch = 30054,
+        SessionStorageUserNotActiveInSession = 30055,
 
         #endregion
         

@@ -25,6 +25,13 @@ namespace AccelByte.Core
         protected Coroutine maintainAccessTokenCoroutine { get; set; }
         protected DateTime nextRefreshTime { get; set; }
         public abstract string AuthorizationToken { get; set; }
+        public virtual string UserId
+        {
+            get
+            {
+                return null;
+            }
+        }
         bool twoFAEnable { get; set; } = false; //Set false for DSSession
 
         // To be set by OAuth and allow UserSession call the Refresh API call

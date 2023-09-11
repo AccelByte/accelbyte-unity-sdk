@@ -10,15 +10,8 @@ namespace AccelByte.Api
     public class PresenceBroadcastEventGatherer
     {
         internal const string EventName = "enhanced_presence";
-
         private Dictionary<string, object> presenceBroadcastEventAdditionalData = new Dictionary<string, object>();
         private static string flightId = string.Empty;
-        private Config config;
-
-        internal PresenceBroadcastEventGatherer(Config config)
-        {
-            this.config = config;
-        }
 
         internal static string GenerateFlightID()
         {
@@ -33,17 +26,6 @@ namespace AccelByte.Api
             }
 
             return flightId;
-        }
-
-        internal string GetGameState()
-        {
-            var rawState = (PresenceBroadcastEventGameState)config.PresenceBroadcastEventGameState;
-            return Utils.JsonUtils.SerializeWithStringEnum(rawState);
-        }
-
-        internal string GetGameContext()
-        {
-            return this.config.PresenceBroadcastEventGameStateDescription;
         }
 
         internal string GetPlatformName()
@@ -63,7 +45,7 @@ namespace AccelByte.Api
             }
         }
 
-        internal bool RemoveAdditionalData(string key) 
+        internal bool RemoveAdditionalData(string key)
         {
             bool successfullyRemoved = presenceBroadcastEventAdditionalData.Remove(key);
             return successfullyRemoved;
@@ -73,5 +55,7 @@ namespace AccelByte.Api
         {
             return presenceBroadcastEventAdditionalData;
         }
+
     }
+
 }

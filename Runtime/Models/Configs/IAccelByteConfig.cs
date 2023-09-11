@@ -7,12 +7,12 @@ namespace AccelByte.Models
     internal interface IAccelByteConfig
     {
         public void SanitizeBaseUrl();
-        public void Expand();
+        public void Expand(bool forceExpandServiceUrl);
     }
 
     internal interface IAccelByteMultiConfigs
     {
-        public void Expand();
+        public void Expand(bool forceExpandServiceUrl);
 
         internal IAccelByteConfig GetConfigFromEnvironment(SettingsEnvironment targetEnvironment);
     }

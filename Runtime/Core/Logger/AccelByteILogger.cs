@@ -8,9 +8,7 @@ namespace AccelByte.Core
 {
     public interface AccelByteILogger
     {
-        public void InvokeLog(AccelByteLogType logType, object message);
-        public void InvokeLog(AccelByteLogType logType, object message, UnityEngine.Object context);
-        public void InvokeException(Exception exception);
-        public void InvokeException(Exception exception, UnityEngine.Object context);
+        public void InvokeLog(AccelByteLogType logType, object message, UnityEngine.Object context=null);
+        public void InvokeException(Exception exception, UnityEngine.Object context=null);
     }
 }

@@ -2,8 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
-using System.Collections.Generic;
+using AccelByte.Api;
 using UnityEngine;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSteam")]
@@ -68,6 +67,7 @@ namespace AccelByte.Core
 
         private static void StopSDK()
         {
+            PredefinedEventBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
             DetachGameUpdateSignaller();
             Main.Stop();
@@ -75,6 +75,7 @@ namespace AccelByte.Core
 
         private static void ExecuteBootstraps()
         {
+            PredefinedEventBootstrap.Execute();
             EnvrionmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();
         }

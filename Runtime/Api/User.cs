@@ -48,6 +48,7 @@ namespace AccelByte.Api
         }
 
         private UserData userDataCache;
+        private PredefinedEventScheduler predefinedEventScheduler;
 
         public bool TwoFAEnable { get; private set; } = false;
 
@@ -123,6 +124,15 @@ namespace AccelByte.Api
                 PlatformLoginCache = null;
             }
 #endif
+        }
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventController">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
+        {
+            this.predefinedEventScheduler = predefinedEventController;
         }
 
         /// <summary>
@@ -212,9 +222,12 @@ namespace AccelByte.Api
                 callback.TryOk();
             });
         }
-        
-        private void Login(System.Action<ResultCallback<TokenData, OAuthError>> loginMethod
-            , ResultCallback<TokenData, OAuthError> callback )
+
+        private void Login(
+            System.Action<ResultCallback<TokenData, OAuthError>> loginMethod
+            , ResultCallback<TokenData, OAuthError> callback
+            , LoginAdditionalInfo additionalInfo = null
+        )
         {
             if (userSession.IsValid())
             { 
@@ -232,10 +245,27 @@ namespace AccelByte.Api
             {
                 if (loginResult.IsError)
                 {
+                    if (predefinedEventScheduler != null)
+                    {
+                        string platformId = additionalInfo != null ? additionalInfo.PlatformId : null;
+                        var loginPayload = new PredefinedLoginFailedPayload(api.Config.Namespace, platformId);
+                        var loginEvent = new AccelByteTelemetryEvent(loginPayload);
+                        predefinedEventScheduler.SendEvent(loginEvent, null);
+                    }
                     callback.TryError(loginResult.Error);
                     return;
                 }
-                else if (PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
+                else
+                {
+                    if (predefinedEventScheduler != null && loginResult.Value != null)
+                    {
+                        var loginPayload = new PredefinedLoginSucceededPayload(loginResult.Value.Namespace, loginResult.Value.user_id, loginResult.Value.platform_id, loginResult.Value.platform_user_id, loginResult.Value.DeviceId);
+                        var loginEvent = new AccelByteTelemetryEvent(loginPayload);
+                        predefinedEventScheduler.SendEvent(loginEvent, null);
+                    }
+                }
+                
+                if (!loginResult.IsError && PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
                 {
                     RefreshTokenCache newRefreshTokenCache = new RefreshTokenCache();
                     newRefreshTokenCache.RefreshToken = loginResult.Value.refresh_token;
@@ -335,8 +365,16 @@ namespace AccelByte.Api
             , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
-            Login(cb => oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless)
-                , callback);
+            LoginAdditionalInfo additionalInfo = new LoginAdditionalInfo();
+            additionalInfo.PlatformId = platformType.ToString().ToLower();
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless);
+                }
+                , callback
+                , additionalInfo
+            );
         }
 
         public void ReloginWithOtherPlatform(PlatformType platformType
@@ -435,8 +473,17 @@ namespace AccelByte.Api
             , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
-            Login(cb => oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless)
-            , callback);
+            LoginAdditionalInfo additionalInfo = new LoginAdditionalInfo();
+            additionalInfo.PlatformId = platformId;
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless);
+                }
+                , callback
+                , additionalInfo
+            );
+
         }
 
         /// <summary>

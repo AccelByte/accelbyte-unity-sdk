@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json.Linq;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -747,6 +748,56 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 sessionApi.RevokeGameSessionCode(sessionId, callback));
+        }
+
+        #endregion
+
+        #region SessionStorage
+
+        /// <summary>
+        /// Update leader's session storage data, can only be updated by current session leader.
+        /// This will overwrite leader storage data, if updating also provide latest leader storage.
+        /// To clear current leader storage data update with empty JObject.
+        /// </summary>
+        /// <param name="sessionId">The game or party session id.</param>
+        /// <param name="data">Data to update leader storage.</param>
+        /// <param name="callback">Callback will be called when completed.</param>
+        public void UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.UpdateLeaderStorage(sessionId, data, callback));
+        }
+
+        /// <summary>
+        /// Update current user's session member storage data.
+        /// This will overwrite this user's storage data, if updating also provide latest user's storage.
+        /// To clear current user's storage data update with empty jsonObject.
+        /// </summary>
+        /// <param name="sessionId">The game or party session id.</param>
+        /// <param name="data">Data to update leader storage.</param>
+        /// <param name="callback">Callback will be called when completed.</param>
+        public void UpdateMemberStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.UpdateMemberStorage(session.UserId, sessionId, data, callback));
         }
 
         #endregion

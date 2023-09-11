@@ -152,6 +152,7 @@ namespace AccelByte.Models
         [DataMember] public object details;
         [DataMember] public string statCode;
         [DataMember] public bool success;
+        [DataMember] public string UserId;
     }
 
     [DataContract, Preserve]
@@ -231,6 +232,7 @@ namespace AccelByte.Models
         [DataMember] public bool success;
         [DataMember] public string statCode;
         [DataMember] public object details;
+        [DataMember] public string UserId;
     }
 
     public class UserStatItem

@@ -812,6 +812,12 @@ namespace AccelByte.Models
         }
     }
 
+    [Preserve]
+    internal class LoginAdditionalInfo
+    {
+        internal string PlatformId;
+    }
+
     public static class MaximumUserIds
     {
         /** Attributes that limit the user ids allowed to proceed with the request */

@@ -53,16 +53,18 @@ namespace AccelByte.Api
 
         public override string AuthorizationToken
         {
-            get => tokenData?.access_token; 
+            get => tokenData?.access_token;
             set => tokenData.access_token = value;
         }
 
         public string refreshToken => tokenData.refresh_token;
-        
+
         public int refreshExpiresIn => tokenData.refresh_expires_in;
 
-        public string UserId => tokenData?.user_id;
-
+        public override string UserId
+        {
+            get => tokenData?.user_id;
+        }
         public bool IsComply => tokenData?.is_comply ?? false;
         
         public RefreshTokenData localTokenData;

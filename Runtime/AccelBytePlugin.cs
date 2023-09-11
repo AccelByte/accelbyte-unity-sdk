@@ -66,6 +66,7 @@ namespace AccelByte.Api
         private static StoreDisplay storeDisplay;
         private static PresenceBroadcastEvent presenceBroadcastEvent;
         private static PresenceBroadcastEventController presenceBroadcastEventController;
+        private static AnalyticsService analyticsService;
         private static Gdpr gdpr;
         #endregion /Modules with ApiBase
 
@@ -73,6 +74,8 @@ namespace AccelByte.Api
         internal static event Action configReset;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
+
+        private static PredefinedEventScheduler predefinedEventScheduler;
 
         internal static OAuthConfig OAuthConfig
         {
@@ -138,7 +141,15 @@ namespace AccelByte.Api
             if (presenceBroadcastEventController != null)
             {
                 presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
+                presenceBroadcastEventController.Dispose();
                 presenceBroadcastEventController = null;
+            }
+
+            if (predefinedEventScheduler != null)
+            {
+                predefinedEventScheduler.SetEventEnabled(false);
+                predefinedEventScheduler.Dispose();
+                predefinedEventScheduler = null;
             }
         }
 
@@ -202,11 +213,16 @@ namespace AccelByte.Api
             httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
             gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
             user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+            
+            analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, user.Session);
+            predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
+            predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
 
             HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
             HttpRequestBuilder.SetGameClientVersion(Application.version);
             HttpRequestBuilder.SetSdkVersion(AccelByteSettingsV2.AccelByteSDKVersion);
             ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
+            PredefinedGameStateCommand.GlobalGameStateCommand.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             if (AccelByteSDK.Environment != null)
             {
@@ -332,6 +348,8 @@ namespace AccelByte.Api
                     userSession),
                 userSession,
                 taskRunner);
+
+            newUser.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             return newUser;
         }
@@ -1228,21 +1246,36 @@ namespace AccelByte.Api
                     bool presenceBroadcastEventJobEnabled = false;
                     if (presenceBroadcastEventController != null)
                     {
-                        presenceBroadcastEventJobEnabled = presenceBroadcastEventController.IsPresenceBroadcastEventJobEnabled;
                         presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
                     }
 
                     presenceBroadcastEventController = null;
                     presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
 
-                    if (presenceBroadcastEventJobEnabled)
-                    {
-                        presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(true);
-                    }
+                    presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(Config.EnablePresenceBroadcastEvent);
                 };
             }
 
             return presenceBroadcastEventController;
+        }
+
+        public static AnalyticsService GetAnalyticService()
+        {
+            CheckPlugin();
+            return analyticsService;
+        }
+
+        private static AnalyticsService CreateAnalytics(Config newSdkConfig, IHttpClient httpClient, CoroutineRunner coroutineRunner, UserSession userSession)
+        {
+            analyticsService = new AnalyticsService(
+            new AnalyticsApi(
+                httpClient,
+                newSdkConfig,
+                userSession),
+            userSession,
+            coroutineRunner);
+
+            return analyticsService;
         }
 
         public static HeartBeat GetHeartBeat()
@@ -1364,6 +1397,12 @@ namespace AccelByte.Api
             {
                 UpdateEnvironment(newEnvironment);
             }
+        }
+
+        [Obsolete("Use AccelByteSDK.Environment.Current to get current environment target")]
+        public static SettingsEnvironment GetEnvironment()
+        {
+            return AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
         }
 
         private static void UpdateEnvironment(SettingsEnvironment newEnvironment)

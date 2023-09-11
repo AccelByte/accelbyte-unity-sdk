@@ -85,6 +85,7 @@ namespace AccelByte.Core
         /// <item><term>Miscellaneous</term></item>
         /// <item><term>Reward</term></item> 
         /// <item><term>PresenceBroadcastEvent</term></item> 
+        /// <item><term>PredefinedAnalyticsEvent</term></item> 
         /// </list>
         /// 
         /// <typeparam name="TWrapper">WrapperBase child - eg, "Group"</typeparam>
@@ -176,6 +177,7 @@ namespace AccelByte.Core
         public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
         public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
+        public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, AnalyticsApi>(); }
 #endregion
 
 

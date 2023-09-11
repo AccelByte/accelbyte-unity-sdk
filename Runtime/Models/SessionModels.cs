@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using UnityEngine.Scripting;
 
 namespace AccelByte.Models
@@ -108,6 +109,39 @@ namespace AccelByte.Models
         [DataMember] public string sentAt;
     }
 
+    #region SessionStorage
+
+    [DataContract, Preserve]
+    public class SessionV2Storage
+    {
+        [DataMember(Name = "leader")] public JObject Leader;
+        [DataMember(Name = "member")] public Dictionary<string, JObject> Member;
+    }
+
+    #endregion
+
+    #region SessionV2Base
+
+    [DataContract, Preserve]
+    public class SessionV2Base
+    {
+        [DataMember(Name = "id")] public string ID;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "isActive")] public bool IsActive;
+        [DataMember(Name = "attributes")] public JObject Attributes;
+        [DataMember(Name = "members")] public SessionV2MemberData[] Members;
+        [DataMember(Name = "createdBy")] public string CreatedBy;
+        [DataMember(Name = "leaderId")] public string LeaderId;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+        [DataMember(Name = "configuration")] public SessionV2PublicConfiguration Configuration;
+        [DataMember(Name = "version")] public int Version;
+        [DataMember(Name = "sessionType")] public SessionV2Joinability SessionType;
+        [DataMember(Name = "storage")] public SessionV2Storage Storage;
+    }
+
+    #endregion
+
     #region PartySession
 
     [DataContract, Preserve]
@@ -135,6 +169,7 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public DateTime updatedAt;
         [DataMember] public int version;
+        [DataMember(Name = "storage")] public SessionV2Storage Storage;
     }
 
     [DataContract, Preserve]
@@ -294,6 +329,7 @@ namespace AccelByte.Models
         [DataMember] public string[] ticketIds;
         [DataMember] public DateTime updatedAt;
         [DataMember] public int version;
+        [DataMember(Name = "storage")] public SessionV2Storage Storage;
     }
 
     [DataContract, Preserve]
