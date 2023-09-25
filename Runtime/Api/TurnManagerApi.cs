@@ -4,7 +4,6 @@
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -22,7 +21,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
 
             var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/public/turn")
+                .CreateGet(BaseUrl + "/turn")
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -45,10 +44,22 @@ namespace AccelByte.Api
             , ResultCallback<TurnServerCredential> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(region, "Can't Get Turn Server Credential! region parameter is null");
-            Assert.IsNotNull(ip, "Can't Get Turn Server Credential! ip parameter is null");
-            Assert.IsTrue(port > 0 && port < 65536,
-                "Can't Get Turn Server Credential! port is not within 1-65535");
+            if (string.IsNullOrEmpty(region))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "region parameter is null or empty!"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(ip))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "ip parameter is null or empty!"));
+                yield break;
+            }
+
+            if (port < 1 || port > 65535)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "port is not between 1-65535!"));
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/turn/secret/{region}/{ip}/{port}")
@@ -68,6 +79,60 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<TurnServerCredential>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator SendMetric(string turnServerRegion, P2PConnectionType connectionType
+            , ResultCallback callback)
+        {
+            if (Namespace_ == null)
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                yield break;
+            }
+            
+            if (AuthToken == null)
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                yield break;
+            }
+            
+            if (string.IsNullOrEmpty(turnServerRegion))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "region is null or empty!"));
+                yield break;
+            }
+            
+            if (connectionType == P2PConnectionType.None)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Connection type cannot be None"));
+                yield break;
+            }
+            
+            var data = new TurnServerMetricRequest()
+            {
+                Region = turnServerRegion,
+                Type = connectionType
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/metrics/namespaces/{namespace}/connected")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParse();
+
             callback.Try(result);
         }
     }

@@ -54,7 +54,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Get the closest TURN server
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">callback to trigger with operation result</param>
         public void GetClosestTurnServer(ResultCallback<TurnServer> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -87,6 +87,24 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(api.GetTurnServerCredential(region, ip, port, callback));
+        }
+
+        /// <summary>
+        /// Send connected metric
+        /// </summary>
+        /// <param name="turnServerRegion">Region of the selected turn server</param>
+        /// <param name="connectionType">P2P connection type</param>
+        /// /// <param name="callback">callback to trigger with operation result</param>
+        public void SendMetric(string turnServerRegion, P2PConnectionType connectionType, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.SendMetric(turnServerRegion, connectionType, callback));
         }
 
         private IEnumerator GetClosestTurnServerAsync(ResultCallback<TurnServer> callback)

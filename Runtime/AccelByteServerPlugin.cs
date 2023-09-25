@@ -162,7 +162,7 @@ namespace AccelByte.Server
 
             session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
             server = CreateDedicatedServerClient(session, coroutineRunner);
-
+            
             serverAnalyticsService = CreateServerAnalyticsService(settings.ServerSdkConfig, httpClient, coroutineRunner, server.Session);
             predefinedEventScheduler = new PredefinedEventScheduler(serverAnalyticsService);
             predefinedEventScheduler.SetEventEnabled(settings.ServerSdkConfig.EnablePreDefinedEvent);
@@ -744,6 +744,16 @@ namespace AccelByte.Server
                 session = CreateServerSessionClient(settings.ServerSdkConfig, settings.OAuthConfig, httpClient, coroutineRunner);
                 server = CreateDedicatedServerClient(session, coroutineRunner);
 
+                serverAnalyticsService = CreateServerAnalyticsService(settings.ServerSdkConfig, httpClient, coroutineRunner, server.Session);
+                if (predefinedEventScheduler != null)
+                {
+                    predefinedEventScheduler.SetEventEnabled(false);
+                    predefinedEventScheduler.Dispose();
+                }
+                predefinedEventScheduler = null;
+                predefinedEventScheduler = new PredefinedEventScheduler(serverAnalyticsService);
+                predefinedEventScheduler.SetEventEnabled(settings.ServerSdkConfig.EnablePreDefinedEvent);
+
                 configReset?.Invoke();
             }
             catch (Exception ex)
@@ -768,7 +778,6 @@ namespace AccelByte.Server
             cloudSave = null;
             seasonPass = null;
             configReset = null;
-            environmentChanged = null;
             serverAnalyticsService = null;
 
             if (predefinedEventScheduler != null)
@@ -782,7 +791,6 @@ namespace AccelByte.Server
         public static void ClearEnvironmentChangedEvent()
         {
             CheckPlugin();
-            environmentChanged = null;
         }
 
         private static void UpdateHttpClientSender(IHttpRequestSender newSender)

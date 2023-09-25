@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.8.0%0D16.7.0) (2023-09-25)
+
+
+### Features
+
+* add StatusV2 for session member and DS status ([6860469](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6860469f5600c8146e050ab0b388d7588429905e))
+* add turn manager send metric endpoint ([eedeb8e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eedeb8e593a258f3613ac792baa0081f99b3fbcc))
+* change client and server environment pointing into a same target ([5b2f67f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5b2f67f874bd6b22df414375a371dc1b7f8a67c8))
+* parity and add missing Oauth2Token params ([d9f9146](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9f9146ec2cab664f410dabcc3f83468ba14611d))
+
 ## [16.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.7.0%0D16.6.5) (2023-09-11)
 
 

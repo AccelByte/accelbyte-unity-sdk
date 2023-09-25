@@ -7,6 +7,16 @@ using UnityEngine.Scripting;
 namespace AccelByte.Models
 {
     [DataContract, Preserve]
+    public enum P2PConnectionType
+    {
+        [EnumMember(Value = "none")] None,
+        [EnumMember(Value = "host")] Host,
+        [EnumMember(Value = "srflx")] Srflx,
+        [EnumMember(Value = "prflx")] Prflx,
+        [EnumMember(Value = "relay")] Relay
+    }
+    
+    [DataContract, Preserve]
     public enum TurnServerStatus
     {
         [EnumMember(Value = "UNREACHABLE")] UNREACHABLE,
@@ -39,5 +49,12 @@ namespace AccelByte.Models
         [DataMember] public string region;
         [DataMember] public string username;
         [DataMember] public string password;
+    }
+
+    [DataContract, Preserve]
+    public class TurnServerMetricRequest
+    {
+        [DataMember(Name = "region")] public string Region;
+        [DataMember(Name = "type")] public P2PConnectionType Type;
     }
 }

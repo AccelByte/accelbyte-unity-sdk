@@ -44,11 +44,22 @@ namespace AccelByte.Models
     }
 
     #endregion enum
+    
+    [DataContract, Preserve]
+    public class TokenBans
+    {
+        [DataMember] public string Ban;
+        [DataMember] public DateTime DisabledDate;
+        [DataMember] public bool Enabled;
+        [DataMember] public DateTime EndDate;
+        [DataMember] public string TargetedNamespace;
+    }
 
     [DataContract, Preserve]
     public class TokenData
     {
         [DataMember] public string access_token;
+        [DataMember] public TokenBans[] Bans;
         [DataMember] public string auth_trust_id;
         [DataMember] public string refresh_token;
         [DataMember] public int refresh_expires_in;
@@ -57,9 +68,13 @@ namespace AccelByte.Models
         [DataMember] public string user_id;
         [DataMember] public string display_name;
         [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "namespace_roles")] public NamespaceRoles[] NamespaceRoles;
+        [DataMember] public Permission[] Permissions;
         [DataMember] public bool is_comply;
         [DataMember] public string platform_id;
         [DataMember] public string platform_user_id;
+        [DataMember] public string[] Roles;
+        [DataMember] public string Scope;
         [DataMember(Name = "device_id")] public string DeviceId;
     }
 

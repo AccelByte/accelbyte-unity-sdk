@@ -1441,6 +1441,16 @@ namespace AccelByte.Api
                 gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
                 user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
 
+                analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, user.Session);
+                if (predefinedEventScheduler != null)
+                {
+                    predefinedEventScheduler.SetEventEnabled(false);
+                    predefinedEventScheduler.Dispose();
+                }
+                predefinedEventScheduler = null;
+                predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
+                predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
+
                 HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
 
                 configReset?.Invoke();
@@ -1455,7 +1465,6 @@ namespace AccelByte.Api
         public static void ClearEnvironmentChangedEvent()
         {
             CheckPlugin();
-            environmentChanged = null;
         }
 
         public static StoreDisplay GetStoreDisplay()

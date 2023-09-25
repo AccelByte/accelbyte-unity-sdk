@@ -97,6 +97,7 @@ namespace AccelByte.Models
         [DataMember] public string platformId;
         [DataMember] public string platformUserId;
         [DataMember] public SessionV2MemberStatus status;
+        [DataMember(Name = "statusV2")] public SessionV2MemberStatus StatusV2;
         [DataMember] public DateTime updatedAt;
     }
     
@@ -271,6 +272,7 @@ namespace AccelByte.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SessionV2DsStatus
     {
+        EMPTY,
         NEED_TO_REQUEST,
         REQUESTED,
         AVAILABLE,
@@ -357,6 +359,7 @@ namespace AccelByte.Models
     {
         [DataMember] public SessionV2GameServer server;
         [DataMember] public SessionV2DsStatus status;
+        [DataMember(Name = "statusV2")] public SessionV2DsStatus StatusV2;
         
         [DataMember( EmitDefaultValue = false, Name = "requestedAt" )]
         [CanBeNull]
