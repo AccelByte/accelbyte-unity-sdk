@@ -60,6 +60,11 @@ namespace AccelByte.Server
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -95,11 +100,15 @@ namespace AccelByte.Server
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
-                
             }
 
             coroutineRunner.Run(
@@ -127,6 +136,11 @@ namespace AccelByte.Server
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -153,6 +167,11 @@ namespace AccelByte.Server
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -189,6 +208,11 @@ namespace AccelByte.Server
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -218,6 +242,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

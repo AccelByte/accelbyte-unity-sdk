@@ -100,9 +100,14 @@ namespace AccelByte.Core
         /// <exception cref="Exception"></exception>
         public HttpRequestBuilder WithPathParam(string key, string value)
         {
-            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(key))
             {
-                throw new Exception($"Path parameter with key={key} is null or empty.");
+                throw new Exception($"Path parameter key is null or empty.");
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new Exception($"The path value of key={key} is null or empty.");
             }
 
             this.urlBuilder.Replace("{" + key + "}", Uri.EscapeDataString(value));

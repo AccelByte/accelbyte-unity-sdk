@@ -127,6 +127,11 @@ namespace AccelByte.Api
         public event ResultCallback<SessionV2GameSessionUpdatedNotification> SessionV2GameSessionUpdated;
 
         /// <summary>
+        /// SessionV2 - Raised when a game session is ended by the DS.
+        /// </summary>
+        public event ResultCallback<SessionV2GameSessionEndedNotification> SessionV2GameSessionEnded;
+
+        /// <summary>
         /// SessionV2 - Raised when status of DS changed
         /// </summary>
         public event ResultCallback<SessionV2DsStatusUpdatedNotification> SessionV2DsStatusChanged;
@@ -1628,7 +1633,7 @@ namespace AccelByte.Api
                             out MultiplayerV2NotifType sessionV2NotificationType))
                     {
                         AccelByteDebug.LogWarning(
-                            $"Error {ErrorCode.ErrorFromException}: SessionV2 notification topic not recognized: {sessionNotification.topic}");
+                            $"SessionV2 notification topic not recognized: {sessionNotification.topic}");
                         return;
                     }
                     HandleMultiplayerV2Notification(message, sessionV2NotificationType);
@@ -1891,6 +1896,12 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<SessionV2GameSessionUpdatedNotification>(jsonString);
                     websocketApi.DispatchNotification(gameSession,
                         SessionV2GameSessionUpdated);
+                    break;
+                case MultiplayerV2NotifType.OnSessionEnded:
+                    var gameSessionEndedNotification =
+                        JsonConvert.DeserializeObject<SessionV2GameSessionEndedNotification>(jsonString);
+                    websocketApi.DispatchNotification(gameSessionEndedNotification,
+                        SessionV2GameSessionEnded);
                     break;
                 case MultiplayerV2NotifType.OnDSStatusChanged:
                     var dSStatusChangedNotification =

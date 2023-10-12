@@ -64,6 +64,31 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get an user profile  
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param> 
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void GetUserProfile(string userId
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserProfile(userId, callback));
+        }
+
+        /// <summary>
         /// Create (my) user profile / current logged in user.
         /// </summary>
         /// <param name="createRequest">User profile details to create user profile.</param>
@@ -84,6 +109,42 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Create an user profile 
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param>
+        /// <param name="language">Language allowed format: en, en-US.</param>
+        /// <param name="customAttributes">Custom attribues value to be included.</param>
+        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void CreateUserProfile(string userId
+            , string language
+            , Dictionary<string, object> customAttributes
+            , string timezone
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var newUserProfile = new CreateUserProfileRequest()
+            {
+                language = language,
+                customAttributes = customAttributes,
+                timeZone = timezone
+            };
+            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, callback));
+        }
+
+        /// <summary>
         /// Update some fields of (my) user profile / current logged in user. 
         /// </summary>
         /// <param name="updateRequest">User profile details to update user profile</param>
@@ -101,6 +162,45 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.UpdateUserProfile(updateRequest, callback));
+        }
+
+        /// <summary>
+        /// Update some fields of an user profile 
+        /// </summary>
+        /// <param name="userId">User Id value to create user profile.</param>
+        /// <param name="language">Language allowed format: en, en-US.</param>
+        /// <param name="customAttributes">Custom attribues value to be included.</param>
+        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
+        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
+        public void UpdateUserProfile(string userId
+            , string language
+            , string timezone
+            , Dictionary<string, object> customAttributes
+            , string zipCode
+            , ResultCallback<UserProfile> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var newRequest = new UpdateUserProfileRequest()
+            {
+                language = language,
+                timeZone = timezone,
+                customAttributes = customAttributes,
+                zipCode = zipCode
+            };
+
+            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, callback));
         }
 
         /// <summary>
@@ -152,6 +252,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -175,7 +280,7 @@ namespace AccelByte.Api
                 {
                     if (result.IsError)
                     {
-                        Debug.LogError(
+                        AccelByteDebug.LogError(
                             $"Unable to get Public User Profile Code:{result.Error.Code} Message:{result.Error.Message}");
                         callback.TryError(result.Error);
                     }
@@ -204,92 +309,6 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserProfilePublicInfoByPublicId(publicId, callback));
-        }
-
-
-        /// <summary>
-        /// Create an user profile 
-        /// </summary>
-        /// <param name="userId">User Id value to create user profile.</param>
-        /// <param name="language">Language allowed format: en, en-US.</param>
-        /// <param name="customAttributes">Custom attribues value to be included.</param>
-        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
-        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
-        public void CreateUserProfile(string userId
-            , string language
-            , Dictionary<string, object> customAttributes
-            , string timezone
-            , ResultCallback<UserProfile> callback)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            if (!session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            var newUserProfile = new CreateUserProfileRequest()
-            {
-                language = language,
-                customAttributes = customAttributes,
-                timeZone = timezone
-            };
-            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, callback));
-        }
-
-        /// <summary>
-        /// Update some fields of an user profile 
-        /// </summary>
-        /// <param name="userId">User Id value to create user profile.</param>
-        /// <param name="language">Language allowed format: en, en-US.</param>
-        /// <param name="customAttributes">Custom attribues value to be included.</param>
-        /// <param name="timezone">Timezone follows : IANA time zone, e.g. Asia/Shanghai.</param>
-        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
-        public void UpdateUserProfile(string userId
-            , string language
-            , string timezone
-            , Dictionary<string, object> customAttributes
-            , string zipCode
-            , ResultCallback<UserProfile> callback)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            if (!session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            var newRequest = new UpdateUserProfileRequest()
-            {
-                language = language,
-                timeZone = timezone,
-                customAttributes = customAttributes,
-                zipCode = zipCode
-            };
-
-            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, callback));
-        }
-
-        /// <summary>
-        /// Get an user profile  
-        /// </summary>
-        /// <param name="userId">User Id value to create user profile.</param> 
-        /// <param name="callback">Returns a Result that contains UserProfile via callback when completed</param>
-        public void GetUserProfile(string userId 
-            , ResultCallback<UserProfile> callback)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            if (!session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                api.GetUserProfile(userId, callback));
         }
 
         /// <summary>
@@ -327,6 +346,11 @@ namespace AccelByte.Api
             , UploadCategory category = UploadCategory.DEFAULT)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

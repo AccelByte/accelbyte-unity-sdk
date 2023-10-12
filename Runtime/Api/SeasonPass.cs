@@ -73,6 +73,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(seasonId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSeasonIdInvalidMessage(seasonId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);

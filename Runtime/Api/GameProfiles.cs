@@ -107,6 +107,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(profileId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetProfileIdInvalidMessage(profileId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -151,6 +157,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(profileId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetProfileIdInvalidMessage(profileId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -174,6 +186,12 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(profileId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetProfileIdInvalidMessage(profileId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -198,6 +216,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfileAttribute> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(profileId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetProfileIdInvalidMessage(profileId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -223,6 +247,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(profileId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetProfileIdInvalidMessage(profileId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);

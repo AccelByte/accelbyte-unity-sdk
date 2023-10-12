@@ -76,7 +76,7 @@ namespace AccelByte.Api
             Assert.IsNotNull(sessionId, "Can't update game session! sessionId parameter is null!");
             Assert.IsNotNull(updateRequest, "Can't update game session! updateRequest parameter is null!");
 
-            if (sessionId.Length == 0)
+            if (string.IsNullOrEmpty(sessionId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
                 yield break;
@@ -118,7 +118,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "Can't update game session! sessionId parameter is null!");
 
-            if (sessionId.Length == 0)
+            if (string.IsNullOrEmpty(sessionId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
                 yield break;
@@ -256,12 +256,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (sessionId.Length == 0)
+            if (string.IsNullOrEmpty(sessionId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
                 yield break;
             }
-            if (targetedUserId.Length == 0)
+            if (string.IsNullOrEmpty(targetedUserId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "targetedUserId can't be empty"));
                 yield break;
@@ -294,12 +294,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (sessionId.Length == 0)
+            if (string.IsNullOrEmpty(sessionId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
                 yield break;
             }
-            if (targetedUserId.Length == 0)
+            if (string.IsNullOrEmpty(targetedUserId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "targetedUserId can't be empty"));
                 yield break;
@@ -329,7 +329,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(targetedUserId, "Can't get recent player! targetedUserId parameter is null!");
 
-            if (targetedUserId.Length == 0)
+            if (string.IsNullOrEmpty(targetedUserId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "targetedUserId can't be empty"));
                 yield break;
@@ -360,7 +360,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(sessionId, "Can't join session! sessionId parameter is null!");
 
-            if (sessionId.Length == 0)
+            if (string.IsNullOrEmpty(sessionId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
                 yield break;

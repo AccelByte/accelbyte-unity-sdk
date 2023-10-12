@@ -57,7 +57,11 @@ namespace AccelByte.Server
             , string[] tags = null)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Can't Grant Exp; UserId parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -84,7 +88,11 @@ namespace AccelByte.Server
             , string[] tags = null)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Can't Grant Exp; UserId parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -110,6 +118,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -131,6 +144,11 @@ namespace AccelByte.Server
             , ResultCallback<UserSeasonExpHistory> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -154,6 +172,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -173,7 +196,11 @@ namespace AccelByte.Server
             , ResultCallback<UserSeasonInfoWithoutReward> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Can't check user progression; UserId parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

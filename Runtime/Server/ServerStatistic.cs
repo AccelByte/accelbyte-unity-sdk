@@ -55,6 +55,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -80,6 +85,11 @@ namespace AccelByte.Server
             , StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -111,6 +121,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -132,6 +147,11 @@ namespace AccelByte.Server
             , ResultCallback<StatItemOperationResult[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -174,6 +194,11 @@ namespace AccelByte.Server
             , ResultCallback<StatItemOperationResult[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -241,6 +266,11 @@ namespace AccelByte.Server
             , ResultCallback<StatItemOperationResult[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -358,6 +388,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -381,6 +416,11 @@ namespace AccelByte.Server
             , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -407,6 +447,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -431,6 +476,11 @@ namespace AccelByte.Server
            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

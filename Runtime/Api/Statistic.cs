@@ -351,6 +351,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -412,6 +417,11 @@ namespace AccelByte.Api
             string[] statCodes = null)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -496,6 +506,11 @@ namespace AccelByte.Api
         )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

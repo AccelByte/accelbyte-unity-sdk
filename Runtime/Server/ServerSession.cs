@@ -40,6 +40,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
             if (!_session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -63,6 +68,11 @@ namespace AccelByte.Server
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!_session.IsValid())
             {
@@ -88,6 +98,11 @@ namespace AccelByte.Server
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!_session.IsValid())
             {

@@ -36,20 +36,25 @@ namespace AccelByte.Core
 
         private IEnumerator Update()
         {
+            WebRequestTask executedTask;
             do
             {
-                if (requestTask != null && requestTask.Count > 0)
+                executedTask = FetchTask();
+
+                if (executedTask != null)
                 {
-                    if (requestTask[0].DelayMs > 0)
+                    if (executedTask.DelayMs > 0)
                     {
-                        yield return new WaitForSeconds(Utils.TimeUtils.SecondsToMilliseconds(requestTask[0].DelayMs));
+                        yield return new WaitForSeconds(Utils.TimeUtils.MillisecondsToSeconds(executedTask.DelayMs));
                     }
-                    Report.GetHttpRequest(requestTask[0].HttpRequest, requestTask[0].WebRequest);
-                    yield return requestTask[0].WebRequest.SendWebRequest();
-                    Report.GetHttpResponse(requestTask[0].WebRequest);
-                    requestTask[0].SetComplete();
-                    requestTask[0].Dispose();
-                    requestTask.RemoveAt(0);
+
+                    using (UnityEngine.Networking.UnityWebRequest webRequest = executedTask.CreateWebRequest())
+                    {
+                        Report.GetHttpRequest(executedTask.HttpRequest, webRequest);
+                        yield return webRequest.SendWebRequest();
+                        Report.GetHttpResponse(webRequest);
+                        executedTask.SetComplete(webRequest);
+                    }
                 }
                 yield return null;
             }

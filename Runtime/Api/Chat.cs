@@ -13,29 +13,51 @@ namespace AccelByte.Api
 {   
     public class Chat : WrapperBase
     {
+        #region private Members
+
+        private ChatApi api;
+        private UserSession session;
+        private ChatWebsocketApi websocketApi;
+        private readonly CoroutineRunner coroutineRunner;
+
+        #endregion
+
         #region constructor
         [UnityEngine.Scripting.Preserve]
         internal Chat(ChatApi inApi
             , UserSession inSession
-            , CoroutineRunner inCoroutineRunner)
+            , CoroutineRunner inCoroutineRunner) : this(inApi, inSession, inCoroutineRunner, null)
+        {
+            
+        }
+
+        [UnityEngine.Scripting.Preserve]
+        internal Chat(ChatApi inApi
+            , UserSession inSession
+            , CoroutineRunner inCoroutineRunner
+            , ChatWebsocketApi websocketApi)
         {
             session = inSession;
             api = inApi;
             coroutineRunner = inCoroutineRunner;
+            this.websocketApi = websocketApi;
 
-            IWebSocket webSocket = new WebSocket();
-            websocketApi = new ChatWebsocketApi(inCoroutineRunner
-                , inSession
-                , webSocket
-                , api.GetConfig().ChatServerWsUrl
-                , api.GetConfig().Namespace);
+            if (websocketApi == null)
+            {
+                IWebSocket webSocket = new WebSocket();
+                this.websocketApi = new ChatWebsocketApi(inCoroutineRunner
+                    , inSession
+                    , webSocket
+                    , api.GetConfig().ChatServerWsUrl
+                    , api.GetConfig().Namespace);
+            }
 
-            websocketApi.OnOpen += HandleOnOpen;
-            websocketApi.OnMessage += HandleOnMessage;
-            websocketApi.OnClose += HandleOnClose;
+            this.websocketApi.OnOpen += HandleOnOpen;
+            this.websocketApi.OnMessage += HandleOnMessage;
+            this.websocketApi.OnClose += HandleOnClose;
         }
         #endregion
-        
+
         #region public events
         /// <summary>
         /// Event triggered when websocket connection successfully connected.
@@ -163,6 +185,12 @@ namespace AccelByte.Api
         public void CreatePersonalTopic(string otherUserId, ResultCallback<ChatActionTopicResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(otherUserId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(otherUserId), callback))
+            {
+                return;
+            }
+
             websocketApi.CreatePersonalTopic(otherUserId, callback);
         }
 
@@ -264,9 +292,15 @@ namespace AccelByte.Api
         public void BlockUser(string userId, ResultCallback<BlockUnblockResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             websocketApi.BlockUser(userId, callback);
         }
-        
+
         /// <summary>
         /// Unblock user.
         /// </summary>
@@ -275,6 +309,12 @@ namespace AccelByte.Api
         public void UnblockUser(string userId, ResultCallback<BlockUnblockResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             websocketApi.UnblockUser(userId, callback);
         }
 
@@ -321,7 +361,7 @@ namespace AccelByte.Api
             , GetSystemMessageStatsRequest request = default)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.GetSystemMessagesStats(new GetSystemMessageStatsRequest(), callback);
+            websocketApi.GetSystemMessagesStats(request, callback);
         }
 
         /// <summary>
@@ -333,6 +373,12 @@ namespace AccelByte.Api
         public void DeleteGroupChat(string groupId, string chatId, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(chatId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChatIdInvalidMessage(chatId), callback))
+            {
+                return;
+            }
+
             coroutineRunner.Run(api.DeleteGroupChat(groupId, chatId, callback));
         }
 
@@ -380,6 +426,12 @@ namespace AccelByte.Api
         public void GetGroupChatSnapshot(string groupId, string chatId, ResultCallback<ChatSnapshotResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(chatId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetChatIdInvalidMessage(chatId), callback))
+            {
+                return;
+            }
+
             coroutineRunner.Run(api.GetGroupChatSnapshot(groupId, chatId, callback));
         }
 
@@ -439,15 +491,6 @@ namespace AccelByte.Api
         
         #region internal events
         internal event Action OnTokenRefreshed;
-        #endregion
-
-        #region private Members
-
-        private ChatApi api;
-        private UserSession session;
-        private ChatWebsocketApi websocketApi;
-        private readonly CoroutineRunner coroutineRunner;
-
         #endregion
 
         #region private methods

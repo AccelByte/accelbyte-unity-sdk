@@ -1095,6 +1095,36 @@ namespace AccelByte.Api
             };
             api.LinkOtherPlatform(requestModel, requestParameter, callback);
         }
+        
+        /// <summary>
+        /// Link other platform's account to the currently logged in user. especially to support OIDC. 
+        /// </summary>
+        /// <param name="platformId">Specify platform's type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformTicket">Ticket / token from other platform to be linked to </param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void LinkOtherPlatformId(string platformId
+            , string platformTicket
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestModel = new LinkOtherPlatformRequest
+            {
+                PlatformId = platformId
+            };
+
+            var requestParameter = new LinkOtherPlatformParameter
+            {
+                Ticket = platformTicket
+            };
+            api.LinkOtherPlatform(requestModel, requestParameter, callback);
+        }
 
         /// <summary>
         /// Force to Link other platform's account to the currently logged in user. 
@@ -1136,6 +1166,47 @@ namespace AccelByte.Api
                 api.ForcedLinkOtherPlatform(requestModel, requestParameter, callback);
             });
         }
+        
+        /// <summary>
+        /// Force to Link other platform's account to the currently logged in user. 
+        /// </summary>
+        /// <param name="platformId">Specify platform's type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformUserId"> UserId from other platform to be linked to </param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ForcedLinkOtherPlatformId(string platformId
+            , string platformUserId
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetData(getUserDataResult =>
+            {
+                if (getUserDataResult.IsError)
+                {
+                    callback.TryError(getUserDataResult.Error);
+                    return;
+                }
+
+                var requestModel = new LinkPlatformAccountRequest
+                {
+                    platformId = platformId,
+                    platformUserId = platformUserId
+                };
+
+                var requestParameter = new LinkPlatformAccountParameter
+                {
+                    UserId = getUserDataResult.Value.userId
+                };
+
+                api.ForcedLinkOtherPlatform(requestModel, requestParameter, callback);
+            });
+        }
 
         /// <summary>
         /// Unlink other platform that has been linked to the currently logged in user. The change will take effect
@@ -1164,6 +1235,91 @@ namespace AccelByte.Api
                 PlatformId = platformType.ToString().ToLower()
             };
             api.UnlinkOtherPlatform(requestModel, requestParameter, callback);
+        }
+        
+        /// <summary>
+        /// Unlink other platform that has been linked to the currently logged in user. The change will take effect
+        /// after user has been re-login. This function specially to support OIDC
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void UnlinkOtherPlatformId(string platformId
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestModel = new UnlinkPlatformAccountRequest
+            {
+                platformNamespace = string.Empty
+            };
+
+            var requestParameter = new UnlinkPlatformAccountParameter
+            {
+                PlatformId = platformId
+            };
+            api.UnlinkOtherPlatform(requestModel, requestParameter, callback);
+        }
+        
+        /// <summary>
+        /// Unlink other platform that has been linked to the currently logged in user. The change will take effect
+        /// after user has been re-login.
+        /// Note: Use this API to unlink all the user's current account from their other accounts in other platforms within the game namespace.
+        /// It resolves issues with the old API by ensuring successful unlinking across multiple namespaces.
+        /// After calling this API, if a user logs in to any namespace with the same 3rd platform account,
+        /// they will be logged in as a different account.
+        /// </summary>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void UnlinkAllOtherPlatform( PlatformType platformType
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestParameter = new UnlinkPlatformAccountParameter
+            {
+                PlatformId = platformType.ToString().ToLower()
+            };
+            api.UnlinkAllOtherPlatform(requestParameter, callback);
+        }
+        
+        /// <summary>
+        /// Unlink other platform that has been linked to the currently logged in user. The change will take effect
+        /// after user has been re-login. This function specially to support OIDC.
+        /// Note: Use this API to unlink all the user's current account from their other accounts in other platforms within the game namespace.
+        /// It resolves issues with the old API by ensuring successful unlinking across multiple namespaces.
+        /// After calling this API, if a user logs in to any namespace with the same 3rd platform account,
+        /// they will be logged in as a different account.
+        /// </summary>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void UnlinkAllOtherPlatformId( string PlatformId
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestParameter = new UnlinkPlatformAccountParameter
+            {
+                PlatformId = PlatformId
+            };
+            api.UnlinkAllOtherPlatform(requestParameter, callback);
         }
 
         /// <summary>
@@ -1244,6 +1400,11 @@ namespace AccelByte.Api
             , ResultCallback<PublicUserData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if(!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!userSession.IsValid())
             {
@@ -1801,6 +1962,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -1823,6 +1989,11 @@ namespace AccelByte.Api
             , ResultCallback<GetUserInformationResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!userSession.IsValid())
             {

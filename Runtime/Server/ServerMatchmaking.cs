@@ -153,9 +153,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(matchId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetMatchIdInvalidMessage(matchId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
-                Debug.Log("Server session is not valid");
+                AccelByteDebug.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }

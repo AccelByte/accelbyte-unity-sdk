@@ -69,11 +69,6 @@ namespace AccelByte.Api
         
         public RefreshTokenData localTokenData;
 
-        public void ForceSetTokenData(TokenData inTokenData)
-        {
-            tokenData = inTokenData;
-        }
-
         public void SetScheduleRefreshToken( DateTime time )
         {
             // don't schedule refresh token if time is in the past.

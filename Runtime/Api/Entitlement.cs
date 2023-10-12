@@ -102,8 +102,11 @@ namespace AccelByte.Api
             , ResultCallback<EntitlementInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(entitlementId, 
-                "Can't get user entitlement by id! entitlementId parameter is null!");
+
+            if (!ValidateAccelByteId(entitlementId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetEntitlementIdInvalidMessage(entitlementId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -379,8 +382,11 @@ namespace AccelByte.Api
             , string requestId = null)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(entitlementId, 
-                "Can't consume user entitlement! entitlementId parameter is null!");
+
+            if (!ValidateAccelByteId(entitlementId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetEntitlementIdInvalidMessage(entitlementId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

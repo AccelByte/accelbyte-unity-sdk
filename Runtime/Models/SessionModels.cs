@@ -82,6 +82,7 @@ namespace AccelByte.Models
         [DataMember] public string deployment;
         [DataMember] public string[] requestedRegions;
         [DataMember] public string clientVersion;
+        [DataMember(Name = "persistent")] public bool Persistent;
     }
 
     [DataContract, Preserve]
@@ -291,23 +292,23 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2GameSessionCreateRequest
     {
-        [DataMember] public Dictionary<string, object> attributes;
-        [DataMember] public string backfillTicketId;
-        [DataMember] public string clientVersion;
-        [DataMember] public string configurationName;
-        [DataMember] public string deployment;
-        [DataMember] public int inactiveTimeout;
-        [DataMember] public int inviteTimeout;
-        [DataMember] public SessionV2Joinability joinability;
-        [DataMember] public string matchPool;
-        [DataMember] public int maxPlayers;
-        [DataMember] public int minPlayers;
-        [DataMember] public string[] requestedRegions;
-        [DataMember] public string serverName;
-        [DataMember] public SessionV2TeamData[] teams;
-        [DataMember] public string[] ticketIds;
-        [DataMember] public SessionConfigurationTemplateType type;
-        [DataMember] public SessionV2MemberData[] members;
+        [DataMember(EmitDefaultValue = false)] public Dictionary<string, object> attributes;
+        [DataMember(EmitDefaultValue = false)] public string backfillTicketId;
+        [DataMember(EmitDefaultValue = false)] public string clientVersion;
+        [DataMember(EmitDefaultValue = false)] public string configurationName;
+        [DataMember(EmitDefaultValue = false)] public string deployment;
+        [DataMember(EmitDefaultValue = false)] public int inactiveTimeout;
+        [DataMember(EmitDefaultValue = false)] public int inviteTimeout;
+        [DataMember(EmitDefaultValue = false)] public SessionV2Joinability joinability;
+        [DataMember(EmitDefaultValue = false)] public string matchPool;
+        [DataMember(EmitDefaultValue = false)] public int maxPlayers;
+        [DataMember(EmitDefaultValue = false)] public int minPlayers;
+        [DataMember(EmitDefaultValue = false)] public string[] requestedRegions;
+        [DataMember(EmitDefaultValue = false)] public string serverName;
+        [DataMember(EmitDefaultValue = false)] public SessionV2TeamData[] teams;
+        [DataMember(EmitDefaultValue = false)] public string[] ticketIds;
+        [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
+        [DataMember(EmitDefaultValue = false)] public SessionV2MemberData[] members;
         [DataMember] public bool textChat;
     }
 
@@ -337,21 +338,21 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2GameSessionUpdateRequest
     {
-        [DataMember] public Dictionary<string, object> attributes;
-        [DataMember] public string backfillTicketId;
-        [DataMember] public string clientVersion;
-        [DataMember] public string deployment;
-        [DataMember] public int inactiveTimeout;
-        [DataMember] public int inviteTimeout;
-        [DataMember] public SessionV2Joinability joinability;
-        [DataMember] public string matchPool;
-        [DataMember] public int maxPlayers;
-        [DataMember] public int minPlayers;
-        [DataMember] public string[] requestedRegions;
-        [DataMember] public SessionV2TeamData[] teams;
-        [DataMember] public string[] ticketIds;
-        [DataMember] public SessionConfigurationTemplateType type;
-        [DataMember] public int version;
+        [DataMember(EmitDefaultValue = false)] public Dictionary<string, object> attributes;
+        [DataMember(EmitDefaultValue = false)] public string backfillTicketId;
+        [DataMember(EmitDefaultValue = false)] public string clientVersion;
+        [DataMember(EmitDefaultValue = false)] public string deployment;
+        [DataMember(EmitDefaultValue = false)] public int inactiveTimeout;
+        [DataMember(EmitDefaultValue = false)] public int inviteTimeout;
+        [DataMember(EmitDefaultValue = false)] public SessionV2Joinability joinability;
+        [DataMember(EmitDefaultValue = false)] public string matchPool;
+        [DataMember(EmitDefaultValue = false)] public int maxPlayers;
+        [DataMember(EmitDefaultValue = false)] public int minPlayers;
+        [DataMember(EmitDefaultValue = false)] public string[] requestedRegions;
+        [DataMember(EmitDefaultValue = false)] public SessionV2TeamData[] teams;
+        [DataMember(EmitDefaultValue = false)] public string[] ticketIds;
+        [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
+        [DataMember(EmitDefaultValue = false)] public int version;
     }
 
     [DataContract, Preserve]
@@ -486,6 +487,13 @@ namespace AccelByte.Models
         [DataMember] public SessionV2GameSession session;
         [DataMember] public string sessionId;
         [DataMember] public string error;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2GameSessionEndedNotification
+    {
+        [DataMember] public string SessionID;
+        [DataMember] public bool TextChat;
     }
     
     #endregion

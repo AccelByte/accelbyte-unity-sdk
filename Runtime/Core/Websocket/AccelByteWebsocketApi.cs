@@ -41,7 +41,7 @@ namespace Core
         
         #region private properties
         protected string websocketUrl;
-        protected UserSession session;
+        protected ISession session;
         protected CoroutineRunner coroutineRunner;
         protected AccelByteWebSocket webSocket;
         protected string namespace_;
@@ -52,7 +52,7 @@ namespace Core
         
         #region constructor
         internal AccelByteWebsocketApi(CoroutineRunner inCoroutineRunner
-            , UserSession inSession
+            , ISession inSession
             , IWebSocket inWebSocket
             , string inWebsocketUrl
             , string inNamespace)

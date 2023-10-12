@@ -594,9 +594,12 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            foreach (string statCode in statCodes)
+            if (statCodes != null)
             {
-                requestBuilder.WithQueryParam("statCodes", statCode);
+                foreach (string statCode in statCodes)
+                {
+                    requestBuilder.WithQueryParam("statCodes", statCode);
+                }
             }
             
             IHttpRequest request = requestBuilder.GetResult();

@@ -40,8 +40,11 @@ namespace AccelByte.Api
         public void GetPartyDetails(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -70,8 +73,12 @@ namespace AccelByte.Api
             ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
             Assert.IsNotNull(request, "SessionV2PartySessionUpdateRequest cannot be null");
 
 
@@ -103,8 +110,12 @@ namespace AccelByte.Api
             ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
             Assert.IsNotNull(request, "SessionV2PartySessionUpdateRequest cannot be null");
 
             if (!session.IsValid())
@@ -130,10 +141,17 @@ namespace AccelByte.Api
             ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if(string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -158,10 +176,17 @@ namespace AccelByte.Api
             ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
-            Assert.IsFalse(string.IsNullOrEmpty(leaderId),
-                "Leader ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(leaderId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Leader id cannot be null or empty"));
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -186,8 +211,11 @@ namespace AccelByte.Api
         public void JoinParty(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -209,8 +237,11 @@ namespace AccelByte.Api
         public void LeaveParty(string partyId, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -232,8 +263,11 @@ namespace AccelByte.Api
         public void RejectPartyInvitation(string partyId, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -260,10 +294,16 @@ namespace AccelByte.Api
             ResultCallback<SessionV2PartySessionKickResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "Party ID cannot be null.");
-            Assert.IsFalse(string.IsNullOrEmpty(partyId),
-                "User ID cannot be null.");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -356,7 +396,11 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(partyId, "partyId cannot be null");
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -377,7 +421,11 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -486,7 +534,11 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -511,7 +563,11 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -537,8 +593,12 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
             Assert.IsNotNull(request, "SessionV2GameSessionUpdateRequest cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -565,8 +625,17 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
-            Assert.IsNotNull(userId, "userId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -592,7 +661,11 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -617,7 +690,11 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -642,7 +719,11 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -717,7 +798,11 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -738,7 +823,11 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -765,7 +854,11 @@ namespace AccelByte.Api
         public void UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -788,7 +881,11 @@ namespace AccelByte.Api
         public void UpdateMemberStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "sessionId cannot be null");
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

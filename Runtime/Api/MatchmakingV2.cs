@@ -62,7 +62,11 @@ namespace AccelByte.Api
             , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
+
+            if (!ValidateAccelByteId(ticketId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetTicketIdInvalidMessage(ticketId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -84,7 +88,11 @@ namespace AccelByte.Api
         public void DeleteMatchmakingTicket(string ticketId, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
+
+            if (!ValidateAccelByteId(ticketId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetTicketIdInvalidMessage(ticketId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

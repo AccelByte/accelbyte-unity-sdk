@@ -62,6 +62,11 @@ namespace AccelByte.Core
         //UserSession please implement this
         public abstract void SetSession(TokenData loginResponse);
 
+        public void ForceSetTokenData(TokenData inTokenData)
+        {
+            tokenData = inTokenData;
+        }
+
         protected IEnumerator MaintainToken()
         {
             nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);

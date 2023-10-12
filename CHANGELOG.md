@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.0%0D16.8.0) (2023-10-12)
+
+
+### Features
+
+* **DSHub:** add session member changed notification handler ([edd7a9f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/edd7a9f85be10bddd2fab7a7d16c1138ba397a64))
+* **mpv2:** add persistent payload in SessionV2PublicConfiguration ([491bb98](https://github.com/AccelByte/accelbyte-unity-sdk/commits/491bb989d4ceca7b0bac0b6ff79112ae9f273e82))
+* oidc unlink features ([ebfb606](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebfb60636229235ac6acf32a9508c73204e6baf3))
+
+
+### Bug Fixes
+
+* add webrequest duplication prevention ([1dd846c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1dd846c9c9da2ab3c82873c20ea2f923522f7c3a))
+* **mpv2:** add missing notification handler for OnSessionEnded and refactor warning message for unrecognized topic ([137d412](https://github.com/AccelByte/accelbyte-unity-sdk/commits/137d4128dc904a87a5d79e0b89142bb0359153a1))
+
+
+### Refactors
+
+* add id input validation ([62b91f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/62b91f40998f4cece2996b5d7641de42fb2ace76))
+
 ## [16.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.8.0%0D16.7.0) (2023-09-25)
 
 

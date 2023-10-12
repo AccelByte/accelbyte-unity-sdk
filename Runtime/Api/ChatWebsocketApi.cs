@@ -30,7 +30,7 @@ namespace AccelByte.Api
         #region constructor
         [UnityEngine.Scripting.Preserve]
         internal ChatWebsocketApi(CoroutineRunner inCoroutineRunner
-            , UserSession inSession
+            , ISession inSession
             , IWebSocket inWebSocket
             , string inWebsocketUrl
             , string inNamespace) : base(inCoroutineRunner, inSession, inWebSocket, inWebsocketUrl, inNamespace)
@@ -264,7 +264,7 @@ namespace AccelByte.Api
             return requestJsonString;
         }
 
-        private void SendRequest<T, U>(ChatMessageMethod method, T request, ResultCallback<U> callback)
+        protected virtual void SendRequest<T, U>(ChatMessageMethod method, T request, ResultCallback<U> callback)
         {
             string messageId = GenerateMessageId().ToString();
 

@@ -61,8 +61,12 @@ namespace AccelByte.Api
             , ResultCallback<LeaderboardRankingResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(leaderboardCode, 
-                "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
+
+            if (string.IsNullOrEmpty(leaderboardCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -92,10 +96,17 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(leaderboardCode, 
-                "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
-            Assert.IsNotNull(userId, 
-                "Can't query all time leaderboard ranking data! userId parameter is null!");
+
+            if (string.IsNullOrEmpty(leaderboardCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -128,12 +139,23 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(leaderboardCode, 
-                "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
-            Assert.IsNotNull(userId, 
-                "Can't query all time leaderboard ranking data! userId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(additionalKey),
-                "Can't query all time leaderboard ranking data! additionalKey paramater couldn't be empty");
+
+            if (string.IsNullOrEmpty(leaderboardCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
+                return;
+            }
+
+            if (string.IsNullOrEmpty(additionalKey))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! additionalKey paramater couldn't be empty"));
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -240,10 +262,17 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingDataV3> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(leaderboardCode, 
-                "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!");
-            Assert.IsNotNull(userId, 
-                "Can't query all time leaderboard ranking data! userId parameter is null!");
+
+            if (string.IsNullOrEmpty(leaderboardCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

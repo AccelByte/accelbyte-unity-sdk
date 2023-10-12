@@ -16,11 +16,11 @@ namespace AccelByte.Api
     {
         private readonly CloudSaveApi api;
         private readonly CoroutineRunner coroutineRunner;
-        private readonly UserSession session;
+        private readonly ISession session;
 
         [UnityEngine.Scripting.Preserve]
         internal CloudSave( CloudSaveApi inApi
-            , UserSession inSession
+            , ISession inSession
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "api==null (@ constructor)");
@@ -39,7 +39,7 @@ namespace AccelByte.Api
         /// <param name="inCoroutineRunner"></param>
         [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
         internal CloudSave( CloudSaveApi inApi
-            , UserSession inSession
+            , ISession inSession
             , string inNamespace
             , CoroutineRunner inCoroutineRunner )
         : this( inApi, inSession, inCoroutineRunner ) // Curry this obsolete data to the new overload ->
@@ -153,6 +153,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -751,6 +756,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -772,6 +782,11 @@ namespace AccelByte.Api
             , ResultCallback<UserRecords> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {

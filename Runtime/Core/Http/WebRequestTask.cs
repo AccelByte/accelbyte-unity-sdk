@@ -8,15 +8,10 @@ using UnityEngine.Networking;
 
 namespace AccelByte.Core
 {
-    internal class WebRequestTask : IDisposable
+    internal class WebRequestTask
     {
+        private readonly int timeoutMs;
         public IHttpRequest HttpRequest
-        {
-            get;
-            private set;
-        }
-        
-        public UnityWebRequest WebRequest
         {
             get;
             private set;
@@ -44,21 +39,37 @@ namespace AccelByte.Core
             private set;
         }
 
-        public WebRequestTask(IHttpRequest httpRequest, UnityWebRequest webRequest, uint delayMs)
+        public WebRequestState State
+        {
+            get;
+            private set;
+        }
+
+        public WebRequestTask(IHttpRequest httpRequest, int timeoutMs, uint delayMs)
         {
             HttpRequest = httpRequest;
-            WebRequest = webRequest;
+            DelayMs = delayMs;
+            this.timeoutMs = timeoutMs;
             CreatedTimeStamp = DateTime.UtcNow;
+            SetState(WebRequestState.Waiting);
         }
 
-        public void SetComplete()
+        public void SetComplete(UnityWebRequest webRequestResult)
         {
-            OnComplete?.Invoke(WebRequest);
+            SetState(WebRequestState.Complete);
+            OnComplete?.Invoke(webRequestResult);
         }
 
-        public void Dispose()
+        public void SetState(WebRequestState newState)
         {
-            WebRequest.Dispose();
+            State = newState;
+        }
+
+        public UnityWebRequest CreateWebRequest()
+        {
+            UnityWebRequest unityWebRequest = HttpRequest.GetUnityWebRequest();
+            unityWebRequest.timeout = timeoutMs / 1000;
+            return unityWebRequest;
         }
     }
 
@@ -86,5 +97,12 @@ namespace AccelByte.Core
 
             return 0;
         }
+    }
+
+    internal enum WebRequestState
+    {
+        Waiting,
+        OnProcess,
+        Complete
     }
 }

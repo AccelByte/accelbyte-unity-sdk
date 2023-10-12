@@ -1321,7 +1321,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedMemberRoles>();
-            callback(result);
+            callback.Try(result);
         }
 
         public IEnumerator GetGroupsByGroupIds(string[] groupIds, ResultCallback<PaginatedGroupListResponse> callback)
@@ -1346,7 +1346,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedGroupListResponse>();
 
-            callback(result);
+            callback.Try(result);
         }
 
         public IEnumerator GetUserJoinedGroups(ResultCallback<PaginatedGroupMemberList> callback, int limit = 0,
@@ -1367,7 +1367,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedGroupMemberList>();
 
-            callback(result);
+            callback.Try(result);
         }
 
         public IEnumerator CancelGroupMemberInvitation(string userId, string groupId,
@@ -1392,7 +1392,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GroupGeneralResponse>();
 
-            callback(result);
+            callback.Try(result);
         }
 
         public IEnumerator UpdateGroupCustomAttributes(string groupId, Dictionary<string, object> customAttributes,
@@ -1417,14 +1417,14 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback(result);
+            callback.Try(result);
         }
 
         public IEnumerator GetUserGroupStatusInfo(string userId, string groupId,
             ResultCallback<GroupMemberInformation> callback)
         {
             Assert.IsNotNull(userId, "Can't get user group status info! UserId parameter is null");
-            Assert.IsNotNull(userId, "Can't get user group status info! GroupId parameter is null");
+            Assert.IsNotNull(groupId, "Can't get user group status info! GroupId parameter is null");
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/status")
@@ -1440,7 +1440,7 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
-            callback(result);
+            callback.Try(result);
         }
     }
 }

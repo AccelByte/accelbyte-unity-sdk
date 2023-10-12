@@ -533,6 +533,33 @@ namespace AccelByte.Api
             });
         }
 
+        public void UnlinkAllOtherPlatform(UnlinkPlatformAccountParameter requestParameter, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (string.IsNullOrEmpty(requestParameter.PlatformId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't unlink platform account! Platform Id parameter is null!"));
+                return;
+            }
+
+            string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}/all";
+
+            var builder = HttpRequestBuilder
+                .CreateDelete(url)
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("platformId", requestParameter.PlatformId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson);
+
+            IHttpRequest request = builder.GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
+        }
+
         public void GetPlatformLinks(GetPlatformLinkRequest requestModel, ResultCallback<PagedPlatformLinks> callback)
         {
             Report.GetFunctionLog(GetType().Name);

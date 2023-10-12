@@ -33,6 +33,16 @@ namespace AccelByte.Server
         /// </summary>
         public event ResultCallback<MatchmakingV2BackfillProposalNotification> MatchmakingV2BackfillProposalReceived;
 
+        /// <summary>
+        /// Event triggered when game session ended.
+        /// </summary>
+        public event ResultCallback<SessionEndedNotification> GameSessionV2Ended;
+
+        /// <summary>
+        /// Event triggered when game session member changed.
+        /// </summary>
+        public event ResultCallback<SessionV2GameSession> GameSessionV2MemberChanged;
+
         #endregion
 
         #region Properties
@@ -40,15 +50,15 @@ namespace AccelByte.Server
         /// <summary>
         /// DSHub connection status
         /// </summary>
-        public bool IsConnected => _serverDSHubWebsocketApi.IsConnected;
+        public bool IsConnected => serverDSHubWebsocketApi.IsConnected;
 
         #endregion
 
-        private readonly ISession _session;
-        private readonly CoroutineRunner _coroutineRunner;
+        private readonly ISession session;
+        private readonly CoroutineRunner coroutineRunner;
 
-        private readonly ServerDSHubApi _serverDSHubApi;
-        private readonly ServerDSHubWebsocketApi _serverDSHubWebsocketApi;
+        private readonly ServerDSHubApi serverDSHubApi;
+        private readonly ServerDSHubWebsocketApi serverDSHubWebsocketApi;
 
         [UnityEngine.Scripting.Preserve]
         internal ServerDSHub(ServerDSHubApi inApi
@@ -58,16 +68,16 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "serverDSHubApi==null (@ constructor)");
             Assert.IsNotNull(inCoroutineRunner, "coroutineRunner==null (@ constructor)");
 
-            _serverDSHubApi = inApi;
-            _session = inSession;
-            _coroutineRunner = inCoroutineRunner;
+            serverDSHubApi = inApi;
+            session = inSession;
+            coroutineRunner = inCoroutineRunner;
 
-            _serverDSHubWebsocketApi =
+            serverDSHubWebsocketApi =
                 new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerUrl, inSession);
 
-            _serverDSHubWebsocketApi.OnOpen += HandleOnOpen;
-            _serverDSHubWebsocketApi.OnClose += HandleOnClose;
-            _serverDSHubWebsocketApi.OnMessage += HandleOnMessage;
+            serverDSHubWebsocketApi.OnOpen += HandleOnOpen;
+            serverDSHubWebsocketApi.OnClose += HandleOnClose;
+            serverDSHubWebsocketApi.OnMessage += HandleOnMessage;
         }
 
         /// <summary>
@@ -78,7 +88,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            _serverDSHubWebsocketApi.Connect(serverName);
+            serverDSHubWebsocketApi.Connect(serverName);
         }
 
         /// <summary>
@@ -88,7 +98,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            _serverDSHubWebsocketApi.Disconnect();
+            serverDSHubWebsocketApi.Disconnect();
         }
 
 
@@ -122,7 +132,7 @@ namespace AccelByte.Server
                     var serverClaimedNotification =
                         JsonConvert.DeserializeObject<ServerDSHubWebsocketNotification<ServerClaimedNotification>>(
                             message);
-                    _serverDSHubWebsocketApi.HandleNotification(serverClaimedNotification.payload,
+                    serverDSHubWebsocketApi.HandleNotification(serverClaimedNotification.payload,
                         MatchmakingV2ServerClaimed);
                     break;
                 case DsHubNotificationTopic.BACKFILL_PROPOSAL:
@@ -130,8 +140,18 @@ namespace AccelByte.Server
                         JsonConvert
                             .DeserializeObject<
                                 ServerDSHubWebsocketNotification<MatchmakingV2BackfillProposalNotification>>(message);
-                    _serverDSHubWebsocketApi.HandleNotification(backfillProposalNotification.payload,
+                    serverDSHubWebsocketApi.HandleNotification(backfillProposalNotification.payload,
                         MatchmakingV2BackfillProposalReceived);
+                    break;
+                case DsHubNotificationTopic.SessionEnded:
+                    var sessionEndedNotification =
+                        JsonConvert.DeserializeObject <ServerDSHubWebsocketNotification<SessionEndedNotification>>(message);
+                    serverDSHubWebsocketApi.HandleNotification(sessionEndedNotification.payload, GameSessionV2Ended);
+                    break;
+                case DsHubNotificationTopic.SessionMemberChanged:
+                    var sessionMemberChangedNotification =
+                        JsonConvert.DeserializeObject<ServerDSHubWebsocketNotification<SessionV2GameSession>>(message);
+                    serverDSHubWebsocketApi.HandleNotification(sessionMemberChangedNotification.payload, GameSessionV2MemberChanged);
                     break;
                 case DsHubNotificationTopic.EMPTY:
                     break;

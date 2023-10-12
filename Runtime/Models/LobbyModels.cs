@@ -155,6 +155,7 @@ namespace AccelByte.Models
         OnSessionRejected,
         OnSessionMembersChanged,
         OnGameSessionUpdated,
+        OnSessionEnded,
 
         // SessionV2 - DS
         OnDSStatusChanged,

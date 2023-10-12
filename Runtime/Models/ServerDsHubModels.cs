@@ -14,6 +14,8 @@ namespace AccelByte.Models
         EMPTY,
         serverClaimed,
         BACKFILL_PROPOSAL,
+        [EnumMember(Value = "SESSION_ENDED_NOTIF")] SessionEnded,
+        [EnumMember(Value = "SESSION_MEMBER_CHANGED")] SessionMemberChanged
     }
     
     [DataContract, Preserve]
@@ -36,5 +38,12 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember(Name = "matching_allies")] public MatchingAlly[] matchingAllies;
         [DataMember(Name = "session_id")] public string sessionId;
+    }
+
+    [DataContract, Preserve]
+    public class SessionEndedNotification
+    {
+        [DataMember(Name = "is_active")] public bool IsActive;
+        [DataMember(Name = "session_id")] public string SessionId;
     }
 }

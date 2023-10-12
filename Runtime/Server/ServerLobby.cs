@@ -90,10 +90,17 @@ namespace AccelByte.Server
                 {
                     callback.TryError(getPartyStorageResult.Error);
                 }
+                else if(getPartyStorageResult.Value == null)
+                {
+                    callback.TryError(new Error(ErrorCode.UnknownError));
+                }
                 else
                 {
-                    getPartyStorageResult.Value.custom_attribute = payloadModifier(getPartyStorageResult.Value.custom_attribute);
-                    
+                    if (payloadModifier != null)
+                    {
+                        getPartyStorageResult.Value.custom_attribute = payloadModifier(getPartyStorageResult.Value.custom_attribute);
+                    }
+
                     var updateRequest = new PartyDataUpdateRequest();
                     updateRequest.custom_attribute = getPartyStorageResult.Value.custom_attribute;
                     updateRequest.updatedAt = getPartyStorageResult.Value.updatedAt;
@@ -119,9 +126,12 @@ namespace AccelByte.Server
         public void GetPartyStorage( string partyId
             , ResultCallback<PartyDataUpdateNotif> callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(partyId), "Party ID should not be null.");
-            
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -142,9 +152,12 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Parameter userId cannot be null or empty string");
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
-            if(!session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -166,7 +179,12 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if(!session.IsValid())
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -185,6 +203,11 @@ namespace AccelByte.Server
             , ResultCallback<GetSessionAttributeAllResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -208,6 +231,11 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -230,7 +258,12 @@ namespace AccelByte.Server
             , string value
             , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(key), "key parameter cannot be null or empty");
+            if(string.IsNullOrEmpty(key))
+            {
+                Error error = new Error(ErrorCode.InvalidRequest, "key parameter cannot be null or empty");
+                callback.TryError(error);
+                return;
+            }
 
             SetSessionAttribute(userId, new Dictionary<string, string>() { { key, value } }, callback);
         }

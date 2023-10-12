@@ -22,8 +22,49 @@ namespace AccelByte.Core
                 requestTask = new List<WebRequestTask>();
             }
 
-            requestTask.Add(newTask);
-            requestTask.Sort(orderComparer);
+            lock (requestTask)
+            {
+                requestTask.Add(newTask);
+                requestTask.Sort(orderComparer);
+            }
+        }
+
+        internal WebRequestTask FetchTask()
+        {
+            if(requestTask == null)
+            {
+                return null;
+            }
+
+            WebRequestTask retval = null;
+            lock (requestTask)
+            {
+                while(requestTask.Count > 0)
+                {
+                    if(requestTask[0].State == WebRequestState.Waiting)
+                    {
+                        break;
+                    }
+                    if (requestTask[0].State == WebRequestState.OnProcess)
+                    {
+                        // If a is task already running, skip fetching
+                        return null;
+                    }
+                    else if(requestTask[0].State == WebRequestState.Complete)
+                    {
+                        requestTask.RemoveAt(0);
+                    }
+                }
+
+                if (requestTask.Count > 0)
+                {
+                    retval = requestTask[0];
+                    requestTask.RemoveAt(0);
+                    retval.SetState(WebRequestState.OnProcess);
+                }
+            }
+
+            return retval;
         }
     }
 }

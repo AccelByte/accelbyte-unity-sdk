@@ -522,7 +522,17 @@ namespace AccelByte.Api
                     callback.TryError(result.Error);
                     return;
                 }
-                byte[] bytes = Convert.FromBase64String(result.Value.preview);
+
+                byte[] bytes = null;
+                try
+                {
+                    bytes = Convert.FromBase64String(result.Value.preview);
+                }
+                catch(Exception ex)
+                {
+                    Error error = new Error(ErrorCode.ErrorFromException, $"Failed to convert preview value.\nError: {ex.Message}");
+                    return;
+                }
                 callback.TryOk(bytes);
             });
         }
