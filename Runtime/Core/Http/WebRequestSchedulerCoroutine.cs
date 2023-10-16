@@ -10,32 +10,34 @@ namespace AccelByte.Core
     internal class WebRequestSchedulerCoroutine : WebRequestScheduler
     {
         CoroutineRunner coroutineRunner;
-        bool isRunning;
+        internal bool IsRunning
+        {
+            get;
+            private set;
+        }
 
         public WebRequestSchedulerCoroutine(CoroutineRunner coroutineRunner)
         {
             this.coroutineRunner = coroutineRunner;
-            StartScheduler();
-        }
-
-        ~WebRequestSchedulerCoroutine()
-        {
-            StopScheduler();
         }
 
         internal override void StartScheduler()
         {
-            isRunning = true;
-            coroutineRunner.Run(Update());
+            if (!IsRunning && coroutineRunner != null)
+            {
+                coroutineRunner.Run(Update());
+            }
         }
 
         internal override void StopScheduler()
         {
-            isRunning = false;
+            IsRunning = false;
         }
 
         private IEnumerator Update()
         {
+            IsRunning = true;
+            int requestCount;
             WebRequestTask executedTask;
             do
             {
@@ -51,14 +53,29 @@ namespace AccelByte.Core
                     using (UnityEngine.Networking.UnityWebRequest webRequest = executedTask.CreateWebRequest())
                     {
                         Report.GetHttpRequest(executedTask.HttpRequest, webRequest);
-                        yield return webRequest.SendWebRequest();
+                        yield return ExecuteWebRequest(webRequest);
                         Report.GetHttpResponse(webRequest);
                         executedTask.SetComplete(webRequest);
                     }
                 }
                 yield return null;
+
+                requestCount = 0;
+                if (requestTask != null)
+                {
+                    lock (requestTask)
+                    {
+                        requestCount = requestTask.Count;
+                    }
+                }
             }
-            while (isRunning);
+            while (IsRunning && requestCount > 0);
+            IsRunning = false;
+        }
+
+        internal virtual IEnumerator ExecuteWebRequest(UnityEngine.Networking.UnityWebRequest webRequest)
+        {
+            yield return null;
         }
     }
 }

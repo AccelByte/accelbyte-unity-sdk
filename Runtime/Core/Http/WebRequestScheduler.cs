@@ -14,6 +14,12 @@ namespace AccelByte.Core
         internal abstract void StopScheduler();
 
         private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
+        
+        ~WebRequestScheduler()
+        {
+            StopScheduler();
+            CleanTask();
+        }
 
         internal void AddTask(WebRequestTask newTask)
         {
@@ -27,6 +33,8 @@ namespace AccelByte.Core
                 requestTask.Add(newTask);
                 requestTask.Sort(orderComparer);
             }
+
+            StartScheduler();
         }
 
         internal WebRequestTask FetchTask()
@@ -65,6 +73,17 @@ namespace AccelByte.Core
             }
 
             return retval;
+        }
+
+        internal void CleanTask()
+        {
+            if (requestTask != null)
+            {
+                lock (requestTask)
+                {
+                    requestTask.Clear();
+                }
+            }
         }
     }
 }

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.9.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.1%0D16.9.0) (2023-10-16)
+
+
+### Refactors
+
+* fix webscheduler process keep looping after unity editor closed ([7f99487](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f99487c9f86a62e06247450ab5e963932826f27))
+
 ## [16.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.0%0D16.8.0) (2023-10-12)
 
 

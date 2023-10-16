@@ -8,27 +8,30 @@ namespace AccelByte.Core
 {
     internal class WebRequestSchedulerAsync : WebRequestScheduler
     {
-        bool isRunning;
-
-        public WebRequestSchedulerAsync()
+        internal bool IsRunning
         {
-            StartScheduler();
+            get;
+            private set;
         }
 
         internal override void StartScheduler()
         {
-            isRunning = true;
-            Update();
+            if (!IsRunning)
+            {
+                Update();
+            }
         }
 
         internal override void StopScheduler()
         {
-            isRunning = false;
+            IsRunning = false;
         }
 
         private async void Update()
         {
+            IsRunning = true;
             WebRequestTask executedTask;
+            int requestCount;
             do
             {
                 executedTask = FetchTask();
@@ -43,14 +46,29 @@ namespace AccelByte.Core
                     using (UnityEngine.Networking.UnityWebRequest webRequest = executedTask.CreateWebRequest())
                     {
                         Report.GetHttpRequest(executedTask.HttpRequest, webRequest);
-                        await webRequest.SendWebRequest();
+                        await ExecuteWebRequest(webRequest);
                         Report.GetHttpResponse(webRequest);
                         executedTask.SetComplete(webRequest);
                     }
                 }
                 await AccelByteHttpHelper.HttpDelayOneFrame;
+
+                requestCount = 0;
+                if (requestTask != null)
+                {
+                    lock (requestTask)
+                    {
+                        requestCount = requestTask.Count;
+                    }
+                }
             }
-            while (isRunning);
+            while (IsRunning && requestCount > 0);
+            IsRunning = false;
+        }
+
+        internal virtual async Task ExecuteWebRequest(UnityEngine.Networking.UnityWebRequest webRequest)
+        {
+            await webRequest.SendWebRequest();
         }
     }
 }
