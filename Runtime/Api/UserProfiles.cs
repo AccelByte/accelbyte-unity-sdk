@@ -29,7 +29,7 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -104,8 +104,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.CreateUserProfile(createRequest, callback));
+            coroutineRunner.Run(api.CreateUserProfile(createRequest, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb, PredefinedAnalyticsMode.Create);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -141,7 +147,15 @@ namespace AccelByte.Api
                 customAttributes = customAttributes,
                 timeZone = timezone
             };
-            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, callback));
+
+            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb, PredefinedAnalyticsMode.Create);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -161,7 +175,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateUserProfile(updateRequest, callback));
+                api.UpdateUserProfile(updateRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb, PredefinedAnalyticsMode.Update);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -200,7 +221,14 @@ namespace AccelByte.Api
                 zipCode = zipCode
             };
 
-            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, callback));
+            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb, PredefinedAnalyticsMode.Update);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -399,5 +427,76 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 api.UpdatePrivateCustomAttributes(updates, callback));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum PredefinedAnalyticsMode
+        {
+            Create,
+            Update
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload(UserProfile result, PredefinedAnalyticsMode mode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (mode)
+            {
+                case PredefinedAnalyticsMode.Create:
+                    payload = new PredefinedUserProfileCreatedPayload(result);
+                    break;
+                case PredefinedAnalyticsMode.Update:
+                    payload = new PredefinedUserProfileUpdatedPayload(result);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent(Result<UserProfile> result, PredefinedAnalyticsMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreatePayload(result.Value, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            var predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        #endregion
     }
 }

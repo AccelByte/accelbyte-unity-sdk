@@ -63,7 +63,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.CreateGroup(createGroupRequest, callback));
+                api.CreateGroup(createGroupRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupCreate);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -82,7 +89,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.CreateGroupV2(createGroupRequest, callback));
+                api.CreateGroupV2(createGroupRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupCreate);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -108,7 +122,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback, groupName, groupRegion, limit, offset));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, groupName, groupRegion);
+                    }
+                    HandleCallback(cb, callback);
+                }, groupName, groupRegion, limit, offset));
         }
 
         /// <summary>
@@ -132,7 +153,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback, groupName, "", limit, offset));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, groupName, "");
+                    }
+                    HandleCallback(cb, callback);
+                }, groupName, "", limit, offset));
         }
 
         /// <summary>
@@ -154,7 +182,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback, groupName, groupRegion));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, groupName, groupRegion);
+                    }
+                    HandleCallback(cb, callback);
+                }, groupName, groupRegion));
         }
 
         /// <summary>
@@ -174,7 +209,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback, groupName));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, groupName, "");
+                    }
+                    HandleCallback(cb, callback);
+                }, groupName));
         }
 
         /// <summary>
@@ -196,7 +238,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback, "", "", limit, offset));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, "", "");
+                    }
+                    HandleCallback(cb, callback);
+                }, "", "", limit, offset));
         }
 
         /// <summary>
@@ -214,7 +263,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchGroups(callback));
+                api.SearchGroups(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGroupFindPredefinedEvent(session.UserId, "", "");
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -240,7 +296,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroup(groupId, callback));
+                api.GetGroup(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupGetInformation);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -268,7 +331,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroup(groupId, updateGroupRequest, callback));
+                api.UpdateGroup(groupId, updateGroupRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdate);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -296,7 +366,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroupV2(groupId, updateGroupRequest, callback));
+                api.UpdateGroupV2(groupId, updateGroupRequest, cb => 
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdate);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -310,7 +387,7 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
+
             if (string.IsNullOrEmpty(groupId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
@@ -326,7 +403,14 @@ namespace AccelByte.Api
             UpdateGroupRequest request = new UpdateGroupRequest { customAttributes = customAttributes };
 
             coroutineRunner.Run(
-                api.UpdateGroup(groupId, request, callback));
+                api.UpdateGroup(groupId, request, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdateCustomAttribute);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -352,7 +436,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.DeleteGroup(groupId, callback));
+                api.DeleteGroup(groupId, cb =>
+                {
+                    if (cb != null && !cb.IsError)
+                    {
+                        SendPredefinedEvent(groupId, EventMode.GroupDelete);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -378,7 +469,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.DeleteGroupV2(groupId, callback));
+                api.DeleteGroupV2(groupId, cb =>
+                {
+                    if (cb != null && !cb.IsError)
+                    {
+                        SendPredefinedEvent(groupId, EventMode.GroupDelete);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -406,7 +504,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroupCustomRule(groupId, ruleUpdateRequest, callback));
+                api.UpdateGroupCustomRule(groupId, ruleUpdateRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdateCustomRule);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -434,7 +539,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroupCustomRuleV2(groupId, ruleUpdateRequest, callback));
+                api.UpdateGroupCustomRuleV2(groupId, ruleUpdateRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdateCustomRule);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -457,7 +569,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            if(allowedAction == AllowedAction.None)
+            if (allowedAction == AllowedAction.None)
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! allowedAction parameter is null!"));
                 return;
@@ -470,7 +582,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroupPredefinedRule(groupId, allowedAction, ruleUpdateRequest, callback));
+                api.UpdateGroupPredefinedRule(groupId, allowedAction, ruleUpdateRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdatePredefinedRule);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -506,7 +625,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UpdateGroupPredefinedRuleV2(groupId, allowedAction, ruleUpdateRequest, callback));
+                api.UpdateGroupPredefinedRuleV2(groupId, allowedAction, ruleUpdateRequest, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupUpdatePredefinedRule);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -540,7 +666,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.DeleteGroupPredefinedRule(groupId, allowedAction, callback));
+                api.DeleteGroupPredefinedRule(groupId, allowedAction, cb =>
+                {
+                    if (cb != null && !cb.IsError)
+                    {
+                        SendGroupPredefinedRuleDeletedPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -574,7 +707,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.DeleteGroupPredefinedRuleV2(groupId, allowedAction, callback));
+                api.DeleteGroupPredefinedRuleV2(groupId, allowedAction, cb =>
+                {
+                    if (cb != null && !cb.IsError)
+                    {
+                        SendGroupPredefinedRuleDeletedPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -643,7 +783,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AcceptGroupInvitation(groupId, callback));
+                api.AcceptGroupInvitation(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteAccept);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -669,7 +816,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AcceptGroupInvitationV2(groupId, callback));
+                api.AcceptGroupInvitationV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteAccept);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -695,7 +849,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.RejectGroupInvitation(groupId, callback));
+                api.RejectGroupInvitation(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteReject);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -721,7 +882,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.RejectGroupInvitationV2(groupId, callback));
+                api.RejectGroupInvitationV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteReject);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -746,7 +914,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.InviteOtherUserToGroup(otherUserId, callback));
+                api.InviteOtherUserToGroup(otherUserId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteUser);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -777,7 +952,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.InviteOtherUserToGroupV2(otherUserId, groupId, callback));
+                api.InviteOtherUserToGroupV2(otherUserId, groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupInviteUser);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -803,7 +985,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.JoinGroup(groupId, callback));
+                api.JoinGroup(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupJoin);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -829,7 +1018,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.JoinGroupV2(groupId, callback));
+                api.JoinGroupV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupJoin);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -855,7 +1051,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.CancelJoinGroupRequest(groupId, callback));
+                api.CancelJoinGroupRequest(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendCancelJoinRequestPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -881,7 +1084,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupMemberList(groupId, callback));
+                api.GetGroupMemberList(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetGroupMemberPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -911,7 +1121,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupMemberList(groupId, callback, limit, offset));
+                api.GetGroupMemberList(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetGroupMemberPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }, limit, offset));
         }
 
         /// <summary>
@@ -936,7 +1153,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.KickGroupMember(otherUserId, callback));
+                api.KickGroupMember(otherUserId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupMemberKick);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -950,7 +1174,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if(string.IsNullOrEmpty(groupId))
+            if (string.IsNullOrEmpty(groupId))
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't kick a group member! groupId parameter is null!"));
                 return;
@@ -968,7 +1192,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.KickGroupMemberV2(otherUserId, groupId, callback));
+                api.KickGroupMemberV2(otherUserId, groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupMemberKick);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -986,7 +1217,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.LeaveGroup(callback));
+                api.LeaveGroup(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupLeft);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1011,7 +1249,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.LeaveGroupV2(groupId, callback));
+                api.LeaveGroupV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupLeft);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1041,7 +1286,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupJoinRequests(groupId, callback, limit, offset));
+                api.GetGroupJoinRequests(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetJoinRequestsPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }, limit, offset));
         }
 
         /// <summary>
@@ -1067,7 +1319,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupJoinRequests(groupId, callback));
+                api.GetGroupJoinRequests(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetJoinRequestsPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1095,7 +1354,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupJoinRequestsV2(groupId, callback, limit, offset));
+                api.GetGroupJoinRequestsV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetJoinRequestsPredefinedEvent(groupId, session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }, limit, offset));
         }
 
         /// <summary>
@@ -1117,7 +1383,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupInvitationRequests(callback, limit, offset));
+                api.GetGroupInvitationRequests(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetInvitationListPredefinedEvent(session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }, limit, offset));
         }
 
         /// <summary>
@@ -1135,7 +1408,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupInvitationRequests(callback));
+                api.GetGroupInvitationRequests(cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetInvitationListPredefinedEvent(session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1159,7 +1439,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGroupInvitationRequestsV2(groupId, callback));
+                api.GetGroupInvitationRequestsV2(groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendGetInvitationListPredefinedEvent(session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1184,7 +1471,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AcceptOtherJoinRequest(otherUserId, callback));
+                api.AcceptOtherJoinRequest(otherUserId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupRequestAccept);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1216,7 +1510,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AcceptOtherJoinRequestV2(otherUserId, groupId, callback));
+                api.AcceptOtherJoinRequestV2(otherUserId, groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupRequestAccept);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1230,7 +1531,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
 
             if (!ValidateAccelByteId(otherUserId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(otherUserId), callback))
-            {   
+            {
                 return;
             }
 
@@ -1241,7 +1542,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.RejectOtherJoinRequest(otherUserId, callback));
+                api.RejectOtherJoinRequest(otherUserId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupRequestReject);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1273,7 +1581,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.RejectOtherJoinRequestV2(otherUserId, groupId, callback));
+                api.RejectOtherJoinRequestV2(otherUserId, groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.GroupRequestReject);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1307,7 +1622,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AssignRoleToMember(memberRoleId, userId, callback));
+                api.AssignRoleToMember(memberRoleId, userId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendMemberRoleUpdatedPredefinedEvent(userId, memberRoleId, cb.Value.groupId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1348,7 +1670,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.AssignRoleToMemberV2(memberRoleId, userId, groupId, callback));
+                api.AssignRoleToMemberV2(memberRoleId, userId, groupId, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendMemberRoleUpdatedPredefinedEvent(userId, memberRoleId, cb.Value.groupId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -1385,7 +1714,14 @@ namespace AccelByte.Api
                 api.RemoveRoleFromMember(
                     memberRoleId,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendMemberRoleDeletedPredefinedEvent(userId, memberRoleId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -1430,7 +1766,14 @@ namespace AccelByte.Api
                     memberRoleId,
                     userId,
                     groupId,
-                    callback));
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendMemberRoleDeletedPredefinedEvent(userId, memberRoleId, groupId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -1477,7 +1820,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if(groupIds == null || groupIds.Length == 0)
+            if (groupIds == null || groupIds.Length == 0)
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, "GroupId can't null or empty!"));
                 return;
@@ -1489,7 +1832,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetGroupsByGroupIds(groupIds, callback));
+            coroutineRunner.Run(api.GetGroupsByGroupIds(groupIds, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendGroupFindByIdsPredefinedEvent(session.UserId, groupIds);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -1539,7 +1889,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.CancelGroupMemberInvitation(userId, groupId, callback));
+            coroutineRunner.Run(api.CancelGroupMemberInvitation(userId, groupId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, EventMode.GroupInviteCancel);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -1565,7 +1922,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.UpdateGroupCustomAttributes(groupId, customAttributes, callback));
+            coroutineRunner.Run(api.UpdateGroupCustomAttributes(groupId, customAttributes, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, EventMode.GroupUpdateCustomAttribute);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -1618,5 +1982,238 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(api.GetMyJoinRequest(callback, limit, offset));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            GroupCreate,
+            GroupUpdate,
+            GroupJoin,
+            GroupDelete,
+            GroupLeft,
+            GroupInviteAccept,
+            GroupInviteReject,
+            GroupInviteCancel,
+            GroupRequestAccept,
+            GroupRequestReject,
+            GroupMemberKick,
+            GroupMemberRoleUpdate,
+            GroupMemberRoleDelete,
+            GroupUpdateCustomAttribute,
+            GroupUpdateCustomRule,
+            GroupUpdatePredefinedRule,
+            GroupDeletePredefinedRule,
+            GroupGetInformation,
+            GroupFind,
+            GroupFindByIds,
+            GroupInviteUser,
+            GroupGetInvitationList,
+            GroupJoinRequestCancel,
+            GroupJoinRequestGet,
+            GroupGetGroupMember
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T result, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (eventMode)
+            {
+                case EventMode.GroupCreate:
+                    var createGroupInformation = result as GroupInformation;
+                    payload = new PredefinedGroupCreatedPayload(createGroupInformation);
+                    break;
+
+                case EventMode.GroupUpdate:
+                    var updateGroupInformation = result as GroupInformation;
+                    payload = new PredefinedGroupUpdatedPayload(updateGroupInformation);
+                    break;
+
+                case EventMode.GroupJoin:
+                    var joinGroupResponse = result as JoinGroupResponse;
+                    payload = new PredefinedGroupJoinedPayload(joinGroupResponse);
+                    break;
+
+                case EventMode.GroupDelete:
+                    var groupId = result as string;
+                    payload = new PredefinedGroupDeletedPayload(groupId, localUserId);
+                    break;
+
+                case EventMode.GroupLeft:
+                    var leftGroupResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupLeftPayload(leftGroupResponse);
+                    break;
+
+                case EventMode.GroupInviteAccept:
+                    var inviteAcceptResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupInviteAcceptedPayload(inviteAcceptResponse);
+                    break;
+
+                case EventMode.GroupInviteReject:
+                    var inviteRejectResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupInviteRejectedPayload(inviteRejectResponse);
+                    break;
+
+                case EventMode.GroupInviteCancel:
+                    var inviteCanceledResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupInviteCanceledPayload(localUserId, inviteCanceledResponse);
+                    break;
+
+                case EventMode.GroupRequestAccept:
+                    var requestAcceptResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupJoinRequestAcceptedPayload(localUserId, requestAcceptResponse);
+                    break;
+
+                case EventMode.GroupRequestReject:
+                    var requestRejectResponse = result as GroupGeneralResponse;
+                    payload = new PredefinedGroupJoinRequestRejectedPayload(localUserId, requestRejectResponse);
+                    break;
+
+                case EventMode.GroupMemberKick:
+                    var memberKickResponse = result as KickMemberResponse;
+                    payload = new PredefinedGroupMemberKickedPayload(localUserId, memberKickResponse);
+                    break;
+
+                case EventMode.GroupUpdateCustomAttribute:
+                    var updateCustomAttributeResponse = result as GroupInformation;
+                    payload = new PredefinedGroupCustomAttributesUpdatedPayload(updateCustomAttributeResponse, localUserId);
+                    break;
+
+                case EventMode.GroupUpdateCustomRule:
+                    var updateCustomRuleResponse = result as GroupInformation;
+                    payload = new PredefinedGroupCustomRuleUpdatedPayload(updateCustomRuleResponse, localUserId);
+                    break;
+
+                case EventMode.GroupUpdatePredefinedRule:
+                    var updatePredefinedRuleResponse = result as GroupInformation;
+                    payload = new PredefinedGroupPredefinedRuleUpdatedPayload(updatePredefinedRuleResponse, localUserId);
+                    break;
+
+                case EventMode.GroupGetInformation:
+                    var getInformationResponse = result as GroupInformation;
+                    payload = new PredefinedGroupGetInformationPayload(getInformationResponse, localUserId);
+                    break;
+
+                case EventMode.GroupInviteUser:
+                    var inviteUserResponse = result as UserInvitationResponse;
+                    payload = new PredefinedGroupInviteUserPayload(inviteUserResponse, localUserId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendGroupPredefinedRuleDeletedPredefinedEvent(string groupId, string userId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupPredefinedRuleDeletedPayload(groupId, userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendGroupFindPredefinedEvent(string userId, string groupName, string groupRegion)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupFindPayload(userId, groupName, groupRegion);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendGroupFindByIdsPredefinedEvent(string userId, string[] groupIds)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupFindByIdsPayload(userId, groupIds);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendGetInvitationListPredefinedEvent(string userId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupGetInvitationListPayload(userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendCancelJoinRequestPredefinedEvent(string groupId, string userId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupCancelJoinRequestPayload(groupId, userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendGetJoinRequestsPredefinedEvent(string groupId, string userId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupGetJoinRequestPayload(groupId, userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendGetGroupMemberPredefinedEvent(string groupId, string userId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupGetGroupMemberPayload(groupId, userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendMemberRoleDeletedPredefinedEvent(string userId, string roleIdToRemove, string groupId = null)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupMemberRoleDeletedPayload(userId, roleIdToRemove, groupId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendMemberRoleUpdatedPredefinedEvent(string userId, string roleIdToAdd, string groupId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedGroupMemberRoleUpdatedPayload(userId, roleIdToAdd, groupId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent<T>(T result, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = CreatePayload(result, eventMode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            AccelByteTelemetryEvent groupEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(groupEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.Try(result);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.Try(result);
+        }
+
+        #endregion
     }
 }

@@ -620,6 +620,29 @@ namespace AccelByte.Models
         [DataMember] public string[] friendIds;
     }
 
+    [DataContract, Preserve]
+    public class SyncThirdPartyFriendInfo
+    {
+        [DataMember(Name = "isLogin")] public bool IsLogin;
+        [DataMember(Name = "platformId", EmitDefaultValue = false)] public string PlatformId;
+        [DataMember(Name = "platformToken", EmitDefaultValue = false)] public string PlatformToken;
+        [DataMember(Name = "psnEnv", EmitDefaultValue = false)] public string PsnEnv;
+    }
+
+    [DataContract, Preserve]
+    public class SyncThirdPartyFriendsRequest
+    {
+        [DataMember(Name = "friendSyncDetails")] public SyncThirdPartyFriendInfo[] FriendSyncDetails;
+    }
+
+    [DataContract, Preserve]
+    public class SyncThirdPartyFriendsResponse
+    {
+        [DataMember(Name = "detail")] public string Detail;
+        [DataMember(Name = "platformId")] public string PlatformId;
+        [DataMember(Name = "status")] public string Status;
+    }
+
     #endregion
 
     #region Presence

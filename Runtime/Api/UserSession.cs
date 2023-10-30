@@ -65,6 +65,17 @@ namespace AccelByte.Api
         {
             get => tokenData?.user_id;
         }
+
+        public string PlatformId
+        {
+            get => tokenData?.platform_id;
+        }
+
+        public string PlatformUserId
+        {
+            get => tokenData?.platform_user_id;
+        }
+
         public bool IsComply => tokenData?.is_comply ?? false;
         
         public RefreshTokenData localTokenData;

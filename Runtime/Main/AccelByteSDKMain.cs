@@ -11,7 +11,9 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
 namespace AccelByte.Core
 {
-#if (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX) && UNITY_SERVER
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+    using PlatformMain = WindowsMain;
+#elif (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX) && UNITY_SERVER
     using PlatformMain = LinuxServerMain;
 #elif !UNITY_EDITOR && UNITY_PS4
     using PlatformMain = PS4Main;

@@ -13,6 +13,10 @@ namespace AccelByte.Api
 {
     public class AccelByteWebSocket
     {
+        internal const string LobbySessionIdHeaderName = "X-Ab-LobbySessionID";
+        internal const string PlatformIdHeaderName = "X-Ab-Platform";
+        internal const string PlatformUserIdHeaderName = "X-Ab-Platform-User-Id";
+
         protected int pingDelay = 4000;
         protected int totalTimeout = 60000;
         protected int backoffDelay = 1000;
@@ -26,7 +30,12 @@ namespace AccelByte.Api
         protected ITokenGenerator tokenGenerator;
         private WebstocketMaintainer maintainer;
 
-        public Dictionary<string, string> CustomHeaders { get; set; }
+        public Dictionary<string, string> ReconnectCustomHeaders { get; set; }
+
+        /// <summary>
+        /// Raised prior websocket reconnect
+        /// </summary>
+        internal event Action OnPreReconnectAction;
 
         /// <summary>
         /// Raised when websocket connection succesfully connected
@@ -80,7 +89,7 @@ namespace AccelByte.Api
 
         private void OnTokenReceived(string token)
         {
-             this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, CustomHeaders, token);
+             this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, ReconnectCustomHeaders, token);
         }
 
         /// <summary>
@@ -131,7 +140,7 @@ namespace AccelByte.Api
             this.webSocket.OnError += OnErrorReceived;
             this.webSocket.OnClose += OnCloseReceived;
 
-            CustomHeaders = new Dictionary<string, string>();
+            ReconnectCustomHeaders = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -179,7 +188,7 @@ namespace AccelByte.Api
         {
             Dictionary<string, string> customHeader = new Dictionary<string, string>()
             {
-                { "X-Ab-LobbySessionID", sessionId }
+                { LobbySessionIdHeaderName, sessionId }
             };
             
             Connect(url, authorizationToken, customHeader);
@@ -275,7 +284,7 @@ namespace AccelByte.Api
             {
                 if (this.tokenGenerator == null)
                 {
-                    webSocket.Connect(webSocketUrl, authorizationToken, CustomHeaders);
+                    webSocket.Connect(webSocketUrl, authorizationToken, ReconnectCustomHeaders);
                 }
                 else
                 {
@@ -288,7 +297,7 @@ namespace AccelByte.Api
                 OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
             };
 
-            maintainer = new WebstocketMaintainer(ref webSocket, ref pingDelay, ref backoffDelay, ref maxDelay, ref totalTimeout, reconnectOnClose, reconnectAction, onReconnectFailed);
+            maintainer = new WebstocketMaintainer(ref webSocket, ref pingDelay, ref backoffDelay, ref maxDelay, ref totalTimeout, reconnectOnClose, OnPreReconnectAction, reconnectAction, onReconnectFailed);
         }
 
         private void StopMaintainConnection()
@@ -308,6 +317,7 @@ namespace AccelByte.Api
         private class WebstocketMaintainer
         {
             private readonly bool reconnectOnClose;
+            private Action setupReconnectAction;
             private Action reconnectAction;
             private Action onReconnectFailed;
             private readonly IWebSocket webSocket;
@@ -317,14 +327,14 @@ namespace AccelByte.Api
             private readonly int totalTimeout;
             bool isMaintaining = false;
 
-            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action reconnectAction, System.Action onReconnectFailed)
+            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action setupReconnectAction, System.Action reconnectAction, System.Action onReconnectFailed)
             {
-                this.reconnectOnClose = reconnectOnClose;
                 this.webSocket = webSocket;
                 this.pingDelay = pingDelay;
                 this.backoffDelay = backoffDelay;
                 this.maxDelay = maxDelay;
                 this.totalTimeout = totalTimeout;
+                this.setupReconnectAction = setupReconnectAction;
                 this.reconnectOnClose = reconnectOnClose;
                 this.reconnectAction = reconnectAction;
                 this.onReconnectFailed = onReconnectFailed;
@@ -385,6 +395,8 @@ namespace AccelByte.Api
 #if DEBUG
                                 AccelByteDebug.LogVerbose("[WS] Re-Connecting");
 #endif
+                                setupReconnectAction?.Invoke();
+
                                 reconnectAction?.Invoke();
 
                                 var randomizedDelay = Mathf.RoundToInt((float)(nextDelay + ((rand.NextDouble() * 0.5) - 0.5)));

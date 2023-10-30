@@ -4,14 +4,15 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    public class PresenceBroadcastEvent : WrapperBase
+    public class PresenceBroadcastEvent : WrapperBase, IAccelByteAnalyticsWrapper
     {
-        private PresenceBroadcastEventApi api = null;
-        private ISession session = null;
+        private readonly PresenceBroadcastEventApi api = null;
+        private readonly ISession session = null;
 
         public PresenceBroadcastEvent(PresenceBroadcastEventApi inApi,
             ISession inSession,
@@ -19,11 +20,24 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");
 
-            this.api = inApi;
+            api = inApi;
             session = inSession;
         }
 
         public void SendData(TelemetryBody data, ResultCallback callback)
+        {
+            if (session.IsValid())
+            {
+                api.SendPresenceBroadcastEvent(data, callback);
+            }
+            else
+            {
+                callback.TryError(ErrorCode.InvalidRequest, "User is not logged in.");
+                return;
+            }
+        }
+
+        public void SendData(List<TelemetryBody> data, ResultCallback callback)
         {
             if (session.IsValid())
             {
@@ -41,9 +55,9 @@ namespace AccelByte.Api
             return api.Config;
         }
 
-        internal ISession GetSession()
+        public ISession GetSession()
         {
-            return this.session;
+            return session;
         }
     }
 }

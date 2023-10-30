@@ -52,7 +52,8 @@ namespace AccelByte.Server
 
         public IEnumerator GrantUserEntitlement( string userId
             , GrantUserEntitlementRequest[] grantUserEntitlementsRequest
-            , ResultCallback<StackableEntitlementInfo[]> callback )
+            , ResultCallback<StackableEntitlementInfo[]> callback
+            , Action<Result<StackableEntitlementInfo[]>> predefinedEventCallback = null)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
@@ -77,13 +78,15 @@ namespace AccelByte.Server
             var result = response.TryParseJson<StackableEntitlementInfo[]>();
 
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
         
         [Obsolete("This does not support for multiplatform wallet, use CreditUserWalletV2 instead")] 
         public IEnumerator CreditUserWallet( string userId
             , string currencyCode
             , CreditUserWalletRequest creditUserWalletRequest
-            , ResultCallback<WalletInfo> callback )
+            , ResultCallback<WalletInfo> callback
+            , Action<Result<WalletInfo>> predefinedEventCallback = null)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
@@ -110,12 +113,14 @@ namespace AccelByte.Server
             var result = response.TryParseJson<WalletInfo>();
 
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator CreditUserWalletV2( string userId
             , string currencyCode
             , CreditUserWalletRequest creditUserWalletRequest
-            , ResultCallback<CreditUserWalletResponse> callback )
+            , ResultCallback<CreditUserWalletResponse> callback
+            , Action<Result<CreditUserWalletResponse>> predefinedEventCallback = null)
         {
             Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
             Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
@@ -142,11 +147,13 @@ namespace AccelByte.Server
             var result = response.TryParseJson<CreditUserWalletResponse>();
 
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator FulfillUserItem( string userId
             , FulfillmentRequest fulfillmentRequest
-            , ResultCallback<FulfillmentResult> callback )
+            , ResultCallback<FulfillmentResult> callback 
+            , Action<Result<FulfillmentResult>> predefinedEventCallback = null)
         {
             Assert.IsNotNull(Namespace_, $"{nameof(Namespace_)} cannot be null");
             Assert.IsNotNull(userId, $"{nameof(userId)} cannot be null");
@@ -171,6 +178,7 @@ namespace AccelByte.Server
             var result = response.TryParseJson<FulfillmentResult>();
 
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
         
         public IEnumerator GetStoreList(ResultCallback<PlatformStore[]> callback)

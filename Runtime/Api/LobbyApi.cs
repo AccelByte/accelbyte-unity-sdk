@@ -233,12 +233,64 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-    
+
+        public IEnumerator SyncThirdPartyFriends(SyncThirdPartyFriendsRequest syncRequest
+            , ResultCallback<SyncThirdPartyFriendsResponse[]> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(ErrorCode.NamespaceNotFound);
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(ErrorCode.Unauthorized);
+                yield break;
+            }
+
+            // The request should contain at least one friend sync detail
+            if (syncRequest.FriendSyncDetails.Length < 1)
+            {
+                callback.TryError(ErrorCode.BadRequest);
+                yield break;
+            }
+
+            foreach (SyncThirdPartyFriendInfo syncThirdPartyFriendInfo in syncRequest.FriendSyncDetails)
+            {
+                // The request should not contain empty platform id and should not contain empty platform token if the user is not logged in
+                if (string.IsNullOrEmpty(syncThirdPartyFriendInfo.PlatformId) ||
+                    (string.IsNullOrEmpty(syncThirdPartyFriendInfo.PlatformToken) && !syncThirdPartyFriendInfo.IsLogin))
+                {
+                    callback.TryError(ErrorCode.BadRequest);
+                    yield break;
+                }
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePatch(BaseUrl + "/friends/sync/namespaces/{namespace}/me")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(syncRequest.FriendSyncDetails.ToUtf8Json())
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<SyncThirdPartyFriendsResponse[]>();
+
+            callback.Try(result);
+        }
+
         public void OnBanNotificationReceived( Action<string> callback )
         {
             Report.GetFunctionLog(GetType().Name);
             ((AccelByteHttpClient)HttpClient).OnBearerAuthRejected(callback);
         }
-
     }
 }

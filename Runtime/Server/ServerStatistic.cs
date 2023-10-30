@@ -15,6 +15,15 @@ namespace AccelByte.Server
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        private enum PredefinedUserStatItemMode
+        {
+            Created,
+            Updated,
+            Deleted
+        }
+
         [UnityEngine.Scripting.Preserve]
         internal ServerStatistic( ServerStatisticApi inApi
             , ISession inSession
@@ -44,6 +53,15 @@ namespace AccelByte.Server
         }
 
         /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        /// <summary>
         /// Create stat items of a user. Before a user can have any data in a stat item, he/she needs to have that stat item created.
         /// </summary>
         /// <param name="userId">UserId of a user</param>
@@ -66,8 +84,43 @@ namespace AccelByte.Server
                 return;
             }
 
+            List<string> collectedStatCodes = new List<string>();
+            foreach (var item in statItems)
+            {
+                if (item != null && item.statCode != null)
+                {
+                    collectedStatCodes.Add(item.statCode.ToString());
+                }
+            }
+            SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Created);
+
             coroutineRunner.Run(
                 api.CreateUserStatItems(userId, statItems, callback));
+        }
+
+        private void SendPredefinedEvent(string userId, List<string> statCodes, PredefinedUserStatItemMode mode)
+        {
+            if (predefinedEventScheduler != null)
+            {
+                IAccelByteTelemetryPayload payload;
+                switch (mode)
+                {
+                    case PredefinedUserStatItemMode.Created:
+                        payload = new PredefinedUserStatItemCreatedPayload(userId, statCodes);
+                        break;
+                    case PredefinedUserStatItemMode.Updated:
+                        payload = new PredefinedUserStatItemUpdatedPayload(userId, statCodes);
+                        break;
+                    case PredefinedUserStatItemMode.Deleted:
+                        payload = new PredefinedUserStatItemDeletedPayload(userId, statCodes);
+                        break;
+                    default:
+                        return;
+                }
+
+                var userProfileEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(userProfileEvent, null);
+            }
         }
 
         /// <summary>
@@ -158,6 +211,16 @@ namespace AccelByte.Server
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            List<string> collectedStatCodes = new List<string>();
+            foreach (var item in increments)
+            {
+                if (item != null && item.statCode != null)
+                {
+                    collectedStatCodes.Add(item.statCode.ToString());
+                }
+            }
+            SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
             coroutineRunner.Run(
                 api.IncrementUserStatItems(userId, increments, callback));
@@ -277,6 +340,16 @@ namespace AccelByte.Server
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            List<string> collectedStatCodes = new List<string>();
+            foreach (var item in updates)
+            {
+                if (item != null && item.statCode != null)
+                {
+                    collectedStatCodes.Add(item.statCode.ToString());
+                }
+            }
+            SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
             coroutineRunner.Run(
                 api.UpdateUserStatItems(userId, additionalKey, updates, callback));
@@ -488,6 +561,13 @@ namespace AccelByte.Server
                 return;
             }
 
+            List<string> collectedStatCodes = new List<string>
+            {
+                statCode.ToString()
+            };
+
+            SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Deleted);
+            
             coroutineRunner.Run(
                 api.DeleteUserStatItems(userId, statCode, additionalKey, callback));
         }

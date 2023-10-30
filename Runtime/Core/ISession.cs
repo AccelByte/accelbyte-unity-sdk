@@ -32,6 +32,20 @@ namespace AccelByte.Core
                 return null;
             }
         }
+        
+        public virtual string Namespace
+        {
+            get
+            {
+                string retval = null;
+                if(tokenData != null)
+                {
+                    retval = tokenData.Namespace;
+                }
+                return retval;
+            }
+        }
+
         bool twoFAEnable { get; set; } = false; //Set false for DSSession
 
         // To be set by OAuth and allow UserSession call the Refresh API call

@@ -68,6 +68,7 @@ namespace AccelByte.Server
             }
 
             serverName = Environment.GetEnvironmentVariable("POD_NAME");
+            PodName = string.IsNullOrEmpty(serverName) ? PodName : serverName;
             var request = new RegisterServerRequest 
             {
                 pod_name = serverName, 
@@ -75,7 +76,11 @@ namespace AccelByte.Server
                 custom_attribute = customAttribute,
             };
             
-            coroutineRunner.Run(api.RegisterServer(request, callback));
+            coroutineRunner.Run(api.RegisterServer(request, cb =>
+            {
+                SendPredefinedEvent(PodName, RequestType.Register);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -105,7 +110,11 @@ namespace AccelByte.Server
                 kill_me = killMe, pod_name = serverName, session_id = matchSessionId,
             };
 
-            coroutineRunner.Run(api.ShutdownServer(request, callback));
+            coroutineRunner.Run(api.ShutdownServer(request, cb =>
+            {
+                SendPredefinedEvent(PodName, RequestType.Deregister);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -141,7 +150,11 @@ namespace AccelByte.Server
                 custom_attribute = customAttribute,
             };
             
-            coroutineRunner.Run(api.RegisterLocalServer(request, callback));
+            coroutineRunner.Run(api.RegisterLocalServer(request, cb =>
+            {
+                SendPredefinedEvent(PodName, RequestType.Register);
+                HandleCallback(cb, callback);
+            }));
         }
 
         [Obsolete("ipify supports will be deprecated in future releases, please use " +
@@ -154,7 +167,11 @@ namespace AccelByte.Server
 
             serverName = inName;
 
-            coroutineRunner.Run(api.RegisterLocalServer(port, inName, callback));
+            coroutineRunner.Run(api.RegisterLocalServer(port, inName, cb =>
+            {
+                SendPredefinedEvent(PodName, RequestType.Register);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -177,7 +194,11 @@ namespace AccelByte.Server
                 return;
             }
             
-            coroutineRunner.Run(api.DeregisterLocalServer(serverName, callback));
+            coroutineRunner.Run(api.DeregisterLocalServer(serverName, cb =>
+            {
+                SendPredefinedEvent(PodName, RequestType.Deregister);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -326,5 +347,71 @@ namespace AccelByte.Server
                 IsHeartBeatJobRunning = false;
             }
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+        internal string PodName = "";
+
+        private enum RequestType
+        {
+            None,
+            Register,
+            Deregister
+        }
+
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload(string podName, RequestType requestType = RequestType.None)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (requestType)
+            {
+                case RequestType.Register:
+                    payload = new PredefinedDSRegisteredPayload(podName);
+                    break;
+                case RequestType.Deregister:
+                    payload = new PredefinedDSUnregisteredPayload(podName);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent(string podName, RequestType requestType = RequestType.None)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(podName, requestType);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            AccelByteTelemetryEvent dsEvent = new AccelByteTelemetryEvent(payload);
+
+            predefinedEventScheduler.SendEvent(dsEvent, null);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        #endregion
     }
 }

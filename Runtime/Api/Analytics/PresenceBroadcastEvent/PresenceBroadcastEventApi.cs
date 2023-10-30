@@ -5,6 +5,7 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {
@@ -39,6 +40,29 @@ namespace AccelByte.Api
                 .CreatePost(presenceBroadcastEventUrl)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(pbeEvent.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpSendResult sendResult = await HttpClient.SendRequestAsync(request);
+            IHttpResponse response = sendResult.CallbackResponse;
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public async void SendPresenceBroadcastEvent(List<TelemetryBody> pbeEvents
+            , ResultCallback callback)
+        {
+            if (pbeEvents.Count < 1)
+            {
+                Assert.IsNotNull(pbeEvents, nameof(pbeEvents) + " is null.");
+                callback.TryError(ErrorCode.InvalidArgument);
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(presenceBroadcastEventUrl)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(pbeEvents.ToUtf8Json())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

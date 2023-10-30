@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -13,6 +14,15 @@ namespace AccelByte.Server
         private readonly ServerEcommerceApi api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        private enum PredefinedEventType
+        {
+            Wallet,
+            WalletV2,
+            EntitlementGrant,
+            Fulfilment
+        }
 
         [UnityEngine.Scripting.Preserve]
         internal ServerEcommerce( ServerEcommerceApi inApi
@@ -26,6 +36,156 @@ namespace AccelByte.Server
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
+
+        #region Predefined Event Analytics
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private void SendPredefinedEntitlementEvent(Result<StackableEntitlementInfo[]> apiCallResult)
+        {
+            IAccelByteTelemetryPayload payload;
+            payload = CreatePredefinedPayload<StackableEntitlementInfo[]>(apiCallResult, PredefinedEventType.EntitlementGrant);
+            SendPredefinedEvent(payload);
+        }
+
+        private IAccelByteTelemetryPayload CreatePredefinedPayload<T>(Result<T> apiCallResult, PredefinedEventType eventType)
+        {
+            switch (eventType)
+            {
+                case PredefinedEventType.Wallet:
+                    {
+                        var walletInfo = apiCallResult as Result<WalletInfo>;
+                        var payload = new PredefinedWalletCreditedPayload(
+                            walletInfo.Value.userId,
+                            walletInfo.Value.currencyCode,
+                            walletInfo.Value.currencySymbol,
+                            walletInfo.Value.balance,
+                            walletInfo.Value.balanceOrigin,
+                            walletInfo.Value.totalPermanentBalance,
+                            walletInfo.Value.totalTimeLimitedBalance);
+                        return payload;
+                    }
+                case PredefinedEventType.WalletV2:
+                    {
+                        var walletInfo = apiCallResult as Result<CreditUserWalletResponse>;
+                        var payload = new PredefinedWalletCreditedPayload(
+                            walletInfo.Value.userId,
+                            walletInfo.Value.currencyCode,
+                            walletInfo.Value.currencySymbol,
+                            walletInfo.Value.balance,
+                            walletInfo.Value.balanceOrigin,
+                            walletInfo.Value.totalPermanentBalance,
+                            walletInfo.Value.totalTimeLimitedBalance);
+                        return payload;
+                    }
+                case PredefinedEventType.EntitlementGrant:
+                    {
+                        var entitlementInfos = apiCallResult as Result<StackableEntitlementInfo[]>;
+                        List<PredefinedEntitlements> list = new List<PredefinedEntitlements>();
+
+                        foreach (var result in entitlementInfos.Value)
+                        {
+                            PredefinedEntitlements entitlement = new PredefinedEntitlements(
+                                result.itemId,
+                                result.itemNamespace,
+                                result.StoreId,
+                                result.grantedCode,
+                                result.source.ToString());
+
+                            list.Add(entitlement);
+                        }
+                        var payload = new PredefinedEntitlementGrantedPayload(list);
+                        return payload;
+                    }
+                case PredefinedEventType.Fulfilment:
+                    {
+                        var fulfilmentResult = apiCallResult as Result<FulfillmentResult>;
+                        string userId = fulfilmentResult.Value.userId;
+
+                        List<PredefinedEntitlementSummary> entitlements = new List<PredefinedEntitlementSummary>();
+                        foreach (var summary in fulfilmentResult.Value.entitlementSummaries)
+                        {
+                            PredefinedEntitlementSummary entSummary = new PredefinedEntitlementSummary(
+                                summary.id,
+                                summary.Name,
+                                summary.type.ToString(),
+                                summary.clazz.ToString(),
+                                summary.itemId,
+                                summary.StoreId.ToString());
+
+                            entitlements.Add(entSummary);
+                        }
+
+                        List<PredefinedCreditSummary> credits = new List<PredefinedCreditSummary>();
+                        foreach (var summary in fulfilmentResult.Value.creditSummaries)
+                        {
+                            PredefinedCreditSummary credsSummary = new PredefinedCreditSummary(
+                                summary.walletId,
+                                summary.userId,
+                                summary.amount,
+                                summary.CurrencyCode);
+
+                            credits.Add(credsSummary);
+                        }
+
+                        List<PredefinedSubscriptionSummary> subscriptions = new List<PredefinedSubscriptionSummary>();
+                        foreach (var summary in fulfilmentResult.Value.subscriptionSummaries)
+                        {
+                            PredefinedSubscriptionSummary subsSummary = new PredefinedSubscriptionSummary(
+                                summary.Id,
+                                summary.ItemId,
+                                summary.UserId,
+                                summary.Sku,
+                                summary.Status.ToString(),
+                                summary.SubscribedBy.ToString());
+
+                            subscriptions.Add(subsSummary);
+                        }
+
+                        var payload = new PredefinedItemFulfilledPayload(userId, entitlements, credits, subscriptions);
+                        return payload;
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        private void SendPredefinedUserWalletEvent(Result<WalletInfo> apiCallResult)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload<WalletInfo>(apiCallResult, PredefinedEventType.Wallet);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedUserWalletEventV2(Result<CreditUserWalletResponse> apiCallResult)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload<CreditUserWalletResponse>(apiCallResult, PredefinedEventType.WalletV2);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload != null)
+            {
+                var userProfileEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(userProfileEvent, null);
+            }
+        }
+
+        private void SendFulfillUserItemPredefinedEvent(Result<FulfillmentResult> apiCall)
+        {
+            IAccelByteTelemetryPayload payload;
+            payload = CreatePredefinedPayload<FulfillmentResult>(apiCall, PredefinedEventType.Fulfilment);
+            SendPredefinedEvent(payload);
+        }
+
+        #endregion
 
         /// <summary>
         /// </summary>
@@ -92,11 +252,18 @@ namespace AccelByte.Server
                 return;
             }
 
+            Action<Result<StackableEntitlementInfo[]>> onPredefinedEventTrigger = null;
+            if (predefinedEventScheduler != null)
+            {
+                onPredefinedEventTrigger = SendPredefinedEntitlementEvent;
+            }
+
             coroutineRunner.Run(
                 api.GrantUserEntitlement(
                     userId,
                     grantUserEntitlementsRequest,
-                    callback));
+                    callback,
+                    onPredefinedEventTrigger));
         }
 
         /// <summary>
@@ -120,12 +287,19 @@ namespace AccelByte.Server
                 return;
             }
 
+            Action<Result<WalletInfo>> onPredefinedEventTrigger = null;
+            if (predefinedEventScheduler != null)
+            {
+                onPredefinedEventTrigger = SendPredefinedUserWalletEvent;
+            }
+
             coroutineRunner.Run(
                 api.CreditUserWallet(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
-                    callback));
+                    callback,
+                    onPredefinedEventTrigger));
         }
 
         /// <summary>
@@ -153,12 +327,19 @@ namespace AccelByte.Server
                 return;
             }
 
+            Action<Result<CreditUserWalletResponse>> onPredefinedEventTrigger = null;
+            if (predefinedEventScheduler != null)
+            {
+                onPredefinedEventTrigger = SendPredefinedUserWalletEventV2;
+            }
+
             coroutineRunner.Run(
                 api.CreditUserWalletV2(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
-                    callback));
+                    callback,
+                    onPredefinedEventTrigger));
         }
 
         /// <summary>
@@ -184,13 +365,20 @@ namespace AccelByte.Server
                 return;
             }
 
+            Action<Result<FulfillmentResult>> onPredefinedEventTrigger = null;
+            if (predefinedEventScheduler != null)
+            {
+                onPredefinedEventTrigger = SendFulfillUserItemPredefinedEvent;
+            }
+
             coroutineRunner.Run(
-                api.FulfillUserItem(
-                    userId,
-                    fulfillmentRequest,
-                    callback));
+               api.FulfillUserItem(
+                   userId,
+                   fulfillmentRequest,
+                   callback,
+                   onPredefinedEventTrigger));
         }
-        
+
         /// <summary>
         /// Get List All Store.
         /// </summary>

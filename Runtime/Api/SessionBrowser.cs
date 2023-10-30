@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -44,7 +45,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.CreateGameSession(createRequest, callback));
+                api.CreateGameSession(createRequest, cb => 
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.SessionCreate);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -263,7 +271,84 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.JoinSession(sessionId, password, callback));
+                api.JoinSession(sessionId, password, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb.Value, EventMode.SessionJoin);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            SessionCreate,
+            SessionJoin
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T result, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (eventMode)
+            {
+                case EventMode.SessionCreate:
+                    SessionBrowserData sessionCreateResult = result as SessionBrowserData;
+                    payload = new PredefinedGameSessionV1CreatedPayload(sessionCreateResult.user_id, sessionCreateResult.session_id);
+                    break;
+
+                case EventMode.SessionJoin:
+                    SessionBrowserData sessionJoinResult = result as SessionBrowserData;
+                    payload = new PredefinedGameSessionV1JoinedPayload(sessionJoinResult.user_id, sessionJoinResult.session_id);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent<T>(T result, EventMode eventMode)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result, eventMode);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        #endregion
     }
 }

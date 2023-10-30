@@ -4,6 +4,7 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using JetBrains.Annotations;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -13,6 +14,8 @@ namespace AccelByte.Api
         private readonly MatchmakingV2Api matchmakingV2Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
+
+        private PredefinedEventScheduler predefinedEventScheduler;
 
         [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
@@ -48,7 +51,10 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, callback));
+                matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, cb => 
+                {
+                    SendPredefinedEvent(matchPoolName, optionalParams, cb, callback);
+                }));
         }
         
         /// <summary>
@@ -101,7 +107,10 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.DeleteMatchmakingTicket(ticketId, callback));
+                matchmakingV2Api.DeleteMatchmakingTicket(ticketId, cb =>
+                {
+                    SendPredefinedEvent(ticketId, cb, callback);
+                }));
         }
 
         /// <summary>
@@ -145,5 +154,90 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 matchmakingV2Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
         }
+
+        #region PredefinedEvents
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        IAccelByteTelemetryPayload CreatePayload(Result result, string matchTicketId)
+        {
+            string localUserId = session.UserId;
+
+            IAccelByteTelemetryPayload payload = new PredefinedMatchmakingCanceledPayload(localUserId, matchTicketId);
+
+            return payload;
+        }
+
+        IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result, string matchPoolName, [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (typeof(T))
+            {
+                case Type createMatchmaking when createMatchmaking == typeof(MatchmakingV2CreateTicketResponse):
+                    var createMatchmakingValue = result.Value as MatchmakingV2CreateTicketResponse;
+                    payload = new PredefinedMatchmakingRequestedPayload(localUserId
+                        , matchPoolName
+                        , optionalParams.sessionId
+                        , optionalParams.attributes
+                        , createMatchmakingValue.matchTicketId
+                        , createMatchmakingValue.queueTime);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent<T>(string matchPoolName, [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams, Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                callback.Try(result);
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result, matchPoolName, optionalParams);
+            var matchmakingEvent = new AccelByteTelemetryEvent(payload);
+
+            predefinedEventScheduler.SendEvent(matchmakingEvent, null);
+            callback.Try(result);
+        }
+
+        private void SendPredefinedEvent(string matchTicketId, Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                callback.Try(result);
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result, matchTicketId);
+            var matchmakingEvent = new AccelByteTelemetryEvent(payload);
+
+            predefinedEventScheduler.SendEvent(matchmakingEvent, null);
+            callback.Try(result);
+        }
+
+        #endregion
     }
 }

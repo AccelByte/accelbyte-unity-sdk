@@ -3,8 +3,11 @@
 // and restrictions contact your company contract manager.
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -14,6 +17,23 @@ namespace AccelByte.Server
         private readonly ServerCloudSaveApi api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        private enum PredefinedGameRecordMode
+        {
+            Updated,
+            Deleted
+        }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        private enum PredefinedGameRecordStrategy
+        {
+            [EnumMember(Value = "APPEND")]
+            Append,
+            [EnumMember(Value = "REPLACE")]
+            Replace,
+        }
 
         [UnityEngine.Scripting.Preserve]
         internal ServerCloudSave( ServerCloudSaveApi inApi
@@ -27,7 +47,16 @@ namespace AccelByte.Server
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="inAi"></param>
@@ -41,6 +70,34 @@ namespace AccelByte.Server
             , CoroutineRunner inCoroutineRunner )
             : this( inApi, inSession, inCoroutineRunner )
         {
+        }
+
+        private void SendPredefinedEvent(
+            PredefinedGameRecordMode mode, 
+            string key, 
+            string strategy = null,
+            string setBy = null, 
+            Dictionary<string, object> values = null)
+        {
+            if (predefinedEventScheduler != null)
+            {
+                IAccelByteTelemetryPayload payload;
+
+                switch (mode)
+                {
+                    case PredefinedGameRecordMode.Updated:
+                        payload = new PredefinedGameRecordUpdatedPayload(key, setBy, Utils.JsonUtils.SerializeWithStringEnum(strategy), values);
+                        break;
+                    case PredefinedGameRecordMode.Deleted:
+                        payload = new PredefinedGameRecordDeletedPayload(key);
+                        break;
+                    default:
+                        return;
+                }
+
+                var userProfileEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(userProfileEvent, null);
+            }
         }
 
         /// <summary>
@@ -284,6 +341,13 @@ namespace AccelByte.Server
                 return;
             }
 
+            SendPredefinedEvent(
+                PredefinedGameRecordMode.Updated,
+                key,
+                Utils.JsonUtils.SerializeWithStringEnum(PredefinedGameRecordStrategy.Append),
+                setBy.GetString(),
+                recordRequest);
+
             coroutineRunner.Run(api.SaveGameRecord(
                 key,
                 recordRequest,
@@ -307,6 +371,8 @@ namespace AccelByte.Server
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            SendPredefinedEvent(PredefinedGameRecordMode.Deleted, key);
 
             coroutineRunner.Run(api.DeleteGameRecord(key, callback));
         }
@@ -333,6 +399,13 @@ namespace AccelByte.Server
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            SendPredefinedEvent(
+                PredefinedGameRecordMode.Updated, 
+                key, 
+                Utils.JsonUtils.SerializeWithStringEnum(PredefinedGameRecordStrategy.Replace), 
+                setBy.GetString(), 
+                recordRequest);
 
             coroutineRunner.Run(api.ReplaceGameRecord(
                 key, 

@@ -20,5 +20,6 @@ namespace AccelByte.Core
             internal set;
             get;
         }
+        internal static Models.OverrideConfigs OverrideConfigs;
     }
 }

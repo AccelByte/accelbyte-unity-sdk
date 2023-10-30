@@ -9,17 +9,22 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using AccelByte.Core;
 using AccelByte.Models;
 using Newtonsoft.Json;
 
-namespace AccelByte.Core
+namespace AccelByte.Utils
 {
     /// <summary>
     /// Awesome Format: AccelByte Web Socket Messaging Format
     /// </summary>
-    public static class AwesomeFormat
+    public class AwesomeFormat : IAccelByteWebsocketSerializer
     {
-        public static void WriteHeader(StringWriter writer, MessageType type, long id = -1, ErrorCode? code = null)
+        public AwesomeFormat()
+        {
+        }
+
+        public void WriteHeader(StringWriter writer, MessageType type, long id = -1, ErrorCode? code = null)
         {
             writer.NewLine = "\n";
             writer.Write("type: {0}", type);
@@ -37,7 +42,7 @@ namespace AccelByte.Core
             }
         }
 
-        public static void WritePayload<T>(StringWriter writer, T inputPayload) where T : class
+        public void WritePayload<T>(StringWriter writer, T inputPayload) where T : class
         {
             writer.NewLine = "\n";
 
@@ -81,7 +86,7 @@ namespace AccelByte.Core
             }
         }
 
-        public static ErrorCode ReadHeader(string message, out MessageType type, out long id)
+        public ErrorCode ReadHeader(string message, out MessageType type, out long id)
         {
             type = MessageType.unknown;
             id = -1;
@@ -132,17 +137,17 @@ namespace AccelByte.Core
             return (ErrorCode) code;
         }
 
-        public static ErrorCode ReadPayload<T>(string message, out T payload) where T : class, new()
+        public ErrorCode ReadPayload<T>(string message, out T payload) where T : class, new()
         {
             payload = default(T);
-            var fields = AwesomeFormat.ParseFields(message);
+            var fields = ParseFields(message);
 
             if (fields == null)
             {
                 return ErrorCode.MessageFormatInvalid;
             }
 
-            return AwesomeFormat.MakePayloadFromFields(fields, out payload);
+            return MakePayloadFromFields(fields, out payload);
         }
 
         private static Dictionary<string, string> ParseFields(string inputString)

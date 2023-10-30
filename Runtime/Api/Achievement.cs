@@ -80,7 +80,14 @@ namespace AccelByte.Api
                     language, 
                     tags,
                     sortBy, 
-                    callback, 
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendUserIdPredefinedEvent(session.UserId, EventMode.GetAll);
+                        }
+                        HandleCallback(cb, callback);
+                    }, 
                     offset, 
                     limit,
                     isGlobal));
@@ -104,7 +111,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetAchievement(achievementCode, callback));
+                api.GetAchievement(achievementCode, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GetSpecific);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -139,7 +153,14 @@ namespace AccelByte.Api
                     session.UserId,
                     tags,
                     sortBy, 
-                    callback, 
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendUserIdPredefinedEvent(session.UserId, EventMode.GetUserAchievement);
+                        }
+                        HandleCallback(cb, callback);
+                    }, 
                     offset, 
                     limit,
                    preferUnlocked));
@@ -164,7 +185,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, callback));
+                api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, cb =>
+                {
+                    if (cb != null && !cb.IsError)
+                    {
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.Unlocked);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -201,7 +229,14 @@ namespace AccelByte.Api
                     achievementCode,
                     achievementStatus,
                     sortBy,
-                    callback,
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGet);
+                        }
+                        HandleCallback(cb, callback);
+                    },
                     offset,
                     limit,
                     tags));
@@ -234,7 +269,14 @@ namespace AccelByte.Api
                 api.QueryGlobalAchievementContributors(
                     achievementCode,
                     sortBy,
-                    callback,
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributors);
+                        }
+                        HandleCallback(cb, callback);
+                    },
                     offset,
                     limit));
         }
@@ -267,7 +309,14 @@ namespace AccelByte.Api
                     session.UserId,
                     achievementCode,
                     sortBy,
-                    callback,
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributed);
+                        }
+                        HandleCallback(cb, callback);
+                    },
                     offset,
                     limit));
         }
@@ -293,8 +342,15 @@ namespace AccelByte.Api
                 api.ClaimGlobalAchievement(
                     session.UserId, 
                     session.AuthorizationToken, 
-                    achievementCode, 
-                    callback));
+                    achievementCode,
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalClaimed);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -320,7 +376,151 @@ namespace AccelByte.Api
             }
             
             coroutineRunner.Run(
-                api.GetTags(name, sortBy, callback, offset, limit));
+                api.GetTags(name, sortBy, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendNamePredefinedEvent(name);
+                    }
+                    HandleCallback(cb, callback);
+                }, offset, limit));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            Unlocked,
+            GetAll,
+            GetSpecific,
+            GetUserAchievement,
+            GlobalGet,
+            GlobalGetContributors,
+            GlobalGetContributed,
+            GlobalClaimed,
+            GetTags
+        }
+
+        private IAccelByteTelemetryPayload CreateAchievementCodePayload(string achievementCode, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (mode)
+            {
+                case EventMode.Unlocked:
+                    payload = new PredefinedAchievementUnlockedPayload(achievementCode);
+                    break;
+
+                case EventMode.GetSpecific:
+                    payload = new PredefinedAchievementGetSpecificPayload(achievementCode);
+                    break;
+
+                case EventMode.GlobalGet:
+                    payload = new PredefinedGlobalAchievementGetPayload(achievementCode);
+                    break;
+
+                case EventMode.GlobalGetContributors:
+                    payload = new PredefinedGlobalAchievementGetContributorsPayload(achievementCode);
+                    break;
+
+                case EventMode.GlobalGetContributed:
+                    payload = new PredefinedGlobalAchievementGetContributedPayload(achievementCode);
+                    break;
+
+                case EventMode.GlobalClaimed:
+                    payload = new PredefinedGlobalAchievementClaimedPayload(achievementCode);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreateUserIdPayload(string userId, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (mode)
+            {
+                case EventMode.GetUserAchievement:
+                    payload = new PredefinedAchievementGetUserAchievementsPayload(userId);
+                    break;
+
+                case EventMode.GetAll:
+                    payload = new PredefinedAchievementGetAllPayload(userId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendAchievementCodePredefinedEvent(string achievementCode, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreateAchievementCodePayload(achievementCode, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendUserIdPredefinedEvent(string userId, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreateUserIdPayload(userId, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendNamePredefinedEvent(string name)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedAchievementGetTagsPayload(name);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        #endregion
+
     }
 }

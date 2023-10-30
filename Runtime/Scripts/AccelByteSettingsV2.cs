@@ -608,6 +608,36 @@ namespace AccelByte.Api
             }
         }
 
+        internal void OverrideClientSDKConfig(SDKConfigArgs overrideConfig)
+        {
+            if (sdkConfig != null && overrideConfig != null)
+            {
+                sdkConfig = overrideConfig.CopyToConfig(sdkConfig);
+            }
+        }
+
+        internal void OverrideServerSDKConfig(SDKConfigArgs overrideConfig)
+        {
+            if (serverSdkConfig != null && overrideConfig != null)
+            {
+                serverSdkConfig = overrideConfig.CopyToConfig(serverSdkConfig);
+            }
+        }
+
+        internal void OverrideOAuthConfig(OAuthConfig overrideConfig)
+        {
+            if (oAuthConfig != null && overrideConfig != null)
+            {
+                if (overrideConfig.ClientId != null)
+                {
+                    oAuthConfig.ClientId = overrideConfig.ClientId;
+                }
+                if (overrideConfig.ClientSecret != null)
+                {
+                    oAuthConfig.ClientSecret = overrideConfig.ClientSecret;
+                }
+            }
+        }
         public OAuthConfig CopyOAuthConfig() 
         { 
             return oAuthConfig != null ? oAuthConfig.ShallowCopy() : null; 

@@ -25,7 +25,19 @@ namespace AccelByte.Api
 #endif
     public static class AccelBytePlugin
     {
-        private static AccelByteSettingsV2 settings;
+        private static AccelByteSettingsV2 currentSettings;
+        private static AccelByteSettingsV2 settings
+        {
+            get
+            {
+                return currentSettings;
+            }
+            set
+            {
+                currentSettings = value;
+                OnSettingsUpdate?.Invoke(currentSettings);
+            }
+        }
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
 
@@ -65,13 +77,14 @@ namespace AccelByte.Api
         private static HeartBeat heartBeat;
         private static StoreDisplay storeDisplay;
         private static PresenceBroadcastEvent presenceBroadcastEvent;
-        private static PresenceBroadcastEventController presenceBroadcastEventController;
+        private static PresenceBroadcastEventScheduler presenceBroadcastEventScheduler;
         private static AnalyticsService analyticsService;
         private static Gdpr gdpr;
         #endregion /Modules with ApiBase
 
         private static bool initialized = false;
         internal static event Action configReset;
+        internal static Action<AccelByteSettingsV2> OnSettingsUpdate;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
 
@@ -124,6 +137,7 @@ namespace AccelByte.Api
                 }
             };
 #endif
+            OnSettingsUpdate += AccelByteDebug.Initialize;
         }
 
         internal static void Reset()
@@ -138,11 +152,10 @@ namespace AccelByte.Api
                 heartBeat = null;
             }
 
-            if (presenceBroadcastEventController != null)
+            if (presenceBroadcastEventScheduler != null)
             {
-                presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
-                presenceBroadcastEventController.Dispose();
-                presenceBroadcastEventController = null;
+                presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(false);
+                presenceBroadcastEventScheduler = null;
             }
 
             if (predefinedEventScheduler != null)
@@ -157,7 +170,9 @@ namespace AccelByte.Api
         {
             Initialize(null, null);
 
+#if TEMPORARY_ENABLE_COMPAT_CHECK
             ValidateCompatibility();
+#endif
         }
 
         internal static void Initialize(Config inConfig, OAuthConfig inOAuthConfig)
@@ -198,17 +213,6 @@ namespace AccelByte.Api
             settings = newSettings;
 
             coroutineRunner = new CoroutineRunner();
-
-            AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
-            AccelByteLogType logTypeEnum;
-            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
-            {
-                AccelByteDebug.SetFilterLogType(logTypeEnum);
-            }
-            else
-            {
-                AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
-            }
 
             httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
             gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
@@ -306,6 +310,8 @@ namespace AccelByte.Api
         private static AccelByteSettingsV2 RetrieveConfigFromJsonFile(string platform, SettingsEnvironment environment)
         {
             var retval = new AccelByteSettingsV2(platform, environment, false);
+            retval.OverrideClientSDKConfig(AccelByteSDK.OverrideConfigs.SDKConfigOverride.GetByEnvironment(environment));
+            retval.OverrideOAuthConfig(AccelByteSDK.OverrideConfigs.OAuthConfigOverride.GetByEnvironment(environment));
             return retval;
         }
 
@@ -384,7 +390,10 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+                    userProfiles.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
+
+                userProfiles.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             }
 
             return userProfiles;
@@ -504,8 +513,11 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+                    orders.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
             }
+
+            orders.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             return orders;
         }
@@ -594,7 +606,11 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    lobby.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
+
+                lobby.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             }
 
             return lobby;
@@ -624,7 +640,11 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    _session.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
+
+                _session.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             }
 
             return _session;
@@ -654,7 +674,11 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    _matchmakingV2.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
+
+                _matchmakingV2.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             }
 
             return _matchmakingV2;
@@ -776,6 +800,8 @@ namespace AccelByte.Api
                         coroutineRunner);
                 };
             }
+
+            fulfillment.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             return fulfillment;
         }
@@ -974,6 +1000,8 @@ namespace AccelByte.Api
                     session,
                     coroutineRunner);
 
+                achievement.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
                 configReset += () =>
                 {
                     achievement = null;
@@ -984,6 +1012,8 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    achievement.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
             }
 
@@ -1004,6 +1034,8 @@ namespace AccelByte.Api
                     session,
                     coroutineRunner);
 
+                group.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
                 configReset += () =>
                 {
                     group = null;
@@ -1014,6 +1046,8 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    group.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
             }
 
@@ -1094,6 +1128,8 @@ namespace AccelByte.Api
                     session,
                     coroutineRunner);
 
+                seasonPass.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
                 configReset += () =>
                 {
                     seasonPass = null;
@@ -1104,6 +1140,8 @@ namespace AccelByte.Api
                             session),
                         session,
                         coroutineRunner);
+
+                    seasonPass.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
             }
 
@@ -1122,6 +1160,8 @@ namespace AccelByte.Api
                         GetUser().Session),
                     user.Session,
                     coroutineRunner);
+
+                sessionBrowser.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             }
             return sessionBrowser;
         }
@@ -1232,31 +1272,35 @@ namespace AccelByte.Api
             return presenceBroadcastEvent;
         }
 
-        public static PresenceBroadcastEventController GetPresenceBroadcastEventController()
+        public static PresenceBroadcastEventScheduler GetPresenceBroadcastEventScheduler()
         {
-            if (presenceBroadcastEventController == null)
+            if (presenceBroadcastEventScheduler == null)
             {
                 CheckPlugin();
 
                 PresenceBroadcastEvent presenceBroadcastEvent = GetPresenceBroadcastEvent();
-                presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
+                presenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(presenceBroadcastEvent);
 
                 configReset += () =>
                 {
                     bool presenceBroadcastEventJobEnabled = false;
-                    if (presenceBroadcastEventController != null)
+                    if (presenceBroadcastEventScheduler != null)
                     {
-                        presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(false);
+                        presenceBroadcastEventJobEnabled = presenceBroadcastEventScheduler.IsPresenceBroadcastEventJobEnabled;
+                        presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(false);
                     }
+                    
+                    presenceBroadcastEventScheduler = null;
+                    presenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(presenceBroadcastEvent);
 
-                    presenceBroadcastEventController = null;
-                    presenceBroadcastEventController = new PresenceBroadcastEventController(presenceBroadcastEvent);
-
-                    presenceBroadcastEventController.SetPresenceBroadcastEventEnabled(Config.EnablePresenceBroadcastEvent);
+                    if (presenceBroadcastEventJobEnabled)
+                    {
+                        presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(true);
+                    }
                 };
             }
 
-            return presenceBroadcastEventController;
+            return presenceBroadcastEventScheduler;
         }
 
         public static AnalyticsService GetAnalyticService()
@@ -1380,7 +1424,7 @@ namespace AccelByte.Api
             turnManager = null;
             configReset = null;
             presenceBroadcastEvent = null;
-            presenceBroadcastEventController = null;
+            presenceBroadcastEventScheduler = null;
         }
 
         #region Environment
@@ -1421,17 +1465,6 @@ namespace AccelByte.Api
                     newSettings = RetrieveConfigFromJsonFile("", newEnvironment);
                 }
                 settings = newSettings;
-
-                AccelByteDebug.SetEnableLogging(settings.SDKConfig.EnableDebugLog);
-                AccelByteLogType logTypeEnum;
-                if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
-                {
-                    AccelByteDebug.SetFilterLogType(logTypeEnum);
-                }
-                else
-                {
-                    AccelByteDebug.SetFilterLogType(AccelByteLogType.Verbose);
-                }
 
                 httpClient = null;
                 user = null;

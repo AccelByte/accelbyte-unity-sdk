@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using Newtonsoft.Json;
@@ -88,6 +89,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
+            podName = serverName;
             serverDSHubWebsocketApi.Connect(serverName);
         }
 
@@ -161,5 +163,213 @@ namespace AccelByte.Server
                     break;
             }
         }
+
+        #region PredefinedEvents
+
+        internal string podName;
+        internal Dictionary<string, SessionV2GameSession> cachedSessions = new Dictionary<string, SessionV2GameSession>();
+        private PredefinedEventScheduler predefinedEventScheduler;
+        private bool isAnalyticsConnected = false;
+
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+
+            ConnectPredefinedAnalyticsToEvents();
+        }
+
+        private void ConnectPredefinedAnalyticsToEvents()
+        {
+            if (isAnalyticsConnected)
+            {
+                return;
+            }
+
+            OnConnected += SendPredefinedEvent;
+            OnDisconnected += SendPredefinedEvent;
+            GameSessionV2MemberChanged += SendPredefinedEvent;
+            MatchmakingV2ServerClaimed += SendPredefinedEvent;
+            MatchmakingV2BackfillProposalReceived += SendPredefinedEvent;
+            GameSessionV2Ended += endedNotif =>
+            {
+                if (endedNotif.IsError)
+                {
+                    return;
+                }
+
+                if (cachedSessions.ContainsKey(endedNotif.Value.SessionId))
+                {
+                    cachedSessions.Remove(endedNotif.Value.SessionId);
+                }
+            };
+
+            isAnalyticsConnected = true;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T result)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (typeof(T))
+            {
+                case Type statusCodeType when statusCodeType == typeof(WsCloseCode):
+                    Enum statusCode = result as Enum;
+                    var statusCodeEnum = (WsCloseCode)statusCode;
+
+                    payload = new PredefinedDSDisconnectedPayload(podName, statusCodeEnum);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (typeof(T))
+            {
+                case Type gameSessionType when gameSessionType == typeof(SessionV2GameSession):
+                    var gameSession = result.Value as SessionV2GameSession;
+                    SendSessionChangedPredefinedEvent(gameSession);
+
+                    if (!cachedSessions.ContainsKey(gameSession.id))
+                    {
+                        cachedSessions.Add(gameSession.id, gameSession);
+                        payload = new PredefinedDSClientJoinedPayload(podName, gameSession.members[0].id);
+                    }
+                    else if (cachedSessions[gameSession.id].members.Length < gameSession.members.Length)
+                    {
+                        SessionV2MemberData joinedMember = null;
+
+                        foreach (var member in gameSession.members)
+                        {
+                            var newMember = Array.Find(cachedSessions[gameSession.id].members, sessionMember =>
+                            {
+                                return sessionMember.id == member.id;
+                            });
+
+                            if (newMember == null)
+                            {
+                                joinedMember = member;
+                                payload = new PredefinedDSClientJoinedPayload(podName, joinedMember.id);
+                                break;
+                            }
+                        }
+                    }
+                    else if (gameSession.members.Length < cachedSessions[gameSession.id].members.Length)
+                    {
+                        SessionV2MemberData joinedMember = null;
+
+                        foreach (var member in cachedSessions[gameSession.id].members)
+                        {
+                            var newMember = Array.Find(gameSession.members, sessionMember =>
+                            {
+                                return sessionMember.id == member.id;
+                            });
+
+                            if (newMember == null)
+                            {
+                                joinedMember = member;
+                                payload = new PredefinedDSClientLeftPayload(podName, joinedMember.id);
+                                break;
+                            }
+                        }
+                    }
+
+                    cachedSessions[gameSession.id] = gameSession;
+                    break;
+
+                case Type serverClaimedType when serverClaimedType == typeof(ServerClaimedNotification):
+                    var serverClaimed = result.Value as ServerClaimedNotification;
+
+                    payload = new PredefinedDSClaimedPayload(podName, serverClaimed.sessionId);
+                    break;
+
+                case Type backfillNotifType when backfillNotifType == typeof(MatchmakingV2BackfillProposalNotification):
+                    var backfillNotif = result.Value as MatchmakingV2BackfillProposalNotification;
+
+                    payload = new PredefinedDSBackfillReceivedPayload(podName, backfillNotif);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload()
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedDSConnectedPayload(podName);
+
+            return payload;
+        }
+
+        internal void SendPredefinedEvent<T>(T result)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var dsHubEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(dsHubEvent, null);
+        }
+
+        internal void SendPredefinedEvent<T>(Result<T> result)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var dsHubEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(dsHubEvent, null);
+        }
+
+        internal void SendPredefinedEvent()
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload();
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var dsHubEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(dsHubEvent, null);
+        }
+
+        private void SendSessionChangedPredefinedEvent(SessionV2GameSession session)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = new PredefinedDSMemberChangedPayload(podName, session);
+
+            var dsHubEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(dsHubEvent, null);
+        }
+
+        #endregion
     }
 }

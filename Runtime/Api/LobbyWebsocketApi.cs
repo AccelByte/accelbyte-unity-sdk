@@ -4,11 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -59,9 +59,8 @@ namespace AccelByte.Api
         private string channelSlug;
         private AccelByteWebSocket webSocket;
         private LobbySessionId lobbySessionId;
+        private Utils.IAccelByteWebsocketSerializer websocketSerializer;
 
-        private const string LOBBY_SESSION_ID_HEADER_NAME = "X-Ab-LobbySessionID";
-        
         #endregion private fields declaration
 
         #region public properties
@@ -84,6 +83,9 @@ namespace AccelByte.Api
             coroutineRunner = inCoroutineRunner;
 
             lobbySessionId = new LobbySessionId();
+
+            websocketSerializer = new Utils.AwesomeFormat();
+
             OverrideWebsocket(inWebsocket);
         }
 
@@ -103,6 +105,7 @@ namespace AccelByte.Api
                 webSocket.OnMessage -= HandleOnMessage;
                 webSocket.OnClose -= HandleOnClose;
                 webSocket.OnError -= HandleOnError;
+                webSocket.OnPreReconnectAction -= HandleOnPreReconnect;
             }
             
             webSocket = new AccelByteWebSocket(inWebSocket);
@@ -110,21 +113,38 @@ namespace AccelByte.Api
             webSocket.OnMessage += HandleOnMessage;
             webSocket.OnClose += HandleOnClose;
             webSocket.OnError += HandleOnError;
+            webSocket.OnPreReconnectAction += HandleOnPreReconnect;
 
             webSocket.SetRetryParameters(inTotalTimeout, inBackoffDelay, inMaxDelay, inPingDelay);
         }
 
         /// <summary>
-        /// Set lobbySessionID for current websocket connection
+        /// Set custom header value for current websocket connection
         /// </summary>
-        public void SetSessionId(string lobbySessionID)
+        internal void AddReconnectCustomHeader(string key, string value)
         {
-            if(webSocket == null)
+            if (webSocket == null)
             {
                 return;
             }
 
-            webSocket.CustomHeaders[LOBBY_SESSION_ID_HEADER_NAME] = lobbySessionID;
+            webSocket.ReconnectCustomHeaders[key] = value;
+        }
+
+        /// <summary>
+        /// Remove custom header value for current websocket connection
+        /// </summary>
+        internal void RemoveReconnectCustomHeader(string key)
+        {
+            if (webSocket == null)
+            {
+                return;
+            }
+
+            if(webSocket.ReconnectCustomHeaders.ContainsKey(key))
+            {
+                webSocket.ReconnectCustomHeaders.Remove(key);
+            }
         }
 
         /// <summary>
@@ -140,7 +160,8 @@ namespace AccelByte.Api
         {
             if (!session.IsValid())
             {
-                throw new Exception("Cannot connect to websocket because user is not logged in.");
+                AccelByteDebug.LogWarning("Cannot connect to websocket because user is not logged in.");
+                return;
             }
 
             if (IsConnected)
@@ -155,7 +176,23 @@ namespace AccelByte.Api
                 return;
             }
 
-            webSocket.Connect(websocketUrl, session.AuthorizationToken, lobbySessionId.lobbySessionID);
+            var customHeader = new Dictionary<string, string>();
+
+            if (session != null)
+            {
+                if (!string.IsNullOrEmpty(session.PlatformId))
+                {
+                    customHeader[AccelByteWebSocket.PlatformIdHeaderName] = session.PlatformId;
+                }
+                if (!string.IsNullOrEmpty(session.PlatformUserId))
+                {
+                    customHeader[AccelByteWebSocket.PlatformUserIdHeaderName] = session.PlatformUserId;
+                }
+            }
+
+            customHeader[AccelByteWebSocket.LobbySessionIdHeaderName] = lobbySessionId.lobbySessionID;
+
+            webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader);
         }
 
         /// <summary>
@@ -203,9 +240,7 @@ namespace AccelByte.Api
             where U : class, new()
         {
             long messageId = GenerateId();
-            var writer = new StringWriter();
-            AwesomeFormat.WriteHeader(writer, requestType, messageId);
-            AwesomeFormat.WritePayload(writer, requestPayload);
+            string message = websocketSerializer.CreateMessage(messageId, requestType, requestPayload);
 
             responseCallbacks[messageId] = (errorCode, response) =>
             {
@@ -218,7 +253,7 @@ namespace AccelByte.Api
                 else
                 {
                     U responsePayload;
-                    errorCode = AwesomeFormat.ReadPayload(response, out responsePayload);
+                    errorCode = websocketSerializer.ReadPayload(response, out responsePayload);
 
                     result = errorCode != ErrorCode.None
                         ? Result<U>.CreateError(errorCode)
@@ -228,7 +263,7 @@ namespace AccelByte.Api
                 coroutineRunner.Run(() => callback.Try(result));
             };
 
-            webSocket.Send(writer.ToString());
+            webSocket.Send(message);
         }
 
         private void SendRequest<T>( MessageType requestType
@@ -237,10 +272,7 @@ namespace AccelByte.Api
             where T : class, new()
         {
             long messageId = GenerateId();
-            var writer = new StringWriter();
-            AwesomeFormat.WriteHeader(writer, requestType, messageId);
-            AwesomeFormat.WritePayload(writer, requestPayload);
-
+            string message = websocketSerializer.CreateMessage(messageId, requestType, requestPayload);
             responseCallbacks[messageId] = (errorCode, response) =>
             {
                 Result result = errorCode != ErrorCode.None 
@@ -250,7 +282,7 @@ namespace AccelByte.Api
                 coroutineRunner.Run(() => callback.Try(result));
             };
 
-            webSocket.Send(writer.ToString());
+            webSocket.Send(message);
         }
 
         private void SendRequest<U>( MessageType requestType
@@ -258,8 +290,7 @@ namespace AccelByte.Api
             where U : class, new()
         {
             long messageId = GenerateId();
-            var writer = new StringWriter();
-            AwesomeFormat.WriteHeader(writer, requestType, messageId);
+            string message = websocketSerializer.CreateMessage(messageId, requestType);
 
             responseCallbacks[messageId] = (errorCode, response) =>
             {
@@ -272,7 +303,7 @@ namespace AccelByte.Api
                 else
                 {
                     U responsePayload;
-                    errorCode = AwesomeFormat.ReadPayload(response, out responsePayload);
+                    errorCode = websocketSerializer.ReadPayload(response, out responsePayload);
 
                     result = errorCode != ErrorCode.None
                         ? Result<U>.CreateError(errorCode)
@@ -282,15 +313,14 @@ namespace AccelByte.Api
                 coroutineRunner.Run(() => callback.Try(result));
             };
 
-            webSocket.Send(writer.ToString());
+            webSocket.Send(message);
         }
 
         private void SendRequest( MessageType requestType
             , ResultCallback callback )
         {
             long messageId = GenerateId();
-            var writer = new StringWriter();
-            AwesomeFormat.WriteHeader(writer, requestType, messageId);
+            string message = websocketSerializer.CreateMessage(messageId, requestType);
 
             responseCallbacks[messageId] = (errorCode, response) =>
             {
@@ -301,7 +331,7 @@ namespace AccelByte.Api
                 coroutineRunner.Run(() => callback.Try(result));
             };
 
-            webSocket.Send(writer.ToString());
+            webSocket.Send(message);
         }
 
         public void HandleNotification<T>(string message, ResultCallback<T> handler, NotificationPayloadModifier<T> modifier = null) where T : class, new()
@@ -314,7 +344,7 @@ namespace AccelByte.Api
             }
 
             T payload;
-            ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out payload);
+            ErrorCode errorCode = websocketSerializer.ReadPayload(message, out payload);
             if (modifier != null)
             {
                 payload = modifier(payload);
@@ -1130,7 +1160,37 @@ namespace AccelByte.Api
         {
             this.OnError?.Invoke(errorMsg);
         }
-        
+
+        private void HandleOnPreReconnect()
+        {
+            string platformId = null;
+            string userPlatformId = null;
+
+            if (session != null)
+            {
+                platformId = session.PlatformId;
+                userPlatformId = session.PlatformUserId;
+            }
+
+            if(string.IsNullOrEmpty(platformId))
+            {
+                RemoveReconnectCustomHeader(AccelByteWebSocket.PlatformIdHeaderName);
+            }
+            else
+            {
+                AddReconnectCustomHeader(AccelByteWebSocket.PlatformIdHeaderName, platformId);
+            }
+
+            if (string.IsNullOrEmpty(userPlatformId))
+            {
+                RemoveReconnectCustomHeader(AccelByteWebSocket.PlatformUserIdHeaderName);
+            }
+            else
+            {
+                AddReconnectCustomHeader(AccelByteWebSocket.PlatformUserIdHeaderName, userPlatformId);
+            }
+        }
+
         private long GenerateId()
         {
             lock (syncToken)

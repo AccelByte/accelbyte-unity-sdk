@@ -191,7 +191,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            websocketApi.CreatePersonalTopic(otherUserId, callback);
+            websocketApi.CreatePersonalTopic(otherUserId, cb =>
+            {
+                SendCreateTopicPredefinedEvent(otherUserId, cb);
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -298,7 +302,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            websocketApi.BlockUser(userId, callback);
+            websocketApi.BlockUser(userId, cb =>
+            {
+                SendPredefinedEvent(EventMode.BlockUser, cb);
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -315,7 +323,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            websocketApi.UnblockUser(userId, callback);
+            websocketApi.UnblockUser(userId, cb =>
+            {
+                SendPredefinedEvent(EventMode.UnblockUser, cb);
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -379,7 +391,11 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.DeleteGroupChat(groupId, chatId, callback));
+            coroutineRunner.Run(api.DeleteGroupChat(groupId, chatId, cb =>
+            {
+                SendModeratorPredefinedEvent(groupId, chatId, EventMode.ModDeleteGroupChat, cb);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -399,7 +415,11 @@ namespace AccelByte.Api
                 Duration = durationInSeconds
             };
 
-            coroutineRunner.Run(api.MuteGroupUserChat(groupId, req, callback));
+            coroutineRunner.Run(api.MuteGroupUserChat(groupId, req, cb =>
+            {
+                SendModeratorPredefinedEvent(groupId, userId, EventMode.ModMuteUser, cb);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -414,7 +434,11 @@ namespace AccelByte.Api
 
             UnmuteGroupChatRequest req = new UnmuteGroupChatRequest { UserId = userId };
 
-            coroutineRunner.Run(api.UnmuteGroupUserChat(groupId, req, callback));
+            coroutineRunner.Run(api.UnmuteGroupUserChat(groupId, req, cb =>
+            {
+                SendModeratorPredefinedEvent(groupId, userId, EventMode.ModUnmuteUser, cb);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -450,7 +474,11 @@ namespace AccelByte.Api
                 UserIds = userIds
             };
 
-            coroutineRunner.Run(api.BanGroupUserChat(groupId, req, callback));
+            coroutineRunner.Run(api.BanGroupUserChat(groupId, req, cb =>
+            {
+                SendModeratorPredefinedEvent(groupId, userIds, EventMode.ModBanUser, cb);
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -468,7 +496,11 @@ namespace AccelByte.Api
                 UserIds = userIds
             };
 
-            coroutineRunner.Run(api.UnbanGroupUserChat(groupId, req, callback));
+            coroutineRunner.Run(api.UnbanGroupUserChat(groupId, req, cb =>
+            {
+                SendModeratorPredefinedEvent(groupId, userIds, EventMode.ModUnbanUser, cb);
+                HandleCallback(cb, callback);
+            }));
         }
         
         #endregion
@@ -642,6 +674,326 @@ namespace AccelByte.Api
                     session.RefreshTokenCallback += OnRefreshTokenCallback_RefreshToken;
                 }
             });
+        }
+
+        #endregion
+
+        #region PredefinedEvents
+
+        PredefinedEventScheduler predefinedEventScheduler;
+        bool isAnalyticsConnected = false;
+
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+
+            ConnectPredefinedAnalyticsToEvents();
+        }
+
+        private void ConnectPredefinedAnalyticsToEvents()
+        {
+            if (isAnalyticsConnected)
+            {
+                return;
+            }
+
+            Connected += SendConnectedPredefinedEvent;
+            Disconnected += (result) =>
+            {
+                SendPredefinedEvent(result);
+            };
+            AddedToTopic += (result) =>
+            {
+                SendPredefinedEvent(result, EventMode.AddUserToTopic);
+            };
+            RemovedFromTopic += (result) =>
+            {
+                SendPredefinedEvent(result, EventMode.RemoveUserFromTopic);
+            };
+
+            isAnalyticsConnected = true;
+        }
+
+        internal enum EventMode
+        {
+            None,
+            AddUserToTopic,
+            RemoveUserFromTopic,
+            BlockUser,
+            UnblockUser,
+            ModMuteUser,
+            ModUnmuteUser,
+            ModBanUser,
+            ModUnbanUser,
+            ModDeleteGroupChat
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T result, EventMode eventMode = EventMode.None)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (typeof(T))
+            {
+                case Type closeCodeDelegate when closeCodeDelegate == typeof(WsCloseCode):
+                    Enum statusCode = result as Enum;
+                    var statusCodeEnum = (WsCloseCode)statusCode;
+
+                    payload = new PredefinedChatV2DisconnectedPayload(localUserId, statusCodeEnum);
+
+                    break;
+
+                case Type addRemoveFromTopicDelegate when addRemoveFromTopicDelegate == typeof(EventAddRemoveFromTopic):
+                    var addRemoveFromTopic = result as EventAddRemoveFromTopic;
+
+                    if (eventMode == EventMode.AddUserToTopic)
+                    {
+                        payload = new PredefinedChatV2TopicUserAddedPayload(addRemoveFromTopic.senderId, addRemoveFromTopic.topicId);
+                    }
+                    else if (eventMode == EventMode.RemoveUserFromTopic)
+                    {
+                        payload = new PredefinedChatV2TopicUserRemovedPayload(addRemoveFromTopic.senderId, addRemoveFromTopic.topicId);
+                    }
+
+                    break;
+
+                case Type updateTopicDelegate when updateTopicDelegate == typeof(EventTopicUpdated):
+                    var updateTopic = result as EventTopicUpdated;
+
+                    payload = new PredefinedChatV2TopicDeletedPayload(updateTopic.senderId, updateTopic.topicId);
+
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (typeof(T))
+            {
+                case Type blockUnblockUserDelegate when blockUnblockUserDelegate == typeof(BlockUnblockResponse):
+                    var blockUnblockResponse = result.Value as BlockUnblockResponse;
+
+                    if (eventMode == EventMode.BlockUser)
+                    {
+                        payload = new PredefinedChatV2UserBlockedPayload(localUserId, blockUnblockResponse.userId);
+                    }
+                    else if (eventMode == EventMode.UnblockUser)
+                    {
+                        payload = new PredefinedChatV2UserUnblockedPayload(localUserId, blockUnblockResponse.userId);
+                    }
+
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreateConnectedPayload()
+        {
+            string localUserId = session.UserId;
+            IAccelByteTelemetryPayload payload = new PredefinedChatV2ConnectedPayload(localUserId);
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreateTopicCreatedPayload(string targetUserId)
+        {
+            string localUserId = session.UserId;
+            IAccelByteTelemetryPayload payload = new PredefinedChatV2CreateTopicPayload(localUserId, targetUserId);
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreateModeratorPayload(string groupId, string targetId, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (eventMode)
+            {
+                case EventMode.ModMuteUser:
+                    payload = new PredefinedChatV2ModeratorMutedPayload(groupId, localUserId, targetId);
+                    break;
+
+                case EventMode.ModUnmuteUser:
+                    payload = new PredefinedChatV2ModeratorUnmutedPayload(groupId, localUserId, targetId);
+                    break;
+
+                case EventMode.ModBanUser:
+                    payload = new PredefinedChatV2ModeratorBannedPayload(groupId, localUserId, targetId);
+                    break;
+
+                case EventMode.ModUnbanUser:
+                    payload = new PredefinedChatV2ModeratorUnbannedPayload(groupId, localUserId, targetId);
+                    break;
+
+                case EventMode.ModDeleteGroupChat:
+                    payload = new PredefinedChatV2ModeratorDeletedPayload(groupId, localUserId, targetId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        internal void SendPredefinedEvent<T>(T result, EventMode eventMode = EventMode.None)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result, eventMode);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var chatEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(chatEvent, null);
+        }
+
+        private void SendPredefinedEvent<T>(EventMode eventMode, Result<T> result)
+        {
+            if (result.IsError)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result, eventMode);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var chatEvent = new AccelByteTelemetryEvent(payload);
+
+            predefinedEventScheduler.SendEvent(chatEvent, null);
+        }
+
+        internal void SendConnectedPredefinedEvent()
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreateConnectedPayload();
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var chatEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(chatEvent, null);
+        }
+
+        private void SendCreateTopicPredefinedEvent(string targetId, Result<ChatActionTopicResponse> result)
+        {
+            if (result.IsError)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreateTopicCreatedPayload(targetId);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var chatEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(chatEvent, null);
+        }
+
+        private void SendModeratorPredefinedEvent(string groupId, string targetId, EventMode eventMode, Result result)
+        {
+            if (result.IsError)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreateModeratorPayload(groupId, targetId, eventMode);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var chatEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(chatEvent, null);
+        }
+
+        private void SendModeratorPredefinedEvent<T>(string groupId, List<string> targetIds, EventMode eventMode, Result<T> result)
+        {
+            if (result.IsError)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            foreach(string targetId in targetIds)
+            {
+                IAccelByteTelemetryPayload payload = CreateModeratorPayload(groupId, targetId, eventMode);
+
+                if (payload == null)
+                {
+                    continue;
+                }
+
+                var chatEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(chatEvent, null);
+            }
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            {
+                if (result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                callback.Try(result);
+            }
         }
 
         #endregion

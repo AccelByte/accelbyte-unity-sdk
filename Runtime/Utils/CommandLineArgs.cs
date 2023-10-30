@@ -23,5 +23,22 @@ namespace AccelByte.Utils
             }
             return null;
         }
+
+        public static string GetArg(string[] args, string argName)
+        {
+            if (args == null)
+            {
+                return null;
+            }
+
+            for (int index = 0; index < args.Length; index++)
+            {
+                if (args[index] == argName && args.Length > index + 1)
+                {
+                    return args[index + 1];
+                }
+            }
+            return null;
+        }
     }
 }

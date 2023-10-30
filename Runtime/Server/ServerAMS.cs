@@ -173,10 +173,11 @@ namespace AccelByte.Server
                     return;
                 }
 
-                AwesomeFormat.ReadHeader(message, out MessageType messageType, out long messageId);
+                Utils.IAccelByteWebsocketSerializer messageSerializer = new Utils.AwesomeFormat();
+                messageSerializer.ReadHeader(message, out MessageType messageType, out long messageId);
                 if (messageType == MessageType.disconnectNotif)
                 {
-                    ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out DisconnectNotif payload);
+                    ErrorCode errorCode = messageSerializer.ReadPayload(message, out DisconnectNotif payload);
                     HandleDisconnecting(payload, errorCode);
                     return;
                 }

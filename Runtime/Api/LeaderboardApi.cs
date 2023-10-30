@@ -158,24 +158,31 @@ namespace AccelByte.Api
             callback.Try( result );
         }
 
+        [System.Obsolete("Use GetRankingsV3")]
         public IEnumerator GetRangkingsV3(string leaderboardCode, int offset, int limit,
             ResultCallback<LeaderboardRankingResult> callback)
         {
-            Report.GetFunctionLog( GetType().Name );
+            return GetRankingsV3(leaderboardCode, offset, limit, callback);
+        }
+
+        public IEnumerator GetRankingsV3(string leaderboardCode, int offset, int limit,
+            ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/alltime")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("leaderboardCode", leaderboardCode)
-                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
-                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
-                .WithBearerAuth( AuthToken )
-                .Accepts( MediaType.ApplicationJson )
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+                .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            
+
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest( request,
+            yield return HttpClient.SendRequest(request,
                 rsp =>
                 {
                     response = rsp;
@@ -183,7 +190,7 @@ namespace AccelByte.Api
 
             Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
 
-            callback.Try( result );
+            callback.Try(result);
         }
 
         public IEnumerator GetRankingsByCycle(string leaderboardCode, string cycleId, int offset, int limit,

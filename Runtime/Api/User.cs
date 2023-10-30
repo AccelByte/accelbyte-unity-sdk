@@ -48,7 +48,6 @@ namespace AccelByte.Api
         }
 
         private UserData userDataCache;
-        private PredefinedEventScheduler predefinedEventScheduler;
 
         public bool TwoFAEnable { get; private set; } = false;
 
@@ -124,15 +123,6 @@ namespace AccelByte.Api
                 PlatformLoginCache = null;
             }
 #endif
-        }
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventController">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
-        {
-            this.predefinedEventScheduler = predefinedEventController;
         }
 
         /// <summary>
@@ -2076,7 +2066,6 @@ namespace AccelByte.Api
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
-
                 return;
             }
 
@@ -2086,10 +2075,46 @@ namespace AccelByte.Api
             };
             api.GetConflictResultWhenLinkHeadlessAccountToFullAccount(requestModel, callback);
         }
-        
+
+        /// <summary>
+        /// Check users's account availability, available only using displayName field
+        /// If the result is success or no error, it means the account already exists. 
+        /// If a new account is added with the defined display name, the service will be unable to perform the action.
+        /// </summary>
+        /// <param name="displayName">User's display name value to be checked</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void CheckUserAccountAvailability(string displayName
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            } 
+
+            api.CheckUserAccountAvailability(displayName, callback);
+        }
+
         private string GetPlatformRefreshTokenCacheKey(string platformId)
         {
             return $"UnityPlatformLoginCache_{platformId}";
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventController">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
+        {
+            this.predefinedEventScheduler = predefinedEventController;
+        }
+
+        #endregion
     }
 }

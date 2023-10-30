@@ -17,6 +17,8 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        private PredefinedEventScheduler predefinedEventScheduler;
+
         [UnityEngine.Scripting.Preserve]
         internal SeasonPass( SeasonPassApi inApi
             , UserSession inSession
@@ -29,7 +31,16 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -60,7 +71,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetCurrentSeason(language, callback));
+            coroutineRunner.Run(api.GetCurrentSeason(language, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, PredefinedAnalyticsMode.GetCurrentSeason);
+                }
+                HandleCallback(cb, callback);
+            })); 
         }
 
         /// <summary>
@@ -84,7 +102,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetUserSeason(session.UserId, seasonId, callback));
+            coroutineRunner.Run(api.GetUserSeason(session.UserId, seasonId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, PredefinedAnalyticsMode.GetUserSeason);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -101,7 +126,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetCurrentUserSeason(session.UserId, callback));
+            coroutineRunner.Run(api.GetCurrentUserSeason(session.UserId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, PredefinedAnalyticsMode.GetCurrentUserSeason);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -120,7 +152,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.ClaimRewards(session.UserId, rewardRequest, callback));
+            coroutineRunner.Run(api.ClaimRewards(session.UserId, rewardRequest, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(rewardRequest, PredefinedAnalyticsMode.ClaimReward);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -137,7 +176,92 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.BulkClaimRewards(session.UserId, callback));
+            coroutineRunner.Run(api.BulkClaimRewards(session.UserId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedEvent(cb.Value, PredefinedAnalyticsMode.BulkClaimReward);
+                }
+                HandleCallback(cb, callback);
+            }));
+        }
+
+        private enum PredefinedAnalyticsMode
+        {
+            ClaimReward,
+            BulkClaimReward,
+            GetCurrentSeason,
+            GetUserSeason,
+            GetCurrentUserSeason
+        }
+
+        private IAccelByteTelemetryPayload CreatePredefinedPayload<T>(T result, PredefinedAnalyticsMode mode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (mode)
+            {
+                case PredefinedAnalyticsMode.ClaimReward:
+                    var claimRewardResult = result as SeasonClaimRewardRequest;
+                    payload = new PredefinedSeasonPassClaimRewardPayload(localUserId, claimRewardResult.passCode, 
+                        claimRewardResult.tierIndex, claimRewardResult.rewardCode);
+                    break;
+
+                case PredefinedAnalyticsMode.BulkClaimReward:
+                    payload = new PredefinedSeasonPassBulkClaimRewardPayload(localUserId);
+                    break;
+
+                case PredefinedAnalyticsMode.GetCurrentSeason:
+                    var getCurrentSeasonResult = result as SeasonInfo;
+                    payload = new PredefinedSeasonPassGetCurrentSeasonPayload(localUserId, getCurrentSeasonResult.language);
+                    break;
+
+                case PredefinedAnalyticsMode.GetUserSeason:
+                    var getUserSeasonResult = result as UserSeasonInfo;
+                    payload = new PredefinedSeasonPassGetUserSeasonPayload(localUserId, 
+                        getUserSeasonResult.seasonId);
+                    break;
+
+                case PredefinedAnalyticsMode.GetCurrentUserSeason:
+                    payload = new PredefinedSeasonPassGetCurrentUserSeasonPayload(localUserId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent<T>(T result, PredefinedAnalyticsMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload(result, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            var seasonPassEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(seasonPassEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
         }
     }
 }

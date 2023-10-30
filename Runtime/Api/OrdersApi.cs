@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -27,7 +28,8 @@ namespace AccelByte.Api
         public IEnumerator CreateOrder( string userId
             , string userAccessToken
             , OrderRequest orderRequest
-            , ResultCallback<OrderInfo> callback )
+            , ResultCallback<OrderInfo> callback
+            , System.Action<Result<OrderInfo>> predefinedEventCallback = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't create order! Namespace parameter is null!");
@@ -52,6 +54,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderInfo>();
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator CancelOrderApi( string orderNo
@@ -88,7 +91,8 @@ namespace AccelByte.Api
         public IEnumerator GetUserOrder( string userId
             , string userAccessToken
             , string orderNumber
-            , ResultCallback<OrderInfo> callback )
+            , ResultCallback<OrderInfo> callback
+            , Action<Result<OrderInfo>> predefinedEventCallback = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't get user's order! Namespace parameter is null!");
@@ -113,13 +117,15 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderInfo>();
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator GetUserOrders( string userId
             , string userAccessToken
             , uint page
             , uint size
-            , ResultCallback<OrderPagingSlicedResult> callback )
+            , ResultCallback<OrderPagingSlicedResult> callback
+            , Action<Result<OrderPagingSlicedResult>> predefinedEventCallback = null)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Can't get user's order! Namespace parameter is null!");
@@ -144,6 +150,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderPagingSlicedResult>();
             callback.Try(result);
+            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator GetUserOrderHistory( string userId

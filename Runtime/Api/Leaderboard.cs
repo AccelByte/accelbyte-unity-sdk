@@ -80,7 +80,19 @@ namespace AccelByte.Api
                     timeFrame,
                     offset,
                     limit,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            var param = new LeaderboardPredefinedParameters()
+                            {
+                                LeaderboardCode = leaderboardCode,
+                                UserId = session.UserId
+                            };
+                            SendPredefinedEvent(param, EventMode.GetRankings);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -118,7 +130,19 @@ namespace AccelByte.Api
                 api.GetUserRanking(
                     leaderboardCode,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            var param = new LeaderboardPredefinedParameters()
+                            {
+                                LeaderboardCode = leaderboardCode,
+                                UserId = userId
+                            };
+                            SendPredefinedEvent(param, EventMode.GetUserRanking);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -167,7 +191,19 @@ namespace AccelByte.Api
                 api.GetUserRanking(
                     leaderboardCode,
                     string.Format("{0}_{1}", userId, additionalKey),
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            var param = new LeaderboardPredefinedParameters()
+                            {
+                                LeaderboardCode = leaderboardCode,
+                                UserId = userId
+                            };
+                            SendPredefinedEvent(param, EventMode.GetUserRanking);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -194,7 +230,18 @@ namespace AccelByte.Api
                 api.GetLeaderboardList(
                     offset,
                     limit,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            var param = new LeaderboardPredefinedParameters()
+                            {
+                                UserId = session.UserId
+                            };
+                            SendPredefinedEvent(param, EventMode.GetLeaderboards);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -213,7 +260,18 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetLeaderboardListV3(offset, limit, callback));
+                api.GetLeaderboardListV3(offset, limit, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        var param = new LeaderboardPredefinedParameters()
+                        {
+                            UserId = session.UserId
+                        };
+                        SendPredefinedEvent(param, EventMode.GetLeaderboards);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -223,7 +281,21 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains LeaderboardRankingResult via callback when completed</param>
         /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
         /// <param name="limit">The limit of item on page (optional)</param>
+        [Obsolete("Use GetRankingsV3")]
         public void GetRangkingsV3(string leaderboardCode, ResultCallback<LeaderboardRankingResult> callback,
+            int offset = 0, int limit = 20)
+        {
+            GetRankingsV3(leaderboardCode, callback, offset, limit);
+        }
+
+        /// <summary>
+        /// Get leaderboard ranking data from the beginning.
+        /// </summary>
+        /// <param name="leaderboardCode">The id of the leaderboard</param>
+        /// <param name="callback">Returns a Result that contains LeaderboardRankingResult via callback when completed</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        /// <param name="limit">The limit of item on page (optional)</param>
+        public void GetRankingsV3(string leaderboardCode, ResultCallback<LeaderboardRankingResult> callback,
             int offset = 0, int limit = 20)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -233,7 +305,19 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(api.GetRangkingsV3(leaderboardCode, offset, limit, callback));
+            coroutineRunner.Run(api.GetRankingsV3(leaderboardCode, offset, limit, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    var param = new LeaderboardPredefinedParameters()
+                    {
+                        LeaderboardCode = leaderboardCode,
+                        UserId = session.UserId
+                    };
+                    SendPredefinedEvent(param, EventMode.GetRankings);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
 
         /// <summary>
@@ -247,7 +331,20 @@ namespace AccelByte.Api
         public void GetRankingsByCycle(string leaderboardCode, string cycleId,
             ResultCallback<LeaderboardRankingResult> callback, int offset = 0, int limit = 20)
         {
-            coroutineRunner.Run(api.GetRankingsByCycle(leaderboardCode, cycleId, offset, limit, callback));
+            coroutineRunner.Run(api.GetRankingsByCycle(leaderboardCode, cycleId, offset, limit, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    var param = new LeaderboardPredefinedParameters()
+                    {
+                        LeaderboardCode = leaderboardCode,
+                        CycleId = cycleId,
+                        UserId = session.UserId
+                    };
+                    SendPredefinedEvent(param, EventMode.GetRankingByCycleId);
+                }
+                HandleCallback(cb, callback);
+            }));
         }
         
         /// <summary>
@@ -284,7 +381,126 @@ namespace AccelByte.Api
                 api.GetUserRankingV3(
                     leaderboardCode,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            var param = new LeaderboardPredefinedParameters()
+                            {
+                                LeaderboardCode = leaderboardCode,
+                                UserId = userId
+                            };
+                            SendPredefinedEvent(param, EventMode.GetUserRanking);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            GetRankings,
+            GetUserRanking,
+            GetLeaderboards,
+            GetRankingByCycleId,
+            GetUsersRankings
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload(LeaderboardPredefinedParameters parameters, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (mode)
+            {
+                case EventMode.GetRankings:
+                    payload = new PredefinedLeaderboardGetRankingsPayload(parameters.LeaderboardCode, parameters.UserId);
+                    break;
+
+                case EventMode.GetUserRanking:
+                    payload = new PredefinedLeaderboardGetUserRankingPayload(parameters.LeaderboardCode, parameters.UserId);
+                    break;
+
+                case EventMode.GetLeaderboards:
+                    payload = new PredefinedLeaderboardGetLeaderboardsPayload(parameters.UserId);
+                    break;
+
+                case EventMode.GetRankingByCycleId:
+                    payload = new PredefinedLeaderboardGetRankingByCycleIdPayload(parameters.LeaderboardCode, parameters.UserId, parameters.CycleId);
+                    break;
+
+                case EventMode.GetUsersRankings:
+                    payload = new PredefinedLeaderboardGetUserRankingsPayload(parameters.LeaderboardCode, parameters.UserIds, parameters.RequesterUserId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent(LeaderboardPredefinedParameters parameters, EventMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreatePayload(parameters, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            AccelByteTelemetryEvent predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private struct LeaderboardPredefinedParameters
+        {
+            public string LeaderboardCode;
+            public string CycleId;
+            public string UserId;
+            public string[] UserIds;
+            public string RequesterUserId;
+        }
+
+        #endregion
     }
 }

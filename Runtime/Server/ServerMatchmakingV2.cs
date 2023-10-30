@@ -4,6 +4,7 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -48,7 +49,11 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _matchmakingV2Api.AcceptBackfillProposal(backfillProposal, stopBackfilling, callback));
+                _matchmakingV2Api.AcceptBackfillProposal(backfillProposal, stopBackfilling, cb =>
+                {
+                    SendPredefinedEvent(backfillProposal, RequestType.Accept);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -71,7 +76,81 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _matchmakingV2Api.RejectBackfillProposal(backfillProposal, stopBackfilling, callback));
+                _matchmakingV2Api.RejectBackfillProposal(backfillProposal, stopBackfilling, cb =>
+                {
+                    SendPredefinedEvent(backfillProposal, RequestType.Reject);
+                    HandleCallback(cb, callback);
+                }));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+        protected string podName;
+
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum RequestType
+        {
+            Accept,
+            Reject
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload(MatchmakingV2BackfillProposalNotification backfillNotif, RequestType requestType)
+        {
+            if (string.IsNullOrEmpty(podName))
+            {
+                podName = AccelByteServerPlugin.GetDedicatedServerManager().ServerName;
+            }
+
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (requestType)
+            {
+                case RequestType.Accept:
+                    payload = new PredefinedDSBackfillAcceptedPayload(podName, backfillNotif);
+                    break;
+
+                case RequestType.Reject:
+                    payload = new PredefinedDSBackfillRejectedPayload(podName, backfillNotif);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent(MatchmakingV2BackfillProposalNotification backfillNotif, RequestType requestType)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(backfillNotif, requestType);
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            var dsHubEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(dsHubEvent, null);
+        }
+
+        private void HandleCallback(Result result, ResultCallback resultCallback)
+        {
+            if (result.IsError)
+            {
+                resultCallback.TryError(result.Error);
+                return;
+            }
+
+            resultCallback.Try(result);
+        }
+
+        #endregion
     }
 }

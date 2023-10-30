@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.10.0%0D16.9.1) (2023-10-30)
+
+
+### Features
+
+* add config injection for windows dev build and linux server platform ([b1fa066](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1fa0660518888ab97a266259140700c3eae184a))
+* added predefined events analytics implementations ([701c1ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/701c1ef10314121a05cc3b88a4dca5f0939ad46b))
+* Expose CheckUserAvailability ([8395a2a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8395a2a5723ca6fed5d40dc33c0f0d7c9d4dad3d))
+* **lobby:** add S2S friend sync API ([5862ea8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5862ea8f8c15b317794ebbc529bc7e692f050e94))
+* Make the error description clearer for CheckUserAccountAvailability. ([00c259f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/00c259fec36f81e05bb1cc28021872884f944d33))
+* update config injector interface ([847fffd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/847fffdea65f8ee21988a72c0308dfa19334c2e0))
+
+
+### Bug Fixes
+
+* AccelbyteDebug config initialization and callbacks ([62d9fc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/62d9fc4a4f4a6d1334d6c7694fffe0c4ab5e3b9e))
+* change presence broadcast event namespace from publisher namespace to session namespace ([4a04d09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4a04d09ec39adb8a39fdd3f035027b54ba822131))
+* remove unused metafile ([3796d57](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3796d57990836f79eddcefcd5f91f6ee487bbeb1))
+* **ugc:** sync the variables for UGC response ([dad6d83](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dad6d830a2510f83540d1ad253bfed9a3e3e82db))
+
+
+### Refactors
+
+* add leaderboard get rankings v3 ([903c30e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/903c30e16561d4b40f7a49efa7a3dc2b419614a0))
+* lobby event send platform info on sending connect request ([f5d20dc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f5d20dcf4f4bb37ea3f2735344efe09bbc63ea4e))
+
 ### [16.9.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.1%0D16.9.0) (2023-10-16)
 
 

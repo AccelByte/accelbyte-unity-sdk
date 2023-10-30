@@ -1014,6 +1014,7 @@ namespace AccelByte.Models
         [DataMember] public EntitlementAppType appType; // ['GAME', 'SOFTWARE', 'DLC', 'DEMO']
         [DataMember] public string sku;
         [DataMember] public string userId;
+        [DataMember(Name = "storeId")] public string StoreId;
         [DataMember] public string itemId;
         [DataMember] public string grantedCode;
         [DataMember] public string itemNamespace;

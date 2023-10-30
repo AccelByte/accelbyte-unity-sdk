@@ -285,6 +285,8 @@ namespace AccelByte.Api
         
         private bool reconnectsOnBans;
 
+        private Utils.IAccelByteWebsocketSerializer websocketSerializer;
+
         /// <summary>
         /// Event triggered each time a websocket reconnection attempt failed
         /// </summary>
@@ -306,6 +308,8 @@ namespace AccelByte.Api
             coroutineRunner = inCoroutineRunner;
 
             reconnectsOnBans = false;
+
+            websocketSerializer = new Utils.AwesomeFormat();
 
             IWebSocket webSocket = new WebSocket();
             websocketApi = new LobbyWebsocketApi(coroutineRunner, api.GetConfig().LobbyServerUrl, webSocket, session, api.GetConfig().Namespace);
@@ -413,7 +417,14 @@ namespace AccelByte.Api
         public void CreateParty(ResultCallback<PartyInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.CreateParty(callback);
+            websocketApi.CreateParty(cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Created, session.UserId, cb.Value.partyID);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -426,7 +437,14 @@ namespace AccelByte.Api
         public void CreateParty(ResultCallback<PartyCreateResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.CreateParty(callback);
+            websocketApi.CreateParty(cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Created, session.UserId, cb.Value.partyID);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -436,7 +454,14 @@ namespace AccelByte.Api
         public void LeaveParty(ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.LeaveParty(callback);
+            websocketApi.LeaveParty(cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Left, session.UserId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -448,7 +473,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.InviteToParty(userId, callback);
+            websocketApi.InviteToParty(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Invited, userId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -463,7 +495,14 @@ namespace AccelByte.Api
             , ResultCallback<PartyInviteResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.InviteToPartyDetailedCallback(userId, callback);
+            websocketApi.InviteToPartyDetailedCallback(userId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Invited, userId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -479,7 +518,14 @@ namespace AccelByte.Api
             , ResultCallback<PartyInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.JoinParty(partyID, invitationToken, callback);
+            websocketApi.JoinParty(partyID, invitationToken, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Joined, session.UserId, cb.Value.partyID);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -491,7 +537,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.KickPartyMember(userId, callback);
+            websocketApi.KickPartyMember(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Kicked, userId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -506,7 +559,14 @@ namespace AccelByte.Api
             , ResultCallback<KickResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.KickPartyMemberDetailedCallback(userId, callback);
+            websocketApi.KickPartyMemberDetailedCallback(userId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedPartyV1Event(EventMode.PartyV1Kicked, userId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -669,7 +729,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.SetUserStatus(status, activity, callback);
+            websocketApi.SetUserStatus(status, activity, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(status.ToString(), EventMode.UserStatusUpdated);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -708,7 +775,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.RequestFriend(userId, callback);
+            websocketApi.RequestFriend(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.FriendRequestSent);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -744,7 +818,14 @@ namespace AccelByte.Api
                 api.BulkFriendRequest(
                     session.UserId,
                     otherUserIds,
-                    callback));
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendPredefinedSocialRequestEvent(userIds, EventMode.FriendRequestSent);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -756,7 +837,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.Unfriend(userId, callback);
+            websocketApi.Unfriend(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.FriendUnfriended);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -792,7 +880,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.CancelFriendRequest(userId, callback);
+            websocketApi.CancelFriendRequest(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.FriendRequestCancelled);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -828,7 +923,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.AcceptFriend(userId, callback);
+            websocketApi.AcceptFriend(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.FriendRequestAccepted);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -840,7 +942,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.RejectFriend(userId, callback);
+            websocketApi.RejectFriend(userId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.FriendRequestRejected);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -893,6 +1002,27 @@ namespace AccelByte.Api
                     userIds,
                     callback,
                     countOnly));
+        }
+
+        /// <summary>
+        /// Sync platform specific friend list to AccelByte friend list.
+        /// This will automatically add platform specific friend list to AccelByte friend list if the friends already linked
+        /// their account to AccelByte service.
+        /// </summary>
+        /// <param name="request">The request containing details of platform information.</param>
+        /// <param name="callback">Returns a Result that contain response details.</param>
+        public void SyncThirdPartyFriends(SyncThirdPartyFriendsRequest request
+            , ResultCallback<SyncThirdPartyFriendsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.SyncThirdPartyFriends(request, callback));
         }
         #endregion Friend
 
@@ -1210,7 +1340,15 @@ namespace AccelByte.Api
             , ResultCallback<MatchmakingCode> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.StartMatchmaking(gameMode, param, callback);
+            websocketApi.StartMatchmaking(gameMode, param, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedMatchmakingV1StartedEvent(session.UserId, gameMode, param.serverName, param.clientVersion,
+                        param.latencies, param.partyAttributes);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1222,7 +1360,14 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.ConfirmReadyForMatch(matchId, callback);
+            websocketApi.ConfirmReadyForMatch(matchId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedMatchmakingV1ReadyEvent(session.UserId, matchId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1233,7 +1378,14 @@ namespace AccelByte.Api
         public void RejectMatch(string matchId, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.RejectMatch(matchId, callback);
+            websocketApi.RejectMatch(matchId, cb =>
+            {
+                if (cb != null && !cb.IsError)
+                {
+                    SendPredefinedMatchmakingV1RejectEvent(session.UserId, matchId);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1247,7 +1399,14 @@ namespace AccelByte.Api
             , ResultCallback<MatchmakingCode> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.CancelMatchmaking(gameMode, callback);
+            websocketApi.CancelMatchmaking(gameMode, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedMatchmakingV1CancelEvent(session.UserId, gameMode);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1263,7 +1422,14 @@ namespace AccelByte.Api
             , ResultCallback<MatchmakingCode> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.CancelMatchmaking(gameMode, isTempParty, callback);
+            websocketApi.CancelMatchmaking(gameMode, isTempParty, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedMatchmakingV1CancelEvent(session.UserId, gameMode, isTempParty);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1402,7 +1568,14 @@ namespace AccelByte.Api
             , ResultCallback<BlockPlayerResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.BlockPlayer(userId, callback);
+            websocketApi.BlockPlayer(userId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.UserBlocked);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
 
@@ -1426,7 +1599,14 @@ namespace AccelByte.Api
             , ResultCallback<UnblockPlayerResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            websocketApi.UnblockPlayer(userId, callback);
+            websocketApi.UnblockPlayer(userId, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
+                {
+                    SendPredefinedSocialRequestEvent(userId, EventMode.UserUnblocked);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -1623,12 +1803,12 @@ namespace AccelByte.Api
 
             long messageId;
             MessageType messageType;
-            ErrorCode errorCode = AwesomeFormat.ReadHeader(message, out messageType, out messageId);
+            ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
 
             switch (messageType)
             {
                 case MessageType.messageSessionNotif:
-                    AwesomeFormat.ReadPayload(message, out Notification sessionNotification);
+                    websocketSerializer.ReadPayload(message, out Notification sessionNotification);
                     if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
                             out MultiplayerV2NotifType sessionV2NotificationType))
                     {
@@ -1657,7 +1837,7 @@ namespace AccelByte.Api
                     websocketApi.HandleNotification(message, PartyChatReceived);
                     break;
                 case MessageType.messageNotif:
-                    AwesomeFormat.ReadPayload(message, out Notification notification);
+                    websocketSerializer.ReadPayload(message, out Notification notification);
                     if (Enum.TryParse<MultiplayerV2NotifType>(notification.topic, true,
                             out MultiplayerV2NotifType matchmakingV2NotificationType))
                     {
@@ -1702,8 +1882,8 @@ namespace AccelByte.Api
                     websocketApi.HandleNotification(message, ChannelChatReceived);
                     break;
                 case MessageType.connectNotif:
-                    AwesomeFormat.ReadPayload(message, out LobbySessionId lobbySessionId);
-                    websocketApi.SetSessionId(lobbySessionId.lobbySessionID);
+                    websocketSerializer.ReadPayload(message, out LobbySessionId lobbySessionId);
+                    websocketApi.AddReconnectCustomHeader(AccelByteWebSocket.LobbySessionIdHeaderName, lobbySessionId.lobbySessionID);
                     break;
                 case MessageType.disconnectNotif:
                     websocketApi.HandleNotification(message, Disconnecting);
@@ -1738,7 +1918,7 @@ namespace AccelByte.Api
                     websocketApi.HandleNotification(message, MatchRejected);
                     break;
                 case MessageType.errorNotif:
-                    AwesomeFormat.ReadPayload(message, out ErrorNotif notif);
+                    websocketSerializer.ReadPayload(message, out ErrorNotif notif);
                     if (string.IsNullOrEmpty(notif.requestType))
                     {
                         if (ErrorNotification != null)
@@ -1792,7 +1972,7 @@ namespace AccelByte.Api
             // Report.GetProtobufNotification(message);
 
             Notification notification;
-            ErrorCode errorCode = AwesomeFormat.ReadPayload(message, out notification);
+            ErrorCode errorCode = websocketSerializer.ReadPayload(message, out notification);
 
             if (errorCode != ErrorCode.None)
             {
@@ -1937,5 +2117,291 @@ namespace AccelByte.Api
                     return;
             }
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+        bool isAnalyticsConnected = false;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+
+            ConnectPredefinedAnalyticsToEvents();
+        }
+
+        private void ConnectPredefinedAnalyticsToEvents()
+        {
+            if (isAnalyticsConnected)
+            {
+                return;
+            }
+
+            Connected += SendPredefinedConnectedEvent;
+            Disconnected += SendPredefinedEvent;
+            MatchmakingV2MatchmakingStarted += SendPredefinedEvent;
+
+            isAnalyticsConnected = true;
+        }
+
+        private enum EventMode
+        {
+            LobbyConnected,
+            LobbyDisconnected,
+            FriendRequestSent,
+            FriendRequestCancelled,
+            FriendRequestAccepted,
+            FriendRequestRejected,
+            FriendUnfriended,
+            UserBlocked,
+            UserUnblocked,
+            UserStatusUpdated,
+            PartyV1Created,
+            PartyV1Invited,
+            PartyV1Joined,
+            PartyV1Left,
+            PartyV1Kicked
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T result)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (typeof(T))
+            {
+                case Type disconnectType when disconnectType == typeof(WsCloseCode):
+                    Enum statusCodeEnum = result as Enum;
+                    WsCloseCode statusCode = (WsCloseCode)statusCodeEnum;
+                    payload = new PredefinedLobbyDisconnectedPayload(localUserId, statusCode);
+                    break;
+
+                case Type partyInfoType when partyInfoType == typeof(PartyInfo):
+                    var partyInfo = result as PartyInfo;
+                    payload = new PredefinedPartyV1CreatedPayload(localUserId, partyInfo.partyID);
+                    break;
+
+                case Type partyCreateResponseType when partyCreateResponseType == typeof(PartyCreateResponse):
+                    var partyCreateResponse = result as PartyCreateResponse;
+                    payload = new PredefinedPartyV1CreatedPayload(localUserId, partyCreateResponse.partyID);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (typeof(T))
+            {
+                case Type matchmakingStarted when matchmakingStarted == typeof(MatchmakingV2MatchmakingStartedNotification):
+                    var matchmakingStartedValue = result.Value as MatchmakingV2MatchmakingStartedNotification;
+                    payload = new PredefinedMatchmakingStartedPayload(localUserId
+                        , matchmakingStartedValue.matchPool
+                        , matchmakingStartedValue.partyId
+                        , matchmakingStartedValue.ticketId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreatePartyV1Payload(string userId, string partyId, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (eventMode)
+            {
+                case EventMode.PartyV1Created:
+                    payload = new PredefinedPartyV1CreatedPayload(userId, partyId);
+                    break;
+
+                case EventMode.PartyV1Invited:
+                    payload = new PredefinedPartyV1InvitedPayload(userId, partyId);
+                    break;
+
+                case EventMode.PartyV1Joined:
+                    payload = new PredefinedPartyV1JoinedPayload(userId, partyId);
+                    break;
+
+                case EventMode.PartyV1Kicked:
+                    payload = new PredefinedPartyV1KickedPayload(userId, partyId);
+                    break;
+
+                case EventMode.PartyV1Left:
+                    payload = new PredefinedPartyV1LeftPayload(userId, partyId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private IAccelByteTelemetryPayload CreateSocialRequestPayload(string targetId, EventMode eventMode)
+        {
+            string localUserId = session.UserId;
+            IAccelByteTelemetryPayload payload = null;
+
+            switch (eventMode)
+            {
+                case EventMode.FriendRequestSent:
+                    payload = new PredefinedFriendRequestSentPayload(localUserId, targetId);
+                    break;
+
+                case EventMode.FriendRequestCancelled:
+                    payload = new PredefinedFriendRequestCancelledPayload(localUserId, targetId);
+                    break;
+
+                case EventMode.FriendRequestAccepted:
+                    payload = new PredefinedFriendRequestAcceptedPayload(targetId, localUserId);
+                    break;
+
+                case EventMode.FriendRequestRejected:
+                    payload = new PredefinedFriendRequestRejectedPayload(targetId, localUserId);
+                    break;
+
+                case EventMode.FriendUnfriended:
+                    payload = new PredefinedFriendUnfriendedPayload(localUserId, targetId);
+                    break;
+
+                case EventMode.UserBlocked:
+                    payload = new PredefinedUserBlockedPayload(localUserId, targetId);
+                    break;
+
+                case EventMode.UserUnblocked:
+                    payload = new PredefinedUserUnblockedPayload(localUserId, targetId);
+                    break;
+
+                case EventMode.UserStatusUpdated:
+                    payload = new PredefinedUserPresenceStatusUpdatedPayload(localUserId, targetId);
+                    break;
+            }
+
+            return payload;
+        }
+
+        internal void SendPredefinedConnectedEvent()
+        {
+            string localUserId = session.UserId;
+            IAccelByteTelemetryPayload payload = new PredefinedLobbyConnectedPayload(localUserId);
+
+            SendPredefinedEvent(payload);
+        }
+
+        internal void SendPredefinedEvent<T>(T result)
+        {   
+            IAccelByteTelemetryPayload payload = CreatePayload(result);
+
+            SendPredefinedEvent(payload);
+        }
+
+        internal void SendPredefinedEvent<T>(Result<T> result)
+        {
+            if (result.IsError)
+            {
+                return;
+            }
+
+            IAccelByteTelemetryPayload payload = CreatePayload(result);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (predefinedEventScheduler == null || payload == null)
+            {
+                return;
+            }
+
+            var predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void SendPredefinedMatchmakingV1StartedEvent(string userId, string gameMode, string serverName,
+            string clientVersion, Dictionary<string, int> latencies, Dictionary<string, object> partyAttribute)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedMatchmakingV1StartedPayload(userId, gameMode, serverName,
+                clientVersion, latencies, partyAttribute);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedMatchmakingV1ReadyEvent(string userId, string matchId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedMatchmakingV1ReadyConsentPayload(userId, matchId);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedMatchmakingV1RejectEvent(string userId, string matchId)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedMatchmakingV1RejectMatchPayload(userId, matchId);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedMatchmakingV1CancelEvent(string userId, string gameMode, bool isTempParty = false)
+        {
+            IAccelByteTelemetryPayload payload = new PredefinedMatchmakingV1CanceledPayload(userId, gameMode, isTempParty);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedPartyV1Event(EventMode eventMode, string userId, string partyId = null)
+        {
+            IAccelByteTelemetryPayload payload = CreatePartyV1Payload(userId, partyId, eventMode);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedSocialRequestEvent(string targetId, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = CreateSocialRequestPayload(targetId, eventMode);
+
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedSocialRequestEvent(string[] targetIds, EventMode eventMode)
+        {
+            foreach (string targetId in targetIds)
+            {
+                IAccelByteTelemetryPayload payload = CreateSocialRequestPayload(targetId, eventMode);
+
+                SendPredefinedEvent(payload);
+            }
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            {
+                if (result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                callback.Try(result);
+            }
+        }
+
+        #endregion
     }
 }

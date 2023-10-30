@@ -58,7 +58,19 @@ namespace AccelByte.Core
                 SignalHandler.SetSignalHandlerAction(OnReceivedSignal);
             }
 
-            if(AMS == null)
+            var argsConfigParser = new Utils.CustomConfigParser();
+            Models.MultiSDKConfigsArgs configArgs = argsConfigParser.ParseSDKConfigFromArgs();
+            if (configArgs != null)
+            {
+                AccelByteSDK.OverrideConfigs.SDKConfigOverride = configArgs;
+            }
+            Models.MultiOAuthConfigs oAuthArgs = argsConfigParser.ParseOAuthConfigFromArgs();
+            if (oAuthArgs != null)
+            {
+                AccelByteSDK.OverrideConfigs.OAuthConfigOverride = oAuthArgs;
+            }
+
+            if (AMS == null)
             {
                 string dsId = GetCommandLineArg(DedicatedServer.CommandLineDsId);
                 string amsServerUrl = GetCommandLineArg(ServerAMS.CommandLineAMSWatchdogUrlId);

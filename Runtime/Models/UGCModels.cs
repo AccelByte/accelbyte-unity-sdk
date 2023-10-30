@@ -198,7 +198,9 @@ namespace AccelByte.Models
         [DataMember] public string creatorName;
         [DataMember] public int downloadCount;
         [DataMember] public string fileExtension;
+        [DataMember] public string[] Groups;
         [DataMember] public string id;
+        [DataMember] public bool IsHidden;
         [DataMember] public bool isOfficial;
         [DataMember] public int likeCount;
         [DataMember] public UGCCreatorState likeState;
@@ -206,10 +208,13 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string payload;
         [DataMember] public UGCPayloadUrl[] payloadURL;
+        [DataMember] public PayLoadUrl[] PreviewUrl;
+        [DataMember] public Screenshots[] Screenshots;
         [DataMember] public string shareCode;
         [DataMember] public string subType;
         [DataMember] public string[] tags;
         [DataMember] public string type;
+        [DataMember] public DateTime UpdatedTime;
         [DataMember] public string userId;
         [DataMember] public Dictionary<string, object> customAttributes;
     }

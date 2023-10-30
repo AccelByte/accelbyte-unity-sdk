@@ -20,7 +20,20 @@ namespace AccelByte.Server
 #endif
     public static class AccelByteServerPlugin
     {
-        private static AccelByteSettingsV2 settings;
+        private static AccelByteSettingsV2 currentSettings;
+        private static AccelByteSettingsV2 settings
+        {
+            get
+            {
+                return currentSettings;
+            }
+
+            set
+            {
+                currentSettings = value;
+                OnSettingsUpdate?.Invoke(currentSettings);
+            }
+        }
         private static ServerOauthLoginSession session;
         private static CoroutineRunner coroutineRunner;
         private static IHttpClient httpClient;
@@ -45,6 +58,7 @@ namespace AccelByte.Server
 
         private static bool initialized = false;
         internal static event Action configReset;
+        internal static event Action<AccelByteSettingsV2> OnSettingsUpdate;
         public static event Action<SettingsEnvironment> environmentChanged;
         private static IHttpRequestSender defaultHttpSender = null;
 
@@ -104,13 +118,16 @@ namespace AccelByte.Server
                 ResetApis();
             };
 #endif
+            OnSettingsUpdate += AccelByteDebug.Initialize;
         }
 
         private static void Initialize()
         {
             Initialize(null, null);
 
+#if TEMPORARY_ENABLE_COMPAT_CHECK
             ValidateCompatibility();
+#endif
         }
 
         internal static void Initialize(ServerConfig inConfig, OAuthConfig inOAuthConfig)
@@ -208,6 +225,8 @@ namespace AccelByte.Server
         private static AccelByteSettingsV2 RetrieveConfigFromJsonFile(string platform, SettingsEnvironment environment)
         {
             var retval = new AccelByteSettingsV2(platform, environment, true);
+            retval.OverrideServerSDKConfig(AccelByteSDK.OverrideConfigs.SDKConfigOverride.GetByEnvironment(environment));
+            retval.OverrideOAuthConfig(AccelByteSDK.OverrideConfigs.OAuthConfigOverride.GetByEnvironment(environment));
             return retval;
         }
 
@@ -285,6 +304,8 @@ namespace AccelByte.Server
                 session,
                 coroutineRunner);
 
+            dsHub.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
             configReset += () =>
             {
                 dsHub = null;
@@ -295,6 +316,8 @@ namespace AccelByte.Server
                         session),
                     session,
                     coroutineRunner);
+
+                dsHub.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             };
 
             return dsHub;
@@ -361,6 +384,8 @@ namespace AccelByte.Server
                 session,
                 coroutineRunner);
             };
+
+            ecommerce.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
             return ecommerce;
         }
@@ -607,6 +632,8 @@ namespace AccelByte.Server
                 session,
                 coroutineRunner);
 
+            _matchmakingV2.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
             configReset += () =>
             {
                 _matchmakingV2 = null;
@@ -617,6 +644,8 @@ namespace AccelByte.Server
                         session),
                     session,
                     coroutineRunner);
+
+                _matchmakingV2.SetPredefinedEventScheduler(ref predefinedEventScheduler);
             };
 
             return _matchmakingV2;

@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Api;
+using AccelByte.Models;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace AccelByte.Core
 
         private static List<AccelByteILogger> loggers = new List<AccelByteILogger>();
         
-        private static AccelByteLogType currentSeverity;
+        internal static AccelByteLogType currentSeverity;
 
         private static readonly AccelByteILogger defaultLogger = new AccelByteLogHandler();
 
@@ -32,12 +33,16 @@ namespace AccelByte.Core
             }
         }
 
-        private static bool logEnabled;
+        internal static bool logEnabled;
 
         static AccelByteDebug()
         {
-            SetEnableLogging(true);
-            SetFilterLogType(AccelByteLogType.Verbose);
+#if UNITY_SERVER
+            var defaultSettings = GetSettings(true);
+#else
+            var defaultSettings = GetSettings();
+#endif
+            Initialize(defaultSettings);
 
             AddLogger(logger.Value);
         }
@@ -46,6 +51,38 @@ namespace AccelByte.Core
         {
             logEnabled = enable;
         }
+
+        private static AccelByteSettingsV2 GetSettings(bool isServer = false)
+        {
+            var activeEnvironment = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
+            string activePlatform = AccelByteSettingsV2.GetActivePlatform(isServer);
+            var defaultSettings = new AccelByteSettingsV2(activePlatform, activeEnvironment, isServer);
+            defaultSettings.OverrideClientSDKConfig(AccelByteSDK.OverrideConfigs.SDKConfigOverride.GetByEnvironment(activeEnvironment));
+            defaultSettings.OverrideOAuthConfig(AccelByteSDK.OverrideConfigs.OAuthConfigOverride.GetByEnvironment(activeEnvironment));
+
+            return defaultSettings;
+        }
+
+        internal static void Initialize(AccelByteSettingsV2 settings)
+        {
+            if (settings.SDKConfig == null)
+            {
+                SetEnableLogging(true);
+                SetFilterLogType(AccelByteLogType.Verbose);
+                return;
+            }
+
+            SetEnableLogging(settings.SDKConfig.EnableDebugLog);
+            AccelByteLogType logTypeEnum;
+            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+            {
+                SetFilterLogType(logTypeEnum);
+            }
+            else
+            {
+                SetFilterLogType(AccelByteLogType.Verbose);
+            }
+        } 
 
         internal static void SetLogger(AccelByteILogger newLogger=null)
         {

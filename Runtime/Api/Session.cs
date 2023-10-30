@@ -2,10 +2,11 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -15,6 +16,8 @@ namespace AccelByte.Api
         private readonly SessionApi sessionApi;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
+
+        private PredefinedEventScheduler predefinedEventScheduler;
 
         [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
@@ -163,7 +166,14 @@ namespace AccelByte.Api
                 sessionApi.InviteUserToParty(
                     partyId,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendPredefinedEvent(PredefinedAnalyticsMode.PartySessionInvite, userId, partyId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }        
         
         /// <summary>
@@ -198,7 +208,14 @@ namespace AccelByte.Api
                 sessionApi.PromoteUserToPartyLeader(
                     partyId,
                     leaderId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionUserPromoted);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -226,7 +243,14 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.JoinParty(
                     partyId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionJoin);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -252,7 +276,14 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.LeaveParty(
                     partyId,
-                    callback));
+                    cb =>
+                    {
+                        if (cb != null && !cb.IsError)
+                        {
+                            SendPredefinedEvent(PredefinedAnalyticsMode.PartySessionLeft, session.UserId, partyId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -310,12 +341,19 @@ namespace AccelByte.Api
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-
+            
             coroutineRunner.Run(
                 sessionApi.KickUserFromParty(
                     partyId,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionKicked, userId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -338,11 +376,18 @@ namespace AccelByte.Api
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-
+                
             coroutineRunner.Run(
                 sessionApi.CreateParty(
                     request,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionCreate);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -384,7 +429,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                sessionApi.JoinPartyByCode(code, callback));
+                sessionApi.JoinPartyByCode(code, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionJoin);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -464,7 +516,14 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.CreateGameSession(
                     request,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionCreate);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -647,7 +706,14 @@ namespace AccelByte.Api
                 sessionApi.InviteUserToGameSession(
                     sessionId,
                     userId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError)
+                        {
+                            SendPredefinedEvent(PredefinedAnalyticsMode.GameSessionInvite, userId, sessionId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -676,7 +742,14 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.JoinGameSession(
                     sessionId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionJoin);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -705,7 +778,14 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.LeaveGameSession(
                     sessionId,
-                    callback));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionLeft);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -786,7 +866,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                sessionApi.JoinGameSessionByCode(code, callback));
+                sessionApi.JoinGameSessionByCode(code, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionJoin);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -895,6 +982,159 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 sessionApi.UpdateMemberStorage(session.UserId, sessionId, data, callback));
+        }
+
+        #endregion
+
+        #region PredefinedEvents
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum PredefinedAnalyticsMode
+        {
+            GameSessionCreate,
+            GameSessionInvite,
+            GameSessionJoin,
+            GameSessionLeft,
+            PartySessionCreate,
+            PartySessionInvite,
+            PartySessionJoin,
+            PartySessionLeft,
+            PartySessionKicked,
+            PartySessionUserPromoted
+        }
+
+        private IAccelByteTelemetryPayload CreatePredefinedPayload<T>(Result<T> apiCallResult, PredefinedAnalyticsMode mode, string targetUserId = null)
+        {
+            IAccelByteTelemetryPayload payload;
+            string userId = (string.IsNullOrEmpty(targetUserId)) ? session.UserId : targetUserId;
+
+            switch (mode)
+            {
+                case PredefinedAnalyticsMode.GameSessionCreate:
+                    var sessionCreateResult = apiCallResult as Result<SessionV2GameSession>;
+                    payload = new PredefinedGameSessionV2CreatedPayload(userId, sessionCreateResult.Value.id);
+                    return payload;
+
+                case PredefinedAnalyticsMode.GameSessionJoin:
+                    var sessionJoinResult = apiCallResult as Result<SessionV2GameSession>;
+                    payload = new PredefinedGameSessionV2JoinedPayload(userId, sessionJoinResult.Value.id);
+                    return payload;
+
+                case PredefinedAnalyticsMode.GameSessionLeft:
+                    var sessionLeftResult = apiCallResult as Result<SessionV2GameSession>;
+                    payload = new PredefinedGameSessionV2LeftPayload(userId, sessionLeftResult.Value.id);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionCreate:
+                    var partyCreateResult = apiCallResult as Result<SessionV2PartySession>;
+                    payload = new PredefinedPartySessionV2CreatedPayload(userId, partyCreateResult.Value.id);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionJoin:
+                    var partyJoinResult = apiCallResult as Result<SessionV2PartySession>;
+                    payload = new PredefinedPartySessionV2JoinedPayload(userId, partyJoinResult.Value.id);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionKicked:
+                    var partyKickedResult = apiCallResult as Result<SessionV2PartySessionKickResponse>;
+                    payload = new PredefinedPartySessionV2KickedPayload(userId, partyKickedResult.Value.partyId);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionUserPromoted:
+                    var userPromotedResult = apiCallResult as Result<SessionV2PartySession>;
+                    payload = new PredefinedPartySessionV2LeaderPromotedPayload(userPromotedResult.Value.leaderId, userPromotedResult.Value.id);
+                    return payload;
+
+                default:
+                    return null;
+            }
+        }
+
+        private IAccelByteTelemetryPayload CreatePredefinedPayload(PredefinedAnalyticsMode mode, string userId, string sessionId)
+        {
+            IAccelByteTelemetryPayload payload;
+
+            switch (mode)
+            {
+                case PredefinedAnalyticsMode.GameSessionInvite:
+                    payload = new PredefinedGameSessionV2InvitedPayload(userId, sessionId);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionInvite:
+                    payload = new PredefinedPartySessionV2InvitedPayload(userId, sessionId);
+                    return payload;
+
+                case PredefinedAnalyticsMode.PartySessionLeft:
+                    payload = new PredefinedPartySessionV2LeftPayload(userId, sessionId);
+                    return payload;
+
+                default:
+                    return null;
+            }
+        }
+
+        private void SendPredefinedEvent<T>(Result<T> result, PredefinedAnalyticsMode mode)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload(result, mode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent<T>(Result<T> result, PredefinedAnalyticsMode mode, string userId)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload(result, mode, userId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(PredefinedAnalyticsMode mode, string userId, string sessionId)
+        {
+            IAccelByteTelemetryPayload payload = CreatePredefinedPayload(mode, userId, sessionId);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            var predefinedEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(predefinedEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+
+            callback.Try(result);
         }
 
         #endregion

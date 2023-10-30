@@ -4,7 +4,7 @@
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using UnityEngine.Assertions; 
 
 namespace AccelByte.Api
 {
@@ -1161,6 +1161,41 @@ namespace AccelByte.Api
             {
                 var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
                 callback.Try(result);
+            });
+        }
+
+        public void CheckUserAccountAvailability(string displayName,
+            ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name); 
+            if (string.IsNullOrEmpty(displayName))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, "Can't check user account availablity. displayName query is null!"));
+                return;
+            }
+
+            const string field = "displayName";
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/availability")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithBearerAuth(Session.AuthorizationToken)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithQueryParam("field", field)
+                 .WithQueryParam("query", displayName)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                if (response.Code == (int)ErrorCode.NotFound)
+                {
+                    callback.TryError(new Error(ErrorCode.NotFound, "Account doesn't exist. If a new account is added with the defined display name, " +
+                        "the service will be able to perform the action."));
+                }
+                else
+                {
+                    var result = response.TryParse();
+                    callback.Try(result);
+                }
             });
         }
     }

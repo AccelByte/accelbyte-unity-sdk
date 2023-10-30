@@ -5,6 +5,7 @@ using System;
 using AccelByte.Models;
 using AccelByte.Core;
 using UnityEngine.Assertions;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {
@@ -29,7 +30,14 @@ namespace AccelByte.Api
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
+        private void RefineRedeemCodeResult(Result<FulfillmentResult> apiCallResult, string code)
+        {
+            IAccelByteTelemetryPayload payload;
+            payload = CreatePredefinedPayload<FulfillmentResult>(apiCallResult, PredefinedEventMode.RedeemCampaignCode, code);
+            SendPredefinedEvent(payload);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -66,6 +74,12 @@ namespace AccelByte.Api
                 return;
             }
 
+            Action<Result<FulfillmentResult>, string> onPredefinedEventTrigger = null;
+            if(predefinedEventScheduler != null)
+            {
+                onPredefinedEventTrigger = RefineRedeemCodeResult;
+            }
+
             FulFillCodeRequest fulFillCodeRequest = new FulFillCodeRequest 
             {
                 code = code,
@@ -77,7 +91,94 @@ namespace AccelByte.Api
                 api.RedeemCode(
                     session.UserId,
                     fulFillCodeRequest,
-                    callback));
+                    callback,
+                    onPredefinedEventTrigger));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum PredefinedEventMode
+        {
+            RedeemCampaignCode
+        }
+
+        private IAccelByteTelemetryPayload CreatePredefinedPayload<T>(Result<T> apiCallResult, PredefinedEventMode mode, string code)
+        {
+            switch (mode)
+            {
+                case PredefinedEventMode.RedeemCampaignCode:
+                    {
+                        var fulfilmentResult = apiCallResult as Result<FulfillmentResult>;
+                        string userId = fulfilmentResult.Value.userId;
+
+                        List<PredefinedEntitlementSummary> entitlements = new List<PredefinedEntitlementSummary>();
+                        foreach (var summary in fulfilmentResult.Value.entitlementSummaries)
+                        {
+                            PredefinedEntitlementSummary entSummary = new PredefinedEntitlementSummary(
+                                summary.id,
+                                summary.Name,
+                                summary.type.ToString(),
+                                summary.clazz.ToString(),
+                                summary.itemId,
+                                summary.StoreId.ToString());
+
+                            entitlements.Add(entSummary);
+                        }
+
+                        List<PredefinedCreditSummary> credits = new List<PredefinedCreditSummary>();
+                        foreach (var summary in fulfilmentResult.Value.creditSummaries)
+                        {
+                            PredefinedCreditSummary credsSummary = new PredefinedCreditSummary(
+                                summary.walletId,
+                                summary.userId,
+                                summary.amount,
+                                summary.CurrencyCode);
+
+                            credits.Add(credsSummary);
+                        }
+
+                        List<PredefinedSubscriptionSummary> subscriptions = new List<PredefinedSubscriptionSummary>();
+                        foreach (var summary in fulfilmentResult.Value.subscriptionSummaries)
+                        {
+                            PredefinedSubscriptionSummary subsSummary = new PredefinedSubscriptionSummary(
+                                summary.Id,
+                                summary.ItemId,
+                                summary.UserId,
+                                summary.Sku,
+                                summary.Status.ToString(),
+                                summary.SubscribedBy.ToString());
+
+                            subscriptions.Add(subsSummary);
+                        }
+
+                        var payload = new PredefinedCampaignCodeRedeemedPayload(userId, code, entitlements, credits, subscriptions);
+                        return payload;
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload != null)
+            {
+                var userProfileEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(userProfileEvent, null);
+            }
+        }
+
+        #endregion
     }
 }
