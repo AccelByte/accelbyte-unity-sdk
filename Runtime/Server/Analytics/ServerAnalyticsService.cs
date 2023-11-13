@@ -26,11 +26,24 @@ namespace AccelByte.Server
             session = inSession;
         }
 
+        public void SendData(TelemetryBody data, ResultCallback callback)
+        {
+            if (session.IsValid())
+            {
+                List<TelemetryBody> dataList = new List<TelemetryBody>() { data };
+                api.SendData(dataList, callback);
+            }
+            else
+            {
+                callback.TryError(ErrorCode.InvalidRequest, "User is not logged in.");
+            }
+        }
+
         public void SendData(List<TelemetryBody> data, ResultCallback callback)
         {
             if (session.IsValid())
             {
-                api.SendPredefinedEvent(data, callback);
+                api.SendData(data, callback);
             }
             else
             {

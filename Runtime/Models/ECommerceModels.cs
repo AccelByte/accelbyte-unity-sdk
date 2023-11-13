@@ -25,7 +25,8 @@ namespace AccelByte.Models
         SEASON,
         OPTIONBOX,
         MEDIA,
-        LOOTBOX
+        LOOTBOX,
+        EXTENSION
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -247,6 +248,28 @@ namespace AccelByte.Models
         Fulfilled,
         [EnumMember(Value = "FAILED")]
         Failed
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum PaymentProvider
+    {
+        None = 0,
+        [EnumMember(Value = "WALLET")] 
+        Wallet, 
+        [EnumMember(Value = "XSOLLA")] 
+        Xsolla, 
+        [EnumMember(Value = "ADYEN")] 
+        Adyen,
+        [EnumMember(Value = "STRIPE")] 
+        Stripe,
+        [EnumMember(Value = "CHECKOUT")] 
+        Checkout, 
+        [EnumMember(Value = "ALIPAY")] 
+        Alipay,
+        [EnumMember(Value = "WXPAY")]
+        Wxpay,
+        [EnumMember(Value = "PAYPAL")] 
+        Paypal 
     }
 
     #endregion
@@ -603,7 +626,7 @@ namespace AccelByte.Models
         [DataMember] public string longDescription;
         [DataMember] public string itemId;
         [DataMember] public string appId;
-        [DataMember] public EntitlementAppType appType; //"GAME"
+        [DataMember] public EntitlementAppType appType;  
         [DataMember] public string baseAppId;
         [DataMember] public string sku;
         [DataMember(Name = "namespace")] public string Namespace;
@@ -636,6 +659,7 @@ namespace AccelByte.Models
         [DataMember] public ItemInfo[] items;
         [DataMember] public string localExt;
         [DataMember] public Dictionary<string, int> itemQty;
+        [DataMember(Name = "flexible")] public bool Flexible;
     }
 
     [DataContract, Preserve]
@@ -646,7 +670,7 @@ namespace AccelByte.Models
         [DataMember] public string longDescription;
         [DataMember] public string itemId;
         [DataMember] public string appId;
-        [DataMember] public EntitlementAppType appType; //"GAME" 
+        [DataMember] public EntitlementAppType appType;  
         [DataMember] public SeasonType SeasonType;
         [DataMember] public string baseAppId;
         [DataMember] public string sku;
@@ -654,12 +678,16 @@ namespace AccelByte.Models
         [DataMember] public string name;
         [DataMember] public EntitlementType entitlementType;
         [DataMember] public int useCount;
+        // 	Whether stack the CONSUMABLE entitlement
         [DataMember] public bool stackable;
         [DataMember] public string categoryPath;
         [DataMember] public ItemStatus status;
+        // Whether can be visible in Store for public user
         [DataMember] public bool listable;
+        // Whether can be purchased
         [DataMember] public bool purchasable;
-        [DataMember] public bool SectionExclusive;
+        // Whether it is sold in section only
+        [DataMember(Name = "sectionExclusive")] public bool SectionExclusive;
         [DataMember] public ItemType itemType;
         [DataMember] public string targetNamespace;
         [DataMember] public string targetCurrencyCode;
@@ -685,11 +713,14 @@ namespace AccelByte.Models
         [DataMember] public ItemPurchaseCondition purchaseCondition;
         [DataMember] public ItemOptionBoxConfig optionBoxConfig;
         [DataMember] public bool Fresh;
-        [DataMember] public bool Sellable;
+        // Whether allow to sell back to store
+        [DataMember(Name = "sellable")] public bool Sellable;
         [DataMember] public ItemSaleConfig SaleConfig;
-        [DataMember] public string localExt;
+        //[DataMember] public string localExt;
         [DataMember] public Dictionary<string, int> itemQty;
         [DataMember] public LootBoxConfig lootBoxConfig;
+        // Whether flexible pricing applied, only applied if itemType is BUNDLE
+        [DataMember(Name = "flexible")] public bool Flexible;
     }
 
     [DataContract, Preserve]
@@ -704,7 +735,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string itemId;
         [DataMember] public string appId;
-        [DataMember] public EntitlementAppType appType; //"GAME" 
+        [DataMember] public EntitlementAppType appType;  
         [DataMember] public SeasonType SeasonType;
         [DataMember] public string baseAppId;
         [DataMember] public string sku;
@@ -786,6 +817,42 @@ namespace AccelByte.Models
         [DataMember] DateTime updatedAt;
     }
 
+    [DataContract, Preserve]
+    public class PriceDetail
+    {
+        [DataMember(Name = "price")] public int Price;
+        // Current discounted price per item
+        [DataMember(Name = "discountedPrice")] public int DiscountedPrice; 
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "itemSku")] public string ItemSku;
+        [DataMember(Name = "quantity")] public int Quantity;
+        // Whether owns this durable item id, consumable item is always false or null.
+        [DataMember(Name = "owned")] public string Owned; 
+        [DataMember(Name = "itemName")] public string ItemName;
+    }
+
+    [DataContract, Preserve]
+    public class EstimatedPriceInfo
+    {
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+        [DataMember(Name = "currencyNamespace")] public string CurrencyNamespace;
+        // Current full price, only calc total price with un-owned durable items if it's a flexible bundle item.
+        [DataMember(Name = "price")] public int Price; 
+        // Current available discounted price, only calc total discounted price with un-owned durable items if it's a flexible bundle item.
+        [DataMember(Name = "discountedPrice")] public int DiscountedPrice; 
+        [DataMember(Name = "priceDetails")] public PriceDetail[] PriceDetails;
+    }
+
+    [DataContract, Preserve]
+    public class EstimatedPricesInfo
+    {
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "region")] public string Region;
+        // Estimated prices in different currency under region, this field maybe null or empty if have not any available price at this time,
+        // Possible reason: This item is not yet for sale, or miss set correct region currency for flexible bundle item.
+        [DataMember(Name = "estimatedPrices")] public EstimatedPriceInfo[] EstimatedPrices;
+    }
+
     #endregion
 
     #region Orders
@@ -823,6 +890,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class OrderBundleItemInfo
+    { 
+        [DataMember(Name = "price")] public int Price;
+        [DataMember(Name = "discountedPrice")] public int DiscountedPrice;
+        [DataMember(Name = "itemName")] public string ItemName;
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "itemSku")] public string ItemSku;
+        [DataMember(Name = "quantity")] public int Quantity;
+        [DataMember(Name = "purchased")] public bool Purchased; 
+    }
+
+    [DataContract, Preserve]
     public class OrderInfo
     {
         [DataMember] public string orderNo;
@@ -852,6 +931,13 @@ namespace AccelByte.Models
         [DataMember] public DateTime refundedTime;
         [DataMember] public DateTime chargebackTime;
         [DataMember] public DateTime chargebackReversedTime;
+        [DataMember(Name = "expireTime")] public DateTime ExpireTime;
+        [DataMember(Name = "paymentRemainSeconds")] public int PaymentRemainSeconds; 
+        [DataMember(Name = "ext")] public object Ext;
+        [DataMember(Name = "totalTax")] public int TotalTax;
+        [DataMember(Name = "totalPrice")] public int TotalPrice;
+        [DataMember(Name = "subtotalPrice")] public int SubtotalPrice;
+        [DataMember(Name = "orderBundleItemInfos")] public OrderBundleItemInfo[] OrderBundleItemInfos;
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
     }
@@ -1391,5 +1477,14 @@ namespace AccelByte.Models
         [DataMember(Name = "itemId")] public int ItemId;
         [DataMember(Name = "sku")] public string Sku;
         [DataMember(Name = "status")] public IAPOrderStatus Status;
+    }
+
+    [DataContract, Preserve]
+    public class UserOrdersRequest
+    {
+        [DataMember] public string ItemId;
+        [DataMember] public OrderStatus Status = OrderStatus.INIT;
+        [DataMember] public int Offset = 0;
+        [DataMember] public int Limit = 20;
     }
 }

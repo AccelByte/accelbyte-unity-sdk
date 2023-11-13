@@ -7,8 +7,14 @@ using System;
 namespace AccelByte.Core
 {
     public class AccelByteEnvironment
-    {
+    { /// <summary>
+      /// Trigger on new environment set (To)
+      /// </summary>
         public Action<Models.SettingsEnvironment> OnEnvironmentChanged;
+        /// <summary>
+        /// Trigger on new environment set (From, To)
+        /// </summary>
+        public Action<Models.SettingsEnvironment, Models.SettingsEnvironment> OnEnvironmentChangedV2;
 
         Models.SettingsEnvironment currentEnvironment;
 
@@ -34,8 +40,10 @@ namespace AccelByte.Core
         /// <param name="newEnvironment">New Environment Target</param>
         public void Set(Models.SettingsEnvironment newEnvironment)
         {
+            var olderEnvironment = currentEnvironment;
             currentEnvironment = newEnvironment;
             OnEnvironmentChanged?.Invoke(currentEnvironment);
+            OnEnvironmentChangedV2?.Invoke(olderEnvironment, currentEnvironment);
         }
     }
 }

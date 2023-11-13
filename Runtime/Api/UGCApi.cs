@@ -16,6 +16,8 @@ namespace AccelByte.Api
     /// </summary>
     internal class UGCApi : ApiBase
     {
+        private const int maxBulkContentIds = 20;
+
         /// <summary>
         /// </summary>
         /// <param name="httpClient"></param>
@@ -1068,6 +1070,949 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCChannelResponse>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SearchContentsSpecificToChannelV2(string channelId
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit
+            , int offset
+            , UGCContentDownloaderSortBy sortBy)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/channels/{channelId}/contents")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("channelId", channelId)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("sortBy", ConvertGetUGCDownloaderSortByToString(sortBy))
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator SearchContentsV2(UGCGetContentFilterRequestV2 filterRequest
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit
+            , int offset
+            , UGCContentSortBy sortBy)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/contents")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithQueryParam("name", filterRequest.Name)
+                 .WithQueryParam("type", filterRequest.Type)
+                 .WithQueryParam("subtype", filterRequest.SubType)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("sortBy", ConvertGetUGCContentsSortByToString(sortBy))
+                 .WithQueryParam("tags", string.Join(",", filterRequest.Tags))
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetContentBulkByIdsV2(string[] contentIds
+            , ResultCallback<UGCModelsContentsResponseV2[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (contentIds.Length <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot be null or empty"));
+                yield break;
+            }
+            if (contentIds.Length > maxBulkContentIds)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot exceed " + maxBulkContentIds));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/contents/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBody(new { contentIds = contentIds }.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsContentsResponseV2[]>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetContentByShareCodeV2(string shareCode
+            , ResultCallback<UGCModelsContentsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(shareCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/contents/sharecodes/{shareCode}")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("shareCode", shareCode)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsContentsResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetContentByContentIdV2(string contentId
+            , ResultCallback<UGCModelsContentsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("contentId", contentId)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsContentsResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator CreateContentV2(string userId
+            , string channelId
+            , CreateUGCRequestV2 createRequest
+            , ResultCallback<UGCModelsCreateUGCResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (createRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(createRequest) + " cannot be null or empty"));
+                yield break;
+            }
+
+            CreateUGCRequestV2 Req = createRequest;
+            if (string.IsNullOrEmpty(Req.ContentType))
+            {
+                Req.ContentType = "application/octet-stream";
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(Req.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsCreateUGCResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteContentV2(string userId
+            , string channelId
+            , string contentId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/{contentId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("contentId", contentId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator ModifyContentV2(string userId
+            , string channelId
+            , string contentId
+            , ModifyUGCRequestV2 modifyRequest
+            , ResultCallback<UGCModelsModifyUGCResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreatePatch(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/{contentId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("contentId", contentId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(modifyRequest.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsModifyUGCResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GenerateUploadContentURLV2(string userId
+            , string channelId
+            , string contentId
+            , UGCUploadContentURLRequestV2 uploadRequest
+            , ResultCallback<UGCModelsUploadContentURLResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(uploadRequest.FileExtension))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            UGCUploadContentURLRequestV2 Req = uploadRequest;
+            if (string.IsNullOrEmpty(Req.ContentType))
+            {
+                Req.ContentType = "application/octet-stream";
+            }
+
+            var request = HttpRequestBuilder
+                 .CreatePatch(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/{contentId}/uploadUrl")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("contentId", contentId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(Req.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsUploadContentURLResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateContentFileLocationV2(string userId
+            , string channelId
+            , string contentId
+            , string fileExtension
+            , string s3Key
+            , ResultCallback<UpdateContentFileLocationResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(fileExtension))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(fileExtension) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(s3Key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(s3Key) + " cannot be null or empty"));
+                yield break;
+            }
+
+            UpdateContentFileLocationRequestV2 Req = new UpdateContentFileLocationRequestV2
+            {
+                FileExtension = fileExtension,
+                FileLocation = s3Key
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePatch(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/{contentId}/fileLocation")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("contentId", contentId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(Req.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UpdateContentFileLocationResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetUserContentsV2(string userId
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit
+            , int offset
+            , UGCContentDownloaderSortBy sortBy)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/contents")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("userId", userId)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("sortBy", ConvertGetUGCDownloaderSortByToString(sortBy))
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateContentScreenshotV2(string userId
+            , string contentId
+            , ScreenshotsUpdatesV2 screenshotsRequest
+            , ResultCallback<ScreenshotsUpdatesV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBody(screenshotsRequest.ToJsonString().ToLower())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<ScreenshotsUpdatesV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UploadContentScreenshotV2(string userId
+            , string contentId
+            , ScreenshotsRequest screenshotsRequest
+            , ResultCallback<ScreenshotsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (screenshotsRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotsRequest) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBody(screenshotsRequest.ToJsonString().ToLower())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<ScreenshotsResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteContentScreenshotV2(string userId
+            , string contentId
+            , string screenshotId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(screenshotId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots/{screenshotId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithPathParam("screenshotId", screenshotId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator AddDownloadContentCountV2(string contentId
+            , ResultCallback<UGCModelsAddDownloadContentCountResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}/downloadcount")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("contentId", contentId)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsAddDownloadContentCountResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListContentDownloaderV2(string contentId
+            , ResultCallback<UGCModelsPaginatedContentDownloaderResponseV2> callback
+            , string userId
+            , int limit
+            , int offset
+            , UGCContentDownloaderSortBy sortBy)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}/downloader")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("contentId", contentId)
+                 .WithQueryParam("userId", userId)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("sortBy", ConvertGetUGCDownloaderSortByToString(sortBy))
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsPaginatedContentDownloaderResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListContentLikerV2(string contentId
+            , ResultCallback<UGCModelsPaginatedContentLikerResponseV2> callback
+            , int limit
+            , int offset
+            , UGCContentDownloaderSortBy sortBy)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}/like")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("contentId", contentId)
+                 .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                 .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                 .WithQueryParam("sortBy", ConvertGetUGCDownloaderSortByToString(sortBy))
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsPaginatedContentLikerResponseV2>();
+            callback.Try(result);
+        }
+
+        public IEnumerator UpdateLikeStatusToContentV2(string contentId
+            , bool likeStatus
+            , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(contentId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}/like")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithPathParam("contentId", contentId)
+                 .WithBody(new
+                 {
+                     likeStatus = likeStatus
+                 }.ToUtf8Json())
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithBearerAuth(AuthToken)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCUpdateLikeStatusToContentResponse>();
             callback.Try(result);
         }
     }

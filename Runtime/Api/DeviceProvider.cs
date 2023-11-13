@@ -23,6 +23,11 @@ namespace AccelByte.Api
 
         public static string EncodeHMAC(string macAddress, string key)
         {
+            if(string.IsNullOrEmpty(macAddress))
+            {
+                return macAddress;
+            }
+
             try
             {
                 byte[] byteArray = Encoding.ASCII.GetBytes(macAddress);

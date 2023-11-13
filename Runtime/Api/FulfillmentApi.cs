@@ -27,8 +27,7 @@ namespace AccelByte.Api
 
         public IEnumerator RedeemCode( string userId
             , FulFillCodeRequest fulFillCodeRequest
-            , ResultCallback<FulfillmentResult> callback
-            , Action<Result<FulfillmentResult>, string> predefinedEventCallback = null)
+            , ResultCallback<FulfillmentResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             Assert.IsNotNull(Namespace_, "Namespace cannot be null");
@@ -53,7 +52,6 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<FulfillmentResult>();
             callback.Try(result);
-            predefinedEventCallback?.Invoke(result, fulFillCodeRequest.code);
         }
 
     }

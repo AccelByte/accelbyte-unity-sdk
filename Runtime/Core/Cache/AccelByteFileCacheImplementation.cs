@@ -11,6 +11,8 @@ namespace AccelByte.Core
     {
 #if !UNITY_WEBGL
         readonly string cacheDirectory = string.Empty;
+        const int readWriteAsyncWaitMs = 100;
+
         public AccelByteFileCacheImplementation(string cacheDirectory)
         {
             if (string.IsNullOrEmpty(cacheDirectory))
@@ -26,14 +28,49 @@ namespace AccelByte.Core
             return retval;
         }
 
-        public bool Emplace(string key, string item)
+        public virtual bool Emplace(string key, string item)
+        {
+            try
+            {
+                if (!System.IO.Directory.Exists(cacheDirectory))
+                {
+                    System.IO.Directory.CreateDirectory(cacheDirectory);
+                }
+                System.IO.File.WriteAllBytes(GetFileFullPath(key), Encoding.ASCII.GetBytes(item));
+            }
+            catch (System.Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+                return false;
+            }
+            return true;
+        }
+
+        public virtual async void EmplaceAsync(string key, string item, System.Action<bool> callback = null)
         {
             if (!System.IO.Directory.Exists(cacheDirectory))
             {
                 System.IO.Directory.CreateDirectory(cacheDirectory);
             }
-            System.IO.File.WriteAllBytes(GetFileFullPath(key), Encoding.ASCII.GetBytes(item));
-            return true;
+
+            string path = GetFileFullPath(key);
+            bool writeSuccess = false;
+            while (!writeSuccess)
+            {
+                try
+                {
+                    using (var outputFile = new System.IO.StreamWriter(path))
+                    {
+                        await outputFile.WriteAsync(item);
+                        writeSuccess = true;
+                    }
+                }
+                catch (System.Exception)
+                {
+                    await System.Threading.Tasks.Task.Delay(readWriteAsyncWaitMs);
+                }
+            }
+            callback?.Invoke(true);
         }
 
         public bool Update(string key, string item)
@@ -60,14 +97,56 @@ namespace AccelByte.Core
             }
         }
 
-        public string Retrieve(string key)
+        public virtual string Retrieve(string key)
         {
             if (!Contains(key))
             {
                 return null;
             }
-            string retval = System.IO.File.ReadAllText(GetFileFullPath(key));
+
+            string retval = null;
+
+            try
+            {
+                retval = System.IO.File.ReadAllText(GetFileFullPath(key));
+            }
+            catch (System.Exception ex)
+            {
+                AccelByteDebug.LogWarning(ex.Message);
+            }
             return retval;
+        }
+
+        public virtual async void RetrieveAsync(string key, System.Action<string> callback)
+        {
+            if (callback != null)
+            {
+                if (!Contains(key))
+                {
+                    callback?.Invoke(null);
+                    return;
+                }
+
+                string fileText = null;
+                bool loadSuccess = false;
+                string path = GetFileFullPath(key);
+                while (!loadSuccess)
+                {
+                    try
+                    {
+                        using (var reader = System.IO.File.OpenText(path))
+                        {
+                            fileText = await reader.ReadToEndAsync();
+                            loadSuccess = true;
+                        }
+                    }
+                    catch (System.Exception)
+                    {
+                        await System.Threading.Tasks.Task.Delay(readWriteAsyncWaitMs);
+                    }
+                }
+                callback?.Invoke(fileText);
+            }
         }
 
         public string Peek(string key)
@@ -91,39 +170,54 @@ namespace AccelByte.Core
             return retval;
         }
 #else
-        public bool Contains(string key)
+        public AccelByteFileCacheImplementation(string cacheDirectory)
         {
-            throw new System.NotImplementedException();
+
         }
 
-        public bool Emplace(string key, string item)
+        public bool Contains(string key)
         {
-            throw new System.NotImplementedException();
+            return false;
+        }
+
+        public virtual bool Emplace(string key, string item)
+        {
+            return false;
+        }
+
+        public virtual void EmplaceAsync(string key, string item, System.Action<bool> callback = null)
+        {
+            callback?.Invoke(false);
         }
 
         public void Empty()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public string Peek(string key)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
 
         public bool Remove(string key)
         {
-            throw new System.NotImplementedException();
+            return false;
         }
 
-        public string Retrieve(string key)
+        public virtual string Retrieve(string key)
         {
-            throw new System.NotImplementedException();
+            return null;
+        }
+
+        public virtual void RetrieveAsync(string key, System.Action<string> callback)
+        {
+            callback?.Invoke(string.Empty);
         }
 
         public bool Update(string key, string item)
         {
-            throw new System.NotImplementedException();
+            return false;
         }
 #endif
     }

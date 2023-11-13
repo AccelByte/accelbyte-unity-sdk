@@ -798,9 +798,10 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Send request friend request in bulk.
+        /// Add other users as friends automatically, other users don't need to accept it.
+        /// This is used for syncing other platform friends to AccelByte friend.
         /// </summary>
-        /// <param name="userIds">Targeted user ID.</param>
+        /// <param name="userIds">Targeted user IDs.</param>
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public void BulkRequestFriend(string[] userIds
             , ResultCallback callback)

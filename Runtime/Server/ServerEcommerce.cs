@@ -110,43 +110,52 @@ namespace AccelByte.Server
                         string userId = fulfilmentResult.Value.userId;
 
                         List<PredefinedEntitlementSummary> entitlements = new List<PredefinedEntitlementSummary>();
-                        foreach (var summary in fulfilmentResult.Value.entitlementSummaries)
+                        if (fulfilmentResult.Value.entitlementSummaries != null)
                         {
-                            PredefinedEntitlementSummary entSummary = new PredefinedEntitlementSummary(
-                                summary.id,
-                                summary.Name,
-                                summary.type.ToString(),
-                                summary.clazz.ToString(),
-                                summary.itemId,
-                                summary.StoreId.ToString());
+                            foreach (var summary in fulfilmentResult.Value.entitlementSummaries)
+                            {
+                                PredefinedEntitlementSummary entSummary = new PredefinedEntitlementSummary(
+                                    summary.id,
+                                    summary.Name,
+                                    summary.type.ToString(),
+                                    summary.clazz.ToString(),
+                                    summary.itemId,
+                                    summary.StoreId.ToString());
 
-                            entitlements.Add(entSummary);
+                                entitlements.Add(entSummary);
+                            }
                         }
 
                         List<PredefinedCreditSummary> credits = new List<PredefinedCreditSummary>();
-                        foreach (var summary in fulfilmentResult.Value.creditSummaries)
+                        if (fulfilmentResult.Value.creditSummaries != null)
                         {
-                            PredefinedCreditSummary credsSummary = new PredefinedCreditSummary(
-                                summary.walletId,
-                                summary.userId,
-                                summary.amount,
-                                summary.CurrencyCode);
+                            foreach (var summary in fulfilmentResult.Value.creditSummaries)
+                            {
+                                PredefinedCreditSummary credsSummary = new PredefinedCreditSummary(
+                                    summary.walletId,
+                                    summary.userId,
+                                    summary.amount,
+                                    summary.CurrencyCode);
 
-                            credits.Add(credsSummary);
+                                credits.Add(credsSummary);
+                            }
                         }
 
                         List<PredefinedSubscriptionSummary> subscriptions = new List<PredefinedSubscriptionSummary>();
-                        foreach (var summary in fulfilmentResult.Value.subscriptionSummaries)
+                        if (fulfilmentResult.Value.subscriptionSummaries != null)
                         {
-                            PredefinedSubscriptionSummary subsSummary = new PredefinedSubscriptionSummary(
-                                summary.Id,
-                                summary.ItemId,
-                                summary.UserId,
-                                summary.Sku,
-                                summary.Status.ToString(),
-                                summary.SubscribedBy.ToString());
+                            foreach (var summary in fulfilmentResult.Value.subscriptionSummaries)
+                            {
+                                PredefinedSubscriptionSummary subsSummary = new PredefinedSubscriptionSummary(
+                                    summary.Id,
+                                    summary.ItemId,
+                                    summary.UserId,
+                                    summary.Sku,
+                                    summary.Status.ToString(),
+                                    summary.SubscribedBy.ToString());
 
-                            subscriptions.Add(subsSummary);
+                                subscriptions.Add(subsSummary);
+                            }
                         }
 
                         var payload = new PredefinedItemFulfilledPayload(userId, entitlements, credits, subscriptions);
@@ -183,6 +192,16 @@ namespace AccelByte.Server
             IAccelByteTelemetryPayload payload;
             payload = CreatePredefinedPayload<FulfillmentResult>(apiCall, PredefinedEventType.Fulfilment);
             SendPredefinedEvent(payload);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+            callback.Try(result);
         }
 
         #endregion
@@ -252,18 +271,18 @@ namespace AccelByte.Server
                 return;
             }
 
-            Action<Result<StackableEntitlementInfo[]>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = SendPredefinedEntitlementEvent;
-            }
-
             coroutineRunner.Run(
                 api.GrantUserEntitlement(
                     userId,
                     grantUserEntitlementsRequest,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedEntitlementEvent(cb);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -287,19 +306,19 @@ namespace AccelByte.Server
                 return;
             }
 
-            Action<Result<WalletInfo>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = SendPredefinedUserWalletEvent;
-            }
-
             coroutineRunner.Run(
                 api.CreditUserWallet(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedUserWalletEvent(cb);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -327,19 +346,19 @@ namespace AccelByte.Server
                 return;
             }
 
-            Action<Result<CreditUserWalletResponse>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = SendPredefinedUserWalletEventV2;
-            }
-
             coroutineRunner.Run(
                 api.CreditUserWalletV2(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            SendPredefinedUserWalletEventV2(cb);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -365,18 +384,18 @@ namespace AccelByte.Server
                 return;
             }
 
-            Action<Result<FulfillmentResult>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = SendFulfillUserItemPredefinedEvent;
-            }
-
             coroutineRunner.Run(
                api.FulfillUserItem(
                    userId,
                    fulfillmentRequest,
-                   callback,
-                   onPredefinedEventTrigger));
+                   cb =>
+                   {
+                       if (!cb.IsError && cb.Value != null)
+                       {
+                           SendFulfillUserItemPredefinedEvent(cb);
+                       }
+                       HandleCallback(cb, callback);
+                   }));
         }
 
         /// <summary>

@@ -110,4 +110,39 @@ namespace AccelByte.Models
         [DataMember] public PublicUserRecordKeys[] Data;
         [DataMember] public Paging Paging;
     }
+
+    [DataContract, Preserve]
+    public class AdminGameRecord
+    {
+        [DataMember] public string Key;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "created_at")] public DateTime CreatedAt;
+        [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+        [DataMember] public Dictionary<string, object> Value;
+    }
+
+    [DataContract, Preserve]
+    public class AdminUserRecord
+    {
+        [DataMember] public string Key;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "user_id")] public string UserId;
+        [DataMember(Name = "created_at")] public DateTime CreatedAt;
+        [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+        [DataMember] public Dictionary<string, object> Value;
+    }
+
+    [DataContract, Preserve]
+    public class AdminUserRecordKeys
+    {
+        [DataMember] public string Key;
+        [DataMember(Name = "user_id")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class PaginatedGetAdminUserRecordKeys
+    {
+        [DataMember] public AdminUserRecordKeys[] Data;
+        [DataMember] public Paging Paging;
+    }
 }

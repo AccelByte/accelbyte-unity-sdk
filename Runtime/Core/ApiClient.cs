@@ -178,6 +178,7 @@ namespace AccelByte.Core
         public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, AnalyticsApi>(); }
+        public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }
 #endregion
 
 

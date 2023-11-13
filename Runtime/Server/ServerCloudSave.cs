@@ -494,5 +494,236 @@ namespace AccelByte.Server
 
             coroutineRunner.Run(api.GetGameRecords(key, callback));
         }
+
+        /// <summary>
+        /// Create new admin game record or append the existing admin game record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void CreateAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.CreateAdminGameRecord(key, recordRequest, callback));
+        }
+
+        /// <summary>
+        /// Get a record by its key in namespace-level.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void QueryAdminGameRecordsByKey(string key
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.QueryAdminGameRecordsByKey(key, callback));
+        }
+
+        /// <summary>
+        /// Retrieve list of records key by namespace
+        /// </summary>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="limit">The limit of the keys result.</param>
+        /// <param name="offset">Distance between the beginning of the data list and a given point</param>
+        public void QueryAdminGameRecordKeys(ResultCallback<GameRecordList> callback
+            , int limit = 20
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.QueryAdminGameRecordKeys(callback, offset, limit));
+        }
+
+        /// <summary>
+        /// Create new admin game record or replace the existing admin game record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.ReplaceAdminGameRecord(key, recordRequest, callback));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void DeleteAdminGameRecord(string key
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.DeleteAdminGameRecord(key, callback));
+        }
+
+        /// <summary>
+        /// Create new admin user record or append the existing admin user record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="userId">UserId of the record owner.</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void CreateAdminUserRecord(string key
+            , string userId
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.CreateAdminUserRecord(key, userId, recordRequest, callback));
+        }
+
+        /// <summary>
+        /// Query admin user records by Key.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="userId">UserId of the record owner.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void QueryAdminUserRecordsByKey(string key
+            , string userId
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.QueryAdminUserRecordsByKey(key, userId, callback));
+        }
+
+        /// <summary>
+        /// Query admin user record Keys.
+        /// </summary>
+        /// <param name="userId">UserId of the record owner.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="limit">The limit of the keys result.</param>
+        /// <param name="offset">Distance between the beginning of the data list and a given point</param>
+        public void QueryAdminUserRecordKeys(string userId
+            , ResultCallback<PaginatedGetAdminUserRecordKeys> callback
+            , int limit = 20
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.QueryAdminUserRecordKeys(userId, callback, limit, offset));
+        }
+
+        /// <summary>
+        /// Replace admin user record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="userId">UserId of the record owner.</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceAdminUserRecord(string key
+            , string userId
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.ReplaceAdminUserRecord(key, userId, recordRequest, callback));
+        }
+
+        public void DeleteAdminUserRecord(string key
+            , string userId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(api.DeleteAdminUserRecord(key, userId, callback));
+        }
     }
 }

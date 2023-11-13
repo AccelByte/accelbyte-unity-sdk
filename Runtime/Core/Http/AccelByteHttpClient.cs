@@ -16,6 +16,7 @@ namespace AccelByte.Core
 {
     public class AccelByteHttpClient : IHttpClient
     {
+        internal const string FlightIdKey = "x-flight-id";
         enum RequestState
         {
             Invalid = 0,
@@ -35,6 +36,12 @@ namespace AccelByte.Core
 
         private AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>> httpCache;
 
+        internal string FlightId
+        {
+            get;
+            private set;
+        }
+
         public AccelByteHttpClient(IHttpRequestSender requestSender = null)
         {
             if(requestSender != null)
@@ -48,6 +55,7 @@ namespace AccelByte.Core
                 this.sender = defaultSender;
             }
             this.SetRetryParameters();
+            SetFlightId(AccelByteSDK.FlightId);
         }
 
         internal void SetCacheImplementation(IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>> cacheImplementation, int cacheMaxLifeTime)
@@ -59,6 +67,11 @@ namespace AccelByte.Core
         {
             this.clientId = clientId;
             this.clientSecret = clientSecret;
+        }
+
+        public void SetFlightId(string newFlightId)
+        {
+            FlightId = newFlightId;
         }
 
         public HttpCredential GetCredentials()
@@ -168,6 +181,12 @@ namespace AccelByte.Core
                 return new HttpSendResult(null, applyAuthErr);
             }
             this.ApplyImplicitPathParams(request);
+            
+            this.ApplyAdditionalData(request, FlightId, out Error applyAdditionalDataErr);
+            if (applyAdditionalDataErr.Code != ErrorCode.None)
+            {
+                return new HttpSendResult(null, applyAdditionalDataErr);
+            }
 
             if (!this.TryResolveUri(request))
             {
@@ -337,6 +356,13 @@ namespace AccelByte.Core
                 yield break;
             }
             this.ApplyImplicitPathParams(request);
+
+            this.ApplyAdditionalData(request, FlightId, out Error applyAdditionalDataErr);
+            if (applyAdditionalDataErr.Code != ErrorCode.None)
+            {
+                callback?.Invoke(null, applyAdditionalDataErr);
+                yield break;
+            }
 
             if (!this.TryResolveUri(request))
             {
@@ -557,6 +583,22 @@ namespace AccelByte.Core
 
                     request.Headers[authHeaderKey] = "Bearer " + this.accessToken;
                     break;
+            }
+        }
+
+        private void ApplyAdditionalData(IHttpRequest request, string flightId, out Error err)
+        {
+            err = new Error(ErrorCode.None);
+
+            if (request == null)
+            {
+                err = new Error(ErrorCode.InvalidRequest, "request object is null");
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(FlightId) && request.Headers != null)
+            {
+                request.Headers[FlightIdKey] = flightId;
             }
         }
 

@@ -396,5 +396,462 @@ namespace AccelByte.Server
             var result = response.TryParseJson<GameRecord>();
             callback.Try(result);
         }
+
+        public IEnumerator CreateAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminGameRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryAdminGameRecordsByKey(string key
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminGameRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryAdminGameRecordKeys(ResultCallback<GameRecordList> callback
+            , int limit
+            , int offset)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<GameRecordList>();
+            callback.Try(result);
+        }
+
+        public IEnumerator ReplaceAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminGameRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteAdminGameRecord(string key
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public IEnumerator CreateAdminUserRecord(string key
+            , string userId
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminUserRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryAdminUserRecordsByKey(string key
+            , string userId
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminUserRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryAdminUserRecordKeys(string userId
+            , ResultCallback<PaginatedGetAdminUserRecordKeys> callback
+            , int limit = 20
+            , int offset = 0)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/adminrecords")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("limit", limit >= 0 ? limit.ToString() : string.Empty)
+                .WithQueryParam("offset", offset >= 0 ? offset.ToString() : string.Empty)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<PaginatedGetAdminUserRecordKeys>();
+            callback.Try(result);
+        }
+
+        public IEnumerator ReplaceAdminUserRecord(string key
+            , string userId
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<AdminUserRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(recordRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<AdminUserRecord>();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteAdminUserRecord(string key
+            , string userId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/adminrecords/{key}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
     }
 }

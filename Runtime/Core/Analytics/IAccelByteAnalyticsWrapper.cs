@@ -10,6 +10,7 @@ namespace AccelByte.Core
     public interface IAccelByteAnalyticsWrapper
     {
         public void SendData(List<TelemetryBody> data, ResultCallback callback);
+        public void SendData(TelemetryBody data, ResultCallback callback);
 
         public ISession GetSession();
     }

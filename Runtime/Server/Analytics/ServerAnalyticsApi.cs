@@ -25,7 +25,7 @@ namespace AccelByte.Server
             gameTelemetryUrl = config.GameTelemetryServerUrl + "/v1/protected/events";
         }
 
-        public async void SendPredefinedEvent(List<TelemetryBody> predefinedEvents
+        public async void SendData(List<TelemetryBody> predefinedEvents
             , ResultCallback callback)
         {
             if (predefinedEvents == null)

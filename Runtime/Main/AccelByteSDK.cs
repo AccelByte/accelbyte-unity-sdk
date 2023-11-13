@@ -20,6 +20,13 @@ namespace AccelByte.Core
             internal set;
             get;
         }
+		
+        public static string FlightId
+        {
+            internal set;
+            get;
+        }
+		
         internal static Models.OverrideConfigs OverrideConfigs;
     }
 }

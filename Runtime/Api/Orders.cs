@@ -117,7 +117,6 @@ namespace AccelByte.Api
             , ResultCallback<OrderInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(orderRequest, "Can't create order; OrderRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -125,19 +124,23 @@ namespace AccelByte.Api
                 return;
             }
 
-            Action<Result<OrderInfo>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = RefinePaymentApiCallback;
-            }
-
             coroutineRunner.Run(
                 api.CreateOrder(
                     session.UserId,
                     session.AuthorizationToken,
                     orderRequest,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            RefinePaymentApiCallback(cb);
+                        }
+                        else if (cb.IsError)
+                        {
+                            RefineFailedApiCallback(session.UserId, orderRequest.itemId, orderRequest.price);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -149,7 +152,6 @@ namespace AccelByte.Api
             , ResultCallback<OrderInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(orderNo, "Can't cancel the order. orderNo parameter is null!");
 
             if (!session.IsValid())
             {
@@ -174,7 +176,6 @@ namespace AccelByte.Api
             , ResultCallback<OrderInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(orderNo, "Can't get user's order; OrderNo parameter is null!");
 
             if (!session.IsValid())
             {
@@ -182,37 +183,39 @@ namespace AccelByte.Api
                 return;
             }
 
-            Action<Result<OrderInfo>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = RefinePaymentApiCallback;
-            }
-
             coroutineRunner.Run(
-                api.GetUserOrder(session.UserId, session.AuthorizationToken, orderNo, callback, onPredefinedEventTrigger));
+                api.GetUserOrder(session.UserId, session.AuthorizationToken, orderNo, cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        RefinePaymentApiCallback(cb);
+                    }
+                    else if (cb.IsError)
+                    {
+                        RefineFailedApiCallback(session.UserId);
+                    }
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
         /// Get all orders limited by paging parameters. Returns a list of OrderInfo contained by a page.
+        /// This Function is obsolete, please use QueryUserOrders(UserOrderRequest userOrderRequest, ResultCallback<OrderPagingSlicedResult> callback) instead. 
         /// </summary>
         /// <param name="startPage">Page number</param>
         /// <param name="size">Size of each page</param>
         /// <param name="callback">Returns a Result that contains OrderPagingSlicedResult via callback when completed</param>
+        [Obsolete]
         public void GetUserOrders( uint startPage
             , uint size
             , ResultCallback<OrderPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
-            }
-
-            Action<Result<OrderPagingSlicedResult>> onPredefinedEventTrigger = null;
-            if (predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = RefineSlicingPaymentApiCallback;
             }
 
             coroutineRunner.Run(
@@ -221,21 +224,29 @@ namespace AccelByte.Api
                     session.AuthorizationToken,
                     startPage,
                     size,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            RefineSlicingPaymentApiCallback(cb);
+                        }
+                        else if (cb.IsError)
+                        {
+                            RefineFailedApiCallback(session.UserId);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
         /// Get history of an order specified by orderNo
         /// </summary>
         /// <param name="orderNo">Order number</param>
-        /// <param name="callback">Returns a Result that contains OrderHistoryInfo array via callback
-        /// when completed.</param>
+        /// <param name="callback">Returns a Result that contains OrderHistoryInfo array via callback when completed.</param>
         public void GetUserOrderHistory( string orderNo
             , ResultCallback<OrderHistoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(orderNo, "Can't get user's order history info; OrderNo parameter is null!");
 
             if (!session.IsValid())
             {
@@ -248,6 +259,30 @@ namespace AccelByte.Api
                     session.UserId,
                     session.AuthorizationToken,
                     orderNo,
+                    callback));
+        }
+
+        /// <summary>
+        ///  Get all of user's orders that have been created with paging.
+        /// </summary>
+        /// <param name="UserOrderRequest">Contains some parameters for query</param>
+        /// <param name="callback">Returns a Result that contains OrderPagingSlicedResult via callback when completed.</param>
+        public void QueryUserOrders(UserOrdersRequest userOrderRequest
+            , ResultCallback<OrderPagingSlicedResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.QueryUserOrders(
+                    session.UserId,
+                    session.AuthorizationToken,
+                    userOrderRequest,
                     callback));
         }
 
@@ -301,19 +336,52 @@ namespace AccelByte.Api
                 if (successData.Count > 0)
                 {
                     payload = new PredefinedPaymentSucceededPayload(successData);
-                    var userProfileEvent = new AccelByteTelemetryEvent(payload);
-                    predefinedEventScheduler.SendEvent(userProfileEvent, null);
+                    SendPredefinedEvent(payload);
                 }
 
                 if (failedData.Count > 0)
                 {
                     payload = new PredefinedPaymentFailedPayload(failedData);
-                    var userProfileEvent = new AccelByteTelemetryEvent(payload);
-                    predefinedEventScheduler.SendEvent(userProfileEvent, null);
+                    SendPredefinedEvent(payload);
                 }
             }
         }
 
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (payload != null && predefinedEventScheduler != null)
+            {
+                var userProfileEvent = new AccelByteTelemetryEvent(payload);
+                predefinedEventScheduler.SendEvent(userProfileEvent, null);
+            }
+        }
+
+        private void RefineFailedApiCallback(string userId, string itemId = "", int price = 0)
+        {
+            List<PredefinedPaymentModel> failedData = new List<PredefinedPaymentModel>
+            {
+                new PredefinedPaymentModel(
+                "",
+                "",
+                userId,
+                itemId,
+                price,
+                "")
+            };
+
+            var payload = new PredefinedPaymentFailedPayload(failedData);
+            SendPredefinedEvent(payload);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+            callback.Try(result);
+        }
         #endregion
     }
 }

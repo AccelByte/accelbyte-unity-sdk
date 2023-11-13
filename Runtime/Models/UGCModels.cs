@@ -303,6 +303,23 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class ScreenshotsV2
+    {
+        [DataMember] public string ContentType;
+        [DataMember] public string Description;
+        [DataMember] public string FileExtension;
+        [DataMember] public string ScreenshotId;
+        [DataMember] public string Source;
+        [DataMember] public string Url;
+    }
+
+    [DataContract, Preserve]
+    public class ScreenshotsResponseV2
+    {
+        [DataMember] public ScreenshotsV2[] Screenshots;
+    }
+
+    [DataContract, Preserve]
     public class SearchContentRequest
     {
         [DataMember] public string name;
@@ -464,5 +481,215 @@ namespace AccelByte.Models
     {
         [DataMember] public UGCGetUserGroupsResponse[] data;
         [DataMember] public Paging paging;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsContentsResponseV2
+    {
+        [DataMember] public string ChannelId;
+        [DataMember] public string CreatedTime;
+        [DataMember] public UserIdState CreatorFollowState;
+        [DataMember] public int DownloadCount;
+        [DataMember] public string FileExtension;
+        [DataMember] public string[] Groups;
+        [DataMember] public string Id;
+        [DataMember] public bool IsHidden;
+        [DataMember] public bool IsOfficial;
+        [DataMember] public int LikeCount;
+        [DataMember] public UserIdState LikeState;
+        [DataMember] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public PayLoadUrl[] PayloadUrl;
+        [DataMember] public ScreenshotsV2[] Screenshots;
+        [DataMember] public string ShareCode;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+        [DataMember] public string UpdatedTime;
+        [DataMember] public string UserId;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+    }
+
+    [DataContract, Preserve]
+    public class UGCSearchContentsPagingResponseV2
+    {
+        [DataMember] public UGCModelsContentsResponseV2[] Data;
+        [DataMember] public Paging Paging;
+    }
+
+    [DataContract, Preserve]
+    public class UGCGetContentFilterRequestV2
+    {
+        [DataMember] public string Name;
+        [DataMember] public string Type;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+    }
+
+    [DataContract, Preserve]
+    public class CreateUGCRequestV2
+    {
+        [DataMember] public string ContentType;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public string FileExtension;
+        [DataMember] public string Name;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsCreateUGCResponseV2
+    {
+        [DataMember] public string ChannelId;
+        [DataMember] public string ContentType;
+        [DataMember] public DateTime CreatedTime;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public string FileExtension;
+        [DataMember] public string FileLocation;
+        [DataMember] public string Id;
+        [DataMember] public bool IsHidden;
+        [DataMember] public bool IsOfficial;
+        [DataMember] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string ParentNamespace;
+        [DataMember] public UGCPayloadUrl[] PayloadURL;
+        [DataMember] public string ShareCode;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+        [DataMember] public DateTime UpdatedTime;
+        [DataMember] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class ModifyUGCRequestV2
+    {
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public string Name;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsModifyUGCResponseV2
+    {
+        [DataMember] public string ChannelId;
+        [DataMember] public string ContentType;
+        [DataMember] public DateTime CreatedTime;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public string FileExtension;
+        [DataMember] public string Id;
+        [DataMember] public bool IsHidden;
+        [DataMember] public bool IsOfficial;
+        [DataMember] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string ParentNamespace;
+        [DataMember] public UGCPayloadUrl[] PayloadURL;
+        [DataMember] public string ShareCode;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+        [DataMember] public DateTime UpdatedTime;
+        [DataMember] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class UGCUploadContentURLRequestV2
+    {
+        [DataMember] public string ContentType;
+        [DataMember] public string FileExtension;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsUploadContentURLResponseV2
+    {
+        [DataMember] public string ContentType;
+        [DataMember] public string FileExtension;
+        [DataMember] public string Url;
+        [DataMember] public string FileLocation;
+    }
+
+    [DataContract, Preserve]
+    public class UpdateContentFileLocationRequestV2
+    {
+        [DataMember] public string FileExtension;
+        [DataMember] public string FileLocation;
+    }
+
+    [DataContract, Preserve]
+    public class UpdateContentFileLocationResponseV2
+    {
+        [DataMember] public string ChannelId;
+        [DataMember] public string ContentType;
+        [DataMember] public DateTime CreatedTime;
+        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember] public string FileExtension;
+        [DataMember] public string FileLocation;
+        [DataMember] public string Id;
+        [DataMember] public bool IsHidden;
+        [DataMember] public bool IsOfficial;
+        [DataMember] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember] public string ParentNamespace;
+        [DataMember] public UGCPayloadUrl[] PayloadURL;
+        [DataMember] public string ShareCode;
+        [DataMember] public string SubType;
+        [DataMember] public string[] Tags;
+        [DataMember] public string Type;
+        [DataMember] public DateTime UpdatedTime;
+        [DataMember] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class ScreenshotUpdateV2
+    {
+        [DataMember] public string Description;
+        [DataMember] public string ScreenshotId;
+    }
+
+    [DataContract, Preserve]
+    public class ScreenshotsUpdatesV2
+    {
+        [DataMember] public ScreenshotUpdateV2[] Screenshots;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsAddDownloadContentCountResponseV2
+    {
+        [DataMember] public string ContentId;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsUGCContentDownloader
+    {
+        [DataMember] public string ContentId;
+        [DataMember] public DateTime CreatedTime;
+        [DataMember] public string DownloadedBy;
+        [DataMember(Name = "namespace")] public string Namespace;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsPaginatedContentDownloaderResponseV2
+    {
+        [DataMember] public UGCModelsUGCContentDownloader[] Data;
+        [DataMember] public Paging Paging;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsUGCContentLiker
+    {
+        [DataMember] public string ContentId;
+        [DataMember] public DateTime CreatedTime;
+        [DataMember] public string LikedBy;
+        [DataMember(Name = "namespace")] public string Namespace;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsPaginatedContentLikerResponseV2
+    {
+        [DataMember] public UGCModelsUGCContentLiker[] Data;
+        [DataMember] public Paging Paging;
     }
 }

@@ -24,6 +24,7 @@ namespace AccelByte.Core
         private readonly StringBuilder queryBuilder = new StringBuilder(256);
         private readonly StringBuilder urlBuilder = new StringBuilder(256);
         private string targetNamespace = null;
+        private Dictionary<string, string> additionalData = new Dictionary<string, string>();
         private HttpRequestPrototype result;
 
         //Custom headers
@@ -319,6 +320,32 @@ namespace AccelByte.Core
             return this;
         }
 
+        /// <summary>
+        /// Add/append to additionalData form field as to be included in the request. param key:val.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public HttpRequestBuilder AddAdditionalData(string key, string value)
+        {
+
+            if (string.IsNullOrEmpty(key))
+            {
+                Assert.IsNotNull(key, "Additional data key is null");
+                return this;
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                Assert.IsNotNull(value, $"Additional data value is null for key {key}");
+                return this;
+            }
+
+            this.additionalData.Add(key, value);
+
+            return this;
+        }
+
         public HttpRequestBuilder WithBody(string body)
         {
             if (!this.result.Headers.ContainsKey("Content-Type"))
@@ -392,6 +419,11 @@ namespace AccelByte.Core
             {
                 this.urlBuilder.Append("?");
                 this.urlBuilder.Append(this.queryBuilder);
+            }
+
+            if (this.additionalData.Count > 0)
+            {
+                this.WithFormParam("additionalData", additionalData.ToJsonString());
             }
             
             if (this.formBuilder.Length > 0)

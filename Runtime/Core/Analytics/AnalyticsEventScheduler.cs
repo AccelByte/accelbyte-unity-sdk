@@ -180,26 +180,17 @@ namespace AccelByte.Core
         #region Common Function
         protected void CommonTriggerSend()
         {
-            if (!jobQueue.IsEmpty)
+            lock (jobQueue)
             {
-                List<TelemetryBody> telemetryBodies = new List<TelemetryBody>();
-                List<ResultCallback> telemetryCallbacks = new List<ResultCallback>();
                 while (!jobQueue.IsEmpty)
                 {
                     if (jobQueue.TryDequeue(out var dequeueResult))
                     {
-                        telemetryBodies.Add(dequeueResult.Item1);
-                        telemetryCallbacks.Add(dequeueResult.Item2);
+                        TelemetryBody telemetryBody = dequeueResult.Item1;
+                        ResultCallback cb = dequeueResult.Item2;
+                        analyticsWrapper.SendData(telemetryBody, cb);
                     }
                 }
-
-                analyticsWrapper.SendData(telemetryBodies, result =>
-                {
-                    foreach (var callback in telemetryCallbacks)
-                    {
-                        callback.Invoke(result);
-                    }
-                });
             }
         }
 
@@ -207,7 +198,10 @@ namespace AccelByte.Core
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
 
-            jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
+            lock (jobQueue)
+            {
+                jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
+            }
             OnTelemetryEventAdded?.Invoke(eventBody);
         }
 

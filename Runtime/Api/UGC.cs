@@ -45,6 +45,8 @@ namespace AccelByte.Api
         {
         }
 
+        #region UGC V1
+
         /// <summary>
         /// Create a content with string preview and get the payload url to upload the content.
         /// </summary>
@@ -989,5 +991,542 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(api.UpdateChannel(requestModel, requestParameter, callback));
         }
+
+        #endregion
+
+        #region UGC V2 (Content)
+
+        /// <summary>
+        /// Search contents specific to a channel.
+        /// </summary>
+        /// <param name="channelId">Channel Id.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 20.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        /// <param name="sortBy">Sorting criteria: created time with asc or desc. Default= created time and desc.</param>
+        public void SearchContentsSpecificToChannelV2(string channelId
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit = 20
+            , int offset = 0
+            , UGCContentDownloaderSortBy sortBy = UGCContentDownloaderSortBy.CreatedTimeDesc)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SearchContentsSpecificToChannelV2(channelId, callback, limit, offset, sortBy));
+        }
+
+        /// <summary>
+        /// Get all contents in current namespace
+        /// </summary>
+        /// <param name="filterRequest">To filter the returned UGC contets.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 20.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        /// <param name="sortBy">Sorting criteria: name, download, like, created time with asc or desc. Default= created time and asc.</param>
+        public void SearchContentsV2(UGCGetContentFilterRequestV2 filterRequest
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit = 20
+            , int offset = 0
+            , UGCContentSortBy sortBy = UGCContentSortBy.CreatedTimeDesc)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SearchContentsV2(filterRequest, callback, limit, offset, sortBy));
+        }
+
+        /// <summary>
+        /// Get contents by content Ids
+        /// </summary>
+        /// <param name="contentId">Content Ids Array</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetContentBulkByIdsV2(string[] contentIds
+            , ResultCallback<UGCModelsContentsResponseV2[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetContentBulkByIdsV2(contentIds, callback));
+        }
+
+        /// <summary>
+        /// Get a content information by its share code.
+        /// </summary>
+        /// <param name="shareCode">The share code of the content that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetContentByShareCodeV2(string shareCode
+            , ResultCallback<UGCModelsContentsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetContentByShareCodeV2(shareCode, callback));
+        }
+
+        /// <summary>
+        /// Get a content information by its content id
+        /// </summary>
+        /// <param name="contentId">The id of the content that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetContentByContentIdV2(string contentId
+            , ResultCallback<UGCModelsContentsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetContentByContentIdV2(contentId, callback));
+        }
+
+        /// <summary>
+        /// Create a UGC content with create content request.
+        /// </summary>
+        /// <param name="channelId ">The id of the content's channel.</param>
+        /// <param name="createRequest">Detail information for the content request.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void CreateContentV2(string channelId
+            , CreateUGCRequestV2 createRequest
+            , ResultCallback<UGCModelsCreateUGCResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.CreateContentV2(session.UserId, channelId, createRequest, callback));
+        }
+
+        /// <summary>
+        /// Delete a content based on the its channel id and content id.
+        /// </summary>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="contentId">The id of the content that will be deleted.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void DeleteContentV2(string channelId
+            , string contentId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.DeleteContentV2(session.UserId, channelId, contentId, callback));
+        }
+
+        /// <summary>
+        /// Modify existing content to update some information.
+        /// </summary>
+        /// <param name="channelId ">The id of the content's channel.</param>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="modifyRequest">Detail information for the content request that will be modified.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void ModifyContentV2(string channelId
+            , string contentId
+            , ModifyUGCRequestV2 modifyRequest
+            , ResultCallback<UGCModelsModifyUGCResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ModifyContentV2(session.UserId, channelId, contentId, modifyRequest, callback));
+        }
+
+        /// <summary>
+        /// Generate Upload URL and Conten File Location.
+        /// </summary>
+        /// <param name="channelId ">The id of the content's channel.</param>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="uploadRequest">Detail information for the upload request.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GenerateUploadContentURLV2(string channelId
+            , string contentId
+            , UGCUploadContentURLRequestV2 uploadRequest
+            , ResultCallback<UGCModelsUploadContentURLResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GenerateUploadContentURLV2(session.UserId, channelId, contentId, uploadRequest, callback));
+        }
+
+        /// <summary>
+        /// Update Content File Location in S3.
+        /// </summary>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="contentId">The id of the content.</param>
+        /// <param name="fileExtension">FileExtension of the content.</param>
+        /// <param name="s3Key">Detail information about the file location in S3.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateContentFileLocationV2(string channelId
+            , string contentId
+            , string fileExtension
+            , string s3Key
+            , ResultCallback<UpdateContentFileLocationResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateContentFileLocationV2(session.UserId, channelId, contentId, fileExtension, s3Key, callback));
+        }
+
+        /// <summary>
+        /// Get user's generated contents
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 20.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        /// <param name="sortBy">Sorting criteria: created time with asc or desc. Default= created time and desc.</param>
+        public void GetUserContentsV2(string userId
+            , ResultCallback<UGCSearchContentsPagingResponseV2> callback
+            , int limit = 20
+            , int offset = 0
+            , UGCContentDownloaderSortBy sortBy = UGCContentDownloaderSortBy.CreatedTimeDesc)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserContentsV2(userId, callback, limit, offset, sortBy));
+        }
+
+        /// <summary>
+        /// Update screenshots for content.
+        /// </summary>
+        /// <param name="contentId">Content Id.</param>
+        /// <param name="userId">The userId.</param>
+        /// <param name="screenshotsRequest">Supported file extensions: pjp, jpg, jpeg, jfif, bmp, png.
+        /// Maximum description length: 1024.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param
+        public void UpdateContentScreenshotV2(string contentId
+            , ScreenshotsUpdatesV2 updateSreenshotsRequest
+            , ResultCallback<ScreenshotsUpdatesV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateContentScreenshotV2(session.UserId, contentId, updateSreenshotsRequest, callback));
+        }
+
+        /// <summary>
+        /// Upload screenshots for content.
+        /// </summary>
+        /// <param name="contentId">Content Id.</param>
+        /// <param name="userId">The userId.</param>
+        /// <param name="screenshotsRequest">Supported file extensions: pjp, jpg, jpeg, jfif, bmp, png.
+        /// Maximum description length: 1024.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param
+        public void UploadContentScreenshotV2(string contentId
+            , ScreenshotsRequest screenshotsRequest
+            , ResultCallback<ScreenshotsResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UploadContentScreenshotV2(session.UserId, contentId, screenshotsRequest, callback));
+        }
+
+        /// <summary>
+        /// Delete screenshots for content.
+        /// </summary>
+        /// <param name="contentId">Content Id.</param>
+        /// <param name="screenshotId">Screenshot Id.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param
+        public void DeleteContentScreenshotV2(string contentId
+            , string screenshotId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(screenshotId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetScreenshotIdInvalidMessage(screenshotId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.DeleteContentScreenshotV2(session.UserId, contentId, screenshotId, callback));
+        }
+
+        #endregion
+
+        #region UGC V2 (Download Count)
+
+        /// <summary>
+        /// Add download count for a content.
+        /// </summary>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void AddDownloadContentCountV2(string contentId
+            , ResultCallback<UGCModelsAddDownloadContentCountResponseV2> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.AddDownloadContentCountV2(contentId, callback));
+        }
+
+        /// <summary>
+        /// Get list of UGC content downloader
+        /// </summary>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="userId">The userId.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 20.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        /// <param name="sortBy">Sorting criteria: created time with asc or desc. Default= created time and desc.</param>
+        public void GetListContentDownloaderV2(string contentId
+            , ResultCallback<UGCModelsPaginatedContentDownloaderResponseV2> callback
+            , string userId = ""
+            , int limit = 20
+            , int offset = 0
+            , UGCContentDownloaderSortBy sortBy = UGCContentDownloaderSortBy.CreatedTimeDesc)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListContentDownloaderV2(contentId, callback, userId, limit, offset, sortBy));
+        }
+
+        #endregion
+
+        #region UGC V2 (Like)
+
+        /// <summary>
+        /// Get a list of users who like the content.
+        /// </summary>
+        /// <param name="contentId">The contentId.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        /// <param name="limit">The limit Number of user per page. Default value is 20.</param>
+        /// <param name="offset">The offset number to retrieve. Default value is 0.</param>
+        /// <param name="sortBy">Sorting criteria: created time with asc or desc. Default= created time and desc.</param>
+        public void GetListContentLikerV2(string contentId
+            , ResultCallback<UGCModelsPaginatedContentLikerResponseV2> callback
+            , int limit = 20
+            , int offset = 0
+            , UGCContentDownloaderSortBy sortBy = UGCContentDownloaderSortBy.CreatedTimeDesc)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListContentLikerV2(contentId, callback, limit, offset, sortBy));
+        }
+
+        /// </summary>
+        /// Update like/unlike status to a content.
+        /// </summary>
+        /// <param name="contentId ">The content id that will be updated.</param>
+        /// <param name="likeStatus ">New like Status value.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void UpdateLikeStatusToContentV2(string contentId
+            , bool likeStatus
+            , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.UpdateLikeStatusToContentV2(contentId, likeStatus, callback));
+        }
+
+        #endregion UGC V2 (Like)
     }
 }
+ 

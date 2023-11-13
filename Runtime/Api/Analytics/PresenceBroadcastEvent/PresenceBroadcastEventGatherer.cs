@@ -2,7 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using AccelByte.Models;
+using AccelByte.Core;
 using System.Collections.Generic;
 
 namespace AccelByte.Api
@@ -11,21 +11,10 @@ namespace AccelByte.Api
     {
         internal const string EventName = "enhanced_presence";
         private Dictionary<string, object> presenceBroadcastEventAdditionalData = new Dictionary<string, object>();
-        private static string flightId = string.Empty;
-
-        internal static string GenerateFlightID()
-        {
-            return System.Guid.NewGuid().ToString();
-        }
 
         internal static string GetFlightID()
         {
-            if (string.IsNullOrEmpty(flightId))
-            {
-                flightId = GenerateFlightID();
-            }
-
-            return flightId;
+            return AccelByteSDK.FlightId;
         }
 
         internal string GetPlatformName()

@@ -6,7 +6,6 @@ using AccelByte.Models;
 
 namespace AccelByte.Core
 {
-
     public class PredefinedEventScheduler : AnalyticsEventScheduler
     {
         private const string predefinedEventNamespace = "io.accelbyte.intelligence.predefinedevents";

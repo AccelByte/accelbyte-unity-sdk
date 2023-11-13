@@ -46,7 +46,9 @@ namespace AccelByte.Core
             }
         }
 
-        [RuntimeInitializeOnLoadMethod]
+        internal static System.Action OnSDKStopped;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void StartAccelByteSDK()
         {
             AccelByteDebug.LogVerbose("AccelByte API Initialized!");
@@ -57,6 +59,7 @@ namespace AccelByte.Core
             }
 
             onGameUpdate = null;
+            OnSDKStopped = null;
 
             ExecuteBootstraps();
 
@@ -69,6 +72,7 @@ namespace AccelByte.Core
 
         private static void StopSDK()
         {
+            OnSDKStopped?.Invoke();
             PredefinedEventBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
             DetachGameUpdateSignaller();
@@ -80,6 +84,7 @@ namespace AccelByte.Core
             PredefinedEventBootstrap.Execute();
             EnvrionmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();
+            FlightIDBootstrap.Execute();
         }
 
 #if UNITY_EDITOR

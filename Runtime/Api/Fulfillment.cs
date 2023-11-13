@@ -31,13 +31,6 @@ namespace AccelByte.Api
             coroutineRunner = inCoroutineRunner;
         }
 
-        private void RefineRedeemCodeResult(Result<FulfillmentResult> apiCallResult, string code)
-        {
-            IAccelByteTelemetryPayload payload;
-            payload = CreatePredefinedPayload<FulfillmentResult>(apiCallResult, PredefinedEventMode.RedeemCampaignCode, code);
-            SendPredefinedEvent(payload);
-        }
-
         /// <summary>
         /// </summary>
         /// <param name="inApi"></param>
@@ -74,12 +67,6 @@ namespace AccelByte.Api
                 return;
             }
 
-            Action<Result<FulfillmentResult>, string> onPredefinedEventTrigger = null;
-            if(predefinedEventScheduler != null)
-            {
-                onPredefinedEventTrigger = RefineRedeemCodeResult;
-            }
-
             FulFillCodeRequest fulFillCodeRequest = new FulFillCodeRequest 
             {
                 code = code,
@@ -91,8 +78,14 @@ namespace AccelByte.Api
                 api.RedeemCode(
                     session.UserId,
                     fulFillCodeRequest,
-                    callback,
-                    onPredefinedEventTrigger));
+                    cb =>
+                    {
+                        if (!cb.IsError && cb.Value != null)
+                        {
+                            RefineRedeemCodeResult(cb, code);
+                        }
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         #region PredefinedEvents
@@ -106,6 +99,13 @@ namespace AccelByte.Api
         internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
         {
             this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private void RefineRedeemCodeResult(Result<FulfillmentResult> apiCallResult, string code)
+        {
+            IAccelByteTelemetryPayload payload;
+            payload = CreatePredefinedPayload<FulfillmentResult>(apiCallResult, PredefinedEventMode.RedeemCampaignCode, code);
+            SendPredefinedEvent(payload);
         }
 
         private enum PredefinedEventMode
@@ -177,6 +177,16 @@ namespace AccelByte.Api
                 var userProfileEvent = new AccelByteTelemetryEvent(payload);
                 predefinedEventScheduler.SendEvent(userProfileEvent, null);
             }
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback.TryError(result.Error);
+                return;
+            }
+            callback.Try(result);
         }
 
         #endregion

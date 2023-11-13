@@ -72,6 +72,12 @@ namespace AccelByte.Utils
             const string formatMessage = "Invalid request, Content Id format is invalid";
             return $"{formatMessage}\nValue: {contentId}";
         }
+
+        public static string GetScreenshotIdInvalidMessage(string screenshotId)
+        {
+            const string formatMessage = "Invalid request, Screenshot Id format is invalid";
+            return $"{formatMessage}\nValue: {screenshotId}";
+        }
         
         public static string GetProfileIdInvalidMessage(string profileId)
         {

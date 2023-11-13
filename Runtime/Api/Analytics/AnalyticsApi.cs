@@ -20,12 +20,12 @@ namespace AccelByte.Api
             gameTelemetryUrl = inConfig.GameTelemetryServerUrl + "/v1/protected/events";
         }
 
-        public async void SendPredefinedEvent(List<TelemetryBody> predefinedEvents
+        public async void SendData(List<TelemetryBody> telemetryBodies
             , ResultCallback callback)
         {
-            if (predefinedEvents == null)
+            if (telemetryBodies == null)
             {
-                AccelByteDebug.LogError(nameof(predefinedEvents) + " is null.");
+                AccelByteDebug.LogError(nameof(telemetryBodies) + " is null.");
                 callback.TryError(ErrorCode.InvalidArgument);
                 return;
             }
@@ -33,7 +33,7 @@ namespace AccelByte.Api
             var request = HttpRequestBuilder
                 .CreatePost(gameTelemetryUrl)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(predefinedEvents.ToUtf8Json())
+                .WithBody(telemetryBodies.ToUtf8Json())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();

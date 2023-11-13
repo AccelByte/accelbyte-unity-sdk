@@ -34,9 +34,21 @@ namespace AccelByte.Api
             , bool populateBundle )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
-            Assert.IsNotNull(itemId, "Can't get item! ItemId parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(itemId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(itemId) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
@@ -53,8 +65,10 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<PopulatedItemInfo>();
 
@@ -76,9 +90,21 @@ namespace AccelByte.Api
             , string region )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(publisherNamespace, "Can't get items by appId! publisherNamespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get items by appId! AccessToken parameter is null!");
-            Assert.IsNotNull(appId, "Can't get items by appId! appId parameter is null!");
+            if (string.IsNullOrEmpty(publisherNamespace))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(publisherNamespace) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(appId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(appId) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byAppId")
@@ -92,8 +118,10 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<ItemInfo>();
 
@@ -104,77 +132,86 @@ namespace AccelByte.Api
             , ResultCallback<ItemPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get items by criteria! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get items by criteria! AccessToken parameter is null!");
-            Assert.IsNotNull(criteria, "Can't get items by criteria! Criteria parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (criteria == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(criteria) + " cannot be null"));
+                yield break;
+            } 
 
             var queries = new Dictionary<string, string>();
 
-            if (criteria != null)
+            if (criteria.categoryPath != null)
             {
-                if (criteria.categoryPath != null)
-                {
-                    queries.Add("categoryPath", criteria.categoryPath);
-                }
+                queries.Add("categoryPath", criteria.categoryPath);
+            }
 
-                queries.Add("includeSubCategoryItem", criteria.includeSubCategoryItem ? "true" : "false");
+            queries.Add("includeSubCategoryItem", criteria.includeSubCategoryItem ? "true" : "false");
 
-                if (criteria.itemType != ItemType.NONE)
-                {
-                    queries.Add("itemType", criteria.itemType.ToString());
-                }
+            if (criteria.itemType != ItemType.NONE)
+            {
+                queries.Add("itemType", criteria.itemType.ToString());
+            }
 
-                if (criteria.appType != EntitlementAppType.NONE)
-                {
-                    queries.Add("appType", criteria.appType.ToString());
-                }
+            if (criteria.appType != EntitlementAppType.NONE)
+            {
+                queries.Add("appType", criteria.appType.ToString());
+            }
 
-                if(criteria.region != null)
-                {
-                    queries.Add("region", criteria.region);
-                }
+            if(criteria.region != null)
+            {
+                queries.Add("region", criteria.region);
+            }
 
-                if(criteria.language != null)
-                {
-                    queries.Add("language", criteria.language);
-                }
+            if(criteria.language != null)
+            {
+                queries.Add("language", criteria.language);
+            }
 
-                if(criteria.tags != null)
-                {
-                    string tags = "";
-                    for(int i=0;i<criteria.tags.Length;i++){
-                        tags += (i < criteria.tags.Length - 1 ? criteria.tags[i] + "," : criteria.tags[i]);
-                    }
-                    queries.Add("tags", tags);
+            if(criteria.tags != null)
+            {
+                string tags = "";
+                for(int i=0;i<criteria.tags.Length;i++){
+                    tags += (i < criteria.tags.Length - 1 ? criteria.tags[i] + "," : criteria.tags[i]);
                 }
+                queries.Add("tags", tags);
+            }
 
-                if(criteria.features != null)
+            if(criteria.features != null)
+            {
+                string feats = "";
+                for (int i = 0; i < criteria.features.Length; i++)
                 {
-                    string feats = "";
-                    for (int i = 0; i < criteria.features.Length; i++)
-                    {
-                        feats += (i < criteria.features.Length - 1 ? criteria.features[i] + "," : criteria.features[i]);
-                    }
-                    queries.Add("features", feats);
+                    feats += (i < criteria.features.Length - 1 ? criteria.features[i] + "," : criteria.features[i]);
                 }
+                queries.Add("features", feats);
+            }
 
-                if (criteria.offset != null)
-                {
-                    queries.Add("offset", Convert.ToString(criteria.offset));
-                }
+            if (criteria.offset != null)
+            {
+                queries.Add("offset", Convert.ToString(criteria.offset));
+            }
 
-                if (criteria.limit != null)
-                {
-                    queries.Add("limit", Convert.ToString(criteria.limit));
-                }
-                if(criteria.sortBy != null)
-                {
-                    queries.Add("sortBy", criteria.sortBy);
-                }
-                if (criteria.storeId != null)
-                {
-                    queries.Add("storeId", criteria.storeId);
-                }
+            if (criteria.limit != null)
+            {
+                queries.Add("limit", Convert.ToString(criteria.limit));
+            }
+            if(criteria.sortBy != null)
+            {
+                queries.Add("sortBy", criteria.sortBy);
+            }
+            if (criteria.storeId != null)
+            {
+                queries.Add("storeId", criteria.storeId);
             }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byCriteria")
@@ -186,8 +223,10 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<ItemPagingSlicedResult>();
 
@@ -202,8 +241,26 @@ namespace AccelByte.Api
             , ResultCallback<ItemPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(language))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(language) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(keyword))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(keyword) + " cannot be null or empty"));
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/search")
@@ -220,8 +277,10 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<ItemPagingSlicedResult>();
 
@@ -234,8 +293,21 @@ namespace AccelByte.Api
             , ResultCallback<ItemInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(sku))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sku) + " cannot be null or empty"));
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/bySku")
@@ -250,8 +322,10 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<ItemInfo>();
 
@@ -265,8 +339,21 @@ namespace AccelByte.Api
             , string storeId)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get item! AccessToken parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (itemIds == null || itemIds.Length == 0)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/locale/byIds")
@@ -297,7 +384,16 @@ namespace AccelByte.Api
         public IEnumerator GetListAllStore(ResultCallback<PlatformStore[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get item! Namespace parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/stores")
@@ -309,10 +405,59 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
 
             var result = response.TryParseJson<PlatformStore[]>();
+
+            callback.Try(result);
+        }
+
+        public IEnumerator GetEstimatedPrice(string[] itemIds, string region, ResultCallback<EstimatedPricesInfo[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (itemIds == null || itemIds.Length == 0)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(itemIds) + " cannot be null or empty"));
+                yield break;
+            } 
+
+            // There will only one published stored in a live game environment. 
+            // Here the StoreId is not included on the query param, 
+            // then the Platform Service will fill by default value/published store Id. 
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/estimatedPrice")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken) 
+                .WithPathParam("region", region)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (itemIds != null && itemIds.Length > 0)
+            {
+                builder.WithQueryParam("itemIds", string.Join(",", itemIds));
+            }
+
+            var request = builder.GetResult();
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp => 
+            { 
+                response = rsp; 
+            });
+
+            var result = response.TryParseJson<EstimatedPricesInfo[]>();
 
             callback.Try(result);
         }

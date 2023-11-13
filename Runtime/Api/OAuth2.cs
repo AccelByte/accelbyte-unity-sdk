@@ -31,7 +31,7 @@ public class OAuth2 : ApiBase
     }
 
     //Need to be assigned to handle new access token obtained
-    private Action<TokenData> OnNewTokenObtained = null;
+    internal Action<TokenData> OnNewTokenObtained = null;
 
     [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
     public void LoginWithUsername
@@ -53,6 +53,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -91,6 +92,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -130,6 +132,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -168,6 +171,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -202,6 +206,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("device_id", deviceProvider.DeviceId)
             .WithFormParam("namespace", Namespace_)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -233,6 +238,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("device_id", deviceProvider.DeviceId)
             .WithFormParam("namespace", Namespace_)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -270,6 +276,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -316,6 +323,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -365,6 +373,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
             .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -401,6 +410,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
             .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -435,6 +445,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("linkingToken", linkingToken)
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -467,6 +478,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("linkingToken", linkingToken)
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -504,6 +516,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("linkingToken", linkingToken)
             .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -539,6 +552,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("password", password)
             .WithFormParam("linkingToken", linkingToken)
             .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -573,6 +587,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("grant_type", "authorization_code")
             .WithFormParam("code", code)
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, response =>
@@ -606,6 +621,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("grant_type", "authorization_code")
             .WithFormParam("code", code)
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -639,6 +655,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("grant_type", "authorization_code")
             .WithFormParam("code", code)
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
@@ -683,6 +700,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "refresh_token")
             .WithFormParam("refresh_token", refreshToken)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         request.Priority = 0;
@@ -710,6 +728,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "refresh_token")
             .WithFormParam("refresh_token", refreshToken)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
         request.Priority = 0;

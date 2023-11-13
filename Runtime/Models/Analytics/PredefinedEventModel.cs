@@ -10,14 +10,34 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
+    [DataContract, Preserve]
+    public abstract class PredefinedEventPayload : IAccelByteTelemetryPayload
+    {
+        internal const string EventType = "PredefinedEvent";
+
+        [DataMember(Name = "predefinedEventName")] public string PredefinedEventName;
+
+        public PredefinedEventPayload()
+        {
+            PredefinedEventName = GetPredefinedModelName();
+        }
+
+        public string GetEventName()
+        {
+            return EventType;
+        }
+
+        internal abstract string GetPredefinedModelName();
+    }
+
     #region Core Game
     [DataContract, Preserve]
-    public class PredefinedSDKInitializedPayload : IAccelByteTelemetryPayload
+    public class PredefinedSDKInitializedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "name")] public string Name;
         [DataMember(Name = "version")] public string Version;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SDK_Initialized";
         }
@@ -30,12 +50,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameLaunchedPayload : IAccelByteTelemetryPayload
+    public class PredefinedGameLaunchedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "gameTitle")] public string GameTitle;
         [DataMember(Name = "gameVersion")] public string GameVersion;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Game_Launched";
         }
@@ -48,9 +68,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameExitedPayload : PredefinedGameModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGameExitedPayload : PredefinedGameModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Game_Exited";
         }
@@ -62,9 +82,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGamePausedPayload : PredefinedGameModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGamePausedPayload : PredefinedGameModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Game_Paused";
         }
@@ -76,7 +96,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameModelBase
+    public class PredefinedGameModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "gameTitle")] public string GameTitle;
         [DataMember(Name = "gameVersion")] public string GameVersion;
@@ -88,18 +108,23 @@ namespace AccelByte.Models
             GameVersion = gameVersion;
             Reason = reason;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            return null;
+        }
     }
     #endregion
 
     #region Access
     [DataContract, Preserve]
-    public class PredefinedLoginSucceededPayload : PredefinedLoginModelBase, IAccelByteTelemetryPayload
+    public class PredefinedLoginSucceededPayload : PredefinedLoginModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "platformUserId")] public string PlatformUserId;
         [DataMember(Name = "deviceId")] public string DeviceId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Login_Succeeded";
         }
@@ -114,9 +139,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLoginFailedPayload : PredefinedLoginModelBase, IAccelByteTelemetryPayload
+    public class PredefinedLoginFailedPayload : PredefinedLoginModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Login_Failed";
         }
@@ -128,7 +153,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLoginModelBase
+    public class PredefinedLoginModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "platformId")] public string PlatformId;
@@ -138,12 +163,17 @@ namespace AccelByte.Models
             Namespace = @namespace;
             PlatformId = platformId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            return null;
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedAgreementAcceptedPayload : PredefinedAgreementDocumentBase, IAccelByteTelemetryPayload
+    public class PredefinedAgreementAcceptedPayload : PredefinedAgreementDocumentBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserAgreement_Accepted";
         }
@@ -155,9 +185,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAgreementNotAcceptedPayload : PredefinedAgreementDocumentBase, IAccelByteTelemetryPayload
+    public class PredefinedAgreementNotAcceptedPayload : PredefinedAgreementDocumentBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserAgreement_NotAccepted";
         }
@@ -169,13 +199,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAgreementDocumentBase
+    public class PredefinedAgreementDocumentBase : PredefinedEventPayload
     {
         [DataMember(Name = "agreementDocuments")] public List<PredefinedAgreementDocument> AgreementDocuments;
 
         public PredefinedAgreementDocumentBase(List<PredefinedAgreementDocument> agreementDocuments)
         {
             AgreementDocuments = agreementDocuments;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return null;
         }
     }
 
@@ -197,9 +232,9 @@ namespace AccelByte.Models
 
     #region Storage
     [DataContract, Preserve]
-    public class PredefinedUserProfileCreatedPayload : PredefinedUserProfileModelBase, IAccelByteTelemetryPayload
+    public class PredefinedUserProfileCreatedPayload : PredefinedUserProfileModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserProfile_Created";
         }
@@ -211,9 +246,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserProfileUpdatedPayload : PredefinedUserProfileModelBase, IAccelByteTelemetryPayload
+    public class PredefinedUserProfileUpdatedPayload : PredefinedUserProfileModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserProfile_Updated";
         }
@@ -225,7 +260,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserProfileModelBase
+    public class PredefinedUserProfileModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "updatedFields")] public UserProfile UpdatedFields;
 
@@ -233,12 +268,17 @@ namespace AccelByte.Models
         {
             UpdatedFields = updatedFields;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserStatItemCreatedPayload : PredefinedUserStatItemModelBase, IAccelByteTelemetryPayload
+    public class PredefinedUserStatItemCreatedPayload : PredefinedUserStatItemModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserStatItem_Created";
         }
@@ -250,9 +290,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserStatItemUpdatedPayload : PredefinedUserStatItemModelBase, IAccelByteTelemetryPayload
+    public class PredefinedUserStatItemUpdatedPayload : PredefinedUserStatItemModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserStatItem_Updated";
         }
@@ -264,9 +304,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserStatItemDeletedPayload : PredefinedUserStatItemModelBase, IAccelByteTelemetryPayload
+    public class PredefinedUserStatItemDeletedPayload : PredefinedUserStatItemModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserStatItem_Deleted";
         }
@@ -278,7 +318,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserStatItemModelBase
+    public class PredefinedUserStatItemModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "statCodes")] public List<string> StatCodes;
@@ -288,17 +328,22 @@ namespace AccelByte.Models
             UserId = userId;
             this.StatCodes = statCodes;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedPlayerRecordUpdatedPayload : PredefinedPlayerRecordModelBase, IAccelByteTelemetryPayload
+    public class PredefinedPlayerRecordUpdatedPayload : PredefinedPlayerRecordModelBase
     {
         [DataMember(Name = "isPublic")] public bool IsPublic;
         [DataMember(Name = "strategy")] public string Strategy;
         [DataMember(Name = "setBy")] public string SetBy;
         [DataMember(Name = "value")] public Dictionary<string, object> Value;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "PlayerRecord_Updated";
         }
@@ -314,9 +359,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPlayerRecordDeletedPayload : PredefinedPlayerRecordModelBase, IAccelByteTelemetryPayload
+    public class PredefinedPlayerRecordDeletedPayload : PredefinedPlayerRecordModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "PlayerRecord_Deleted";
         }
@@ -328,7 +373,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPlayerRecordModelBase
+    public class PredefinedPlayerRecordModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "key")] public string Key;
@@ -338,16 +383,21 @@ namespace AccelByte.Models
             UserId = userId;
             Key = key;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameRecordUpdatedPayload : PredefinedGameRecordModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGameRecordUpdatedPayload : PredefinedGameRecordModelBase
     {
         [DataMember(Name = "setBy")] public string SetBy;
         [DataMember(Name = "strategy")] public string Strategy;
         [DataMember(Name = "value")] public Dictionary<string, object> Values;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GameRecord_Updated";
         }
@@ -362,9 +412,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameRecordDeletedPayload : PredefinedGameRecordModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGameRecordDeletedPayload : PredefinedGameRecordModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GameRecord_Deleted";
         }
@@ -376,7 +426,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameRecordModelBase
+    public class PredefinedGameRecordModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "key")] public string Key;
 
@@ -384,13 +434,18 @@ namespace AccelByte.Models
         {
             Key = key;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
     #endregion
 
     #region Engagement
 
     [DataContract, Preserve]
-    public class PredefinedGroupModelBase
+    public class PredefinedGroupModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "groupId")] public string GroupId;
 
@@ -398,10 +453,15 @@ namespace AccelByte.Models
         {
             GroupId = groupId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupCreatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupCreatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "configurationCode")] public string ConfigurationCode;
         [DataMember(Name = "groupMaxMember")] public int GroupMaxMember;
@@ -416,14 +476,14 @@ namespace AccelByte.Models
             GroupRegion = groupInformation.groupRegion;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Created";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupUpdatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupUpdatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "configurationCode")] public string ConfigurationCode;
         [DataMember(Name = "groupMaxMember")] public int GroupMaxMember;
@@ -438,14 +498,14 @@ namespace AccelByte.Models
             GroupRegion = groupInformation.groupRegion;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Updated";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupJoinedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupJoinedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "status")] public JoinGroupStatus Status;
@@ -456,14 +516,14 @@ namespace AccelByte.Models
             Status = joinGroupResponse.status;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Joined";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupDeletedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupDeletedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -472,14 +532,14 @@ namespace AccelByte.Models
             UserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Deleted";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupLeftPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupLeftPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -488,14 +548,14 @@ namespace AccelByte.Models
             UserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Left";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupInviteAcceptedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupInviteAcceptedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -504,14 +564,14 @@ namespace AccelByte.Models
             UserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_InvitationAccepted";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupInviteRejectedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupInviteRejectedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -520,14 +580,14 @@ namespace AccelByte.Models
             UserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_InvitationRejected";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupInviteCanceledPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupInviteCanceledPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "canceledUserId")] public string CanceledUserId;
         [DataMember(Name = "adminUserId")] public string AdminUserId;
@@ -538,14 +598,14 @@ namespace AccelByte.Models
             CanceledUserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_InvitationCanceled";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupJoinRequestAcceptedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupJoinRequestAcceptedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "acceptedUserId")] public string AcceptedUserId;
         [DataMember(Name = "adminUserId")] public string AdminUserId;
@@ -556,14 +616,14 @@ namespace AccelByte.Models
             AcceptedUserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_JoinRequestAccepted";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupJoinRequestRejectedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupJoinRequestRejectedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "rejectedUserId")] public string RejectedUserId;
         [DataMember(Name = "adminUserId")] public string AdminUserId;
@@ -574,14 +634,14 @@ namespace AccelByte.Models
             RejectedUserId = groupResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_JoinRequestRejected";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupMemberKickedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupMemberKickedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "kickedUserId")] public string KickedUserId;
         [DataMember(Name = "adminUserId")] public string AdminUserId;
@@ -592,14 +652,14 @@ namespace AccelByte.Models
             KickedUserId = groupResponse.kickedUserId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_MemberKicked";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupMemberRoleUpdatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupMemberRoleUpdatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "memberRoleId")] public string MemberRoleId;
         [DataMember(Name = "updatedUserId")] public string UpdatedUserId;
@@ -610,14 +670,14 @@ namespace AccelByte.Models
             UpdatedUserId = updatedUserId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_MemberRoleUpdated";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupMemberRoleDeletedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupMemberRoleDeletedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "memberRoleId")] public string MemberRoleId;
         [DataMember(Name = "updatedUserId")] public string UpdatedUserId;
@@ -628,7 +688,7 @@ namespace AccelByte.Models
             UpdatedUserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_MemberRoleDeleted";
         }
@@ -636,7 +696,7 @@ namespace AccelByte.Models
 
 
     [DataContract, Preserve]
-    public class PredefinedGroupCustomAttributesUpdatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupCustomAttributesUpdatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "adminUserId")] public string AdminUserId;
         [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
@@ -647,14 +707,14 @@ namespace AccelByte.Models
             CustomAttributes = groupInformation.customAttributes;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_CustomAttributesUpdated";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupCustomRuleUpdatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupCustomRuleUpdatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "adminUserId")] public string AdminUserId;
         [DataMember(Name = "groupRules")] public GroupRules GroupRules;
@@ -665,14 +725,14 @@ namespace AccelByte.Models
             GroupRules = groupInformation.groupRules;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_CustomRuleUpdated";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupPredefinedRuleUpdatedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupPredefinedRuleUpdatedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "adminUserId")] public string AdminUserId;
 
@@ -681,14 +741,14 @@ namespace AccelByte.Models
             AdminUserId = adminUserId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_PredefinedRuleUpdated";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupPredefinedRuleDeletedPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupPredefinedRuleDeletedPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "adminUserId")] public string AdminUserId;
 
@@ -697,14 +757,14 @@ namespace AccelByte.Models
             AdminUserId = adminUserId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_PredefinedRuleDeleted";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupGetInformationPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupGetInformationPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -713,14 +773,14 @@ namespace AccelByte.Models
             UserId = adminUserId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_GetInformation";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupFindPayload : IAccelByteTelemetryPayload
+    public class PredefinedGroupFindPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "groupName")] public string GroupName;
@@ -733,14 +793,14 @@ namespace AccelByte.Models
             GroupRegion = groupRegion;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_Find";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupFindByIdsPayload : IAccelByteTelemetryPayload
+    public class PredefinedGroupFindByIdsPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "groupIds")] public string[] GroupIds;
@@ -751,14 +811,14 @@ namespace AccelByte.Models
             GroupIds = groupIds;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_FindByIds";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupInviteUserPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupInviteUserPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "adminUserId")] public string AdminUserId;
         [DataMember(Name = "invitedUserId")] public string InvitedUserId;
@@ -769,14 +829,14 @@ namespace AccelByte.Models
             InvitedUserId = userInvitationResponse.userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_UserInvited";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupGetInvitationListPayload : IAccelByteTelemetryPayload
+    public class PredefinedGroupGetInvitationListPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -785,14 +845,14 @@ namespace AccelByte.Models
             UserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_GetInvitationList";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupCancelJoinRequestPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupCancelJoinRequestPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -801,14 +861,14 @@ namespace AccelByte.Models
             UserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_JoinRequestCanceled";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupGetJoinRequestPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupGetJoinRequestPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -817,14 +877,14 @@ namespace AccelByte.Models
             UserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_GetJoinRequest";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedGroupGetGroupMemberPayload : PredefinedGroupModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGroupGetGroupMemberPayload : PredefinedGroupModelBase
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -833,20 +893,20 @@ namespace AccelByte.Models
             UserId = userId;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Group_GetGroupMember";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassClaimRewardPayload : PredefinedSeasonPassModelBase , IAccelByteTelemetryPayload
+    public class PredefinedSeasonPassClaimRewardPayload : PredefinedSeasonPassModelBase
     {
         [DataMember(Name = "passCode")] public string PassCode;
         [DataMember(Name = "tierIndex")] public int TierIndex;
         [DataMember(Name = "rewardCode")] public string RewardCode;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SeasonPass_RewardClaimed";
         }
@@ -860,9 +920,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassBulkClaimRewardPayload : PredefinedSeasonPassModelBase, IAccelByteTelemetryPayload
+    public class PredefinedSeasonPassBulkClaimRewardPayload : PredefinedSeasonPassModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SeasonPass_BulkRewardClaimed";
         }
@@ -873,7 +933,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassGetCurrentSeasonPayload : PredefinedSeasonPassModelBase, IAccelByteTelemetryPayload
+    public class PredefinedSeasonPassGetCurrentSeasonPayload : PredefinedSeasonPassModelBase
     {
         [DataMember(Name = "language")] public string Language;
 
@@ -882,14 +942,14 @@ namespace AccelByte.Models
             Language = language;
         }
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SeasonPass_GetCurrentSeason";
         }
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassModelBase
+    public class PredefinedSeasonPassModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -897,14 +957,19 @@ namespace AccelByte.Models
         {
             UserId = userId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassGetUserSeasonPayload : PredefinedSeasonPassModelBase, IAccelByteTelemetryPayload
+    public class PredefinedSeasonPassGetUserSeasonPayload : PredefinedSeasonPassModelBase
     {
         [DataMember(Name = "seasonId")] public string SeasonId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SeasonPass_GetUserSpecificSeasonData";
         }
@@ -916,9 +981,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedSeasonPassGetCurrentUserSeasonPayload : PredefinedSeasonPassModelBase, IAccelByteTelemetryPayload
+    public class PredefinedSeasonPassGetCurrentUserSeasonPayload : PredefinedSeasonPassModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "SeasonPass_GetUserCurrentSeasonData";
         }
@@ -929,7 +994,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementModelBase
+    public class PredefinedAchievementModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "achievementCode")] public string AchievementCode;
 
@@ -937,12 +1002,17 @@ namespace AccelByte.Models
         {
             AchievementCode = achievementCode;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementUnlockedPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedAchievementUnlockedPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Achievement_Unlocked";
         }
@@ -953,11 +1023,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementGetAllPayload : IAccelByteTelemetryPayload
+    public class PredefinedAchievementGetAllPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Achievement_GetAll";
         }
@@ -969,9 +1039,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementGetSpecificPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedAchievementGetSpecificPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Achievement_GetSpecific";
         }
@@ -982,11 +1052,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementGetUserAchievementsPayload : IAccelByteTelemetryPayload
+    public class PredefinedAchievementGetUserAchievementsPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Achievement_GetUserAchievements";
         }
@@ -998,9 +1068,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGlobalAchievementGetPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGlobalAchievementGetPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GlobalAchievement_Get";
         }
@@ -1011,9 +1081,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGlobalAchievementGetContributorsPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGlobalAchievementGetContributorsPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GlobalAchievement_GetContributors";
         }
@@ -1024,9 +1094,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGlobalAchievementGetContributedPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGlobalAchievementGetContributedPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GlobalAchievement_GetContributed";
         }
@@ -1037,9 +1107,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGlobalAchievementClaimedPayload : PredefinedAchievementModelBase, IAccelByteTelemetryPayload
+    public class PredefinedGlobalAchievementClaimedPayload : PredefinedAchievementModelBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "GlobalAchievement_Claimed";
         }
@@ -1050,11 +1120,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedAchievementGetTagsPayload : IAccelByteTelemetryPayload
+    public class PredefinedAchievementGetTagsPayload : PredefinedEventPayload
     {
         [DataMember(Name = "name")] public string Name;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Achievement_GetTags";
         }
@@ -1066,11 +1136,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardGetRankingsPayload : PredefinedLeaderboardBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedLeaderboardGetRankingsPayload : PredefinedLeaderboardBaseModel
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Leaderboard_GetRankings";
         }
@@ -1082,11 +1152,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardGetUserRankingPayload : PredefinedLeaderboardBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedLeaderboardGetUserRankingPayload : PredefinedLeaderboardBaseModel
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Leaderboard_GetUserRanking";
         }
@@ -1098,11 +1168,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardGetLeaderboardsPayload :  IAccelByteTelemetryPayload
+    public class PredefinedLeaderboardGetLeaderboardsPayload :  PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Leaderboard_GetLeaderboards";
         }
@@ -1114,12 +1184,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardGetRankingByCycleIdPayload : PredefinedLeaderboardBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedLeaderboardGetRankingByCycleIdPayload : PredefinedLeaderboardBaseModel
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "cycleId")] public string CycleId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Leaderboard_GetRankingByCycleId";
         }
@@ -1132,12 +1202,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardGetUserRankingsPayload : PredefinedLeaderboardBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedLeaderboardGetUserRankingsPayload : PredefinedLeaderboardBaseModel
     {
         [DataMember(Name = "userIds")] public string[] UserIds;
         [DataMember(Name = "requesterUserId")] public string RequesterUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Leaderboard_GetUsersRankings";
         }
@@ -1150,7 +1220,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLeaderboardBaseModel
+    public class PredefinedLeaderboardBaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "leaderboardCode")] public string LeaderboardCode;
 
@@ -1158,17 +1228,22 @@ namespace AccelByte.Models
         {
             LeaderboardCode = leaderboardCode;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #endregion
 
     #region Monetization
     [DataContract, Preserve]
-    public class PredefinedStoreOpenedPayload : PredefinedStoreModelBase, IAccelByteTelemetryPayload
+    public class PredefinedStoreOpenedPayload : PredefinedStoreModelBase
     {
         private readonly string eventName = "Store_Opened";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1180,11 +1255,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedStoreClosedPayload : PredefinedStoreModelBase, IAccelByteTelemetryPayload
+    public class PredefinedStoreClosedPayload : PredefinedStoreModelBase
     {
         private readonly string eventName = "Store_Closed";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1197,7 +1272,7 @@ namespace AccelByte.Models
 
     [DataContract, Preserve]
 
-    public class PredefinedStoreModelBase
+    public class PredefinedStoreModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "storeId")] public string StoreId;
         [DataMember(Name = "storeName")] public string StoreName;
@@ -1209,14 +1284,19 @@ namespace AccelByte.Models
             StoreName = storeName;
             Category = category;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedItemInspectOpenedPayload : PredefinedItemInspectModelBase, IAccelByteTelemetryPayload
+    public class PredefinedItemInspectOpenedPayload : PredefinedItemInspectModelBase
     {
         private readonly string eventName = "ItemInspect_Opened";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1228,11 +1308,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedItemInspectClosedPayload : PredefinedItemInspectModelBase, IAccelByteTelemetryPayload
+    public class PredefinedItemInspectClosedPayload : PredefinedItemInspectModelBase
     {
         private readonly string eventName = "ItemInspect_Closed";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1244,7 +1324,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedItemInspectModelBase
+    public class PredefinedItemInspectModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "itemId")] public string ItemId;
         [DataMember(Name = "itemNamespace")] public string ItemNamespace;
@@ -1258,16 +1338,21 @@ namespace AccelByte.Models
             StoreId = storeId;
             Language = language;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedCurrencyUpdatedPayload : IAccelByteTelemetryPayload
+    public class PredefinedCurrencyUpdatedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "walletId")] public string WalletId;
         [DataMember(Name = "currencyCode")] public string CurrencyCode;
         private readonly string eventName = "Currency_Updated";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1280,12 +1365,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedEntitlementGrantedPayload : IAccelByteTelemetryPayload
+    public class PredefinedEntitlementGrantedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "entitlements")] public List<PredefinedEntitlements> Entitlements;
         private readonly string eventName = "Entitlement_Granted";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1297,12 +1382,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedEntitlementRevokedPayload : IAccelByteTelemetryPayload
+    public class PredefinedEntitlementRevokedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "affected")] public object Affected;
         private readonly string eventName = "Entitlement_Revoked";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1333,7 +1418,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedCampaignCodeRedeemedPayload : IAccelByteTelemetryPayload
+    public class PredefinedCampaignCodeRedeemedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userID")] public string UserId;
         [DataMember(Name = "code")] public string Code;
@@ -1343,7 +1428,7 @@ namespace AccelByte.Models
 
         private readonly string eventName = "CampaignCode_Redeemed";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1364,7 +1449,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedItemFulfilledPayload : IAccelByteTelemetryPayload
+    public class PredefinedItemFulfilledPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userID")] public string UserId;
         [DataMember(Name = "entitlementSummaries")] public List<PredefinedEntitlementSummary> EntitlementSummaries;
@@ -1373,7 +1458,7 @@ namespace AccelByte.Models
 
         private readonly string eventName = "Item_Fulfilled";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1451,13 +1536,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedItemRewardedPayload : IAccelByteTelemetryPayload
+    public class PredefinedItemRewardedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "success")] public bool Success;
 
         private readonly string eventName = "Item_Rewarded";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1469,13 +1554,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPaymentSucceededPayload : IAccelByteTelemetryPayload
+    public class PredefinedPaymentSucceededPayload : PredefinedEventPayload
     {
         [DataMember(Name = "data")] public List<PredefinedPaymentModel> Data;
 
         private readonly string eventName = "Payment_Succeeded";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1487,13 +1572,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPaymentFailedPayload : IAccelByteTelemetryPayload
+    public class PredefinedPaymentFailedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "data")] public List<PredefinedPaymentModel> Data;
 
         private readonly string eventName = "Payment_Failed";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1526,11 +1611,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedWalletCreditedPayload : PredefinedWalletModelBase, IAccelByteTelemetryPayload
+    public class PredefinedWalletCreditedPayload : PredefinedWalletModelBase
     {
         private readonly string eventName = "Wallet_Credited";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1549,11 +1634,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedWalletDebitedPayload : PredefinedWalletModelBase, IAccelByteTelemetryPayload
+    public class PredefinedWalletDebitedPayload : PredefinedWalletModelBase
     {
         private readonly string eventName = "Wallet_Debited";
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return eventName;
         }
@@ -1572,7 +1657,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedWalletModelBase
+    public class PredefinedWalletModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "currencyCode")] public string CurrencyCode;
@@ -1599,13 +1684,18 @@ namespace AccelByte.Models
             TotalPermanentBalance = totalPermanentBalance;
             TotalTimeLimitedBalance = totalTimeLimitedBalance;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
     #endregion
 
     #region Play
 
     [DataContract, Preserve]
-    public class PredefinedSessionV2BaseModel
+    public class PredefinedSessionV2BaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
@@ -1613,16 +1703,26 @@ namespace AccelByte.Models
         {
             UserId = userId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedSessionLeaderPromotedV2BaseModel
+    public class PredefinedSessionLeaderPromotedV2BaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "promotedUserId")] public string PromotedUserId;
 
         public PredefinedSessionLeaderPromotedV2BaseModel(string userId)
         {
             PromotedUserId = userId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -1649,9 +1749,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV2CreatedPayload : PredefinedGameSessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV2CreatedPayload : PredefinedGameSessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_GameSession_Created";
         }
@@ -1662,9 +1762,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV2InvitedPayload : PredefinedGameSessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV2InvitedPayload : PredefinedGameSessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_GameSession_Invited";
         }
@@ -1675,9 +1775,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV2JoinedPayload : PredefinedGameSessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV2JoinedPayload : PredefinedGameSessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_GameSession_Joined";
         }
@@ -1688,9 +1788,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV2LeftPayload : PredefinedGameSessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV2LeftPayload : PredefinedGameSessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_GameSession_Left";
         }
@@ -1701,11 +1801,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV2LeaderPromotedPayload : PredefinedSessionLeaderPromotedV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV2LeaderPromotedPayload : PredefinedSessionLeaderPromotedV2BaseModel
     {
         [DataMember(Name = "gameSessionId")] public string GameSessionId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_GameSession_LeaderPromoted";
         }
@@ -1717,9 +1817,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2CreatedPayload : PredefinedPartySessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2CreatedPayload : PredefinedPartySessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_Created";
         }
@@ -1730,9 +1830,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2InvitedPayload : PredefinedPartySessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2InvitedPayload : PredefinedPartySessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_Invited";
         }
@@ -1743,9 +1843,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2JoinedPayload : PredefinedPartySessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2JoinedPayload : PredefinedPartySessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_Joined";
         }
@@ -1756,9 +1856,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2LeftPayload : PredefinedPartySessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2LeftPayload : PredefinedPartySessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_Left";
         }
@@ -1769,9 +1869,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2KickedPayload : PredefinedPartySessionV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2KickedPayload : PredefinedPartySessionV2BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_Kicked";
         }
@@ -1782,11 +1882,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartySessionV2LeaderPromotedPayload : PredefinedSessionLeaderPromotedV2BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartySessionV2LeaderPromotedPayload : PredefinedSessionLeaderPromotedV2BaseModel
     {
         [DataMember(Name = "partySessionId")] public string PartySessionId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_PartySession_LeaderPromoted";
         }
@@ -1798,7 +1898,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingRequestedPayload : IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingRequestedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "matchPool")] public string MatchPool;
@@ -1807,7 +1907,7 @@ namespace AccelByte.Models
         [DataMember(Name = "matchTicketId")] public string MatchTicketId;
         [DataMember(Name = "queueTime")] public int QueueTime;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_Matchmaking_Requested";
         }
@@ -1824,14 +1924,14 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingStartedPayload : IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingStartedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "matchTicketId")] public string MatchTicketId;
         [DataMember(Name = "partySessionId")] public string PartySessionId;
         [DataMember(Name = "matchPool")] public string MatchPool;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_Matchmaking_Started";
         }
@@ -1846,12 +1946,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingCanceledPayload : IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingCanceledPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "matchTicketId")] public string MatchTicketId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV2_Matchmaking_Canceled";
         }
@@ -1864,9 +1964,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV1CreatedPayload : PredefinedGameSessionV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV1CreatedPayload : PredefinedGameSessionV1BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_GameSession_Created";
         }
@@ -1878,9 +1978,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV1JoinedPayload : PredefinedGameSessionV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedGameSessionV1JoinedPayload : PredefinedGameSessionV1BaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_GameSession_Joined";
         }
@@ -1892,7 +1992,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameSessionV1BaseModel
+    public class PredefinedGameSessionV1BaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "gameSessionId")] public string GameSessionId;
@@ -1902,10 +2002,15 @@ namespace AccelByte.Models
             UserId = userId;
             GameSessionId = gameSessionId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1StartedPayload :  IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingV1StartedPayload :  PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "gameMode")] public string GameMode;
@@ -1914,7 +2019,7 @@ namespace AccelByte.Models
         [DataMember(Name = "latencies")] public Dictionary<string, int> Latencies;
         [DataMember(Name = "partyAttribute")] public Dictionary<string, object> PartyAttribute;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Matchmaking_Started";
         }
@@ -1932,14 +2037,14 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1NotifReceivedPayload : PredefinedMatchmakingV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingV1NotifReceivedPayload : PredefinedMatchmakingV1BaseModel
     {
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "matchPool")] public string MatchPool;
         [DataMember(Name = "teams")] public string Teams;
         [DataMember(Name = "tickets")] public string Tickets;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Matchmaking_MatchNotif_Received";
         }
@@ -1955,10 +2060,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1ReadyConsentPayload : PredefinedMatchmakingV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingV1ReadyConsentPayload : PredefinedMatchmakingV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Matchmaking_ReadyConsent";
         }
@@ -1969,10 +2074,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1RejectMatchPayload : PredefinedMatchmakingV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingV1RejectMatchPayload : PredefinedMatchmakingV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Matchmaking_RejectMatch";
         }
@@ -1983,13 +2088,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1CanceledPayload : IAccelByteTelemetryPayload
+    public class PredefinedMatchmakingV1CanceledPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "gameMode")] public string GameMode;
         [DataMember(Name = "isTempParty")] public bool IsTempParty;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Matchmaking_Canceled";
         }
@@ -2003,7 +2108,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedMatchmakingV1BaseModel
+    public class PredefinedMatchmakingV1BaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "matchId")] public string MatchId;
@@ -2013,13 +2118,18 @@ namespace AccelByte.Models
             UserId = userId;
             MatchId = matchId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1CreatedPayload : PredefinedPartyV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyV1CreatedPayload : PredefinedPartyV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Party_Created";
         }
@@ -2030,10 +2140,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1InvitedPayload : PredefinedPartyV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyV1InvitedPayload : PredefinedPartyV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Party_Invited";
         }
@@ -2044,10 +2154,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1JoinedPayload : PredefinedPartyV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyV1JoinedPayload : PredefinedPartyV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Party_Joined";
         }
@@ -2058,10 +2168,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1LeftPayload : PredefinedPartyV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyV1LeftPayload : PredefinedPartyV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Party_Left";
         }
@@ -2072,10 +2182,10 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1KickedPayload : PredefinedPartyV1BaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyV1KickedPayload : PredefinedPartyV1BaseModel
     {
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "MPV1_Party_Kicked";
         }
@@ -2086,7 +2196,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyV1BaseModel
+    public class PredefinedPartyV1BaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "partyId")] public string PartyId;
@@ -2096,12 +2206,17 @@ namespace AccelByte.Models
             UserId = userId;
             PartyId = partyId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSConnectedPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSConnectedPayload : PredefinedDSBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_DSHub_Connected";
         }
@@ -2112,11 +2227,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSDisconnectedPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSDisconnectedPayload : PredefinedDSBaseModel
     {
         [DataMember(Name = "statusCode")] public WsCloseCode StatusCode;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_DSHub_Disconnected";
         }
@@ -2128,9 +2243,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSRegisteredPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSRegisteredPayload : PredefinedDSBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_Registered";
         }
@@ -2141,9 +2256,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSUnregisteredPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSUnregisteredPayload : PredefinedDSBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_Unregistered";
         }
@@ -2154,13 +2269,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSMemberChangedPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSMemberChangedPayload : PredefinedDSBaseModel
     {
         [DataMember(Name = "gameSessionId")] public string GameSessionId;
         [DataMember(Name = "members")] public SessionV2MemberData[] Members;
         [DataMember(Name = "teams")] public SessionV2TeamData[] Teams;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_MemberChangedNotif_Received";
         }
@@ -2174,11 +2289,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSClientJoinedPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSClientJoinedPayload : PredefinedDSBaseModel
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_GameClient_Joined";
         }
@@ -2190,11 +2305,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSClientLeftPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSClientLeftPayload : PredefinedDSBaseModel
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_GameClient_Left";
         }
@@ -2206,11 +2321,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSClaimedPayload : PredefinedDSBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSClaimedPayload : PredefinedDSBaseModel
     {
         [DataMember(Name = "gameSessionId")] public string GameSessionId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_Claimed";
         }
@@ -2222,9 +2337,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSBackfillReceivedPayload : PredefinedDSBackfillBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSBackfillReceivedPayload : PredefinedDSBackfillBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_BackfillProposal_Received";
         }
@@ -2235,9 +2350,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSBackfillAcceptedPayload : PredefinedDSBackfillBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSBackfillAcceptedPayload : PredefinedDSBackfillBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_BackfillProposal_Accepted";
         }
@@ -2248,9 +2363,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSBackfillRejectedPayload : PredefinedDSBackfillBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedDSBackfillRejectedPayload : PredefinedDSBackfillBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "DS_BackfillProposal_Rejected";
         }
@@ -2261,7 +2376,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSBaseModel
+    public class PredefinedDSBaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "podName")] public string PodName;
 
@@ -2270,10 +2385,15 @@ namespace AccelByte.Models
         {
             PodName = podName;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedDSBackfillBaseModel
+    public class PredefinedDSBackfillBaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "podName")] public string PodName;
         [DataMember(Name = "backfillTicketId")] public string BackfillTicketId;
@@ -2293,15 +2413,20 @@ namespace AccelByte.Models
             ProposedTeams = backfillNotif.proposedTeams;
             AddedTickets = backfillNotif.addedTickets;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserRequestDSPayload : IAccelByteTelemetryPayload
+    public class PredefinedUserRequestDSPayload : PredefinedEventPayload
     {
         [DataMember(Name = "matchId")] public string MatchId;
         [DataMember(Name = "gameMode")] public string GameMode;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "User_RequestDS";
         }
@@ -2314,13 +2439,13 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserBannedPayload : IAccelByteTelemetryPayload
+    public class PredefinedUserBannedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "banType")] public string BanType;
         [DataMember(Name = "endDate")] public string EndDate;
         [DataMember(Name = "reason")] public string Reason;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "User_Banned";
         }
@@ -2334,11 +2459,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserUnbannedPayload : IAccelByteTelemetryPayload
+    public class PredefinedUserUnbannedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "banType")] public string BanType;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "User_Unbanned";
         }
@@ -2352,9 +2477,9 @@ namespace AccelByte.Models
 
     #region Social
     [DataContract, Preserve]
-    public class PredefinedPartyJoinedPayload : PredefinedPartyBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyJoinedPayload : PredefinedPartyBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Party_Joined";
         }
@@ -2366,9 +2491,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyLeavePayload : PredefinedPartyBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyLeavePayload : PredefinedPartyBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Party_Leave";
         }
@@ -2380,9 +2505,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyInvitePayload : PredefinedPartyBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyInvitePayload : PredefinedPartyBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Party_Invite";
         }
@@ -2394,9 +2519,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyKickPayload : PredefinedPartyBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedPartyKickPayload : PredefinedPartyBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Party_Kick";
         }
@@ -2408,7 +2533,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedPartyBaseModel
+    public class PredefinedPartyBaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "partyId")] public string PartyId;
 
@@ -2416,14 +2541,19 @@ namespace AccelByte.Models
         {
             PartyId = partyId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedLobbyConnectedPayload : IAccelByteTelemetryPayload
+    public class PredefinedLobbyConnectedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Lobby_Connected";
         }
@@ -2435,12 +2565,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedLobbyDisconnectedPayload : IAccelByteTelemetryPayload
+    public class PredefinedLobbyDisconnectedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "statusCode")] public WsCloseCode StatusCode;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Lobby_Disconnected";
         }
@@ -2453,7 +2583,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendRequestBase
+    public class PredefinedFriendRequestBase : PredefinedEventPayload
     {
         [DataMember(Name = "senderId")] public string SenderId;
         [DataMember(Name = "receiverId")] public string ReceiverId;
@@ -2463,12 +2593,17 @@ namespace AccelByte.Models
             SenderId = senderId;
             ReceiverId = receiverId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendRequestSentPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedFriendRequestSentPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "FriendRequest_Sent";
         }
@@ -2479,9 +2614,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendRequestCancelledPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedFriendRequestCancelledPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "FriendRequest_Cancelled";
         }
@@ -2492,9 +2627,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendRequestAcceptedPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedFriendRequestAcceptedPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "FriendRequest_Accepted";
         }
@@ -2505,9 +2640,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendRequestRejectedPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedFriendRequestRejectedPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "FriendRequest_Rejected";
         }
@@ -2518,9 +2653,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserBlockedPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedUserBlockedPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "User_Blocked";
         }
@@ -2531,9 +2666,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserUnblockedPayload : PredefinedFriendRequestBase, IAccelByteTelemetryPayload
+    public class PredefinedUserUnblockedPayload : PredefinedFriendRequestBase
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "User_Unblocked";
         }
@@ -2544,12 +2679,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedFriendUnfriendedPayload : IAccelByteTelemetryPayload
+    public class PredefinedFriendUnfriendedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "friendId")] public string FriendId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "Friend_Unfriended";
         }
@@ -2562,12 +2697,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedUserPresenceStatusUpdatedPayload : IAccelByteTelemetryPayload
+    public class PredefinedUserPresenceStatusUpdatedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "status")] public string Status;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "UserPresence_StatusUpdated";
         }
@@ -2580,11 +2715,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ConnectedPayload : IAccelByteTelemetryPayload
+    public class PredefinedChatV2ConnectedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Connected";
         }
@@ -2596,12 +2731,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2DisconnectedPayload : IAccelByteTelemetryPayload
+    public class PredefinedChatV2DisconnectedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "statusCode")] public WsCloseCode StatusCode;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Disconnected";
         }
@@ -2614,7 +2749,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicBaseModel
+    public class PredefinedChatV2TopicBaseModel : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "topicId")] public string TopicId;
@@ -2624,12 +2759,17 @@ namespace AccelByte.Models
             UserId = userId;
             TopicId = topicId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicJoinedPayload : PredefinedChatV2TopicBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedChatV2TopicJoinedPayload : PredefinedChatV2TopicBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Topic_Joined";
         }
@@ -2641,9 +2781,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicQuitPayload : PredefinedChatV2TopicBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedChatV2TopicQuitPayload : PredefinedChatV2TopicBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Topic_Quit";
         }
@@ -2655,9 +2795,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicUserAddedPayload : PredefinedChatV2TopicBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedChatV2TopicUserAddedPayload : PredefinedChatV2TopicBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Topic_UserAdded";
         }
@@ -2668,9 +2808,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicUserRemovedPayload : PredefinedChatV2TopicBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedChatV2TopicUserRemovedPayload : PredefinedChatV2TopicBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Topic_UserRemoved";
         }
@@ -2682,9 +2822,9 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2TopicDeletedPayload : PredefinedChatV2TopicBaseModel, IAccelByteTelemetryPayload
+    public class PredefinedChatV2TopicDeletedPayload : PredefinedChatV2TopicBaseModel
     {
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_Topic_Deleted";
         }
@@ -2696,12 +2836,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2UserBlockedPayload : IAccelByteTelemetryPayload
+    public class PredefinedChatV2UserBlockedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "blockedUserId")] public string BlockedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_User_Blocked";
         }
@@ -2714,12 +2854,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2UserUnblockedPayload : IAccelByteTelemetryPayload
+    public class PredefinedChatV2UserUnblockedPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "blockedUserId")] public string BlockedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_User_Unblocked";
         }
@@ -2732,12 +2872,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2CreateTopicPayload : IAccelByteTelemetryPayload
+    public class PredefinedChatV2CreateTopicPayload : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "targetUserId")] public string TargetUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_PersonalTopic_Created";
         }
@@ -2750,7 +2890,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorBase
+    public class PredefinedChatV2ModeratorBase : PredefinedEventPayload
     {
         [DataMember(Name = "groudId")] public string GroupId;
         [DataMember(Name = "moderatorId")] public string ModeratorId;
@@ -2760,14 +2900,19 @@ namespace AccelByte.Models
             GroupId = groupId;
             ModeratorId = moderatorId;
         }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorMutedPayload : PredefinedChatV2ModeratorBase, IAccelByteTelemetryPayload
+    public class PredefinedChatV2ModeratorMutedPayload : PredefinedChatV2ModeratorBase
     {
         [DataMember(Name = "mutedUserId")] public string MutedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_GroupChat_ModeratorMutedUser";
         }
@@ -2779,11 +2924,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorUnmutedPayload : PredefinedChatV2ModeratorBase, IAccelByteTelemetryPayload
+    public class PredefinedChatV2ModeratorUnmutedPayload : PredefinedChatV2ModeratorBase
     {
         [DataMember(Name = "unmutedUserId")] public string UnmutedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_GroupChat_ModeratorUnmutedUser";
         }
@@ -2795,11 +2940,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorBannedPayload : PredefinedChatV2ModeratorBase, IAccelByteTelemetryPayload
+    public class PredefinedChatV2ModeratorBannedPayload : PredefinedChatV2ModeratorBase
     {
         [DataMember(Name = "bannedUserId")] public string BannedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_GroupChat_ModeratorBannedUser";
         }
@@ -2811,11 +2956,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorUnbannedPayload : PredefinedChatV2ModeratorBase, IAccelByteTelemetryPayload
+    public class PredefinedChatV2ModeratorUnbannedPayload : PredefinedChatV2ModeratorBase
     {
         [DataMember(Name = "unbannedUserId")] public string UnbannedUserId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_GroupChat_ModeratorUnbannedUser";
         }
@@ -2827,11 +2972,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedChatV2ModeratorDeletedPayload : PredefinedChatV2ModeratorBase, IAccelByteTelemetryPayload
+    public class PredefinedChatV2ModeratorDeletedPayload : PredefinedChatV2ModeratorBase
     {
         [DataMember(Name = "chatId")] public string ChatId;
 
-        public string GetEventName()
+        internal override string GetPredefinedModelName()
         {
             return "ChatV2_GroupChat_ModeratorDeletedGroupChat";
         }

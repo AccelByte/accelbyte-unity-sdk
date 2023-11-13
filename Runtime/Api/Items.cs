@@ -63,7 +63,6 @@ namespace AccelByte.Api
             , bool populateBundle = false )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(itemId, "Can't get item; ItemId parameter is null!");
 
             if (!session.IsValid())
             {
@@ -85,7 +84,6 @@ namespace AccelByte.Api
             , ResultCallback<ItemPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(criteria, "Can't get items by criteria; Criteria parameter is null!");
 
             if (!session.IsValid())
             {
@@ -110,7 +108,6 @@ namespace AccelByte.Api
             , string region = "" )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(appId, "Can't get item by App ID; appId parameter is null!");
 
             if (!session.IsValid())
             {
@@ -144,8 +141,6 @@ namespace AccelByte.Api
             , ResultCallback<ItemPagingSlicedResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(language, "Can't search item; language parameter is null!");
-            Assert.IsNotNull(keyword, "Can't search item; keyword parameter is null!");
 
             if (!session.IsValid())
             {
@@ -176,7 +171,6 @@ namespace AccelByte.Api
             , ResultCallback<ItemInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sku, "Can't get item by sku; sku parameter is null!");
 
             if (!session.IsValid())
             {
@@ -240,6 +234,29 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetListAllStore(callback));
+        }
+
+        /// <summary>
+        /// Get estimated prices of an item.
+        /// </summary>
+        /// <param name="itemIds">Item IDs to get the estimated items information</param>
+        /// <param name="region">Region Code, ISO 3166-1 alpha-2 country tag, e.g., "US", "CN".Item IDs to get item</param>
+        /// <param name="callback">Returns a result that contain EstimatedPricesInfo array via callback when completed.</param>
+        public void GetEstimatedPrice(string[] itemIds
+			, string region
+			, ResultCallback<EstimatedPricesInfo[]> callback)
+  
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetEstimatedPrice(itemIds, region, callback));
         }
     }
 }

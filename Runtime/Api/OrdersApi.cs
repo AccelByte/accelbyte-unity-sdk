@@ -28,14 +28,29 @@ namespace AccelByte.Api
         public IEnumerator CreateOrder( string userId
             , string userAccessToken
             , OrderRequest orderRequest
-            , ResultCallback<OrderInfo> callback
-            , System.Action<Result<OrderInfo>> predefinedEventCallback = null)
+            , ResultCallback<OrderInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create order! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't create order! UserId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't create order! UserAccessToken parameter is null!");
-            Assert.IsNotNull(orderRequest, "Can't create order! OrderRequest parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty")); 
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (orderRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderRequest) + " cannot be null"));
+                yield break;
+            } 
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders")
@@ -54,7 +69,6 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderInfo>();
             callback.Try(result);
-            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator CancelOrderApi( string orderNo
@@ -63,10 +77,26 @@ namespace AccelByte.Api
             , ResultCallback<OrderInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(orderNo, "Can't cancel the order! orderNo parameter is null!");
-            Assert.IsNotNull(Namespace_, "Can't cancel the order! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't cancel the order! userId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't cancel the order! userAccessToken parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(orderNo))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders/{orderNo}/cancel")
@@ -91,14 +121,29 @@ namespace AccelByte.Api
         public IEnumerator GetUserOrder( string userId
             , string userAccessToken
             , string orderNumber
-            , ResultCallback<OrderInfo> callback
-            , Action<Result<OrderInfo>> predefinedEventCallback = null)
+            , ResultCallback<OrderInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user's order! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user's order! UserId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get user's order! UserAccessToken parameter is null!");
-            Assert.IsNotNull(orderNumber, "Can't get user's order! OrderNumber parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(orderNumber))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNumber) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders/{orderNo}")
@@ -117,20 +162,30 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderInfo>();
             callback.Try(result);
-            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator GetUserOrders( string userId
             , string userAccessToken
             , uint page
             , uint size
-            , ResultCallback<OrderPagingSlicedResult> callback
-            , Action<Result<OrderPagingSlicedResult>> predefinedEventCallback = null)
+            , ResultCallback<OrderPagingSlicedResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user's order! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user's order! UserId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get user's order! UserAccessToken parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders")
@@ -145,12 +200,61 @@ namespace AccelByte.Api
 
             IHttpResponse response = null;
 
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<OrderPagingSlicedResult>();
+            callback.Try(result);
+        }
+
+        public IEnumerator QueryUserOrders(string userId
+            , string userAccessToken
+            , UserOrdersRequest userOrderRequest
+            , ResultCallback<OrderPagingSlicedResult> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (userOrderRequest == null)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userOrderRequest) + " cannot be null"));
+                yield break;
+            }
+            if (userOrderRequest.Status == OrderStatus.NONE)
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be OrderStatus.NONE"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(userAccessToken)
+                .WithQueryParam("itemId", userOrderRequest.ItemId)
+                .WithQueryParam("status", userOrderRequest.Status.ToString())
+                .WithQueryParam("offset", userOrderRequest.Offset.ToString())
+                .WithQueryParam("limit", userOrderRequest.Limit.ToString())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult(); 
+            IHttpResponse response = null;
+
             yield return HttpClient.SendRequest(request, 
                 rsp => response = rsp);
 
             var result = response.TryParseJson<OrderPagingSlicedResult>();
             callback.Try(result);
-            predefinedEventCallback?.Invoke(result);
         }
 
         public IEnumerator GetUserOrderHistory( string userId
@@ -159,10 +263,26 @@ namespace AccelByte.Api
             , ResultCallback<OrderHistoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user's order history! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user's order history! UserId parameter is null!");
-            Assert.IsNotNull(userAccessToken, "Can't get user's order history! UserAccessToken parameter is null!");
-            Assert.IsNotNull(orderNo, "Can't get user's order history! OrderNo parameter is null!");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userAccessToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(orderNo))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
+                yield break;
+            } 
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders/{orderNo}/history")

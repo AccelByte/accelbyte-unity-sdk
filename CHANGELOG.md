@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.11.0%0D16.10.0) (2023-11-13)
+
+
+### Features
+
+* Added custom roslyn analyzer for preview attribute warning emission ([2cf9cc6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cf9cc663fa56c0922e37583d0bb767bdd9e1bc2))
+* added game standard events analytics implementations ([fdfc560](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fdfc560bcae4b58af3927e31970a5c795ef651dd))
+* added public binary cloud save APIs ([44fed92](https://github.com/AccelByte/accelbyte-unity-sdk/commits/44fed92cfb9587294c2bf9cd563f7f25b4af3737))
+* **Cloudsave:** Expose Admin Game and Player Record endpoints ([48c1192](https://github.com/AccelByte/accelbyte-unity-sdk/commits/48c1192d61da8405d2666af1f240c80e5014aa26))
+* **ecommerce:** flexible bundle pricing ([a7e9566](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a7e956615dc306abe467ff271d6ba44b01c792b3))
+* integrated flight id to api calls ([6c4234b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6c4234bc2448c0bc4cd9e85d37352cefeea763a5))
+* Make the error description clearer for CheckUserAccountAvailability. ([77cb44a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/77cb44acbf53e2fd6d16781495656d35287e9e83))
+* remove game standard customizable event namespace ([a16c943](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a16c9437f299162dfc09f9df970d538e9ff5546b))
+* **UGC:** Add new V2 endpoints for UGC Service ([04999f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/04999f4a3b21de9f96f1bf2b9c3ce6fcd6449520))
+
+
+### Bug Fixes
+
+* add payment failed predefined event ([efdbcb6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/efdbcb6a304360dae2109060a1800ecf79e72ca6))
+* fix client session not update after environment updated ([d201225](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d201225613c21bb672223081c7d5f699b9876068))
+* fix empty device id on desktop platform ([8ab38d4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8ab38d46a80c16cbbe0a52cda0f72d253b306007))
+* fix file cache webgl implementation ([3b9ef4b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b9ef4b027c128827e8e1df79cfc66b3b7db6e14))
+* fix predefined event on monetization category ([fa5f8e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fa5f8e8c6aa2aa97f9f414f8a55e80ee6a2d28db))
+
+
+### Refactors
+
+* transfer previous event name to payload param, implemented generic event name ([143c1ba](https://github.com/AccelByte/accelbyte-unity-sdk/commits/143c1ba14b3532402a81eb99e2fc486648afb8a1))
+* update game standard payload model ([0161695](https://github.com/AccelByte/accelbyte-unity-sdk/commits/01616950b2a0380dd6db11e9a35530cde7b98bb8))
+
 ## [16.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.10.0%0D16.9.1) (2023-10-30)
 
 

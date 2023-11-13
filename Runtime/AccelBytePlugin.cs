@@ -20,9 +20,6 @@ namespace AccelByte.Api
     /// <summary>
     /// Equivalent to Unreal's FRegistry
     /// </summary>
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#endif
     public static class AccelBytePlugin
     {
         private static AccelByteSettingsV2 currentSettings;
@@ -76,9 +73,11 @@ namespace AccelByte.Api
         private static ServiceVersion serviceVersion;
         private static HeartBeat heartBeat;
         private static StoreDisplay storeDisplay;
+        private static BinaryCloudSave binaryCloudSave;
         private static PresenceBroadcastEvent presenceBroadcastEvent;
         private static PresenceBroadcastEventScheduler presenceBroadcastEventScheduler;
         private static AnalyticsService analyticsService;
+        private static GameStandardAnalyticsClientService gameStandardAnalyticsService;
         private static Gdpr gdpr;
         #endregion /Modules with ApiBase
 
@@ -89,6 +88,9 @@ namespace AccelByte.Api
         private static IHttpRequestSender defaultHttpSender = null;
 
         private static PredefinedEventScheduler predefinedEventScheduler;
+        private static AccelByteGameStandardEventCacheImp gameStandardCacheImp;
+
+        private static UserSession activeSession;
 
         internal static OAuthConfig OAuthConfig
         {
@@ -128,23 +130,23 @@ namespace AccelByte.Api
 
         static AccelBytePlugin()
         {
-#if UNITY_EDITOR // Handle an unexpected behaviour if Domain Reload (experimental) is disabled
-            EditorApplication.playModeStateChanged += state =>
+            AccelByteSDKMain.OnSDKStopped += () =>
             {
-                if (state == PlayModeStateChange.ExitingEditMode)
+                if (gameStandardAnalyticsService != null)
                 {
-                    Reset();
+                    gameStandardAnalyticsService.StopScheduler();
+
+                    CacheGameStandardAnalytics(gameStandardCacheImp, gameStandardAnalyticsService, AccelByteSDK.Environment.Current.ToString(), false);
                 }
+
+                Reset();
             };
-#endif
             OnSettingsUpdate += AccelByteDebug.Initialize;
         }
 
         internal static void Reset()
         {
             initialized = false;
-
-            ResetApis();
 
             if (heartBeat != null)
             {
@@ -164,6 +166,8 @@ namespace AccelByte.Api
                 predefinedEventScheduler.Dispose();
                 predefinedEventScheduler = null;
             }
+
+            ResetApis();
         }
 
         internal static void Initialize()
@@ -217,10 +221,23 @@ namespace AccelByte.Api
             httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
             gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
             user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
-            
-            analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, user.Session);
+            activeSession = user.Session;
+
+            analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, activeSession);
             predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
             predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
+
+            gameStandardAnalyticsService = new GameStandardAnalyticsClientService(
+                analyticsService,
+                activeSession,
+                coroutineRunner
+            );
+
+            string gameStandardCacheDirectory = GameStandardAnalyticsClientService.DefaultCacheDirectory;
+            string gameStandardCacheFileName = GameStandardAnalyticsClientService.DefaultCacheFileName;
+            gameStandardCacheImp = new AccelByteGameStandardEventCacheImp(gameStandardCacheDirectory, gameStandardCacheFileName, settings.OAuthConfig.ClientId);
+
+            LoadGameStandardAnalyticsCache(gameStandardCacheImp, gameStandardAnalyticsService, AccelByteSDK.Environment.Current.ToString());
 
             HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
             HttpRequestBuilder.SetGameClientVersion(Application.version);
@@ -228,11 +245,8 @@ namespace AccelByte.Api
             ServicePointManager.ServerCertificateValidationCallback = OnCertificateValidated;
             PredefinedGameStateCommand.GlobalGameStateCommand.SetPredefinedEventScheduler(ref predefinedEventScheduler);
 
-            if (AccelByteSDK.Environment != null)
-            {
-                AccelByteSDK.Environment.OnEnvironmentChanged += UpdateEnvironment;
-                AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
-            }
+            AccelByteSDK.Environment.OnEnvironmentChangedV2 += UpdateEnvironment;
+            AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
 
             initialized = true;
         }
@@ -242,12 +256,11 @@ namespace AccelByte.Api
             if (serviceVersion == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 serviceVersion = new ServiceVersion(
                     new ServiceVersionApi(
                         httpClient,
                         Config, // baseUrl==justBaseUrl
-                        session),
+                        activeSession),
                     coroutineRunner);
             }
 
@@ -371,13 +384,12 @@ namespace AccelByte.Api
             if (userProfiles == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 userProfiles = new UserProfiles(
                     new UserProfilesApi(
                         httpClient,
                         Config, // baseUrl==BasicServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -387,8 +399,8 @@ namespace AccelByte.Api
                         new UserProfilesApi(
                             httpClient,
                             Config, // baseUrl==BasicServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                     userProfiles.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
@@ -404,13 +416,12 @@ namespace AccelByte.Api
             if (categories == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 categories = new Categories(
                     new CategoriesApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -420,8 +431,8 @@ namespace AccelByte.Api
                         new CategoriesApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -434,13 +445,12 @@ namespace AccelByte.Api
             if (items == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 items = new Items(
                     new ItemsApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -450,8 +460,8 @@ namespace AccelByte.Api
                         new ItemsApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -464,13 +474,12 @@ namespace AccelByte.Api
             if (currencies == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 currencies = new Currencies(
                     new CurrenciesApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -480,8 +489,8 @@ namespace AccelByte.Api
                         new CurrenciesApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -494,13 +503,12 @@ namespace AccelByte.Api
             if (orders == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 orders = new Orders(
                     new OrdersApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -510,8 +518,8 @@ namespace AccelByte.Api
                         new OrdersApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                     orders.SetPredefinedEventScheduler(ref predefinedEventScheduler);
                 };
@@ -527,13 +535,12 @@ namespace AccelByte.Api
             if (reward == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 reward = new Reward(
                     new RewardApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -543,8 +550,8 @@ namespace AccelByte.Api
                         new RewardApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -557,13 +564,12 @@ namespace AccelByte.Api
             if (wallet == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 wallet = new Wallet(
                     new WalletApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -573,8 +579,8 @@ namespace AccelByte.Api
                         new WalletApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -587,13 +593,12 @@ namespace AccelByte.Api
             if (lobby == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 lobby = new Lobby(
                     new LobbyApi(
                         httpClient,
                         Config, // baseUrl==LobbyServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -603,8 +608,8 @@ namespace AccelByte.Api
                         new LobbyApi(
                             httpClient,
                             Config, // baseUrl==LobbyServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     lobby.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -621,13 +626,12 @@ namespace AccelByte.Api
             if (_session == null)
             {
                 CheckPlugin();
-                ISession session = GetUser().Session;
                 _session = new Session(
                     new SessionApi(
                         httpClient,
                         Config, // baseUrl==SessionServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -637,8 +641,8 @@ namespace AccelByte.Api
                         new SessionApi(
                             httpClient,
                             Config, // baseUrl==SessionServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     _session.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -655,13 +659,12 @@ namespace AccelByte.Api
             if (_matchmakingV2 == null)
             {
                 CheckPlugin();
-                ISession session = GetUser().Session;
                 _matchmakingV2 = new MatchmakingV2(
                     new MatchmakingV2Api(
                         httpClient,
                         Config, // baseUrl==MatchmakingV2ServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -671,8 +674,8 @@ namespace AccelByte.Api
                         new MatchmakingV2Api(
                             httpClient,
                             Config, // baseUrl==MatchmakingV2ServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     _matchmakingV2.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -689,13 +692,12 @@ namespace AccelByte.Api
             if (cloudStorage == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 cloudStorage = new CloudStorage(
                     new CloudStorageApi(
                         httpClient,
                         Config,
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -705,8 +707,8 @@ namespace AccelByte.Api
                         new CloudStorageApi(
                             httpClient,
                             Config,
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -719,13 +721,12 @@ namespace AccelByte.Api
             if (gameProfiles == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 gameProfiles = new GameProfiles(
                     new GameProfilesApi(
                         httpClient,
                         Config, // baseUrl==GameProfileServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -735,8 +736,8 @@ namespace AccelByte.Api
                         new GameProfilesApi(
                             httpClient,
                             Config, // baseUrl==GameProfileServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -749,13 +750,12 @@ namespace AccelByte.Api
             if (entitlement == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 entitlement = new Entitlement(
                     new EntitlementApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -765,8 +765,8 @@ namespace AccelByte.Api
                         new EntitlementApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -779,13 +779,12 @@ namespace AccelByte.Api
             if (fulfillment == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 fulfillment = new Fulfillment(
                     new FulfillmentApi(
                         httpClient,
                         Config, // baseUrl==PlatformServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -795,8 +794,8 @@ namespace AccelByte.Api
                         new FulfillmentApi(
                             httpClient,
                             Config, // baseUrl==PlatformServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -811,13 +810,12 @@ namespace AccelByte.Api
             if (statistic == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 statistic = new Statistic(
                     new StatisticApi(
                         httpClient,
                         Config, // baseUrl==StatisticServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -827,8 +825,8 @@ namespace AccelByte.Api
                         new StatisticApi(
                             httpClient,
                             Config, // baseUrl==StatisticServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -841,13 +839,12 @@ namespace AccelByte.Api
             if (_qosManager == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 _qosManager = new QosManager(
                     new QosManagerApi(
                         httpClient,
                         Config, // baseUrl==QosManagerServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -857,8 +854,8 @@ namespace AccelByte.Api
                         new QosManagerApi(
                             httpClient,
                             Config, // baseUrl==QosManagerServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -871,13 +868,12 @@ namespace AccelByte.Api
             if (agreement == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 agreement = new Agreement(
                     new AgreementApi(
                         httpClient,
                         Config, // baseUrl==AgreementServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -887,8 +883,8 @@ namespace AccelByte.Api
                         new AgreementApi(
                             httpClient,
                             Config, // baseUrl==AgreementServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -901,13 +897,12 @@ namespace AccelByte.Api
             if (leaderboard == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 leaderboard = new Leaderboard(
                     new LeaderboardApi(
                         httpClient,
                         Config, // baseUrl==LeaderboardServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -917,8 +912,8 @@ namespace AccelByte.Api
                         new LeaderboardApi(
                             httpClient,
                             Config, // baseUrl==LeaderboardServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -931,13 +926,12 @@ namespace AccelByte.Api
             if (cloudSave == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 cloudSave = new CloudSave(
                     new CloudSaveApi(
                         httpClient,
                         Config, // baseUrl==CloudSaveServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -947,8 +941,8 @@ namespace AccelByte.Api
                         new CloudSaveApi(
                             httpClient,
                             Config, // baseUrl==CloudSaveServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -961,13 +955,12 @@ namespace AccelByte.Api
             if (gameTelemetry == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 gameTelemetry = new GameTelemetry(
                     new GameTelemetryApi(
                         httpClient,
                         Config, // baseUrl==GameTelemetryServerUrl 
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -977,8 +970,8 @@ namespace AccelByte.Api
                         new GameTelemetryApi(
                             httpClient,
                             Config, // baseUrl==GameTelemetryServerUrl 
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -991,13 +984,12 @@ namespace AccelByte.Api
             if (achievement == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 achievement = new Achievement(
                     new AchievementApi(
                         httpClient,
                         Config, // baseUrl==AchievementServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 achievement.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1009,8 +1001,8 @@ namespace AccelByte.Api
                         new AchievementApi(
                             httpClient,
                             Config, // baseUrl==AchievementServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     achievement.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1025,13 +1017,12 @@ namespace AccelByte.Api
             if (group == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 group = new Group(
                     new GroupApi(
                         httpClient,
                         Config, // baseUrl==GroupServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 group.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1043,8 +1034,8 @@ namespace AccelByte.Api
                         new GroupApi(
                             httpClient,
                             Config, // baseUrl==GroupServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     group.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1059,13 +1050,12 @@ namespace AccelByte.Api
             if (ugc == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 ugc = new UGC(
                     new UGCApi(
                         httpClient,
                         Config, // baseUrl==UGCServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -1075,8 +1065,8 @@ namespace AccelByte.Api
                         new UGCApi(
                             httpClient,
                             Config, // baseUrl==UGCServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -1089,13 +1079,12 @@ namespace AccelByte.Api
             if (reporting == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 reporting = new Reporting(
                     new ReportingApi(
                         httpClient,
                         Config, // baseUrl==ReportingServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -1105,8 +1094,8 @@ namespace AccelByte.Api
                         new ReportingApi(
                             httpClient,
                             Config, // baseUrl==ReportingServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -1119,13 +1108,12 @@ namespace AccelByte.Api
             if (seasonPass == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 seasonPass = new SeasonPass(
                     new SeasonPassApi(
                         httpClient,
                         Config, // baseUrl==SeasonPassServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 seasonPass.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1137,8 +1125,8 @@ namespace AccelByte.Api
                         new SeasonPassApi(
                             httpClient,
                             Config, // baseUrl==SeasonPassServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
 
                     seasonPass.SetPredefinedEventScheduler(ref predefinedEventScheduler);
@@ -1157,11 +1145,24 @@ namespace AccelByte.Api
                     new SessionBrowserApi(
                         httpClient,
                         Config, // baseUrl==SessionBrowserServerUrl
-                        GetUser().Session),
-                    user.Session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 sessionBrowser.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+
+                configReset += () =>
+                {
+                    sessionBrowser = new SessionBrowser(
+                        new SessionBrowserApi(
+                            httpClient,
+                            Config, // baseUrl==SessionBrowserServerUrl
+                            activeSession),
+                        activeSession,
+                        coroutineRunner);
+
+                    seasonPass.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+                };
             }
             return sessionBrowser;
         }
@@ -1175,9 +1176,20 @@ namespace AccelByte.Api
                     new TurnManagerApi(
                         httpClient,
                         Config, // baseUrl==TurnManagerServerUrl
-                        GetUser().Session),
-                    user.Session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
+
+                configReset += () =>
+                {
+                    turnManager = new TurnManager(
+                        new TurnManagerApi(
+                            httpClient,
+                            Config, // baseUrl==TurnManagerServerUrl
+                            activeSession),
+                        activeSession,
+                        coroutineRunner);
+                };
             }
             return turnManager;
         }
@@ -1187,13 +1199,12 @@ namespace AccelByte.Api
             if (miscellaneous == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 miscellaneous = new Miscellaneous(
                     new MiscellaneousApi(
                         httpClient,
                         Config, // baseUrl==BasicServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -1203,8 +1214,8 @@ namespace AccelByte.Api
                         new MiscellaneousApi(
                             httpClient,
                             Config, // baseUrl==BasicServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -1217,13 +1228,12 @@ namespace AccelByte.Api
             if (reporting == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 gdpr = new Gdpr(
                     new GdprApi(
                         httpClient,
                         Config, // baseUrl==GdprServerUrl
-                        session),
-                    session,
+                        activeSession),
+                    activeSession,
                     coroutineRunner);
 
                 configReset += () =>
@@ -1233,8 +1243,8 @@ namespace AccelByte.Api
                         new GdprApi(
                             httpClient,
                             Config, // baseUrl==GdprServerUrl
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -1247,13 +1257,12 @@ namespace AccelByte.Api
             if (presenceBroadcastEvent == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 presenceBroadcastEvent = new PresenceBroadcastEvent(
                 new PresenceBroadcastEventApi(
                     httpClient,
                     Config,
-                    session),
-                session,
+                    activeSession),
+                activeSession,
                 coroutineRunner);
 
                 configReset += () =>
@@ -1263,8 +1272,8 @@ namespace AccelByte.Api
                         new PresenceBroadcastEventApi(
                             httpClient,
                             Config,
-                            session),
-                        session,
+                            activeSession),
+                        activeSession,
                         coroutineRunner);
                 };
             }
@@ -1289,7 +1298,7 @@ namespace AccelByte.Api
                         presenceBroadcastEventJobEnabled = presenceBroadcastEventScheduler.IsPresenceBroadcastEventJobEnabled;
                         presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(false);
                     }
-                    
+
                     presenceBroadcastEventScheduler = null;
                     presenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(presenceBroadcastEvent);
 
@@ -1307,6 +1316,30 @@ namespace AccelByte.Api
         {
             CheckPlugin();
             return analyticsService;
+        }
+
+        public static GameStandardAnalyticsClientService GetGameStandardAnalyticsService()
+        {
+            CheckPlugin();
+            return gameStandardAnalyticsService;
+        }
+
+        internal static void CacheGameStandardAnalytics(AccelByteGameStandardEventCacheImp cacheImp, GameStandardAnalyticsClientService gameStandardService, string environment, bool async)
+        {
+            if (cacheImp != null && gameStandardService != null)
+            {
+                cacheImp.SetSaveAsync(async);
+                gameStandardService.CacheEvents(cacheImp, environment);
+            }
+        }
+
+        internal static void LoadGameStandardAnalyticsCache(AccelByteGameStandardEventCacheImp cacheImp, GameStandardAnalyticsClientService gameStandardService, string environment)
+        {
+            if (cacheImp != null && gameStandardService != null)
+            {
+                cacheImp.SetLoadAsync(true);
+                gameStandardService.LoadCachedEvent(cacheImp, environment);
+            }
         }
 
         private static AnalyticsService CreateAnalytics(Config newSdkConfig, IHttpClient httpClient, CoroutineRunner coroutineRunner, UserSession userSession)
@@ -1327,12 +1360,11 @@ namespace AccelByte.Api
             if (heartBeat == null)
             {
                 CheckPlugin();
-                UserSession session = GetUser().Session;
                 heartBeat = new HeartBeat(
                     new HeartBeatApi(
                         httpClient,
                         Config,
-                        session));
+                        activeSession));
                 ProvideHeartbeatData(heartBeat);
 
                 configReset += () =>
@@ -1348,7 +1380,7 @@ namespace AccelByte.Api
                         new HeartBeatApi(
                             httpClient,
                             Config,
-                            session));
+                            activeSession));
                     ProvideHeartbeatData(heartBeat);
                     if (isHeartBeatJobEnabled)
                     {
@@ -1358,6 +1390,64 @@ namespace AccelByte.Api
             }
 
             return heartBeat;
+        }
+
+        public static StoreDisplay GetStoreDisplay()
+        {
+            if (storeDisplay == null)
+            {
+                CheckPlugin();
+                storeDisplay = new StoreDisplay(
+                    new StoreDisplayApi(
+                        httpClient,
+                        Config,
+                        activeSession),
+                    activeSession,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    storeDisplay = null;
+                    storeDisplay = new StoreDisplay(
+                        new StoreDisplayApi(
+                            httpClient,
+                            Config,
+                            activeSession),
+                        activeSession,
+                        coroutineRunner);
+                };
+            }
+
+            return storeDisplay;
+        }
+
+        public static BinaryCloudSave GetBinaryCloudSave()
+        {
+            if (binaryCloudSave == null)
+            {
+                CheckPlugin();
+                binaryCloudSave = new BinaryCloudSave(
+                    new BinaryCloudSaveApi(
+                        httpClient,
+                        Config,
+                        activeSession),
+                    activeSession,
+                    coroutineRunner);
+
+                configReset += () =>
+                {
+                    binaryCloudSave = null;
+                    binaryCloudSave = new BinaryCloudSave(
+                    new BinaryCloudSaveApi(
+                        httpClient,
+                        Config,
+                        activeSession),
+                    activeSession,
+                    coroutineRunner);
+                };
+            }
+
+            return binaryCloudSave;
         }
 
         private static void ProvideHeartbeatData(HeartBeat targetHeartbeat)
@@ -1424,32 +1514,23 @@ namespace AccelByte.Api
             turnManager = null;
             configReset = null;
             presenceBroadcastEvent = null;
-            presenceBroadcastEventScheduler = null;
+            gameStandardAnalyticsService = null;
         }
 
         #region Environment
         [Obsolete("Use AccelByteSDK.Environment.Set() to update environment target")]
         public static void SetEnvironment(SettingsEnvironment newEnvironment)
         {
-            CheckPlugin();
-
-            if (AccelByteSDK.Environment != null)
-            {
-                AccelByteSDK.Environment.Set(newEnvironment);
-            }
-            else
-            {
-                UpdateEnvironment(newEnvironment);
-            }
+            AccelByteSDK.Environment.Set(newEnvironment);
         }
 
         [Obsolete("Use AccelByteSDK.Environment.Current to get current environment target")]
         public static SettingsEnvironment GetEnvironment()
         {
-            return AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
+            return AccelByteSDK.Environment.Current;
         }
 
-        private static void UpdateEnvironment(SettingsEnvironment newEnvironment)
+        private static void UpdateEnvironment(SettingsEnvironment previousEnvironment, SettingsEnvironment newEnvironment)
         {
             try
             {
@@ -1474,7 +1555,9 @@ namespace AccelByte.Api
                 gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
                 user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
 
-                analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, user.Session);
+                activeSession = user.Session;
+
+                analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, activeSession);
                 if (predefinedEventScheduler != null)
                 {
                     predefinedEventScheduler.SetEventEnabled(false);
@@ -1483,6 +1566,22 @@ namespace AccelByte.Api
                 predefinedEventScheduler = null;
                 predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
                 predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
+
+                // Cache game standard events
+                var oldGameStandardAnalytics = gameStandardAnalyticsService;
+                oldGameStandardAnalytics.StopScheduler();
+
+                const bool cacheGameStandardAsync = true;
+                CacheGameStandardAnalytics(gameStandardCacheImp, oldGameStandardAnalytics, previousEnvironment.ToString(), cacheGameStandardAsync);
+
+                gameStandardAnalyticsService = null;
+                gameStandardAnalyticsService = new GameStandardAnalyticsClientService(
+                    analyticsService,
+                    activeSession,
+                    coroutineRunner
+                );
+                gameStandardCacheImp.UpdateKey(settings.OAuthConfig.ClientId);
+                LoadGameStandardAnalyticsCache(gameStandardCacheImp, gameStandardAnalyticsService, newEnvironment.ToString());
 
                 HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
 
@@ -1498,36 +1597,6 @@ namespace AccelByte.Api
         public static void ClearEnvironmentChangedEvent()
         {
             CheckPlugin();
-        }
-
-        public static StoreDisplay GetStoreDisplay()
-        {
-            if (storeDisplay == null)
-            {
-                CheckPlugin();
-                UserSession session = GetUser().Session;
-                storeDisplay = new StoreDisplay(
-                    new StoreDisplayApi(
-                        httpClient,
-                        Config,
-                        session),
-                    session,
-                    coroutineRunner);
-
-                configReset += () =>
-                {
-                    storeDisplay = null;
-                    storeDisplay = new StoreDisplay(
-                        new StoreDisplayApi(
-                            httpClient,
-                            Config,
-                            session),
-                        session,
-                        coroutineRunner);
-                };
-            }
-
-            return storeDisplay;
         }
     }
 }
