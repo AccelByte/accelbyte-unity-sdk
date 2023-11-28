@@ -265,45 +265,8 @@ public class OAuth2 : ApiBase
         , ResultCallback callback
         , bool createHeadless = true)
     {
-        Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
-
-        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
-            .WithPathParam("platformId", platformType.ToString().ToLower())
-            .WithBasicAuth()
-            .WithContentType(MediaType.ApplicationForm)
-            .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("platform_token", platformToken)
-            .WithFormParam("namespace", Namespace_)
-            .WithFormParam("createHeadless", createHeadless ? "true" : "false")
-            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
-            .GetResult();
-
-        httpOperator.SendRequest(request, response =>
-        {
-            var result = response.TryParseJson<TokenData>();
-
-            if (!result.IsError)
-            {
-#if UNITY_GAMECORE
-                if(result.Value != null)
-                {
-                    string fetchedDeviceId = result.Value.DeviceId;
-                    if (!string.IsNullOrEmpty(fetchedDeviceId))
-                    {
-                        DeviceProvider.CacheDeviceId(result.Value.DeviceId);
-                    }
-                }
-#endif
-
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
-            }
-            else
-            {
-                callback.TryError(result.Error);
-            }
-        });
+        string platformId = platformType.ToString().ToLower();
+        LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
     }
 
     public void LoginWithOtherPlatform
@@ -312,46 +275,8 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenData, OAuthError> callback
         , bool createHeadless = true)
     {
-        Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null."); 
-
-        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
-            .WithPathParam("platformId", platformType.ToString().ToLower())
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
-            .WithContentType(MediaType.ApplicationForm)
-            .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("platform_token", platformToken)
-            .WithFormParam("namespace", Namespace_)
-            .WithFormParam("createHeadless", createHeadless ? "true" : "false")
-            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
-            .GetResult();
-
-        httpOperator.SendRequest(request, (response, error) =>
-        {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-#if UNITY_GAMECORE
-                if(result.Value != null)
-                {
-                    string fetchedDeviceId = result.Value.DeviceId;
-                    if (!string.IsNullOrEmpty(fetchedDeviceId))
-                    {
-                        DeviceProvider.CacheDeviceId(result.Value.DeviceId);
-                    }
-                }
-#endif
-
-            OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
-        });
+        string platformId = platformType.ToString().ToLower();
+        LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
@@ -364,7 +289,7 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name);
         Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
 
-        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
+        HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
             .WithBasicAuth()
             .WithContentType(MediaType.ApplicationForm)
@@ -372,14 +297,29 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
-            .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
-            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
-            .GetResult();
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId);
+
+        string[] macAddresses = DeviceProvider.GetMacAddress();
+        if (macAddresses != null && macAddresses.Length > 0)
+        {
+            requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
+        }
+
+        var request = requestBuilder.GetResult();
 
         httpOperator.SendRequest(request, response =>
         {
             var result = response.TryParseJson<TokenData>();
-
+#if UNITY_GAMECORE
+            if (result.Value != null)
+            {
+                string fetchedDeviceId = result.Value.DeviceId;
+                if (!string.IsNullOrEmpty(fetchedDeviceId))
+                {
+                    DeviceProvider.CacheDeviceId(result.Value.DeviceId);
+                }
+            }
+#endif
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
@@ -401,7 +341,7 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name);
         Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
 
-        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
+        HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
             .WithBasicAuthWithCookie(Config.PublisherNamespace)
             .WithContentType(MediaType.ApplicationForm)
@@ -409,14 +349,29 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", createHeadless ? "true" : "false")
-            .WithFormParam("macAddress", string.Join("-", DeviceProvider.GetMacAddress()))
-            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
-            .GetResult();
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId);
+
+        string[] macAddresses = DeviceProvider.GetMacAddress();
+        if(macAddresses != null && macAddresses.Length > 0)
+        {
+            requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
+        }
+
+        var request = requestBuilder.GetResult();
 
         httpOperator.SendRequest(request, (response, error) =>
         {
             var result = response.TryParseJson<TokenData, OAuthError>();
-
+#if UNITY_GAMECORE
+            if (result.Value != null)
+            {
+                string fetchedDeviceId = result.Value.DeviceId;
+                if (!string.IsNullOrEmpty(fetchedDeviceId))
+                {
+                    DeviceProvider.CacheDeviceId(result.Value.DeviceId);
+                }
+            }
+#endif
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);

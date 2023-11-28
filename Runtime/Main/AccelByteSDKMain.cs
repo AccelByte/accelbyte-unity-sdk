@@ -27,6 +27,7 @@ namespace AccelByte.Core
     public static class AccelByteSDKMain
     {
         internal static PlatformMain Main;
+        private static bool isMainInitialized = false;
 
         private static IAccelByteGameThreadSignaller gameThreadSignaller;
 
@@ -59,28 +60,44 @@ namespace AccelByte.Core
             }
 
             onGameUpdate = null;
-            OnSDKStopped = null;
 
             ExecuteBootstraps();
 
-            Main.Run();
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationPlayyModeStateChanged;
 #endif
             Application.quitting += ApplicationQuitting;
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void LateStartAccelByteSDK()
+        {
+            if (isMainInitialized)
+            {
+                return;
+            }
+
+            Main.Run();
+            isMainInitialized = true;
+        }
+
         private static void StopSDK()
         {
             OnSDKStopped?.Invoke();
+            CreateFilestreamBootstrap.Stop();
             PredefinedEventBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
             DetachGameUpdateSignaller();
+
             Main.Stop();
+            isMainInitialized = false;
+
+            OnSDKStopped = null;
         }
 
         private static void ExecuteBootstraps()
         {
+            CreateFilestreamBootstrap.Execute();
             PredefinedEventBootstrap.Execute();
             EnvrionmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();
@@ -140,6 +157,20 @@ namespace AccelByte.Core
                 }
                 AttachGameUpdateSignaller(accelByteSignaller);
             }
+        }
+
+        internal static void AddGameUpdateListener(System.Action<float> newListener, bool checkThreadSignallerIsAlive = true)
+        {
+            if(checkThreadSignallerIsAlive)
+            {
+                CheckMainThreadSignallerAlive();
+            }
+            onGameUpdate += newListener;
+        }
+
+        internal static void RemoveGameUpdateListener(System.Action<float> removedListener)
+        {
+            onGameUpdate -= removedListener;
         }
 
         private static void OnGameThreadUpdate(float deltaTime)

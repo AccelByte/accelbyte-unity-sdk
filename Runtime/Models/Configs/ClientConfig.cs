@@ -77,6 +77,7 @@ namespace AccelByte.Models
         [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
         [DataMember] public bool EnableClientAnalyticsEvent = false;
         [DataMember] public float ClientAnalyticsEventInterval = defaultClientAnalyticsEventIntervalInSecond;
+        [DataMember] public bool EnableAmsServerQos = false;
 
         /// <summary>
         ///  Copy member values
@@ -321,7 +322,8 @@ namespace AccelByte.Models
 
                 this.StatisticServerUrl = ExpandServiceApiUrl(this.StatisticServerUrl, "/social", forceExpandServiceApiUrl);
 
-                this.QosManagerServerUrl = ExpandServiceApiUrl(this.QosManagerServerUrl, "/qosm", forceExpandServiceApiUrl);
+                string qosUrl = EnableAmsServerQos ? "/ams-qosm" : "/qosm";
+                this.QosManagerServerUrl = ExpandServiceApiUrl(this.QosManagerServerUrl, qosUrl, forceExpandServiceApiUrl);
 
                 this.AgreementServerUrl = ExpandServiceApiUrl(this.AgreementServerUrl, "/agreement", forceExpandServiceApiUrl);
 

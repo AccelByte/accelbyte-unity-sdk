@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using AccelByte.Core;
+using AccelByte.Api;
 using UnityEngine.Assertions;
-using WebSocketSharp;
 
 namespace AccelByte.Server
 {
@@ -26,81 +26,83 @@ namespace AccelByte.Server
 
         #region Properties
 
-        public bool IsConnected => _webSocket?.ReadyState is WebSocketState.Open;
+        public bool IsConnected => webSocket?.State is WsState.Open;
 
         #endregion
 
-        private readonly CoroutineRunner _coroutineRunner;
-        private readonly ISession _session;
+        private readonly CoroutineRunner coroutineRunner;
+        private readonly ISession session;
 
-        private string _websocketUrl;
-        private WebSocket _webSocket;
+        private readonly string websocketUrl;
+        private AccelByteWebSocket webSocket;
 
         public ServerDSHubWebsocketApi(CoroutineRunner inCoroutineRunner, string inWebsocketUrl, ISession inSession)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
-            _coroutineRunner = inCoroutineRunner;
-            _websocketUrl = inWebsocketUrl.Replace("https://", "wss://");
-            _session = inSession;
+            coroutineRunner = inCoroutineRunner;
+            websocketUrl = inWebsocketUrl.Replace("https://", "wss://");
+            session = inSession;
         }
 
-        public void CreateWebsocket(string serverName)
+        private void CreateWebsocket(string serverName)
         {
-            _webSocket = new WebSocket(_websocketUrl, _session.AuthorizationToken);
-            _webSocket.SslConfiguration.EnabledSslProtocols =
-                System.Security.Authentication.SslProtocols.Default
-                | System.Security.Authentication.SslProtocols.Tls11
-                | System.Security.Authentication.SslProtocols.Tls12;
-            _webSocket.CustomHeaders = new Dictionary<string, string>
+            Dictionary<string, string> headers = new Dictionary<string, string>()
             {
+                { "Authorization", $"Bearer {session.AuthorizationToken}"},
                 { "X-Ab-ServerID", serverName }
             };
 
-            _webSocket.OnOpen += (sender, ev) =>
+            webSocket = new AccelByteWebSocket(new HybridWebSocket.WebSocket());
+
+            webSocket.OnOpen += () =>
             {
                 OnOpen?.Invoke();
             };
 
-            _webSocket.OnMessage += (sender, ev) =>
+            webSocket.OnClose += code =>
             {
-                if (ev.RawData == null) return;
-
-                OnMessage?.Invoke(ev.Data);
+                OnClose?.Invoke((ushort)code);
             };
 
-            _webSocket.OnError += (sender, ev) => { OnError?.Invoke(ev.Message); };
+            webSocket.OnError += msg =>
+            {
+                OnError?.Invoke(msg);
+            };
 
-            _webSocket.OnClose += (sender, ev) => { OnClose?.Invoke(ev.Code); };
+            webSocket.OnMessage += data =>
+            {
+                OnMessage?.Invoke(data);
+            };
 
-            _webSocket.Connect();
+            webSocket.Connect(websocketUrl, "", headers);
         }
 
         public void Connect(string serverName)
         {
-            if (!_session.IsValid())
+            if (!session.IsValid())
             {
                 throw new Exception("Cannot connect to websocket because server is not authenticated.");
             }
 
             try
             {
-                if (_webSocket != null)
+                if (webSocket != null)
                 {
-                    switch (_webSocket.ReadyState)
+                    switch (webSocket.State)
                     {
-                        case WebSocketState.Open:
+                        case WsState.Open:
                             AccelByteDebug.LogWarning("[Server DS Hub] Websocket is connected");
                             return;
-                        case WebSocketState.Connecting:
+                        case WsState.Connecting:
                             AccelByteDebug.LogWarning("[Server DS Hub] Websocket is connecting");
                             return;
-                        case WebSocketState.Closing:
-                        case WebSocketState.Closed:
-                            _webSocket = null;
+                        case WsState.Closing:
+                        case WsState.Closed:
+                            webSocket = null;
                             break;
                         default:
-                            throw new WebSocketInvalidStateException("[Server DS Hub] Websocket in invalid state.");
+                            throw new NativeWebSocket.WebSocketInvalidStateException("[Server DS Hub] Websocket in invalid state.");
                     }
                 }
 
@@ -108,27 +110,27 @@ namespace AccelByte.Server
             }
             catch (Exception e)
             {
-                throw new WebSocketUnexpectedException("[Server DS Hub] Websocket failed to connect.", e);
+                throw new NativeWebSocket.WebSocketUnexpectedException("[Server DS Hub] Websocket failed to connect.", e);
             }
         }
 
         public void Disconnect(WsCloseCode code = WsCloseCode.Normal, string reason = null)
         {
-            if (_webSocket.ReadyState is WebSocketState.Closing || _webSocket.ReadyState is WebSocketState.Closed)
+            if (webSocket.State is WsState.Closing || webSocket.State is WsState.Closed)
             {
                 return;
             }
 
             try
             {
-                _webSocket.Close((ushort)code, reason);
+                webSocket.Disconnect();
             }
             catch (Exception e)
             {
-                throw new WebSocketUnexpectedException("Failed to close the connection.", e);
+                throw new NativeWebSocket.WebSocketUnexpectedException("Failed to close the connection.", e);
             }
 
-            _webSocket = null;
+            webSocket = null;
         }
 
         public void HandleNotification<T>(T payload, ResultCallback<T> handler) where T : class, new()
@@ -140,7 +142,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            _coroutineRunner.Run(() => handler(Result<T>.CreateOk(payload)));
+            coroutineRunner.Run(() => handler(Result<T>.CreateOk(payload)));
         }
     }
 }

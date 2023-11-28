@@ -87,11 +87,17 @@ namespace AccelByte.Core
             }
             else
             {
+                string sessionCacheTableName = $"TokenCache/{AccelByteSDK.Environment}/TokenData";
+
+                IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.FileStream);
+
                 session = new UserSession(
                     httpClient,
                     coroutineRunner,
                     config.PublisherNamespace,
-                    config.UsePlayerPrefs );
+                    config.UsePlayerPrefs,
+                    sessionCacheTableName,
+                    dataStorage);
             }
 
             return new ApiClient( session, httpClient, coroutineRunner );
@@ -99,20 +105,26 @@ namespace AccelByte.Core
 
         /// <summary>
         /// </summary>
-        /// <param name="serverApiClient"></param>
+        /// <param name="apiClient"></param>
         /// <param name="key">Leave empty for "default"; duplicate key names will replace the previous entry</param>
         /// <returns>isSuccess</returns>
-        public static bool RegisterApiClient(string key, ApiClient serverApiClient)
+        public static bool RegisterApiClient(string key, ApiClient apiClient)
         {
-            Assert.IsNotNull(serverApiClient, "!apiClient @ RegisterApiClient");
+            Assert.IsNotNull(apiClient, "!apiClient @ RegisterApiClient");
             if (string.IsNullOrEmpty(key))
             {
                 UnityEngine.Debug.LogError("!key @ RegisterApiClient");
                 return false;
             }
             
-            apiClientInstances[key] = serverApiClient;
+            apiClientInstances[key] = apiClient;
             return true;
+        }
+
+        internal static bool DeleteApiClient(string key)
+        {
+            bool result = apiClientInstances.Remove(key);
+            return result;
         }
         #endregion /Client
         
@@ -193,6 +205,12 @@ namespace AccelByte.Core
             
             serverApiClientInstances[key] = serverApiClient;
             return true;
+        }
+
+        internal static bool DeleteServerApiClient(string key)
+        {
+            bool result = serverApiClientInstances.Remove(key);
+            return result;
         }
         #endregion /Server
     }

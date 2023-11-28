@@ -81,7 +81,7 @@ namespace AccelByte.Core
             tokenData = inTokenData;
         }
 
-        protected IEnumerator MaintainToken()
+        protected virtual IEnumerator MaintainToken()
         {
             nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
             TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);

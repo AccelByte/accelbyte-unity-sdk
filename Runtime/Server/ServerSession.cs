@@ -116,5 +116,36 @@ namespace AccelByte.Server
                     request,
                     callback));
         }
+
+        /// <summary>
+        /// Inform session service that current DS session is ready to receive client travel.
+        /// This is needed if the session template used for this game session enabled the dsManualSetReady flag.
+        /// </summary>
+        /// <param name="sessionId">ID of the game session that claimed the DS.</param>
+        /// <param name="isDsSessionReady">Bool value indicating if the DS session is ready or not.</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void SendDSSessionReady(string sessionId, bool isDsSessionReady
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            _coroutineRunner.Run(
+                _sessionApi.SendDSSessionReady(
+                    sessionId,
+                    isDsSessionReady,
+                    callback));
+        }
     }
 }

@@ -220,7 +220,7 @@ namespace AccelByte.Api
 
             httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
             gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient, activeEnvironment.ToString(), AccelByteSDK.FileStream);
             activeSession = user.Session;
 
             analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, activeSession);
@@ -352,13 +352,19 @@ namespace AccelByte.Api
             return newGameClient;
         }
 
-        private static User CreateUser(Config newSdkConfig, CoroutineRunner taskRunner, IHttpClient httpClient)
+        internal static User CreateUser(Config newSdkConfig, CoroutineRunner taskRunner, IHttpClient httpClient, string environment, AccelByteFileStream accelByteFileStream)
         {
+            string sessionCacheTableName = $"TokenCache/{environment}/TokenData";
+
+            IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(accelByteFileStream);
+
             var userSession = new UserSession(
                 httpClient,
                 taskRunner,
                 newSdkConfig.PublisherNamespace,
-                newSdkConfig.UsePlayerPrefs);
+                newSdkConfig.UsePlayerPrefs,
+                sessionCacheTableName,
+                dataStorage);
 
             var newUser = new User(
                 new UserApi(
@@ -1553,7 +1559,7 @@ namespace AccelByte.Api
 
                 httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
                 gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient);
+                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient, newEnvironment.ToString(), AccelByteSDK.FileStream);
 
                 activeSession = user.Session;
 

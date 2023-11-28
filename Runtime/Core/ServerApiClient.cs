@@ -122,6 +122,7 @@ namespace AccelByte.Core
         public DedicatedServerManager GetDedicatedServerManager() { return GetServerApi<DedicatedServerManager, DedicatedServerManagerApi>(); }
         public ServerEcommerce GetEcommerce() { return GetServerApi<ServerEcommerce, ServerEcommerceApi>(); }
         public ServerStatistic GetStatistic() { return GetServerApi<ServerStatistic, ServerStatisticApi>(); }
+        public ServerUGC GetUGC() { return GetServerApi<ServerUGC, ServerUGCApi>(); }
         public ServerQosManager GetQos() { return GetServerApi<ServerQosManager, ServerQosManagerApi>(); }
         public ServerGameTelemetry GetGameTelemetry() { return GetServerApi<ServerGameTelemetry, ServerGameTelemetryApi>(); }
         public ServerAchievement GetAchievement() { return GetServerApi<ServerAchievement, ServerAchievementApi>(); }

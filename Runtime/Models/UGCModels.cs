@@ -328,6 +328,7 @@ namespace AccelByte.Models
         [DataMember] public string subtype;
         [DataMember] public string[] tags;
         [DataMember] public bool isOfficial;
+        [DataMember] public bool IsHidden;
         [DataMember] public UGCSortBy sortBy = UGCSortBy.DATE; // Default to sorting criteria = date
         [DataMember] public UGCOrderBy orderBy = UGCOrderBy.DESC; // Default to sorting order = desc
         [DataMember] public int limit = 1000; // Default value = 1000

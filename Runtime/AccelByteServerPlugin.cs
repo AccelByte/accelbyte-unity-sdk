@@ -43,6 +43,7 @@ namespace AccelByte.Server
         private static DedicatedServerManager dedicatedServerManager;
         private static ServerEcommerce ecommerce;
         private static ServerStatistic statistic;
+        private static ServerUGC ugc;
         private static ServerQosManager _qosManager;
         private static ServerGameTelemetry gameTelemetry;
         private static ServerAchievement achievement;
@@ -55,6 +56,7 @@ namespace AccelByte.Server
         private static ServerSeasonPass seasonPass;
         private static ServiceVersion serviceVersion;
         private static ServerAnalyticsService serverAnalyticsService;
+        private static AccelByteStatsDMetricExporterApi statsDMetricExporter;
 
         private static bool initialized = false;
         internal static event Action configReset;
@@ -102,14 +104,8 @@ namespace AccelByte.Server
 
         static AccelByteServerPlugin()
         {
-#if UNITY_EDITOR // Handle an unexpected behaviour if Domain Reload (experimental) is disabled
-            EditorApplication.playModeStateChanged += state =>
+            AccelByteSDKMain.OnSDKStopped += () =>
             {
-                if (state != PlayModeStateChange.ExitingEditMode)
-                {
-                    return;
-                }
-
                 initialized = false;
                 if (ams != null)
                 {
@@ -117,7 +113,7 @@ namespace AccelByte.Server
                 }
                 ResetApis();
             };
-#endif
+
             OnSettingsUpdate += AccelByteDebug.Initialize;
         }
 
@@ -256,6 +252,11 @@ namespace AccelByte.Server
 
         internal static ServerAMS CreateAMSConnection(string dsId, string amsServerUrl, int amsHeartbeatIntervalSecond)
         {
+            if (ams == null)
+            {
+                CheckPlugin();
+            }
+
             if (dsId == null)
             {
                 AccelByteDebug.LogWarning("dsid not provided, not connecting to ams");
@@ -267,6 +268,8 @@ namespace AccelByte.Server
                 amsHeartbeatIntervalSecond,
                 coroutineRunner);
             newAMS.Connect(dsId);
+
+            ams = newAMS;
             return newAMS;
         }
 
@@ -325,7 +328,26 @@ namespace AccelByte.Server
 
         public static ServerAMS GetAMS()
         {
+            if (ams != null)
+            {
+                return ams;
+            }
+
             CheckPlugin();
+            string dsId = string.IsNullOrEmpty(Config.DsId) ?
+                Utils.CommandLineArgs.GetArg(DedicatedServer.CommandLineDsId) : Config.DsId;
+
+            ams = CreateAMSConnection(dsId, Config);
+
+            configReset += () =>
+            {
+                ams = null;
+                string dsId = string.IsNullOrEmpty(Config.DsId) ?
+                    Utils.CommandLineArgs.GetArg(DedicatedServer.CommandLineDsId) : Config.DsId;
+
+                ams = CreateAMSConnection(dsId, Config);
+            };
+
             return ams;
         }
 
@@ -416,6 +438,34 @@ namespace AccelByte.Server
             };
 
             return statistic;
+        }
+
+        public static ServerUGC GetUGC()
+        {
+            if (ugc != null) return ugc;
+
+            CheckPlugin();
+            ugc = new ServerUGC(
+                new ServerUGCApi(
+                    httpClient,
+                    Config, // baseUrl==UGCServerUrl
+                    session),
+                session,
+                coroutineRunner);
+
+            configReset += () =>
+            {
+                ugc = null;
+                ugc = new ServerUGC(
+                new ServerUGCApi(
+                    httpClient,
+                    Config, // baseUrl==UGCServerUrl
+                    session),
+                session,
+                coroutineRunner);
+            };
+
+            return ugc;
         }
 
         public static ServerQosManager GetQos()
@@ -729,6 +779,28 @@ namespace AccelByte.Server
             return serverAnalyticsService;
         }
 
+        public static AccelByteStatsDMetricExporterApi GetStatsDMetricExporter()
+        {
+            CheckPlugin();
+
+            if (statsDMetricExporter == null)
+            {
+                configReset += () =>
+                {
+                    statsDMetricExporter = null;
+                    statsDMetricExporter = new AccelByteStatsDMetricExporterApi(httpClient,
+                        Config,
+                        session);
+                };
+            }
+
+            return statsDMetricExporter ?? (statsDMetricExporter = new AccelByteStatsDMetricExporterApi(
+                httpClient,
+                Config,
+                session
+                ));
+        }
+
         #region Environment
         [Obsolete("Use AccelByteSDK.Environment.Set() to update environment target")]
         public static void SetEnvironment(SettingsEnvironment newEnvironment)
@@ -808,6 +880,7 @@ namespace AccelByte.Server
             seasonPass = null;
             configReset = null;
             serverAnalyticsService = null;
+            statsDMetricExporter = null;
 
             if (predefinedEventScheduler != null)
             {

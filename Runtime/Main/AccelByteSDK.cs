@@ -26,7 +26,16 @@ namespace AccelByte.Core
             internal set;
             get;
         }
+
+        public static string Version
+        {
+            get
+            {
+                return AccelByteSettingsV2.AccelByteSDKVersion;
+            }
+        }
 		
         internal static Models.OverrideConfigs OverrideConfigs;
+        internal static AccelByteFileStream FileStream;
     }
 }

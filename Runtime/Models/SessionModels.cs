@@ -276,6 +276,7 @@ namespace AccelByte.Models
         EMPTY,
         NEED_TO_REQUEST,
         REQUESTED,
+        PREPARING,
         AVAILABLE,
         FAILED_TO_REQUEST,
         ENDED,
@@ -353,6 +354,12 @@ namespace AccelByte.Models
         [DataMember(EmitDefaultValue = false)] public string[] ticketIds;
         [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
         [DataMember(EmitDefaultValue = false)] public int version;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2DsSessionReadyRequest
+    {
+        [DataMember] public bool Ready = false;
     }
 
     [DataContract, Preserve]

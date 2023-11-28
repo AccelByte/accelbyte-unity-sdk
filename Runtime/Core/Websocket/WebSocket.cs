@@ -2,13 +2,10 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-
 using System;
 using System.Collections.Generic;
 using AccelByte.Core;
-#if !UNITY_WEBGL || UNITY_EDITOR
-using WebSocketSharp;
-#endif
+
 #if UNITY_WEBGL && !UNITY_EDITOR
 using AOT;
 using System.Runtime.InteropServices;
@@ -348,11 +345,7 @@ namespace HybridWebSocket
 
     internal class WebSocket : IWebSocket
     {
-        private WebSocketSharp.WebSocket webSocket;
-        private bool IsProxySet = false;
-        private string ProxyUrl;
-        private string ProxyUsername;
-        private string ProxyPassword;
+        private NativeWebSocket.WebSocket webSocket;
 
         public event OnOpenHandler OnOpen;
         public event OnMessageHandler OnMessage;
@@ -361,28 +354,27 @@ namespace HybridWebSocket
 
         ~WebSocket()
         {
-            this.OnOpen = null;
-            this.OnMessage = null;
-            this.OnError = null;
-            this.OnClose = null;
+            OnOpen = null;
+            OnMessage = null;
+            OnError = null;
+            OnClose = null;
         }
 
         public WsState ReadyState
         {
             get
             {
-                if (this.webSocket == null)
+                if (webSocket == null)
                 {
                     return WsState.Closed;
                 }
-                
-                switch (this.webSocket.ReadyState)
+
+                switch (webSocket.State)
                 {
-                    case WebSocketState.Open: return WsState.Open;
-                    case WebSocketState.Closed: return WsState.Closed;
-                    case WebSocketState.Closing: return WsState.Closing;
-                    case WebSocketState.Connecting: return WsState.Connecting;
-                    case WebSocketState.New: return WsState.New;
+                    case NativeWebSocket.WebSocketState.Open: return WsState.Open;
+                    case NativeWebSocket.WebSocketState.Closed: return WsState.Closed;
+                    case NativeWebSocket.WebSocketState.Closing: return WsState.Closing;
+                    case NativeWebSocket.WebSocketState.Connecting: return WsState.Connecting;
                     default: throw new WebSocketInvalidStateException("Unrecognized websocket ready state.");
                 }
             }
@@ -390,10 +382,7 @@ namespace HybridWebSocket
 
         public void SetProxy(string url, string username, string password)
         {
-            this.ProxyUrl = url;
-            this.ProxyUsername = username;
-            this.ProxyPassword = password;
-            this.IsProxySet = true;
+            throw new NotSupportedException("Proxy is not supported");
         }
 
         public void Connect(string url, string protocols, string sessionId, string entitlementToken = null)
@@ -415,72 +404,32 @@ namespace HybridWebSocket
         {
             try
             {
-                if(protocols != null && protocols.Length > 0)
-                {
-                    this.webSocket = new WebSocketSharp.WebSocket(url, protocols);
-                    this.webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Default
-                        | System.Security.Authentication.SslProtocols.Tls11
-                        | System.Security.Authentication.SslProtocols.Tls12;
-                }
-                else
-                {
-                    this.webSocket = new WebSocketSharp.WebSocket(url);
-                }
+                webSocket = string.IsNullOrEmpty(protocols) ? new NativeWebSocket.WebSocket(url, customHeaders) : new NativeWebSocket.WebSocket(url, protocols, customHeaders);
 
-                this.webSocket.CustomHeaders = customHeaders;
-
-                if (IsProxySet)
+                webSocket.OnOpen += () =>
                 {
-                    this.webSocket.SetProxy(this.ProxyUrl, this.ProxyUsername, this.ProxyPassword);
-                }
-
-                this.webSocket.OnOpen += (sender, ev) =>
-                {
-                    OnOpenHandler handler = this.OnOpen;
-
-                    if (handler != null)
-                    {
-                        handler();
-                    }
+                    OnOpen?.Invoke();
                 };
 
-                this.webSocket.OnMessage += (sender, ev) =>
+                webSocket.OnMessage += data =>
                 {
-                    if (ev.RawData == null) return;
-
-                    OnMessageHandler handler = this.OnMessage;
-
-                    if (handler != null)
-                    {
-                        handler(ev.Data);
-                    }
+                    string dataStr = System.Text.Encoding.UTF8.GetString(data);
+                    OnMessage?.Invoke(dataStr);
                 };
 
-                this.webSocket.OnError += (sender, ev) =>
+                webSocket.OnError += errorMessage =>
                 {
-                    OnErrorHandler handler = this.OnError;
-
-                    if (handler != null)
-                    {
-                        handler(ev.Message);
-                    }
+                    OnError?.Invoke(errorMessage);
                 };
 
-                this.webSocket.OnClose += (sender, ev) =>
+                webSocket.OnClose += code =>
                 {
-                    OnCloseHandler handler = this.OnClose;
+                    OnClose?.Invoke((ushort)code);
+                };
 
-                    if (handler != null)
-                    {
-                        handler(ev.Code);
-                    }
-
-                    OnMessageHandler messageHandler = this.OnMessage;
-
-                    if (messageHandler != null)
-                    {
-                        messageHandler(ev.Reason);
-                    }
+                AccelByteSDKMain.OnGameUpdate += _ =>
+                {
+                    webSocket.DispatchMessageQueue();
                 };
             }
             catch (Exception e)
@@ -488,16 +437,20 @@ namespace HybridWebSocket
                 throw new WebSocketUnexpectedException("Websocket cannot be created.", e);
             }
 
-            switch (this.webSocket.ReadyState)
+            switch (webSocket.State)
             {
-            case WebSocketState.Open: return;
-            case WebSocketState.Closing: throw new WebSocketInvalidStateException("WebSocket is closing.");
-            case WebSocketState.Closed: break;
+            case NativeWebSocket.WebSocketState.Open:
+                AccelByteDebug.Log($"Websocket connection to {url} already opened");
+                return;
+            case NativeWebSocket.WebSocketState.Connecting:
+                AccelByteDebug.LogWarning($"Websocket connection to {url} is connecting");
+                break;
+            case NativeWebSocket.WebSocketState.Closing: throw new WebSocketInvalidStateException("WebSocket is closing.");
+            case NativeWebSocket.WebSocketState.Closed:
             default:
-
                 try
                 {
-                    this.webSocket.ConnectAsync();
+                    webSocket.Connect();
                 }
                 catch (Exception e)
                 {
@@ -511,13 +464,13 @@ namespace HybridWebSocket
         public void Send(string message)
         {
             // Check state
-            if (this.webSocket.ReadyState != WebSocketState.Open)
+            if (webSocket.State != NativeWebSocket.WebSocketState.Open)
                 throw new WebSocketInvalidStateException("Websocket is not open.");
 
             try
             {
                 Report.GetWebSocketRequest(message);
-                this.webSocket.SendAsync(message, null);
+                webSocket.SendText(message);
             }
             catch (Exception e)
             {
@@ -527,20 +480,20 @@ namespace HybridWebSocket
 
         public void Ping()
         {
-            this.webSocket.SendAsync("", null);
+            webSocket.SendText("");
         }
 
         public void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null)
         {
-            if (this.webSocket.ReadyState == WebSocketState.Closing ||
-                this.webSocket.ReadyState == WebSocketState.Closed)
+            if (webSocket.State == NativeWebSocket.WebSocketState.Closing ||
+                webSocket.State == NativeWebSocket.WebSocketState.Closed)
             {
                 return;
             }
 
             try
             {
-                this.webSocket.Close((ushort) code, reason);
+                webSocket.Close();
             }
             catch (Exception e)
             {

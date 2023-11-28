@@ -66,6 +66,11 @@ namespace AccelByte.Models
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string AMSServerUrl;
         [DataMember] public int? AMSHeartbeatInterval;
+        [DataMember] public bool? EnableAmsServerQos;
+        [DataMember] public string StatsDServerUrl;
+        [DataMember] public int? StatsDServerPort;
+        [DataMember] public int? StatsDMetricInterval;
+        [DataMember] public string DsId;
     }
 
     [DataContract, Preserve]

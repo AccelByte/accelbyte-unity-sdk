@@ -12,14 +12,19 @@ namespace AccelByte.Models {
     {
         private const int defaultCacheSize = 100;
         private const int defaultCacheLifeTime = 100;
+        private const string defaultAMSServerUrl = "ws://127.0.0.1:5555/watchdog";
         private const int defaultAMSHeartbeatInterval = 15;
         private const bool defaultPredefinedEvent = false;
+        private const string defaultStatsDUrl = "localhost";
+        private const int defaultStatsDPort = 8125;
+        private const int defaultStatsDMetricInterval = 60;
         [DataMember] public string Namespace;
         [DataMember] public string BaseUrl;
         [DataMember] public string IamServerUrl;
         [DataMember] public string DSHubServerUrl;
         [DataMember] public string DSMControllerServerUrl;
         [DataMember] public string StatisticServerUrl;
+        [DataMember] public string UGCServerUrl;
         [DataMember] public string PlatformServerUrl;
         [DataMember] public string QosManagerServerUrl;
         [DataMember] public string GameTelemetryServerUrl;
@@ -31,11 +36,15 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
         [DataMember] public string SeasonPassServerUrl;
-        [DataMember] public string AMSServerUrl;
+        [DataMember] public string AMSServerUrl = defaultAMSServerUrl;
         [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
         [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
+        [DataMember] public string StatsDServerUrl;
+        [DataMember] public int StatsDServerPort;
+        [DataMember] public int StatsDMetricInterval;
+        [DataMember] public string DsId;
 
 
         /// <summary>
@@ -62,6 +71,8 @@ namespace AccelByte.Models {
             this.PlatformServerUrl = this.ExpanServiceApiUrl(this.PlatformServerUrl, "/platform", forceExpandServiceApiUrl);
 
             this.StatisticServerUrl = this.ExpanServiceApiUrl(this.StatisticServerUrl, "/social", forceExpandServiceApiUrl);
+
+            this.UGCServerUrl = this.ExpanServiceApiUrl(this.UGCServerUrl, "/ugc", forceExpandServiceApiUrl);
 
             this.QosManagerServerUrl = this.ExpanServiceApiUrl(this.QosManagerServerUrl, "/qosm", forceExpandServiceApiUrl);
 
@@ -92,6 +103,10 @@ namespace AccelByte.Models {
                 AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
                 MaximumCacheLifeTime = defaultCacheLifeTime;
             }
+                
+            this.StatsDServerUrl = string.IsNullOrEmpty(this.StatsDServerUrl) ? defaultStatsDUrl : this.StatsDServerUrl;
+            this.StatsDServerPort = this.StatsDServerPort <= 0 ? defaultStatsDPort : this.StatsDServerPort;
+            this.StatsDMetricInterval = this.StatsDMetricInterval <= 0 ? defaultStatsDMetricInterval : this.StatsDMetricInterval;
         }
 
         /// <summary>
@@ -115,6 +130,8 @@ namespace AccelByte.Models {
             if (this.PlatformServerUrl == httpBaseUrl + "/platform") this.PlatformServerUrl = null;
 
             if (this.StatisticServerUrl == httpBaseUrl + "/statistic") this.StatisticServerUrl = null;
+
+            if (this.UGCServerUrl == httpBaseUrl + "/ugc") this.UGCServerUrl = null;
 
             if (this.QosManagerServerUrl == httpBaseUrl + "/qosm") this.QosManagerServerUrl = null;
 

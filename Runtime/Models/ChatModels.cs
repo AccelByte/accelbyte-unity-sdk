@@ -97,7 +97,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ChatWsMessage<T> : ChatWsMessage
     {
-        [DataMember, JsonProperty("params")]
+        [DataMember, JsonProperty(PropertyName = "params", DefaultValueHandling = DefaultValueHandling.Populate)]
         public T params_;
     }
     

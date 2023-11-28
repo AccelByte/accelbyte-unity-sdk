@@ -15,6 +15,7 @@ namespace AccelByte.Server
 {
     public class ServerAMS
     {
+        internal const string DefaultServerUrl = "ws://127.0.0.1:5555/watchdog";
         internal const int DefaulHeatbeatSeconds = 15;
         internal const string CommandLineAMSWatchdogUrlId = "-watchdogUrl";
         internal const string CommandLineAMSHeartbeatId = "-heartbeat";
@@ -126,6 +127,7 @@ namespace AccelByte.Server
         /// </summary>
         public void SendReadyMessage()
         {
+            AccelByteDebug.LogVerbose("Send ready to AMS");
             SendReadyMessageImplementation();
         }
 

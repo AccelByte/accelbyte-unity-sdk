@@ -245,8 +245,10 @@ namespace AccelByte.Api
             
             string requestJsonString = JsonConvert.SerializeObject(requestEnveloped, Formatting.None, 
                 skipNullSerializer);
-            
-            return requestJsonString;
+
+            string requestJsonStringNullReplaced = requestJsonString.Replace("\"params\":null,", "\"params\":{},");
+
+            return requestJsonStringNullReplaced;
         }
         
         private string CreateRequestMessage(string messageId, ChatMessageMethod method)

@@ -16,6 +16,8 @@ namespace AccelByte.Api
         internal const string LobbySessionIdHeaderName = "X-Ab-LobbySessionID";
         internal const string PlatformIdHeaderName = "X-Ab-Platform";
         internal const string PlatformUserIdHeaderName = "X-Ab-Platform-User-Id";
+        internal const string GameClientVersionHeaderName = "Game-Client-Version";
+        internal const string SDKVersionHeaderName = "AccelByte-SDK-Version";
 
         protected int pingDelay = 4000;
         protected int totalTimeout = 60000;
@@ -178,6 +180,16 @@ namespace AccelByte.Api
             }
         }
 
+        private Dictionary<string, string> ApplyAdditionalData(Dictionary<string, string> header)
+        {
+            var retval = new Dictionary<string, string>(header);
+            retval[SDKVersionHeaderName] = AccelByteSDK.Version;
+#if !UNITY_SERVER
+            retval[GameClientVersionHeaderName] = Application.version;
+#endif
+            return retval;
+        }
+
         /// <summary>
         /// Establish websocket connection
         /// </summary>
@@ -219,6 +231,8 @@ namespace AccelByte.Api
             {
                 customHeaders["Entitlement"] = tokenGenerator.Token;
             }
+
+            customHeaders = ApplyAdditionalData(customHeaders);
 
             AccelByteDebug.LogVerbose($"Connecting websocket to {url}");
             webSocket.Connect(url, this.authorizationToken, customHeaders);
@@ -282,6 +296,8 @@ namespace AccelByte.Api
             const bool reconnectOnClose = true;
             System.Action reconnectAction = () =>
             {
+                ReconnectCustomHeaders = ApplyAdditionalData(ReconnectCustomHeaders);
+
                 if (this.tokenGenerator == null)
                 {
                     webSocket.Connect(webSocketUrl, authorizationToken, ReconnectCustomHeaders);

@@ -41,39 +41,9 @@ namespace AccelByte.Api
 
         public UserSession Session { get { return userSession; } }
 
-        internal AccelByteFileCacheImplementation PlatformLoginCache
-        {
-            get;
-            private set;
-        }
-
         private UserData userDataCache;
 
         public bool TwoFAEnable { get; private set; } = false;
-
-        /// <summary>
-        /// </summary>
-        /// <param name="inLoginSession">
-        /// UserSession; not ISession (unlike similar modules like this)
-        /// </param>
-        /// <param name="inApi"></param>
-        /// <param name="inCoroutineRunner"></param>
-        /// <param name="platformLoginCacheDirectory">Directory of platform login cache</param>
-        [UnityEngine.Scripting.Preserve]
-        internal User(UserApi inApi
-            , UserSession inLoginSession
-            , CoroutineRunner inCoroutineRunner
-            , string platformLoginCacheDirectory)
-        {
-            userSession = inLoginSession;
-            api = inApi;
-            coroutineRunner = inCoroutineRunner;
-            oAuth2 = new OAuth2(
-                inApi.HttpClient,
-                inApi.Config,
-                userSession);
-            SetPlatformLoginCache(platformLoginCacheDirectory);
-        }
 
         /// <summary>
         /// User class constructor
@@ -86,8 +56,15 @@ namespace AccelByte.Api
         [UnityEngine.Scripting.Preserve]
         internal User( UserApi inApi
             , UserSession inLoginSession
-            , CoroutineRunner inCoroutineRunner) : this(inApi, inLoginSession, inCoroutineRunner, DefaultPlatformCacheDirectory)
+            , CoroutineRunner inCoroutineRunner)
         {
+            userSession = inLoginSession;
+            api = inApi;
+            coroutineRunner = inCoroutineRunner;
+            oAuth2 = new OAuth2(
+                inApi.HttpClient,
+                inApi.Config,
+                userSession);
         }
 
         /// <summary>
@@ -101,28 +78,9 @@ namespace AccelByte.Api
         internal User( UserSession inLoginSession
             , UserApi inApi
             , CoroutineRunner inCoroutineRunner )
-            : this( inApi, inLoginSession, inCoroutineRunner, DefaultPlatformCacheDirectory)
+            : this( inApi, inLoginSession, inCoroutineRunner)
         {
             // Curry this obsolete data to the new overload ->
-        }
-
-        /// <summary>
-        /// Set cache implementation of platform login
-        /// </summary>
-        /// <param name="loginCacheDirectory">Cache directory</param>
-        internal void SetPlatformLoginCache(string loginCacheDirectory)
-        {
-#if !UNITY_WEBGL
-            if (!string.IsNullOrEmpty(loginCacheDirectory))
-            {
-                PlatformLoginCache = new AccelByteFileCacheImplementation(loginCacheDirectory);
-                PlatformLoginCache.Empty();
-            }
-            else
-            {
-                PlatformLoginCache = null;
-            }
-#endif
         }
 
         /// <summary>
@@ -192,12 +150,15 @@ namespace AccelByte.Api
             LoginWithUserNameV3(username, password, callback, rememberMe);
         }
         
-        private void Login(System.Action<ResultCallback> loginMethod,  ResultCallback callback)
+        private void Login(System.Action<ResultCallback> loginMethod
+            , Action<Error> onAlreadyLogin
+            , Action<Error> onLoginFailed
+            , Action onLoginSuccess)
         {
             if (userSession.IsValid())
             {
-                callback.TryError(ErrorCode.InvalidRequest, 
-                    "User is already logged in.");
+                var error = new Error(ErrorCode.InvalidRequest, "User is already logged in.");
+                onAlreadyLogin?.Invoke(error);
                 return;
             }
 
@@ -205,18 +166,20 @@ namespace AccelByte.Api
             {
                 if (loginResult.IsError)
                 {
-                    callback.TryError(loginResult.Error);
-                    return;
+                    onLoginFailed?.Invoke(loginResult.Error);
                 }
-
-                callback.TryOk();
+                else
+                {
+                    onLoginSuccess?.Invoke();
+                }
             });
         }
 
         private void Login(
             System.Action<ResultCallback<TokenData, OAuthError>> loginMethod
-            , ResultCallback<TokenData, OAuthError> callback
-            , LoginAdditionalInfo additionalInfo = null
+            , Action<OAuthError> onAlreadyLogin
+            , Action<OAuthError> onLoginFailed
+            , Action<TokenData> onLoginSuccess
         )
         {
             if (userSession.IsValid())
@@ -226,8 +189,8 @@ namespace AccelByte.Api
                     error = ErrorCode.InvalidRequest.ToString(),
                     error_description = "User is already logged in."
                 };
-                
-                callback.TryError(error);
+
+                onAlreadyLogin?.Invoke(error);
                 return;
             }
 
@@ -235,36 +198,12 @@ namespace AccelByte.Api
             {
                 if (loginResult.IsError)
                 {
-                    if (predefinedEventScheduler != null)
-                    {
-                        string platformId = additionalInfo != null ? additionalInfo.PlatformId : null;
-                        var loginPayload = new PredefinedLoginFailedPayload(api.Config.Namespace, platformId);
-                        var loginEvent = new AccelByteTelemetryEvent(loginPayload);
-                        predefinedEventScheduler.SendEvent(loginEvent, null);
-                    }
-                    callback.TryError(loginResult.Error);
-                    return;
+                    onLoginFailed?.Invoke(loginResult.Error);
                 }
                 else
                 {
-                    if (predefinedEventScheduler != null && loginResult.Value != null)
-                    {
-                        var loginPayload = new PredefinedLoginSucceededPayload(loginResult.Value.Namespace, loginResult.Value.user_id, loginResult.Value.platform_id, loginResult.Value.platform_user_id, loginResult.Value.DeviceId);
-                        var loginEvent = new AccelByteTelemetryEvent(loginPayload);
-                        predefinedEventScheduler.SendEvent(loginEvent, null);
-                    }
+                    onLoginSuccess?.Invoke(loginResult.Value);
                 }
-                
-                if (!loginResult.IsError && PlatformLoginCache != null && loginResult.Value != null && !string.IsNullOrEmpty(loginResult.Value.platform_id))
-                {
-                    RefreshTokenCache newRefreshTokenCache = new RefreshTokenCache();
-                    newRefreshTokenCache.RefreshToken = loginResult.Value.refresh_token;
-
-                    newRefreshTokenCache.ExpiredDate = DateTime.UtcNow + new TimeSpan(0, 0, loginResult.Value.refresh_expires_in);
-
-                    PlatformLoginCache.Emplace(GetPlatformRefreshTokenCacheKey(loginResult.Value.platform_id), newRefreshTokenCache.ToJsonString(Newtonsoft.Json.Formatting.Indented));
-                }
-                callback.Try(loginResult);
             });
         }
         
@@ -281,8 +220,28 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
             Login(cb => oAuth2.LoginWithUsername(email, password, cb, rememberMe)
-                ,callback);
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess);
         }
 
         /// <summary>
@@ -298,8 +257,28 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false)
         {
-            Login(cb => oAuth2.LoginWithUsername(email, password, cb, rememberMe),
-                callback);
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess)=>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+            Login(cb => oAuth2.LoginWithUsername(email, password, cb, rememberMe)
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess);
         }
 
         [Obsolete("Instead, use LoginWithUserNameV3() which use different callback type")]
@@ -308,8 +287,28 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
             Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
-                , callback);
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess);
         }
         
         private void LoginWithUserNameV3( string email
@@ -317,8 +316,28 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
             Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
-                , callback);
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess);
         }
 
         /// <summary>
@@ -330,15 +349,15 @@ namespace AccelByte.Api
         /// <param name="platformToken">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         [Obsolete]
-        public void LoginWithOtherPlatform( PlatformType platformType
+        public void LoginWithOtherPlatformId( PlatformType platformType
             , string platformToken
             , ResultCallback callback
             , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
 
-            Login(cb => oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless)
-                , callback);
+            string platformId = platformType.ToString().ToLower();
+            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
         }
 
         /// <summary>
@@ -355,77 +374,19 @@ namespace AccelByte.Api
             , bool createHeadless = true )
         {
             Report.GetFunctionLog(GetType().Name);
-            LoginAdditionalInfo additionalInfo = new LoginAdditionalInfo();
-            additionalInfo.PlatformId = platformType.ToString().ToLower();
-            Login(
-                cb =>
-                {
-                    oAuth2.LoginWithOtherPlatform(platformType, platformToken, cb, createHeadless);
-                }
-                , callback
-                , additionalInfo
-            );
+
+            string platformId = platformType.ToString().ToLower();
+            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
         }
 
-        public void ReloginWithOtherPlatform(PlatformType platformType
-            , ResultCallback<TokenData, OAuthError> callback)
+        public void ReloginWithOtherPlatform(PlatformType platformType, ResultCallback<TokenData, OAuthError> callback)
         {
-            ReloginWithOtherPlatform(platformType.ToString(), callback);
+            LoginWithCachedRefreshToken(platformType.ToString().ToLower(), callback);
         }
 
         public void ReloginWithOtherPlatform(string platformId, ResultCallback<TokenData, OAuthError> callback)
         {
-            string cacheKey = GetPlatformRefreshTokenCacheKey(platformId);
-            if (PlatformLoginCache == null)
-            {
-                var newError = new OAuthError
-                {
-                    error = ErrorCode.CachedTokenNotFound.ToString(),
-                    error_description = "Platform refresh token caching not enabled"
-                };
-                callback.TryError(newError);
-                return;
-            }
-            else if (!PlatformLoginCache.Contains(cacheKey))
-            {
-                var newError = new OAuthError
-                {
-                    error = ErrorCode.CachedTokenNotFound.ToString(),
-                    error_description = "Platform refresh token cache not found"
-                };
-                callback.TryError(newError);
-                return;
-            }
-
-            string cachedRefreshTokenJson = PlatformLoginCache.Retrieve(cacheKey);
-            RefreshTokenCache cacheRefreshToken = null;
-            try
-            {
-                cacheRefreshToken = cachedRefreshTokenJson.ToObject<RefreshTokenCache>();
-            }
-            catch(Exception e)
-            {
-                var newError = new OAuthError
-                {
-                    error = ErrorCode.UnableToSerializeDeserializeCachedToken.ToString(),
-                    error_description = $"Failed to deserialize token cache file.\n{e.Message}"
-                };
-                callback.TryError(newError);
-                return;
-            }
-
-            if(DateTime.UtcNow >= cacheRefreshToken.ExpiredDate)
-            {
-                var newError = new OAuthError
-                {
-                    error = ErrorCode.CachedTokenExpired.ToString(),
-                    error_description = $"Cached token is expired"
-                };
-                callback.TryError(newError);
-                return;
-            }    
-
-            LoginWithLatestRefreshToken(cacheRefreshToken.RefreshToken, callback);
+            LoginWithCachedRefreshToken(platformId, callback);
         }
 
         /// <summary>
@@ -444,8 +405,33 @@ namespace AccelByte.Api
             , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
-            Login(cb => oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless),
-                 callback);
+
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
+            Login(cb =>
+                {
+                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess);
         }
 
         /// <summary>
@@ -463,15 +449,34 @@ namespace AccelByte.Api
             , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
-            LoginAdditionalInfo additionalInfo = new LoginAdditionalInfo();
-            additionalInfo.PlatformId = platformId;
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
             Login(
                 cb =>
                 {
                     oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless);
                 }
-                , callback
-                , additionalInfo
+                , onAlreadyLogin
+                , onLoginFailed
+                , onLoginSuccess
             );
 
         }
@@ -492,7 +497,32 @@ namespace AccelByte.Api
                 return;
             }
 
-            Login(cb => oAuth2.LoginWithAuthorizationCode(authCode, cb), callback);
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(authCode, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.LoginWithAuthorizationCode(authCode, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -501,9 +531,13 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void LoginWithLauncher( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
             string authCode = Environment.GetEnvironmentVariable(AuthorizationCodeEnvironmentVariable);
+            LoginWithLauncher(authCode, callback);
+        }
 
+        internal void LoginWithLauncher(string authCode, ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(authCode))
             {
                 OAuthError error = new OAuthError()
@@ -515,7 +549,32 @@ namespace AccelByte.Api
                 return;
             }
 
-            Login(cb => oAuth2.LoginWithAuthorizationCodeV3(authCode, cb), callback);
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(authCode, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.LoginWithAuthorizationCodeV3(authCode, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -527,7 +586,33 @@ namespace AccelByte.Api
         public void LoginWithDeviceId( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Login(oAuth2.LoginWithDeviceId, callback);
+
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(Session.PlatformUserId, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.LoginWithDeviceId(cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -538,7 +623,33 @@ namespace AccelByte.Api
         public void LoginWithDeviceId( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Login(oAuth2.LoginWithDeviceId, callback);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(tokenData.platform_user_id, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.LoginWithDeviceId(cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -549,7 +660,7 @@ namespace AccelByte.Api
         public void LoginWithLatestRefreshToken( ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            LoginWithLatestRefreshToken(null, callback);
+            LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
         }
 
         /// <summary>
@@ -559,7 +670,7 @@ namespace AccelByte.Api
         public void LoginWithLatestRefreshToken( ResultCallback<TokenData, OAuthError> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            LoginWithLatestRefreshToken(null, callback);
+            LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
         }
 
         /// <summary>
@@ -573,30 +684,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (refreshToken != null)
+            if (!string.IsNullOrEmpty(refreshToken))
             {
-                userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
-                oAuth2.RefreshSession(userSession.refreshToken, callback);
-            }
-            else if (File.Exists(UserSession.TokenPath))
-            {
-                if (userSession.localTokenData == null)
-                {
-                    userSession.LoadRefreshToken();
-                }
-
-                if (userSession.localTokenData == null)
-                {
-                    callback.TryError(ErrorCode.InvalidRequest, "Refresh token not found!");
-                }
-                else
-                {
-                    oAuth2.RefreshSession(userSession.refreshToken, callback);
-                }
+                LoginWithRefreshToken(refreshToken, UserSession.LastLoginUserCacheKey, callback);
             }
             else
             {
-                callback.TryError(ErrorCode.InvalidRequest, "Refresh Token is null or PlayerPrefs is disabled!");
+                LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
             }
         }
         
@@ -610,41 +704,143 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (refreshToken != null)
+            if (!string.IsNullOrEmpty(refreshToken))
             {
-                userSession.ForceSetTokenData(new TokenData { refresh_token = refreshToken });
-                oAuth2.RefreshSession(userSession.refreshToken, callback);
-            }
-            else if (File.Exists(UserSession.TokenPath))
-            {
-                if (userSession.localTokenData == null)
-                {
-                    userSession.LoadRefreshToken();
-                }
-
-                if (userSession.localTokenData == null)
-                {
-                    OAuthError error = new OAuthError()
-                    {
-                        error = ErrorCode.InvalidRequest.ToString(),
-                        error_description = "Refresh token not found!"
-                    };
-                    callback.TryError(error);
-                }
-                else
-                {
-                    oAuth2.RefreshSession(userSession.refreshToken, callback);
-                }
+                LoginWithRefreshToken(refreshToken, UserSession.LastLoginUserCacheKey, callback);
             }
             else
             {
-                OAuthError error = new OAuthError()
-                {
-                    error = ErrorCode.InvalidRequest.ToString(),
-                    error_description = "Refresh Token is null or PlayerPrefs is disabled!"
-                };
-                callback.TryError(error);
+                LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
             }
+        }
+
+        [Obsolete]
+        private void LoginWithCachedRefreshToken(string cacheKey, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
+            {
+                if (refreshTokenData == null)
+                {
+                    callback.TryError(ErrorCode.UnableToSerializeDeserializeCachedToken, $"Failed to find token cache file.");
+                    return;
+                }
+
+                DateTime refreshTokenExpireTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(refreshTokenData.expiration_date);
+                if (DateTime.UtcNow >= refreshTokenExpireTime)
+                {
+                    callback.TryError(ErrorCode.CachedTokenExpired, $"Cached token is expired");
+                    return;
+                }
+
+                LoginWithRefreshToken(cacheKey, cacheKey, callback);
+            });
+        }
+
+        /// <summary>
+        /// Login with refresh token from local cache file
+        /// </summary>
+        /// <param name="cacheKey">Login unique cache name</param>
+        public void LoginWithCachedRefreshToken(string cacheKey
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
+            {
+                if (refreshTokenData == null)
+                {
+                    var newError = new OAuthError
+                    {
+                        error = ErrorCode.CachedTokenNotFound.ToString(),
+                        error_description = $"Failed to find token cache file."
+                    };
+                    callback.TryError(newError);
+                    return;
+                }
+
+                DateTime refreshTokenExpireTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(refreshTokenData.expiration_date);
+                if (DateTime.UtcNow >= refreshTokenExpireTime)
+                {
+                    var newError = new OAuthError
+                    {
+                        error = ErrorCode.CachedTokenExpired.ToString(),
+                        error_description = $"Cached token is expired"
+                    };
+                    callback.TryError(newError);
+                    return;
+                }
+
+                LoginWithRefreshToken(refreshTokenData.refresh_token, cacheKey, callback);
+            });
+        }
+
+        [Obsolete]
+        private void LoginWithRefreshToken(string refreshToken, string cacheKey, ResultCallback callback)
+        {
+            Assert.IsNotNull(refreshToken, "Refresh token is null");
+            Assert.AreNotEqual(string.Empty, refreshToken, "Refresh token is empty");
+
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(cacheKey, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.RefreshSession(refreshToken, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
+        }
+
+        private void LoginWithRefreshToken(string refreshToken, string cacheKey, ResultCallback<TokenData, OAuthError> callback)
+        {
+            Assert.IsNotNull(refreshToken, "Refresh token is null");
+            Assert.AreNotEqual(string.Empty, refreshToken, "Refresh token is empty");
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(cacheKey, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
+            Login(cb =>
+            {
+                oAuth2.RefreshSession(refreshToken, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -696,7 +892,7 @@ namespace AccelByte.Api
             oAuth2.Logout(userSession.AuthorizationToken,
                 result=>
             {
-                userSession.ClearSession();
+                userSession.ClearSession(true);
                 callback?.Invoke(result);
             });
         }
@@ -1851,8 +2047,30 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
             Login(cb => oAuth2.CreateHeadlessAccountAndResponseToken(linkingToken, extendExp, cb)
-            , callback);
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -1866,8 +2084,30 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
             Login(cb => oAuth2.CreateHeadlessAccountAndResponseToken(linkingToken, extendExp, cb)
-             , callback);
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -1885,8 +2125,30 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            Action<Error> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<Error> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action onLoginSuccess = () =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEventFromCurrentSession();
+                    callback.TryOk();
+                });
+            };
+
             Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
-            , callback);
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -1902,8 +2164,30 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenData> onLoginSuccess = (tokenData) =>
+            {
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    SendLoginSuccessPredefinedEvent(tokenData);
+                    callback.TryOk(tokenData);
+                });
+            };
+
             Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
-            , callback);
+            , onAlreadyLogin
+            , onLoginFailed
+            , onLoginSuccess);
         }
 
         /// <summary>
@@ -2097,11 +2381,6 @@ namespace AccelByte.Api
             api.CheckUserAccountAvailability(displayName, callback);
         }
 
-        private string GetPlatformRefreshTokenCacheKey(string platformId)
-        {
-            return $"UnityPlatformLoginCache_{platformId}";
-        }
-
         #region PredefinedEvents
 
         private PredefinedEventScheduler predefinedEventScheduler;
@@ -2113,6 +2392,39 @@ namespace AccelByte.Api
         internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
         {
             this.predefinedEventScheduler = predefinedEventController;
+        }
+
+        private void SendLoginSuccessPredefinedEventFromCurrentSession()
+        {
+            var token = new TokenData()
+            {
+                Namespace = Session.Namespace,
+                user_id = Session.UserId,
+                platform_id = Session.PlatformId,
+                platform_user_id = Session.PlatformUserId,
+                DeviceId = Session.DeviceId
+            };
+            SendLoginSuccessPredefinedEvent(token);
+        }
+
+        internal virtual void SendLoginSuccessPredefinedEvent(TokenData loginTokenData)
+        {
+            if (loginTokenData != null && predefinedEventScheduler != null)
+            {
+                var loginPayload = new PredefinedLoginSucceededPayload(loginTokenData.Namespace, loginTokenData.user_id, loginTokenData.platform_id, loginTokenData.platform_user_id, loginTokenData.DeviceId);
+                var loginEvent = new AccelByteTelemetryEvent(loginPayload);
+                predefinedEventScheduler.SendEvent(loginEvent, null);
+            }
+        }
+
+        internal virtual void SendLoginFailedPredefinedEvent(string @namespace, string platformId)
+        {
+            if (predefinedEventScheduler != null)
+            {
+                var loginPayload = new PredefinedLoginFailedPayload(@namespace, platformId);
+                var loginEvent = new AccelByteTelemetryEvent(loginPayload);
+                predefinedEventScheduler.SendEvent(loginEvent, null);
+            }
         }
 
         #endregion

@@ -321,6 +321,8 @@ namespace AccelByte.Api
             if(showServiceUrlConfigs)
             {
                 CreateToggleInput((newValue) => generateServiceUrl = newValue, generateServiceUrl, "Auto Generate Service Url");
+                CreateToggleInput((newValue) => editedSdkConfig.EnableAmsServerQos = newValue, editedSdkConfig.EnableAmsServerQos, "Use AMS QoS Server Url");
+
                 CreateTextInput((newValue) => editedSdkConfig.IamServerUrl = newValue, editedSdkConfig.IamServerUrl, "IAM Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.PlatformServerUrl = newValue, editedSdkConfig.PlatformServerUrl, "Platform Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.BasicServerUrl = newValue, editedSdkConfig.BasicServerUrl, "Basic Server Url", false, generateServiceUrl);
@@ -330,6 +332,7 @@ namespace AccelByte.Api
                 CreateTextInput((newValue) => editedSdkConfig.StatisticServerUrl = newValue, editedSdkConfig.StatisticServerUrl, "Statistic Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.AchievementServerUrl = newValue, editedSdkConfig.AchievementServerUrl, "Achievement Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.CloudSaveServerUrl = newValue, editedSdkConfig.CloudSaveServerUrl, "CloudSave Server Url", false, generateServiceUrl);
+                CreateTextInput((newValue) => editedSdkConfig.QosManagerServerUrl = newValue, editedSdkConfig.QosManagerServerUrl, "QoS Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.AgreementServerUrl = newValue, editedSdkConfig.AgreementServerUrl, "Agreement Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.LeaderboardServerUrl = newValue, editedSdkConfig.LeaderboardServerUrl, "Leaderboard Server Url", false, generateServiceUrl);
                 CreateTextInput((newValue) => editedSdkConfig.GameTelemetryServerUrl = newValue, editedSdkConfig.GameTelemetryServerUrl, "Game Telemetry Server Url", false, generateServiceUrl);

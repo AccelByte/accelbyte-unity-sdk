@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.0%0D16.11.0) (2023-11-28)
+
+
+### Features
+
+* add sdk version and game version info on multiplayer connect ([45463a4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/45463a416587ed5dafc82f96a06fb7a17c3bc392))
+* Added api endpoint to serversession for sending ds session ready state ([9dd0bd6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9dd0bd60ea13352bb3b115bd06d7f400011d709e))
+* Added flag in client config to toggle using AMS QoS url ([11928b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/11928b273e37c5fbe27c9d209aef1a158c1ae424))
+* added new search hidden content parameters ([5cdb9f8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5cdb9f8ba18b2fad38a3368b96b63f086112a11e))
+* implemented statsD / server metrics ([392ba48](https://github.com/AccelByte/accelbyte-unity-sdk/commits/392ba48cce98a69fba12bfdae4ad5ed0f5f23196))
+
+
+### Bug Fixes
+
+* change websocket-sharp to native-websocket ([3d83b5e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3d83b5ef9b9129294dd500987beb535dfe292081))
+* fixed OnSDKStop race condition resulting in service clean up not triggering ([24c6fe2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/24c6fe24fad57e9e6289400e642ee64f850c2e8f))
+* move main run to first scene load before other scripts are run, api typo ([dbe9d28](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dbe9d28d7c752eb288498f33b8e21cd1749d04e5))
+
+
+### Refactors
+
+* refactor session cache implementation ([8e3bb7b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8e3bb7bdf9705bddbd30ddcc3c082458c6b369f7))
+* store linux command line information to override config ([a8e6cc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8e6cc4bac7224a4011f799c5bed37d0f53cf31c))
+
 ## [16.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.11.0%0D16.10.0) (2023-11-13)
 
 
