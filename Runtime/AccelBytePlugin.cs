@@ -140,6 +140,11 @@ namespace AccelByte.Api
                 }
 
                 Reset();
+
+                if(defaultHttpSender != null)
+                {
+                    defaultHttpSender.ClearTasks();
+                }
             };
             OnSettingsUpdate += AccelByteDebug.Initialize;
         }
@@ -156,7 +161,7 @@ namespace AccelByte.Api
 
             if (presenceBroadcastEventScheduler != null)
             {
-                presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(false);
+                presenceBroadcastEventScheduler.StopPresenceEvent();
                 presenceBroadcastEventScheduler = null;
             }
 
@@ -220,18 +225,23 @@ namespace AccelByte.Api
 
             httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
             gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-            user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient, activeEnvironment.ToString(), AccelByteSDK.FileStream);
-            activeSession = user.Session;
+
+            var newSession = CreateSession(settings.SDKConfig, coroutineRunner, activeEnvironment.ToString(), AccelByteSDK.FileStream);
+            activeSession = newSession;
 
             analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, activeSession);
-            predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
-            predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
+
+            presenceBroadcastEventScheduler = CreatePresenceBroadcastEventScheduler(analyticsService, settings.SDKConfig);
+
+            predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsService, settings.SDKConfig);
 
             gameStandardAnalyticsService = new GameStandardAnalyticsClientService(
                 analyticsService,
                 activeSession,
                 coroutineRunner
             );
+
+            user = CreateUser(settings.SDKConfig, newSession, coroutineRunner, httpClient);
 
             string gameStandardCacheDirectory = GameStandardAnalyticsClientService.DefaultCacheDirectory;
             string gameStandardCacheFileName = GameStandardAnalyticsClientService.DefaultCacheFileName;
@@ -352,13 +362,13 @@ namespace AccelByte.Api
             return newGameClient;
         }
 
-        internal static User CreateUser(Config newSdkConfig, CoroutineRunner taskRunner, IHttpClient httpClient, string environment, AccelByteFileStream accelByteFileStream)
+        internal static UserSession CreateSession(Config newSdkConfig, CoroutineRunner taskRunner, string environment, AccelByteFileStream accelByteFileStream)
         {
             string sessionCacheTableName = $"TokenCache/{environment}/TokenData";
 
             IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(accelByteFileStream);
 
-            var userSession = new UserSession(
+            var newSession = new UserSession(
                 httpClient,
                 taskRunner,
                 newSdkConfig.PublisherNamespace,
@@ -366,6 +376,11 @@ namespace AccelByte.Api
                 sessionCacheTableName,
                 dataStorage);
 
+            return newSession;
+        }
+
+        internal static User CreateUser(Config newSdkConfig, UserSession userSession, CoroutineRunner taskRunner, IHttpClient httpClient)
+        {
             var newUser = new User(
                 new UserApi(
                     httpClient,
@@ -1289,33 +1304,31 @@ namespace AccelByte.Api
 
         public static PresenceBroadcastEventScheduler GetPresenceBroadcastEventScheduler()
         {
-            if (presenceBroadcastEventScheduler == null)
-            {
-                CheckPlugin();
-
-                PresenceBroadcastEvent presenceBroadcastEvent = GetPresenceBroadcastEvent();
-                presenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(presenceBroadcastEvent);
-
-                configReset += () =>
-                {
-                    bool presenceBroadcastEventJobEnabled = false;
-                    if (presenceBroadcastEventScheduler != null)
-                    {
-                        presenceBroadcastEventJobEnabled = presenceBroadcastEventScheduler.IsPresenceBroadcastEventJobEnabled;
-                        presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(false);
-                    }
-
-                    presenceBroadcastEventScheduler = null;
-                    presenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(presenceBroadcastEvent);
-
-                    if (presenceBroadcastEventJobEnabled)
-                    {
-                        presenceBroadcastEventScheduler.SetPresenceBroadcastEventEnabled(true);
-                    }
-                };
-            }
-
+            CheckPlugin();
             return presenceBroadcastEventScheduler;
+        }
+
+        internal static PresenceBroadcastEventScheduler CreatePresenceBroadcastEventScheduler(AnalyticsService analyticsService, Config config)
+        {
+            bool presenceBroadcastEventJobEnabled = config.EnablePresenceBroadcastEvent;
+            var presenceInitialState = (PresenceBroadcastEventGameState)config.PresenceBroadcastEventGameState;
+            string presenceInitialStateDescription = config.PresenceBroadcastEventGameStateDescription;
+            string @namespace = config.Namespace;
+
+            var newPresenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(analyticsService, @namespace, presenceInitialState, presenceInitialStateDescription);
+            if (presenceBroadcastEventJobEnabled)
+            {
+                int presenceBroadcastIntervalInMs = Utils.TimeUtils.SecondsToMilliseconds(config.PresenceBroadcastEventInterval);
+                newPresenceBroadcastEventScheduler.StartPresenceEvent(presenceBroadcastIntervalInMs);
+            }
+            return newPresenceBroadcastEventScheduler;
+        }
+
+        internal static PredefinedEventScheduler CreatePredefinedEventScheduler(AnalyticsService analyticsService, Config config)
+        {
+            var newPredefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
+            newPredefinedEventScheduler.SetEventEnabled(config.EnablePreDefinedEvent);
+            return newPredefinedEventScheduler;
         }
 
         public static AnalyticsService GetAnalyticService()
@@ -1559,19 +1572,25 @@ namespace AccelByte.Api
 
                 httpClient = CreateHttpClient(settings.OAuthConfig, settings.SDKConfig);
                 gameClient = CreateGameClient(settings.OAuthConfig, settings.SDKConfig, httpClient);
-                user = CreateUser(settings.SDKConfig, coroutineRunner, httpClient, newEnvironment.ToString(), AccelByteSDK.FileStream);
 
-                activeSession = user.Session;
+                var newSession = CreateSession(settings.SDKConfig, coroutineRunner, newEnvironment.ToString(), AccelByteSDK.FileStream);
+                activeSession = newSession;
 
                 analyticsService = CreateAnalytics(settings.SDKConfig, httpClient, coroutineRunner, activeSession);
+
+                if (presenceBroadcastEventScheduler != null)
+                {
+                    presenceBroadcastEventScheduler.StopPresenceEvent();
+                    presenceBroadcastEventScheduler = null;
+                }
+                presenceBroadcastEventScheduler = CreatePresenceBroadcastEventScheduler(analyticsService, settings.SDKConfig);
+
                 if (predefinedEventScheduler != null)
                 {
                     predefinedEventScheduler.SetEventEnabled(false);
                     predefinedEventScheduler.Dispose();
                 }
-                predefinedEventScheduler = null;
-                predefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
-                predefinedEventScheduler.SetEventEnabled(settings.SDKConfig.EnablePreDefinedEvent);
+                predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsService, settings.SDKConfig);
 
                 // Cache game standard events
                 var oldGameStandardAnalytics = gameStandardAnalyticsService;
@@ -1588,6 +1607,8 @@ namespace AccelByte.Api
                 );
                 gameStandardCacheImp.UpdateKey(settings.OAuthConfig.ClientId);
                 LoadGameStandardAnalyticsCache(gameStandardCacheImp, gameStandardAnalyticsService, newEnvironment.ToString());
+
+                user = CreateUser(settings.SDKConfig, newSession, coroutineRunner, httpClient);
 
                 HttpRequestBuilder.SetNamespace(settings.SDKConfig.Namespace);
 

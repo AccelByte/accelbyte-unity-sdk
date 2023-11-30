@@ -8,7 +8,8 @@ namespace AccelByte.Core
         {
             if (string.IsNullOrEmpty(AccelByteSDK.FlightId))
             {
-                AccelByteSDK.FlightId = Guid.NewGuid().ToString();
+                string newId = Guid.NewGuid().ToString();
+                AccelByteSDK.FlightId = newId.Replace("-", string.Empty);
             }
         }
     }

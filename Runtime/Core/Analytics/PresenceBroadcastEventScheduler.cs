@@ -4,7 +4,6 @@
 
 using AccelByte.Api;
 using AccelByte.Models;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -12,14 +11,14 @@ namespace AccelByte.Core
 {
     public class PresenceBroadcastEventScheduler : AnalyticsEventScheduler
     {
-        private readonly PresenceBroadcastEvent pbeWrapper = null;
         private readonly PresenceBroadcastEventGatherer gatherer;
         private PresenceBroadcastEventPayload presenceBroadcastPayloadModel = null;
-        
-        private ResultCallback onPresenceBroadcastEventResponse = null;
-        internal PresenceEventRuntimeConfig Config = null;
 
-        protected override int defaultEventIntervalInlMs 
+        private string defaultNamespace = null;
+        PresenceBroadcastEventGameState currentGameState;
+        string currentGameStateDescription;
+
+        protected override int defaultEventIntervalInMs 
         {
             get
             {
@@ -34,41 +33,6 @@ namespace AccelByte.Core
             {
                 return eventIntervalInlMs;
             }
-        }
-
-        public PresenceBroadcastEventScheduler(PresenceBroadcastEvent pbeWrapper) : base(pbeWrapper)
-        {
-            eventIntervalInlMs = defaultEventIntervalInlMs;
-            this.pbeWrapper = pbeWrapper;
-            RunValidator();
-
-            if (pbeWrapper.GetConfig().PresenceBroadcastEventInterval <= 0)
-            {
-                pbeWrapper.GetConfig().PresenceBroadcastEventInterval = (int)Utils.TimeUtils.MillisecondsToSeconds(defaultEventIntervalInlMs);
-            }
-
-            Config = new PresenceEventRuntimeConfig(
-                (PresenceBroadcastEventGameState)pbeWrapper.GetConfig().PresenceBroadcastEventGameState, 
-                pbeWrapper.GetConfig().EnablePresenceBroadcastEvent,
-                Utils.TimeUtils.SecondsToMilliseconds(pbeWrapper.GetConfig().PresenceBroadcastEventInterval),
-                pbeWrapper.GetConfig().PresenceBroadcastEventGameStateDescription);
-
-            gatherer = new PresenceBroadcastEventGatherer();
-        }
-
-        internal void SetPresenceBroadcastEventCallback(ResultCallback onPBEResponse)
-        {
-            onPresenceBroadcastEventResponse = onPBEResponse;
-        }
-
-        internal void SetPresenceBroadcastEventEnabled(bool enabled, int intervalInMs = 0)
-        {
-            bool enablePbe = false;
-#if !UNITY_SERVER
-            enablePbe = enabled;
-#endif
-
-            SetEventEnabled(enablePbe, intervalInMs);
         }
 
         public bool IsPresenceBroadcastEventJobRunning
@@ -110,22 +74,6 @@ namespace AccelByte.Core
             }
         }
 
-        public void SetPresenceBroadcastEventInterval(int newIntervalInMs)
-        {
-            if (maintainer != null)
-            {
-                AccelByteDebug.LogWarning("Presence Broadcast Event is still running, please stop it before changing the interval");
-                return;
-            }
-            Config.IntervalInMs = newIntervalInMs;
-            SetInterval(newIntervalInMs);
-        }
-
-        public void SetPresenceBroadcastEventInterval(float newIntervalInS)
-        {
-            SetPresenceBroadcastEventInterval(UnityEngine.Mathf.RoundToInt(newIntervalInS) * 1000);
-        }
-
         public PresenceBroadcastEventPayload PresenceBroadcastEventPayloadModel
         {
             get
@@ -142,6 +90,26 @@ namespace AccelByte.Core
             }
         }
 
+        public PresenceBroadcastEventScheduler(AnalyticsService analyticsWrapper, string defaultNamespace, PresenceBroadcastEventGameState initialGameState, string initialGameStateDescription) : base(analyticsWrapper)
+        {
+            eventIntervalInlMs = defaultEventIntervalInMs;
+
+            currentGameState = initialGameState;
+            currentGameStateDescription = initialGameStateDescription;
+            this.defaultNamespace = defaultNamespace;
+            gatherer = new PresenceBroadcastEventGatherer();
+        }
+
+        [Obsolete("Please set presence interval from SDK config")]
+        public void SetPresenceBroadcastEventInterval(int newIntervalInMs)
+        {
+        }
+
+        [Obsolete("Please set presence interval from SDK config")]
+        public void SetPresenceBroadcastEventInterval(float newIntervalInS)
+        {
+        }
+
         public void AddSendData(string key, string data)
         {
             gatherer.AddAdditionalData(key, data);
@@ -154,22 +122,49 @@ namespace AccelByte.Core
 
         public void SetGameState(PresenceBroadcastEventGameState gameState)
         {
-            Config.GameState = gameState;
+            currentGameState = gameState;
         }
 
         public void SetGameStateDescription(string gameStateDescription)
         {
-            Config.GameStateDescription = gameStateDescription;
+            currentGameStateDescription = gameStateDescription;
         }
 
-        #region Data Preparation
+        public PresenceBroadcastEventGameState GetGameState()
+        {
+            PresenceBroadcastEventGameState retval = currentGameState;
+            return retval;
+        }
+
+        public string GetGameStateDescription()
+        {
+            string retval = currentGameStateDescription;
+            return retval;
+        }
+
+        #region Internal Implementation
+        internal void StartPresenceEvent(int intervalInMs = 0)
+        {
+            bool enablePbe = true;
+#if UNITY_SERVER
+            enablePbe = false;
+#endif
+
+            SetEventEnabled(enablePbe, intervalInMs);
+        }
+
+        internal void StopPresenceEvent()
+        {
+            const bool enablePbe = false;
+            SetEventEnabled(enablePbe);
+        }
+
         internal TelemetryBody PrepareData()
         {
             ProvidePBEPayloadData();
 
             TelemetryBody body = new TelemetryBody()
             {
-                EventNamespace = pbeWrapper.GetSession().Namespace,
                 EventName = PresenceBroadcastEventGatherer.EventName,
                 Payload = presenceBroadcastPayloadModel
             };
@@ -181,15 +176,8 @@ namespace AccelByte.Core
         {
             ProvidePBEPayloadData();
 
-            string eventNamespace = pbeWrapper.GetSession().Namespace;
-            if(string.IsNullOrEmpty(eventNamespace))
-            {
-                eventNamespace = pbeWrapper.GetConfig().Namespace;
-            }
-
             TelemetryBody body = new TelemetryBody(telemetryEvent)
             {
-                EventNamespace = eventNamespace,
                 EventName = PresenceBroadcastEventGatherer.EventName,
                 Payload = presenceBroadcastPayloadModel
             };
@@ -202,17 +190,11 @@ namespace AccelByte.Core
             presenceBroadcastPayloadModel = new PresenceBroadcastEventPayload
             {
                 FlightId = PresenceBroadcastEventGatherer.GetFlightID(),
-                GameState = GetGameState(),
-                GameContext = GetGameContext(),
+                GameState = GetSerializedGameState(currentGameState),
+                GameContext = GetGameStateDescription(),
                 PlatformInfo = gatherer.GetPlatformName(),
                 AdditionalData = gatherer.GetAdditionalData()
             };
-        }
-
-        public new void Dispose()
-        {
-            keepValidating = false;
-            base.Dispose();
         }
 
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
@@ -230,23 +212,22 @@ namespace AccelByte.Core
 
         protected override void TriggerSend()
         {
-            pbeWrapper.SendData(PrepareData(), onPresenceBroadcastEventResponse);
+            TelemetryBody telemetry = PrepareData();
+            string eventNamespace = analyticsWrapper.GetSession().Namespace;
+            if (string.IsNullOrEmpty(eventNamespace))
+            {
+                eventNamespace = defaultNamespace;
+            }
+            telemetry.EventNamespace = eventNamespace;
+            analyticsWrapper.SendData(telemetry, null);
         }
 
-        #endregion
-
-        #region Data Gathering
-        private string GetGameState()
+        internal static string GetSerializedGameState(PresenceBroadcastEventGameState state)
         {
-            var rawState = Config.GameState;
-            return Utils.JsonUtils.SerializeWithStringEnum(rawState);
+            var rawState = state;
+            string retval = Utils.JsonUtils.SerializeWithStringEnum(rawState);
+            return retval;
         }
-
-        private string GetGameContext()
-        {
-            return Config.GameStateDescription;
-        }
-
         #endregion
     }
 }

@@ -112,6 +112,11 @@ namespace AccelByte.Server
                     ams.Disconnect();
                 }
                 ResetApis();
+
+                if (defaultHttpSender != null)
+                {
+                    defaultHttpSender.ClearTasks();
+                }
             };
 
             OnSettingsUpdate += AccelByteDebug.Initialize;

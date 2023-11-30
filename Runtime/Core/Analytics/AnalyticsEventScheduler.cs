@@ -19,12 +19,12 @@ namespace AccelByte.Core
         protected int eventIntervalInlMs;
         protected bool keepValidating;
 
-        protected abstract int defaultEventIntervalInlMs
+        protected abstract int defaultEventIntervalInMs
         {
             get;
         }
 
-        protected virtual int defaultMinimumEventIntervalInlMs
+        protected virtual int defaultMinimumEventIntervalInMs
         {
             get
             {
@@ -68,7 +68,7 @@ namespace AccelByte.Core
 
         public AnalyticsEventScheduler(IAccelByteAnalyticsWrapper analyticsWrapper)
         {
-            eventIntervalInlMs = defaultEventIntervalInlMs;
+            eventIntervalInlMs = defaultEventIntervalInMs;
             this.analyticsWrapper = analyticsWrapper;
 
             keepValidating = true;
@@ -108,10 +108,10 @@ namespace AccelByte.Core
 
         internal void SetInterval(int eventIntervalInlMs)
         {
-            if (eventIntervalInlMs < defaultMinimumEventIntervalInlMs)
+            if (eventIntervalInlMs < defaultMinimumEventIntervalInMs)
             {
-                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInlMs} ms");
-                this.eventIntervalInlMs = defaultMinimumEventIntervalInlMs;
+                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
+                this.eventIntervalInlMs = defaultMinimumEventIntervalInMs;
             }
             else
             {
@@ -161,7 +161,14 @@ namespace AccelByte.Core
             {
                 maintainer.Stop();
             }
-            maintainer = new AccelByteHeartBeat(intervalMs);
+
+            int heartbeatInterval = intervalMs;
+            if(heartbeatInterval < defaultMinimumEventIntervalInMs)
+            {
+                heartbeatInterval = defaultEventIntervalInMs;
+                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
+            }
+            maintainer = new AccelByteHeartBeat(heartbeatInterval);
             maintainer.OnHeartbeatTrigger += () =>
             {
                 TriggerSend();
@@ -178,7 +185,7 @@ namespace AccelByte.Core
         }
 
         #region Common Function
-        protected void CommonTriggerSend()
+        protected void CommonTriggerSend(bool overrideEventNamespaceFromSessionData)
         {
             lock (jobQueue)
             {
@@ -186,7 +193,12 @@ namespace AccelByte.Core
                 {
                     if (jobQueue.TryDequeue(out var dequeueResult))
                     {
+                        ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
                         TelemetryBody telemetryBody = dequeueResult.Item1;
+                        if(overrideEventNamespaceFromSessionData && session != null && session.IsValid())
+                        {
+                            telemetryBody.EventNamespace = session.Namespace;
+                        }
                         ResultCallback cb = dequeueResult.Item2;
                         analyticsWrapper.SendData(telemetryBody, cb);
                     }

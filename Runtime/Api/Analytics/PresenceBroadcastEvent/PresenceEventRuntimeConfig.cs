@@ -47,23 +47,4 @@ namespace AccelByte.Api
 
         private float intervalInMs;
     }
-
-    public class PresenceEventRuntimeConfig : AnalyticEventRuntimeConfig
-    {
-        internal const string EventName = "enhanced_presence";
-
-        internal PresenceBroadcastEventGameState GameState;
-        internal string GameStateDescription;
-
-        public PresenceEventRuntimeConfig(
-            PresenceBroadcastEventGameState initialState, 
-            bool isEnabled, 
-            float intervalInMs,
-            string gameStateDescription)
-            : base (isEnabled, intervalInMs) 
-        {
-            GameState = initialState;
-            GameStateDescription = gameStateDescription;
-        }
-    }
 }

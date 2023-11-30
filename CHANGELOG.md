@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.12.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.1%0D16.12.0) (2023-11-30)
+
+
+### Bug Fixes
+
+* add missing override config in editor ([7830887](https://github.com/AccelByte/accelbyte-unity-sdk/commits/78308871f1218459d4092bbf058203c00d484a0a))
+* fix presence broadcast event is never initiated ([9f2b327](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f2b3270ae18ba1b8495fbe24deee36f6f2296aa))
+* fix unable to login with latest token ([5a33906](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5a339065407711c4f1b93cd57d56790716f80645))
+
+
+### Refactors
+
+* remove flight id hypens ([25f32d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25f32d77703231a2d080b2b6afd438e4396367bd))
+
 ## [16.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.0%0D16.11.0) (2023-11-28)
 
 

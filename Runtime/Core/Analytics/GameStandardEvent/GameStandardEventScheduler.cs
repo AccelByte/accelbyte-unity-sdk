@@ -12,7 +12,7 @@ namespace AccelByte.Core
     {
         System.Collections.Generic.List<System.Tuple<TelemetryBody, ResultCallback>> inProcessJob;
 
-        protected override int defaultEventIntervalInlMs
+        protected override int defaultEventIntervalInMs
         {
             get
             {

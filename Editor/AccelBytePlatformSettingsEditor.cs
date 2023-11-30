@@ -364,6 +364,11 @@ namespace AccelByte.Api
             {
                 CreateToggleInput((newValue) => editedSdkConfig.EnablePresenceBroadcastEvent = newValue, editedSdkConfig.EnablePresenceBroadcastEvent, "Enable Presence Broadcast Event");
                 CreateNumberInput((newValue) => editedSdkConfig.PresenceBroadcastEventInterval = (int)newValue, editedSdkConfig.PresenceBroadcastEventInterval, "Set Interval In Seconds");
+                int minimumInternvalInSecond = Core.PresenceBroadcastEventScheduler.MiniumAllowedIntervalInlMs / 1000;
+                if (editedSdkConfig.PresenceBroadcastEventInterval < minimumInternvalInSecond)
+                {
+                    editedSdkConfig.PresenceBroadcastEventInterval = minimumInternvalInSecond;
+                }
 
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Game State");

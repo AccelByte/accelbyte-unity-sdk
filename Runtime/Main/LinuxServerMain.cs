@@ -89,35 +89,58 @@ namespace AccelByte.Core
 
             if (AMS == null)
             {
-                string amsServerUrl = GetCommandLineArg(ServerAMS.CommandLineAMSWatchdogUrlId);
-                if (string.IsNullOrEmpty(amsServerUrl))
+                string amsServerUrl = null;
+                if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl))
                 {
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.AMSServerUrl = amsServerUrl;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl = amsServerUrl;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.AMSServerUrl = amsServerUrl;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.AMSServerUrl = amsServerUrl;
+                    amsServerUrl = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl;
                 }
-
-                string amsHeartbeatInterval = GetCommandLineArg(ServerAMS.CommandLineAMSHeartbeatId);
-                int heartbeatInterval = 0;
-                if (!string.IsNullOrEmpty(amsHeartbeatInterval))
+                else
                 {
-                    if (!int.TryParse(amsHeartbeatInterval, out heartbeatInterval))
+                    amsServerUrl = GetCommandLineArg(ServerAMS.CommandLineAMSWatchdogUrlId);
+                    if (string.IsNullOrEmpty(amsServerUrl))
                     {
-                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.AMSHeartbeatInterval = heartbeatInterval;
-                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval = heartbeatInterval;
-                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.AMSHeartbeatInterval = heartbeatInterval;
-                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.AMSHeartbeatInterval = heartbeatInterval;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.AMSServerUrl = amsServerUrl;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl = amsServerUrl;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.AMSServerUrl = amsServerUrl;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.AMSServerUrl = amsServerUrl;
                     }
                 }
 
-                string dsId = GetCommandLineArg(DedicatedServer.CommandLineDsId);
-                if (!string.IsNullOrEmpty(dsId))
+                int heartbeatInterval = 0;
+                if (AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval.HasValue)
                 {
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.AchievementServerUrl = dsId;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId = dsId;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.DsId = dsId;
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.DsId = dsId;
+                    heartbeatInterval = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval.Value;
+                }
+                else
+                {
+                    string amsHeartbeatInterval = GetCommandLineArg(ServerAMS.CommandLineAMSHeartbeatId);
+                    if (!string.IsNullOrEmpty(amsHeartbeatInterval))
+                    {
+                        if (!int.TryParse(amsHeartbeatInterval, out heartbeatInterval))
+                        {
+                            AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.AMSHeartbeatInterval = heartbeatInterval;
+                            AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval = heartbeatInterval;
+                            AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.AMSHeartbeatInterval = heartbeatInterval;
+                            AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.AMSHeartbeatInterval = heartbeatInterval;
+                        }
+                    }
+                }
+
+                string dsId = null;
+                if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId))
+                {
+                    dsId = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId;
+                }
+                else
+                {
+                    dsId = GetCommandLineArg(DedicatedServer.CommandLineDsId);
+                    if (!string.IsNullOrEmpty(dsId))
+                    {
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId = dsId;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Certification.DsId = dsId;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Development.DsId = dsId;
+                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.Production.DsId = dsId;
+                    }
                 }
 
                 if(!string.IsNullOrEmpty(dsId))

@@ -21,6 +21,8 @@ namespace AccelByte.Core
     using PlatformMain = PS5Main;
 #elif !UNITY_EDITOR && UNITY_GAMECORE
     using PlatformMain = GameCoreMain;
+#elif UNITY_EDITOR
+    using PlatformMain = EditorMain;
 #else
     using PlatformMain = NullMain;
 #endif
@@ -84,7 +86,6 @@ namespace AccelByte.Core
         private static void StopSDK()
         {
             OnSDKStopped?.Invoke();
-            CreateFilestreamBootstrap.Stop();
             PredefinedEventBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
             DetachGameUpdateSignaller();
@@ -97,7 +98,6 @@ namespace AccelByte.Core
 
         private static void ExecuteBootstraps()
         {
-            CreateFilestreamBootstrap.Execute();
             PredefinedEventBootstrap.Execute();
             EnvrionmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();

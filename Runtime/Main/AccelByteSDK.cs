@@ -36,6 +36,21 @@ namespace AccelByte.Core
         }
 		
         internal static Models.OverrideConfigs OverrideConfigs;
-        internal static AccelByteFileStream FileStream;
+        private static AccelByteFileStream fileStream;
+        internal static AccelByteFileStream FileStream
+        {
+            get
+            {
+                if(fileStream == null)
+                {
+                    fileStream = new AccelByteFileStream();
+                    AccelByteSDKMain.OnGameUpdate += dt =>
+                    {
+                        fileStream.Pop();
+                    };
+                }
+                return fileStream;
+            }
+        }
     }
 }

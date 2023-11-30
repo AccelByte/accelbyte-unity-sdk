@@ -39,6 +39,11 @@ namespace AccelByte.Core
             AccelByteSDKMain.OnGameUpdate += onGameUpdate;
         }
 
+        public void ClearTasks()
+        {
+            this.httpTaskScheduler.CleanTask();
+        }
+
         public void ClearCookies(Uri uri)
         {
             UnityWebRequest.ClearCookieCache(uri);

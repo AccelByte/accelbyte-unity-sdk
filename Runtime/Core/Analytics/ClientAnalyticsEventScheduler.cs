@@ -14,7 +14,7 @@ namespace AccelByte.Core
 
         private string defaultEventNamespace = ClientAnalyticMainEventNamespace;
 
-        protected override int defaultEventIntervalInlMs
+        protected override int defaultEventIntervalInMs
         {
             get
             {
@@ -23,7 +23,7 @@ namespace AccelByte.Core
             }
         }
 
-        protected override int defaultMinimumEventIntervalInlMs
+        protected override int defaultMinimumEventIntervalInMs
         {
             get
             {
@@ -61,7 +61,8 @@ namespace AccelByte.Core
 
         protected override void TriggerSend()
         {
-            CommonTriggerSend();
+            const bool overrideEventNamespaceOnSend = false;
+            CommonTriggerSend(overrideEventNamespaceOnSend);
         }
 
         protected override void RunValidator()

@@ -8,9 +8,7 @@ namespace AccelByte.Core
 {
     public class PredefinedEventScheduler : AnalyticsEventScheduler
     {
-        private const string predefinedEventNamespace = "io.accelbyte.intelligence.predefinedevents";
-
-        protected override int defaultEventIntervalInlMs
+        protected override int defaultEventIntervalInMs
         {
             get
             {
@@ -26,10 +24,7 @@ namespace AccelByte.Core
 
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
-            TelemetryBody eventBody = new TelemetryBody(telemetryEvent)
-            {
-                EventNamespace = predefinedEventNamespace
-            };
+            TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
 
             jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
             OnTelemetryEventAdded?.Invoke(eventBody);
@@ -37,7 +32,8 @@ namespace AccelByte.Core
 
         protected override void TriggerSend()
         {
-            CommonTriggerSend();
+            const bool overrideEventNamespaceOnSend = true;
+            CommonTriggerSend(overrideEventNamespaceOnSend);
         }
 
         protected override void RunValidator()
