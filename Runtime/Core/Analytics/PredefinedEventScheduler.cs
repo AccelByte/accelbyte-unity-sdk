@@ -19,7 +19,6 @@ namespace AccelByte.Core
 
         public PredefinedEventScheduler(IAccelByteAnalyticsWrapper analyticsWrapper) : base(analyticsWrapper)
         {
-
         }
 
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)

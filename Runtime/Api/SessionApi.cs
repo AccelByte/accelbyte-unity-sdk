@@ -803,6 +803,57 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public IEnumerator PromoteUserToGameSessionLeader(string sessionId, string leaderId
+            , ResultCallback<SessionV2GameSession> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(leaderId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(leaderId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var data = new SessionV2GameSessionPromoteLeaderRequest()
+            {
+                LeaderId = leaderId
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/leader")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<SessionV2GameSession>();
+
+            callback.Try(result);
+        }
+
         #endregion
 
         #region SessionStorage

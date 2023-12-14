@@ -2,18 +2,31 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System.Collections.Generic;
+
 namespace AccelByte.Utils
 {
     public class AccelByteIdValidator
     {
         public const int AccelByteIdLength = 32;
         public const int AccelByteIdWithHypensLength = 36;
+        
+        // Contains a list of user IDs that don't have the UUIDv4 format
+        static readonly List<string> AllowedUserIdList = new List<string>
+        {
+            "official"
+        };
 
         internal virtual bool IsAccelByteIdValid(string accelByteId, AccelByteIdValidator.HypensRule hypensRule = HypensRule.NoRule)
         {
             if (string.IsNullOrEmpty(accelByteId))
             {
                 return false;
+            }
+            
+            if (AllowedUserIdList.Contains(accelByteId))
+            {
+                return true;
             }
 
             string processedAccelByteId = accelByteId;

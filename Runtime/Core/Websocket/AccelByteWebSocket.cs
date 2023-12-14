@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
+using AccelByte.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -281,9 +282,15 @@ namespace AccelByte.Api
         /// Send message to websocket server
         /// </summary>
         /// <param name="message">message to be sent</param>
-        public void Send(string message)
+        public async void Send(string message)
+        {
+            await RetryBackoffUtils.Run<int>(() => WebsocketSend(message));
+        }
+
+        private async Task<int> WebsocketSend(string message)
         {
             webSocket.Send(message);
+            return 0;
         }
 
         private void StartMaintainConnection()

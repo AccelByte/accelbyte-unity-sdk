@@ -319,6 +319,8 @@ namespace AccelByte.Api
                 maintainAccessTokenCoroutine = null;
             }
 
+            ClearThirdPartyPlatformTokenData();
+
             tokenData = null;
             localTokenData = null;
             httpClient.SetImplicitBearerAuth(null);

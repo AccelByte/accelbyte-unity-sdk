@@ -139,5 +139,124 @@ namespace AccelByte.Server
             var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
             callback.Try(result);
         }
+        
+        public IEnumerator ModifyContentByShareCode( string userId
+            , string channelId
+            , string shareCode
+            , UGCUpdateRequest modifyRequest
+            , ResultCallback<UGCResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(shareCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                yield break;
+            }
+
+            UGCUpdateRequest updateRequest = modifyRequest;
+            if (string.IsNullOrEmpty(updateRequest.ContentType))
+            {
+                updateRequest.ContentType = "application/octet-stream";
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/s3/sharecodes/{shareCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("shareCode", shareCode)
+                .WithBody(updateRequest.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator DeleteContentByShareCode( string userId
+            , string channelId
+            , string shareCode
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(shareCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/sharecodes/{shareCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("shareCode", shareCode)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
     }        
 }

@@ -89,7 +89,7 @@ namespace AccelByte.Server
                         payload = new PredefinedGameRecordUpdatedPayload(key, setBy, Utils.JsonUtils.SerializeWithStringEnum(strategy), values);
                         break;
                     case PredefinedGameRecordMode.Deleted:
-                        payload = new PredefinedGameRecordDeletedPayload(key);
+                        payload = new PredefinedGameRecordDeletedPayload(session.UserId, key);
                         break;
                     default:
                         return;

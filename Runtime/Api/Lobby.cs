@@ -1769,7 +1769,14 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.LogVerbose("[WS] Connection close: " + closecode);
+            if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
+            {
+                AccelByteDebug.LogVerbose($"[WS Lobby] Connection close: {closecode} named {verboseCode.ToString()}");
+            }
+            else
+            {
+                AccelByteDebug.LogVerbose($"[WS Lobby] Connection close: {closecode}. Please refers https://demo.accelbyte.io/lobby/v1/messages for more info");
+            }
 #endif
             var code = (WsCloseCode)closecode;
 

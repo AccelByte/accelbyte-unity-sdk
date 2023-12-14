@@ -26,7 +26,7 @@ namespace AccelByte.Server
 
         #region Properties
 
-        public bool IsConnected => webSocket?.State is WsState.Open;
+        public bool IsConnected => GetCurrentWebsocket()?.State is WsState.Open;
 
         #endregion
 
@@ -53,29 +53,29 @@ namespace AccelByte.Server
                 { "X-Ab-ServerID", serverName }
             };
 
-            webSocket = new AccelByteWebSocket(new HybridWebSocket.WebSocket());
+            SetCurrentWebsocket(new HybridWebSocket.WebSocket());
 
-            webSocket.OnOpen += () =>
+            GetCurrentWebsocket().OnOpen += () =>
             {
                 OnOpen?.Invoke();
             };
 
-            webSocket.OnClose += code =>
+            GetCurrentWebsocket().OnClose += code =>
             {
                 OnClose?.Invoke((ushort)code);
             };
 
-            webSocket.OnError += msg =>
+            GetCurrentWebsocket().OnError += msg =>
             {
                 OnError?.Invoke(msg);
             };
 
-            webSocket.OnMessage += data =>
+            GetCurrentWebsocket().OnMessage += data =>
             {
                 OnMessage?.Invoke(data);
             };
 
-            webSocket.Connect(websocketUrl, "", headers);
+            GetCurrentWebsocket().Connect(websocketUrl, "", headers);
         }
 
         public void Connect(string serverName)
@@ -87,9 +87,9 @@ namespace AccelByte.Server
 
             try
             {
-                if (webSocket != null)
+                if (GetCurrentWebsocket() != null)
                 {
-                    switch (webSocket.State)
+                    switch (GetCurrentWebsocket().State)
                     {
                         case WsState.Open:
                             AccelByteDebug.LogWarning("[Server DS Hub] Websocket is connected");
@@ -99,7 +99,7 @@ namespace AccelByte.Server
                             return;
                         case WsState.Closing:
                         case WsState.Closed:
-                            webSocket = null;
+                            SetCurrentWebsocket(null);
                             break;
                         default:
                             throw new NativeWebSocket.WebSocketInvalidStateException("[Server DS Hub] Websocket in invalid state.");
@@ -116,21 +116,21 @@ namespace AccelByte.Server
 
         public void Disconnect(WsCloseCode code = WsCloseCode.Normal, string reason = null)
         {
-            if (webSocket.State is WsState.Closing || webSocket.State is WsState.Closed)
+            if (GetCurrentWebsocket().State is WsState.Closing || GetCurrentWebsocket().State is WsState.Closed)
             {
                 return;
             }
 
             try
             {
-                webSocket.Disconnect();
+                GetCurrentWebsocket().Disconnect();
             }
             catch (Exception e)
             {
                 throw new NativeWebSocket.WebSocketUnexpectedException("Failed to close the connection.", e);
             }
 
-            webSocket = null;
+            SetCurrentWebsocket(null);
         }
 
         public void HandleNotification<T>(T payload, ResultCallback<T> handler) where T : class, new()
@@ -143,6 +143,63 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(() => handler(Result<T>.CreateOk(payload)));
+        }
+
+        internal virtual void AddOnOpenHandlerListener(OnOpenHandler handleOnOpen)
+        {
+            OnOpen += handleOnOpen;
+        }
+
+        internal virtual void RemoveOnOpenHandlerListener(OnOpenHandler handleOnOpen)
+        {
+            OnOpen -= handleOnOpen;
+        }
+
+        internal virtual void AddOnCloseHandlerListener(OnCloseHandler handleOnClose)
+        {
+            OnClose += handleOnClose;
+        }
+
+        internal virtual void RemoveOnCloseHandlerListener(OnCloseHandler handleOnClose)
+        {
+            OnClose -= handleOnClose;
+        }
+
+        internal virtual void AddOnMessageHandlerListener(OnMessageHandler handleOnMessage)
+        {
+            OnMessage += handleOnMessage;
+        }
+
+        internal virtual void RemoveOnMessageHandlerListener(OnMessageHandler handleOnMessage)
+        {
+            OnMessage -= handleOnMessage;
+        }
+
+        internal virtual void AddOnErrorHandlerListener(OnErrorHandler handleOnError)
+        {
+            OnError += handleOnError;
+        }
+
+        internal virtual void RemoveOnErrorHandlerListener(OnErrorHandler handleOnError)
+        {
+            OnError -= handleOnError;
+        }
+
+        internal virtual AccelByteWebSocket GetCurrentWebsocket()
+        {
+            return this.webSocket;
+        }
+
+        internal virtual void SetCurrentWebsocket(IWebSocket inWs)
+        {
+            if (inWs != null)
+            {
+                this.webSocket = new AccelByteWebSocket(inWs);
+            }
+            else
+            {
+                this.webSocket = null;
+            }
         }
     }
 }

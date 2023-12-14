@@ -59,7 +59,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetRewardByRewardCode(rewardCode, callback));
+                api.GetRewardByRewardCode(rewardCode, cb =>
+                {
+                    SendPredefinedEvent(rewardCode, EventMode.ByCode);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -79,7 +83,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetRewardByRewardId(rewardId, callback));
+                api.GetRewardByRewardId(rewardId, cb =>
+                {
+                    SendPredefinedEvent(rewardId, EventMode.ById);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -110,7 +118,89 @@ namespace AccelByte.Api
                     offset,
                     limit,
                     sortBy,
-                    callback));
+                    cb =>
+                    {
+                        SendPredefinedEvent(eventTopic, EventMode.Query);
+                        HandleCallback(cb, callback);
+                    }));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            ByCode,
+            ById,
+            Query
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload(string value, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (eventMode)
+            {
+                case EventMode.ByCode:
+                    payload = new PredefinedRewardGetRewardByCodePayload(localUserId, value);
+                    break;
+
+                case EventMode.ById:
+                    payload = new PredefinedRewardGetRewardByIdPayload(localUserId, value);
+                    break;
+
+                case EventMode.Query:
+                    payload = new PredefinedRewardGetAllRewardPayload(localUserId, value);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendPredefinedEvent(string value, EventMode eventMode)
+        {
+            var payload = CreatePayload(value, eventMode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            AccelByteTelemetryEvent rewardEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(rewardEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.Try(result);
+        }
+
+        #endregion
     }
 }

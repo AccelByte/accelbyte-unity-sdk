@@ -1261,6 +1261,16 @@ namespace AccelByte.Models
         [DataMember(Name = "iapOrderStatus")] public EntitlementIAPOrderStatus IapOrderStatus;
     }
 
+    [DataContract, Preserve]
+    public class SyncEpicGamesInventoryResponse
+    {
+        [DataMember(Name = "transactionId")] public string TransactionId;
+        [DataMember(Name = "epicGamesItemId")] public string EpicGamesItemId;
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "sku")] public string Sku;
+        [DataMember(Name = "status")] public EntitlementIAPOrderStatus Status;
+    }
+
     #endregion
 
     #region Fulfillment

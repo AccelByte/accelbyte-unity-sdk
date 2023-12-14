@@ -991,6 +991,84 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(api.UpdateChannel(requestModel, requestParameter, callback));
         }
+        
+        /// <summary>
+        /// Modify existing content to update some information by share code.
+        /// </summary>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="shareCode">The share code of the content that will be fetched.</param>
+        /// <param name="modifyRequest">Detail information for the content request that will be modified.</param>
+        /// <param name="callback">
+        /// This will be called when the operation succeeded. The result is UGCResponse Model.
+        /// </param>
+        public void ModifyContentByShareCode(string channelId
+            , string shareCode
+            , UGCUpdateRequest modifyRequest
+            , ResultCallback<UGCResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ModifyContentByShareCode(session.UserId, channelId, shareCode, modifyRequest, callback));
+        }
+        
+        /// <summary>
+        /// Delete a content based on  its channel id and share code.
+        /// </summary>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="shareCode">The share code of the content that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void DeleteContentByShareCode(string channelId
+            , string shareCode
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.DeleteContentByShareCode(session.UserId, channelId, shareCode, callback));
+        }
+        
+        /// <summary>
+        /// Get contents by share codes
+        /// </summary>
+        /// <param name="shareCodes">Content ShareCodes Array</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void BulkGetContentByShareCode(string[] shareCodes
+            , ResultCallback<UGCModelsContentsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetContentByShareCode(shareCodes, callback));
+        }
 
         #endregion
 
@@ -1400,6 +1478,26 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.DeleteContentScreenshotV2(session.UserId, contentId, screenshotId, callback));
+        }
+        
+        /// <summary>
+        /// Get contents by share codes
+        /// </summary>
+        /// <param name="shareCodes">Content ShareCodes Array</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void BulkGetContentByShareCodeV2(string[] shareCodes
+            , ResultCallback<UGCModelsContentsResponseV2[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.BulkGetContentByShareCodeV2(shareCodes, callback));
         }
 
         #endregion

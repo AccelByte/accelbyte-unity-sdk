@@ -89,5 +89,77 @@ namespace AccelByte.Server
             coroutineRunner.Run(
                 api.SearchContentsSpesificToChannel(channelId, searchContentRequest, callback, userId));
         }
+        
+        /// <summary>
+        /// Modify existing content to update some information by share code.
+        /// </summary>
+        /// <param name="userId">The user id who modify the Content.</param>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="shareCode">The share code of the content that will be fetched.</param>
+        /// <param name="modifyRequest">Detail information for the content request that will be modified.</param>
+        /// <param name="callback">
+        /// This will be called when the operation succeeded. The result is UGCResponse Model.
+        /// </param>
+        public void ModifyContentByShareCode(string userId
+            , string channelId
+            , string shareCode
+            , UGCUpdateRequest modifyRequest
+            , ResultCallback<UGCResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.ModifyContentByShareCode(userId, channelId, shareCode, modifyRequest, callback));
+        }
+        
+        /// <summary>
+        /// Delete a content based on its channel id and share code.
+        /// </summary>
+        /// <param name="userId">The user id who delete the Content.</param>
+        /// <param name="channelId">The id of the content's channel.</param>
+        /// <param name="shareCode">The share code of the content that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void DeleteContentByShareCode(string userId
+            , string channelId
+            , string shareCode
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(channelId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChannelIdInvalidMessage(channelId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.DeleteContentByShareCode(userId, channelId, shareCode, callback));
+        }
     }
 }

@@ -2381,6 +2381,32 @@ namespace AccelByte.Api
             api.CheckUserAccountAvailability(displayName, callback);
         }
 
+        /// <summary>
+        /// This function is used for retrieving third party platform token for user that login using third party, 
+        /// if user have not link requested platform in game namespace, will try to retrieving third party platform token from publisher namespace. 
+        /// Passing platform group name or it's member will return same access token that can be used across the platform members.
+        /// Note: The third party platform and platform group covered for this is:
+        ///   (psn) ps4web, (psn) ps4, (psn) ps5, epicgames, twitch, awscognito.
+        /// </summary>
+        /// <param name="platformType">Platform type value</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void RetrieveUserThirdPartyPlatformToken(PlatformType platformType 
+            , ResultCallback<ThirdPartyPlatformTokenData, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                var Error = new OAuthError();
+                Error.error = ErrorCode.IsNotLoggedIn.ToString();
+                callback.TryError(Error);
+                return;
+            }
+
+            string userId = userSession.UserId;
+            coroutineRunner.Run(
+                oAuth2.RetrieveUserThirdPartyPlatformToken(userId, platformType, callback));
+        }
         #region PredefinedEvents
 
         private PredefinedEventScheduler predefinedEventScheduler;

@@ -225,17 +225,38 @@ namespace AccelByte.Api
             , ResultCallback callback
             , Action callbackOnConflictedData = null )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(key, nameof(key) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(data.ToString()))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/namespaces/{namespace}/users/{userID}/concurrent/records/{key}/public")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userID", userId)
                 .WithPathParam("key", key)
+                .WithQueryParam("responseBody", "false")
                 .WithBearerAuth(AuthToken)
                 .WithBody(data.ToUtf8Json())
                 .WithContentType(MediaType.ApplicationJson)
@@ -248,6 +269,72 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
+
+            if (result.IsError && 
+                result.Error.Code == ErrorCode.PlayerRecordPreconditionFailed && 
+                callbackOnConflictedData != null)
+            {
+                callbackOnConflictedData?.Invoke();
+            }
+            else
+            {
+                callback.Try(result);
+            }
+        }
+        
+        public IEnumerator ReplaceUserRecord( string userId
+            , string key
+            , ConcurrentReplaceRequest data
+            , ResultCallback<ConcurrentReplaceUserRecordResponse> callback
+            , Action callbackOnConflictedData = null )
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(data.ToString()))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/namespaces/{namespace}/users/{userID}/concurrent/records/{key}/public")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userID", userId)
+                .WithPathParam("key", key)
+                .WithQueryParam("responseBody", "true")
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<ConcurrentReplaceUserRecordResponse>();
 
             if (result.IsError && 
                 result.Error.Code == ErrorCode.PlayerRecordPreconditionFailed && 

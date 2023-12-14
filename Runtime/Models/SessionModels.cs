@@ -432,6 +432,12 @@ namespace AccelByte.Models
         [DataMember(Name = "code")] public string Code;
     }
 
+    [DataContract, Preserve]
+    public class SessionV2GameSessionPromoteLeaderRequest
+    {
+        [DataMember(Name = "leaderID")] public string LeaderId;
+    }
+
     #region Notification
 
     [DataContract, Preserve]
@@ -486,6 +492,7 @@ namespace AccelByte.Models
         [DataMember] public SessionV2TeamData[] teams;
         [DataMember(Name = "ds_information")] public SessionV2DsInformation dsInformation;
         [DataMember(Name = "ticket_ids")] public string[] ticketIds;
+        [DataMember(Name = "LeaderID")] public string LeaderId;
     }
     
     [DataContract, Preserve]

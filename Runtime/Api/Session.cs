@@ -926,6 +926,26 @@ namespace AccelByte.Api
                 sessionApi.RevokeGameSessionCode(sessionId, callback));
         }
 
+        public void PromoteUserToGameSessionLeader(string sessionId, string leaderId,
+            ResultCallback<SessionV2GameSession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                sessionApi.PromoteUserToGameSessionLeader(sessionId, leaderId, callback));
+        }
+
         #endregion
 
         #region SessionStorage

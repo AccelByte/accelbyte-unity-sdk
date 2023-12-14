@@ -950,5 +950,54 @@ namespace AccelByte.Api
             var result = response.TryParse();
             callback.Try(result);
         }
+
+        public IEnumerator SyncEpicGameInventory(string userId
+            , string epicGamesJwtToken
+            , ResultCallback<SyncEpicGamesInventoryResponse[]> callback)
+        {
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+
+            if (string.IsNullOrEmpty(epicGamesJwtToken))
+            {
+                callback.TryError(new Error(ErrorCode.BadRequest, nameof(epicGamesJwtToken) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var bodyRequest = new { epicGamesJwtToken = epicGamesJwtToken };
+            var builder = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/epicgames/sync")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(bodyRequest.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, rsp =>
+            {
+                response = rsp;
+            });
+
+            var result = response.TryParseJson<SyncEpicGamesInventoryResponse[]>();
+            callback.Try(result);
+        }
     }
 }

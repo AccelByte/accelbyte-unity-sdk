@@ -254,7 +254,7 @@ namespace AccelByte.Models
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PlatformType { Steam, EpicGames, PS4, Live, Google, Apple, Facebook, Twitch, Oculus, Twitter, Device, 
-        Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin, Discord, Snapchat }
+        Android, iOS, Nintendo, awscognito, PS5, Netflix, EAOrigin, Discord, Snapchat, PS4Web } 
 
     [DataContract, Preserve]
     public class PlatformLink
@@ -837,5 +837,13 @@ namespace AccelByte.Models
     {
         /** Attributes that limit the user ids allowed to proceed with the request */
         public const int UserIdsLimit = 40;
+    }
+
+    [DataContract, Preserve]
+    public class ThirdPartyPlatformTokenData
+    {
+        [DataMember(Name = "platform_token")] public string PlatformToken;
+        [DataMember(Name = "platform_token_expires_at")] public int ExpiredAt;
+        [DataMember(Name = "sand_box_id")] public string SanboxId; 
     }
 };

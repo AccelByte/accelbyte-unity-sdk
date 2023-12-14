@@ -304,6 +304,175 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class PredefinedUserStatItemResetPayload : PredefinedUserStatItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "UserStatItem_Reset";
+        }
+
+        public PredefinedUserStatItemResetPayload(string userId, List<string> statCodes)
+            : base(userId, statCodes)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUserStatGetItemsByCodesPayload : PredefinedUserStatItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "UserStatItem_GetItemsByCodes";
+        }
+
+        public PredefinedUserStatGetItemsByCodesPayload(string userId, List<string> statCodes)
+            : base(userId, statCodes)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUserStatGetSameItemsFromUsersPayload : PredefinedUserStatItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "UserStatItem_GetSameItemsFromUsers";
+        }
+
+        public PredefinedUserStatGetSameItemsFromUsersPayload(string userId, List<string> statCodes)
+            : base(userId, statCodes)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUserStatGetItemsPayload : PredefinedUserStatItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "UserStatItem_GetItems";
+        }
+
+        public PredefinedUserStatGetItemsPayload(string userId, List<string> statCodes)
+            : base(userId, statCodes)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedGlobalStatGetItemByCodePayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "statCode")] public string StatCode;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "GlobalStatItem_GetItemByCode";
+        }
+
+        public PredefinedGlobalStatGetItemByCodePayload(string userId, string statCode)
+        {
+            UserId = userId;
+            StatCode = statCode;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedStatCycleItemModelBase : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "cycleId")] public string CycleId;
+
+        public PredefinedStatCycleItemModelBase(string userId, string cycleId)
+        {
+            UserId = userId;
+            CycleId = cycleId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedStatCycleGetItemListPayload : PredefinedStatCycleItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "StatCycleItem_GetItemList";
+        }
+
+        public PredefinedStatCycleGetItemListPayload(string userId, string cycleId) : base (userId, cycleId)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedStatCycleGetConfigByCycleIdPayload : PredefinedStatCycleItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "StatCycleItem_GetConfigByCycleId";
+        }
+
+        public PredefinedStatCycleGetConfigByCycleIdPayload(string userId, string cycleId)
+            : base(userId, cycleId)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedStatCycleGetListCyclePayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "StatCycleItem_GetListCycle";
+        }
+
+        public PredefinedStatCycleGetListCyclePayload(string userId)
+        {
+            UserId = userId;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedStatCycleGetCycleItemsPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "cycleId")] public string CycleId;
+        [DataMember(Name = "statCodes")] public List<string> StatCodes;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "StatCycleItem_GetCycleItems";
+        }
+
+        public PredefinedStatCycleGetCycleItemsPayload(string userId, string cycleId, List<string> statCodes)
+        {
+            UserId = userId;
+            CycleId = cycleId;
+            StatCodes = statCodes;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUserStatGetItemListPayload : PredefinedUserStatItemModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "StatCycleItem_GetItemList";
+        }
+
+        public PredefinedUserStatGetItemListPayload(string userId, List<string> statCodes)
+            : base(userId, statCodes)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
     public class PredefinedUserStatItemDeletedPayload : PredefinedUserStatItemModelBase
     {
         internal override string GetPredefinedModelName()
@@ -373,6 +542,159 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class PredefinedPlayerRecordGetRecordsPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "keys")] public string[] Keys;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "PlayerRecord_GetRecords";
+        }
+
+        public PredefinedPlayerRecordGetRecordsPayload(string userId, string[] keys)
+        {
+            UserId = userId;
+            Keys = keys;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPublicPlayerRecordGetSameRecordsFromUsersPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "key")] public string Key;
+        [DataMember(Name = "userIds")] public List<string> UserIds;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "PublicPlayerRecord_GetSameRecordsFromUsers";
+        }
+
+        public PredefinedPublicPlayerRecordGetSameRecordsFromUsersPayload(string key, List<string> userIds)
+        {
+            Key = key;
+            UserIds = userIds;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPublicPlayerRecordGetRecordPayload : PredefinedPlayerRecordModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "PublicPlayerRecord_GetRecord";
+        }
+
+        public PredefinedPublicPlayerRecordGetRecordPayload(string userId, string key) : base (userId, key)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPublicPlayerRecordUpdatedPayload : PredefinedPlayerRecordModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "PublicPlayerRecord_Updated";
+        }
+
+        public PredefinedPublicPlayerRecordUpdatedPayload(string userId, string key) : base(userId, key)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPublicPlayerRecordGetOtherUserKeysPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "PublicPlayerRecord_GetOtherUserKeys";
+        }
+
+        public PredefinedPublicPlayerRecordGetOtherUserKeysPayload(string userId)
+        {
+            UserId = userId;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPublicPlayerRecordGetOtherUserRecordsPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "keys")] public string[] Keys;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "PublicPlayerRecord_GetOtherUserRecords";
+        }
+
+        public PredefinedPublicPlayerRecordGetOtherUserRecordsPayload(string userId, string[] keys)
+        {
+            UserId = userId;
+            Keys = keys;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedGameRecordCreatedPayload : PredefinedPlayerRecordModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "GameRecord_Created";
+        }
+
+        public PredefinedGameRecordCreatedPayload(string userId, string key) : base(userId, key)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedGameRecordGetRecordPayload : PredefinedPlayerRecordModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "GameRecord_GetRecord";
+        }
+
+        public PredefinedGameRecordGetRecordPayload(string userId, string key) : base(userId, key)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedGameRecordGetRecordsPayload : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "keys")] public string[] Keys;
+
+        internal override string GetPredefinedModelName()
+        {
+            return "GameRecord_GetRecords";
+        }
+
+        public PredefinedGameRecordGetRecordsPayload(string userId, string[] keys)
+        {
+            UserId = userId;
+            Keys = keys;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedPlayerBinaryRecordCreatedPayload : PredefinedPlayerRecordModelBase
+    {
+        internal override string GetPredefinedModelName()
+        {
+            return "PlayerBinaryRecord_Created";
+        }
+
+        public PredefinedPlayerBinaryRecordCreatedPayload(string userId, string key) : base(userId, key)
+        {
+        }
+    }
+
+    [DataContract, Preserve]
     public class PredefinedPlayerRecordModelBase : PredefinedEventPayload
     {
         [DataMember(Name = "userId")] public string UserId;
@@ -412,15 +734,15 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class PredefinedGameRecordDeletedPayload : PredefinedGameRecordModelBase
+    public class PredefinedGameRecordDeletedPayload : PredefinedPlayerRecordModelBase
     {
         internal override string GetPredefinedModelName()
         {
             return "GameRecord_Deleted";
         }
 
-        public PredefinedGameRecordDeletedPayload(string key)
-            : base(key)
+        public PredefinedGameRecordDeletedPayload(string userId, string key)
+            : base(userId, key)
         {
         }
     }
@@ -1227,6 +1549,497 @@ namespace AccelByte.Models
         public PredefinedLeaderboardBaseModel(string leaderboardCode)
         {
             LeaderboardCode = leaderboardCode;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedRewardGetRewardByCodePayload : PredefinedRewardBaseModel
+    {
+        [DataMember(Name = "rewardCode")] public string RewardCode;
+
+        public PredefinedRewardGetRewardByCodePayload(string userId, string rewardCode) : base(userId)
+        {
+            RewardCode = rewardCode;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "Reward_GetRewardByCode";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedRewardGetRewardByIdPayload : PredefinedRewardBaseModel
+    {
+        [DataMember(Name = "rewardId")] public string RewardId;
+
+        public PredefinedRewardGetRewardByIdPayload(string userId, string rewardId) : base(userId)
+        {
+            RewardId = rewardId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "Reward_GetRewardById";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedRewardGetAllRewardPayload : PredefinedRewardBaseModel
+    {
+        [DataMember(Name = "eventTopic")] public string EventTopic;
+
+        public PredefinedRewardGetAllRewardPayload(string userId, string eventTopic) : base(userId)
+        {
+            EventTopic = eventTopic;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "Reward_GetAllReward";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedRewardBaseModel : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+
+        public PredefinedRewardBaseModel(string userId)
+        {
+            UserId = userId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcChannelCreatedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelName")] public string ChannelName;
+
+        public PredefinedUgcChannelCreatedPayload(string userId, string channelName) : base(userId)
+        {
+            ChannelName = channelName;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ChannelCreated";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcChannelUpdatedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+        [DataMember(Name = "channelName")] public string ChannelName;
+
+        public PredefinedUgcChannelUpdatedPayload(string userId, string channelId, string channelName) 
+            : base(userId)
+        {
+            ChannelId = channelId;
+            ChannelName = channelName;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ChannelUpdated";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcChannelDeletedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+
+        public PredefinedUgcChannelDeletedPayload(string userId, string channelId)
+            : base(userId)
+        {
+            ChannelId = channelId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ChannelDeleted";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcContentCreatedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+
+        public PredefinedUgcContentCreatedPayload(string userId, string channelId)
+            : base(userId)
+        {
+            ChannelId = channelId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ContentCreated";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcContentUpdatedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+        [DataMember(Name = "contentId")] public string ContentId;
+
+        public PredefinedUgcContentUpdatedPayload(string userId, string channelId, string contentId)
+            : base(userId)
+        {
+            ChannelId = channelId;
+            ContentId = contentId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ContentUpdated";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcContentDeletedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+        [DataMember(Name = "contentId")] public string ContentId;
+
+        public PredefinedUgcContentDeletedPayload(string userId, string channelId, string contentId)
+            : base(userId)
+        {
+            ChannelId = channelId;
+            ContentId = contentId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ContentDeleted";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcContentLikedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "contentId")] public string ContentId;
+        [DataMember(Name = "likeStatus")] public bool LikeStatus;
+
+        public PredefinedUgcContentLikedPayload(string userId, string contentId, bool likeStatus)
+            : base(userId)
+        {
+            ContentId = contentId;
+            LikeStatus = likeStatus;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ContentLiked";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcCreatorFollowedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "followStatus")] public bool FollowStatus;
+
+        public PredefinedUgcCreatorFollowedPayload(string userId, bool followStatus)
+            : base(userId)
+        {
+            FollowStatus = followStatus;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_CreatorFollowed";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetListFollowersPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "targetUserId")] public string TargetUserId;
+
+        public PredefinedUgcGetListFollowersPayload(string userId, string targetUserId)
+            : base(userId)
+        {
+            TargetUserId = targetUserId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetListFollowers";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetUserContentsPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "targetUserId")] public string TargetUserId;
+
+        public PredefinedUgcGetUserContentsPayload(string userId, string targetUserId)
+            : base(userId)
+        {
+            TargetUserId = targetUserId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetUserContents";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcContentScreenshotUploadedPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "contentId")] public string ContentId;
+
+        public PredefinedUgcContentScreenshotUploadedPayload(string userId, string contentId)
+            : base(userId)
+        {
+            ContentId = contentId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_ContentScreenshotUploaded";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetFollowedContentPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetFollowedContentPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetFollowedContent";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetFollowedUsersPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetFollowedUsersPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetFollowedUsers";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetLikedContentsPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetLikedContentsPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetLikedContents";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetCreatorPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "targetUserId")] public string TargetUserId;
+
+        public PredefinedUgcGetCreatorPayload(string userId, string targetUserId)
+            : base(userId)
+        {
+            TargetUserId = targetUserId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetCreator";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetGroupsPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "targetUserId")] public string TargetUserId;
+
+        public PredefinedUgcGetGroupsPayload(string userId, string targetUserId)
+            : base(userId)
+        {
+            TargetUserId = targetUserId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetGroups";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcSearchContentsChannelPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+
+        public PredefinedUgcSearchContentsChannelPayload(string userId, string channelId)
+            : base(userId)
+        {
+            ChannelId = channelId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_SearchContentsChannel";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcSearchContentsPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcSearchContentsPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_SearchContents";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetChannelsPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetChannelsPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetChannels";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetTypesPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetTypesPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetTypes";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetTagsPayload : PredefinedUgcBaseModel
+    {
+        public PredefinedUgcGetTagsPayload(string userId)
+            : base(userId)
+        {
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetTags";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetPreviewPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "contentId")] public string ContentId;
+
+        public PredefinedUgcGetPreviewPayload(string userId, string contentId)
+            : base(userId)
+        {
+            ContentId = contentId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetPreview";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetContentByShareCodePayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "shareCode")] public string ShareCode;
+
+        public PredefinedUgcGetContentByShareCodePayload(string userId, string shareCode)
+            : base(userId)
+        {
+            ShareCode = shareCode;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetContentByShareCode";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetContentByContentIdPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "contentId")] public string ContentId;
+
+        public PredefinedUgcGetContentByContentIdPayload(string userId, string contentId)
+            : base(userId)
+        {
+            ContentId = contentId;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetContentByContentId";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcGetContentBulkPayload : PredefinedUgcBaseModel
+    {
+        [DataMember(Name = "contentIds")] public List<string> ContentIds;
+
+        public PredefinedUgcGetContentBulkPayload(string userId, List<string> contentIds)
+            : base(userId)
+        {
+            ContentIds = contentIds;
+        }
+
+        internal override string GetPredefinedModelName()
+        {
+            return "UGC_GetContentBulk";
+        }
+    }
+
+    [DataContract, Preserve]
+    public class PredefinedUgcBaseModel : PredefinedEventPayload
+    {
+        [DataMember(Name = "userId")] public string UserId;
+
+        public PredefinedUgcBaseModel(string userId)
+        {
+            UserId = userId;
         }
 
         internal override string GetPredefinedModelName()

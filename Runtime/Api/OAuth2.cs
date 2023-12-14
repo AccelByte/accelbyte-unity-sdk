@@ -7,6 +7,8 @@ using UnityEngine.Assertions;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Api;
+using System.Collections;
+using AccelByte.Utils;
 
 public class OAuth2 : ApiBase
 {
@@ -32,6 +34,19 @@ public class OAuth2 : ApiBase
 
     //Need to be assigned to handle new access token obtained
     internal Action<TokenData> OnNewTokenObtained = null;
+
+    private AccelByteIdValidator accelByteIdValidator;
+    private AccelByteIdValidator IdValidator
+    {
+        get
+        {
+            if (accelByteIdValidator == null)
+            {
+                accelByteIdValidator = new AccelByteIdValidator();
+            }
+            return accelByteIdValidator;
+        }
+    }
 
     [Obsolete("This end point is going to be deprected, use LoginWithUsernameV3 instead")]
     public void LoginWithUsername
@@ -860,5 +875,81 @@ public class OAuth2 : ApiBase
             errorResult.error_description = requestError.Message;
         }
         return errorResult;
+    }
+
+    public IEnumerator RetrieveUserThirdPartyPlatformToken(string userId
+        , PlatformType platformType
+        , ResultCallback<ThirdPartyPlatformTokenData, OAuthError> callback)
+    {
+        if (string.IsNullOrEmpty(Namespace_))
+        {
+            var oauthError = new OAuthError();
+            oauthError.error = ErrorCode.BadRequest.ToString();
+            oauthError.error_description = nameof(Namespace_) + " cannot be null or empty";
+            callback.TryError(oauthError);
+            yield break;
+        }
+
+        if (string.IsNullOrEmpty(AuthToken))
+        {
+            var oauthError = new OAuthError();
+            oauthError.error = ErrorCode.BadRequest.ToString();
+            oauthError.error_description = nameof(AuthToken) + " cannot be null or empty";
+            callback.TryError(oauthError);
+            yield break;
+        }
+         
+        if (IdValidator.IsAccelByteIdValid(userId, AccelByteIdValidator.HypensRule.NoHypens))
+        {
+            var oauthError = new OAuthError();
+            oauthError.error = ErrorCode.BadRequest.ToString();
+            oauthError.error_description = nameof(userId) + " is invalid.";
+            callback.TryError(oauthError);
+            yield break;
+        }         
+
+        switch(platformType)
+        {
+            case PlatformType.PS4Web:
+            case PlatformType.PS4:
+            case PlatformType.PS5:
+            case PlatformType.EpicGames:
+            case PlatformType.Twitch:
+            case PlatformType.awscognito:
+                break;
+            default:
+                var oauthError = new OAuthError();
+                oauthError.error = ErrorCode.BadRequest.ToString();
+                oauthError.error_description = nameof(platformType) + " platform is not supported.";
+                callback.TryError(oauthError);
+                yield break;
+        }
+
+        string platformId = platformType.ToString().ToLower();          
+
+        var request = HttpRequestBuilder
+            .CreateGet(BaseUrl + "/v3/oauth/namespaces/{namespace}/users/{userId}/platforms/{platformId}/platformToken")
+            .WithPathParam("namespace", Namespace_)
+            .WithPathParam("userId", userId)
+            .WithPathParam("platformId", platformId)
+            .WithBearerAuth(AuthToken)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .GetResult();
+
+        IHttpResponse response = null;
+
+        yield return HttpClient.SendRequest(request, rsp =>
+        {
+            response = rsp;
+        });
+
+        var result = response.TryParseJson<ThirdPartyPlatformTokenData, OAuthError>();
+        callback.Try(result); 
+
+        if (!result.IsError)
+        {
+            Session.SetThirdPartyPlatformTokenData(platformId, result.Value);
+        }
     }
 }

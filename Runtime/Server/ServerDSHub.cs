@@ -59,7 +59,7 @@ namespace AccelByte.Server
         private readonly CoroutineRunner coroutineRunner;
 
         private readonly ServerDSHubApi serverDSHubApi;
-        private readonly ServerDSHubWebsocketApi serverDSHubWebsocketApi;
+        private ServerDSHubWebsocketApi serverDSHubWebsocketApi;
 
         [UnityEngine.Scripting.Preserve]
         internal ServerDSHub(ServerDSHubApi inApi
@@ -76,9 +76,18 @@ namespace AccelByte.Server
             serverDSHubWebsocketApi =
                 new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerUrl, inSession);
 
-            serverDSHubWebsocketApi.OnOpen += HandleOnOpen;
-            serverDSHubWebsocketApi.OnClose += HandleOnClose;
-            serverDSHubWebsocketApi.OnMessage += HandleOnMessage;
+            serverDSHubWebsocketApi.AddOnOpenHandlerListener(HandleOnOpen);
+            serverDSHubWebsocketApi.AddOnCloseHandlerListener(HandleOnClose);
+            serverDSHubWebsocketApi.AddOnMessageHandlerListener(HandleOnMessage);
+        }
+
+        internal void SetWebsocketApi(ServerDSHubWebsocketApi inWebsocket)
+        {
+            serverDSHubWebsocketApi = inWebsocket;
+
+            serverDSHubWebsocketApi.AddOnOpenHandlerListener(HandleOnOpen);
+            serverDSHubWebsocketApi.AddOnCloseHandlerListener(HandleOnClose);
+            serverDSHubWebsocketApi.AddOnMessageHandlerListener(HandleOnMessage);
         }
 
         /// <summary>
@@ -115,7 +124,14 @@ namespace AccelByte.Server
         private void HandleOnClose(ushort closeCode)
         {
 #if DEBUG
-            AccelByteDebug.Log("[Server DS Hub] Websocket connection close: " + closeCode);
+            if (Enum.TryParse(closeCode.ToString(), out WsCloseCode verboseCode))
+            {
+                AccelByteDebug.Log($"[Server DS Hub] Websocket connection close: {closeCode} named {verboseCode.ToString()}");
+            }
+            else
+            {
+                AccelByteDebug.Log($"[Server DS Hub] Websocket connection close: {closeCode}. Please refers https://demo.accelbyte.io/dshub/v1/messages for more info");
+            }
 #endif
             var code = (WsCloseCode)closeCode;
 

@@ -16,7 +16,8 @@ namespace AccelByte.Api
     /// </summary>
     internal class UGCApi : ApiBase
     {
-        private const int maxBulkContentIds = 20;
+        private const int maxBulkContentIds = 100;
+        private const int maxBulkShareCodes = 100;
 
         /// <summary>
         /// </summary>
@@ -2015,6 +2016,211 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCUpdateLikeStatusToContentResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator ModifyContentByShareCode(string userId
+            , string channelId
+            , string shareCode
+            , UGCUpdateRequest modifyRequest
+            , ResultCallback<UGCResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(shareCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                yield break;
+            }
+
+            UGCUpdateRequest updateRequest = modifyRequest;
+            if (string.IsNullOrEmpty(updateRequest.ContentType))
+            {
+                updateRequest.ContentType = "application/octet-stream";
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/s3/sharecodes/{shareCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("shareCode", shareCode)
+                .WithBody(updateRequest.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCResponse>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator DeleteContentByShareCode(string userId
+            , string channelId
+            , string shareCode
+            , ResultCallback callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(AuthToken))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(channelId))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                yield break;
+            }
+            if (string.IsNullOrEmpty(shareCode))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/sharecodes/{shareCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("channelId", channelId)
+                .WithPathParam("shareCode", shareCode)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request, 
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+        
+        public IEnumerator BulkGetContentByShareCode(string[] shareCodes
+            , ResultCallback<UGCModelsContentsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            
+            if (shareCodes.Length <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
+                yield break;
+            }
+            if (shareCodes.Length > maxBulkShareCodes)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/contents/sharecodes/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBody(new { shareCodes = shareCodes }.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsContentsResponse[]>();
+            callback.Try(result);
+        }
+        
+        public IEnumerator BulkGetContentByShareCodeV2(string[] shareCodes
+            , ResultCallback<UGCModelsContentsResponseV2[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (string.IsNullOrEmpty(Namespace_))
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                yield break;
+            }
+            
+            if (shareCodes.Length <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
+                yield break;
+            }
+            if (shareCodes.Length > maxBulkShareCodes)
+            {
+                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/contents/sharecodes/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBody(new { shareCodes = shareCodes }.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsContentsResponseV2[]>();
             callback.Try(result);
         }
     }

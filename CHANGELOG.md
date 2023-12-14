@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.13.0%0D16.12.1) (2023-12-14)
+
+
+### Features
+
+* add byte converter utils ([f54008d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f54008d05645f1ec14e1f73f5691aa827b0f47b7))
+* Added missing predefined events, refactored predefined event namespace ([5230409](https://github.com/AccelByte/accelbyte-unity-sdk/commits/523040937a0200f85b7a8a4437bf36ba5616f89a))
+* adjust concurrent record endpoint behavior ([a687d16](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a687d16a59d40a9d416fc82d451dbd00a4cc503c))
+* expose public bulk get content by sharecode ([d6f722b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d6f722b6445246ec351fd889cf4fd12886313ebf))
+* Expose UGC ModifyContent and DeleteContent by shareCode ([f138270](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f138270800841e7874fc0721422e6b56b81bbf3f))
+* **MPv2:** add promote game session leader API ([873bed5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/873bed529493c683192a504877ea28bc7ffb88e0))
+* sync epic games inventory/IAP ([1dd4133](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1dd41337fb7e0c39dfa803a730de10ccc2f3322d))
+
+
+### Bug Fixes
+
+* change websocket-sharp to native-websocket ([59d4f5a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/59d4f5aefe148069baa8e9fafa5be2f1bf354e2a))
+* fix websocket send logic and add retry backoff mechanism ([f57df25](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f57df257fc2b20f029d909d84ea3ad49fb0b826e))
+
 ### [16.12.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.1%0D16.12.0) (2023-11-30)
 
 

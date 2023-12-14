@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -169,7 +170,11 @@ namespace AccelByte.Api
                 api.GetUserRecord(
                     userId,
                     key,
-                    callback,
+                    cb =>
+                    {
+                        SendMultiParameterPredefinedEvent(EventMode.PublicPlayerGetRecord, userId, key);
+                        HandleCallback(cb, callback);
+                    },
                     isPublic:true));
         }
         
@@ -238,7 +243,11 @@ namespace AccelByte.Api
                     session.UserId,
                     key,
                     recordRequest,
-                    callback,
+                    cb =>
+                    {
+                        SendPredefinedEvent(key, EventMode.PublicReplaceUserRecord);
+                        HandleCallback(cb, callback);
+                    },
                     isPublic:false));
         }
 
@@ -274,10 +283,15 @@ namespace AccelByte.Api
                     recordRequest,
                     RecordSetBy.CLIENT,
                     setPublic,
-                    callback));
+                    cb =>
+                    {
+                        SendPredefinedEvent(key, EventMode.PublicReplaceUserRecord);
+                        HandleCallback(cb, callback);
+                    }));
         }
         #endregion /ReplaceUserRecord Overloads
 
+        #region ReplaceUserRecordCheckLatest WithoutResponse
         /// <summary>
         /// Replace a record in user-level. If the record doesn't exist, it will create and
         /// save the record. If already exists, it will replace the existing one,
@@ -294,9 +308,6 @@ namespace AccelByte.Api
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
-            Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
-
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -316,7 +327,11 @@ namespace AccelByte.Api
                     session.UserId,
                     key, 
                     request,
-                    callback));
+                    cb =>
+                    {
+                        SendPredefinedEvent(key, EventMode.PublicReplaceUserRecord);
+                        HandleCallback(cb, callback);
+                    }));
         }
 
         /// <summary>
@@ -427,6 +442,154 @@ namespace AccelByte.Api
                 }
             });
         }
+        #endregion /ReplaceUserRecordCheckLatest WithoutResponse
+
+        #region ReplaceUserRecordCheckLatest WithResponse
+        /// <summary>
+        /// Replace a record in user-level. If the record doesn't exist, it will create and
+        /// save the record. If already exists, it will replace the existing one,
+        /// but will failed if lastUpdated is not up-to-date.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="lastUpdated">
+        /// last time the record is updated. Retrieve it from GetGameRecord.
+        /// </param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceUserRecordCheckLatestWithResponse( string key
+            , DateTime lastUpdated
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<ConcurrentReplaceUserRecordResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ConcurrentReplaceRequest
+            {
+                updatedAt = lastUpdated,
+                value = recordRequest,
+            };
+
+            coroutineRunner.Run(
+                api.ReplaceUserRecord(
+                    session.UserId,
+                    key, 
+                    request,
+                    callback));
+        }
+
+        /// <summary>
+        /// Replace a record in user-level. If the record doesn't exist, it will create and
+        /// save the record. If already exists, it will replace the existing one.
+        /// Beware:
+        /// Function will try to get the latest value, put it in the custom modifier and
+        /// request to replace the record. will retry it again when the record is updated
+        /// by other user, until exhaust all the attempt.
+        /// </summary>
+        /// <param name="tryAttempt"> Attempt to try to replace the game record.</param>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        /// <param name="payloadModifier">
+        /// Function to modify the latest record value with your customized modifier.
+        /// </param>
+        public void ReplaceUserRecordCheckLatestWithResponse( int tryAttempt
+            , string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<ConcurrentReplaceUserRecordResponse> callback
+            , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            ReplaceUserRecordRecursive(
+                tryAttempt,
+                key,
+                recordRequest,
+                callback,
+                payloadModifier);
+        }
+
+        private void ReplaceUserRecordRecursive( int remainingAttempt
+            , string key
+            , Dictionary<string, object> recordRequest
+            , ResultCallback<ConcurrentReplaceUserRecordResponse> callback
+            , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier )
+        {
+            if (remainingAttempt <= 0)
+            {
+                callback.TryError(new Error(ErrorCode.PreconditionFailed, 
+                    "Exhaust all retry attempt to modify game record. Please try again."));
+                return;
+            }
+
+            GetUserRecord(key, getUserRecordResult =>
+            {
+                var updateRequest = new ConcurrentReplaceRequest();
+                if (getUserRecordResult.IsError)
+                {
+                    if (getUserRecordResult.Error.Code == ErrorCode.PlayerRecordNotFound)
+                    {
+                        updateRequest.value = recordRequest;
+                        updateRequest.updatedAt = DateTime.Now;
+
+                        coroutineRunner.Run(
+                            api.ReplaceUserRecord(
+                                session.UserId,
+                                key,
+                                updateRequest,
+                                callback,
+                                () =>
+                                {
+                                    ReplaceUserRecordRecursive(
+                                        remainingAttempt - 1,
+                                        key, 
+                                        recordRequest, 
+                                        callback, 
+                                        payloadModifier);
+                                }));
+                    }
+                    else
+                    {
+                        callback.TryError(getUserRecordResult.Error);
+                    }
+                }
+                else
+                {
+                    getUserRecordResult.Value.value = payloadModifier(getUserRecordResult.Value.value);
+
+                    updateRequest.value = getUserRecordResult.Value.value;
+                    updateRequest.updatedAt = getUserRecordResult.Value.updated_at;
+
+                    coroutineRunner.Run(
+                        api.ReplaceUserRecord(
+                            session.UserId,
+                            key,
+                            updateRequest,
+                            callback,
+                            () =>
+                            {
+                                ReplaceUserRecordRecursive(
+                                    remainingAttempt - 1, 
+                                    key, 
+                                    recordRequest, 
+                                    callback,
+                                    payloadModifier);
+                            }));
+                }
+            });
+        }
+        #endregion /ReplaceUserRecordCheckLatest WithResponse
 
         /// <summary>
         /// Delete a record under the given key in user-level.
@@ -471,7 +634,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SaveGameRecord(key, recordRequest, callback));
+                api.SaveGameRecord(key, recordRequest, cb =>
+                {
+                    SendPredefinedEvent(key, EventMode.GameSaveRecord);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -494,7 +661,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetGameRecord(key, callback));
+                api.GetGameRecord(key, cb =>
+                {
+                    SendPredefinedEvent(key, EventMode.GameGetRecord);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -687,7 +858,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.DeleteGameRecord(key, callback));
+                api.DeleteGameRecord(key, cb =>
+                {
+                    SendPredefinedEvent(key, EventMode.GameDeletedRecord);
+                    HandleCallback(cb, callback);
+                }));
         }
         
         /// <summary>
@@ -713,7 +888,11 @@ namespace AccelByte.Api
             };
             
             coroutineRunner.Run(
-                api.BulkGetUserRecords(bulkGetRecordsByKeyRequest, callback));
+                api.BulkGetUserRecords(bulkGetRecordsByKeyRequest, cb =>
+                {
+                    SendPredefinedEvent(keys, EventMode.PlayerGetRecords);
+                    HandleCallback(cb, callback);
+                }));
         }
         
         /// <summary>
@@ -739,7 +918,11 @@ namespace AccelByte.Api
             };
             
             coroutineRunner.Run(
-                api.BulkGetGameRecords(bulkGetRecordsByKeyRequest, callback));
+                api.BulkGetGameRecords(bulkGetRecordsByKeyRequest, cb =>
+                {
+                    SendPredefinedEvent(keys, EventMode.GameGetRecords);
+                    HandleCallback(cb, callback);
+                }));
         }
 
         /// <summary>
@@ -768,7 +951,14 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.BulkGetOtherPlayerPublicRecordKeys(userId, callback, offset, limit));
+                api.BulkGetOtherPlayerPublicRecordKeys(userId, 
+                    cb =>
+                    {
+                        SendPredefinedEvent(userId, EventMode.PublicPlayerGetOtherUserKeys);
+                        HandleCallback(cb, callback);
+                    }, 
+                    offset, 
+                    limit));
         }
 
         /// <summary>
@@ -795,7 +985,146 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.BulkGetOtherPlayerPublicRecords(userId, data, callback));
+                api.BulkGetOtherPlayerPublicRecords(userId, data, cb =>
+                {
+                    SendMultiParameterPredefinedEvent(EventMode.PublicPlayerGetOtherUserRecords, userId, data.keys);
+                    HandleCallback(cb, callback);
+                }));
         }
+
+        #region PredefinedEvents
+
+        private PredefinedEventScheduler predefinedEventScheduler;
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
+        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        {
+            this.predefinedEventScheduler = predefinedEventScheduler;
+        }
+
+        private enum EventMode
+        {
+            PlayerGetRecords,
+            PublicPlayerGetRecord,
+            PublicReplaceUserRecord,
+            PublicPlayerGetOtherUserKeys,
+            PublicPlayerGetOtherUserRecords,
+            GameSaveRecord,
+            GameGetRecord,
+            GameDeletedRecord,
+            GameGetRecords
+        }
+
+        private IAccelByteTelemetryPayload CreatePayload<T>(T value, EventMode eventMode)
+        {
+            IAccelByteTelemetryPayload payload = null;
+            string localUserId = session.UserId;
+
+            switch (eventMode)
+            {
+                case EventMode.PlayerGetRecords:
+                    var playerGetRecordsResult = value as string[];
+                    payload = new PredefinedPlayerRecordGetRecordsPayload(localUserId, playerGetRecordsResult);
+                    break;
+
+                case EventMode.PublicPlayerGetRecord:
+                    var publicPlayerGetRecordResult = value as object[];
+                    payload = new PredefinedPublicPlayerRecordGetRecordPayload((string)publicPlayerGetRecordResult[0], (string)publicPlayerGetRecordResult[1]);
+                    break;
+
+                case EventMode.PublicReplaceUserRecord:
+                    var publicPlayerReplaceUserRecordResult = value as string;
+                    payload = new PredefinedPublicPlayerRecordUpdatedPayload(localUserId, publicPlayerReplaceUserRecordResult);
+                    break;
+
+                case EventMode.PublicPlayerGetOtherUserKeys:
+                    var publicPlayerGetOtherUserKeysResult = value as string;
+                    payload = new PredefinedPublicPlayerRecordGetOtherUserKeysPayload(publicPlayerGetOtherUserKeysResult);
+                    break;
+
+                case EventMode.PublicPlayerGetOtherUserRecords:
+                    var publicPlayerGetOtherUserRecordsResult = value as object[];
+                    var userId = publicPlayerGetOtherUserRecordsResult[0];
+                    payload = new PredefinedPublicPlayerRecordGetOtherUserRecordsPayload((string)userId, (string[])publicPlayerGetOtherUserRecordsResult[1]);
+                    break;
+
+                case EventMode.GameSaveRecord:
+                    var gameSaveRecordResult = value as string;
+                    payload = new PredefinedGameRecordCreatedPayload(localUserId, gameSaveRecordResult);
+                    break;
+
+                case EventMode.GameGetRecord:
+                    var gameGetRecordResult = value as string;
+                    payload = new PredefinedGameRecordGetRecordPayload(localUserId, gameGetRecordResult);
+                    break;
+
+                case EventMode.GameDeletedRecord:
+                    var gameDeletedRecordResult = value as string;
+                    payload = new PredefinedGameRecordDeletedPayload(localUserId, gameDeletedRecordResult);
+                    break;
+
+                case EventMode.GameGetRecords:
+                    var gameGetRecordsResult = value as string[];
+                    payload = new PredefinedGameRecordGetRecordsPayload(localUserId, gameGetRecordsResult);
+                    break;
+            }
+
+            return payload;
+        }
+
+        private void SendMultiParameterPredefinedEvent(EventMode eventMode, params object[] eventParameters)
+        {
+            var payload = CreatePayload(eventParameters, eventMode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent<T>(T value, EventMode eventMode)
+        {
+            var payload = CreatePayload(value, eventMode);
+            SendPredefinedEvent(payload);
+        }
+
+        private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
+        {
+            if (predefinedEventScheduler == null)
+            {
+                return;
+            }
+
+            if (payload == null)
+            {
+                return;
+            }
+
+            AccelByteTelemetryEvent rewardEvent = new AccelByteTelemetryEvent(payload);
+            predefinedEventScheduler.SendEvent(rewardEvent, null);
+        }
+
+        private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.Try(result);
+        }
+
+        private void HandleCallback(Result result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.Try(result);
+        }
+
+        #endregion
     }
 }

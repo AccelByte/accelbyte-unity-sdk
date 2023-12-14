@@ -9,6 +9,7 @@ using UnityEngine.Assertions;
 using AccelByte.Core;
 using AccelByte.Models;
 using Random = System.Random;
+using System.Collections.Generic;
 
 namespace AccelByte.Core
 {
@@ -24,6 +25,8 @@ namespace AccelByte.Core
         protected TokenData tokenData { get; set; }
         protected Coroutine maintainAccessTokenCoroutine { get; set; }
         protected DateTime nextRefreshTime { get; set; }
+        protected Dictionary<string, ThirdPartyPlatformTokenData> thirdPartyPlatformTokenData { get; set; }
+            = new Dictionary<string, ThirdPartyPlatformTokenData>();
         public abstract string AuthorizationToken { get; set; }
         public virtual string UserId
         {
@@ -79,6 +82,16 @@ namespace AccelByte.Core
         public void ForceSetTokenData(TokenData inTokenData)
         {
             tokenData = inTokenData;
+        }
+
+        public Dictionary<string, ThirdPartyPlatformTokenData> GetThirdPartyPlatformTokenData()
+        {
+            return thirdPartyPlatformTokenData;
+        }
+
+        public void ClearThirdPartyPlatformTokenData()
+        {
+            thirdPartyPlatformTokenData.Clear();
         }
 
         protected virtual IEnumerator MaintainToken()
@@ -145,6 +158,11 @@ namespace AccelByte.Core
         protected virtual DateTime ScheduleNormalRefresh(int expiresIn)
         {
             return DateTime.UtcNow + TimeSpan.FromSeconds((expiresIn - 1) * 0.8);
+        }
+
+        internal void SetThirdPartyPlatformTokenData(string key, ThirdPartyPlatformTokenData inThirdPartyPlatformTokenData)
+        {
+            thirdPartyPlatformTokenData[key] = inThirdPartyPlatformTokenData;
         }
 
         TimeSpan CalculateBackoffInterval(TimeSpan previousRefreshBackoff, int randomNum)

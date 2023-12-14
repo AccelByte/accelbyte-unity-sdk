@@ -78,6 +78,12 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt; // Time format should style: RFC3339
         [DataMember] public Dictionary<string, object> value;
     }
+    
+    [DataContract, Preserve]
+    public class ConcurrentReplaceUserRecordResponse
+    {        
+        [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+    }
 
     [DataContract, Preserve]
     public class BulkGetRecordsByKeyRequest

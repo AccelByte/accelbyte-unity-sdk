@@ -156,7 +156,14 @@ namespace AccelByte.Server
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.LogVerbose("[WS] Connection close: " + closecode);
+            if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
+            {
+                AccelByteDebug.Log($"[WS Server AMS] Websocket connection close: {closecode} named {verboseCode.ToString()}");
+            }
+            else
+            {
+                AccelByteDebug.Log($"[WS Server AMS] Websocket connection close: {closecode}.");
+            }
 #endif
             var code = (WsCloseCode)closecode;
             Disconnected?.Invoke(code);

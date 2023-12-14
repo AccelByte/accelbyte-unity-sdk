@@ -529,6 +529,17 @@ namespace AccelByte.Api
         
         private void HandleOnClose(ushort closecode)
         {
+#if DEBUG
+            if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
+            {
+                AccelByteDebug.Log($"[Ws Chat] Websocket connection close: {closecode} named {verboseCode.ToString()}");
+            }
+            else
+            {
+                AccelByteDebug.Log($"[Ws Chat] Websocket connection close: {closecode}. Please refers https://demo.accelbyte.io/chat/v1/messages for more info");
+            }
+#endif
+
             Disconnected?.Invoke((WsCloseCode)closecode);
             websocketApi.SessionId = string.Empty;
         }

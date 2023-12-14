@@ -16,32 +16,6 @@ namespace AccelByte.Core {
 
     public enum WsState { New, Connecting, Open, Closing, Closed }
 
-    public enum WsCloseCode
-    {
-        /* Do NOT use NotSet - it's only purpose is to indicate that the close code cannot be parsed. */
-        NotSet = 0,
-        Normal = 1000,
-        Away = 1001,
-        ProtocolError = 1002,
-        UnsupportedData = 1003,
-        Undefined = 1004,
-        NoStatus = 1005,
-        Abnormal = 1006,
-        InvalidData = 1007,
-        PolicyViolation = 1008,
-        TooBig = 1009,
-        MandatoryExtension = 1010,
-        ServerError = 1011,
-        ServiceRestart = 1012,
-        TryAgainLater = 1013,
-        BadGateway = 1014,
-        TlsHandshakeFailure = 1015,
-        ServerShuttingDown = 4000,
-        AuthTokenRevoked = 4001,
-        ServerClosed = 4002,
-        ServerDisconnected = 4003
-    }
-
     public abstract class WebSocketException : Exception
     {
         protected WebSocketException(string message, Exception innerException = null)

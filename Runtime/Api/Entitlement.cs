@@ -886,5 +886,28 @@ namespace AccelByte.Api
                     callback
                 ));
         }
+
+        /// <summary>
+        /// Synchronize Epic Games Inventory/IAP.
+        /// </summary>
+        /// <param name="epicGamesJwtToken">Epic Game Jwt Token.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SyncEpicGameInventory(string epicGamesJwtToken
+            , ResultCallback<SyncEpicGamesInventoryResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.SyncEpicGameInventory(
+                    session.UserId,
+                    epicGamesJwtToken,
+                    callback
+                ));
+        }
     }
 }
