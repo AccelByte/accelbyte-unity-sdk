@@ -20,34 +20,54 @@ namespace AccelByte.Core
         public ServerOauthLoginSession session;
         public IHttpClient httpClient;
         public readonly CoroutineRunner coroutineRunner;
-        
-        public ServerApiClient( ServerOauthLoginSession inSession
+
+        private ServerConfig serverConfig;
+        private OAuthConfig serverOAuthConfig;
+
+        private Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
+        private AccelByteStatsDMetricExporterApi statsExporterApi;
+        private DedicatedServer dedicatedServer;
+
+        public ServerApiClient(ServerOauthLoginSession inSession
             , IHttpClient inHttpClient
-            , CoroutineRunner inCoroutinerunner )
+            , CoroutineRunner inCoroutinerunner) : this(inSession, inHttpClient, inCoroutinerunner, AccelByteServerPlugin.Config, AccelByteServerPlugin.OAuthConfig)
+        {
+        }
+
+        public ServerApiClient(ServerOauthLoginSession inSession
+            , IHttpClient inHttpClient
+            , CoroutineRunner inCoroutineRunner
+            , ServerConfig serverConfig
+            , OAuthConfig oAuthConfig)
         {
             session = inSession;
             httpClient = inHttpClient;
-            coroutineRunner = inCoroutinerunner;
+            coroutineRunner = inCoroutineRunner;
+            this.serverConfig = serverConfig;
+            this.serverOAuthConfig = oAuthConfig;
+            sharedMemory = new ApiSharedMemory();
         }
         #endregion /Constructor
 
-        private static OAuthConfig serverOAuthConfig => AccelByteServerPlugin.OAuthConfig;
-        private static ServerConfig serverConfig => AccelByteServerPlugin.Config;
-        
+        public void Reset()
+        {
+            session.Reset();
+        }
+
         public object[] getApiArgs() => new object[]
         {
             httpClient,
-            serverConfig, 
+            serverConfig,
             session,
         };
 
-        private Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
-        
         // Reflection cannot find `internal` scope modifiers without these bindings.
         private const BindingFlags reflectionBindingToFindInternal =
             BindingFlags.Public |
             BindingFlags.NonPublic |
             BindingFlags.Instance;
+
+        private ApiSharedMemory sharedMemory;
 
         /// <summary>
         /// Get new ServerApiBase child class instance.
@@ -79,7 +99,7 @@ namespace AccelByte.Core
             // Expected TApi constructor params: (IHttpClient, ServerConfig, ISession)
             // Expected TWrapper constructor params: (TServerApi, ISession, CoroutineRunner)
             // ####################################################################
-            
+
             string currentWrapperName = typeof(TServerWrapper).GetTypeInfo().FullName;
 
             if (wrapperBaseCollection.ContainsKey(currentWrapperName))
@@ -88,15 +108,15 @@ namespace AccelByte.Core
             }
 
             object[] apiArgs = getApiArgs();
-            
+
             // Create the TApi to pass as a param to the TCore constructor
             TServerApi api = (TServerApi)Activator.CreateInstance(
-                typeof(TServerApi), 
+                typeof(TServerApi),
                 bindingAttr: reflectionBindingToFindInternal,
                 binder: null,
                 args: apiArgs,
                 culture: null);
-            
+
             object[] wrapperArgs =
             {
                 api,
@@ -105,20 +125,35 @@ namespace AccelByte.Core
             };
 
             // Return CoreBase child with consistently-known args, including an ApiBase type
-            object newWrapperInstance = Activator.CreateInstance(
-                typeof(TServerWrapper), 
+            TServerWrapper newWrapperInstance = (TServerWrapper)Activator.CreateInstance(
+                typeof(TServerWrapper),
                 bindingAttr: reflectionBindingToFindInternal,
                 binder: null,
                 args: wrapperArgs,
                 culture: null);
 
-            TServerWrapper ServerWrapperInstance = (TServerWrapper)newWrapperInstance;
-            
-            wrapperBaseCollection.Add(currentWrapperName, ServerWrapperInstance);
+            TServerWrapper ServerWrapperInstance = newWrapperInstance;
+
+            SetApi(ServerWrapperInstance);
             return ServerWrapperInstance;
         }
 
+        public void SetApi<TWrapper>(TWrapper newWrapper) where TWrapper : WrapperBase
+        {
+            string currentWrapperName = typeof(TWrapper).GetTypeInfo().FullName;
+            newWrapper.SetSharedMemory(sharedMemory);
+            wrapperBaseCollection[currentWrapperName] = newWrapper;
+        }
+
         #region API_GETTER
+        public DedicatedServer GetDedicatedServer()
+        {
+            if (dedicatedServer == null)
+            {
+                dedicatedServer = new DedicatedServer(session, coroutineRunner);
+            }
+            return dedicatedServer;
+        }
         public DedicatedServerManager GetDedicatedServerManager() { return GetServerApi<DedicatedServerManager, DedicatedServerManagerApi>(); }
         public ServerEcommerce GetEcommerce() { return GetServerApi<ServerEcommerce, ServerEcommerceApi>(); }
         public ServerStatistic GetStatistic() { return GetServerApi<ServerStatistic, ServerStatisticApi>(); }
@@ -134,16 +169,29 @@ namespace AccelByte.Core
         public ServerDSHub GetDsHub() { return GetServerApi<ServerDSHub, ServerDSHubApi>(); }
         public ServerSession GetSession() { return GetServerApi<ServerSession, ServerSessionApi>(); }
         public ServerMatchmakingV2 GetMatchmakingV2() { return GetServerApi<ServerMatchmakingV2, ServerMatchmakingV2Api>(); }
+        public ServerAnalyticsService GetAnalyticsService() { return GetServerApi<ServerAnalyticsService, ServerAnalyticsApi>(); }
+        public ServiceVersion GetVersionService() { return GetServerApi<ServiceVersion, ServiceVersionApi>(); }
 
+        public AccelByteStatsDMetricExporterApi GetStatsMetricExporterService()
+        {
+            if (statsExporterApi == null)
+            {
+                statsExporterApi = new AccelByteStatsDMetricExporterApi(httpClient, serverConfig, session);
+            }
+            return statsExporterApi;
+        }
+        #endregion
+
+        internal void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            sharedMemory = newSharedMemory;
+        }
         
-#endregion
-
         internal void environmentChanged()
         {
             session = AccelByteServerPlugin.GetDedicatedServer().Session as ServerOauthLoginSession;
             httpClient.SetCredentials(serverOAuthConfig.ClientId, serverOAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(serverConfig.BaseUrl));
         }
-
     }
 }

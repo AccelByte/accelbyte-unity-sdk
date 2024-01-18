@@ -74,28 +74,34 @@ namespace AccelByte.Core
 
         public void Start()
         {
-            TransitionTo(new RunningState(intervalInMs, () =>
+            if (!(state is RunningState))
             {
-                OnHeartbeatTrigger?.Invoke();
-            }));
+                TransitionTo(new RunningState(intervalInMs, () =>
+                {
+                    OnHeartbeatTrigger?.Invoke();
+                }));
+            }
         }
 
         public void Stop()
         {
-            TransitionTo(new IdleState());
+            if (!(state is IdleState))
+            {
+                TransitionTo(new IdleState());
+            }
         }
 
         public void Pause()
         {
-            TransitionTo(new PauseState());
+            if (!(state is PauseState))
+            {
+                TransitionTo(new PauseState());
+            }
         }
 
         public void UnPause()
         {
-            TransitionTo(new RunningState(intervalInMs, () =>
-            {
-                OnHeartbeatTrigger?.Invoke();
-            }));
+            Start();
         }
 
         private void TransitionTo(IHeartBeatState state)

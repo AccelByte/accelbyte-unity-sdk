@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.14.0%0D16.13.0) (2024-01-18)
+
+
+### Features
+
+* add ams port in server config ([ecacee3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ecacee3ae62184de4f7239e6f76c1f8e562f4759))
+* add config injection v2 ([0863526](https://github.com/AccelByte/accelbyte-unity-sdk/commits/08635264f27b62b0c028323a8df63d39a3ca50c8))
+* add new client registry interface ([e975af9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e975af93de2a0ef68118c938b78702a06dcbd4a3))
+* add new server registry interface ([970a45d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/970a45d1794369043b7be5aaf83a418fe10a6a4f))
+* add override reload config option ([456e819](https://github.com/AccelByte/accelbyte-unity-sdk/commits/456e81906fa633eb43508b9fbddd03b3f4ca13b8))
+* added network conditioner to simulate dropped packets for websocket ([cc60e35](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cc60e358a576f9ea917b40b33f4839786a8e3747))
+* implemented sdk adjustments to accomodate new field on userdata, new user search overloads, and getting other user platform basic info ([cbd0181](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cbd0181f630c9264d63da80e0fd61580adbbcade))
+* **lobby:** add change user region ([4d31610](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d316109c5d3f492e0735115e070f7e4d36f949d))
+* **lobby:** automatically change region on lobby connected ([38e9581](https://github.com/AccelByte/accelbyte-unity-sdk/commits/38e9581e7355694c1a1956169191523ef2d9c2b2))
+* **UGC:** expose public staging content endpoint ([bf18df9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bf18df92c9d66fc101f4b8a1d95041a2569834fb))
+
+
+### Bug Fixes
+
+* fix linux dedicated server error build ([13ea996](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13ea996f5aec15cdfa583a137b775aa724eafbe9))
+* readd namepsace on predefined event added ([12447b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/12447b85f70a8506589d2d3b7218082ef129b7bd))
+
+
+### Refactors
+
+* redirect all interface into api registry ([fb5c730](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb5c730d20a236db36c732ebe23923f496644e07))
+* refactored null param handlers for game client services, fixed errors with incorrect uri and headers ([ed79e37](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed79e374401820ead6cd7aa9716d1bc2dfd7f852))
+* update various service ([20637e0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/20637e065aa4cb8ddca882801ee371a6fca43d60))
+
 ## [16.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.13.0%0D16.12.1) (2023-12-14)
 
 

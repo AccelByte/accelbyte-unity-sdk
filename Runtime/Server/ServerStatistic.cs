@@ -15,8 +15,6 @@ namespace AccelByte.Server
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        private PredefinedEventScheduler predefinedEventScheduler;
-
         private enum PredefinedUserStatItemMode
         {
             Created,
@@ -50,15 +48,6 @@ namespace AccelByte.Server
             , CoroutineRunner inCoroutineRunner)
             : this( inApi, inSession, inCoroutineRunner )
         {
-        }
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
         }
 
         /// <summary>
@@ -100,6 +89,7 @@ namespace AccelByte.Server
 
         private void SendPredefinedEvent(string userId, List<string> statCodes, PredefinedUserStatItemMode mode)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler != null)
             {
                 IAccelByteTelemetryPayload payload;

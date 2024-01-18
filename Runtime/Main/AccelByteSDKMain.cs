@@ -5,6 +5,7 @@
 using AccelByte.Api;
 using UnityEngine;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKEditor")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSteam")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS4")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
@@ -86,8 +87,9 @@ namespace AccelByte.Core
         private static void StopSDK()
         {
             OnSDKStopped?.Invoke();
-            PredefinedEventBootstrap.Stop();
+            EnvrionmentBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
+            SdkInterfaceBootstrap.Stop();
             DetachGameUpdateSignaller();
 
             Main.Stop();
@@ -98,10 +100,10 @@ namespace AccelByte.Core
 
         private static void ExecuteBootstraps()
         {
-            PredefinedEventBootstrap.Execute();
             EnvrionmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();
             FlightIDBootstrap.Execute();
+            SdkInterfaceBootstrap.Execute();
         }
 
 #if UNITY_EDITOR

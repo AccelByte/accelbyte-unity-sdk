@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System;
+
 using AccelByte.Models;
 using AccelByte.Core;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System;
 using System.Collections;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -71,8 +73,12 @@ namespace AccelByte.Api
             , string[] features = null)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(entitlementName, "Can't query user entitlements! EntitlementName parameter is null!");
-            Assert.IsNotNull(itemId, "Can't query user entitlements! ItemId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(entitlementName, itemId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -102,6 +108,12 @@ namespace AccelByte.Api
             , ResultCallback<EntitlementInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(entitlementId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!ValidateAccelByteId(entitlementId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetEntitlementIdInvalidMessage(entitlementId), callback))
             {
@@ -132,10 +144,14 @@ namespace AccelByte.Api
             , ResultCallback<Ownership> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(appId, 
-                "Can't get user entitlement ownership by appId! appId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(appId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
-            if(!session.IsValid())
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -160,8 +176,12 @@ namespace AccelByte.Api
             , ResultCallback<Ownership> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sku, 
-                "Can't get user entitlement ownership by SKU! SKU parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sku);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -188,8 +208,12 @@ namespace AccelByte.Api
             , ResultCallback<Ownership> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(ItemId, 
-                "Can't get user entitlement ownership by ItemId! ItemId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(ItemId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -219,9 +243,15 @@ namespace AccelByte.Api
             , ResultCallback<Ownership> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(
-                itemIds == null && appIds == null && skus == null, 
-                "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+            if (itemIds == null && appIds == null && skus == null)
+            {
+                callback.TryError(new Error(
+                    ErrorCode.InvalidRequest
+                    , "Can't get user entitlement any ownership! All itemIds, " +
+                    "appIds, and skus parameters are null!")
+                );
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -263,11 +293,22 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            Assert.IsFalse(string.IsNullOrEmpty(key), 
-                "Can't get user entitlement any ownership! public key is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
-            Assert.IsFalse(itemIds == null && appIds == null && skus == null, 
-                "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+            if (itemIds == null && appIds == null && skus == null)
+            {
+                callback.TryError(new Error(
+                    ErrorCode.InvalidRequest
+                    , "Can't get user entitlement any ownership! All itemIds, " +
+                    "appIds, and skus parameters are null!")
+                );
+                return;
+            }
 
             coroutineRunner.Run(
                 GetUserEntitlementOwnershipTokenAsync(
@@ -346,8 +387,15 @@ namespace AccelByte.Api
             , ResultCallback<OwnershipToken> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(itemIds == null && appIds == null && skus == null, 
-                "Can't get user entitlement any ownership! all itemIds, appIds and skus parameters are null!");
+            if (itemIds == null && appIds == null && skus == null)
+            {
+                callback.TryError(new Error(
+                    ErrorCode.InvalidRequest
+                    , "Can't get user entitlement any ownership! All itemIds, " +
+                    "appIds, and skus parameters are null!")
+                );
+                return;
+            }
 
             if (!session.IsValid())
             {

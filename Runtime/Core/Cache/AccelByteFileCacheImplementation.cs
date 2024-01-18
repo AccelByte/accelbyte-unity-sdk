@@ -160,7 +160,14 @@ namespace AccelByte.Core
             {
                 return false;
             }
-            System.IO.File.Delete(GetFileFullPath(key));
+            try
+            {
+                System.IO.File.Delete(GetFileFullPath(key));
+            }
+            catch(System.Exception ex)
+            {
+                AccelByteDebug.LogWarning($"Failed to delete cache file.\n{ex.Message}");
+            }
             return true;
         }
 

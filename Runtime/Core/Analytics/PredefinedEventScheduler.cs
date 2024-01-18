@@ -24,9 +24,19 @@ namespace AccelByte.Core
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
+            if(analyticsWrapper != null && analyticsWrapper.GetSession().IsValid())
+            {
+                eventBody.EventNamespace = analyticsWrapper.GetSession().Namespace;
+            }
 
             jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
             OnTelemetryEventAdded?.Invoke(eventBody);
+        }
+
+        internal System.Tuple<TelemetryBody, ResultCallback>[] GetJobQueue()
+        {
+            System.Tuple<TelemetryBody, ResultCallback>[] retval = jobQueue.ToArray();
+            return retval;
         }
 
         protected override void TriggerSend()

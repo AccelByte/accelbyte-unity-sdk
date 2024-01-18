@@ -84,14 +84,7 @@ namespace AccelByte.Server
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
         protected string podName;
-
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
 
         private enum RequestType
         {
@@ -124,6 +117,7 @@ namespace AccelByte.Server
 
         private void SendPredefinedEvent(MatchmakingV2BackfillProposalNotification backfillNotif, RequestType requestType)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

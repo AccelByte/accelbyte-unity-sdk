@@ -187,6 +187,7 @@ namespace AccelByte.Models
         [DataMember] public string type;
         [DataMember] public string userId;
         [DataMember] public Dictionary<string, object> customAttributes;
+        [DataMember(Name = "contentStatus")] public string ContentStatus;
     }
 
     [DataContract, Preserve]
@@ -692,5 +693,57 @@ namespace AccelByte.Models
     {
         [DataMember] public UGCModelsUGCContentLiker[] Data;
         [DataMember] public Paging Paging;
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCListStagingContentSortBy
+    {
+        CreatedTime,
+        CreatedTimeAsc,
+        CreatedTimeDesc,
+        UpdatedTime,
+        UpdatedTimeAsc,
+        UpdatedTimeDesc
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum UGCStagingContentStatus
+    {
+        Pending,
+        Rejected
+    }
+
+    [DataContract, Preserve]
+    public class UGCUpdateStagingContentRequest : UGCUpdateRequest
+    {
+        [DataMember] public string FileLocation;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelStagingContent
+    {
+        [DataMember(Name = "channelId")] public string ChannelId;
+        [DataMember(Name = "createdTime")] public DateTime CreatedTime;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> customAttribute;
+        [DataMember(Name = "fileExtension")] public string FileExtension;
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "name")] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "note")] public string Note;
+        [DataMember(Name = "payloadUrl")] public string PayloadUrl;
+        [DataMember(Name = "screenshots")] public Screenshots[] Screenshots;
+        [DataMember(Name = "status")] public string Status;
+        [DataMember(Name = "subType")] public string SubType;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "type")] public string Type;
+        [DataMember(Name = "updatedTime")] public DateTime UpdatedTime;
+        [DataMember(Name = "userId")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class UGCModelsPaginatedStagingContentResponse
+    {
+        [DataMember] public UGCModelStagingContent[] Data;
+        [DataMember] public PagingCursor Paging;
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -83,7 +84,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(GetAllServerLatenciesAsync(callback));
         }
 
-        private IEnumerator GetAllServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
+        internal virtual IEnumerator GetAllServerLatenciesAsync( ResultCallback<Dictionary<string, int>> callback )
         {
             Result<QosServerList> getQosServersResult = null;
 
@@ -108,6 +109,13 @@ namespace AccelByte.Api
             coroutineRunner.Run(GetServerLatenciesAsync(callback));
         }
 
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            SharedMemory.OnLobbyConnected += HandleOnLobbyConnected;
+        }
+        
+
         private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
         {
             Result<QosServerList> getQosServersResult = null;
@@ -122,6 +130,32 @@ namespace AccelByte.Api
             }
 
             yield return CalculateServerLatencies(getQosServersResult.Value.servers, callback);
+        }
+
+        private void HandleOnLobbyConnected()
+        {
+            GetAllServerLatencies(result =>
+            {
+                if(result.IsError)
+                {
+                    return;
+                }
+
+                SharedMemory.ClosestRegion = GetClosestRegion(result.Value);
+            });
+        }
+
+        private string GetClosestRegion(Dictionary<string, int> listRegion)
+        {
+            var closestRegion = listRegion.First();
+            foreach (var serverLatency in listRegion)
+            {
+                if (serverLatency.Value < closestRegion.Value)
+                {
+                    closestRegion = serverLatency;
+                }
+            }
+            return closestRegion.Key;
         }
     }
 }

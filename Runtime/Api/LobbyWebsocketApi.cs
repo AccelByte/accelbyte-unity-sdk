@@ -56,10 +56,11 @@ namespace AccelByte.Api
 
         private long id;
         private string websocketUrl;
-        private string channelSlug;
         private AccelByteWebSocket webSocket;
         private LobbySessionId lobbySessionId;
         private Utils.IAccelByteWebsocketSerializer websocketSerializer;
+
+        internal string ChannelSlug;
 
         #endregion private fields declaration
 
@@ -230,7 +231,7 @@ namespace AccelByte.Api
         {
             webSocket.Disconnect();
 
-            channelSlug = null;
+            ChannelSlug = null;
         }
         
         private void SendRequest<T, U>( MessageType requestType
@@ -387,6 +388,19 @@ namespace AccelByte.Api
                 responseCallbacks.Remove(messageId);
                 handler(errorCode, message);
             }
+        }
+
+        /// <summary>
+        /// Change user region
+        /// </summary>
+        /// <param name="region">New region</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ChangeUserRegion(string region, ResultCallback callback)
+        {
+            SendRequest(MessageType.changeRegionRequest, new ChangeRegionRequest
+            {
+                Region = region
+            }, callback);
         }
 
         #region Party
@@ -640,7 +654,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    channelSlug = result.Value.channelSlug;
+                    ChannelSlug = result.Value.channelSlug;
                     callback.Try(result);
                 }
             });
@@ -654,7 +668,7 @@ namespace AccelByte.Api
         public void SendChannelChat( string chatMessage
             , ResultCallback callback )
         {
-            if (string.IsNullOrEmpty(channelSlug))
+            if (string.IsNullOrEmpty(ChannelSlug))
             {
                 callback.TryError(ErrorCode.InvalidRequest, 
                     "You're not in any chat channel.");
@@ -663,7 +677,7 @@ namespace AccelByte.Api
             {
                 SendRequest(MessageType.sendChannelChatRequest, new ChannelChatRequest
                 {
-                    channelSlug = channelSlug,
+                    channelSlug = ChannelSlug,
                     payload = chatMessage,
                 }, callback);
             }

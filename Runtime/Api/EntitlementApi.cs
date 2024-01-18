@@ -2,11 +2,12 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Core;
+using AccelByte.Models;
+using AccelByte.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AccelByte.Core;
-using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -513,7 +514,7 @@ namespace AccelByte.Api
 
             if (!string.IsNullOrEmpty(XBoxDLCSync.xstsToken))
             {
-                content = string.Format("{\"xstsToken\": \"{0}\"}", XBoxDLCSync.xstsToken);
+                content = string.Format("{{\"xstsToken\": \"{0}\"}}", XBoxDLCSync.xstsToken);
             }
             
             var request = HttpRequestBuilder
@@ -688,9 +689,12 @@ namespace AccelByte.Api
         public IEnumerator ValidateUserItemPurchaseCondition(ValidateUserItemPurchaseConditionRequest requestModel
            , ResultCallback<PlatformValidateUserItemPurchaseResponse[]> callback)
         {
-            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
-            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
-            Assert.IsNotNull(requestModel.ItemIds, "Can't validate user item purchase condition! items parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, requestModel, requestModel?.ItemIds);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/items/purchase/conditions/validate")
@@ -713,13 +717,17 @@ namespace AccelByte.Api
             ,string[] ids
             , ResultCallback<EntitlementOwnershipItemIds[]> callback)
         {
-            Assert.IsNotNull(Namespace_, "Can't validate user item purchase condition! Namespace_ from parent is null!");
-            Assert.IsNotNull(AuthToken, "Can't validate user item purchase condition! AccessToken from parent is null!");
-            Assert.IsNotNull(ids, "Can't Get ids condition! ids parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, ids);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/ownership/byItemIds")
                 .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson); 
                 if (ids != null) 
@@ -838,10 +846,19 @@ namespace AccelByte.Api
             , ResultCallback<SellItemEntitlementInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't sell user entitlement! Namespace_ from parent  is null!");
-            Assert.IsNotNull(AuthToken, "Can't sell user entitlement! AccessToken from parent is null!");
-            Assert.IsNotNull(userEntitlementSoldParams.UserId, "Can't sell user entitlement! userId parameter is null!");
-            Assert.IsNotNull(userEntitlementSoldParams.EntitlementId, "Can't sell user entitlement! entitlementId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userEntitlementSoldParams
+                , userEntitlementSoldParams?.UserId
+                , userEntitlementSoldParams?.EntitlementId
+                , entitlementSoldRequest
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             EntitlementSoldRequest entitlementSoldRequestBody = new EntitlementSoldRequest
             {

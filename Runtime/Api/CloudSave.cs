@@ -94,8 +94,6 @@ namespace AccelByte.Api
             , bool isPublic = false)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -124,7 +122,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRecord> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
 
             if (!session.IsValid())
             {
@@ -153,7 +150,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRecord> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -228,8 +224,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
-            Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -267,8 +261,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
-            Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -355,8 +347,6 @@ namespace AccelByte.Api
             , ResultCallback callback
             , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
-
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -600,7 +590,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
 
             if (!session.IsValid())
             {
@@ -624,8 +613,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't save game record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save game record! RecordRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -652,7 +639,6 @@ namespace AccelByte.Api
             , ResultCallback<GameRecord> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't get game record! Key parameter is null!");
 
             if (!session.IsValid())
             {
@@ -680,8 +666,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't replace game record! Key parameter is null!");
-            Assert.IsNotNull(key, "Can't replace game record! RecordRequest parameter is null!");
 
             if (!session.IsValid())
             {
@@ -709,9 +693,6 @@ namespace AccelByte.Api
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
-            Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
-
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -754,8 +735,6 @@ namespace AccelByte.Api
             , ResultCallback callback
             , Func<Dictionary<string, object>, Dictionary<string, object>> payloadModifier )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
-
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -849,7 +828,6 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't delete game record! Key parameter is null!");
 
             if (!session.IsValid())
             {
@@ -874,7 +852,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRecords> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsTrue(keys.Length != 0, "Can't bulk get user records! Key parameter is empty!");
 
             if (!session.IsValid())
             {
@@ -904,7 +881,6 @@ namespace AccelByte.Api
             , ResultCallback<GameRecords> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsTrue(keys.Length != 0, "Can't bulk get user records! Key parameter is empty!");
 
             if (!session.IsValid())
             {
@@ -993,18 +969,6 @@ namespace AccelByte.Api
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         private enum EventMode
         {
             PlayerGetRecords,
@@ -1089,6 +1053,7 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

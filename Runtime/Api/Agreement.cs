@@ -66,7 +66,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (session?.AuthorizationToken == null)
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -173,7 +173,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (session?.AuthorizationToken == null)
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -193,7 +193,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (session?.AuthorizationToken == null)
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -215,7 +215,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (session?.AuthorizationToken == null)
+            if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;

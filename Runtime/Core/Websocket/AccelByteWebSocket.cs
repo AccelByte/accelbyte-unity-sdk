@@ -287,10 +287,19 @@ namespace AccelByte.Api
             await RetryBackoffUtils.Run<int>(() => WebsocketSend(message));
         }
 
-        private async Task<int> WebsocketSend(string message)
+        private Task<int> WebsocketSend(string message)
         {
-            webSocket.Send(message);
-            return 0;
+            int errorCode = 0;
+            try
+            {
+                webSocket.Send(message);
+            }
+            catch (Exception e)
+            {
+                AccelByteDebug.LogWarning($"Sending failed with error : {e.Message}");
+                errorCode = 1;
+            }
+            return Task.FromResult(errorCode);
         }
 
         private void StartMaintainConnection()

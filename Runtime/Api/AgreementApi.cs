@@ -1,9 +1,11 @@
 // Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
+
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
+using System.Collections;
 using UnityEngine.Assertions;
 using UnityEngine.Networking;
 
@@ -31,8 +33,13 @@ namespace AccelByte.Api
         {
             string functionName = "GetLegalPolicies";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(Namespace_, "Can't " + functionName + "! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/policies/namespaces/{namespace}")
@@ -61,7 +68,13 @@ namespace AccelByte.Api
         {
             string functionName = "GetLegalPoliciesByCountry";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(countryCode, "Can't " + functionName + "! CountryCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(countryCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/policies/countries/{countryCode}")

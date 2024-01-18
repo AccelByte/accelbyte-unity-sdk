@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Core;
+using AccelByte.Models;
+using AccelByte.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using AccelByte.Core;
-using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -104,9 +105,12 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool isPublic )
         {
-            Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -139,10 +143,12 @@ namespace AccelByte.Api
             , ResultCallback<UserRecord> callback
             , bool isPublic )
         {
-            Assert.IsNotNull(Namespace_, "Can't get user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user record! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -176,6 +182,13 @@ namespace AccelByte.Api
             , bool setPublic
             , ResultCallback callback )
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             Dictionary<string, object> requestToSend = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
             yield return ReplaceUserRecord(userId, key, recordRequest, callback, isPublic:false);
         }
@@ -187,11 +200,12 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool isPublic )
         {
-            Assert.IsNotNull(Namespace_, "Can't replace user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't replace user record! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't replace user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't replace user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string url = "/v1/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -352,10 +366,12 @@ namespace AccelByte.Api
             , string key
             , ResultCallback callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't delete user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete user record! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't delete user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/{key}")
@@ -380,6 +396,13 @@ namespace AccelByte.Api
             , RecordSetBy setBy
             , ResultCallback callback )
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, recordRequest, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
             yield return SaveGameRecord(key, recordRequest, callback);
         }
@@ -388,10 +411,12 @@ namespace AccelByte.Api
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't save game record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't save game record! AccessToken parameter is null!");
-            Assert.IsNotNull(key, "Can't save game record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save game record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, recordRequest, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/records/{key}")
@@ -415,9 +440,12 @@ namespace AccelByte.Api
         public IEnumerator GetGameRecord( string key
             , ResultCallback<GameRecord> callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't get game record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get game record! AccessToken parameter is null!");
-            Assert.IsNotNull(key, "Can't get game record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/records/{key}")
@@ -443,6 +471,13 @@ namespace AccelByte.Api
             , RecordSetBy setBy
             , ResultCallback callback )
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(namespace_, accessToken, key, recordRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             Dictionary<string, object> requestToSend = AddMetaDataJsonGameRecord(setBy, recordRequest);
             yield return ReplaceGameRecord(key, recordRequest, callback);
         }
@@ -451,10 +486,12 @@ namespace AccelByte.Api
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't replace game record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't replace game record! AccessToken parameter is null!");
-            Assert.IsNotNull(key, "Can't replace game record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't replace game record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, recordRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/namespaces/{namespace}/records/{key}")
@@ -480,10 +517,12 @@ namespace AccelByte.Api
             , ResultCallback callback
             , Action callbackOnConflictedData = null )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(key, nameof(key) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, data);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/namespaces/{namespace}/concurrent/records/{key}")
@@ -517,9 +556,12 @@ namespace AccelByte.Api
         public IEnumerator DeleteGameRecord( string key
             , ResultCallback callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't delete game record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete game record! AccessToken parameter is null!");
-            Assert.IsNotNull(key, "Can't delete game record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/namespaces/{namespace}/records/{key}")
@@ -542,10 +584,24 @@ namespace AccelByte.Api
         public IEnumerator BulkGetUserRecords( BulkGetRecordsByKeyRequest data
             , ResultCallback<UserRecords> callback )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, "Can't bulk get user records! data parameter is null!");
-            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get user records! data.keys exceeding {0}!", maxBulkRecords));
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, data, data?.keys);
+            if (error == null && data.keys.Length == 0)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , "Can't bulk get user records! data.keys parameter is empty!"
+                );
+            }
+            if (error == null && data.keys.Length > maxBulkRecords)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , $"Can't bulk get user records! data.keys exceeding {maxBulkRecords}!"
+                );
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/users/me/records/bulk")
@@ -568,10 +624,24 @@ namespace AccelByte.Api
         public IEnumerator BulkGetGameRecords( BulkGetRecordsByKeyRequest data
             , ResultCallback<GameRecords> callback )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, "Can't bulk get game records! data parameter is null!");
-            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get game records! data.keys exceeding {0}!", maxBulkRecords));
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, data, data?.keys);
+            if (error == null && data.keys.Length == 0)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , "Can't bulk get game records! data.keys parameter is empty!"
+                );
+            }
+            if (error == null && data.keys.Length > maxBulkRecords)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , $"Can't bulk get game records! data.keys exceeding {maxBulkRecords}!"
+                );
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/records/bulk")
@@ -596,9 +666,12 @@ namespace AccelByte.Api
             , int offset
             , int limit)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, "Can't bulk get other player public record keys! UserId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/public")
@@ -625,12 +698,25 @@ namespace AccelByte.Api
             , BulkGetRecordsByKeyRequest data
             , ResultCallback<UserRecords> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, "Can't bulk get other player public record by keys! UserId parameter is null!");
-            Assert.IsFalse(data.keys.Length == 0, "Can't bulk get other player public record by keys! Keys parameter is null!");
-            Assert.IsFalse(data.keys.Length > maxBulkRecords, String.Format("Can't bulk get other player public record by keys! keys exceeding {0}!", maxBulkRecords));
-
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, data, data?.keys);
+            if (error == null && data.keys.Length == 0)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , "Can't bulk get user records! data.keys parameter is empty!"
+                );
+            }
+            if (error == null && data.keys.Length > maxBulkRecords)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , $"Can't bulk get user records! data.keys exceeding {maxBulkRecords}!"
+                );
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+            
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/users/{userId}/records/public/bulk")
                 .WithPathParam("namespace", Namespace_)

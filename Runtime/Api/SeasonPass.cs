@@ -17,8 +17,6 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        private PredefinedEventScheduler predefinedEventScheduler;
-
         [UnityEngine.Scripting.Preserve]
         internal SeasonPass( SeasonPassApi inApi
             , UserSession inSession
@@ -30,15 +28,6 @@ namespace AccelByte.Api
             api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
-        }
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
         }
 
         /// <summary>
@@ -244,6 +233,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

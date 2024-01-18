@@ -14,9 +14,17 @@ namespace AccelByte.Core
         [DllImport("lib_sigterm_handler", EntryPoint = "on_term", CallingConvention = CallingConvention.StdCall)]
         protected static extern void OnReceivedSignalTerm([MarshalAs(UnmanagedType.FunctionPtr)] SignalHandlerDelegate handler);
 
+        bool enableSignalTerm = true;
+
         public AccelByteSignalHandler()
         {
-            OnReceivedSignalTerm(null);
+#if UNITY_EDITOR_WIN //To avoid running sigterm in linux dedicated server but with windows editor
+            enableSignalTerm = false;
+#endif
+            if(enableSignalTerm)
+            {
+                OnReceivedSignalTerm(null);
+            }
         }
 
         ~AccelByteSignalHandler()
@@ -26,12 +34,18 @@ namespace AccelByte.Core
 
         public void ShutDown()
         {
-            OnReceivedSignalTerm(null);
+            if (enableSignalTerm)
+            {
+                OnReceivedSignalTerm(null);
+            }
         }
 
         public virtual void SetSignalHandlerAction(SignalHandlerDelegate newHandlerAction)
         {
-            OnReceivedSignalTerm(newHandlerAction);
+            if (enableSignalTerm)
+            {
+                OnReceivedSignalTerm(newHandlerAction);
+            }
         }
     }
 }

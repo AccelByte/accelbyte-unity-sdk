@@ -12,7 +12,13 @@ namespace AccelByte.Core
     public static class AccelByteNetUtilities
     {
         private static readonly CoroutineRunner coroutineRunner = new CoroutineRunner();
-        private static readonly IHttpClient HttpClient = new AccelByteHttpClient();
+        private static readonly IHttpClient httpClient;
+
+        static AccelByteNetUtilities()
+        {
+            IHttpRequestSender httpSender = AccelByteSDK.SdkHttpSenderFactory.CreateHttpRequestSender();
+            httpClient = new AccelByteHttpClient(httpSender);
+        }
 
         [Obsolete("ipify supports will be deprecated in future releases)")]
         public static void GetPublicIp(ResultCallback<PublicIp> callback)
@@ -29,7 +35,7 @@ namespace AccelByte.Core
 
             IHttpResponse response = null;
 
-            yield return AccelByteNetUtilities.HttpClient.SendRequest(getPubIpRequest, rsp => response = rsp);
+            yield return AccelByteSDK.GetClientRegistry().GetApi().httpClient.SendRequest(getPubIpRequest, rsp => response = rsp);
 
             var result = response.TryParseJson<PublicIp>();
             callback.Try(result);
@@ -50,7 +56,7 @@ namespace AccelByte.Core
 
             IHttpResponse response = null;
 
-            yield return AccelByteNetUtilities.HttpClient.SendRequest(uploadRequest, rsp => response = rsp);
+            yield return httpClient.SendRequest(uploadRequest, rsp => response = rsp);
 
             var result = response.TryParse();
             callback.Try(result);
@@ -70,7 +76,7 @@ namespace AccelByte.Core
 
             IHttpResponse response = null;
 
-            yield return AccelByteNetUtilities.HttpClient.SendRequest(uploadRequest, rsp => response = rsp);
+            yield return httpClient.SendRequest(uploadRequest, rsp => response = rsp);
 
             Result<byte[]> result;
 

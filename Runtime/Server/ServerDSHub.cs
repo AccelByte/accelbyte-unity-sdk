@@ -184,13 +184,17 @@ namespace AccelByte.Server
 
         internal string podName;
         internal Dictionary<string, SessionV2GameSession> cachedSessions = new Dictionary<string, SessionV2GameSession>();
-        private PredefinedEventScheduler predefinedEventScheduler;
         private bool isAnalyticsConnected = false;
 
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        internal override void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
         {
-            this.predefinedEventScheduler = predefinedEventScheduler;
+            base.SetPredefinedEventScheduler(ref predefinedEventScheduler);
+            ConnectPredefinedAnalyticsToEvents();
+        }
 
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
             ConnectPredefinedAnalyticsToEvents();
         }
 
@@ -321,6 +325,7 @@ namespace AccelByte.Server
 
         internal void SendPredefinedEvent<T>(T result)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -339,6 +344,7 @@ namespace AccelByte.Server
 
         internal void SendPredefinedEvent<T>(Result<T> result)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -357,6 +363,7 @@ namespace AccelByte.Server
 
         internal void SendPredefinedEvent()
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -375,6 +382,7 @@ namespace AccelByte.Server
 
         private void SendSessionChangedPredefinedEvent(SessionV2GameSession session)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -387,5 +395,35 @@ namespace AccelByte.Server
         }
 
         #endregion
+
+        internal void TriggerConnect()
+        {
+            OnConnected?.Invoke();
+        }
+
+        internal void TriggerDisconnect(WsCloseCode wsCloseCode)
+        {
+            OnDisconnected?.Invoke(wsCloseCode);
+        }
+
+        internal void TriggerServerClaimed(ServerClaimedNotification serverClaimedNotification)
+        {
+            MatchmakingV2ServerClaimed?.Invoke(Result<ServerClaimedNotification>.CreateOk(serverClaimedNotification));
+        }
+
+        internal void TriggerBackfillProposalReceived(MatchmakingV2BackfillProposalNotification backfillNotif)
+        {
+            MatchmakingV2BackfillProposalReceived?.Invoke(Result<MatchmakingV2BackfillProposalNotification>.CreateOk(backfillNotif));
+        }
+
+        internal void TriggerSessionMemberChanged(SessionV2GameSession gameSession)
+        {
+            GameSessionV2MemberChanged?.Invoke(Result<SessionV2GameSession>.CreateOk(gameSession));
+        }
+
+        internal void TriggerSessionEnded(SessionEndedNotification endedNotification)
+        {
+            GameSessionV2Ended?.Invoke(Result<SessionEndedNotification>.CreateOk(endedNotification));
+        }
     }
 }

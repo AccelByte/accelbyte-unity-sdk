@@ -1625,6 +1625,137 @@ namespace AccelByte.Api
         }
 
         #endregion UGC V2 (Like)
+
+        #region UGC V2 (Staging Content)
+
+        /// </summary>
+        /// Get user staging content by Id.
+        /// </summary>
+        /// <param name="contentId ">The content id that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetUserStagingContentByContentId(string userId
+            , string contentId
+            , ResultCallback<UGCModelStagingContent> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetUserStagingContentByContentId(userId, contentId, callback));
+        }
+
+        /// </summary>
+        /// Get user staging content by Id.
+        /// </summary>
+        /// <param name="userId ">The User id.</param>
+        /// <param name="status ">Status of staging content that will be fetched</param>
+        /// <param name="offset">The offset of the channel results.</param>
+        /// <param name="limit">The limit of the channel results.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void GetListStagingContent(string userId
+            , UGCStagingContentStatus status
+            , int limit
+            , int offset
+            , UGCListStagingContentSortBy sortBy
+            , ResultCallback<UGCModelsPaginatedStagingContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            coroutineRunner.Run(
+                api.GetListStagingContent(userId, status, limit, offset, sortBy, callback));
+        }
+
+        /// <summary>
+        /// Modify staging content to update some information based on content id.
+        /// </summary>
+        /// <param name="userId ">The User di.</param>
+        /// <param name="contentId">The content Id.</param>
+        /// <param name="modifyRequest">Detail information for the content request that will be modified.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void ModifyStagingContentByContentId(string userId
+            , string contentId
+            , UGCUpdateStagingContentRequest modifyRequest
+            , ResultCallback<UGCModelStagingContent> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            coroutineRunner.Run(
+                api.ModifyStagingContentByContentId(userId, contentId, modifyRequest, callback));
+        }
+
+        /// </summary>
+        /// Delete a content based on content id.
+        /// </summary
+        /// <param name="userId ">The User id.</param>
+        /// <param name="contentId ">The content id that will be fetched.</param>
+        /// <param name="callback">This will be called when the operation succeeded.</param>
+        public void DeleteStagingContentByContentId(string userId
+            , string contentId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(contentId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetContenttIdInvalidMessage(contentId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            coroutineRunner.Run(
+                api.DeleteStagingContentByContentId(userId, contentId, callback));
+        }
+
+        #endregion
     }
 }
  

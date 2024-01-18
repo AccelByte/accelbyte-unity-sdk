@@ -283,13 +283,22 @@ namespace AccelByte.Api
             Assert.IsNotNull(loginResponse);
 
             tokenData = loginResponse;
-            HttpRequestBuilder.SetNamespace(loginResponse.Namespace);
+
+            var additionalPathParam = new Dictionary<string, string>();
+            if(!string.IsNullOrEmpty(tokenData.Namespace))
+            {
+                const string namespaceHeaderKey = "namespace";
+                additionalPathParam.Add(namespaceHeaderKey, tokenData.Namespace);
+            }
+            if (!string.IsNullOrEmpty(tokenData.user_id))
+            {
+                const string userIdHeaderKey = "userId";
+                additionalPathParam.Add(userIdHeaderKey, tokenData.user_id);
+            }
+
+            httpClient.AddAdditionalHeaderInfo(AccelByteHttpClient.NamespaceHeaderKey, tokenData.Namespace);
             httpClient.SetImplicitBearerAuth(tokenData.access_token);
-            httpClient.SetImplicitPathParams(
-                new Dictionary<string, string>
-                {
-                    { "namespace", tokenData.Namespace }, { "userId", tokenData.user_id }
-                });
+            httpClient.SetImplicitPathParams(additionalPathParam);
             httpClient.ClearCookies();
 
             RefreshTokenCallback?.Invoke(tokenData.refresh_token);

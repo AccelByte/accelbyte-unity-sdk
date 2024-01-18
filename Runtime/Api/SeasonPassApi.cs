@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -28,9 +28,13 @@ namespace AccelByte.Api
             , ResultCallback<SeasonInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Current Season! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get Current Season! AccessToken parameter is null!");
-            Assert.IsNotNull(language, "Can't Get Current Season! language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/seasons/current")
@@ -56,10 +60,13 @@ namespace AccelByte.Api
             , ResultCallback<UserSeasonInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get User Season! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get User Season! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't Get User Season! userId parameter is null!");
-            Assert.IsNotNull(seasonId, "Can't Get User Season! seasonId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, seasonId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/{seasonId}/data")
@@ -85,9 +92,13 @@ namespace AccelByte.Api
             , ResultCallback<UserSeasonInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get User Current Season! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get User Current Season! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't Get User Current Season! userId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/data")
@@ -113,9 +124,13 @@ namespace AccelByte.Api
             , ResultCallback<SeasonClaimRewardResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Claim Rewards! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Claim Rewards! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't Claim Rewards! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards")
@@ -142,9 +157,13 @@ namespace AccelByte.Api
             , ResultCallback<SeasonClaimRewardResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Claim Rewards! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Claim Rewards! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't Claim Rewards! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/seasons/current/rewards/bulk")

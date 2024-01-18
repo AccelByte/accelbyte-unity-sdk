@@ -14,7 +14,6 @@ namespace AccelByte.Server
         private readonly ServerEcommerceApi api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
-        private PredefinedEventScheduler predefinedEventScheduler;
 
         private enum PredefinedEventType
         {
@@ -38,15 +37,6 @@ namespace AccelByte.Server
         }
 
         #region Predefined Event Analytics
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
 
         private void SendPredefinedEntitlementEvent(Result<StackableEntitlementInfo[]> apiCallResult)
         {
@@ -180,7 +170,8 @@ namespace AccelByte.Server
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
-            if (payload != null)
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
+            if (payload != null && predefinedEventScheduler != null)
             {
                 var userProfileEvent = new AccelByteTelemetryEvent(payload);
                 predefinedEventScheduler.SendEvent(userProfileEvent, null);

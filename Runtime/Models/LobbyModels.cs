@@ -134,6 +134,8 @@ namespace AccelByte.Models
         setRejectConsentRequest,
         setRejectConsentResponse,
         setRejectConsentNotif,
+        changeRegionRequest,
+        changeRegionResponse,
         errorNotif
     }
 
@@ -911,5 +913,14 @@ namespace AccelByte.Models
         [DataMember(Name = "storageChanges")] public JObject StorageChanges;
     }
 
+    #endregion
+
+    #region Region
+
+    [DataContract, Preserve]
+    public class ChangeRegionRequest
+    {
+        [DataMember(Name = "region")] public string Region;
+    }
     #endregion
 }

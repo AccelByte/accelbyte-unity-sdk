@@ -106,6 +106,19 @@ namespace AccelByte.Core
         }
         #endregion
 
+        internal void SetAnalyticsApiWrapper(IAccelByteAnalyticsWrapper newAnalyticsWrapper)
+        {
+            analyticsWrapper = newAnalyticsWrapper;
+        }
+
+        internal void ClearTasks()
+        {
+            lock (jobQueue)
+            {
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
+            }
+        }
+
         internal void SetInterval(int eventIntervalInlMs)
         {
             if (eventIntervalInlMs < defaultMinimumEventIntervalInMs)
@@ -171,7 +184,10 @@ namespace AccelByte.Core
             maintainer = new AccelByteHeartBeat(heartbeatInterval);
             maintainer.OnHeartbeatTrigger += () =>
             {
-                TriggerSend();
+                if (analyticsWrapper != null && analyticsWrapper.GetSession().IsValid())
+                {
+                    TriggerSend();
+                }
             };
         }
 
@@ -219,53 +235,25 @@ namespace AccelByte.Core
 
         protected async void RunCommonValidator()
         {
-            ISession session = null;
             bool currentSessionValid;
-            bool? previousSessionValid = null;
+            ISession session = null;
 
             while (keepValidating)
             {
                 if (maintainer != null)
                 {
-                    if (session == null)
-                    {
-                        session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
-                    }
+                    session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
 
                     currentSessionValid = session != null ? session.IsValid() : false;
 
-                    if (previousSessionValid == null)
+                    if (currentSessionValid)
                     {
-                        if (currentSessionValid)
-                        {
-                            maintainer.Start();
-                        }
+                        maintainer.Start();
                     }
                     else
                     {
-                        if (currentSessionValid != previousSessionValid)
-                        {
-                            if (currentSessionValid)
-                            {
-                                if (!maintainer.IsHeartBeatJobRunning)
-                                {
-                                    maintainer.Start();
-                                }
-                                else
-                                {
-                                    maintainer.UnPause();
-                                }
-                            }
-                            else
-                            {
-                                maintainer.Pause();
-                            }
-
-                            currentSessionValid = session.IsValid();
-                        }
+                        maintainer.Pause();
                     }
-
-                    previousSessionValid = currentSessionValid;
                 }
 
                 await System.Threading.Tasks.Task.Delay(AccelByteHttpHelper.HttpDelayOneFrameTimeMs);

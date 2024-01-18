@@ -102,7 +102,6 @@ namespace AccelByte.Api
             , ResultCallback<MultiLanguageAchievement> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(achievementCode, "Can't get achievement; AchievementCode parameter is null!");
 
             if (!session.IsValid())
             {
@@ -174,8 +173,6 @@ namespace AccelByte.Api
         public void UnlockAchievement( string achievementCode
             , ResultCallback callback )
         {
-            Assert.IsNotNull(achievementCode, "Can't unlock achievement; AchievementCode parameter is null!");
-
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -387,18 +384,6 @@ namespace AccelByte.Api
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         private enum EventMode
         {
             Unlocked,
@@ -484,6 +469,7 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

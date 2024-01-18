@@ -44,6 +44,7 @@ namespace AccelByte.Core
             currentEnvironment = newEnvironment;
             OnEnvironmentChanged?.Invoke(currentEnvironment);
             OnEnvironmentChangedV2?.Invoke(olderEnvironment, currentEnvironment);
+            AccelByteDebug.Log($"Environment is changed to {newEnvironment}");
         }
     }
 }

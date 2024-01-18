@@ -4,6 +4,7 @@
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions; 
 
 namespace AccelByte.Api
@@ -83,10 +84,12 @@ namespace AccelByte.Api
             });
         }
 
-        public void GetData(ResultCallback<UserData> callback)
+        public void GetData(ResultCallback<UserData> callback, bool isIncludeAllPlatforms = false)
         {
             Report.GetFunctionLog(GetType().Name);
+
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/users/me")
+                .WithQueryParam("includeAllPlatforms", isIncludeAllPlatforms.ToString().ToLower())
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
@@ -260,6 +263,7 @@ namespace AccelByte.Api
             if (string.IsNullOrEmpty(requestModel.username))
             {
                 callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! username parameter is null!"));
+                return;
             }
 
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/headless/code/verify";
@@ -605,6 +609,8 @@ namespace AccelByte.Api
                 return;
             }
 
+            string platformBy = PlatformSearchTypeEnumToString(requestModel.PlatformBy);
+
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users")
                 .WithPathParam("namespace", Namespace_)
@@ -614,6 +620,16 @@ namespace AccelByte.Api
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
+
+            if (!string.IsNullOrEmpty(requestModel.PlatformId))
+            {
+                builder.WithQueryParam("platformId", requestModel.PlatformId);
+            }
+
+            if (!string.IsNullOrEmpty(platformBy))
+            {
+                builder.WithQueryParam("platformBy", platformBy);
+            }
             
             if (requestModel.SearchBy != SearchType.ALL)
             {
@@ -1197,6 +1213,53 @@ namespace AccelByte.Api
                     callback.Try(result);
                 }
             });
+        }
+
+        public void GetUserOtherPlatformBasicPublicInfo(
+            PlatformAccountInfoRequest requestPayload
+            , ResultCallback<AccountUserPlatformInfosResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, Session.AuthorizationToken, requestPayload);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/namespace/{namespace}/users/platforms")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(requestPayload.ToUtf8Json())
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AccountUserPlatformInfosResponse>();
+                callback.Try(result);
+            });
+        }
+
+        private string PlatformSearchTypeEnumToString(SearchPlatformType platformBy)
+        {
+            string retVal;
+            switch (platformBy)
+            {
+                case SearchPlatformType.None:
+                    retVal = string.Empty;
+                    break;
+                case SearchPlatformType.PlatformDisplayName:
+                    retVal = "platformDisplayName";
+                    break;
+                default:
+                    retVal = null;
+                    break;
+            }
+
+            return retVal;
         }
     }
 }

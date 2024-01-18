@@ -325,6 +325,52 @@ namespace AccelByte.Api
             return retval;
         }
 
+        internal static AccelByteSettingsV2 GetSettingsByEnv(SettingsEnvironment environment, OverrideConfigs overrideConfigs, bool getServerConfig)
+        {
+            var targetEnvironment = environment;
+            const bool isServer = false;
+            string activePlatform = AccelByteSettingsV2.GetActivePlatform(isServer);
+            var newSettings = GetSettingsByPlatformAndEnv(activePlatform, targetEnvironment, overrideConfigs, getServerConfig);
+            bool configValid = true;
+            if(getServerConfig && newSettings.ServerSdkConfig.IsRequiredFieldEmpty())
+            {
+                configValid = false;
+            }
+            else if (!getServerConfig && newSettings.SDKConfig.IsRequiredFieldEmpty())
+            {
+                configValid = false;
+            }
+
+            if(!configValid)
+            {
+                targetEnvironment = SettingsEnvironment.Default;
+                newSettings = GetSettingsByPlatformAndEnv(activePlatform, targetEnvironment, overrideConfigs, getServerConfig);
+            }
+
+            if (newSettings.OAuthConfig.IsRequiredFieldEmpty())
+            {
+                newSettings = GetSettingsByPlatformAndEnv(string.Empty, targetEnvironment, overrideConfigs, getServerConfig);
+            }
+            return newSettings;
+        }
+
+        private static AccelByteSettingsV2 GetSettingsByPlatformAndEnv(string platform, SettingsEnvironment environment, OverrideConfigs overrideConfigs, bool getServerConfig)
+        {
+            var retval = new AccelByteSettingsV2(platform, environment, getServerConfig);
+            SDKConfigArgs configArgs = overrideConfigs.SDKConfigOverride.GetByEnvironment(environment);
+            OAuthConfig oAuthConfigArgs = overrideConfigs.OAuthConfigOverride.GetByEnvironment(environment);
+            if (!getServerConfig)
+            {
+                retval.OverrideClientSDKConfig(configArgs);
+            }
+            else
+            {
+                retval.OverrideServerSDKConfig(configArgs);
+            }
+            retval.OverrideOAuthConfig(oAuthConfigArgs);
+            return retval;
+        }
+
         public static Config GetSDKConfigByEnvironment(MultiConfigs multiSDKConfigs, SettingsEnvironment environment)
         {
             if(multiSDKConfigs == null)
@@ -612,6 +658,12 @@ namespace AccelByte.Api
         {
             if (sdkConfig != null && overrideConfig != null)
             {
+                if (overrideConfig.OverrideServiceUrl == true && overrideConfig.BaseUrl != null)
+                {
+                    sdkConfig.BaseUrl = overrideConfig.BaseUrl;
+                    sdkConfig.SanitizeBaseUrl();
+                    sdkConfig.Expand(true);
+                }
                 sdkConfig = overrideConfig.CopyToConfig(sdkConfig);
             }
         }
@@ -620,6 +672,12 @@ namespace AccelByte.Api
         {
             if (serverSdkConfig != null && overrideConfig != null)
             {
+                if (overrideConfig.OverrideServiceUrl == true && !string.IsNullOrEmpty(overrideConfig.BaseUrl))
+                {
+                    serverSdkConfig.BaseUrl = overrideConfig.BaseUrl;
+                    serverSdkConfig.SanitizeBaseUrl();
+                    serverSdkConfig.Expand(true);
+                }
                 serverSdkConfig = overrideConfig.CopyToConfig(serverSdkConfig);
             }
         }

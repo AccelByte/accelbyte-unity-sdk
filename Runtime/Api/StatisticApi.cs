@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2019-2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Assertions;
 
@@ -60,10 +61,12 @@ namespace AccelByte.Api
             , CreateStatItemRequest[] statItems
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
-            Assert.IsNotNull(statItems, nameof(statItems) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, accessToken, statItems);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/bulk")
@@ -94,9 +97,12 @@ namespace AccelByte.Api
             , int limit
             , StatisticSortBy sortBy)
         {
-            Assert.IsNotNull(Namespace_, "Can't get stat items! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get stat items! userIds parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't get stat items! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(
@@ -141,9 +147,12 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't add stat item value! namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
@@ -170,9 +179,12 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback ) 
         {
-            Assert.IsNotNull(Namespace_, "Can't add stat item value! namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
@@ -200,9 +212,12 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback ) 
         {
-            Assert.IsNotNull(Namespace_, "Can't add stat item value! namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't add stat item value! userId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
@@ -232,12 +247,19 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<FetchUser[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(statCodes, nameof(statCodes) + " cannot be null");
-            Assert.IsNotNull(tags, nameof(tags) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , statCodes
+                , tags
+                , additionalKey
+                , accessToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
@@ -274,12 +296,19 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<UpdateUserStatItemValueResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(updateUserStatItem, nameof(updateUserStatItem) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , statCode
+                , updateUserStatItem
+                , additionalKey
+                , accessToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems/value")
@@ -307,10 +336,17 @@ namespace AccelByte.Api
            , string[] userIds
            , ResultCallback<FetchUserStatistic> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , statCode
+                , userIds
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string[] processedUserIds = new string[0];
             string[] notProcessedUserIds = new string[0];
@@ -368,8 +404,16 @@ namespace AccelByte.Api
 
         public IEnumerator GetGlobalStatItemsByStatCode(string statCode,string accessToken, ResultCallback<GlobalStatItem> callback)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(statCode), nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(accessToken, nameof(accessToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , statCode
+                , accessToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/globalstatitems/{statCode}")
@@ -393,8 +437,16 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatCycleConfig> callback)
         {
-            Assert.IsNotNull(cycleId, "Can't get statistic cycle config! CycleId is null or empty");
-            Assert.IsNotNull(accessToken, "Can't get statistic cycle config! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , cycleId
+                , accessToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/statCycles/{cycleId}")
@@ -468,8 +520,16 @@ namespace AccelByte.Api
             int offset, 
             int limit)
         {
-            Assert.IsNotNull(cycleId, "Can't add stat item value! cycle id parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't add stat item value! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , cycleId
+                , accessToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statCycles/{cycleId}/statCycleitems")

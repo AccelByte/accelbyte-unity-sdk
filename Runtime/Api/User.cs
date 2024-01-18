@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections;
-using System.IO;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -30,6 +30,9 @@ namespace AccelByte.Api
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
 
         internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/" + Application.productName;
+
+        internal Action<TokenData> OnLoginSuccess;
+        internal Action OnLogout;
 
         //Readonly members
         private readonly UserSession userSession;//renamed from LoginSession
@@ -164,22 +167,15 @@ namespace AccelByte.Api
 
             loginMethod(loginResult =>
             {
-                if (loginResult.IsError)
-                {
-                    onLoginFailed?.Invoke(loginResult.Error);
-                }
-                else
-                {
-                    onLoginSuccess?.Invoke();
-                }
+                TriggerLoginResult(loginResult, onLoginFailed, onLoginSuccess);
             });
         }
 
-        private void Login(
-            System.Action<ResultCallback<TokenData, OAuthError>> loginMethod
-            , Action<OAuthError> onAlreadyLogin
-            , Action<OAuthError> onLoginFailed
-            , Action<TokenData> onLoginSuccess
+        internal virtual void Login(
+            System.Action<ResultCallback<TokenData, OAuthError>> loginMethod,
+            Action<OAuthError> onAlreadyLogin,
+            Action<OAuthError> onLoginFailed,
+            Action<TokenData> onLoginSuccess
         )
         {
             if (userSession.IsValid())
@@ -196,17 +192,34 @@ namespace AccelByte.Api
 
             loginMethod(loginResult =>
             {
-                if (loginResult.IsError)
-                {
-                    onLoginFailed?.Invoke(loginResult.Error);
-                }
-                else
-                {
-                    onLoginSuccess?.Invoke(loginResult.Value);
-                }
+                TriggerLoginResult(loginResult, onLoginFailed, onLoginSuccess);
             });
         }
-        
+
+        protected void TriggerLoginResult(Result loginResult, Action<Error> onLoginFailed, Action onLoginSuccess)
+        {
+            if (loginResult.IsError)
+            {
+                onLoginFailed?.Invoke(loginResult.Error);
+            }
+            else
+            {
+                onLoginSuccess?.Invoke();
+            }
+        }
+
+        protected void TriggerLoginResult(Result<TokenData, OAuthError> loginResult, Action<OAuthError> onLoginFailed, Action<TokenData> onLoginSuccess)
+        {
+            if (loginResult.IsError)
+            {
+                onLoginFailed?.Invoke(loginResult.Error);
+            }
+            else
+            {
+                onLoginSuccess?.Invoke(loginResult.Value);
+            }
+        }
+
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password.
         /// </summary>
@@ -234,6 +247,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -271,6 +285,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess)=>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -301,6 +316,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -330,6 +346,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -420,6 +437,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -464,6 +482,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -511,6 +530,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(authCode, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -563,6 +583,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(authCode, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -601,6 +622,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(Session.PlatformUserId, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -638,6 +660,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(tokenData.platform_user_id, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -747,6 +770,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            TriggerLoginWithCachedRefreshToken(cacheKey, callback);
+        }
+
+        protected virtual void TriggerLoginWithCachedRefreshToken(string cacheKey
+            , ResultCallback<TokenData, OAuthError> callback)
+        {
             userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
             {
                 if (refreshTokenData == null)
@@ -796,6 +825,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(cacheKey, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -812,8 +842,15 @@ namespace AccelByte.Api
 
         private void LoginWithRefreshToken(string refreshToken, string cacheKey, ResultCallback<TokenData, OAuthError> callback)
         {
-            Assert.IsNotNull(refreshToken, "Refresh token is null");
-            Assert.AreNotEqual(string.Empty, refreshToken, "Refresh token is empty");
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                callback.TryError(new OAuthError()
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "refreshToken cannot be null or empty"
+                });
+                return;
+            }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -829,6 +866,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(cacheKey, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -888,13 +926,25 @@ namespace AccelByte.Api
                 return;
             }
 
-            userDataCache = null;
-            oAuth2.Logout(userSession.AuthorizationToken,
-                result=>
+            TriggerLogout((logoutResult) =>
             {
-                userSession.ClearSession(true);
-                callback?.Invoke(result);
+                if (!logoutResult.IsError)
+                {
+                    userDataCache = null;
+                    userSession.ClearSession(true);
+                }
+                OnLogout?.Invoke();
+                callback?.Invoke(logoutResult);
             });
+        }
+
+        protected virtual void TriggerLogout(ResultCallback callback)
+        {
+            oAuth2.Logout(userSession.AuthorizationToken,
+               result =>
+               {
+                   callback?.Invoke(result);
+               });
         }
 
         /// <summary>
@@ -983,7 +1033,7 @@ namespace AccelByte.Api
         /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void GetData( ResultCallback<UserData> callback )
+        public void GetData(ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -998,25 +1048,76 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get current logged in user data with platform data. It will return cached user data if it has been called before
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains UserData via callback</param>
+        public void GetDataWithLinkedPlatform(ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (userDataCache != null && userDataCache.PlatformInfos != null)
+            {
+                callback.TryOk(userDataCache);
+            }
+            else
+            {
+                RefreshData(callback, isIncludeAllPlatforms: true);
+            }
+        }
+
+        /// <summary>
+        /// This function will get user basic and public info of 3rd party account
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC).</param>
+        /// <param name="userIds">Array of user ids to get information on</param>
+        /// <param name="callback">Returns a result that contains users' platform info via callback</param>
+        public void GetUserOtherPlatformBasicPublicInfo(
+            string platformId
+            , string[] userIds
+            , ResultCallback<AccountUserPlatformInfosResponse> callback
+        )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new PlatformAccountInfoRequest
+            {
+                PlatformId = platformId,
+                UserIds = userIds
+            };
+
+            api.GetUserOtherPlatformBasicPublicInfo(request, callback);
+        }
+
+        /// <summary>
         /// Refresh currrent cached user data.
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
-        public void RefreshData( ResultCallback<UserData> callback )
+        /// <param name="isIncludeAllPlatforms">Set to true to also get other platform data. Default: false</param>
+        public void RefreshData(ResultCallback<UserData> callback, bool isIncludeAllPlatforms = false)
         {
             Report.GetFunctionLog(GetType().Name);
             userDataCache = null;
 
-            api.GetData(result =>
-            {
-                if (!result.IsError)
+            api.GetData(
+                result =>
                 {
-                    userDataCache = result.Value;
-                    callback.TryOk(userDataCache);
-                    return;
-                }
+                    if (!result.IsError)
+                    {
+                        userDataCache = result.Value;
+                        callback.TryOk(userDataCache);
+                        return;
+                    }
 
-                callback.Try(result);
-            });
+                    callback.Try(result);
+                }
+                , isIncludeAllPlatforms
+            );
         }
 
         /// <summary>
@@ -1536,13 +1637,17 @@ namespace AccelByte.Api
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
-        /// <param name="limit"> Targeted offset query filter. </param>
+        /// <param name="limit"> Targeted limit query filter. </param>
         /// <param name="offset"> Targeted offset query filter. </param>
+        /// <param name="platformId"> Specify platform type, string type of this field makes support OpenID Connect (OIDC). </param>
+        /// <param name="platformBy"> Filter the responded PagedPublicUsersInfo by SearchPlatformType. </param>
         public void SearchUsers( string query
             , SearchType by
             , ResultCallback<PagedPublicUsersInfo> callback
             , int offset = 0 
-            , int limit = 100 )
+            , int limit = 100
+            , string platformId = null
+            , SearchPlatformType platformBy = SearchPlatformType.None)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -1557,8 +1662,11 @@ namespace AccelByte.Api
                 Query = query,
                 SearchBy = by,
                 Offset = offset,
-                Limit = limit
+                Limit = limit,
+                PlatformId = platformId,
+                PlatformBy = platformBy
             };
+
             api.SearchUsers(requestModel, callback);
         }
 
@@ -1567,14 +1675,67 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="query"> Display name or username that needed to get user data.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
-        /// <param name="limit"> Targeted offset query filter. </param>
         /// <param name="offset"> Targeted offset query filter. </param>
+        /// <param name="limit"> Targeted limit query filter. </param>
         public void SearchUsers( string query
             , ResultCallback<PagedPublicUsersInfo> callback
             , int offset = 0
             , int limit = 100)
         {
             SearchUsers(query, SearchType.ALL, callback, offset, limit);
+        }
+
+        /// <summary>
+        /// Get user data from another user by displayName or username with respect to platformType. The query will be used to find the user with the most approximate username or display name.
+        /// </summary>
+        /// <param name="query">Targeted user's Username or Display Name.</param>
+        /// <param name="platformType">The PlatformType (Steam, PS4, Xbox, etc).</param>
+        /// <param name="platformBy">Filter the responded PagedPublicUsersInfo by SearchPlatformType.</param>
+        /// <param name="callback">Return a Result that contains UsersData when completed.</param>
+        /// <param name="offset">Targeted offset query filter.</param>
+        /// <param name="limit">Targeted limit query filter.</param>
+        public void SearchUsersByOtherPlatformType(
+            string query
+            , PlatformType platformType
+            , SearchPlatformType platformBy
+            , ResultCallback<PagedPublicUsersInfo> callback
+            , int offset = 0
+            , int limit = 100)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var platformId = platformType.ToString().ToLower();
+            SearchUsers(query, SearchType.ALL, callback, offset, limit, platformId, platformBy);
+        }
+
+        /// <summary>
+        /// Searches for users on third-party platforms using their Username or Display Name. 
+        /// This function specifically targets users on platforms and utilizes the platform's DisplayName for the search.
+        /// </summary>
+        /// <param name="query">Targeted user's Username or Display Name.</param>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC).</param>
+        /// <param name="platformBy">Filter the responded PagedPublicUsersInfo by SearchPlatformType.</param>
+        /// <param name="callback">Return a Result that contains UsersData when completed.</param>
+        /// <param name="offset">Targeted offset query filter.</param>
+        /// <param name="limit">Targeted limit query filter.</param>
+        public void SearchUsersByOtherPlatformId(
+            string query
+            , string platformId
+            , SearchPlatformType platformBy
+            , ResultCallback<PagedPublicUsersInfo> callback
+            , int offset = 0
+            , int limit = 100)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(platformId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+
+            SearchUsers(query, SearchType.ALL, callback, offset, limit, platformId, platformBy);
         }
 
         /// <summary>
@@ -2062,6 +2223,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -2099,6 +2261,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -2140,6 +2303,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
                     callback.TryOk();
                 });
@@ -2179,6 +2343,7 @@ namespace AccelByte.Api
                 const bool saveTokenAsLatestUser = true;
                 Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
                 {
+                    OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
                     callback.TryOk(tokenData);
                 });
@@ -2299,7 +2464,33 @@ namespace AccelByte.Api
             }
             oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
         }
-        
+
+        /// <summary>
+        /// This function generate a code that can be exchanged into publisher namespace token (i.e. by web portal)
+        /// </summary>
+        /// <param name="publisherClientId">The targeted game's publisher ClientID.</param>
+        /// <param name="callback">A callback that will be called when the operation succeeded.</param>
+        public void GenerateCodeForPublisherTokenExchange(string publisherClientId
+            , ResultCallback<CodeForTokenExchangeResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            TriggerGenerateCodeForPublisherTokenExchange(Session.AuthorizationToken, api.Config.PublisherNamespace, publisherClientId, callback);
+        }
+
+        protected virtual void TriggerGenerateCodeForPublisherTokenExchange(string authToken
+            , string publisherNamespace
+            , string publisherClientId
+            , ResultCallback<CodeForTokenExchangeResponse> callback)
+        {
+            oAuth2.GenerateCodeForPublisherTokenExchange(authToken, publisherNamespace, publisherClientId, callback);
+        }
+
         /// <summary>
         /// Generate publisher user's game token. Required a code from request game token
         /// </summary>
@@ -2407,18 +2598,8 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 oAuth2.RetrieveUserThirdPartyPlatformToken(userId, platformType, callback));
         }
+
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventController">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
-        {
-            this.predefinedEventScheduler = predefinedEventController;
-        }
 
         private void SendLoginSuccessPredefinedEventFromCurrentSession()
         {
@@ -2435,6 +2616,7 @@ namespace AccelByte.Api
 
         internal virtual void SendLoginSuccessPredefinedEvent(TokenData loginTokenData)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (loginTokenData != null && predefinedEventScheduler != null)
             {
                 var loginPayload = new PredefinedLoginSucceededPayload(loginTokenData.Namespace, loginTokenData.user_id, loginTokenData.platform_id, loginTokenData.platform_user_id, loginTokenData.DeviceId);
@@ -2445,6 +2627,7 @@ namespace AccelByte.Api
 
         internal virtual void SendLoginFailedPredefinedEvent(string @namespace, string platformId)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler != null)
             {
                 var loginPayload = new PredefinedLoginFailedPayload(@namespace, platformId);

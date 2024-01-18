@@ -17,8 +17,6 @@ namespace AccelByte.Api
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        private PredefinedEventScheduler predefinedEventScheduler;
-
         [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
             , ISession inSession
@@ -1007,16 +1005,6 @@ namespace AccelByte.Api
         #endregion
 
         #region PredefinedEvents
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         private enum PredefinedAnalyticsMode
         {
             GameSessionCreate,
@@ -1126,6 +1114,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

@@ -17,6 +17,6 @@ namespace AccelByte.Core
 
         private void Update()
         {
-            GameThreadSignal?.Invoke(Time.deltaTime);
+            GameThreadSignal?.Invoke(Time.unscaledDeltaTime);
         }
     }}

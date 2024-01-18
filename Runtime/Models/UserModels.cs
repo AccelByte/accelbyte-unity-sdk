@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using Newtonsoft.Json;
@@ -16,7 +16,7 @@ namespace AccelByte.Models
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum SearchType { ALL, DISPLAYNAME, USERNAME }
+    public enum SearchType { ALL, DISPLAYNAME, USERNAME, THIRDPARTYPLATFORM }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum TwoFAFactorType
@@ -26,6 +26,9 @@ namespace AccelByte.Models
         [Description("backupCode")]
         BACKUPCODE
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SearchPlatformType { None, PlatformDisplayName }
 
     public static class TwoFAFactorTypeExtensions
     {
@@ -145,6 +148,7 @@ namespace AccelByte.Models
         [DataMember] public bool platformAvatarUrl;
         [DataMember] public bool platformDisplayName;
         [DataMember] public string platformId;
+        [DataMember(Name = "platformInfos")] public AccountUserPlatformInfo[] PlatformInfos;
         [DataMember] public string platformUserId;
         [DataMember] public string[] roles;
         [DataMember] public string userId;
@@ -454,8 +458,9 @@ namespace AccelByte.Models
         public SearchType SearchBy;
         public int Offset;
         public int Limit;
-
-        public readonly string[] FilterType = { "", "displayName", "username" };
+        public string PlatformId;
+        public SearchPlatformType PlatformBy;
+        public readonly string[] FilterType = { "", "displayName", "username", "thirdPartyPlatform" };
     }
 
     public class GetUserByUserIdRequest
@@ -764,6 +769,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class CodeForTokenExchangeResponse
+    {
+        [DataMember(Name = "code")] public string Code;
+    }
+
+    [DataContract, Preserve]
     public class ListUserDataRequest
     {
         [DataMember(Name = "userIds")] public string[] UserIds;
@@ -845,5 +856,37 @@ namespace AccelByte.Models
         [DataMember(Name = "platform_token")] public string PlatformToken;
         [DataMember(Name = "platform_token_expires_at")] public int ExpiredAt;
         [DataMember(Name = "sand_box_id")] public string SanboxId; 
+    }
+
+    [DataContract, Preserve]
+    public class AccountUserPlatformInfo
+    {
+        [DataMember(Name = "platformAvatarUrl")] public string PlatformAvatarUrl;
+        [DataMember(Name = "platformDisplayName")] public string PlatformDisplayName;
+        [DataMember(Name = "platformGroup")] public string PlatformGroup;
+        [DataMember(Name = "platformId")] public string PlatformId;
+        [DataMember(Name = "platformUserId")] public string PlatformUserId;
+    }
+
+    [DataContract, Preserve]
+    public class AccountUserPlatformData
+    {
+        [DataMember(Name = "avatarUrl")] public string AvatarUrl;
+        [DataMember(Name = "displayName")] public string DisplayName;
+        [DataMember(Name = "platformInfos")] public List<AccountUserPlatformInfo> PlatformInfos;
+        [DataMember(Name = "userId")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class PlatformAccountInfoRequest
+    {
+        [DataMember(Name = "platformId")] public string PlatformId;
+        [DataMember(Name = "userIds")] public string[] UserIds;
+    }
+
+    [DataContract, Preserve]
+    public class AccountUserPlatformInfosResponse
+    {
+        [DataMember(Name = "data")] public AccountUserPlatformData[] Data;
     }
 };

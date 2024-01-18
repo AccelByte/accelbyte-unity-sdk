@@ -174,8 +174,25 @@ public class OAuth2 : ApiBase
         , bool rememberMe = false)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(username, "Username parameter is null.");
-        Assert.IsNotNull(password, "Password parameter is null.");
+
+        if (string.IsNullOrEmpty(username))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "username cannot be null or empty"
+            });
+            return;
+        }
+        if (string.IsNullOrEmpty(password))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "password cannot be null or empty"
+            });
+            return;
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
@@ -354,7 +371,16 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(platformToken, "PlatformToken parameter is null.");
+
+        if (string.IsNullOrEmpty(platformToken))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "platformToken cannot be null or empty"
+            });
+            return;
+        }
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
@@ -512,7 +538,15 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(linkingToken, "linkingToken parameter is null.");
+        if (string.IsNullOrEmpty(linkingToken))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "linkingToken cannot be null or empty"
+            });
+            return;
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/authenticateWithLink")
             .WithBasicAuth()
@@ -616,7 +650,15 @@ public class OAuth2 : ApiBase
             , ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(code, "Code parameter is null.");
+        if (string.IsNullOrEmpty(code))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "code cannot be null or empty"
+            });
+            return;
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuthWithCookie(Config.PublisherNamespace)
@@ -816,6 +858,42 @@ public class OAuth2 : ApiBase
             var result = response.TryParseJson<GeneratedOneTimeCode>();
 
             callback.Try(result);
+        });
+    }
+
+    /// <summary>
+    /// This function generate a code that can be exchanged into publisher namespace token (i.e. by web portal)
+    /// </summary>
+    /// <param name="accessToken">Player's access token</param>
+    /// <param name="publisherNamespace">The targeted game's publisher Namespace</param>
+    /// <param name="publisherClientId">The targeted game's publisher ClientID</param>
+    /// <param name="callback">A callback will be called when the operation succeeded</param>
+    public void GenerateCodeForPublisherTokenExchange(string accessToken
+        , string publisherNamespace
+        , string publisherClientId
+        , ResultCallback<CodeForTokenExchangeResponse> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken, publisherNamespace ,publisherClientId);
+        if (error != null)
+        {
+            callback.TryError(error);
+            return;
+        }
+
+        var request = HttpRequestBuilder
+            .CreatePost($"{BaseUrl}/v3/namespace/{publisherNamespace}/token/request")
+            .WithBearerAuth(accessToken)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("client_id", publisherClientId.ToString().ToLower())
+            .GetResult();
+
+        httpOperator.SendRequest(request, response =>
+        {
+            var result = response.TryParseJson<CodeForTokenExchangeResponse>();
+            callback?.Try(result);
         });
     }
 

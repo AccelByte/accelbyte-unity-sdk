@@ -18,18 +18,19 @@ namespace AccelByte.Api
             private set;
         }
 
-        protected TAnalyticsWrapper api;
-        private ISession session = null;
-
-        public GameStandardAnalyticsServiceBase(TAnalyticsWrapper inApi,
-            ISession inSession,
-            CoroutineRunner runner)
+        public GameStandardAnalyticsServiceBase(TAnalyticsWrapper inApi)
         {
-            UnityEngine.Assertions.Assert.IsTrue(inApi != null, "inApi parameter can not be null.");
+            Initialize(inApi);
+        }
 
-            api = inApi;
-            session = inSession;
-            Scheduler = new GameStandardEventScheduler<TAnalyticsWrapper>(api);
+        internal void Initialize(TAnalyticsWrapper inApi)
+        {
+            Scheduler = new GameStandardEventScheduler<TAnalyticsWrapper>(inApi);
+        }
+
+        internal void SetAnalyticsWrapper(TAnalyticsWrapper inApi)
+        {
+            Scheduler.SetAnalyticsApiWrapper(inApi);
         }
 
         internal void CacheEvents(AccelByteGameStandardEventCacheImpTemplate cacheImp, string environment)

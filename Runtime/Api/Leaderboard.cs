@@ -62,12 +62,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (string.IsNullOrEmpty(leaderboardCode))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
-                return;
-            }
-
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -108,12 +102,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-
-            if (string.IsNullOrEmpty(leaderboardCode))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
-                return;
-            }
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -163,18 +151,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingData> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-
-            if (string.IsNullOrEmpty(leaderboardCode))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
-                return;
-            }
-
-            if (string.IsNullOrEmpty(additionalKey))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! additionalKey paramater couldn't be empty"));
-                return;
-            }
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -253,6 +229,7 @@ namespace AccelByte.Api
         public void GetLeaderboardListV3(ResultCallback<LeaderboardPagedListV3> callback, int offset = 0, int limit = 20)
         {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -299,6 +276,7 @@ namespace AccelByte.Api
             int offset = 0, int limit = 20)
         {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -331,6 +309,14 @@ namespace AccelByte.Api
         public void GetRankingsByCycle(string leaderboardCode, string cycleId,
             ResultCallback<LeaderboardRankingResult> callback, int offset = 0, int limit = 20)
         {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
             coroutineRunner.Run(api.GetRankingsByCycle(leaderboardCode, cycleId, offset, limit, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
@@ -359,12 +345,6 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingDataV3> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-
-            if (string.IsNullOrEmpty(leaderboardCode))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't query all time leaderboard ranking data! leaderboardCode parameter is null!"));
-                return;
-            }
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -397,18 +377,6 @@ namespace AccelByte.Api
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         private enum EventMode
         {
             GetRankings,
@@ -456,6 +424,7 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (payload == null)
             {
                 return;

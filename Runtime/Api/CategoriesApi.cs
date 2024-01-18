@@ -5,6 +5,7 @@
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -29,10 +30,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get category! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get category! AccessToken parameter is null!");
-            Assert.IsNotNull(language, "Can't get category! Language parameter is null!");
-            Assert.IsNotNull(categoryPath, "Can't get category! CategoryPath parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, language, categoryPath);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/categories/{categoryPath}")
@@ -56,9 +60,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get root categories! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get root categories! AccessToken parameter is null!");
-            Assert.IsNotNull(language, "Can't get root categories! Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/categories")
                 .WithPathParam("namespace", Namespace_)
@@ -81,11 +89,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            
-            Assert.IsNotNull(Namespace_, "Can't get child categories! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get child categories! AccessToken parameter is null!");
-            Assert.IsNotNull(categoryPath, "Can't get child categories! CategoryPath parameter is null!");
-            Assert.IsNotNull(language, "Can't get child categories! Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, categoryPath, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/categories/{categoryPath}/children")
@@ -110,10 +120,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get descendant categories! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get descendant categories! AccessToken parameter is null!");
-            Assert.IsNotNull(categoryPath, "Can't get descendant categories! CategoryPath parameter is null!");
-            Assert.IsNotNull(language, "Can't get descendant categories! Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, categoryPath, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/categories/{categoryPath}/descendants")

@@ -135,7 +135,7 @@ namespace AccelByte.Api
                         {
                             RefinePaymentApiCallback(cb);
                         }
-                        else if (cb.IsError)
+                        else if (cb.IsError && orderRequest != null)
                         {
                             RefineFailedApiCallback(session.UserId, orderRequest.itemId, orderRequest.price);
                         }
@@ -265,7 +265,7 @@ namespace AccelByte.Api
         /// <summary>
         ///  Get all of user's orders that have been created with paging.
         /// </summary>
-        /// <param name="UserOrderRequest">Contains some parameters for query</param>
+        /// <param name="userOrderRequest">Contains some parameters for query</param>
         /// <param name="callback">Returns a Result that contains OrderPagingSlicedResult via callback when completed.</param>
         public void QueryUserOrders(UserOrdersRequest userOrderRequest
             , ResultCallback<OrderPagingSlicedResult> callback)
@@ -287,17 +287,6 @@ namespace AccelByte.Api
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
 
         private void SendPredefinedEventPayload(List<PredefinedPaymentModel> model)
         {
@@ -349,6 +338,7 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (payload != null && predefinedEventScheduler != null)
             {
                 var userProfileEvent = new AccelByteTelemetryEvent(payload);

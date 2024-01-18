@@ -5,6 +5,7 @@
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -201,7 +202,13 @@ namespace AccelByte.Api
             , string storeId = "" )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(itemIds, "Can't bulk Get Locale Items; itemIds parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(itemIds);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {

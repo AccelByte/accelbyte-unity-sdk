@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
-using Newtonsoft.Json;
+using AccelByte.Utils;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {
@@ -30,8 +29,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't create new group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't create new group! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/groups")
@@ -54,6 +58,15 @@ namespace AccelByte.Api
         public IEnumerator CreateGroupV2(CreateGroupRequest createGroupRequest
             , ResultCallback<GroupInformation> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/groups")
                 .WithPathParam("namespace", Namespace_)
@@ -78,8 +91,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't get list of groups! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't get list of groups! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/groups")
@@ -105,11 +123,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group information! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group information! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't get group information! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}")
@@ -133,11 +153,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update group information! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group information! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't update group information! GroupId parameter is null!");
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}")
@@ -179,11 +201,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update group information! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group information! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't update group information! GroupId parameter is null!");
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreatePatch(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}")
@@ -224,9 +248,13 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't delete group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't delete group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't delete group! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}")
@@ -249,9 +277,13 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't delete group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't delete group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't delete group! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}")
@@ -275,11 +307,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't update group custon rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group custon rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't update group custon rule! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UpdateGroupCustomRuleRequest customRule =
                 new UpdateGroupCustomRuleRequest { groupCustomRule = ruleUpdateRequest };
@@ -308,11 +342,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't update group custon rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group custon rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't update group custon rule! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UpdateGroupCustomRuleRequest customRule =
                 new UpdateGroupCustomRuleRequest { groupCustomRule = ruleUpdateRequest };
@@ -342,14 +378,17 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't update group predefined rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group predefined rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't update group predefined rule! GroupId parameter is null!");
-            Assert.AreNotEqual(AllowedAction.None, allowedAction,
-                "Can't update group predefined rule! allowedAction parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error == null && allowedAction == AllowedAction.None)
+            {
+                error = new Error(ErrorCode.InvalidRequest, $"allowedAction parameter cannot be AllowedAction.None!");
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/rules/defined/{allowedAction}")
@@ -377,14 +416,17 @@ namespace AccelByte.Api
             , ResultCallback<GroupInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't update group predefined rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't update group predefined rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't update group predefined rule! GroupId parameter is null!");
-            Assert.AreNotEqual(AllowedAction.None, allowedAction,
-                "Can't update group predefined rule! allowedAction parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error == null && allowedAction == AllowedAction.None)
+            {
+                error = new Error(ErrorCode.InvalidRequest, $"allowedAction parameter cannot be AllowedAction.None!");
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/rules/defined/{allowedAction}")
@@ -411,14 +453,17 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't delete group predefined rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't delete group predefined rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't delete group predefined rule! GroupId parameter is null!");
-            Assert.AreNotEqual(AllowedAction.None, allowedAction,
-                "Can't delete group predefined rule! allowedAction parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error == null && allowedAction == AllowedAction.None)
+            {
+                error = new Error(ErrorCode.InvalidRequest, $"allowedAction parameter cannot be AllowedAction.None!");
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl +
@@ -445,14 +490,17 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't delete group predefined rule! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't delete group predefined rule! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't delete group predefined rule! GroupId parameter is null!");
-            Assert.AreNotEqual(AllowedAction.None, allowedAction,
-                "Can't delete group predefined rule! allowedAction parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error == null && allowedAction == AllowedAction.None)
+            {
+                error = new Error(ErrorCode.InvalidRequest, $"allowedAction parameter cannot be AllowedAction.None!");
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl +
@@ -478,12 +526,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupMemberInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get user's group information! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get user's group information! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Can't get user's group information! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}")
@@ -506,11 +555,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't accept group invitation! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't accept group invitation! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't accept group invitation! groupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/invite/accept")
@@ -533,11 +584,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't accept group invitation! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't accept group invitation! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't accept group invitation! groupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/invite/accept")
@@ -560,11 +613,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't reject group invitation! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't reject group invitation! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't reject group invitation! groupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/invite/reject")
@@ -587,11 +642,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't reject group invitation! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't reject group invitation! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't reject group invitation! groupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/invite/reject")
@@ -614,11 +671,13 @@ namespace AccelByte.Api
             , ResultCallback<UserInvitationResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't invite other user to group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't invite other user to group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't invite other user to group! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/invite")
@@ -641,11 +700,13 @@ namespace AccelByte.Api
             , ResultCallback<UserInvitationResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't invite other user to group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't invite other user to group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't invite other user to group! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/invite")
@@ -669,9 +730,13 @@ namespace AccelByte.Api
             , ResultCallback<JoinGroupResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't join group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't join group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't join group! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/join")
@@ -695,9 +760,13 @@ namespace AccelByte.Api
             , ResultCallback<JoinGroupResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't join group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't join group! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't join group! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/join")
@@ -721,12 +790,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't cancel join group request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't cancel join group request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't cancel join group request! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/join/cancel")
@@ -752,11 +822,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group member list! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group member list ! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't get group member list! groupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/members")
@@ -782,10 +854,13 @@ namespace AccelByte.Api
             , ResultCallback<KickMemberResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't kick a group member! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't kick a group member! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't kick a group member! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/kick")
@@ -809,11 +884,13 @@ namespace AccelByte.Api
             , ResultCallback<KickMemberResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't kick a group member! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't kick a group member! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't kick a group member! UserId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't kick a group member! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/kick")
@@ -837,8 +914,13 @@ namespace AccelByte.Api
         public IEnumerator LeaveGroup(ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't leave group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't leave group! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/leave")
@@ -860,8 +942,13 @@ namespace AccelByte.Api
         public IEnumerator LeaveGroupV2(string groupId, ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_), "Can't leave group! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken), "Can't leave group! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/leave")
@@ -887,11 +974,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group join requests! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group join requests! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't get group join requests! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/join/request")
@@ -919,14 +1008,16 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group join requests! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group join requests! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId), "Can't get group join requests! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/groups/{groupId}/join/request")
+                .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/join/request")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("groupId", groupId)
                 .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
@@ -950,10 +1041,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group join requests! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group join requests! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/me/join/request")
@@ -979,10 +1073,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group join requests! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group join requests! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/invite/request")
@@ -1008,10 +1105,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't get group join requests! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group join requests! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/groups/{groupId}/invite/request")
@@ -1041,12 +1141,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't accept other user join request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't accept other user join request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Can't accept other user join request! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/join/accept")
@@ -1070,12 +1171,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't accept other user join request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't accept other user join request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Can't accept other user join request! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/join/accept")
@@ -1100,12 +1202,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't reject other user join request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't reject other user join request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Can't reject other user join request! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/join/reject")
@@ -1129,12 +1232,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't reject other user join request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't reject other user join request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId),
-                "Can't reject other user join request! UserId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/join/reject")
@@ -1160,13 +1264,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupMemberInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't assign group role request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(memberRoleId),
-                "Can't assign group role request! MemberRoleId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't assign group role request! UserId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't assign group role request! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             AssignRoleRequest assignedUser = new AssignRoleRequest { userId = userId };
 
@@ -1194,15 +1298,13 @@ namespace AccelByte.Api
             , ResultCallback<GroupMemberInformation> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't assign group role request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(memberRoleId),
-                "Can't assign group role request! MemberRoleId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't assign group role request! UserId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't assign group role request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't assign group role request! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             AssignRoleRequest assignedUser = new AssignRoleRequest { userId = userId };
 
@@ -1231,13 +1333,13 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't remove group role request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(memberRoleId),
-                "Can't remove group role request! MemberRoleId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't remove group role request! UserId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't remove group role request! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             AssignRoleRequest removedUser = new AssignRoleRequest { userId = userId };
 
@@ -1265,15 +1367,13 @@ namespace AccelByte.Api
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(Namespace_),
-                "Can't remove group role request! Namespace parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(memberRoleId),
-                "Can't remove group role request! MemberRoleId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(userId), "Can't remove group role request! UserId parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't remove group role request! AccessToken parameter is null!");
-            Assert.IsFalse(string.IsNullOrEmpty(groupId),
-                "Can't remove group role request! GroupId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             AssignRoleRequest removedUser = new AssignRoleRequest { userId = userId };
 
@@ -1303,8 +1403,13 @@ namespace AccelByte.Api
             , int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(AuthToken),
-                "Can't get group role request! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/roles")
@@ -1327,7 +1432,13 @@ namespace AccelByte.Api
         public IEnumerator GetGroupsByGroupIds(string[] groupIds, ResultCallback<PaginatedGroupListResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(groupIds, "Can't get groups by group ids! GroupIds parameter is null");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupIds);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestModel = new GetGroupsByGroupIdsRequest { groupIDs = groupIds };
 
@@ -1353,9 +1464,17 @@ namespace AccelByte.Api
             int offset = 0)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/me/groups")
                 .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
-                .WithQueryParam("offset", (offset > 0) ? offset.ToString() : "")
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -1374,8 +1493,13 @@ namespace AccelByte.Api
             ResultCallback<GroupGeneralResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userId, "Can't cancel group member invitation! UserId parameter is null");
-            Assert.IsNotNull(groupId, "Can't cancel group member invitation! GroupId parameter is null");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/invite/cancel")
@@ -1398,8 +1522,13 @@ namespace AccelByte.Api
         public IEnumerator UpdateGroupCustomAttributes(string groupId, Dictionary<string, object> customAttributes,
             ResultCallback<GroupInformation> callback)
         {
-            Assert.IsNotNull(groupId, "Can't update group custom attribute! GroupId parameter is null");
-            Assert.IsNotNull(customAttributes, "Can't update group custom attribute! CustomAttribute parameter is null");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId, customAttributes);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var updateRequest = new UpdateCustomAttributesRequest { customAttributes = customAttributes };
             
@@ -1423,8 +1552,12 @@ namespace AccelByte.Api
         public IEnumerator GetUserGroupStatusInfo(string userId, string groupId,
             ResultCallback<GroupMemberInformation> callback)
         {
-            Assert.IsNotNull(userId, "Can't get user group status info! UserId parameter is null");
-            Assert.IsNotNull(groupId, "Can't get user group status info! GroupId parameter is null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/groups/{groupId}/status")

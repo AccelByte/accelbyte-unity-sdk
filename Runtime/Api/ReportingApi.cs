@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -29,8 +29,13 @@ namespace AccelByte.Api
             , int limit )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/reasonGroups")
@@ -58,9 +63,13 @@ namespace AccelByte.Api
             , string title)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
-            Assert.IsNotNull(reasonGroup, "Can't create content! reasonGroup parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, reasonGroup);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/reasons")
@@ -87,9 +96,13 @@ namespace AccelByte.Api
             , ResultCallback<ReportingSubmitResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
-            Assert.IsNotNull(reportData, "Can't create content! reasonGroup parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, reportData);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/reports")
@@ -113,9 +126,13 @@ namespace AccelByte.Api
             , ResultCallback<ReportingSubmitResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
-            Assert.IsNotNull(reportData, "Can't create content! reasonGroup parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, reportData);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/reports")

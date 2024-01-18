@@ -1,11 +1,13 @@
 // Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System;
+
 using AccelByte.Models;
 using AccelByte.Core;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -59,7 +61,12 @@ namespace AccelByte.Api
             , ResultCallback<FulfillmentResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(code, "Can't redeem code! code parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(code);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -89,20 +96,15 @@ namespace AccelByte.Api
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         private void RefineRedeemCodeResult(Result<FulfillmentResult> apiCallResult, string code)
         {
+            if (apiCallResult.Value.entitlementSummaries == null
+                || apiCallResult.Value.creditSummaries == null
+                || apiCallResult.Value.subscriptionSummaries == null)
+            {
+                return;
+            }
+
             IAccelByteTelemetryPayload payload;
             payload = CreatePredefinedPayload<FulfillmentResult>(apiCallResult, PredefinedEventMode.RedeemCampaignCode, code);
             SendPredefinedEvent(payload);
@@ -172,7 +174,8 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
-            if (payload != null)
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
+            if (payload != null && predefinedEventScheduler != null)
             {
                 var userProfileEvent = new AccelByteTelemetryEvent(payload);
                 predefinedEventScheduler.SendEvent(userProfileEvent, null);

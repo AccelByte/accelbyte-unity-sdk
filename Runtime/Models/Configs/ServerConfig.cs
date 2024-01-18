@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020-2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -38,6 +38,7 @@ namespace AccelByte.Models {
         [DataMember] public string SeasonPassServerUrl;
         [DataMember] public string AMSServerUrl = defaultAMSServerUrl;
         [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
+        [DataMember] public int AMSPort;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
         [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;

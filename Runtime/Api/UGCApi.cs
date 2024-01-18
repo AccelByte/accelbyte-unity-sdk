@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -80,9 +79,9 @@ namespace AccelByte.Api
             switch (orderBy)
             {
                 case UGCOrderBy.ASC:
-                    return "name";
+                    return "asc";
                 case UGCOrderBy.DESC:
-                    return "date";
+                    return "desc";
             }
             return "";
         }
@@ -138,6 +137,26 @@ namespace AccelByte.Api
             }
             return "";
         }
+        
+        private string ConvertUGCListStagingContentSortByToString(UGCListStagingContentSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case UGCListStagingContentSortBy.CreatedTime:
+                    return "createdTime";
+                case UGCListStagingContentSortBy.CreatedTimeAsc:
+                    return "createdTime:asc";
+                case UGCListStagingContentSortBy.CreatedTimeDesc:
+                    return "createdTime:desc";
+                case UGCListStagingContentSortBy.UpdatedTime:
+                    return "updatedTime";
+                case UGCListStagingContentSortBy.UpdatedTimeAsc:
+                    return "updatedTime:asc";
+                case UGCListStagingContentSortBy.UpdatedTimeDesc:
+                    return "updatedTime:desc";
+            }
+            return "";
+        }
 
         public IEnumerator CreateContent( string userId
             , string channelId
@@ -145,10 +164,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't create content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't create content! channelId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UGCRequest Req = createRequest;
             if (string.IsNullOrEmpty(Req.contentType))
@@ -188,16 +215,24 @@ namespace AccelByte.Api
             , string contentType )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't create content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't create content! channelId parameter is null!");
-            Assert.IsNotNull(name, "Can't create content! name parameter is null!");
-            Assert.IsNotNull(type, "Can't create content! type parameter is null!");
-            Assert.IsNotNull(subtype, "Can't create content! subType parameter is null!");
-            Assert.IsNotNull(tags, "Can't create content! tags parameter is null!");
-            Assert.IsNotNull(preview, "Can't create content! preview parameter is null!");
-            Assert.IsNotNull(fileExtension, "Can't create content! fileExtension parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+                , name
+                , type
+                , subtype
+                , tags
+                , preview
+                , fileExtension
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UGCRequest createRequest = new UGCRequest
             {
@@ -220,12 +255,20 @@ namespace AccelByte.Api
             , ResultCallback<UGCResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't modify content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't modify content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't modify content! channelId parameter is null!");
-            Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
-            Assert.IsNotNull(modifyRequest, "Can't modify content! type parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+                , contentId
+                , modifyRequest
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UGCUpdateRequest Req = modifyRequest;
             if (string.IsNullOrEmpty(Req.ContentType))
@@ -262,12 +305,20 @@ namespace AccelByte.Api
             , bool updateContent)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't modify content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't modify content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't modify content! channelId parameter is null!");
-            Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
-            Assert.IsNotNull(modifyRequest, "Can't modify content! type parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+                , contentId
+                , modifyRequest
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UGCUpdateRequest Req = new UGCUpdateRequest
             {
@@ -300,17 +351,25 @@ namespace AccelByte.Api
             , bool updateContent)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't modify content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't modify content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't modify content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't modify content! channelId parameter is null!");
-            Assert.IsNotNull(contentId, "Can't modify content! name parameter is null!");
-            Assert.IsNotNull(name, "Can't modify content! name parameter is null!");
-            Assert.IsNotNull(type, "Can't modify content! type parameter is null!");
-            Assert.IsNotNull(subtype, "Can't modify content! subType parameter is null!");
-            Assert.IsNotNull(tags, "Can't modify content! tags parameter is null!");
-            Assert.IsNotNull(preview, "Can't modify content! preview parameter is null!");
-            Assert.IsNotNull(fileExtension, "Can't modify content! fileExtension parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+                , contentId
+                , name
+                , type
+                , subtype
+                , tags
+                , preview
+                , fileExtension
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             UGCRequest modifyRequest = new UGCRequest
             {
@@ -331,7 +390,16 @@ namespace AccelByte.Api
             , ResultCallback<UGCSearchContentsPagingResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents")
@@ -367,8 +435,17 @@ namespace AccelByte.Api
             , ResultCallback<UGCSearchContentsPagingResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
-            Assert.IsNotNull(channelId, "Can't search content! channelId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , channelId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/channels/{channelId}/contents")
@@ -405,11 +482,19 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't delete content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't delete content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete content! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't delete content! ChannelId parameter is null!");
-            Assert.IsNotNull(contentId, "Can't delete content! ContentId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+                , contentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}/contents/{contentId}")
@@ -435,10 +520,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCContentResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get content by content id! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get content by content id! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get content by content id! AccessToken parameter is null!");
-            Assert.IsNotNull(contentId, "Can't get content by content id! ContentId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , contentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/{contentId}")
@@ -461,9 +554,17 @@ namespace AccelByte.Api
             , ResultCallback<UGCContentResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get content by share code! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get content by share code! AccessToken parameter is null!");
-            Assert.IsNotNull(shareCode, "Can't get content by share code! ShareCoded parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , shareCode
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/sharecodes/{shareCode}")
@@ -487,10 +588,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCPreview> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get content! AccessToken parameter is null!");
-            Assert.IsNotNull(contentId, "Can't get content! contentId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , contentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/{contentId}/preview")
@@ -515,10 +624,18 @@ namespace AccelByte.Api
             , ResultCallback<byte[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get content! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get content! AccessToken parameter is null!");
-            Assert.IsNotNull(contentId, "Can't get content! contentId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , contentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             yield return GetContentPreview(userId, contentId, result =>
             {
@@ -547,8 +664,16 @@ namespace AccelByte.Api
             , int limit )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Tags! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get Tags! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/tags")
@@ -573,8 +698,16 @@ namespace AccelByte.Api
             , int limit )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get types! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get types! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/types")
@@ -599,10 +732,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCChannelResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create channel! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't create channel! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create channel! AccessToken parameter is null!");
-            Assert.IsNotNull(channelName, "Can't create channel! channelName parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelName
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels")
@@ -630,9 +771,17 @@ namespace AccelByte.Api
             , string channelName)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get channels! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get channels! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get channels! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels")
@@ -659,10 +808,18 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't delete channel! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't delete channel! UserId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete channel! AccessToken parameter is null!");
-            Assert.IsNotNull(channelId, "Can't delete channel! ChannelId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , channelId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}")
@@ -687,7 +844,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCUpdateLikeStatusToContentResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , requestParameter
+                , requestParameter?.ContentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/contents/{contentId}/like")
@@ -713,7 +881,17 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/followers")
@@ -740,7 +918,18 @@ namespace AccelByte.Api
             , ResultCallback<UGCUpdateFollowStatusToUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , requestParameter
+                , requestParameter?.UserId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/follow")
@@ -765,7 +954,15 @@ namespace AccelByte.Api
             , ResultCallback<UGCModelsContentsResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Content Followed! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/contents/bulk")
@@ -790,8 +987,17 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't Get Followed Creators! userId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents")
@@ -819,8 +1025,18 @@ namespace AccelByte.Api
             , ResultCallback<ScreenshotsResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't Get Followed Creators! userId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , contentId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
@@ -847,7 +1063,16 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Content Followed! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/followed")
@@ -873,7 +1098,16 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/followed")
@@ -900,7 +1134,17 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/following")
@@ -926,7 +1170,16 @@ namespace AccelByte.Api
             , ResultCallback<UGCContentsPagingResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/contents/liked")
@@ -957,7 +1210,16 @@ namespace AccelByte.Api
             , ResultCallback<UGCContentsPagingResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string tags = "";
             if(getLikedContentRequest.Tags.Length > 0 && getLikedContentRequest.Tags != null)
@@ -997,8 +1259,17 @@ namespace AccelByte.Api
             , ResultCallback<UGCGetCreatorStatsResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't GetCreatorStats! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't GetCreatorStats! userId parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}")
@@ -1024,7 +1295,17 @@ namespace AccelByte.Api
             , int offset)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Followed Creators! Namespace parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/groups")
@@ -1051,10 +1332,21 @@ namespace AccelByte.Api
             , ResultCallback<UGCChannelResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get List Followers! Namespace parameter is null!");
-            Assert.IsNotNull(requestParameter.UserId, "Can't UpdateChannel! userId parameter is null!");
-            Assert.IsNotNull(requestParameter.ChannelId, "Can't UpdateChannel! channelId parameter is null!");
-            Assert.IsNotNull(requestModel.Name, "Can't UpdateChannel! name parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , requestModel
+                , requestModel?.Name
+                , requestParameter
+                , requestParameter?.UserId
+                , requestParameter?.ChannelId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/channels/{channelId}")
@@ -1132,14 +1424,14 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , filterRequest
+            );
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback.TryError(error);
                 yield break;
             }
 
@@ -1175,14 +1467,14 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , contentIds
+            );
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback.TryError(error);
                 yield break;
             }
             if (contentIds.Length <= 0)
@@ -1698,7 +1990,7 @@ namespace AccelByte.Api
             }
 
             var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
+                .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/contents/{contentId}/screenshots")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("contentId", contentId)
@@ -2142,13 +2434,17 @@ namespace AccelByte.Api
             , ResultCallback<UGCModelsContentsResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , shareCodes
+            );
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback.TryError(error);
                 yield break;
             }
-            
             if (shareCodes.Length <= 0)
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
@@ -2185,13 +2481,17 @@ namespace AccelByte.Api
             , ResultCallback<UGCModelsContentsResponseV2[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , shareCodes
+            );
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback.TryError(error);
                 yield break;
             }
-            
             if (shareCodes.Length <= 0)
             {
                 callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
@@ -2223,5 +2523,168 @@ namespace AccelByte.Api
             var result = response.TryParseJson<UGCModelsContentsResponseV2[]>();
             callback.Try(result);
         }
+
+#region StagingContent
+        public IEnumerator GetUserStagingContentByContentId(string userId
+            , string contentId
+            , ResultCallback<UGCModelStagingContent> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, contentId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/staging-contents/{contentId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelStagingContent>();
+            callback.Try(result);
+        }
+
+        public IEnumerator GetListStagingContent(string userId
+            , UGCStagingContentStatus status
+            , int limit
+            , int offset
+            , UGCListStagingContentSortBy sortBy
+            , ResultCallback<UGCModelsPaginatedStagingContentResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/staging-contents")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueryParam("status", status.ToString().ToUpper())
+                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("offset", offset.ToString())
+                .WithQueryParam("sortBy", ConvertUGCListStagingContentSortByToString(sortBy))
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelsPaginatedStagingContentResponse>();
+            callback.Try(result);
+        }
+
+        public IEnumerator ModifyStagingContentByContentId(string userId
+            , string contentId
+            , UGCUpdateStagingContentRequest modifyRequest
+            , ResultCallback<UGCModelStagingContent> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , contentId
+                , modifyRequest
+                , modifyRequest.FileLocation);
+
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            UGCUpdateStagingContentRequest Req = modifyRequest;
+            if (string.IsNullOrEmpty(Req.ContentType))
+            {
+                Req.ContentType = "application/octet-stream";
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/staging-contents/{contentId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(Req.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParseJson<UGCModelStagingContent>();
+            callback.Try(result);
+        }
+
+        public IEnumerator DeleteStagingContentByContentId(string userId
+            , string contentId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, contentId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/staging-contents/{contentId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("contentId", contentId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp =>
+                {
+                    response = rsp;
+                });
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+#endregion
     }
 }

@@ -23,6 +23,13 @@ namespace AccelByte.Core
 
         protected CoroutineRunner coroutineRunner { get; set; }
         protected TokenData tokenData { get; set; }
+        internal TokenData TokenData
+        {
+            get
+            {
+                return tokenData;
+            }
+        }
         protected Coroutine maintainAccessTokenCoroutine { get; set; }
         protected DateTime nextRefreshTime { get; set; }
         protected Dictionary<string, ThirdPartyPlatformTokenData> thirdPartyPlatformTokenData { get; set; }

@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
+
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
+using System.Collections;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -118,8 +120,13 @@ namespace AccelByte.Api
             , bool isGlobal)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't query achievements! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query achievements! AuthToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements")
@@ -150,9 +157,13 @@ namespace AccelByte.Api
             , ResultCallback<MultiLanguageAchievement> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get achievement! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get achievement! AuthToken parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't get achievement! AchievementCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements/{achievementCode}")
                 .WithPathParam("namespace", Namespace_)
@@ -179,8 +190,13 @@ namespace AccelByte.Api
             , bool preferUnlocked )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't query user achievements! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query user achievements! AuthToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements")
@@ -214,10 +230,13 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't unlock achievement! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't unlock achievement! AuthToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't unlock achievement! UserId parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't unlock achievement! AchievementCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
@@ -248,9 +267,13 @@ namespace AccelByte.Api
             ) 
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't query global achievements! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query global achievements! AuthToken parameter is null!");
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements")
@@ -286,9 +309,13 @@ namespace AccelByte.Api
             )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't query global achievement contributors! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query global achievement contributors! AuthToken parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't query global achievement contributors! AchievementCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements/{achievementCode}/contributors")
@@ -319,10 +346,13 @@ namespace AccelByte.Api
             )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't query global achievement contributors! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query global achievement contributors! AuthToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't global achievement contributors! UserId parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't query global achievement contributors! AchievementCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements")
@@ -352,10 +382,13 @@ namespace AccelByte.Api
             ) 
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't claim global achievement contributors! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't claim global achievement contributors! AuthToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't claim global achievement contributors! UserId parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't claim global achievement contributors! AchievementCode parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements/{achievementCode}/claim")
@@ -383,8 +416,12 @@ namespace AccelByte.Api
             , int limit
         )
         {
-            Assert.IsNotNull(Namespace_, "Can't query user achievements! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't query user achievements! AuthToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/tags")

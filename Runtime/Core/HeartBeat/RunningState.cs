@@ -8,28 +8,35 @@ namespace AccelByte.Core
 {
     internal class RunningState : IHeartBeatState
     {
-        private int delayTimeInMs;
-        private bool isRunning;
         private Action triggerAction;
+        private bool isRunning;
+        Utils.AccelByteTimer timer;
 
         public RunningState(int delayTimeInMs, Action triggerAction)
         {
+            float delayTimeInS = Utils.TimeUtils.MillisecondsToSeconds(delayTimeInMs);
             this.triggerAction = triggerAction;
-            isRunning = true;
-            this.delayTimeInMs = delayTimeInMs;
+            Action onTimerDone = () =>
+            {
+                if (isRunning)
+                {
+                    this.triggerAction?.Invoke();
+                    timer.Start();
+                }
+            };
+            timer = new Utils.AccelByteTimer(delayTimeInS, onTimerDone);
         }
 
-        public async void Run()
+        public void Run()
         {
-            while (isRunning)
-            {
-                triggerAction?.Invoke();
-                await System.Threading.Tasks.Task.Delay(delayTimeInMs);
-            }
+            triggerAction?.Invoke();
+            timer.Start();
+            isRunning = true;
         }
 
         public void Stop()
         {
+            timer.Stop();
             isRunning = false;
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -17,22 +17,11 @@ namespace AccelByte.Core
     /// </summary>
     public class ApiClient
     {
-        #region Constructor
         public UserSession session;
         public IHttpClient httpClient;
         public readonly CoroutineRunner coroutineRunner;
         public Dictionary<string, WrapperBase> wrapperBaseCollection = new Dictionary<string, WrapperBase>();
 
-        public ApiClient( UserSession inSession
-            , IHttpClient inHttpClient
-            , CoroutineRunner inCoroutineRunner )
-        {
-            session = inSession;
-            httpClient = inHttpClient;
-            coroutineRunner = inCoroutineRunner;
-        }
-        #endregion /Constructor
-        
         // Reflection cannot find `internal` scope modifiers without these bindings.
         private const BindingFlags reflectionBindingToFindInternal =
             BindingFlags.Public |
@@ -41,16 +30,58 @@ namespace AccelByte.Core
 
         /// <summary>CURRENTLY UNUSED: Added for Unreal parity</summary>
         public bool UseSharedCredentials;
-        
-        private static OAuthConfig oAuthConfig => AccelBytePlugin.OAuthConfig;
-        private static Config config => AccelBytePlugin.Config;
-        
+
+        private OAuthConfig oAuthConfig;
+        internal Config Config;
+
         public object[] getApiArgs() => new object[]
         {
             httpClient,
-            config, 
+            Config,
             session,
         };
+
+        private ApiSharedMemory sharedMemory;
+
+        #region Constructor
+        public ApiClient( UserSession inSession
+            , IHttpClient inHttpClient
+            , CoroutineRunner inCoroutineRunner ) : this(inSession, inHttpClient, inCoroutineRunner, AccelBytePlugin.Config, AccelBytePlugin.OAuthConfig)
+        {
+        }
+
+        internal ApiClient(UserSession inSession
+            , IHttpClient inHttpClient
+            , CoroutineRunner inCoroutineRunner
+            , Config clientConfig
+            , OAuthConfig oAuthConfig)
+        {
+            session = inSession;
+            httpClient = inHttpClient;
+            coroutineRunner = inCoroutineRunner;
+            Config = clientConfig;
+            this.oAuthConfig = oAuthConfig;
+            sharedMemory = new ApiSharedMemory();
+        }
+        #endregion /Constructor
+
+        public void Reset()
+        {
+            StopHeartBeat();
+
+            const bool autoCreate = false;
+            User user = GetUser(autoCreate);
+            if (user != null)
+            {
+                user.OnLoginSuccess = null;
+                user.OnLogout = null;
+            }
+
+            if (session != null)
+            {
+                session.ClearSession();
+            }
+        }
         
         /// <summary>
         /// Get new CoreBase child class instance with dynamic params.
@@ -98,54 +129,69 @@ namespace AccelByte.Core
         /// </example>
         /// 
         /// <returns>Returns new ApiBase child instance.</returns>
-        public TWrapper GetApi<TWrapper, TApi>() 
+        public TWrapper GetApi<TWrapper, TApi>(bool autoCreate = true) 
             where TWrapper : WrapperBase 
             where TApi  : ApiBase // `Parent` supports both client and server
         {
+            TWrapper wrapper = null;
             string currentWrapperName = typeof(TWrapper).GetTypeInfo().FullName;
 
             if (wrapperBaseCollection.ContainsKey(currentWrapperName))
             {
-                return (TWrapper)wrapperBaseCollection[currentWrapperName];
+                wrapper = (TWrapper)wrapperBaseCollection[currentWrapperName];
             }
-
-            // ####################################################################
-            // Expected TApi constructor params: (IHttpClient, Config, ISession)
-            // Expected TWrapper constructor params: (TApi, IUserSession, CoroutineRunner)
-            // ####################################################################
-
-            object[] apiArgs = getApiArgs();
-            
-            // Create the TApi to pass as a param to the TCore constructor
-            TApi api = (TApi)Activator.CreateInstance(
-                typeof(TApi), 
-                bindingAttr: reflectionBindingToFindInternal,
-                binder: null,
-                args: apiArgs,
-                culture: null);
-            
-            object[] wrapperArgs =
+            else if (autoCreate)
             {
+                // ####################################################################
+                // Expected TApi constructor params: (IHttpClient, Config, ISession)
+                // Expected TWrapper constructor params: (TApi, IUserSession, CoroutineRunner)
+                // ####################################################################
+
+                object[] apiArgs = getApiArgs();
+
+                // Create the TApi to pass as a param to the TCore constructor
+                TApi api = (TApi)Activator.CreateInstance(
+                    typeof(TApi)
+                    , bindingAttr: reflectionBindingToFindInternal
+                    , binder: null
+                    , args: apiArgs
+                    , culture: null
+                );
+
+                object[] wrapperArgs =
+                {
                 api,
                 session,
                 coroutineRunner,
-            };
+                };
 
-            // Return CoreBase child with consistently-known args, including an ApiBase type
-            object newWrapperInstance = Activator.CreateInstance(
-                typeof(TWrapper), 
-                bindingAttr: reflectionBindingToFindInternal,
-                binder: null,
-                args: wrapperArgs,
-                culture: null);
+                // Return CoreBase child with consistently-known args, including an ApiBase type
+                TWrapper newWrapperInstance = (TWrapper)Activator.CreateInstance(
+                    typeof(TWrapper),
+                    bindingAttr: reflectionBindingToFindInternal,
+                    binder: null,
+                    args: wrapperArgs,
+                    culture: null);
 
-            wrapperBaseCollection.Add(currentWrapperName, (WrapperBase)newWrapperInstance);
-            return (TWrapper)wrapperBaseCollection[currentWrapperName];
+                SetApi(newWrapperInstance);
+                wrapper = newWrapperInstance;
+            }
+            return wrapper;
         }
 
+        public void SetApi<TWrapper>(TWrapper newWrapper) where TWrapper : WrapperBase
+        {
+            string currentWrapperName = typeof(TWrapper).GetTypeInfo().FullName;
+            newWrapper.SetSharedMemory(sharedMemory);
+            wrapperBaseCollection[currentWrapperName] = newWrapper;
+        }
 
-#region API_GETTER
-        public User GetUser() { return GetApi<User, UserApi>(); }
+        #region API_GETTER
+        public User GetUser(bool autoCreate = true)
+        {
+            User retval = GetApi<User, UserApi>(autoCreate);
+            return retval;
+        }
         public UserProfiles GetUserProfiles() { return GetApi<UserProfiles, UserProfilesApi>(); }
         public Categories GetCategories() { return GetApi<Categories, CategoriesApi>(); }
         public Items GetItems() { return GetApi<Items, ItemsApi>(); }
@@ -179,14 +225,29 @@ namespace AccelByte.Core
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, AnalyticsApi>(); }
         public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }
-#endregion
-
-
-        internal void environmentChanged()
+        public Api.ServiceVersion GetVersionService() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
+        public HeartBeat GetHeartBeatService(bool autoCreate = true)
         {
-            session = AccelBytePlugin.GetUser().Session as UserSession;
-            httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
-            httpClient.SetBaseUri(new Uri(config.BaseUrl));
+            HeartBeat retval = GetApi<HeartBeat, HeartBeatApi>(autoCreate);
+            return retval;
+        }
+        public StoreDisplay GetStoreDisplayService() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
+        #endregion
+
+        private void StopHeartBeat()
+        {
+            const bool setActive = false;
+            const bool autoCreate = false;
+            HeartBeat heartbeatService = GetHeartBeatService(autoCreate);
+            if (heartbeatService != null && heartbeatService.IsHeartBeatJobEnabled)
+            {
+                heartbeatService.SetHeartBeatEnabled(setActive);
+            }
+        }
+
+        internal void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            sharedMemory = newSharedMemory;
         }
     }
     // Class

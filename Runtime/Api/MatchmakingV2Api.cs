@@ -1,11 +1,12 @@
 ﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
+
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using JetBrains.Annotations;
-using UnityEngine.Assertions;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -29,9 +30,16 @@ namespace AccelByte.Api
             , [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams
             , ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(matchPoolName, nameof(matchPoolName) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , matchPoolName
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var requestBody = new MatchmakingV2CreateTicketRequest()
             {
@@ -67,9 +75,16 @@ namespace AccelByte.Api
         public IEnumerator GetMatchmakingTicket(string ticketId
             , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , ticketId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/match-tickets/{ticketId}")
@@ -92,9 +107,16 @@ namespace AccelByte.Api
 
         public IEnumerator DeleteMatchmakingTicket(string ticketId, ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(ticketId, nameof(ticketId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , ticketId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/namespaces/{namespace}/match-tickets/{ticketId}")
@@ -117,10 +139,17 @@ namespace AccelByte.Api
 
         public IEnumerator GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsFalse(string.IsNullOrEmpty(matchPool), nameof(matchPool) + " cannot be null or empty");
-            
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , matchPool
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/match-pools/{matchPool}/metrics")
                 .WithPathParam("namespace", Namespace_)

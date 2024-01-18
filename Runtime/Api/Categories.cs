@@ -5,6 +5,7 @@
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -57,8 +58,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(categoryPath, "Can't get category; CategoryPath parameter is null!");
-            Assert.IsNotNull(language, "Can't get category; Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(categoryPath, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -79,7 +85,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(language, "Can't get root categories; Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -102,8 +114,13 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(categoryPath, "Can't get child categories; CategoryPath parameter is null!");
-            Assert.IsNotNull(language, "Can't get child categories; Language parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(categoryPath, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {
@@ -129,9 +146,14 @@ namespace AccelByte.Api
             , ResultCallback<CategoryInfo[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(categoryPath, "Can't get descendant categories; Language parameter is null!");
-            Assert.IsNotNull(language, "Can't get descendant categories; Language parameter is null!");
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(categoryPath, language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+            
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);

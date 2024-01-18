@@ -281,17 +281,21 @@ namespace AccelByte.Api
                 }));
         }
 
+        internal string GetHashSessionPassword(string inString)
+        {
+            var retVal = api.GetHashSessionPassword(inString);
+            return retVal;
+        }
+
         #region PredefinedEvents
 
-        private PredefinedEventScheduler predefinedEventScheduler;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
+        private PredefinedEventScheduler predefinedEventScheduler
         {
-            this.predefinedEventScheduler = predefinedEventScheduler;
+            get
+            {
+                PredefinedEventScheduler retval = SharedMemory.PredefinedEventScheduler;
+                return retval;
+            }
         }
 
         private enum EventMode

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -48,11 +48,16 @@ namespace AccelByte.Api
             , ResultCallback<RewardInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Reward By Reward Code! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get Reward By Reward Code! accessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/rewards/byCode")
-                .WithPathParam("namepsace", Namespace_)
+                .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("rewardCode", rewardCode)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -72,8 +77,13 @@ namespace AccelByte.Api
             , ResultCallback<RewardInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Reward By Reward Code! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get Reward By Reward Code! accessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, rewardId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/rewards/{rewardId}")
                 .WithPathParam("namespace", Namespace_)
@@ -99,8 +109,13 @@ namespace AccelByte.Api
             , ResultCallback<QueryRewardInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Query Rewards! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't QueryRewards! accessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/rewards/byCriteria")
                 .WithPathParam("namespace", Namespace_)

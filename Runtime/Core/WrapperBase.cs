@@ -11,22 +11,49 @@ namespace AccelByte.Core
     /// </summary>
     public class WrapperBase
     {
-        Utils.AccelByteIdValidator accelByteIdValidator;
+        private ApiSharedMemory sharedMemory;
+        internal ApiSharedMemory SharedMemory
+        {
+            get
+            {
+                if(sharedMemory == null)
+                {
+                    sharedMemory = new ApiSharedMemory();
+                }
+                return sharedMemory;
+            }
+            set
+            {
+                sharedMemory = value;
+            }
+        }
+
         protected Utils.AccelByteIdValidator IdValidator
         {
             get
             {
-                if(accelByteIdValidator == null)
-                {
-                    accelByteIdValidator = new Utils.AccelByteIdValidator();
-                }
-                return accelByteIdValidator;
+                var retval = SharedMemory.IdValidator;
+                return retval;
             }
         }
 
         internal void SetAccelByteIdValidator(Utils.AccelByteIdValidator idValidator)
         {
-            accelByteIdValidator = idValidator;
+            SharedMemory.IdValidator = idValidator;
+        }
+
+        internal virtual void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            SharedMemory = newSharedMemory;
+        }
+
+        /// <summary>
+        /// Set predefined event scheduler to the wrapper
+        /// </summary>
+        /// <param name="predefinedEventController">Predefined event scheduler object reference</param>
+        internal virtual void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventController)
+        {
+            SharedMemory.PredefinedEventScheduler = predefinedEventController;
         }
 
         internal virtual bool ValidateAccelByteId(string accelByteId, Utils.AccelByteIdValidator.HypensRule hypensRule, string errorMessage, ResultCallback callback)

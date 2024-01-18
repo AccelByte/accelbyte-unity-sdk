@@ -98,6 +98,7 @@ namespace AccelByte.Core {
         void SetCredentials(string clientId, string clientSecret);
         HttpCredential GetCredentials();
         void SetImplicitBearerAuth(string accessToken);
+        void AddAdditionalHeaderInfo(string headerKey, string headerValue);
         void SetImplicitPathParams(IDictionary<string, string> pathParams);
         void ClearImplicitPathParams();
         void SetBaseUri(Uri baseUri);

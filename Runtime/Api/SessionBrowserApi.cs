@@ -1,15 +1,13 @@
-// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
+using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
-using Newtonsoft;
 
 namespace AccelByte.Api
 {
@@ -24,7 +22,13 @@ namespace AccelByte.Api
         public IEnumerator CreateGameSession(SessionBrowserCreateRequest createRequest, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(createRequest, "Can't create game session! request parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(createRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             if (createRequest.session_type == SessionType.none)
             {
@@ -73,8 +77,13 @@ namespace AccelByte.Api
         public IEnumerator UpdateGameSession(string sessionId, SessionBrowserUpdateSessionRequest updateRequest, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "Can't update game session! sessionId parameter is null!");
-            Assert.IsNotNull(updateRequest, "Can't update game session! updateRequest parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(updateRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             if (string.IsNullOrEmpty(sessionId))
             {
@@ -116,7 +125,6 @@ namespace AccelByte.Api
         public IEnumerator RemoveGameSession(string sessionId, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "Can't update game session! sessionId parameter is null!");
 
             if (string.IsNullOrEmpty(sessionId))
             {
@@ -145,7 +153,13 @@ namespace AccelByte.Api
         public IEnumerator GetGameSessions(SessionBrowserQuerySessionFilter filter, ResultCallback<SessionBrowserGetResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(filter, "Can't get game sessions! filter parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(filter);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             if (filter.sessionType == SessionType.none)
             {
@@ -194,7 +208,13 @@ namespace AccelByte.Api
         public IEnumerator GetGameSessionsByUserIds(string[] userIds, ResultCallback<SessionBrowserGetByUserIdsResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(userIds, "Can't get game sessions! userIds parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userIds);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             if (userIds.Length == 0)
             {
@@ -226,11 +246,11 @@ namespace AccelByte.Api
         public IEnumerator GetGameSession(string sessionId, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "Can't get game session! sessionId parameter is null!");
 
-            if (sessionId.Length == 0)
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "sessionId can't be empty"));
+                callback.TryError(error);
                 yield break;
             }
 
@@ -327,7 +347,6 @@ namespace AccelByte.Api
         public IEnumerator GetRecentPlayer(string targetedUserId, uint offset, uint limit, ResultCallback<SessionBrowserRecentPlayerGetResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(targetedUserId, "Can't get recent player! targetedUserId parameter is null!");
 
             if (string.IsNullOrEmpty(targetedUserId))
             {
@@ -358,7 +377,6 @@ namespace AccelByte.Api
         public IEnumerator JoinSession(string sessionId, string password, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(sessionId, "Can't join session! sessionId parameter is null!");
 
             if (string.IsNullOrEmpty(sessionId))
             {
@@ -388,7 +406,7 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
-        private string GetHashSessionPassword(string password)
+        internal string GetHashSessionPassword(string password)
         {
             string retval = string.Empty;
             using (MD5 md5 = MD5.Create())

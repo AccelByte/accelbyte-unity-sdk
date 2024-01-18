@@ -9,13 +9,22 @@ namespace AccelByte.Api
     public class GameStandardAnalyticsClientService : GameStandardAnalyticsServiceBase<AnalyticsService>
     {
         internal const string DefaultCacheFileName = "GameStandardClientEvent.cache";
-        public GameStandardAnalyticsClientService(AnalyticsService inApi, ISession inSession, CoroutineRunner runner) : base(inApi, inSession, runner)
+        Config config;
+
+        public GameStandardAnalyticsClientService(AnalyticsService inApi, Config config) : base(inApi)
         {
+            this.config = config;
+        }
+
+        internal void Initialize(AnalyticsService inApi, Config config)
+        {
+            this.config = config;
+            Initialize(inApi);
         }
 
         internal Config GetConfig()
         {
-            return api.GetConfig();
+            return config;
         }
 
         public void SendResourceSourcedEvent(ResourceSourcedEventPayload payload)

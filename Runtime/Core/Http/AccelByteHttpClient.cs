@@ -17,6 +17,9 @@ namespace AccelByte.Core
     public class AccelByteHttpClient : IHttpClient
     {
         internal const string FlightIdKey = "x-flight-id";
+        internal const string NamespaceHeaderKey = "Namespace";
+        internal const string GameClientVersionHeaderKey = "Game-Client-Version";
+        internal const string SdkVersionHeaderKey = "AccelByte-SDK-Version";
         enum RequestState
         {
             Invalid = 0,
@@ -36,12 +39,6 @@ namespace AccelByte.Core
 
         private AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>> httpCache;
 
-        internal string FlightId
-        {
-            get;
-            private set;
-        }
-
         public AccelByteHttpClient(IHttpRequestSender requestSender = null)
         {
             if(requestSender != null)
@@ -55,7 +52,6 @@ namespace AccelByte.Core
                 this.sender = defaultSender;
             }
             this.SetRetryParameters();
-            SetFlightId(AccelByteSDK.FlightId);
         }
 
         internal void SetCacheImplementation(IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>> cacheImplementation, int cacheMaxLifeTime)
@@ -71,13 +67,28 @@ namespace AccelByte.Core
 
         public void SetFlightId(string newFlightId)
         {
-            FlightId = newFlightId;
+            AddAdditionalHeaderInfo(FlightIdKey, newFlightId);
+        }
+
+        public string GetFlightId()
+        {
+            string retval = null;
+            if (AdditionalHeaderInfo.ContainsKey(FlightIdKey))
+            {
+                retval = AdditionalHeaderInfo[FlightIdKey];
+            }
+            return retval;
         }
 
         public HttpCredential GetCredentials()
         {
             HttpCredential retval = new HttpCredential(this.clientId, this.clientSecret);
             return retval;
+        }
+
+        public void AddAdditionalHeaderInfo(string headerKey, string headerValue)
+        {
+            AdditionalHeaderInfo[headerKey] = headerValue;
         }
 
         public void SetImplicitPathParams(IDictionary<string, string> pathParams)
@@ -182,7 +193,7 @@ namespace AccelByte.Core
             }
             this.ApplyImplicitPathParams(request);
             
-            this.ApplyAdditionalData(request, FlightId, out Error applyAdditionalDataErr);
+            this.ApplyAdditionalData(request, AdditionalHeaderInfo, out Error applyAdditionalDataErr);
             if (applyAdditionalDataErr.Code != ErrorCode.None)
             {
                 return new HttpSendResult(null, applyAdditionalDataErr);
@@ -357,7 +368,7 @@ namespace AccelByte.Core
             }
             this.ApplyImplicitPathParams(request);
 
-            this.ApplyAdditionalData(request, FlightId, out Error applyAdditionalDataErr);
+            this.ApplyAdditionalData(request, AdditionalHeaderInfo, out Error applyAdditionalDataErr);
             if (applyAdditionalDataErr.Code != ErrorCode.None)
             {
                 callback?.Invoke(null, applyAdditionalDataErr);
@@ -586,7 +597,7 @@ namespace AccelByte.Core
             }
         }
 
-        private void ApplyAdditionalData(IHttpRequest request, string flightId, out Error err)
+        private void ApplyAdditionalData(IHttpRequest request, IDictionary<string,string> additionalHeaders, out Error err)
         {
             err = new Error(ErrorCode.None);
 
@@ -596,9 +607,15 @@ namespace AccelByte.Core
                 return;
             }
 
-            if (!string.IsNullOrEmpty(FlightId) && request.Headers != null)
+            if(additionalHeaders != null && additionalHeaders.Count > 0)
             {
-                request.Headers[FlightIdKey] = flightId;
+                foreach(KeyValuePair<string,string> headerKeyValue in additionalHeaders)
+                {
+                    if(!request.Headers.ContainsKey(headerKeyValue.Key) && !string.IsNullOrEmpty(headerKeyValue.Value))
+                    {
+                        request.Headers.Add(headerKeyValue);
+                    }
+                }
             }
         }
 
@@ -648,6 +665,7 @@ namespace AccelByte.Core
         private string clientSecret;
         private string accessToken;
         private readonly IDictionary<string,string> pathParams = new Dictionary<string, string>();
+        internal readonly IDictionary<string, string> AdditionalHeaderInfo = new Dictionary<string, string>();
         private Uri baseUri;
 
         private bool isBanDetected;

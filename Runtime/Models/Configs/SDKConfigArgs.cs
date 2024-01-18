@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Runtime.Serialization;
@@ -66,11 +66,13 @@ namespace AccelByte.Models
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string AMSServerUrl;
         [DataMember] public int? AMSHeartbeatInterval;
+        [DataMember] public int? AMSPort;
         [DataMember] public bool? EnableAmsServerQos;
         [DataMember] public string StatsDServerUrl;
         [DataMember] public int? StatsDServerPort;
         [DataMember] public int? StatsDMetricInterval;
         [DataMember] public string DsId;
+        [DataMember] public bool? OverrideServiceUrl;
     }
 
     [DataContract, Preserve]

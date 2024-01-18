@@ -11,15 +11,20 @@ namespace AccelByte.Core
 {
     internal static class EnvrionmentBootstrap
     {
-
         internal static void Execute()
         {
             AccelByteSDK.Environment = new AccelByteEnvironment();
+            AccelByteSDK.Environment.OnEnvironmentChanged += OnEnvironmentChanged;
         }
 
         public static void Stop()
         {
+            AccelByteSDK.Environment.OnEnvironmentChanged -= OnEnvironmentChanged;
+        }
 
+        private static void OnEnvironmentChanged(Models.SettingsEnvironment newEnvironment)
+        {
+            AccelByteSDK.ChangeInterfaceEnvironment(newEnvironment);
         }
     }
 }

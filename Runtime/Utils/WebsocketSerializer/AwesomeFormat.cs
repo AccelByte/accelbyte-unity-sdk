@@ -150,7 +150,7 @@ namespace AccelByte.Utils
             return MakePayloadFromFields(fields, out payload);
         }
 
-        private static Dictionary<string, string> ParseFields(string inputString)
+        internal static Dictionary<string, string> ParseFields(string inputString)
         {
             var fields = new Dictionary<string, string>();
 

@@ -4,6 +4,7 @@
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -78,7 +79,13 @@ namespace AccelByte.Api
             , ResultCallback<WalletInfoResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code; CurrencyCode is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(currencyCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
 
             if (!session.IsValid())
             {

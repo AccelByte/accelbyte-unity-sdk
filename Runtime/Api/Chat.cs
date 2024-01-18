@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -40,21 +40,21 @@ namespace AccelByte.Api
             session = inSession;
             api = inApi;
             coroutineRunner = inCoroutineRunner;
-            this.websocketApi = websocketApi;
 
             if (websocketApi == null)
             {
                 IWebSocket webSocket = new WebSocket();
-                this.websocketApi = new ChatWebsocketApi(inCoroutineRunner
+                var newChatWebsocket = new ChatWebsocketApi(inCoroutineRunner
                     , inSession
                     , webSocket
                     , api.GetConfig().ChatServerWsUrl
                     , api.GetConfig().Namespace);
+                SetWebsocketApi(newChatWebsocket);
             }
-
-            this.websocketApi.OnOpen += HandleOnOpen;
-            this.websocketApi.OnMessage += HandleOnMessage;
-            this.websocketApi.OnClose += HandleOnClose;
+            else
+            {
+                SetWebsocketApi(websocketApi);
+            }
         }
         #endregion
 
@@ -519,6 +519,27 @@ namespace AccelByte.Api
             
             Connect();
         }
+
+        internal void SetWebsocketApi(ChatWebsocketApi newWebsocketApi)
+        {
+            if (newWebsocketApi == null)
+            {
+                return;
+            }
+
+            if (this.websocketApi != null)
+            {
+                this.websocketApi.OnOpen -= HandleOnOpen;
+                this.websocketApi.OnMessage -= HandleOnMessage;
+                this.websocketApi.OnClose -= HandleOnClose;
+                this.websocketApi = null;
+            }
+
+            this.websocketApi = newWebsocketApi;
+            this.websocketApi.OnOpen += HandleOnOpen;
+            this.websocketApi.OnMessage += HandleOnMessage;
+            this.websocketApi.OnClose += HandleOnClose;
+        }
         #endregion
         
         #region internal events
@@ -570,7 +591,13 @@ namespace AccelByte.Api
                 return;
             }
 
-            // get event type from method field
+            string chatMessageMethod = messageJsonObjectMethod.method.ToString();
+            if (SharedMemory.NetworkConditioner != null 
+                && SharedMemory.NetworkConditioner.CalculateFailRate(chatMessageMethod))
+            {
+                AccelByteDebug.Log($"[AccelByteNetworkConditioner] Dropped chat message method {chatMessageMethod}.");
+                return;
+            }
 
             // switch case between handle type
             switch (messageJsonObjectMethod.method)
@@ -691,15 +718,7 @@ namespace AccelByte.Api
 
         #region PredefinedEvents
 
-        PredefinedEventScheduler predefinedEventScheduler;
         bool isAnalyticsConnected = false;
-
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-
-            ConnectPredefinedAnalyticsToEvents();
-        }
 
         private void ConnectPredefinedAnalyticsToEvents()
         {
@@ -853,6 +872,7 @@ namespace AccelByte.Api
 
         internal void SendPredefinedEvent<T>(T result, EventMode eventMode = EventMode.None)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -876,6 +896,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -895,6 +916,7 @@ namespace AccelByte.Api
 
         internal void SendConnectedPredefinedEvent()
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -918,6 +940,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -941,6 +964,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;
@@ -964,6 +988,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

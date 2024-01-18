@@ -18,6 +18,16 @@ namespace AccelByte.Models
             return TransferArgsConfigToConfig(source, target);
         }
 
+        public static SDKConfigArgs CopyToArgConfig(this SDKConfigArgs source, SDKConfigArgs target)
+        {
+            return TransferArgsConfigToArgsConfig(source, target);
+        }
+
+        public static OAuthConfig CopyToArgConfig(this OAuthConfig source, OAuthConfig target)
+        {
+            return TransferArgsConfigToArgsConfig(source, target);
+        }
+
         public static SDKConfigArgs GetByEnvironment(this MultiSDKConfigsArgs source, SettingsEnvironment environment)
         {
             return GetConfigByEnvironment<SDKConfigArgs, MultiSDKConfigsArgs>(source, environment);
@@ -58,6 +68,19 @@ namespace AccelByte.Models
             }
 
             return retval;
+        }
+
+        private static ArgsSourceT TransferArgsConfigToArgsConfig<ArgsSourceT>(ArgsSourceT source, ArgsSourceT target) where ArgsSourceT : class
+        {
+            if (source != null && target == null)
+            {
+                target = source;
+            }
+            else if (source != null)
+            {
+                target = TransferArgsConfigToConfig(source, target);
+            }
+            return target;
         }
 
         private static ConfigT GetConfigByEnvironment<ConfigT, MultiConfigT>(MultiConfigT multiConfig, SettingsEnvironment environment) where ConfigT : class where MultiConfigT : class

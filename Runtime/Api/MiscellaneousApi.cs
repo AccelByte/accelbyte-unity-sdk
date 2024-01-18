@@ -1,10 +1,12 @@
 // Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
-using System.Collections.Generic;
+
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace AccelByte.Api 
 {
@@ -48,6 +50,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/misc/countries")
                 .WithPathParam("namespace", Namespace_)
@@ -66,6 +75,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/misc/languages")
                 .WithPathParam("namespace", Namespace_)
@@ -83,6 +99,13 @@ namespace AccelByte.Api
         public IEnumerator GetTimeZones( ResultCallback<string[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/misc/timezones")

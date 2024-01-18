@@ -21,7 +21,7 @@ namespace AccelByte.Server
         private Coroutine heartBeatCoroutine;
         private ResultCallback heartBeatCallback = null;
         private HeartBeatMaintainer maintainer;
-        private int heartBeatIntervalMs;
+        private const int defaultHeartBeatIntervalMs = 1 * 10000;
 
         [UnityEngine.Scripting.Preserve]
         internal DedicatedServerManager( DedicatedServerManagerApi inApi
@@ -271,7 +271,7 @@ namespace AccelByte.Server
         {
             if (intervalInMs == 0)
             {
-                intervalInMs = heartBeatIntervalMs;
+                intervalInMs = defaultHeartBeatIntervalMs;
             }
             if (enabled)
             {
@@ -349,8 +349,6 @@ namespace AccelByte.Server
         }
 
         #region PredefinedEvents
-
-        private PredefinedEventScheduler predefinedEventScheduler;
         internal string PodName = "";
 
         private enum RequestType
@@ -358,11 +356,6 @@ namespace AccelByte.Server
             None,
             Register,
             Deregister
-        }
-
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
         }
 
         private IAccelByteTelemetryPayload CreatePayload(string podName, RequestType requestType = RequestType.None)
@@ -384,6 +377,7 @@ namespace AccelByte.Server
 
         private void SendPredefinedEvent(string podName, RequestType requestType = RequestType.None)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 return;

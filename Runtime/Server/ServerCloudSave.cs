@@ -18,8 +18,6 @@ namespace AccelByte.Server
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
-        private PredefinedEventScheduler predefinedEventScheduler;
-
         private enum PredefinedGameRecordMode
         {
             Updated,
@@ -49,15 +47,6 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="inAi"></param>
         /// <param name="inSession"></param>
@@ -79,6 +68,7 @@ namespace AccelByte.Server
             string setBy = null, 
             Dictionary<string, object> values = null)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler != null)
             {
                 IAccelByteTelemetryPayload payload;

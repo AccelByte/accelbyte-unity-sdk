@@ -11,6 +11,8 @@ namespace AccelByte.Server
 {
     public class ServerOauthLoginSession : ISession
     {
+        internal System.Action OnLoginSuccess;
+        internal System.Action OnLogoutSuccess;
         private readonly string clientId;
         private readonly string clientSecret;
         private readonly string baseUrl;
@@ -49,12 +51,7 @@ namespace AccelByte.Server
 
             if (!getClientTokenResult.IsError)
             {
-                SetSession(getClientTokenResult.Value);
-                if (maintainAccessTokenCoroutine == null)
-                {
-                    maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
-                }
-
+                OnReceivedLoginToken(getClientTokenResult.Value);
                 callback.TryOk();
             }
             else
@@ -86,6 +83,7 @@ namespace AccelByte.Server
                     maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
                 }
 
+                OnLoginSuccess?.Invoke();
                 callback.TryOk(getClientTokenResult.Value);
             }
             else
@@ -127,10 +125,16 @@ namespace AccelByte.Server
             yield return httpClient.SendRequest(request,
                 rsp => response = rsp);
 
-            tokenData = null;
             var result = response.TryParse();
-            coroutineRunner.Stop(maintainAccessTokenCoroutine);
-            maintainAccessTokenCoroutine = null;
+
+            if (!result.IsError)
+            {
+                tokenData = null;
+                coroutineRunner.Stop(maintainAccessTokenCoroutine);
+                maintainAccessTokenCoroutine = null;
+                OnLogoutSuccess?.Invoke();
+            }
+
             callback.Try(result);
         }
 
@@ -146,12 +150,17 @@ namespace AccelByte.Server
             HttpSendResult sendResult = await httpClient.SendRequestAsync(request);
 
             IHttpResponse response = sendResult.CallbackResponse;
-            Result<TokenData> getClientTokenResult = response.TryParseJson<TokenData>();
 
-            tokenData = null;
             var result = response.TryParse();
-            coroutineRunner.Stop(maintainAccessTokenCoroutine);
-            maintainAccessTokenCoroutine = null;
+
+            if (!result.IsError)
+            {
+                tokenData = null;
+                coroutineRunner.Stop(maintainAccessTokenCoroutine);
+                maintainAccessTokenCoroutine = null;
+                OnLogoutSuccess?.Invoke();
+            }
+
             callback.Try(result);
         }
 
@@ -194,9 +203,31 @@ namespace AccelByte.Server
 
         public override void SetSession(TokenData loginResponse)
         {
-            HttpRequestBuilder.SetNamespace(loginResponse.Namespace);
+            httpClient.AddAdditionalHeaderInfo(AccelByteHttpClient.NamespaceHeaderKey, loginResponse.Namespace);
             tokenData = loginResponse;
-            return;
+        }
+
+        internal void Reset()
+        {
+            OnLoginSuccess = null;
+            OnLogoutSuccess = null;
+            if (maintainAccessTokenCoroutine != null)
+            {
+                coroutineRunner.Stop(maintainAccessTokenCoroutine);
+                maintainAccessTokenCoroutine = null;
+            }
+            tokenData = null;
+        }
+
+        internal void OnReceivedLoginToken(TokenData token)
+        {
+            SetSession(token);
+            if (maintainAccessTokenCoroutine == null)
+            {
+                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
+            }
+
+            OnLoginSuccess?.Invoke();
         }
     }
 }

@@ -53,6 +53,12 @@ namespace AccelByte.Core
             }
         }
 
+        internal override void DeleteCache(string environment)
+        {
+            string cacheFileName = environment + saveFile;
+            FileCacheImp.Remove(cacheFileName);
+        }
+
         protected override void DecryptCache(string content, Action<string> callback)
         {
             string plainText = cryptoImp.Decrypt(content);
@@ -61,7 +67,6 @@ namespace AccelByte.Core
 
         protected override void CacheTelemetryEvents(string content, string environment, Action<bool> callback)
         {
-            string cacheDirectory = saveDirectory;
             string cacheFileName = environment + saveFile;
             if (saveAsync)
             {
@@ -76,7 +81,6 @@ namespace AccelByte.Core
 
         protected override void LoadTelemetryEventsCache(string environment, Action<string> callback)
         {
-            string cacheDirectory = saveDirectory;
             string cacheFileName = environment + saveFile;
 
             if (loadAsync)

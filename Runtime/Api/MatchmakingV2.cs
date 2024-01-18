@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
@@ -14,8 +14,6 @@ namespace AccelByte.Api
         private readonly MatchmakingV2Api matchmakingV2Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
-
-        private PredefinedEventScheduler predefinedEventScheduler;
 
         [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
@@ -42,7 +40,6 @@ namespace AccelByte.Api
             ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(matchPoolName, nameof(matchPoolName) + " cannot be null");
 
             if (!session.IsValid())
             {
@@ -121,7 +118,6 @@ namespace AccelByte.Api
         public void GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsFalse(string.IsNullOrEmpty(matchPool), nameof(matchPool) + " cannot be null or empty");
             
             if (!session.IsValid())
             {
@@ -157,15 +153,6 @@ namespace AccelByte.Api
 
         #region PredefinedEvents
 
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-        }
-
         IAccelByteTelemetryPayload CreatePayload(Result result, string matchTicketId)
         {
             string localUserId = session.UserId;
@@ -186,8 +173,8 @@ namespace AccelByte.Api
                     var createMatchmakingValue = result.Value as MatchmakingV2CreateTicketResponse;
                     payload = new PredefinedMatchmakingRequestedPayload(localUserId
                         , matchPoolName
-                        , optionalParams.sessionId
-                        , optionalParams.attributes
+                        , optionalParams?.sessionId
+                        , optionalParams?.attributes
                         , createMatchmakingValue.matchTicketId
                         , createMatchmakingValue.queueTime);
                     break;
@@ -204,6 +191,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 callback.Try(result);
@@ -225,6 +213,7 @@ namespace AccelByte.Api
                 return;
             }
 
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
                 callback.Try(result);

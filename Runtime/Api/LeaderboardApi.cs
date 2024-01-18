@@ -4,6 +4,7 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using System.Collections;
 using UnityEngine.Assertions;
 
@@ -31,8 +32,13 @@ namespace AccelByte.Api
             , ResultCallback<LeaderboardRankingResult> callback )
         {
             Report.GetFunctionLog( GetType().Name );
-            Assert.IsNotNull( Namespace_, "Can't get ranking! Namespace parameter is null!" );
-            Assert.IsNotNull( leaderboardCode, "Can't get ranking! Leaderboard Code parameter is null!" );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, leaderboardCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             string timeFrameString = "";
             switch( timeFrame )
@@ -80,10 +86,13 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingData> callback )
         {
             Report.GetFunctionLog( GetType().Name );
-            Assert.IsNotNull( Namespace_, "Can't get item! Namespace parameter is null!" );
-            Assert.IsNotNull( AuthToken, "Can't get item! AccessToken parameter is null!" );
-            Assert.IsNotNull( leaderboardCode, "Can't get item! Leaderboard Code parameter is null!" );
-            Assert.IsNotNull( userId, "Can't get item! UserId parameter is null!" );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/users/{userId}" )
@@ -110,7 +119,13 @@ namespace AccelByte.Api
             , ResultCallback<LeaderboardPagedList> callback )
         {
             Report.GetFunctionLog( GetType().Name );
-            Assert.IsNotNull( Namespace_, "Can't get leaderboard! Namespace parameter is null!" );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards" )
@@ -135,6 +150,13 @@ namespace AccelByte.Api
         public IEnumerator GetLeaderboardListV3(int offset, int limit, ResultCallback<LeaderboardPagedListV3> callback)
         {
             Report.GetFunctionLog( GetType().Name );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards")
@@ -170,6 +192,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/alltime")
                 .WithPathParam("namespace", Namespace_)
@@ -197,6 +226,13 @@ namespace AccelByte.Api
             ResultCallback<LeaderboardRankingResult> callback)
         {
             Report.GetFunctionLog( GetType().Name );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, cycleId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/cycles/{cycleId}")
@@ -227,10 +263,13 @@ namespace AccelByte.Api
             , ResultCallback<UserRankingDataV3> callback )
         {
             Report.GetFunctionLog( GetType().Name );
-            Assert.IsNotNull( Namespace_, "Can't get item! Namespace parameter is null!" );
-            Assert.IsNotNull( AuthToken, "Can't get item! AccessToken parameter is null!" );
-            Assert.IsNotNull( leaderboardCode, "Can't get item! Leaderboard Code parameter is null!" );
-            Assert.IsNotNull( userId, "Can't get item! UserId parameter is null!" );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/users/{userId}" )

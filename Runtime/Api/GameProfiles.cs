@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -132,6 +133,14 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(gameProfile, gameProfile?.profileId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+
             if (!session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);

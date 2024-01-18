@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -19,26 +19,8 @@ namespace AccelByte.Core
     /// </para>
     /// </summary>
     public static class MultiRegistry
-    {
-        #region Constructor
-        // public static readonly bool UseSharedCredentials; // TODO: Why do we need this?
-        private static readonly Dictionary<string, ApiClient> apiClientInstances;
-        private static readonly Dictionary<string, ServerApiClient> serverApiClientInstances;
-
-        static MultiRegistry()
-        {
-            apiClientInstances = new Dictionary<string, ApiClient>();
-            serverApiClientInstances = new Dictionary<string, ServerApiClient>();
-        }
-        #endregion /Constructor
-
-        
+    {   
         #region Client
-        private static Config config => AccelBytePlugin.Config;
-        private static OAuthConfig oAuthConfig => AccelBytePlugin.OAuthConfig;
-
-        private static OAuthConfig serverOAuthConfig => AccelByteServerPlugin.OAuthConfig;
-        private static ServerConfig serverConfig => AccelByteServerPlugin.Config;
 
         /// <summary>
         /// </summary>
@@ -46,23 +28,7 @@ namespace AccelByte.Core
         /// <returns></returns>
         public static ApiClient GetApiClient(string key = "default")
         {
-            // If an existing instance exists here, return it.
-            bool hasExistingInstance = apiClientInstances.ContainsKey(key); 
-            if (hasExistingInstance)
-            {
-                apiClientInstances.TryGetValue(key, out ApiClient apiBase);
-                return apiBase;
-            }
-            
-            ApiClient newApiClient = CreateNewApiClient(key);
-            RegisterApiClient(key, newApiClient);
-
-            if(key == "default")
-            {
-                AccelBytePlugin.configReset += newApiClient.environmentChanged;
-            }
-
-            return newApiClient;
+            return AccelByteSDK.GetClientRegistry().GetApi(key);
         }
 
         /// <summary>
@@ -73,34 +39,7 @@ namespace AccelByte.Core
         /// <returns></returns>
         public static ApiClient CreateNewApiClient(string key = "default")
         {
-            CoroutineRunner coroutineRunner = new CoroutineRunner();
-
-            AccelByteHttpClient httpClient = new AccelByteHttpClient();
-            httpClient.SetCredentials(oAuthConfig.ClientId, oAuthConfig.ClientSecret);
-            httpClient.SetBaseUri( new Uri( config.BaseUrl ) );
-
-            UserSession session;
-
-            if (key == "default")
-            {
-                session = AccelBytePlugin.GetUser().Session as UserSession;
-            }
-            else
-            {
-                string sessionCacheTableName = $"TokenCache/{AccelByteSDK.Environment}/TokenData";
-
-                IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.FileStream);
-
-                session = new UserSession(
-                    httpClient,
-                    coroutineRunner,
-                    config.PublisherNamespace,
-                    config.UsePlayerPrefs,
-                    sessionCacheTableName,
-                    dataStorage);
-            }
-
-            return new ApiClient( session, httpClient, coroutineRunner );
+            return AccelByteSDK.GetClientRegistry().CreateNewApi();
         }
 
         /// <summary>
@@ -110,24 +49,21 @@ namespace AccelByte.Core
         /// <returns>isSuccess</returns>
         public static bool RegisterApiClient(string key, ApiClient apiClient)
         {
-            Assert.IsNotNull(apiClient, "!apiClient @ RegisterApiClient");
-            if (string.IsNullOrEmpty(key))
-            {
-                UnityEngine.Debug.LogError("!key @ RegisterApiClient");
-                return false;
-            }
-            
-            apiClientInstances[key] = apiClient;
-            return true;
+            bool retval = AccelByteSDK.GetClientRegistry().RegisterApi(key, apiClient);
+            return retval;
         }
 
+        /// <summary>
+        /// Remove an existing ApiClient.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>isSuccess</returns>
         internal static bool DeleteApiClient(string key)
         {
-            bool result = apiClientInstances.Remove(key);
-            return result;
+            bool retval = AccelByteSDK.GetClientRegistry().RemoveApi(key);
+            return retval;
         }
         #endregion /Client
-        
 
         #region Server
         /// <summary>
@@ -136,23 +72,7 @@ namespace AccelByte.Core
         /// <returns></returns>
         public static ServerApiClient GetServerApiClient(string key = "default")
         {
-            // If an existing instance exists here, return it.
-            bool hasExistingInstance = serverApiClientInstances.ContainsKey(key); 
-            if (hasExistingInstance)
-            {
-                serverApiClientInstances.TryGetValue(key, out ServerApiClient serverApiBase);
-                return serverApiBase;
-            }
-            
-            ServerApiClient newServerApiClient = CreateNewServerApiClient(key);
-            RegisterServerApiClient(key, newServerApiClient);
-
-            if (key == "default")
-            {
-                AccelByteServerPlugin.configReset += newServerApiClient.environmentChanged;
-            }
-
-            return newServerApiClient;
+            return AccelByteSDK.GetServerRegistry().GetApi(key);
         }
 
         /// <summary>
@@ -163,29 +83,7 @@ namespace AccelByte.Core
         /// <returns></returns>
         public static ServerApiClient CreateNewServerApiClient(string key = "default")
         {
-            CoroutineRunner coroutineRunner = new CoroutineRunner();
-
-            AccelByteHttpClient httpClient = new AccelByteHttpClient();
-            httpClient.SetCredentials( serverOAuthConfig.ClientId, serverOAuthConfig.ClientSecret );
-            httpClient.SetBaseUri( new Uri( serverConfig.BaseUrl ) );
-
-            ServerOauthLoginSession session;
-
-            if( key == "default" )
-            {
-                session = AccelByteServerPlugin.GetDedicatedServer().Session as ServerOauthLoginSession;
-            }
-            else
-            {
-                session = new ServerOauthLoginSession(
-                    serverConfig.IamServerUrl,
-                    serverOAuthConfig.ClientId,
-                    serverOAuthConfig.ClientSecret,
-                    httpClient,
-                    coroutineRunner );
-            }
-
-            return new ServerApiClient( session, httpClient, coroutineRunner );
+            return AccelByteSDK.GetServerRegistry().CreateNewApi();
         }
 
         /// <summary>
@@ -196,21 +94,13 @@ namespace AccelByte.Core
         /// <returns>isSuccess</returns>
         public static bool RegisterServerApiClient(string key, ServerApiClient serverApiClient)
         {
-            Assert.IsNotNull(serverApiClient, "!apiClient @ RegisterServerApiClient");
-            if (string.IsNullOrEmpty(key))
-            {
-                UnityEngine.Debug.LogError("!key @ RegisterServerApiClient");
-                return false;
-            }
-            
-            serverApiClientInstances[key] = serverApiClient;
-            return true;
+            return AccelByteSDK.GetServerRegistry().RegisterApi(key, serverApiClient);
         }
-
+        
         internal static bool DeleteServerApiClient(string key)
         {
-            bool result = serverApiClientInstances.Remove(key);
-            return result;
+            bool retval = AccelByteSDK.GetServerRegistry().RemoveApi(key);
+            return retval;
         }
         #endregion /Server
     }

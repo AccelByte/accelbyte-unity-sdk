@@ -14,8 +14,7 @@ namespace AccelByte.Server
         private readonly CoroutineRunner coroutineRunner;
 
         [UnityEngine.Scripting.Preserve]
-        internal ServiceVersion(ServiceVersionApi inApi
-            , CoroutineRunner inCoroutineRunner)
+        internal ServiceVersion(ServiceVersionApi inApi, ISession inLoginSession, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, "inApi==null (@ constructor)");
             Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner==null (@ constructor)");

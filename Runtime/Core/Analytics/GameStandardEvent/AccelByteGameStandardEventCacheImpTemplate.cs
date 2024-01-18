@@ -51,6 +51,8 @@ namespace AccelByte.Core
             });
         }
 
+        internal abstract void DeleteCache(string environment);
+
         protected abstract void EncryptCache(string content, Action<string> callback);
 
         protected abstract void DecryptCache(string content, Action<string> callback);

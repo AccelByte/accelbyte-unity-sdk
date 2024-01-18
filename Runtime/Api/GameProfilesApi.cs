@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -29,9 +30,12 @@ namespace AccelByte.Api
             , ResultCallback<UserGameProfiles[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get all game profiles! namespace parameter is null!");
-            Assert.IsNotNull(userIds, "Can't get all game profiles! userIds parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't all game profiles! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userIds, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/profiles")
                 .WithPathParam("namespace", Namespace_)
@@ -55,9 +59,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get all game profiles! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get all game profiles! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't all game profiles! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
@@ -83,10 +90,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create a game profile! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't create a game profile! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create a game profile! accessToken parameter is null!");
-            Assert.IsNotNull(gameProfile, "Can't create a game profile! gameProfile parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, gameProfile);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles")
@@ -113,10 +122,12 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get a game profile! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get a game profile! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get a game profile! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't get a game profile! profileId parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, profileId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
@@ -144,11 +155,18 @@ namespace AccelByte.Api
             , ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update a game profile! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update a game profile! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't update a game profile! accessToken parameter is null!");
-            Assert.IsNotNull(gameProfile, "Can't update a game profile! gameProfile parameter is null!");
-            Assert.IsNotNull(profileId, "Can't update a game profile! gameProfile.profileId is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , AuthToken
+                , gameProfile
+                , profileId
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/profiles/{profileId}")
@@ -176,10 +194,12 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't delete a game profile! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't delete a game profile! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete a game profile! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't delete a game profile! fileSection parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, profileId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
 
             var request = HttpRequestBuilder
@@ -207,11 +227,18 @@ namespace AccelByte.Api
             , ResultCallback<GameProfileAttribute> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get a game profile attribute! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get a game profile attribute! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get a game profile attribute! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't get a game profile attribute! profileId parameter is null!");
-            Assert.IsNotNull(attributeName, "Can't get a game profile attribute! attributeName parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , AuthToken
+                , profileId
+                , attributeName
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(
@@ -242,12 +269,19 @@ namespace AccelByte.Api
             ,  ResultCallback<GameProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update a game profile attribute! namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update a game profile attribute! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't update a game profile attribute! accessToken parameter is null!");
-            Assert.IsNotNull(profileId, "Can't update a game profile attribute! profileId parameter is null!");
-            Assert.IsNotNull(attribute, "Can't update a game profile attribute! attribute parameter is null!");
-            Assert.IsNotNull(attribute.name, "Can't update a game profile attribute! attribute.name is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , AuthToken
+                , profileId
+                , attribute
+                , attribute?.name
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(

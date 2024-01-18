@@ -35,7 +35,6 @@ namespace AccelByte.Api
             , string inWebsocketUrl
             , string inNamespace) : base(inCoroutineRunner, inSession, inWebSocket, inWebsocketUrl, inNamespace)
         {
-            SetOnMessageHandler(HandleOnMessage);
         }
         #endregion
 

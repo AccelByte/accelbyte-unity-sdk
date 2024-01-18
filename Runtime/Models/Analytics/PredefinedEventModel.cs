@@ -34,12 +34,13 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class PredefinedSDKInitializedPayload : PredefinedEventPayload
     {
+        internal const string ModelName = "SDK_Initialized";
         [DataMember(Name = "name")] public string Name;
         [DataMember(Name = "version")] public string Version;
 
         internal override string GetPredefinedModelName()
         {
-            return "SDK_Initialized";
+            return ModelName;
         }
 
         public PredefinedSDKInitializedPayload(string name, string version)

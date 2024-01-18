@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -287,6 +287,8 @@ namespace AccelByte.Api
 
         private Utils.IAccelByteWebsocketSerializer websocketSerializer;
 
+        internal string UserRegion;
+
         /// <summary>
         /// Event triggered each time a websocket reconnection attempt failed
         /// </summary>
@@ -391,6 +393,27 @@ namespace AccelByte.Api
             {
                 session.RefreshTokenCallback -= LoginSession_RefreshTokenCallback;
             }
+        }
+
+        /// <summary>
+        /// Change user region
+        /// </summary>
+        /// <param name="region">New region</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ChangeUserRegion(string region, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            websocketApi.ChangeUserRegion(region, result =>
+            {
+                if (result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                UserRegion = region;
+                callback.TryOk();
+            });
         }
 
         #region Party
@@ -1813,6 +1836,14 @@ namespace AccelByte.Api
             MessageType messageType;
             ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
 
+            string lobbyNotification = messageType.ToString();
+            if (SharedMemory.NetworkConditioner != null 
+                && SharedMemory.NetworkConditioner.CalculateFailRate(lobbyNotification))
+            {
+                AccelByteDebug.Log($"[AccelByteNetworkConditioner] Dropped lobby notification {lobbyNotification}.");
+                return;
+            }
+
             switch (messageType)
             {
                 case MessageType.messageSessionNotif:
@@ -2126,21 +2157,19 @@ namespace AccelByte.Api
             }
         }
 
+        private void HandleOnClosestRegionChanged(string newRegion)
+        {
+            if (string.IsNullOrEmpty(newRegion))
+            {
+                return;
+            }
+
+            ChangeUserRegion(newRegion, result => {});
+        }
+
         #region PredefinedEvents
 
-        private PredefinedEventScheduler predefinedEventScheduler;
         bool isAnalyticsConnected = false;
-
-        /// <summary>
-        /// Set predefined event scheduler to the wrapper
-        /// </summary>
-        /// <param name="predefinedEventScheduler">Predefined event scheduler object reference</param>
-        internal void SetPredefinedEventScheduler(ref PredefinedEventScheduler predefinedEventScheduler)
-        {
-            this.predefinedEventScheduler = predefinedEventScheduler;
-
-            ConnectPredefinedAnalyticsToEvents();
-        }
 
         private void ConnectPredefinedAnalyticsToEvents()
         {
@@ -2294,6 +2323,29 @@ namespace AccelByte.Api
             return payload;
         }
 
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            Connected += () =>
+            {
+                SharedMemory.LobbyConnected = true;
+            };
+
+            Disconnected += (WsCloseCode) =>
+            {
+                SharedMemory.LobbyConnected = false;
+            };
+            SharedMemory.OnClosestRegionChanged += HandleOnClosestRegionChanged;
+
+            if (!string.IsNullOrEmpty(SharedMemory.ClosestRegion) && IsConnected)
+            {
+                ChangeUserRegion(SharedMemory.ClosestRegion, result =>
+                {
+                    UserRegion = SharedMemory.ClosestRegion;
+                });
+            }
+        }
+
         internal void SendPredefinedConnectedEvent()
         {
             string localUserId = session.UserId;
@@ -2323,6 +2375,7 @@ namespace AccelByte.Api
 
         private void SendPredefinedEvent(IAccelByteTelemetryPayload payload)
         {
+            PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null || payload == null)
             {
                 return;

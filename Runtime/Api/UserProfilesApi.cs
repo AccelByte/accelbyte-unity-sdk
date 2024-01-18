@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -28,8 +29,12 @@ namespace AccelByte.Api
         public IEnumerator GetUserProfile( ResultCallback<UserProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user profile! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user profile! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
@@ -52,9 +57,12 @@ namespace AccelByte.Api
           , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
@@ -78,12 +86,12 @@ namespace AccelByte.Api
             , ResultCallback<UserProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create user profile! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create user profile! accessToken parameter is null!");
-            Assert.IsNotNull(createRequest, "Can't create user profile! CreateRequest parameter is null!");
-            Assert.IsNotNull(
-                createRequest.language,
-                "Can't create user profile! CreateRequest.language parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, createRequest, createRequest.language);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
@@ -109,12 +117,20 @@ namespace AccelByte.Api
             , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't create user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
-            Assert.IsNotNull(createRequest.language, "Can't update user profile! language parameter is null!");
-            Assert.IsNotNull(createRequest.customAttributes, "Can't update user profile! customAttributes parameter is null!");
-            Assert.IsNotNull(createRequest.timeZone, "Can't update user profile! timezone parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't create user profile! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , createRequest
+                , createRequest.language
+                , createRequest.customAttributes
+                , createRequest.timeZone
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
@@ -140,9 +156,12 @@ namespace AccelByte.Api
             , ResultCallback<UserProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
-            Assert.IsNotNull(updateRequest, "Can't update user profile! ProfileRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, updateRequest);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles")
@@ -167,13 +186,21 @@ namespace AccelByte.Api
             , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't update user profile! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't update user profile! userId parameter is null!");
-            Assert.IsNotNull(updateRequest.language, "Can't update user profile! language parameter is null!");
-            Assert.IsNotNull(updateRequest.timeZone, "Can't update user profile! timezone parameter is null!");
-            Assert.IsNotNull(updateRequest.customAttributes, "Can't update user profile! customAttributes parameter is null!");
-            Assert.IsNotNull(updateRequest.zipCode, "Can't update user profile! zipCode parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't update user profile! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , userId
+                , updateRequest
+                , updateRequest.language
+                , updateRequest.timeZone
+                , updateRequest.customAttributes
+                , updateRequest.zipCode
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles")
@@ -198,9 +225,12 @@ namespace AccelByte.Api
             , ResultCallback<PublicUserProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user profile public info! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user profile public info! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user profile public info! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/public")
@@ -223,12 +253,12 @@ namespace AccelByte.Api
             , ResultCallback<PublicUserProfile[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user profile public info by ids! Namespace parameter is null!");
-            Assert.IsNotNull(
-                AuthToken,
-                "Can't get user profile public info by ids! accessToken parameter is null!");
-
-            Assert.IsNotNull(userIds, "Can't get user profile info by ids! userIds parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userIds);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/profiles/public")
@@ -265,9 +295,12 @@ namespace AccelByte.Api
             , ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! userId is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, updates, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/profiles/customAttributes")
@@ -291,8 +324,12 @@ namespace AccelByte.Api
         public IEnumerator GetTimeZones( ResultCallback<string[]> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get time zones! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get time zones! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/misc/timezones")
@@ -313,9 +350,12 @@ namespace AccelByte.Api
         public IEnumerator GetUserProfilePublicInfoByPublicId(string publicId, ResultCallback<PublicUserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(publicId, "publicId parameter is null!");
-            Assert.IsNotNull(Namespace_, "Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "AccessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(publicId, Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/profiles/public/byPublicId")
@@ -339,9 +379,12 @@ namespace AccelByte.Api
           , ResultCallback<GenerateUploadURLResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Generate Upload URL! Namespace parameter is null!");
-            Assert.IsNotNull(folder, "Can't Generate Upload URL! folder parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Generate Upload URL! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, folder, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/folders/{folder}/files")
@@ -369,10 +412,13 @@ namespace AccelByte.Api
             , UploadCategory category = UploadCategory.DEFAULT)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Generate Upload URL for User Content! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't Generate Upload URL for User Content! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Generate Upload URL for User Content! accessToken parameter is null!");
-
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+            
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/files")
                 .WithPathParam("namespace", Namespace_)
@@ -398,8 +444,12 @@ namespace AccelByte.Api
             ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles/privateCustomAttributes")
@@ -422,8 +472,12 @@ namespace AccelByte.Api
             , ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get custom attributes! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get custom attributes! accessToken parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(updates, Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/profiles/privateCustomAttributes")
