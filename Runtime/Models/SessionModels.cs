@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -398,7 +398,7 @@ namespace AccelByte.Models
         [DataMember(Name = "alternate_ips")] public string[] alternateIps;
 
         [DataMember(Name = "custom_attribute")]
-        public Dictionary<string, string> customAttribute;
+        public string customAttribute;
 
         [DataMember] public string deployment;
         [DataMember(Name = "game_version")] public string gameVersion;

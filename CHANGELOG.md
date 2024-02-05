@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.15.0%0D16.14.0) (2024-02-05)
+
+
+### Features
+
+* add GetCountryGroupV3 ([21e104f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/21e104fb5010826ea62b01914fcba4a956fcaa4b))
+
+
+### Bug Fixes
+
+* prevent login error exception if an user hasn't complying legal agreement ([f5a8761](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f5a8761a12f5a9538d05e99b8a8e8284d64baa07))
+
+
+### Refactors
+
+* add 429 response code description ([13b5313](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13b5313d6bf35f1799188f5750224f3f57202326))
+* change custom_attribute type based on backend ([d8cd351](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d8cd351ff5bf122f77f882ac7f749efaf0686de9))
+
 ## [16.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.14.0%0D16.13.0) (2024-01-18)
 
 

@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
+
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
-using UnityEngine.Assertions; 
 
 namespace AccelByte.Api
 {
@@ -1239,6 +1238,30 @@ namespace AccelByte.Api
             httpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<AccountUserPlatformInfosResponse>();
+                callback.Try(result);
+            });
+        }
+
+        public void GetCountryGroupV3(ResultCallback<Country[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/countries")
+                .WithPathParam("namespace", Namespace_)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<Country[]>();
+
                 callback.Try(result);
             });
         }

@@ -419,120 +419,86 @@ namespace AccelByte.Core
         {
             switch (this.Code)
             {
-            case ErrorCode.None:
-
-                return "This error code doesn't make sense and should not happen at all.";
-
-            //HTTP Status Codes
-            case ErrorCode.BadRequest:
-
-                return "The request could not be understood by the server due to malformed syntax.";
-            case ErrorCode.Unauthorized:
-
-                return "The request requires user authentication.";
-            case ErrorCode.PaymentRequired:
-
-                return "The request requires a payment.";
-            case ErrorCode.Forbidden:
-
-                return "The server understood the request, but is refusing to fulfill it.";
-            case ErrorCode.NotFound:
-
-                return "The server has not found anything matching the Request-URI.";
-            case ErrorCode.MethodNotAllowed:
-
-                return "The method specified in the Request-Line is not allowed for the resource identified by the " +
-                    "Request-URI.";
-            case ErrorCode.NotAcceptable:
-
-                return "The resource identified by the request can not generate content according to the accept " +
-                    "headers sent in the request.";
-            case ErrorCode.ProxyAuthenticationRequired:
-
-                return "The request requires user authentication via proxy.";
-            case ErrorCode.RequestTimeout:
-
-                return "The client did not produce a request within the time that the server was prepared to wait.";
-            case ErrorCode.Conflict:
-
-                return "The request could not be completed due to a conflict with the current state of the resource.";
-            case ErrorCode.Gone:
-
-                return "The requested resource is no longer available at the server and no forwarding address is " +
-                    "known.";
-            case ErrorCode.LengthRequired:
-
-                return "The server refuses to accept the request without a defined Content-Length.";
-            case ErrorCode.PreconditionFailed:
-
-                return "The precondition given in one or more of the request-header fields evaluated to false when " +
-                    "it was tested on the server.";
-            case ErrorCode.RequestEntityTooLarge:
-
-                return "The request entity is larger than the server is willing or able to process.";
-            case ErrorCode.RequestUriTooLong:
-
-                return "The Request-URI is longer than the server is willing to interpret.";
-            case ErrorCode.UnsupportedMediaType:
-
-                return "The entity of the request is in a format not supported by the requested resource for the " +
-                    "requested method.";
-            case ErrorCode.RequestedRangeNotSatisfiable:
-
-                return "The request included a Range request-header field but none of the range-specifier values in " +
-                    "this field overlap the current extent of the selected resource, and the request did not include" +
-                    " an If-Range request-header field.";
-            case ErrorCode.ExpectationFailed:
-
-                return "The expectation given in an Expect request-header field could not be met by this server.";
-            case ErrorCode.UnprocessableEntity:
-
-                return "Entity can not be processed.";
-            case ErrorCode.InternalServerError:
-
-                return "Unexpected condition encountered which prevented the server from fulfilling the request.";
-            case ErrorCode.NotImplemented:
-
-                return "The server does not support the functionality required to fulfill the request.";
-            case ErrorCode.BadGateway:
-
-                return "The gateway or proxy received an invalid response from the upstream server.";
-            case ErrorCode.ServiceUnavailable:
-
-                return "The server is currently unable to handle the request due to a temporary overloading or " +
-                    "maintenance of the server.";
-            case ErrorCode.GatewayTimeout:
-
-                return "The gateway or proxy, did not receive a timely response from the upstream server.";
-            case ErrorCode.HttpVersionNotSupported:
-
-                return "The server does not support the HTTP protocol version that was used in the request message.";
-
-            //Client side error codes
-            case ErrorCode.IsNotLoggedIn:
-
-                return "User is not logged in.";
-            case ErrorCode.NetworkError:
-
-                return "There is no response.";
-            case ErrorCode.MessageFieldTypeNotSupported:
-
-                return "Serialization for expected field type is not supported.";
-            case ErrorCode.MessageFormatInvalid:
-
-                return "Message is not well formed.";
-            case ErrorCode.MessageFieldDoesNotExist:
-
-                return "Expected message field cannot be found.";
-            case ErrorCode.MessageFieldConversionFailed:
-
-                return "Message field value cannot be converted to expected field type.";
-            case ErrorCode.MessageCannotBeSent:
-
-                return "Sending message to server failed.";
-            default:
-
-                return "Unknown error: " + this.Code.ToString("G");
+                case ErrorCode.None:
+                    return "This error code doesn't make sense and should not happen at all.";
+                //HTTP Status Codes
+                case ErrorCode.BadRequest:
+                    return "The request could not be understood by the server due to malformed syntax.";
+                case ErrorCode.Unauthorized:
+                    return "The request requires user authentication.";
+                case ErrorCode.PaymentRequired:
+                    return "The request requires a payment.";
+                case ErrorCode.Forbidden:
+                    return "The server understood the request, but is refusing to fulfill it.";
+                case ErrorCode.NotFound:
+                    return "The server has not found anything matching the Request-URI.";
+                case ErrorCode.MethodNotAllowed:
+                    return "The method specified in the Request-Line is not allowed for the resource identified by the " +
+                        "Request-URI.";
+                case ErrorCode.NotAcceptable:
+                    return "The resource identified by the request can not generate content according to the accept " +
+                        "headers sent in the request.";
+                case ErrorCode.ProxyAuthenticationRequired:
+                    return "The request requires user authentication via proxy.";
+                case ErrorCode.RequestTimeout:
+                    return "The client did not produce a request within the time that the server was prepared to wait.";
+                case ErrorCode.Conflict:
+                    return "The request could not be completed due to a conflict with the current state of the resource.";
+                case ErrorCode.Gone:
+                    return "The requested resource is no longer available at the server and no forwarding address is " +
+                        "known.";
+                case ErrorCode.LengthRequired:
+                    return "The server refuses to accept the request without a defined Content-Length.";
+                case ErrorCode.PreconditionFailed:
+                    return "The precondition given in one or more of the request-header fields evaluated to false when " +
+                        "it was tested on the server.";
+                case ErrorCode.RequestEntityTooLarge:
+                    return "The request entity is larger than the server is willing or able to process.";
+                case ErrorCode.RequestUriTooLong:
+                    return "The Request-URI is longer than the server is willing to interpret.";
+                case ErrorCode.UnsupportedMediaType:
+                    return "The entity of the request is in a format not supported by the requested resource for the " +
+                        "requested method.";
+                case ErrorCode.RequestedRangeNotSatisfiable:
+                    return "The request included a Range request-header field but none of the range-specifier values in " +
+                        "this field overlap the current extent of the selected resource, and the request did not include" +
+                        " an If-Range request-header field.";
+                case ErrorCode.ExpectationFailed:
+                    return "The expectation given in an Expect request-header field could not be met by this server.";
+                case ErrorCode.UnprocessableEntity:
+                    return "Entity can not be processed.";
+                case ErrorCode.InternalServerError:
+                    return "Unexpected condition encountered which prevented the server from fulfilling the request.";
+                case ErrorCode.NotImplemented:
+                    return "The server does not support the functionality required to fulfill the request.";
+                case ErrorCode.BadGateway:
+                    return "The gateway or proxy received an invalid response from the upstream server.";
+                case ErrorCode.ServiceUnavailable:
+                    return "The server is currently unable to handle the request due to a temporary overloading or " +
+                        "maintenance of the server.";
+                case ErrorCode.GatewayTimeout:
+                    return "The gateway or proxy, did not receive a timely response from the upstream server.";
+                case ErrorCode.HttpVersionNotSupported:
+                    return "The server does not support the HTTP protocol version that was used in the request message.";
+                //Client side error codes
+                case ErrorCode.IsNotLoggedIn:
+                    return "User is not logged in.";
+                case ErrorCode.NetworkError:
+                    return "There is no response.";
+                case ErrorCode.MessageFieldTypeNotSupported:
+                    return "Serialization for expected field type is not supported.";
+                case ErrorCode.MessageFormatInvalid:
+                    return "Message is not well formed.";
+                case ErrorCode.MessageFieldDoesNotExist:
+                    return "Expected message field cannot be found.";
+                case ErrorCode.MessageFieldConversionFailed:
+                    return "Message field value cannot be converted to expected field type.";
+                case ErrorCode.MessageCannotBeSent:
+                    return "Sending message to server failed.";
+                case ErrorCode.HttpTooManyRequests:
+                    return "Too many HTTP Requests, please try again.";
+                default:
+                    return "Unknown error: " + this.Code.ToString("G");
             }
         }
     }

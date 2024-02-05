@@ -225,28 +225,35 @@ namespace AccelByte.Api
 
         internal void SaveRefreshToken(string cacheKey, TokenData tokenData, bool updateLastUserLoginCache, Action<bool> onDone)
         {
-            string encodedToken = EncodeToken(tokenData.refresh_token);
-            
-            int epochTimeNow = (int) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            int expirationDate = refreshExpiresIn + epochTimeNow;
-
-            localTokenData = new RefreshTokenData
+            if (string.IsNullOrEmpty(cacheKey))
             {
-                refresh_token = encodedToken,
-                expiration_date = expirationDate,
-            };
-            
-            localTokenDataCacheKey = cacheKey;
-
-            var keyValueSaveInfo = new List<Tuple<string, object>>()
-            {
-                new Tuple<string, object>(cacheKey, localTokenData)
-            };
-            if(updateLastUserLoginCache)
-            {
-                keyValueSaveInfo.Add(new Tuple<string, object>(LastLoginUserCacheKey, localTokenData));
+                onDone?.Invoke(false);
             }
-            dataStorage.SaveItems(keyValueSaveInfo, onDone, TokenTableName);
+            else
+            {
+                string encodedToken = EncodeToken(tokenData.refresh_token);
+
+                int epochTimeNow = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                int expirationDate = refreshExpiresIn + epochTimeNow;
+
+                localTokenData = new RefreshTokenData
+                {
+                    refresh_token = encodedToken,
+                    expiration_date = expirationDate,
+                };
+
+                localTokenDataCacheKey = cacheKey;
+
+                var keyValueSaveInfo = new List<Tuple<string, object>>()
+                {
+                    new Tuple<string, object>(cacheKey, localTokenData)
+                };
+                if (updateLastUserLoginCache)
+                {
+                    keyValueSaveInfo.Add(new Tuple<string, object>(LastLoginUserCacheKey, localTokenData));
+                }
+                dataStorage.SaveItems(keyValueSaveInfo, onDone, TokenTableName);
+            }
         }
 
         private string EncodeToken(string refreshToken)

@@ -215,7 +215,6 @@ public class OAuth2 : ApiBase
                 SaveAuthTrustId(result.Value);
                 OnNewTokenObtained?.Invoke(result.Value);
                 callback.TryOk(result.Value);
-
             }
             else
             {

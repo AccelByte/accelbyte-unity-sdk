@@ -2,12 +2,11 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -982,7 +981,7 @@ namespace AccelByte.Api
         /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
         /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
-        /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
+        /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
         /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
         public void Registerv2( string emailAddress
@@ -1833,6 +1832,17 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             api.GetCountryFromIP(callback);
+        }
+
+        /// <summary>
+        /// Get all valid country codes for User Registration
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains an Array of <see cref="Country"/> via callback when completed</param>
+        public void GetCountryGroupV3(ResultCallback<Country[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            api.GetCountryGroupV3(callback);
         }
 
         /// <summary>
