@@ -1,9 +1,6 @@
-﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-
-using AccelByte.Models;
-using System;
 
 namespace AccelByte.Core
 {
@@ -172,12 +169,14 @@ namespace AccelByte.Core
         MessageFieldConversionFailed = 14018,
         MessageCannotBeSent = 14019,
         MessageTypeNotSupported = 14020,
-        
+
         UserUnderage = 10130,
         EmailAlreadyUsed = 10133,
         CountryNotFound = 10154,
         PlatformAlreadyLinked = 10173,
         UserAlreadyExist = 10180,
+        UniqueDisplayNameAlreadyExists = 10222,
+
         InvalidSession = 13132,
         FriendListIsEmpty = 11732,
 

@@ -64,9 +64,11 @@ namespace AccelByte.Api
         public void RegisterV2(RegisterUserRequestv2 requestModel, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            if (requestModel == null)
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, requestModel);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, "Register failed. registerUserRequest is null!"));
+                callback.TryError(error);
                 return;
             }
 
@@ -208,12 +210,6 @@ namespace AccelByte.Api
             if (string.IsNullOrEmpty(requestModel.Password))
             {
                 callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! password parameter is null!"));
-                return;
-            }
-
-            if (string.IsNullOrEmpty(requestModel.Username))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! UserName parameter is null!"));
                 return;
             }
 
@@ -1182,35 +1178,62 @@ namespace AccelByte.Api
         public void CheckUserAccountAvailability(string displayName,
             ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name); 
-            if (string.IsNullOrEmpty(displayName))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, "Can't check user account availablity. displayName query is null!"));
-                return;
-            }
+            CheckUserAccountAvailabilityByFieldName(displayName, "displayName", callback);
+        }
 
-            const string field = "displayName";
-            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/availability")
+        public void GetConfigUniqueDisplayNameEnabled(ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            GetConfigValue<UniqueDisplayNameEnabledResponse>("uniqueDisplayNameEnabled", result =>
+            {
+                if (result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                callback.TryOk(result.Value.UniqueDisplayNameEnabled);
+            });
+        }
+
+        public void GetConfigUserNameDisabled(ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            GetConfigValue<DisplayNameDisabledResponse>("usernameDisabled", result =>
+            {
+                if(result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                callback.TryOk(result.Value.UserNameDisabled);
+            });
+        }
+
+        private void GetConfigValue<T>(string configKey, ResultCallback<T> callback) where T : class, new()
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/config/{configKey}")
                  .WithPathParam("namespace", Namespace_)
-                 .WithBearerAuth(Session.AuthorizationToken)
+                 .WithPathParam("configKey", configKey)
                  .WithContentType(MediaType.ApplicationJson)
-                 .WithQueryParam("field", field)
-                 .WithQueryParam("query", displayName)
                  .Accepts(MediaType.ApplicationJson)
                  .GetResult();
 
             httpOperator.SendRequest(request, response =>
             {
-                if (response.Code == (int)ErrorCode.NotFound)
+                var result = response.TryParseJson<ConfigValueResponse<T>>();
+                if (result.IsError)
                 {
-                    callback.TryError(new Error(ErrorCode.NotFound, "Account doesn't exist. If a new account is added with the defined display name, " +
-                        "the service will be able to perform the action."));
+                    callback.TryError(result.Error);
+                    return;
                 }
-                else
-                {
-                    var result = response.TryParse();
-                    callback.Try(result);
-                }
+
+                callback.Try(Result<T>.CreateOk(result.Value.Result));
             });
         }
 
@@ -1239,6 +1262,43 @@ namespace AccelByte.Api
             {
                 var result = response.TryParseJson<AccountUserPlatformInfosResponse>();
                 callback.Try(result);
+            });
+        }
+
+        public void CheckUserAccountAvailabilityByFieldName(string valueToCheck, string fieldName,
+            ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, valueToCheck, fieldName);
+            if (error != null)
+            {
+                callback.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/availability")
+                 .WithPathParam("namespace", Namespace_)
+                 .WithBearerAuth(Session.AuthorizationToken)
+                 .WithContentType(MediaType.ApplicationJson)
+                 .WithQueryParam("field", fieldName)
+                 .WithQueryParam("query", valueToCheck)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                if (response.Code == (int)ErrorCode.NotFound)
+                {
+                    callback.TryError(new Error(ErrorCode.NotFound,
+                        $"Account doesn't exist. If a new account is added with the defined {fieldName}, " +
+                        "the service will be able to perform the action."));
+                }
+                else
+                {
+                    var result = response.TryParse();
+                    callback.Try(result);
+                }
             });
         }
 

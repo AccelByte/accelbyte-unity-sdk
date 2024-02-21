@@ -232,6 +232,11 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
             Action<Error> onAlreadyLogin = (error) =>
             {
                 callback.TryError(error);
@@ -270,6 +275,11 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false)
         {
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
                 callback.TryError(error);
@@ -301,6 +311,11 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
             Action<Error> onAlreadyLogin = (error) =>
             {
                 callback.TryError(error);
@@ -331,6 +346,11 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
                 callback.TryError(error);
@@ -978,10 +998,81 @@ namespace AccelByte.Api
         /// Register a user by giving username, password, and displayName 
         /// </summary>
         /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="uniqueDisplayName">This is required when uniqueDisplayNameEnabled/UNIQUE_DISPLAY_NAME_ENABLED is true.</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void Register(string emailAddress
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , string uniqueDisplayName
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var registerUserRequest = new RegisterUserRequest
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                displayName = displayName,
+                emailAddress = emailAddress,
+                password = password,
+                UniqueDisplayName = uniqueDisplayName
+            };
+
+            api.Register(registerUserRequest, callback);
+        }
+
+        /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
         /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
         /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
-        /// <param name="country">User'd country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="uniqueDisplayName">This is required when uniqueDisplayNameEnabled/UNIQUE_DISPLAY_NAME_ENABLED is true.</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void RegisterV2(string emailAddress
+            , string username
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , string uniqueDisplayName
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var registerUserRequest = new RegisterUserRequestv2
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                displayName = displayName,
+                emailAddress = emailAddress,
+                password = password,
+                UniqueDisplayName = uniqueDisplayName,
+                username = username
+            };
+
+            api.RegisterV2(registerUserRequest, callback);
+        }
+
+        /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
         /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
         public void Registerv2( string emailAddress
@@ -1016,13 +1107,14 @@ namespace AccelByte.Api
             , ResultCallback<RegisterUserResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            
+
             //authType other than EMAILPASSWD is not supported
             request.authType = AuthenticationType.EMAILPASSWD;
             bool regexMatch = Regex.IsMatch(request.dateOfBirth, "^\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$");
             if (!regexMatch)
             {
                 callback.TryError(new Error(ErrorCode.BadRequest, "Date of birth format is yyyy-MM-dd"));
+                return;
             }
 
             api.RegisterV2(request, callback);
@@ -1175,6 +1267,11 @@ namespace AccelByte.Api
                 NeedVerificationCode = needVerificationCode
             };
 
+            if (!EmailUtils.IsValidEmailAddress(userName))
+            {
+                AccelByteDebug.LogWarning("Upgrade username is deprecated, please use email for the replacement.");
+            }
+
             api.Upgrade(requestModel, requestParameter, result =>
             {
                 if (!result.IsError)
@@ -1194,6 +1291,7 @@ namespace AccelByte.Api
         /// <param name="userName">Username the user is upgraded to</param>
         /// <param name="password">Password to login with username</param>
         /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
+        [Obsolete("userName param is deprecated, use Upgradev2 overload "), UnityEngine.Scripting.Preserve]
         public void Upgradev2( string emailAddress
             , string userName
             , string password
@@ -1206,6 +1304,36 @@ namespace AccelByte.Api
                 EmailAddress = emailAddress,
                 Password = password,
                 Username = userName
+            };
+
+            api.UpgradeV2(requestModel, result =>
+            {
+                if (!result.IsError)
+                {
+                    userDataCache = result.Value;
+                }
+
+                callback.Try(result);
+            });
+        }
+
+        /// <summary>
+        /// Upgrade a headless account with username and password. User must be logged in before this method can be
+        /// used.
+        /// </summary>
+        /// <param name="emailAddress">Email Address the user is upgraded to</param>
+        /// <param name="password">Password to login with username</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback when completed</param>
+        public void Upgradev2( string emailAddress
+            , string password
+            , ResultCallback<UserData> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var requestModel = new UpgradeV2Request
+            {
+                EmailAddress = emailAddress,
+                Password = password,
             };
 
             api.UpgradeV2(requestModel, result =>
@@ -1322,6 +1450,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!EmailUtils.IsValidEmailAddress(userName))
+            {
+                AccelByteDebug.LogWarning("username is deprecated, please use email for the replacement.");
+            }
+
             var requestModel = new SendPasswordResetCodeRequest
             {
                 EmailAddress = userName
@@ -1342,6 +1475,11 @@ namespace AccelByte.Api
             , ResultCallback callback )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!EmailUtils.IsValidEmailAddress(userName))
+            {
+                AccelByteDebug.LogWarning("username is deprecated, please use email for the replacement.");
+            }
 
             var requestModel = new ResetPasswordRequest
             {
@@ -1634,14 +1772,14 @@ namespace AccelByte.Api
         /// Get user data from another user displayName or username. The query will be used to find the user with the most approximate username or display name.
         /// </summary>
         /// <param name="query"> Display name or username that needed to get user data.</param>
-        /// <param name="by"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the SearchType.ALL if you want to be responded with all query type.</param>
+        /// <param name="searchBy"> Filter the responded PagedPublicUsersInfo by SearchType. Choose the <c>SearchType.ALL</c> if you want to be responded with all query type.</param>
         /// <param name="callback"> Return a Result that contains UsersData when completed. </param>
         /// <param name="limit"> Targeted limit query filter. </param>
         /// <param name="offset"> Targeted offset query filter. </param>
         /// <param name="platformId"> Specify platform type, string type of this field makes support OpenID Connect (OIDC). </param>
         /// <param name="platformBy"> Filter the responded PagedPublicUsersInfo by SearchPlatformType. </param>
         public void SearchUsers( string query
-            , SearchType by
+            , SearchType searchBy
             , ResultCallback<PagedPublicUsersInfo> callback
             , int offset = 0 
             , int limit = 100
@@ -1656,10 +1794,15 @@ namespace AccelByte.Api
                 return;
             }
 
+            if (searchBy == SearchType.USERNAME)
+            {
+                AccelByteDebug.LogWarning("Search by Username is deprecated, please use other search type for the replacement.");
+            }
+
             var requestModel = new SearchUsersRequest
             {
                 Query = query,
-                SearchBy = by,
+                SearchBy = searchBy,
                 Offset = offset,
                 Limit = limit,
                 PlatformId = platformId,
@@ -2286,18 +2429,23 @@ namespace AccelByte.Api
         /// <summary>
         /// Authentication With PlatformLink for Account Linking
         /// </summary>
-        /// <param name="username">Username to login</param>
+        /// <param name="email">Email to login</param>
         /// <param name="password">Password to login</param>
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Token for other platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         [Obsolete]
-        public void AuthenticationWithPlatformLink(string username
+        public void AuthenticationWithPlatformLink(string email
             , string password
             , string linkingToken
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Authentication using username is deprecated, please use user's email.");
+            }
 
             Action<Error> onAlreadyLogin = (error) =>
             {
@@ -2311,7 +2459,7 @@ namespace AccelByte.Api
             Action onLoginSuccess = () =>
             {
                 const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
                 {
                     OnLoginSuccess?.Invoke(Session.TokenData);
                     SendLoginSuccessPredefinedEventFromCurrentSession();
@@ -2319,7 +2467,7 @@ namespace AccelByte.Api
                 });
             };
 
-            Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
+            Login(cb => oAuth2.AuthenticationWithPlatformLink(email, password, linkingToken, cb)
             , onAlreadyLogin
             , onLoginFailed
             , onLoginSuccess);
@@ -2328,16 +2476,21 @@ namespace AccelByte.Api
         /// <summary>
         /// Authentication With PlatformLink for Account Linking
         /// </summary>
-        /// <param name="username">Username to login</param>
+        /// <param name="email">Email to login</param>
         /// <param name="password">Password to login</param>
         /// /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        public void AuthenticationWithPlatformLink(string username
+        public void AuthenticationWithPlatformLink(string email
             , string password
             , string linkingToken
             , ResultCallback<TokenData, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Authentication using username is deprecated, please use user's email.");
+            }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -2351,7 +2504,7 @@ namespace AccelByte.Api
             Action<TokenData> onLoginSuccess = (tokenData) =>
             {
                 const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(username, saveTokenAsLatestUser, (saveSuccess) =>
+                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
                 {
                     OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
@@ -2359,7 +2512,7 @@ namespace AccelByte.Api
                 });
             };
 
-            Login(cb => oAuth2.AuthenticationWithPlatformLink(username, password, linkingToken, cb)
+            Login(cb => oAuth2.AuthenticationWithPlatformLink(email, password, linkingToken, cb)
             , onAlreadyLogin
             , onLoginFailed
             , onLoginSuccess);
@@ -2562,9 +2715,8 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Check users's account availability, available only using displayName field
+        /// Check user's account availability using displayName field.
         /// If the result is success or no error, it means the account already exists. 
-        /// If a new account is added with the defined display name, the service will be unable to perform the action.
         /// </summary>
         /// <param name="displayName">User's display name value to be checked</param>
         /// <param name="callback">Return Result via callback when completed</param> 
@@ -2577,9 +2729,54 @@ namespace AccelByte.Api
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
-            } 
+            }
 
-            api.CheckUserAccountAvailability(displayName, callback);
+            string fieldName = JsonUtils.SerializeWithStringEnum(AccountAvailabilityField.DisplayName);
+            api.CheckUserAccountAvailabilityByFieldName(displayName, fieldName, callback);
+        }
+
+        /// <summary>
+        /// Check user's account availability.
+        /// If the result is success or no error, it means the account already exists. 
+        /// </summary>
+        /// <param name="valueToCheck">User's account value to be checked</param>
+        /// <param name="field">Field to be checked</param>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void CheckUserAccountAvailability(string valueToCheck, AccountAvailabilityField field
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!userSession.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            string fieldName = JsonUtils.SerializeWithStringEnum(field);
+            api.CheckUserAccountAvailabilityByFieldName(valueToCheck, fieldName, callback);
+        }
+
+        /// <summary>
+        /// Get user config value of uniqueDisplayNameEnabled
+        /// </summary>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void GetConfigUniqueDisplayNameEnabled(ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            api.GetConfigUniqueDisplayNameEnabled(callback);
+        }
+
+        /// <summary>
+        /// Get user config value of userNameDisabled
+        /// </summary>
+        /// <param name="callback">Return Result via callback when completed</param> 
+        public void GetConfigUserNameDisabled(ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            api.GetConfigUserNameDisabled(callback);
         }
 
         /// <summary>

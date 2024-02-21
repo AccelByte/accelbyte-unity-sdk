@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.16.0%0D16.15.0) (2024-02-21)
+
+
+### Features
+
+* **account:** account profile revamp ([b361231](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b361231729bc9de1833e98a1b70df328dee3d0f7))
+* **User:** deprecate upgrade account username param ([94907c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/94907c41c014080065d9f341ccc829b3385fac78))
+
+
+### Bug Fixes
+
+* add preserve attributes on some models ([668e6c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/668e6c493919885beb375b9d56f71e07217256ca))
+* missing sanitation stage ([0f61f12](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0f61f12c00ff5891141dfcc71932f4de696f20de))
+
+
+### Refactors
+
+* deprecate authentication platform link with username ([1d35f50](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1d35f5012e73dda06e566bfe4a14d75c371e5859))
+
 ## [16.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.15.0%0D16.14.0) (2024-02-05)
 
 

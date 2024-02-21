@@ -16,7 +16,7 @@ namespace AccelByte.Models
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
-    public enum SearchType { ALL, DISPLAYNAME, USERNAME, THIRDPARTYPLATFORM }
+    public enum SearchType { ALL, DISPLAYNAME, USERNAME, THIRDPARTYPLATFORM, UNIQUEDISPLAYNAME }
 
     [JsonConverter( typeof( StringEnumConverter ) )]
     public enum TwoFAFactorType
@@ -29,6 +29,14 @@ namespace AccelByte.Models
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SearchPlatformType { None, PlatformDisplayName }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum AccountAvailabilityField
+    {
+        [EnumMember(Value = "displayName")] DisplayName,
+        [EnumMember(Value = "uniqueDisplayName")] UniqueDisplayName,
+        [EnumMember(Value = "userName")] UserName
+    }
 
     public static class TwoFAFactorTypeExtensions
     {
@@ -79,6 +87,7 @@ namespace AccelByte.Models
         [DataMember] public string[] Roles;
         [DataMember] public string Scope;
         [DataMember(Name = "device_id")] public string DeviceId;
+        [DataMember(Name = "unique_display_name")] public string UniqueDisplayName;
     }
 
     [DataContract, Preserve]
@@ -151,6 +160,7 @@ namespace AccelByte.Models
         [DataMember(Name = "platformInfos")] public AccountUserPlatformInfo[] PlatformInfos;
         [DataMember] public string platformUserId;
         [DataMember] public string[] roles;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userId;
         [DataMember] public string userName;
         [DataMember] public bool eligible = true;
@@ -176,6 +186,7 @@ namespace AccelByte.Models
         [DataMember] public string platformUserId;
         [DataMember] public string[] roles;
         [DataMember] public string userId;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userName;
         [DataMember] public bool eligible = true;
     }
@@ -187,6 +198,7 @@ namespace AccelByte.Models
         [DataMember] public string displayName;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public string userId;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userName;
     }
 
@@ -215,6 +227,7 @@ namespace AccelByte.Models
         [DataMember] public string displayName;
         [DataMember] public string emailAddress;
         [DataMember] public string password;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public List<PolicyAcceptance> acceptedPolicies;
     }
     
@@ -227,6 +240,7 @@ namespace AccelByte.Models
         [DataMember] public string displayName;
         [DataMember] public string emailAddress;
         [DataMember] public string password;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
         [DataMember] public List<PolicyAcceptance> acceptedPolicies;
     }
@@ -241,6 +255,7 @@ namespace AccelByte.Models
         [DataMember] public string emailAddress;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public string userId;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
     }
 
@@ -251,7 +266,8 @@ namespace AccelByte.Models
         [DataMember] public string dateOfBirth; // Date of Birth format : YYYY-MM-DD, e.g. 2019-04-29.
         [DataMember] public string displayName;
         [DataMember] public string emailAddress; // Able to be used in publisher namespace 
-        [DataMember] public string languageTag; 
+        [DataMember] public string languageTag;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
         [DataMember] public string avatarUrl;
     }
@@ -270,6 +286,7 @@ namespace AccelByte.Models
         [DataMember] public string originNamespace;
         [DataMember] public string platformId;
         [DataMember] public string platformUserId;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userId;
     }
 
@@ -330,6 +347,7 @@ namespace AccelByte.Models
         [DataMember] public string emailAddress;
         [DataMember] public string password;
         [DataMember] public bool reachMinimumAge = true; //optional. If user input DOB, BE will not check this field
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
         [DataMember] public bool validateOnly = false;
     }
@@ -460,7 +478,7 @@ namespace AccelByte.Models
         public int Limit;
         public string PlatformId;
         public SearchPlatformType PlatformBy;
-        public readonly string[] FilterType = { "", "displayName", "username", "thirdPartyPlatform" };
+        public readonly string[] FilterType = { "", "displayName", "username", "thirdPartyPlatform" , "uniqueDisplayName" };
     }
 
     public class GetUserByUserIdRequest
@@ -608,6 +626,7 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, string> platformUserIds; 
         [DataMember] public string userId;
         [DataMember] public string publisherAvatarUrl;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
     }
 
@@ -756,6 +775,7 @@ namespace AccelByte.Models
         [DataMember] public string[] emailAddresses;
         [DataMember] public string phoneNumber;
         [DataMember] public PlatformUserInformation[] platformUsers;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
         [DataMember] public string xboxUserId;
     }
@@ -786,6 +806,7 @@ namespace AccelByte.Models
         [DataMember(Name = "displayName")] public string DisplayName;
         [DataMember(Name = "emailAddress")] public string EmailAddress;
         [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember(Name = "userId")] public string UserId;
     }
 
@@ -874,6 +895,7 @@ namespace AccelByte.Models
         [DataMember(Name = "avatarUrl")] public string AvatarUrl;
         [DataMember(Name = "displayName")] public string DisplayName;
         [DataMember(Name = "platformInfos")] public List<AccountUserPlatformInfo> PlatformInfos;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember(Name = "userId")] public string UserId;
     }
 
@@ -888,5 +910,23 @@ namespace AccelByte.Models
     public class AccountUserPlatformInfosResponse
     {
         [DataMember(Name = "data")] public AccountUserPlatformData[] Data;
+    }
+
+    [DataContract, Preserve]
+    internal class ConfigValueResponse<T>
+    {
+        [DataMember(Name = "result")] public T Result;
+    }
+
+    [DataContract, Preserve]
+    internal class UniqueDisplayNameEnabledResponse
+    {
+        [DataMember(Name = "uniqueDisplayNameEnabled")] public bool UniqueDisplayNameEnabled;
+    }
+
+    [DataContract, Preserve]
+    internal class DisplayNameDisabledResponse
+    {
+        [DataMember(Name = "usernameDisabled")] public bool UserNameDisabled;
     }
 };

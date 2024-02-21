@@ -217,21 +217,25 @@ namespace AccelByte.Models {
             {
                 Development = new ServerConfig();
             }
+            Development.SanitizeBaseUrl();
             Development.Expand(forceExpandServiceApiUrl);
             if (Certification == null)
             {
                 Certification = new ServerConfig();
             }
+            Certification.SanitizeBaseUrl();
             Certification.Expand(forceExpandServiceApiUrl);
             if (Production == null)
             {
                 Production = new ServerConfig();
             }
+            Production.SanitizeBaseUrl();
             Production.Expand(forceExpandServiceApiUrl);
             if (Default == null)
             {
                 Default = new ServerConfig();
             }
+            Default.SanitizeBaseUrl();
             Default.Expand(forceExpandServiceApiUrl);
         }
 

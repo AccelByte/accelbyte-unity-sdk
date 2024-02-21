@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -236,7 +236,8 @@ namespace AccelByte.Core
 
         private static void InvokeLog(AccelByteLogType logType, object message, Object context=null)
         {
-            if (onLog == null || !FilterLogSeverity(currentSeverity, logType) || !logEnabled)
+            bool isLogAccepted = FilterLogSeverity(currentSeverity, logType);
+            if (onLog == null || !isLogAccepted || !logEnabled)
             {
                 return;
             }

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,6 +14,7 @@ namespace AccelByte.Api
         private readonly AnalyticsApi api = null;
         private readonly ISession session = null;
 
+        [UnityEngine.Scripting.Preserve]
         public AnalyticsService(AnalyticsApi inApi,
             ISession inSession,
             CoroutineRunner runner)
