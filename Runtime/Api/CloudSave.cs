@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -18,6 +18,8 @@ namespace AccelByte.Api
         private readonly CloudSaveApi api;
         private readonly CoroutineRunner coroutineRunner;
         private readonly ISession session;
+
+        private const int userIdsRequestLimit = 20;
 
         [UnityEngine.Scripting.Preserve]
         internal CloudSave( CloudSaveApi inApi
@@ -221,7 +223,8 @@ namespace AccelByte.Api
 
         public void ReplaceUserRecord( string key
             , Dictionary<string, object> recordRequest
-            , ResultCallback callback )
+            , ResultCallback callback
+            , bool isPublic = false)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -242,7 +245,7 @@ namespace AccelByte.Api
                         SendPredefinedEvent(key, EventMode.PublicReplaceUserRecord);
                         HandleCallback(cb, callback);
                     },
-                    isPublic:false));
+                    isPublic));
         }
 
         /// <summary>
@@ -871,7 +874,40 @@ namespace AccelByte.Api
                     HandleCallback(cb, callback);
                 }));
         }
-        
+
+        /// <summary>
+        /// Bulk get public user records by multiple userIds and keys.
+        /// </summary>
+        /// <param name="key">Keys of records</param>
+        /// <param name="userIds">Collection of AccelByte Ids</param>
+        /// <param name="callback">Returns a result that contains UserRecords</param>
+        public void BulkGetPublicUserRecord(string key
+            , string[] userIds
+            , ResultCallback<UserRecords> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            if (userIds.Length <= 0 || userIds.Length > userIdsRequestLimit)
+            {
+                callback.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            BulkGetPublicUserRecordsByUserIdsRequest request = new BulkGetPublicUserRecordsByUserIdsRequest()
+            {
+                UserIds = userIds
+            };
+
+            coroutineRunner.Run(
+                api.BulkGetPublicUserRecords(key, request, callback));
+        }
+
         /// <summary>
         /// Bulk get game records by keys.
         /// </summary>

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -8,22 +8,12 @@ namespace AccelByte.Models
 {
     internal static class ConfigArgsExtension
     {
-        public static Config CopyToConfig(this SDKConfigArgs source, Config target)
-        {
-            return TransferArgsConfigToConfig(source, target);
-        }
-
-        public static ServerConfig CopyToConfig(this SDKConfigArgs source, ServerConfig target)
+        public static ConfigT CopyToConfig<ConfigT>(this SDKConfigArgs source, ConfigT target) where ConfigT : class
         {
             return TransferArgsConfigToConfig(source, target);
         }
 
         public static SDKConfigArgs CopyToArgConfig(this SDKConfigArgs source, SDKConfigArgs target)
-        {
-            return TransferArgsConfigToArgsConfig(source, target);
-        }
-
-        public static OAuthConfig CopyToArgConfig(this OAuthConfig source, OAuthConfig target)
         {
             return TransferArgsConfigToArgsConfig(source, target);
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,8 +10,11 @@ namespace AccelByte.Api
 {
     public class GameStandardAnalyticsServiceBase<TAnalyticsWrapper> : WrapperBase where TAnalyticsWrapper : IAccelByteAnalyticsWrapper
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        internal static readonly string DefaultCacheDirectory = "AccelByte/";
+#else
         internal static readonly string DefaultCacheDirectory = $"{Application.persistentDataPath}/AccelByte/{Application.productName}/";
-
+#endif
         internal GameStandardEventScheduler<TAnalyticsWrapper> Scheduler
         {
             get;

@@ -147,6 +147,8 @@ namespace AccelByte.Core
 
                 oAuthConfig = LoadOAuthConfig(platform, environment);
 
+                AccelByteDebug.Initialize(clientConfig.EnableDebugLog, clientConfig.DebugLogFilter);
+
                 string iAmUrl = clientConfig.IamServerUrl;
 
                 CoroutineRunner taskRunner = new CoroutineRunner();

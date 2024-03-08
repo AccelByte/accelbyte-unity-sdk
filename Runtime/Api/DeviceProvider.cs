@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -18,7 +18,11 @@ namespace AccelByte.Api
         public readonly string DeviceType;
         public readonly string UniqueId;
 
+#if UNITY_SWITCH && !UNITY_EDITOR
+        public static readonly string DefaultGeneratedIdCacheFileDir = "AccelByte/";
+#else
         public static string DefaultGeneratedIdCacheFileDir = $"{Application.persistentDataPath}/AccelByte/{Application.productName}/";
+#endif
         public static string CacheFileName = "DeviceId";
 
         public static string EncodeHMAC(string macAddress, string key)
@@ -198,6 +202,13 @@ namespace AccelByte.Api
                         platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
                         break;
                     }
+                    case RuntimePlatform.Switch:
+                    {
+                        iware = new Utils.Infoware.SwitchInfoware();
+                        string deviceId = iware.GetDeviceID();
+                        platformUniqueIdentifier = EncodeHMAC(deviceId, encodeKey);
+                        break;
+                    }
                     default:
                     {
                         iware = new Utils.Infoware.OtherOs();
@@ -230,9 +241,11 @@ namespace AccelByte.Api
 
         public static string[] GetMacAddress()
         {
+            string[] macAddressArray = null;
+#if !UNITY_SWITCH || UNITY_EDITOR
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
 
-            string[] macAddressArray = new string[] { };
+            macAddressArray = new string[] { };
             foreach (NetworkInterface adapter in networkInterfaces)
             {
                 string physicalAddress = adapter.GetPhysicalAddress().ToString();
@@ -242,6 +255,7 @@ namespace AccelByte.Api
                 }
 
             }
+#endif
             return macAddressArray;
         }
 

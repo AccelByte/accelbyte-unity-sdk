@@ -28,7 +28,11 @@ namespace AccelByte.Api
         //Constants
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
 
+#if UNITY_SWITCH && !UNITY_EDITOR
+        internal static readonly string DefaultPlatformCacheDirectory = "AccelByte/PlatformLoginCache/";
+#else
         internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/" + Application.productName;
+#endif
 
         internal Action<TokenData> OnLoginSuccess;
         internal Action OnLogout;
@@ -1091,6 +1095,7 @@ namespace AccelByte.Api
                 username = username,
                 password = password,
                 displayName = displayName,
+                UniqueDisplayName = displayName,
                 country = country,
                 dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd")
             };

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -83,6 +83,12 @@ namespace AccelByte.Models
     public class ConcurrentReplaceUserRecordResponse
     {        
         [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+    }
+
+    [DataContract, Preserve]
+    public class BulkGetPublicUserRecordsByUserIdsRequest
+    {
+        [DataMember(Name = "userIds")] public string[] UserIds;
     }
 
     [DataContract, Preserve]

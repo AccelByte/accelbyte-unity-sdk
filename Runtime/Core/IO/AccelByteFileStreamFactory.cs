@@ -1,0 +1,19 @@
+﻿// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// This is licensed software from AccelByte Inc, for limitations
+// and restrictions contact your company contract manager.
+
+namespace AccelByte.Core
+{
+    internal class AccelByteFileStreamFactory : IFileStreamFactory
+    {
+        public IFileStream CreateFileStream()
+        {
+#if UNITY_SWITCH && !UNITY_EDITOR
+            var retval = new NullFileStream();
+#else
+            var retval = new AccelByteFileStream();
+#endif
+            return retval;
+        }
+    }
+}

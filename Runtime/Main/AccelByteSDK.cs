@@ -56,6 +56,7 @@ namespace AccelByte.Core
         {
             const bool getServerConfig = false;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
+            AccelByteDebug.Initialize(settings.SDKConfig.EnableDebugLog, settings.SDKConfig.DebugLogFilter);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
             var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory);
             return newClientRegistry;
@@ -65,6 +66,7 @@ namespace AccelByte.Core
         {
             const bool getServerConfig = true;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
+            AccelByteDebug.Initialize(settings.ServerSdkConfig.EnableDebugLog, settings.ServerSdkConfig.DebugLogFilter);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
             var newClientRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory);
             return newClientRegistry;
@@ -128,6 +130,16 @@ namespace AccelByte.Core
                 sdkHttpSenderFactory.ResetHttpRequestSenders();
                 sdkHttpSenderFactory = null;
             }
+
+            AccelByteDebug.Reset();
+        }
+
+        internal static void DisposeFileStream()
+        {
+            if(fileStream != null)
+            {
+                fileStream.Dispose();
+            }
         }
 
         internal static AccelByteClientRegistry ClientRegistry;
@@ -135,14 +147,19 @@ namespace AccelByte.Core
         internal static Models.OverrideConfigs OverrideConfigs;
 
         #region File Stream
-        private static AccelByteFileStream fileStream;
-        internal static AccelByteFileStream FileStream
+        private static IFileStream fileStream;
+        internal static IFileStream FileStream
         {
             get
             {
                 if (fileStream == null)
                 {
-                    fileStream = new AccelByteFileStream();
+                    IFileStreamFactory fileStreamFactory = FileStreamFactory;
+                    if(fileStreamFactory == null)
+                    {
+                        fileStreamFactory = new AccelByteFileStreamFactory();
+                    }
+                    fileStream = fileStreamFactory.CreateFileStream();
                     AccelByteSDKMain.OnGameUpdate += dt =>
                     {
                         fileStream.Pop();
@@ -151,6 +168,7 @@ namespace AccelByte.Core
                 return fileStream;
             }
         }
+        public static IFileStreamFactory FileStreamFactory;
         #endregion
 
         private static IHttpRequestSenderFactory sdkHttpSenderFactory;

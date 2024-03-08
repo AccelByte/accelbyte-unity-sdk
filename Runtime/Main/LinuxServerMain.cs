@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -79,7 +79,11 @@ namespace AccelByte.Core
             }
 
             string amsServerUrl = null;
-            if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl))
+            if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl))
+            {
+                amsServerUrl = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl;
+            }
+            else if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl))
             {
                 amsServerUrl = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl;
             }

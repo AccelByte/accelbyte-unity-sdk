@@ -37,8 +37,9 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingV2ServerUrl;
         [DataMember] public string SeasonPassServerUrl;
         [DataMember] public string AMSServerUrl = defaultAMSServerUrl;
+        [DataMember] public string WatchdogUrl;
         [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
-        [DataMember] public int AMSPort;
+        [DataMember] public int Port;
         [DataMember] public int MaximumCacheSize = defaultCacheSize;
         [DataMember] public int MaximumCacheLifeTime = defaultCacheLifeTime;
         [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
@@ -46,6 +47,8 @@ namespace AccelByte.Models {
         [DataMember] public int StatsDServerPort;
         [DataMember] public int StatsDMetricInterval;
         [DataMember] public string DsId;
+        [DataMember] public bool EnableDebugLog = true;
+        [DataMember] public string DebugLogFilter = "Verbose";
 
 
         /// <summary>

@@ -26,7 +26,15 @@ namespace AccelByte.Server
         private ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
         private Coroutine telemetryCoroutine = null;
         private bool isTelemetryJobStarted = false;
-        private static readonly TimeSpan MINIMUM_INTERVAL_TELEMETRY = new TimeSpan(0, 0, 5);
+        private static readonly TimeSpan minimumTelemetryInterval = new TimeSpan(0, 0, 5);
+
+        internal TimeSpan TelemetryInterval
+        {
+            get
+            {
+                return telemetryInterval;
+            }
+        }
 
         [UnityEngine.Scripting.Preserve]
         internal ServerGameTelemetry( ServerGameTelemetryApi inApi
@@ -49,15 +57,26 @@ namespace AccelByte.Server
         /// <param name="interval">The interval between telemetry event.</param>
         public void SetBatchFrequency( TimeSpan interval )
         {
-            if (interval >= MINIMUM_INTERVAL_TELEMETRY)
+            if (interval >= minimumTelemetryInterval)
             {
                 telemetryInterval = interval;
             }
             else
             {
-                AccelByteDebug.LogWarning($"Telemetry schedule interval is too small! Set to {MINIMUM_INTERVAL_TELEMETRY.TotalSeconds} seconds.");
-                telemetryInterval = MINIMUM_INTERVAL_TELEMETRY;
+                AccelByteDebug.LogWarning($"Telemetry schedule interval is too small! Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
+                telemetryInterval = minimumTelemetryInterval;
             }
+        }
+
+        /// <summary>
+        /// Set the interval of sending telemetry event to the backend.
+        /// By default it sends the queued events once a minute.
+        /// Should not be less than 5 seconds.
+        /// </summary>
+        /// <param name="intervalSeconds">The seconds interval between telemetry event.</param>
+        public void SetBatchFrequency(int intervalSeconds)
+        {
+            SetBatchFrequency(TimeSpan.FromSeconds(intervalSeconds));
         }
 
         /// <summary>
@@ -90,11 +109,11 @@ namespace AccelByte.Server
             }
             else
             {
+                jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
                 if (isTelemetryJobStarted == false)
                 {
                     StartTelemetryScheduler();
                 }
-                jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
             }
         }
 

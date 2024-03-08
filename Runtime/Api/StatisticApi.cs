@@ -301,7 +301,6 @@ namespace AccelByte.Api
                 , userId
                 , statCode
                 , updateUserStatItem
-                , additionalKey
                 , accessToken
             );
             if (error != null)

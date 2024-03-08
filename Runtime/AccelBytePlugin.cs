@@ -323,7 +323,7 @@ namespace AccelByte.Api
             return new Version(AccelByteSDK.Version);
         }
 
-        internal static UserSession CreateSession(Config newSdkConfig, IHttpClient httpClient, CoroutineRunner taskRunner, string environment, AccelByteFileStream accelByteFileStream)
+        internal static UserSession CreateSession(Config newSdkConfig, IHttpClient httpClient, CoroutineRunner taskRunner, string environment, IFileStream accelByteFileStream)
         {
             string sessionCacheTableName = $"TokenCache/{environment}/TokenData";
 

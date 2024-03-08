@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -620,7 +620,52 @@ namespace AccelByte.Api
             var result = response.TryParseJson<UserRecords>();
             callback.Try(result);
         }
-        
+
+        public IEnumerator BulkGetPublicUserRecords(string key
+            , BulkGetPublicUserRecordsByUserIdsRequest data
+            , ResultCallback<UserRecords> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, data, data?.UserIds);
+            if (error == null && data.UserIds.Length == 0)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , "Can't bulk get user records! data.userId parameter is empty!"
+                );
+            }
+            if (error == null && data.UserIds.Length > maxBulkRecords)
+            {
+                error = new Error(ErrorCode.InvalidRequest
+                    , $"Can't bulk get user records! data.keys exceeding {maxBulkRecords}!"
+                );
+            }
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/namespaces/{namespace}/users/bulk/records/{key}/public")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                result =>
+                {
+                    response = result;
+                });
+
+            var result = response.TryParseJson<UserRecords>();
+            callback.Try(result);
+        }
+
         public IEnumerator BulkGetGameRecords( BulkGetRecordsByKeyRequest data
             , ResultCallback<GameRecords> callback )
         {

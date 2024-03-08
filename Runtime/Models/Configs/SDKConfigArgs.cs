@@ -1,6 +1,7 @@
 // Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System.Runtime.Serialization;
 using UnityEngine.Scripting;
 
@@ -61,17 +62,20 @@ namespace AccelByte.Models
         [DataMember] public bool? EnablePreDefinedEvent;
         [DataMember] public bool? EnableClientAnalyticsEvent;
         [DataMember] public float? ClientAnalyticsEventInterval;
+        [DataMember] public bool? EnableAmsServerQos;
         [DataMember] public string DSHubServerUrl;
         [DataMember] public string DSMControllerServerUrl;
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string AMSServerUrl;
+        [DataMember] public string WatchdogUrl;
         [DataMember] public int? AMSHeartbeatInterval;
-        [DataMember] public int? AMSPort;
-        [DataMember] public bool? EnableAmsServerQos;
+        [DataMember] public int? Port;
         [DataMember] public string StatsDServerUrl;
         [DataMember] public int? StatsDServerPort;
         [DataMember] public int? StatsDMetricInterval;
         [DataMember] public string DsId;
+        [DataMember] public string ClientId;
+        [DataMember] public string ClientSecret;
         [DataMember] public bool? OverrideServiceUrl;
     }
 

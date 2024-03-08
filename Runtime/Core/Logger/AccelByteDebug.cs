@@ -16,7 +16,7 @@ namespace AccelByte.Core
         private static Lazy<AccelByteILogger> logger = new Lazy<AccelByteILogger>(() => DefaultLogger);
 
         private static List<AccelByteILogger> loggers = new List<AccelByteILogger>();
-        
+
         internal static AccelByteLogType currentSeverity;
 
         private static readonly AccelByteILogger defaultLogger = new AccelByteLogHandler();
@@ -24,6 +24,8 @@ namespace AccelByte.Core
         private static Action<AccelByteLogType, object, Object> onLog;
 
         private static Action<Exception, Object> onException;
+
+        private static List<LogCache> unsentLogs;
 
         internal static AccelByteILogger DefaultLogger
         {
@@ -35,16 +37,19 @@ namespace AccelByte.Core
 
         internal static bool logEnabled;
 
+        private static bool isInitialized;
+
         static AccelByteDebug()
         {
-#if UNITY_SERVER
-            var defaultSettings = GetSettings(true);
-#else
-            var defaultSettings = GetSettings();
-#endif
-            Initialize(defaultSettings);
-
+            unsentLogs = new List<LogCache>();
+            isInitialized = false;
             AddLogger(logger.Value);
+        }
+
+        internal static void Reset()
+        {
+            unsentLogs.Clear();
+            isInitialized = false;
         }
 
         public static void SetEnableLogging(bool enable)
@@ -52,29 +57,21 @@ namespace AccelByte.Core
             logEnabled = enable;
         }
 
-        private static AccelByteSettingsV2 GetSettings(bool isServer = false)
-        {
-            var activeEnvironment = AccelByteSDK.Environment != null ? AccelByteSDK.Environment.Current : SettingsEnvironment.Default;
-            string activePlatform = AccelByteSettingsV2.GetActivePlatform(isServer);
-            var defaultSettings = new AccelByteSettingsV2(activePlatform, activeEnvironment, isServer);
-            defaultSettings.OverrideClientSDKConfig(AccelByteSDK.OverrideConfigs.SDKConfigOverride.GetByEnvironment(activeEnvironment));
-            defaultSettings.OverrideOAuthConfig(AccelByteSDK.OverrideConfigs.OAuthConfigOverride.GetByEnvironment(activeEnvironment));
-
-            return defaultSettings;
-        }
-
         internal static void Initialize(AccelByteSettingsV2 settings)
         {
             if (settings.SDKConfig == null)
             {
-                SetEnableLogging(true);
-                SetFilterLogType(AccelByteLogType.Verbose);
                 return;
             }
 
-            SetEnableLogging(settings.SDKConfig.EnableDebugLog);
+            Initialize(settings.SDKConfig.EnableDebugLog, settings.SDKConfig.DebugLogFilter);
+        }
+
+        internal static void Initialize(bool enableLog, string logFilter)
+        {
+            SetEnableLogging(enableLog);
             AccelByteLogType logTypeEnum;
-            if (Enum.TryParse(settings.SDKConfig.DebugLogFilter, out logTypeEnum))
+            if (Enum.TryParse(logFilter, out logTypeEnum))
             {
                 SetFilterLogType(logTypeEnum);
             }
@@ -82,11 +79,17 @@ namespace AccelByte.Core
             {
                 SetFilterLogType(AccelByteLogType.Verbose);
             }
-        } 
 
-        internal static void SetLogger(AccelByteILogger newLogger=null)
+            if (!isInitialized)
+            {
+                isInitialized = true;
+                SendUnsentLog();
+            }
+        }
+
+        internal static void SetLogger(AccelByteILogger newLogger = null)
         {
-            if(newLogger != null)
+            if (newLogger != null)
             {
                 SetLoggers(new AccelByteILogger[] { newLogger });
             }
@@ -156,7 +159,7 @@ namespace AccelByte.Core
         public static void SetFilterLogType(LogType type)
         {
             string unityLogTypeStr = type.ToString();
-            if(!Enum.TryParse(unityLogTypeStr, true, out currentSeverity))
+            if (!Enum.TryParse(unityLogTypeStr, true, out currentSeverity))
             {
                 currentSeverity = AccelByteLogType.Log;
                 throw new System.InvalidOperationException($"Failed assign Unity log severity type : {type}.");
@@ -208,8 +211,15 @@ namespace AccelByte.Core
             InvokeLog(AccelByteLogType.Error, message, context);
         }
 
-        public static void LogException(Exception exception, Object context=null)
+        public static void LogException(Exception exception, Object context = null)
         {
+            if (!isInitialized)
+            {
+                LogCache newLogCache = new LogCache(exception, context);
+                unsentLogs.Add(newLogCache);
+                return;
+            }
+
             if (onException == null || !FilterLogSeverity(currentSeverity, AccelByteLogType.Exception) || !logEnabled)
             {
                 return;
@@ -234,14 +244,64 @@ namespace AccelByte.Core
             return logSeverity <= activeSeverity;
         }
 
-        private static void InvokeLog(AccelByteLogType logType, object message, Object context=null)
+        private static void InvokeLog(AccelByteLogType logType, object message, Object context = null)
         {
+            if (!isInitialized)
+            {
+                LogCache newLogCache = new LogCache(logType, message, context);
+                unsentLogs.Add(newLogCache);
+                return;
+            }
+
             bool isLogAccepted = FilterLogSeverity(currentSeverity, logType);
             if (onLog == null || !isLogAccepted || !logEnabled)
             {
                 return;
             }
             onLog?.Invoke(logType, message, context);
+        }
+
+        private static void SendUnsentLog()
+        {
+            if(unsentLogs.Count > 0)
+            {
+                foreach(LogCache logCache in unsentLogs)
+                {
+                    if (logCache.LogType == AccelByteLogType.Exception)
+                    {
+                        LogException(logCache.ExceptionLog, logCache.Context);
+                    }
+                    else
+                    {
+                        InvokeLog(logCache.LogType, logCache.Message, logCache.Context);
+                    }
+                }
+            }
+            unsentLogs.Clear();
+        }
+
+        private struct LogCache
+        {
+            public AccelByteLogType LogType;
+            public Exception ExceptionLog;
+            public object Message;
+            public Object Context;
+
+            public LogCache(AccelByteLogType logType, object message, Object context)
+            {
+                LogType = logType;
+                Message = message;
+                Context = context;
+                ExceptionLog = null;
+            }
+
+            public LogCache(Exception exceptionLog, Object context)
+            {
+                LogType = AccelByteLogType.Exception;
+                ExceptionLog = exceptionLog;
+                Message = null;
+                Context = context;
+            }
         }
     }
 }

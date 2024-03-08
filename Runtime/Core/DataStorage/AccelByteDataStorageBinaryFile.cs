@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,12 +11,16 @@ namespace AccelByte.Core
 {
     internal class AccelByteDataStorageBinaryFile : IAccelByteDataStorage
     {
+#if UNITY_SWITCH && !UNITY_EDITOR
+        internal static readonly string RootPath = "AccelByte/";
+#else
         internal static readonly string RootPath = $"{Application.persistentDataPath}/AccelByte/{Application.productName}";
+#endif
 
-        private readonly AccelByteFileStream accelByteFileStream;
+        private readonly IFileStream accelByteFileStream;
         private readonly BinaryFormatter formatter;
 
-        public AccelByteDataStorageBinaryFile(AccelByteFileStream accelByteFileStream)
+        public AccelByteDataStorageBinaryFile(IFileStream accelByteFileStream)
         {
             UnityEngine.Assertions.Assert.IsNotNull(accelByteFileStream, "AccelByte File Stream can't null");
             this.accelByteFileStream = accelByteFileStream;
@@ -26,27 +30,28 @@ namespace AccelByte.Core
 
         public void DeleteItem(string key, Action<bool> onDone, string tableName = "DefaultKeyValueTable")
         {
-            Action<bool, object> onReadDone = (isSuccess, result) =>
+            Action<bool, string> onReadDone = (isSuccess, resultJson) =>
             {
-                if(result == null)
+                if (string.IsNullOrEmpty(resultJson))
                 {
                     onDone?.Invoke(false);
                     return;
                 }
 
-                if(result is Dictionary<string, object>)
+                try
                 {
-                    var storage = result as Dictionary<string, object>;
+                    Dictionary<string, object> storage = resultJson.ToObject<Dictionary<string, object>>();
                     bool isRemoveSuccess = storage.Remove(key);
-                    if(!isRemoveSuccess)
+                    if (!isRemoveSuccess)
                     {
                         onDone?.Invoke(false);
                         return;
                     }
                     const bool instantWrite = true;
-                    this.accelByteFileStream.WriteFile(formatter, storage, GetPath(tableName), onDone, instantWrite);
+                    string storageJson = storage.ToJsonString();
+                    this.accelByteFileStream.WriteFile(formatter, storageJson, GetPath(tableName), onDone, instantWrite);
                 }
-                else
+                catch (Exception)
                 {
                     onDone?.Invoke(false);
                 }
@@ -56,28 +61,28 @@ namespace AccelByte.Core
 
         public void GetItem<T>(string key, Action<bool, T> onDone, string tableName = "DefaultKeyValueTable")
         {
-            Action<bool, object> onReadDone = (isSuccess, result) =>
+            Action<bool, string> onReadDone = (isSuccess, resultJson) =>
             {
-                if (result == null)
+                if (string.IsNullOrEmpty(resultJson))
                 {
                     onDone?.Invoke(false, default(T));
                     return;
                 }
 
-                if (result is Dictionary<string, object>)
+                try
                 {
-                    var storage = result as Dictionary<string, object>;
+                    Dictionary<string, object> storage = resultJson.ToObject<Dictionary<string, object>>();
                     storage.TryGetValue(key, out object value);
-                    if(value is T)
-                    {
-                        onDone?.Invoke(true, (T)value);
-                    }
-                    else
+                    if(value == null)
                     {
                         onDone?.Invoke(false, default(T));
+                        return;
                     }
+                    string valueJson = value.ToJsonString();
+                    var trueTypeValue = valueJson.ToObject<T>();
+                    onDone?.Invoke(true, trueTypeValue);
                 }
-                else
+                catch(Exception)
                 {
                     onDone?.Invoke(false, default(T));
                 }
@@ -99,20 +104,20 @@ namespace AccelByte.Core
 
         public void SaveItems(List<Tuple<string, object>> keyItems, Action<bool> onDone, string tableName = "DefaultKeyValueTable")
         {
-            Action<bool, object> onReadDone = (isSuccess, result) =>
+            Action<bool, string> onReadDone = (isSuccess, resultJson) =>
             {
                 Dictionary<string, object> storage = null;
-                if (result == null)
+                if (string.IsNullOrEmpty(resultJson))
                 {
                     storage = new Dictionary<string, object>();
                 }
                 else
                 {
-                    if (result is Dictionary<string, object>)
+                    try
                     {
-                        storage = result as Dictionary<string, object>;
+                        storage = resultJson.ToObject<Dictionary<string, object>>();
                     }
-                    else
+                    catch(Exception)
                     {
                         storage = new Dictionary<string, object>();
                     }
@@ -123,7 +128,8 @@ namespace AccelByte.Core
                     storage[keyItemPair.Item1] = keyItemPair.Item2;
                 }
                 const bool instantWrite = true;
-                accelByteFileStream.WriteFile(formatter, storage, GetPath(tableName), onDone, instantWrite);
+                string storageJson = storage.ToJsonString();
+                accelByteFileStream.WriteFile(formatter, storageJson, GetPath(tableName), onDone, instantWrite);
             };
             accelByteFileStream.ReadFile(formatter, GetPath(tableName), onReadDone);
         }

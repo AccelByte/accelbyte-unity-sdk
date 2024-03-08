@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 #if !UNITY_WEBGL
@@ -24,7 +24,8 @@ namespace AccelByte.Core
 
         public bool Contains(string key)
         {
-            var retval = System.IO.File.Exists(GetFileFullPath(key));
+            string itemPath = GetFileFullPath(key);
+            var retval = AccelByteSDK.FileStream.IsFileExist(itemPath);
             return retval;
         }
 
@@ -32,11 +33,8 @@ namespace AccelByte.Core
         {
             try
             {
-                if (!System.IO.Directory.Exists(cacheDirectory))
-                {
-                    System.IO.Directory.CreateDirectory(cacheDirectory);
-                }
-                System.IO.File.WriteAllBytes(GetFileFullPath(key), Encoding.ASCII.GetBytes(item));
+                string itemSavePath = GetFileFullPath(key);
+                AccelByteSDK.FileStream.WriteFile(formatter: null, item, path: itemSavePath, onDone: null, instantWrite: true);
             }
             catch (System.Exception ex)
             {
@@ -48,22 +46,16 @@ namespace AccelByte.Core
 
         public virtual async void EmplaceAsync(string key, string item, System.Action<bool> callback = null)
         {
-            if (!System.IO.Directory.Exists(cacheDirectory))
-            {
-                System.IO.Directory.CreateDirectory(cacheDirectory);
-            }
-
-            string path = GetFileFullPath(key);
+            string filePath = GetFileFullPath(key);
             bool writeSuccess = false;
             while (!writeSuccess)
             {
                 try
                 {
-                    using (var outputFile = new System.IO.StreamWriter(path))
+                    AccelByteSDK.FileStream.WriteFileAsync(item, filePath, (success) =>
                     {
-                        await outputFile.WriteAsync(item);
-                        writeSuccess = true;
-                    }
+                        writeSuccess = success;
+                    });
                 }
                 catch (System.Exception)
                 {
@@ -86,10 +78,7 @@ namespace AccelByte.Core
         {
             try
             {
-                if (System.IO.Directory.Exists(cacheDirectory))
-                {
-                    System.IO.Directory.Delete(cacheDirectory, true);
-                }
+                AccelByteSDK.FileStream.DeleteDirectory(cacheDirectory, onDone: null);
             }
             catch (System.Exception exception)
             {
@@ -99,16 +88,18 @@ namespace AccelByte.Core
 
         public virtual string Retrieve(string key)
         {
-            if (!Contains(key))
-            {
-                return null;
-            }
-
+            string filePath = GetFileFullPath(key);
             string retval = null;
 
             try
             {
-                retval = System.IO.File.ReadAllText(GetFileFullPath(key));
+                AccelByteSDK.FileStream.ReadFile(formatter: null, filePath, instantRead: true, onDone: (isSucess, readResult)=>
+                {
+                    if(isSucess)
+                    {
+                        retval = (string) readResult;
+                    }
+                });
             }
             catch (System.Exception ex)
             {
@@ -117,35 +108,15 @@ namespace AccelByte.Core
             return retval;
         }
 
-        public virtual async void RetrieveAsync(string key, System.Action<string> callback)
+        public virtual void RetrieveAsync(string key, System.Action<string> callback)
         {
             if (callback != null)
             {
-                if (!Contains(key))
+                string filePath = GetFileFullPath(key);
+                AccelByteSDK.FileStream.ReadFileAsync(filePath, (success, readResult) =>
                 {
-                    callback?.Invoke(null);
-                    return;
-                }
-
-                string fileText = null;
-                bool loadSuccess = false;
-                string path = GetFileFullPath(key);
-                while (!loadSuccess)
-                {
-                    try
-                    {
-                        using (var reader = System.IO.File.OpenText(path))
-                        {
-                            fileText = await reader.ReadToEndAsync();
-                            loadSuccess = true;
-                        }
-                    }
-                    catch (System.Exception)
-                    {
-                        await System.Threading.Tasks.Task.Delay(readWriteAsyncWaitMs);
-                    }
-                }
-                callback?.Invoke(fileText);
+                    callback?.Invoke(readResult);
+                });
             }
         }
 
@@ -156,19 +127,20 @@ namespace AccelByte.Core
 
         public bool Remove(string key)
         {
-            if (!Contains(key))
-            {
-                return false;
-            }
+            bool result = false;
             try
             {
-                System.IO.File.Delete(GetFileFullPath(key));
+                string filePath = GetFileFullPath(key);
+                AccelByteSDK.FileStream.DeleteFile(filePath, instantDelete: true, onDone: (isSuccess) =>
+                {
+                    result = isSuccess;
+                });
             }
             catch(System.Exception ex)
             {
                 AccelByteDebug.LogWarning($"Failed to delete cache file.\n{ex.Message}");
             }
-            return true;
+            return result;
         }
 
         string GetFileFullPath(string key)

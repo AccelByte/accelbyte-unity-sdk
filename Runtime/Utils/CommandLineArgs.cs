@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -65,9 +65,26 @@ namespace AccelByte.Utils
 
             for (int index = 0; index < args.Length; index++)
             {
-                if (args[index] == argName && args.Length > index + 1)
+                if (args[index]?.Length <= argName.Length)
                 {
-                    argValues.Add(args[index + 1]);
+                    continue;
+                }
+
+                if (args[index].Substring(0, argName.Length).ToLower() == argName.ToLower())
+                {
+                    string argConfig = args[index].Substring(argName.Length);
+
+                    if (args.Length > index + 1)
+                    {
+                        if (!string.IsNullOrEmpty(args[index + 1]) && args[index + 1]?.Substring(0, 1) != "-")
+                        {
+                            string argValue = args[index + 1];
+                            argValues.Add($"{argConfig}={argValue}");
+
+                            continue;
+                        }
+                    }
+                    argValues.Add(argConfig + "=");
                 }
             }
             return argValues.ToArray();

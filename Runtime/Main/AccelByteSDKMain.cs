@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,6 +10,7 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS4")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSwitch")]
 namespace AccelByte.Core
 {
 #if !UNITY_EDITOR && UNITY_STANDALONE_WIN
@@ -22,6 +23,8 @@ namespace AccelByte.Core
     using PlatformMain = PS5Main;
 #elif !UNITY_EDITOR && UNITY_GAMECORE
     using PlatformMain = GameCoreMain;
+#elif !UNITY_EDITOR && UNITY_SWITCH
+    using PlatformMain = SwitchMain;
 #elif UNITY_EDITOR
     using PlatformMain = EditorMain;
 #else

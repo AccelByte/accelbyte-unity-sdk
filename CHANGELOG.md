@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.0%0D16.16.0) (2024-03-08)
+
+
+### Features
+
+* add cloudsave endpoint ([dc771a9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dc771a9132efc9036675e0a7e2d1b989a034590e))
+* add default null filestream for switch platform. ([83db847](https://github.com/AccelByte/accelbyte-unity-sdk/commits/83db847b21d568cf77a93712d83e9499b1c6b78c))
+* **user:** assign uniqueDisplayName with displayName on Register ([db1dc88](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db1dc88c383caa56e8c1ad7804c597293a98e11d))
+
+
+### Bug Fixes
+
+* fixed roslyn compiler warnings triggering on other attributes with the preview keyword ([47371cd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/47371cd8eaf4ed09ffcb29a1efdca7bf1429fc24))
+* remove additionalKey requirement from UpdateUserStatItemsValue ([f12c56a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f12c56a6f8b09d9007c3cb36ecc238d6c79f9177))
+
+
+### Refactors
+
+* add server log settings, log only active after configuration loaded ([5acf0af](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5acf0af8605658e24cc308bb5fab0d4c6e818430))
+* change config injection command ([064f3d5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/064f3d5865cc2ad9ce0ceb63bcb5e1bc2f0e4947))
+* refactor config injection to avoid unnecessary warning ([42e36b4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42e36b4bda899f5a06092ec551c653c87fcbc380))
+* refactor SDK filesystem for switch support ([4eba29d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4eba29d2d50cd98803ff82281bf1f9de6ebad85e))
+* update game telemetry cache save & load ([b12ceb0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b12ceb0530cd00e39d666d90bff3369ff60ebb26))
+
 ## [16.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.16.0%0D16.15.0) (2024-02-21)
 
 

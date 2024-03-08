@@ -12,7 +12,7 @@ namespace AccelByte.Utils.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     [ComVisible(true)]
-    internal class PreviewAttribute : Attribute
+    internal class AccelBytePreviewAttribute : Attribute
     {
         
     }

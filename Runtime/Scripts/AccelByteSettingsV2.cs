@@ -573,18 +573,23 @@ namespace AccelByte.Api
             string serverFlagLog = isServer ? "" : "Server ";
 
             MultiOAuthConfigs multiOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(platform, isServer);
-            if (multiOAuthConfigs == null)
+            bool platformOauthConfigNotFound = false;
+
+            if (multiOAuthConfigs == null && !string.IsNullOrEmpty(platform))
             {
+                platformOauthConfigNotFound = true;
                 multiOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(string.Empty, isServer);
-                if (multiOAuthConfigs != null)
-                {
-                    AccelByteDebug.Log($"{serverFlagLog}OAuth {platform} config not found, using default OAuth config");
-                }
             }
+
             if (multiOAuthConfigs == null)
             {
                 multiOAuthConfigs = new MultiOAuthConfigs();
-                AccelByteDebug.LogWarning($"{serverFlagLog}OAuth config not found, using empty config");
+                string onPlatformOAuthNotFoundAdditionalMessage = string.Empty;
+                if (platformOauthConfigNotFound)
+                {
+                    onPlatformOAuthNotFoundAdditionalMessage = $"or {serverFlagLog}OAuth{platform}";
+                }
+                AccelByteDebug.LogWarning($"{serverFlagLog}OAuth config {onPlatformOAuthNotFoundAdditionalMessage} not found, using empty config");
             }
 
             IAccelByteMultiConfigs multiConfigs;

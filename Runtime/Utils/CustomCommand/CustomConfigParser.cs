@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -12,10 +12,9 @@ namespace AccelByte.Utils
 {
     internal class CustomConfigParser
     {
-        internal const string OverrideSDKConfigCommand = "-OverrideSDKConfig";
-        internal const string OverrideOAuthConfigCommand = "-OverrideOAuthConfig";
-        internal const string OverrideSDKConfigV2Command = "-SetSDKConfig";
-        internal const string OverrideOAuthConfigV2Command = "-SetOAuthConfig";
+        private const string OverrideSDKConfigCommand = "-OverrideSDKConfig";
+        private const string OverrideOAuthConfigCommand = "-OverrideOAuthConfig";
+        private const string OverrideConfigV2Prefix = "-AB";
 
         private ConfigT ParseConfigFromArgs<ConfigT>(string command) where ConfigT : class
         {
@@ -55,14 +54,19 @@ namespace AccelByte.Utils
                         string configName = configArray[0];
                         string configValue = configArray[1];
 
-                        var configField = typeof(ConfigT).GetField(configName);
+                        var configField = typeof(ConfigT).GetField(configName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         var configType = Nullable.GetUnderlyingType(configField.FieldType) ?? configField.FieldType;
+
+                        if (string.IsNullOrEmpty(configValue) && configType == typeof(bool))
+                        {
+                            configValue = "True";
+                        }
 
                         configField.SetValue(retval, Convert.ChangeType(configValue, configType));
                     }
                     catch (System.Exception ex)
                     {
-                        AccelByteDebug.LogWarning($"Failed to parse {overrideConfigs[index]} arg.\nException:{ex.Message}");
+                        AccelByteDebug.LogWarning($"Failed to parse {overrideConfigs[index]} arg for config injection.\nException:{ex.Message}");
                     }
                 }
             }
@@ -78,7 +82,7 @@ namespace AccelByte.Utils
         {
             MultiSDKConfigsArgs retval = null;
             var configArgs = ParseConfigFromArgs<SDKConfigArgs>(OverrideSDKConfigCommand);
-            var configArgsV2 = ParseConfigV2FromArgs<SDKConfigArgs>(OverrideSDKConfigV2Command);
+            var configArgsV2 = ParseConfigV2FromArgs<SDKConfigArgs>(OverrideConfigV2Prefix);
 
             configArgs = configArgsV2.CopyToArgConfig(configArgs);
 
@@ -96,13 +100,15 @@ namespace AccelByte.Utils
         public MultiOAuthConfigs ParseOAuthConfigFromArgs()
         {
             MultiOAuthConfigs retval = null;
-            var oAuthArgs = ParseConfigFromArgs<OAuthConfig>(OverrideOAuthConfigCommand);
-            var oAuthArgsV2 = ParseConfigV2FromArgs<OAuthConfig>(OverrideOAuthConfigV2Command);
+            var configArgs = ParseConfigFromArgs<SDKConfigArgs>(OverrideOAuthConfigCommand);
+            var configArgsV2 = ParseConfigV2FromArgs<SDKConfigArgs>(OverrideConfigV2Prefix);
 
-            oAuthArgs = oAuthArgsV2.CopyToArgConfig(oAuthArgs);
+            configArgs = configArgsV2.CopyToArgConfig(configArgs);
 
-            if (oAuthArgs != null)
+            if (configArgs != null)
             {
+                var oAuthArgs = configArgs.CopyToConfig(new OAuthConfig());
+                
                 retval = new MultiOAuthConfigs();
                 retval.Default = oAuthArgs;
                 retval.Certification = oAuthArgs;

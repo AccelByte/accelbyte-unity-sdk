@@ -30,8 +30,19 @@ namespace AccelByte.Api
         
         private Coroutine telemetryCoroutine = null;
         private bool isTelemetryJobStarted = false;
-        private static readonly TimeSpan MINIMUM_INTERVAL_TELEMETRY = 
+        private static readonly TimeSpan minimumTelemetryInterval = 
             new TimeSpan(0, 0, 5);
+
+        IAccelByteDataStorage cacheStorage;
+        string cacheTableName;
+
+        internal TimeSpan TelemetryInterval
+        {
+            get
+            {
+                return telemetryInterval;
+            }
+        }
 
         [UnityEngine.Scripting.Preserve]
         internal GameTelemetry( GameTelemetryApi inApi
@@ -44,13 +55,23 @@ namespace AccelByte.Api
             api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
+
+            cacheStorage = session.DataStorage;
+            cacheTableName = $"GameTelemetryCache/{AccelByteSDK.Environment.Current}.cache";
+
             if (session.IsValid())
             {
-                LoadEventsFromCache();
+                SendCachedTelemetry();
             }
             else
             {
-                session.RefreshTokenCallback += LoadEventsFromCache;
+                Action<string> onGetRefreshToken = null;
+                onGetRefreshToken = (newAccessToken) =>
+                {
+                    session.RefreshTokenCallback -= onGetRefreshToken;
+                    SendCachedTelemetry();
+                };
+                session.RefreshTokenCallback += onGetRefreshToken;
             }
         }
 
@@ -62,16 +83,27 @@ namespace AccelByte.Api
         /// <param name="interval">The interval between telemetry event.</param>
         public void SetBatchFrequency( TimeSpan interval )
         {
-            if (interval >= MINIMUM_INTERVAL_TELEMETRY)
+            if (interval >= minimumTelemetryInterval)
             {
                 telemetryInterval = interval;
             }
             else
             {
                 AccelByteDebug.LogWarning($"Telemetry schedule interval is too small! " +
-                    $"Set to {MINIMUM_INTERVAL_TELEMETRY.TotalSeconds} seconds.");
-                telemetryInterval = MINIMUM_INTERVAL_TELEMETRY;
+                    $"Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
+                telemetryInterval = minimumTelemetryInterval;
             }
+        }
+
+        /// <summary>
+        /// Set the interval of sending telemetry event to the backend.
+        /// By default it sends the queued events once a minute.
+        /// Should not be less than 5 seconds.
+        /// </summary>
+        /// <param name="intervalSeconds">The seconds interval between telemetry event.</param>
+        public void SetBatchFrequency(int intervalSeconds)
+        {
+            SetBatchFrequency(TimeSpan.FromSeconds(intervalSeconds));
         }
 
         /// <summary>
@@ -103,13 +135,35 @@ namespace AccelByte.Api
             }
             else
             {
+                jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
+                AppendEventToCache(telemetryBody);
+
                 if (isTelemetryJobStarted == false)
                 {
                     StartTelemetryScheduler();
                 }
-                jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
-                AppendEventToCache(telemetryBody);
             }
+        }
+
+        private void Send(List<TelemetryBody> telemetryBodies, ResultCallback callback)
+        {
+            if (telemetryBodies != null && telemetryBodies.Count > 0)
+            {
+                coroutineRunner.Run(
+                    api.SendProtectedEvents(telemetryBodies, callback)
+                );
+            }
+        }
+
+        private void SendCachedTelemetry()
+        {
+            LoadEventsFromCache(telemetryBodies =>
+            {
+                Send(telemetryBodies, cb =>
+                {
+                    RemoveEventsFromCache();
+                });
+            });
         }
 
         private IEnumerator RunPeriodicTelemetry()
@@ -160,66 +214,77 @@ namespace AccelByte.Api
             telemetryCoroutine = null;
         }
 
-        private string GetTelemetryKey()
+        internal void LoadEventsFromCache(Action<List<TelemetryBody>> onLoadCacheDone)
         {
-            return "TELEMETRY_" + session.UserId;
-        }
-
-        private void LoadEventsFromCache( string accessToken = "" )
-        {
-            if (!session.IsValid() || !session.usePlayerPrefs)
+            if (!session.IsValid())
             {
+                onLoadCacheDone?.Invoke(null);
                 return;
             }
-            string telemetryKey = GetTelemetryKey();
-            var events = PlayerPrefs.GetString(telemetryKey);
-            if (!string.IsNullOrEmpty(events))
-            {
-                List<TelemetryBody> telemetryBodies = new List<TelemetryBody>();
-                var eventListDict = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(events);
-                foreach(var item in eventListDict)
+
+            LoadEventsFromCache(session.UserId, onLoadCacheDone);
+        }
+
+        internal void LoadEventsFromCache(string key, Action<List<TelemetryBody>> onLoadCacheDone)
+        {
+            cacheStorage.GetItem(
+                key
+                , tableName: cacheTableName
+                , onDone: (bool isSuccess, string loadedTelemetry) =>
                 {
-                    TelemetryBody telemetryBody = new TelemetryBody();
-                    telemetryBody.EventName = item["EventName"].ToString();
-                    telemetryBody.EventNamespace = item["EventNamespace"].ToString();
-                    telemetryBody.Payload = item["Payload"];
-                    telemetryBodies.Add(telemetryBody);
-                }
-                coroutineRunner.Run(
-                    api.SendProtectedEvents(telemetryBodies, result =>
+                    if (isSuccess && !string.IsNullOrEmpty(loadedTelemetry))
                     {
-                        RemoveEventsFromCache();
-                    })
-                );
-            }
-            if (!string.IsNullOrEmpty(accessToken))
+                        List<TelemetryBody> telemetryBodies = new List<TelemetryBody>();
+                        var eventListDict = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(loadedTelemetry);
+                        foreach (var item in eventListDict)
+                        {
+                            TelemetryBody telemetryBody = new TelemetryBody();
+                            telemetryBody.EventName = item["EventName"].ToString();
+                            telemetryBody.EventNamespace = item["EventNamespace"].ToString();
+                            telemetryBody.Payload = item["Payload"];
+                            telemetryBodies.Add(telemetryBody);
+                        }
+                        onLoadCacheDone?.Invoke(telemetryBodies);
+                    }
+                    else
+                    {
+                        onLoadCacheDone?.Invoke(null);
+                    }
+                }
+            );
+        }
+
+        internal void AppendEventToCache(TelemetryBody telemetryBody, Action<bool> onSaveCacheDone = null)
+        {
+            if (!session.IsValid())
             {
-                session.RefreshTokenCallback -= LoadEventsFromCache;
+                onSaveCacheDone?.Invoke(false);
+                return;
             }
+
+            AppendEventToCache(session.UserId, telemetryBody, onSaveCacheDone);
+        }
+
+        internal void AppendEventToCache(string key, TelemetryBody telemetryBody, Action<bool> onSaveCacheDone = null)
+        {
+            eventList.Add(telemetryBody);
+            var telemetryEventsJson = System.Text.Encoding.UTF8.GetString(eventList.ToUtf8Json());
+            cacheStorage.SaveItem(key, telemetryEventsJson, onSaveCacheDone, tableName: cacheTableName);
+        }
+
+        internal void DeleteCache(Action<bool> onDone = null)
+        {
+            cacheStorage.Reset(result: onDone, tableName: cacheTableName);
         }
 
         private void RemoveEventsFromCache()
         {
-            if (!session.IsValid() || !session.usePlayerPrefs)
+            if (!session.IsValid())
             {
                 return;
             }
-            string telemetryKey = GetTelemetryKey();
-            PlayerPrefs.DeleteKey(telemetryKey);
-            PlayerPrefs.Save();
-        }
 
-        private void AppendEventToCache( TelemetryBody telemetryBody )
-        {
-            if (!session.IsValid() || !session.usePlayerPrefs)
-            {
-                return;
-            }
-            string telemetryKey = GetTelemetryKey();
-            eventList.Add(telemetryBody);
-            var telemetryEventsJson = System.Text.Encoding.UTF8.GetString(eventList.ToUtf8Json());
-            PlayerPrefs.SetString(telemetryKey, telemetryEventsJson);
-            PlayerPrefs.Save();
+            cacheStorage.DeleteItem(session.UserId, onDone: null, tableName:cacheTableName);
         }
     }
 }
