@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.17.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.1%0D16.17.0) (2024-03-11)
+
+
+### Bug Fixes
+
+* **utility:** missmatch data on download ([01d274b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/01d274b0a6bdc2f0f8565f6973a7e76ecd49a282))
+
 ## [16.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.0%0D16.16.0) (2024-03-08)
 
 
