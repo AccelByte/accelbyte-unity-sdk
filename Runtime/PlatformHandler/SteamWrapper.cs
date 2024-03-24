@@ -43,20 +43,26 @@ namespace AccelByte.Core
         {
             try
             {
+                Models.AccelByteResult<ThirdParties.Steam.GetSteamTokenResult, Error> result = null; 
                 if (string.IsNullOrEmpty(authTicketIdentity))
                 {
-                    GetInfoware().GetAccelByteSteamToken(result =>
-                    {
-                        callback?.Invoke(result.AccelByteSteamToken);
-                    });
+                    result = ThirdParties.Steam.AccelByteSteam.GetAccelByteSteamToken();
                 }
                 else
                 {
-                    GetInfoware().GetAccelByteSteamToken(authTicketIdentity, result =>
-                    {
-                        callback?.Invoke(result.AccelByteSteamToken);
-                    });
+                    result = ThirdParties.Steam.AccelByteSteam.GetAccelByteSteamToken(authTicketIdentity);
                 }
+
+                result
+                .OnSuccess(getResult =>
+                {
+                    callback?.Invoke(getResult.AccelByteSteamToken);
+                })
+                .OnFailed(error =>
+                {
+                    AccelByteDebug.LogWarning(error.Message);
+                    callback?.Invoke(null);
+                });
             }
             catch (Exception e)
             {
@@ -65,9 +71,9 @@ namespace AccelByte.Core
             }
         }
 
-        protected virtual ThirdParties.Steam.ISteamWrapper GetInfoware()
+        protected virtual ThirdParties.Steam.ISteamWrapper GetImplementation()
         {
-            return ThirdParties.Steam.AccelByteSteam.SteamWrapperGetter();
+            return ThirdParties.Steam.AccelByteSteam.SteamImpGetter();
         }
     }
 }

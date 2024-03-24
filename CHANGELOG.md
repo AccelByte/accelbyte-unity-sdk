@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.18.0%0D16.17.1) (2024-03-24)
+
+
+### Features
+
+* add get config interfaces ([2795fe2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2795fe261ebc4448ef465937e6c80806543fa03e))
+* add implementation of nintendo switch platform ([60f3392](https://github.com/AccelByte/accelbyte-unity-sdk/commits/60f3392a33b597ff7cc61e8038d937395002aebe))
+* add server config editor ([3c5995a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3c5995a6c074008e4e90a3d53b843938566381f4))
+* **login:** add login queue API ([7363d14](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7363d14cdcc388089a69fa2e1af1e4feacbe3fd3))
+
+
+### Bug Fixes
+
+* fixed dshub error on empty websocket message topic ([4c77671](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4c77671ba422bd092e59a4ae755bdb5c24f044ab))
+
+
+### Refactors
+
+* add new steam handler format ([c3207ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c3207ee699703b802ee762fbd6c48cc696c1516f))
+
+
+### Tests
+
+* set internal visible to e2e test ([eff30f2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eff30f24a123373601dcb9ddd2a12420d3b91d69))
+
 ### [16.17.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.1%0D16.17.0) (2024-03-11)
 
 

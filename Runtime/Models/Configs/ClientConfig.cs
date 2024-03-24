@@ -51,6 +51,7 @@ namespace AccelByte.Models
         [DataMember] public string MatchmakingV2ServerUrl = "";
         [DataMember] public bool UseTurnManager = true;
         [DataMember] public string TurnManagerServerUrl = "";
+        [DataMember] public string LoginQueueServerUrl = "";
         [DataMember] public string TurnServerHost = "";
         [DataMember] public string TurnServerPort = "";
         [DataMember] public string TurnServerPassword = "";
@@ -114,6 +115,7 @@ namespace AccelByte.Models
                    this.SessionServerUrl == anotherConfig.SessionServerUrl &&
                    this.MatchmakingV2ServerUrl == anotherConfig.MatchmakingV2ServerUrl &&
                    this.TurnManagerServerUrl == anotherConfig.TurnManagerServerUrl &&
+                   this.LoginQueueServerUrl == anotherConfig.LoginQueueServerUrl &&
                    this.UseTurnManager == anotherConfig.UseTurnManager &&
                    this.TurnServerHost == anotherConfig.TurnServerHost &&
                    this.TurnServerPort == anotherConfig.TurnServerPort &&
@@ -231,6 +233,10 @@ namespace AccelByte.Models
             if (TurnManagerServerUrl == null)
             {
                 TurnManagerServerUrl = "";
+            }
+            if (LoginQueueServerUrl == null)
+            {
+                LoginQueueServerUrl = "";
             }
             if (TurnServerHost == null)
             {
@@ -353,6 +359,8 @@ namespace AccelByte.Models
 
                 this.ChatServerUrl = ExpandServiceApiUrl(this.ChatServerUrl, "/chat", forceExpandServiceApiUrl);
 
+                this.LoginQueueServerUrl = ExpandServiceApiUrl(this.LoginQueueServerUrl, "/login-queue", forceExpandServiceApiUrl);
+
                 if (string.IsNullOrEmpty(this.ChatServerWsUrl) || forceExpandServiceApiUrl)
                 {
                     this.ChatServerWsUrl = wssBaseUrl + "/chat";
@@ -422,6 +430,11 @@ namespace AccelByte.Models
                 if (this.ChatServerWsUrl == wssBaseUrl + "/chat") this.ChatServerWsUrl = null;
 
                 if (this.ChatServerUrl == httpsBaseUrl + "chat") this.ChatServerUrl = null;
+
+                if (this.LoginQueueServerUrl == httpsBaseUrl + "/login-queue")
+                {
+                    this.LoginQueueServerUrl = null;
+                }
             }
         }
 

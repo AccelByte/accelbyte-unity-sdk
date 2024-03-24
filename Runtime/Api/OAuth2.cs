@@ -29,7 +29,6 @@ public class OAuth2 : ApiBase
         {
             session.SetSession(tokenData);
         };
-        session.CallRefresh = RefreshSession;
     }
 
     //Need to be assigned to handle new access token obtained
@@ -78,6 +77,10 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
+                Session.CallRefresh = (refreshToken, callback) =>
+                {
+                    RefreshSession(refreshToken, callback);
+                };
                 callback.TryOk();
             }
             else
@@ -112,18 +115,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.Try(result);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -158,6 +150,10 @@ public class OAuth2 : ApiBase
             {
                 SaveAuthTrustId(result.Value);
                 OnNewTokenObtained?.Invoke(result.Value);
+                Session.CallRefresh = (refreshToken, callback) =>
+                {
+                    RefreshSession(refreshToken, callback);
+                };
                 callback.TryOk();
             }
             else
@@ -208,19 +204,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                SaveAuthTrustId(result.Value);
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -274,18 +258,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -401,27 +374,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-#if UNITY_GAMECORE
-            if (result.Value != null)
-            {
-                string fetchedDeviceId = result.Value.DeviceId;
-                if (!string.IsNullOrEmpty(fetchedDeviceId))
-                {
-                    DeviceProvider.CacheDeviceId(result.Value.DeviceId);
-                }
-            }
-#endif
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -478,18 +431,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -560,18 +502,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -629,18 +560,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -671,18 +591,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -746,18 +655,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            var result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -785,18 +683,7 @@ public class OAuth2 : ApiBase
 
         httpOperator.SendRequest(request, (response, error) =>
         {
-            Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
-
-            if (!result.IsError)
-            {
-                OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk(result.Value);
-            }
-            else
-            {
-                OAuthError errorResult = GenerateOAuthError(result.Error, request, error, httpOperator);
-                callback.TryError(errorResult);
-            }
+            HandleLoginResponse(request, response, error, callback);
         });
     }
 
@@ -1027,6 +914,386 @@ public class OAuth2 : ApiBase
         if (!result.IsError)
         {
             Session.SetThirdPartyPlatformTokenData(platformId, result.Value);
+        }
+    }
+    #region V4
+
+    public void LoginWithEmailV4(string emailAddress
+        , string password
+        , bool rememberMe
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(emailAddress, password);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("grant_type", "password")
+            .WithFormParam("username", emailAddress)
+            .WithFormParam("password", password)
+            .WithFormParam("namespace", Namespace_)
+            .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
+
+        IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/device/token")
+            .WithPathParam("platformId", deviceProvider.DeviceType)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("device_id", deviceProvider.DeviceId)
+            .WithFormParam("namespace", Namespace_)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void LoginWithOtherPlatformIdV4(string platformId
+        , string platformToken
+        , bool createHeadless
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+
+        HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/{platformId}/token")
+            .WithPathParam("platformId", platformId)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("platform_token", platformToken)
+            .WithFormParam("namespace", Namespace_)
+            .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId);
+
+        string[] macAddresses = DeviceProvider.GetMacAddress();
+        if (macAddresses != null && macAddresses.Length > 0)
+        {
+            requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
+        }
+
+        var request = requestBuilder.GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void LoginWithAuthorizationCodeV4(string code, ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        if (string.IsNullOrEmpty(code))
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = "code cannot be null or empty"
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("grant_type", "authorization_code")
+            .WithFormParam("code", code)
+            .WithFormParam("redirect_uri", this.Config.RedirectUri)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void RefreshSessionV4(string refreshToken, ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("grant_type", "refresh_token")
+            .WithFormParam("refresh_token", refreshToken)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        request.Priority = 0;
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void Verify2FACodeV4(string mfaToken
+        , TwoFAFactorType factor
+        , string code
+        , bool rememberDevice
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(mfaToken, code);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/mfa/verify")
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("mfaToken", mfaToken)
+            .WithFormParam("factor", factor.GetString())
+            .WithFormParam("code", code)
+            .WithFormParam("rememberDevice", rememberDevice ? "true" : "false")
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void GenerateGameTokenV4(string code
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        var error = ApiHelperUtils.CheckForNullOrEmpty(code);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder
+            .CreatePost(BaseUrl + "/v4/oauth/token/exchange")
+            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("code", code)
+            .GetResult();
+
+        httpOperator.SendRequest(request, response =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void AuthenticationWithPlatformLinkV4(string email
+        , string password
+        , string linkingToken
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        var error = ApiHelperUtils.CheckForNullOrEmpty(email, password, linkingToken);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/authenticateWithLink")
+            .WithBasicAuth()
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("username", email)
+            .WithFormParam("password", password)
+            .WithFormParam("linkingToken", linkingToken)
+            .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void GetTokenWithLoginTicket(string loginTicket
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        var error = ApiHelperUtils.CheckForNullOrEmpty(loginTicket);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("grant_type", "urn:ietf:params:oauth:grant-type:login_queue_ticket")
+            .WithFormParam("login_queue_ticket", loginTicket)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    public void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
+        , bool extendExp
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+        var error = ApiHelperUtils.CheckForNullOrEmpty(linkingToken);
+        if (error != null)
+        {
+            callback.TryError(new OAuthError()
+            {
+                error = error.Code.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/headless/token")
+            .WithBasicAuth()
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("linkingToken", linkingToken)
+            .WithFormParam("extend_exp", extendExp ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+
+        httpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    private void HandleLoginQueue(IHttpRequest request
+        , IHttpResponse response
+        , AccelByte.Core.Error requestError
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        TokenDataV4 tokenData = new TokenDataV4();
+        // response code 202 on queue
+        if (response.Code == (int)ErrorCode.Accepted)
+        {
+            Result<LoginQueueTicketResponse> ticketQueueResult = response.TryParseJson<LoginQueueTicketResponse>();
+            tokenData.Queue = ticketQueueResult.Value;
+            callback.TryOk(tokenData);
+            return;
+        }
+
+        Result<TokenDataV4, OAuthError> tokenDataResult = response.TryParseJson<TokenDataV4, OAuthError>();
+#if UNITY_GAMECORE
+        if (tokenDataResult.Value != null)
+        {
+            string fetchedDeviceId = tokenDataResult.Value.DeviceId;
+            if (!string.IsNullOrEmpty(fetchedDeviceId))
+            {
+                DeviceProvider.CacheDeviceId(tokenDataResult.Value.DeviceId);
+            }
+        }
+#endif
+
+        if (!tokenDataResult.IsError)
+        {
+            tokenData = tokenDataResult.Value;
+            SaveAuthTrustId(tokenDataResult.Value);
+            OnNewTokenObtained?.Invoke(tokenDataResult.Value);
+            Session.CallRefresh = (refreshToken, callback) =>
+            {
+                RefreshSessionV4(refreshToken, result =>
+                {
+                    var refreshTokenData = Result<TokenData, OAuthError>.CreateOk(result.Value);
+                    callback.Try(refreshTokenData);
+                });
+            };
+            callback.TryOk(tokenData);
+        }
+        else
+        {
+            OAuthError errorResult = GenerateOAuthError(tokenDataResult.Error, request, requestError, httpOperator);
+            callback.TryError(errorResult);
+        }
+    }
+    #endregion
+
+    private void HandleLoginResponse(IHttpRequest request
+        , IHttpResponse response
+        , AccelByte.Core.Error requestError
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Result<TokenData, OAuthError> result = response.TryParseJson<TokenData, OAuthError>();
+#if UNITY_GAMECORE
+        if (result.Value != null)
+        {
+            string fetchedDeviceId = result.Value.DeviceId;
+            if (!string.IsNullOrEmpty(fetchedDeviceId))
+            {
+                DeviceProvider.CacheDeviceId(result.Value.DeviceId);
+            }
+        }
+#endif
+
+        if (!result.IsError)
+        {
+            SaveAuthTrustId(result.Value);
+            OnNewTokenObtained?.Invoke(result.Value);
+            Session.CallRefresh = (refreshToken, callback) =>
+            {
+                RefreshSession(refreshToken, callback);
+            };
+            callback.TryOk(result.Value);
+        }
+        else
+        {
+            OAuthError errorResult = GenerateOAuthError(result.Error, request, requestError, httpOperator);
+            callback.TryError(errorResult);
         }
     }
 }

@@ -171,6 +171,7 @@ namespace AccelByte.Server
                         JsonConvert.DeserializeObject<ServerDSHubWebsocketNotification<SessionV2GameSession>>(message);
                     serverDSHubWebsocketApi.HandleNotification(sessionMemberChangedNotification.payload, GameSessionV2MemberChanged);
                     break;
+                case DsHubNotificationTopic.DsHubConnected:
                 case DsHubNotificationTopic.EMPTY:
                     break;
                 default:

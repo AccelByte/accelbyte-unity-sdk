@@ -52,6 +52,26 @@ namespace AccelByte.Core
             return ServerRegistry;
         }
 
+        /// <summary>
+        /// Get SDK config for client side
+        /// </summary>
+        public static Models.Config GetClientConfig()
+        {
+            Models.Config retval = GetClientRegistry().Config;
+            retval = retval.ShallowCopy();
+            return retval;
+        }
+
+        /// <summary>
+        /// Get SDK config for server side
+        /// </summary>
+        public static Models.ServerConfig GetServerConfig()
+        {
+            Models.ServerConfig retval = GetServerRegistry().Config;
+            retval = retval.ShallowCopy();
+            return retval;
+        }
+
         internal static AccelByteClientRegistry CreateClientRegistry(Models.SettingsEnvironment environment)
         {
             const bool getServerConfig = false;

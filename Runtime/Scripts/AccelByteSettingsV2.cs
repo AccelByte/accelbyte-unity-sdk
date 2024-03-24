@@ -279,6 +279,7 @@ namespace AccelByte.Api
                 SaveConfig(retval, SDKConfigFullPath(false));
 #endif
             }
+
             if (retval != null)
             {
                 retval.Expand();
@@ -289,7 +290,7 @@ namespace AccelByte.Api
 
         public static MultiServerConfigs LoadSDKServerConfigFile()
         {
-            var retval = new MultiServerConfigs();
+            MultiServerConfigs retval = null;
             UnityEngine.Object targetConfigFile = null;
             bool moveConfigFile = false;
 
@@ -317,6 +318,7 @@ namespace AccelByte.Api
                 SaveConfig(retval, SDKConfigFullPath(true));
 #endif
             }
+
             if (retval != null)
             {
                 retval.Expand();
@@ -399,7 +401,58 @@ namespace AccelByte.Api
             return retval;
         }
 
+        public static ServerConfig GetSDKConfigByEnvironment(MultiServerConfigs multiSDKConfigs, SettingsEnvironment environment)
+        {
+            if (multiSDKConfigs == null)
+            {
+                return null;
+            }
+
+            ServerConfig retval;
+            switch (environment)
+            {
+                case SettingsEnvironment.Development:
+                    retval = multiSDKConfigs.Development;
+                    break;
+                case SettingsEnvironment.Certification:
+                    retval = multiSDKConfigs.Certification;
+                    break;
+                case SettingsEnvironment.Production:
+                    retval = multiSDKConfigs.Production;
+                    break;
+                case SettingsEnvironment.Default:
+                default:
+                    retval = multiSDKConfigs.Default;
+                    break;
+            }
+
+            return retval;
+        }
+
         public static MultiConfigs SetSDKConfigByEnvironment(MultiConfigs multiSDKConfig, Config newSDKConfig, SettingsEnvironment environment)
+        {
+            var retval = multiSDKConfig;
+            switch (environment)
+            {
+                case SettingsEnvironment.Development:
+                    retval.Development = newSDKConfig;
+                    break;
+                case SettingsEnvironment.Certification:
+                    retval.Certification = newSDKConfig;
+                    break;
+                case SettingsEnvironment.Production:
+                    retval.Production = newSDKConfig;
+                    break;
+                case SettingsEnvironment.Default:
+                default:
+                    retval.Default = newSDKConfig;
+                    break;
+            }
+
+            return retval;
+        }
+
+        public static MultiServerConfigs SetSDKConfigByEnvironment(MultiServerConfigs multiSDKConfig, ServerConfig newSDKConfig, SettingsEnvironment environment)
         {
             var retval = multiSDKConfig;
             switch (environment)

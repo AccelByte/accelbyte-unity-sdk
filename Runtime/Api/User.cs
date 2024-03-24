@@ -41,6 +41,7 @@ namespace AccelByte.Api
         private readonly UserSession userSession;//renamed from LoginSession
         public readonly OAuth2 oAuth2;
         private readonly UserApi api;
+        private readonly LoginQueueApi loginQueueApi;
 #pragma warning disable IDE0052 // Remove unread private members
         private readonly CoroutineRunner coroutineRunner;
 #pragma warning restore IDE0052 // Remove unread private members
@@ -67,7 +68,13 @@ namespace AccelByte.Api
             userSession = inLoginSession;
             api = inApi;
             coroutineRunner = inCoroutineRunner;
+
             oAuth2 = new OAuth2(
+                inApi.HttpClient,
+                inApi.Config,
+                userSession);
+
+            loginQueueApi = new LoginQueueApi(
                 inApi.HttpClient,
                 inApi.Config,
                 userSession);
@@ -199,6 +206,31 @@ namespace AccelByte.Api
             });
         }
 
+        internal virtual void Login(
+            System.Action<ResultCallback<TokenDataV4, OAuthError>> loginMethod,
+            Action<OAuthError> onAlreadyLogin,
+            Action<OAuthError> onLoginFailed,
+            Action<TokenDataV4> onLoginCompleted
+        )
+        {
+            if (userSession.IsValid())
+            { 
+                var error = new OAuthError() 
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "User is already logged in."
+                };
+
+                onAlreadyLogin?.Invoke(error);
+                return;
+            }
+
+            loginMethod(loginResult =>
+            {
+                TriggerLoginResult(loginResult, onLoginFailed, onLoginCompleted);
+            });
+        }
+
         protected void TriggerLoginResult(Result loginResult, Action<Error> onLoginFailed, Action onLoginSuccess)
         {
             if (loginResult.IsError)
@@ -211,7 +243,7 @@ namespace AccelByte.Api
             }
         }
 
-        protected void TriggerLoginResult(Result<TokenData, OAuthError> loginResult, Action<OAuthError> onLoginFailed, Action<TokenData> onLoginSuccess)
+        protected void TriggerLoginResult<T,U>(Result<T, U> loginResult, Action<U> onLoginFailed, Action<T> onLoginSuccess)
         {
             if (loginResult.IsError)
             {
@@ -2397,7 +2429,7 @@ namespace AccelByte.Api
         /// Create Headless Account for Account Linking
         /// </summary>
         /// <param name="linkingToken">Token for platfrom type</param>
-        /// <param name="extendExp">Token for other platfrom type</param>
+        /// <param name="extendExp">Extend expiration date of refresh token</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         public void CreateHeadlessAccountAndResponseToken(string linkingToken
             , bool extendExp
@@ -2810,6 +2842,672 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 oAuth2.RetrieveUserThirdPartyPlatformToken(userId, platformType, callback));
         }
+
+        #region V4
+
+        /// <summary>
+        /// Login to AccelByte account with email and password.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="email">Email address</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithEmailV4(string email
+            , string password
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool rememberMe = false)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = email;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithEmailV4(email, password, rememberMe, cb);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Login with device id. A user registered with this method is called a headless account because it doesn't
+        /// have username yet.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(tokenData.platform_user_id, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = string.Empty;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithDeviceIdV4(cb);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms. This will automatically register a user if the user
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="platformType">Other platform type</param>
+        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatformV4(PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            string platformId = platformType.ToString().ToLower();
+            LoginWithOtherPlatformIdV4(platformId, platformToken, callback, createHeadless);
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatformIdV4(string platformId
+            , string platformToken
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool createHeadless = true)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = platformId;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, cb);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted
+            );
+        }
+
+        /// <summary>
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithLastRefreshTokenV4(ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, callback);
+        }
+
+        /// <summary>
+        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="refreshToken">The latest user's refresh token</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithRefreshTokenV4(string refreshToken
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                LoginWithRefreshTokenV4(refreshToken, UserSession.LastLoginUserCacheKey, callback);
+            }
+            else
+            {
+                LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, callback);
+            }
+        }
+
+        /// <summary>
+        /// Login with refresh token from local cache file.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="cacheKey">Login unique cache name</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithCachedRefreshTokenV4(string cacheKey
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            TriggerLoginWithCachedRefreshTokenV4(cacheKey, callback);
+        }
+
+        protected virtual void TriggerLoginWithCachedRefreshTokenV4(string cacheKey
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
+            {
+                if (refreshTokenData == null)
+                {
+                    var newError = new OAuthError()
+                    {
+                        error = ErrorCode.CachedTokenNotFound.ToString(),
+                        error_description = $"Failed to find token cache file."
+                    };
+                    callback.TryError(newError);
+                    return;
+                }
+
+                DateTime refreshTokenExpireTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(refreshTokenData.expiration_date);
+                if (DateTime.UtcNow >= refreshTokenExpireTime)
+                {
+                    var newError = new OAuthError()
+                    {
+                        error = ErrorCode.CachedTokenExpired.ToString(),
+                        error_description = $"Cached token is expired"
+                    };
+                    callback.TryError(newError);
+                    return;
+                }
+
+                LoginWithRefreshTokenV4(refreshTokenData.refresh_token, cacheKey, callback);
+            });
+        }
+
+        private void LoginWithRefreshTokenV4(string refreshToken
+            , string cacheKey
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                callback.TryError(new OAuthError()
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "refreshToken cannot be null or empty"
+                });
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(cacheKey, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = cacheKey;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.RefreshSessionV4(refreshToken, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Create Headless Account for Account Linking.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="extendExp">Extend expiration date of refresh token</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
+            , bool extendExp
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = linkingToken;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Authentication With PlatformLink for Account Linking.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="email">Email address to login</param>
+        /// <param name="password">Password to login</param>
+        ///  <param name="linkingToken">Token for platfrom type</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void AuthenticationWithPlatformLinkAndLoginV4(string email
+            , string password
+            , string linkingToken
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(linkingToken))
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidArgument.ToString(),
+                    error_description = "The application was not executed from launcher"
+                };
+                callback?.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = linkingToken;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.AuthenticationWithPlatformLinkV4(email, password, linkingToken, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Generate publisher user's game token. Required a code from request game token
+        /// </summary>
+        /// <param name="code">code from request game token</param>
+        /// <param name="callback">Return Result via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void GenerateGameTokenV4(string code
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (string.IsNullOrEmpty(code))
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidArgument.ToString(),
+                    error_description = "The application was not executed from launcher"
+                };
+                callback?.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = code;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.GenerateGameTokenV4(code, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Verify 2FA Code 
+        /// </summary>
+        /// <param name="mfaToken">Multi-factor authentication Token</param>
+        /// <param name="factor">The factor will return factor based on what factors is enabled</param>
+        /// <param name="code">Verification code</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="rememberDevice">Will record device token when true</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void Verify2FACodeV4(string mfaToken
+            , TwoFAFactorType factor
+            , string code
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool rememberDevice = false)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (userSession.IsValid())
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "User is already logged in."
+                };
+                callback.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = code;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.Verify2FACodeV4(mfaToken, factor, code, rememberDevice, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        /// <summary>
+        /// Claim Access Token using Login Ticket.
+        /// </summary>
+        /// <param name="loginTicket">LoginTicket Login Ticket to claim the access token
+        /// <param name="callback">Returns a result via callback when completed.
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void ClaimAccessToken(TokenDataV4 loginTicket
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            oAuth2.GetTokenWithLoginTicket(loginTicket.Queue.Ticket, result =>
+            {
+                if(result.IsError)
+                {
+                    callback.TryError(result.Error);
+                    return;
+                }
+
+                if (loginTicket.Queue.Identifier == string.Empty)
+                {
+                    loginTicket.Queue.Identifier = result.Value.user_id;
+                }
+
+                const bool saveTokenAsLatestUser = true;
+                Session.SaveRefreshToken(loginTicket.Queue.Identifier, saveTokenAsLatestUser, (saveSuccess) =>
+                {
+                    OnLoginSuccess?.Invoke(result.Value);
+                    SendLoginSuccessPredefinedEvent(result.Value);
+                });
+
+                callback.TryOk(result.Value);
+            });
+        }
+
+        #region LoginQueueApi
+
+        /// <summary>
+        /// Refresh ticket.
+        /// </summary>
+        /// <param name="loginTicket">Login queue ticket</param>
+        /// <param name="namespace_">user namespace</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void RefreshLoginQueueTicket(TokenDataV4 loginTicket
+            , ResultCallback<RefreshTicketResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
+
+            loginQueueApi.RefreshTicket(loginTicket.Queue.Ticket, ticketNamespace, callback);
+        }
+
+        /// <summary>
+        /// Cancel ticket.
+        /// </summary>
+        /// <param name="loginTicket">Login queue ticket</param>
+        /// <param name="callback">Returns Result via callback when completed</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void CancelLoginQueueTicket(TokenDataV4 loginTicket, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
+
+            loginQueueApi.CancelTicket(loginTicket.Queue.Ticket, ticketNamespace, callback);
+        }
+        
+        #endregion
+
+        #endregion
 
         #region PredefinedEvents
 

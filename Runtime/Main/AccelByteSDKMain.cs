@@ -11,6 +11,7 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSwitch")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
 namespace AccelByte.Core
 {
 #if !UNITY_EDITOR && UNITY_STANDALONE_WIN

@@ -929,4 +929,39 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "usernameDisabled")] public bool UserNameDisabled;
     }
+
+    #region V4
+
+    [DataContract, Preserve]
+    public class LoginQueueTicket
+    {
+        [DataMember(Name = "estimatedWaitingTimeInSeconds")] public int EstimatedWaitingTimeInSeconds;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "position")] public int Position;
+        [DataMember(Name = "reconnectExpiredAt")] public int ReconnectExpiredAt;
+        [DataMember(Name = "ticket")] public string Ticket;
+        [DataMember] public string Identifier;
+    }
+
+    [DataContract, Preserve]
+    public class TokenDataV4 : TokenData
+    {
+        [DataMember] public LoginQueueTicket Queue;
+    }
+
+    [DataContract, Preserve]
+    internal class LoginQueueTicketResponse : LoginQueueTicket
+    {
+        [DataMember(Name = "refresh")] internal TicketEndpointAction Refresh;
+        [DataMember(Name = "cancel")] internal TicketEndpointAction Cancel;
+    }
+
+    [DataContract, Preserve]
+    internal class TicketEndpointAction
+    {
+        [DataMember(Name = "action")] public string Action;
+        [DataMember(Name = "href")] public string Href;
+    };
+
+    #endregion
 };

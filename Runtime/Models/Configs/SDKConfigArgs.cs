@@ -48,6 +48,7 @@ namespace AccelByte.Models
         [DataMember] public string ChatServerWsUrl;
         [DataMember] public string ChatServerUrl;
         [DataMember] public string GdprServerUrl;
+        [DataMember] public string LoginQueueServerUrl;
         [DataMember] public string RedirectUri;
         [DataMember] public string AppId;
         [DataMember] public string PublisherNamespace;
