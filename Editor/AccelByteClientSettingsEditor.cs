@@ -56,9 +56,9 @@ namespace AccelByte.Editor
         {
             if (!initialized)
             {
-                this.temporaryPlatformSetting = EditorCommon.PlatformList.Length - 1;
+                this.temporaryPlatformSetting = 0;
 
-                temporaryEnvironmentSetting = EditorCommon.EnvironmentList.Length - 1;
+                temporaryEnvironmentSetting = 0;
 
                 presenceBroadcastEventGameStateList = new string[]
                 {
@@ -84,10 +84,7 @@ namespace AccelByte.Editor
                 if(originalSdkConfigs == null)
                 {
                     originalSdkConfigs = new MultiConfigs();
-                    originalSdkConfigs.Certification = new Config();
-                    originalSdkConfigs.Production = new Config();
-                    originalSdkConfigs.Default = new Config();
-                    originalSdkConfigs.Development = new Config();
+                    originalSdkConfigs.InitializeNullEnv();
                 }
             }
             if (originalClientOAuthConfigs == null)
@@ -97,10 +94,7 @@ namespace AccelByte.Editor
                 if (originalClientOAuthConfigs == null)
                 {
                     originalClientOAuthConfigs = new MultiOAuthConfigs();
-                    originalClientOAuthConfigs.Certification = new OAuthConfig();
-                    originalClientOAuthConfigs.Production = new OAuthConfig();
-                    originalClientOAuthConfigs.Default = new OAuthConfig();
-                    originalClientOAuthConfigs.Development = new OAuthConfig();
+                    originalClientOAuthConfigs.InitializeNullEnv();
                 }
             }
             if (originalAnalyticsOAuthConfigs == null)
@@ -118,26 +112,24 @@ namespace AccelByte.Editor
                 if (originalAnalyticsOAuthConfigs == null)
                 {
                     originalAnalyticsOAuthConfigs = new MultiOAuthConfigs();
-                    originalAnalyticsOAuthConfigs.Certification = new OAuthConfig();
-                    originalAnalyticsOAuthConfigs.Default = new OAuthConfig();
-                    originalAnalyticsOAuthConfigs.Development = new OAuthConfig();
-                    originalAnalyticsOAuthConfigs.Production = new OAuthConfig();
+                    originalAnalyticsOAuthConfigs.InitializeNullEnv();
                 }
             }
 
+            SettingsEnvironment targetEnvironment = EditorCommon.GetEnvironment(EditorCommon.EnvironmentList, temporaryEnvironmentSetting);
             if (editedSdkConfig == null)
             {
-                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, targetEnvironment);
                 editedSdkConfig = originalSdkConfig != null ? originalSdkConfig.ShallowCopy() : new Config();
             }
             if (editedClientOAuthConfig == null)
             {
-                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, targetEnvironment);
                 editedClientOAuthConfig = originalClientOAuthConfig != null ? originalClientOAuthConfig.ShallowCopy() : new OAuthConfig();
             }
             if (editedAnalyticsOAuthConfig == null)
             {
-                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, targetEnvironment);
                 editedAnalyticsOAuthConfig = originalAnalyticsOAuthConfig != null ? originalAnalyticsOAuthConfig.ShallowCopy() : new OAuthConfig();
             }
 
@@ -170,9 +162,10 @@ namespace AccelByte.Editor
             }
 
             {
-                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                SettingsEnvironment targetEnvironment = EditorCommon.GetEnvironment(EditorCommon.EnvironmentList, temporaryEnvironmentSetting);
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, targetEnvironment);
+                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, targetEnvironment);
+                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, targetEnvironment);
 
                 bool oAuthConfigIdentical = EditorCommon.CompareConfig(editedClientOAuthConfig, originalClientOAuthConfig);
                 bool clientConfigIdentical = EditorCommon.CompareConfig(editedSdkConfig, originalSdkConfig);
@@ -181,6 +174,10 @@ namespace AccelByte.Editor
                 if (!oAuthConfigIdentical || !clientConfigIdentical || !analyticsConfigIdentical)
                 {
                     EditorGUILayout.HelpBox("Unsaved changes", UnityEditor.MessageType.Warning, wide: true);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("No changes detected", UnityEditor.MessageType.Info, wide: true);
                 }
             }
 
@@ -198,9 +195,11 @@ namespace AccelByte.Editor
             temporaryEnvironmentSetting = EditorGUILayout.Popup(temporaryEnvironmentSetting, EditorCommon.EnvironmentList);
             if (EditorGUI.EndChangeCheck())
             {
-                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
-                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting);
+                SettingsEnvironment targetEnvironment = EditorCommon.GetEnvironment(EditorCommon.EnvironmentList, temporaryEnvironmentSetting);
+
+                var originalSdkConfig = AccelByteSettingsV2.GetSDKConfigByEnvironment(originalSdkConfigs, targetEnvironment);
+                var originalClientOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, targetEnvironment);
+                var originalAnalyticsOAuthConfig = AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, targetEnvironment);
 
                 editedSdkConfig = originalSdkConfig != null ? originalSdkConfig.ShallowCopy() : new Config();
                 editedClientOAuthConfig = originalClientOAuthConfig != null ? originalClientOAuthConfig.ShallowCopy() : new OAuthConfig();
@@ -220,6 +219,8 @@ namespace AccelByte.Editor
                 {
                     targetPlatform = EditorCommon.PlatformList[temporaryPlatformSetting];
                 }
+                SettingsEnvironment targetEnvironment = EditorCommon.GetEnvironment(EditorCommon.EnvironmentList, temporaryEnvironmentSetting);
+
                 originalClientOAuthConfigs = AccelByteSettingsV2.LoadOAuthFile(targetPlatform);
                 try
                 {
@@ -230,8 +231,8 @@ namespace AccelByte.Editor
                     originalAnalyticsOAuthConfigs = null;
                 }
 
-                editedClientOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting) : new OAuthConfig();
-                editedAnalyticsOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, (SettingsEnvironment)temporaryEnvironmentSetting) : new OAuthConfig();
+                editedClientOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalClientOAuthConfigs, targetEnvironment) : new OAuthConfig();
+                editedAnalyticsOAuthConfig = originalClientOAuthConfigs != null ? AccelByteSettingsV2.GetOAuthByEnvironment(originalAnalyticsOAuthConfigs, targetEnvironment) : new OAuthConfig();
             }
             EditorGUILayout.LabelField("");
             EditorGUILayout.EndHorizontal();
@@ -395,9 +396,10 @@ namespace AccelByte.Editor
                 editedSdkConfig.SanitizeBaseUrl();
                 editedSdkConfig.Expand(generateServiceUrl);
 
-                originalClientOAuthConfigs = AccelByteSettingsV2.SetOAuthByEnvironment(originalClientOAuthConfigs, editedClientOAuthConfig.ShallowCopy(), (SettingsEnvironment) temporaryEnvironmentSetting);
-                originalSdkConfigs = AccelByteSettingsV2.SetSDKConfigByEnvironment(originalSdkConfigs, editedSdkConfig.ShallowCopy(), (SettingsEnvironment)temporaryEnvironmentSetting);
-                originalAnalyticsOAuthConfigs = AccelByteSettingsV2.SetOAuthByEnvironment(originalAnalyticsOAuthConfigs, editedAnalyticsOAuthConfig.ShallowCopy(), (SettingsEnvironment)temporaryEnvironmentSetting);
+                SettingsEnvironment targetEnvironment = EditorCommon.GetEnvironment(EditorCommon.EnvironmentList, temporaryEnvironmentSetting);
+                originalClientOAuthConfigs = AccelByteSettingsV2.SetOAuthByEnvironment(originalClientOAuthConfigs, editedClientOAuthConfig.ShallowCopy(), targetEnvironment);
+                originalSdkConfigs = AccelByteSettingsV2.SetSDKConfigByEnvironment(originalSdkConfigs, editedSdkConfig.ShallowCopy(), targetEnvironment);
+                originalAnalyticsOAuthConfigs = AccelByteSettingsV2.SetOAuthByEnvironment(originalAnalyticsOAuthConfigs, editedAnalyticsOAuthConfig.ShallowCopy(), targetEnvironment);
 
                 string platformName = EditorCommon.GetPlatformName(EditorCommon.PlatformList, temporaryPlatformSetting);
                 AccelByteSettingsV2.SaveConfig(originalClientOAuthConfigs, AccelByteSettingsV2.OAuthFullPath(platformName));

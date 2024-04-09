@@ -2042,9 +2042,9 @@ namespace AccelByte.Api
                 }
 
                 string[] skus = itemInfoResult.Value.features;
-                string[] appIds = { AccelBytePlugin.Config.AppId };
+                string[] appIds = { AccelByteSDK.GetClientConfig().AppId };
 
-                AccelBytePlugin.GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, ownershipResult =>
+                AccelByteSDK.GetClientRegistry().GetApi().GetEntitlement().GetUserEntitlementOwnershipAny(null, appIds, skus, ownershipResult =>
                 {
                     if (ownershipResult.IsError)
                     {
@@ -2056,7 +2056,7 @@ namespace AccelByte.Api
                 });
             };
 
-            AccelBytePlugin.GetItems().GetItemByAppId(AccelBytePlugin.Config.AppId, onGotItemInfo);
+            AccelByteSDK.GetClientRegistry().GetApi().GetItems().GetItemByAppId(AccelByteSDK.GetClientConfig().AppId, onGotItemInfo);
         }
 
         public void RefreshTokenCallback( Action<string> refreshTokenCallback )

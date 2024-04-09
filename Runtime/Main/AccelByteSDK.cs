@@ -53,7 +53,7 @@ namespace AccelByte.Core
         }
 
         /// <summary>
-        /// Get SDK config for client side
+        /// Get SDK config on client side
         /// </summary>
         public static Models.Config GetClientConfig()
         {
@@ -63,11 +63,31 @@ namespace AccelByte.Core
         }
 
         /// <summary>
-        /// Get SDK config for server side
+        /// Get oauth config on client side
+        /// </summary>
+        public static Models.OAuthConfig GetClientOAuthConfig()
+        {
+            Models.OAuthConfig retval = GetClientRegistry().OAuthConfig;
+            retval = retval.ShallowCopy();
+            return retval;
+        }
+
+        /// <summary>
+        /// Get SDK config on server side
         /// </summary>
         public static Models.ServerConfig GetServerConfig()
         {
             Models.ServerConfig retval = GetServerRegistry().Config;
+            retval = retval.ShallowCopy();
+            return retval;
+        }
+
+        /// <summary>
+        /// Get oauth config on server side
+        /// </summary>
+        public static Models.OAuthConfig GetServerOAuthConfig()
+        {
+            Models.OAuthConfig retval = GetServerRegistry().OAuthConfig;
             retval = retval.ShallowCopy();
             return retval;
         }

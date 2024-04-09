@@ -2,8 +2,10 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -14,16 +16,29 @@ namespace AccelByte.Editor
     {
         private static GUIStyle requiredTextFieldGUIStyle;
         private static Texture2D accelByteLogo;
-        internal static string[] EnvironmentList = new string[]
+
+        private static string[] environmentList;
+        internal static string[] EnvironmentList
         {
-            "Development",
-            "Certification",
-            "Production",
-            "Default"
-        };
+            get
+            {
+                if (environmentList == null)
+                {
+                    List<string> retval = Enum.GetValues(typeof(SettingsEnvironment))
+                        .Cast<SettingsEnvironment>()
+                        .Where(envEnum => envEnum != SettingsEnvironment.Default)
+                        .Select(envEnum => envEnum.ToString())
+                        .ToList();
+                    retval.Insert(index: 0, SettingsEnvironment.Default.ToString());
+                    environmentList = retval.ToArray();
+                }
+                return environmentList;
+            }
+        }
 
         internal static string[] PlatformList = new string[]
         {
+            "Default",
             AccelByte.Models.PlatformType.Steam.ToString(),
             AccelByte.Models.PlatformType.Apple.ToString(),
             AccelByte.Models.PlatformType.iOS.ToString(),
@@ -31,8 +46,7 @@ namespace AccelByte.Editor
             AccelByte.Models.PlatformType.PS4.ToString(),
             AccelByte.Models.PlatformType.PS5.ToString(),
             AccelByte.Models.PlatformType.Live.ToString(),
-            AccelByte.Models.PlatformType.Nintendo.ToString(),
-            "Default"
+            AccelByte.Models.PlatformType.Nintendo.ToString()
         };
 
         internal static GUIStyle RequiredTextFieldGUIStyle
@@ -177,6 +191,24 @@ namespace AccelByte.Editor
                 targetPlatform = platformList[index];
             }
             return targetPlatform;
+        }
+
+        internal static SettingsEnvironment GetEnvironment(string[] environmentList, int index)
+        {
+            SettingsEnvironment retval = SettingsEnvironment.Default;
+            try
+            {
+                string envString = environmentList[index];
+                if(Enum.TryParse(envString, out SettingsEnvironment parsedEnum))
+                {
+                    retval = parsedEnum;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex.Message);
+            }
+            return retval;
         }
 
         internal static bool CompareConfig<T>(T firstConfig, T secondConfig) where T : class

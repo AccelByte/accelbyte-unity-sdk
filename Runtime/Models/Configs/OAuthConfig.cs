@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -70,45 +70,76 @@ namespace AccelByte.Models
         [DataMember] public OAuthConfig Development;
         [DataMember] public OAuthConfig Certification;
         [DataMember] public OAuthConfig Production;
+        [DataMember] public OAuthConfig Sandbox;
+        [DataMember] public OAuthConfig Integration;
+        [DataMember] public OAuthConfig QA;
         [DataMember] public OAuthConfig Default;
 
         public void Expand()
         {
-            if (Development == null)
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Development = new OAuthConfig();
+                OAuthConfig envOAuthConfig = fieldInfo.GetValue(this) as OAuthConfig ;
+                if (envOAuthConfig == null)
+                {
+                    envOAuthConfig = new OAuthConfig();
+                }
+                envOAuthConfig.Expand();
+
+                fieldInfo.SetValue(this, envOAuthConfig);
             }
-            Development.Expand();
-            if (Certification == null)
-            {
-                Certification = new OAuthConfig();
-            }
-            Certification.Expand();
-            if (Production == null)
-            {
-                Production = new OAuthConfig();
-            }
-            Production.Expand();
-            if (Default == null)
-            {
-                Default = new OAuthConfig();
-            }
-            Default.Expand();
         }
 
-        internal OAuthConfig GetConfigFromEnvironment(SettingsEnvironment environment)
+        public void InitializeNullEnv()
         {
-            switch (environment)
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                case SettingsEnvironment.Development:
-                    return Development;
-                case SettingsEnvironment.Certification:
-                    return Certification;
-                case SettingsEnvironment.Production:
-                    return Production;
-                case SettingsEnvironment.Default:
-                default:
-                    return Default;
+                OAuthConfig envConfig = fieldInfo.GetValue(this) as OAuthConfig;
+                if (envConfig == null)
+                {
+                    envConfig = new OAuthConfig();
+                    fieldInfo.SetValue(this, envConfig);
+                }
+            }
+        }
+
+        public OAuthConfig GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
+        {
+            OAuthConfig retval = null;
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    retval = fieldInfo.GetValue(this) as OAuthConfig;
+                    break;
+                }
+            }
+
+            return retval;
+        }
+
+        public void SetConfigValueToAllEnv(OAuthConfig newOAuthConfig)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                fieldInfo.SetValue(this, newOAuthConfig);
+            }
+        }
+
+        public void SetConfigToEnv(OAuthConfig newOAuthConfig, SettingsEnvironment targetEnvironment)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    fieldInfo.SetValue(this, newOAuthConfig);
+                    break;
+                }
             }
         }
     }

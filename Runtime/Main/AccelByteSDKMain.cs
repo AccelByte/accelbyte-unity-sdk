@@ -11,6 +11,7 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSwitch")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKAndroid")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
 namespace AccelByte.Core
 {
@@ -73,7 +74,9 @@ namespace AccelByte.Core
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationPlayyModeStateChanged;
 #endif
+#if !UNITY_SWITCH
             Application.quitting += ApplicationQuitting;
+#endif
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -179,14 +182,14 @@ namespace AccelByte.Core
             onGameUpdate -= removedListener;
         }
 
+        internal static void ApplicationQuitting()
+        {
+            StopSDK();
+        }
+
         private static void OnGameThreadUpdate(float deltaTime)
         {
             onGameUpdate?.Invoke(deltaTime);
-        }
-
-        private static void ApplicationQuitting()
-        {
-            StopSDK();
         }
     }
 }

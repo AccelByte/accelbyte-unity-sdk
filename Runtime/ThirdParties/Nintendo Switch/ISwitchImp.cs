@@ -6,8 +6,11 @@ namespace AccelByte.ThirdParties.NintendoSwitch
     public interface ISwitchImp
     {
         public Models.AccelByteResult<Core.Error> Initialize(string mountName);
+        public Models.AccelByteResult<Core.Error> Initialize(string mountName, bool autoHandleOnExit);
         public Models.AccelByteResult<Core.Error> MountStorage(string mountName);
         public Models.AccelByteResult<Core.Error> UnmountStorage(string mountName);
         public Models.AccelByteResult<GetSwitchTokenResult, Core.Error> GetNsaToken();
+        public Models.AccelByteResult<Core.Error> SaveCacheFiles();
+        public Models.AccelByteResult<Core.Error> HandleGameExit();
     }
 }

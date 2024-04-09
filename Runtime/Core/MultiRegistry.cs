@@ -2,13 +2,6 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
-using System.Collections.Generic;
-using AccelByte.Api;
-using AccelByte.Server;
-using AccelByte.Models;
-using UnityEngine.Assertions;
-
 namespace AccelByte.Core
 {
     /// <summary>
@@ -19,7 +12,12 @@ namespace AccelByte.Core
     /// </para>
     /// </summary>
     public static class MultiRegistry
-    {   
+    {
+        static MultiRegistry()
+        {
+            const string deprecatedWarning = "MultiRegistry is deprecated and will be removed on July release. Please migrate to AccelByteSDK.GetClientRegistry and AccelByteSDK.GetServerRegistry.\nGuideline how to migrate: https://docs.accelbyte.io/gaming-services/developers/sdk-tools/sdk-guides/multiple-registries/migrate-to-multiple-registry-unity/";
+            UnityEngine.Debug.LogWarning(deprecatedWarning);
+        }
         #region Client
 
         /// <summary>

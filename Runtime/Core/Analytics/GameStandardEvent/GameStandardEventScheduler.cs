@@ -47,6 +47,12 @@ namespace AccelByte.Core
             OnTelemetryEventAdded?.Invoke(eventBody);
         }
 
+        /// <summary>
+        /// Enqueue a single telemetry data. 
+        /// Client/Server should be logged in.
+        /// </summary>
+        /// <param name="eventBody">Telemetry request with arbitrary payload. </param>
+        /// <param name="callback">Returns boolean status via callback when completed. </param>
         public void SendEvent(TelemetryBody eventBody, ResultCallback callback)
         {
             lock (jobQueue)
@@ -56,44 +62,67 @@ namespace AccelByte.Core
             OnTelemetryEventAdded?.Invoke(eventBody);
         }
 
-        protected override void TriggerSend()
+        /// <summary>
+        /// Send telemetry data in queue
+        /// </summary>
+        /// <param name="callback">Callback after sending telemetry data is complete</param>
+        public void SendQueuedEvent(ResultCallback callback)
         {
+            ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> queue = null;
             lock (jobQueue)
             {
-                while (!jobQueue.IsEmpty)
+                if (jobQueue == null || jobQueue.IsEmpty)
                 {
-                    if (jobQueue.TryDequeue(out var dequeueResult))
-                    {
-                        lock (inProcessJob)
-                        {
-                            inProcessJob.Add(dequeueResult);
-                        }
-                        TelemetryBody telemetryBody = dequeueResult.Item1;
-                        ResultCallback cb = dequeueResult.Item2;
-                        
-                        telemetryBody.EventNamespace = analyticsWrapper.GetSession().Namespace;
+                    callback?.Invoke(Result.CreateOk());
+                    return;
+                }
 
-                        analyticsWrapper.SendData(telemetryBody, (callback) =>
-                        {
-                            lock (inProcessJob)
-                            {
-                                inProcessJob.Remove(dequeueResult);
-                            }
-                            if (callback.IsError)
-                            {
-                                lock (jobQueue)
-                                {
-                                    jobQueue.Enqueue(dequeueResult);
-                                }
-                            }
-                            else
-                            {
-                                cb?.Try(callback);
-                            }
-                        });
-                    }
+                queue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(jobQueue);
+                jobQueue.Clear();
+            }
+
+            var queueBackup = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(queue);
+
+            var telemetryBodies = new System.Collections.Generic.List<TelemetryBody>();
+            var telemetryCallbacks = new System.Collections.Generic.List<ResultCallback>();
+            while (!queue.IsEmpty)
+            {
+                if (queue.TryDequeue(out var dequeueResult))
+                {
+                    TelemetryBody telemetryBody = dequeueResult.Item1;
+                    ResultCallback cb = dequeueResult.Item2;
+                    telemetryBody.EventNamespace = analyticsWrapper.GetSession().Namespace;
+
+                    telemetryBodies.Add(telemetryBody);
+                    telemetryCallbacks.Add(cb);
                 }
             }
+
+            analyticsWrapper.SendData(telemetryBodies, (result) =>
+            {
+                if (result.IsError)
+                {
+                    lock (jobQueue)
+                    {
+                        foreach (var unsentQueue in queueBackup)
+                        {
+                            jobQueue.Enqueue(unsentQueue);
+                        }
+                    }
+                }
+
+                foreach (var telemetryCallback in telemetryCallbacks)
+                {
+                    telemetryCallback?.Invoke(result);
+                }
+
+                callback?.Invoke(result);
+            });
+        }
+
+        protected override void TriggerSend()
+        {
+            SendQueuedEvent(callback: null);
         }
 
         protected override void RunValidator()

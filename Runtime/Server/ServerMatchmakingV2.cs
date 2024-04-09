@@ -96,7 +96,7 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(podName))
             {
-                podName = AccelByteServerPlugin.GetDedicatedServerManager().ServerName;
+                podName = AccelByteSDK.GetServerRegistry().GetApi().GetDedicatedServerManager().ServerName;
             }
 
             IAccelByteTelemetryPayload payload = null;

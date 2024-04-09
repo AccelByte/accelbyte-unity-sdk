@@ -23,28 +23,33 @@ namespace AccelByte.Server
             : base( httpClient, config, config.GameTelemetryServerUrl, session )
         {
         }
-        
-        public IEnumerator SendProtectedEvents( List<TelemetryBody> events
+
+        public IEnumerator SendProtectedEvents(List<TelemetryBody> events
             , string accessToken
-            , ResultCallback callback )
+            , ResultCallback callback)
         {
-            Assert.IsNotNull(events, nameof(events) + " is null.");
+            if (events == null)
+            {
+                Result errorResult = Result.CreateError(ErrorCode.InvalidRequest, "Telemetry events are empty");
+                callback?.Invoke(errorResult);
+                yield break;
+            }
 
-                var request = HttpRequestBuilder
-                    .CreatePost(BaseUrl + "/v1/protected/events")
-                    .WithContentType(MediaType.ApplicationJson)
-                    .WithBody(events.ToUtf8Json())
-                    .WithBearerAuth(accessToken)
-                    .Accepts(MediaType.ApplicationJson)
-                    .GetResult();
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/protected/events")
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(events.ToUtf8Json())
+                .WithBearerAuth(accessToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
 
-                IHttpResponse response = null;
+            IHttpResponse response = null;
 
-                yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request,
+            rsp => response = rsp);
 
-                var result = response.TryParse();
-                callback.Try(result);
+            var result = response.TryParse();
+            callback.Try(result);
         }
     }
 }

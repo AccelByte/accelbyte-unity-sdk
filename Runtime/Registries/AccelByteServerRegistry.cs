@@ -258,7 +258,7 @@ namespace AccelByte.Server
         private void InitializeAnalytics(ServerConfig config)
         {
             const ServerAnalyticsService analyticsApiWrapper = null;
-            predefinedEventScheduler = Server.AccelByteServerPlugin.CreatePredefinedEventScheduler(analyticsApiWrapper, config);
+            predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsApiWrapper, config);
         }
 
         private void ClearAnalytics()
@@ -308,6 +308,13 @@ namespace AccelByte.Server
                 config,
                 coroutineRunner);
             return newAMS;
+        }
+
+        internal static PredefinedEventScheduler CreatePredefinedEventScheduler(ServerAnalyticsService analyticsService, ServerConfig config)
+        {
+            var newPredefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
+            newPredefinedEventScheduler.SetEventEnabled(config.EnablePreDefinedEvent);
+            return newPredefinedEventScheduler;
         }
     }
 }

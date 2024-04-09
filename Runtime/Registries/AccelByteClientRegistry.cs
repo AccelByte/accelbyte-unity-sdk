@@ -310,8 +310,8 @@ namespace AccelByte.Api
         private void InitializeAnalytics(Config config)
         {
             const AnalyticsService analyticsApiWrapper = null;
-            predefinedEventScheduler = AccelBytePlugin.CreatePredefinedEventScheduler(analyticsApiWrapper, config);
-            presenceEventScheduler = AccelBytePlugin.CreatePresenceBroadcastEventScheduler(analyticsApiWrapper, config);
+            predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsApiWrapper, config);
+            presenceEventScheduler = CreatePresenceBroadcastEventScheduler(analyticsApiWrapper, config);
             if(gameStandardAnalyticsService != null)
             {
                 gameStandardAnalyticsService.Initialize(analyticsApiWrapper, config);
@@ -459,6 +459,46 @@ namespace AccelByte.Api
         private void InitializeNetworkConditioner()
         {
             networkConditioner = new AccelByteNetworkConditioner();
+        }
+
+        internal static PresenceBroadcastEventScheduler CreatePresenceBroadcastEventScheduler(AnalyticsService analyticsService, Config config)
+        {
+            bool presenceBroadcastEventJobEnabled = config.EnablePresenceBroadcastEvent;
+            var presenceInitialState = (PresenceBroadcastEventGameState)config.PresenceBroadcastEventGameState;
+            string presenceInitialStateDescription = config.PresenceBroadcastEventGameStateDescription;
+            string @namespace = config.Namespace;
+
+            var newPresenceBroadcastEventScheduler = new PresenceBroadcastEventScheduler(analyticsService, @namespace, presenceInitialState, presenceInitialStateDescription);
+            if (presenceBroadcastEventJobEnabled)
+            {
+                int presenceBroadcastIntervalInMs = Utils.TimeUtils.SecondsToMilliseconds(config.PresenceBroadcastEventInterval);
+                newPresenceBroadcastEventScheduler.StartPresenceEvent(presenceBroadcastIntervalInMs);
+            }
+            return newPresenceBroadcastEventScheduler;
+        }
+
+        internal static PredefinedEventScheduler CreatePredefinedEventScheduler(AnalyticsService analyticsService, Config config)
+        {
+            var newPredefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
+            newPredefinedEventScheduler.SetEventEnabled(config.EnablePreDefinedEvent);
+            return newPredefinedEventScheduler;
+        }
+
+        internal static UserSession CreateSession(Config newSdkConfig, IHttpClient httpClient, CoroutineRunner taskRunner, string environment, IFileStream accelByteFileStream)
+        {
+            string sessionCacheTableName = $"TokenCache/{environment}/TokenData";
+
+            IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(accelByteFileStream);
+
+            var newSession = new UserSession(
+                httpClient,
+                taskRunner,
+                newSdkConfig.PublisherNamespace,
+                newSdkConfig.UsePlayerPrefs,
+                sessionCacheTableName,
+                dataStorage);
+
+            return newSession;
         }
     }
 }

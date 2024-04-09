@@ -27,7 +27,7 @@ namespace AccelByte.Core
         {
             Assert.IsFalse(itemIds == null && appIds == null && skus == null, "Can't create entitlement token generator! all itemIds, appIds and skus parameters are null!");
 
-            this.entitlement = AccelBytePlugin.GetEntitlement();
+            this.entitlement = AccelByteSDK.GetClientRegistry().GetApi().GetEntitlement();
 
             this.itemIds = itemIds;
             this.appIds = appIds;

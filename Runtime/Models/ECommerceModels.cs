@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -465,6 +465,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ItemCriteria
     {
+        [DataMember] public bool AutoCalcEstimatedPrice = false;
         [DataMember] public string storeId;
         [DataMember] public ItemType itemType;
         [DataMember] public EntitlementAppType appType;

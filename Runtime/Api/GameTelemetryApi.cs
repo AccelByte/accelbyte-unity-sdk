@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -21,16 +21,57 @@ namespace AccelByte.Api
         public GameTelemetryApi( IHttpClient httpClient
             , Config config
             , ISession session ) 
-            : base( httpClient, config, config.GameTelemetryServerUrl, session )
+            : this( httpClient, config, session , null)
         {
         }
-        
-        public IEnumerator SendProtectedEvents( List<TelemetryBody> events
-            , ResultCallback callback )
-        {
-            Assert.IsNotNull(events, nameof(events) + " is null.");
 
-                var request = HttpRequestBuilder
+        [UnityEngine.Scripting.Preserve]
+        public GameTelemetryApi(IHttpClient httpClient
+            , Config config
+            , ISession session
+            , HttpOperator httpOperator)
+            : base(httpClient, config, config.GameTelemetryServerUrl, session, httpOperator)
+        {
+        }
+
+        [System.Obsolete("This API is deprecated and will be removed on July Release. Use SendProtectedEventsV1")]
+        public IEnumerator SendProtectedEvents(List<TelemetryBody> events
+            , ResultCallback callback)
+        {
+            if (events == null)
+            {
+                Result errorResult = Result.CreateError(ErrorCode.InvalidRequest, "Telemetry events are empty");
+                callback?.Invoke(errorResult);
+                yield break;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/protected/events")
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(events.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            IHttpResponse response = null;
+
+            yield return HttpClient.SendRequest(request,
+                rsp => response = rsp);
+
+            var result = response.TryParse();
+            callback.Try(result);
+        }
+
+        public void SendProtectedEventsV1(List<TelemetryBody> events, ResultCallback callback)
+        {
+            if(events == null)
+            {
+                Result result = Result.CreateError(ErrorCode.InvalidRequest, "Telemetry events are empty");
+                callback?.Invoke(result);
+                return;
+            }
+
+            var request = HttpRequestBuilder
                     .CreatePost(BaseUrl + "/v1/protected/events")
                     .WithContentType(MediaType.ApplicationJson)
                     .WithBody(events.ToUtf8Json())
@@ -38,14 +79,11 @@ namespace AccelByte.Api
                     .Accepts(MediaType.ApplicationJson)
                     .GetResult();
 
-                IHttpResponse response = null;
-
-                yield return HttpClient.SendRequest(request, 
-                    rsp => response = rsp);
-
+            httpOperator.SendRequest(request, response =>
+            {
                 var result = response.TryParse();
                 callback.Try(result);
+            });
         }
-
     }
 }

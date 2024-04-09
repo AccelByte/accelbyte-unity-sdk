@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Runtime.Serialization;
 using UnityEngine.Scripting;
 
@@ -26,6 +27,7 @@ namespace AccelByte.Models
         [DataMember] public string AgreementServerUrl;
         [DataMember] public string LeaderboardServerUrl;
         [DataMember] public string CloudSaveServerUrl;
+        [DataMember] public string ChallengeServerUrl;
         [DataMember] public string GameTelemetryServerUrl;
         [DataMember] public string AchievementServerUrl;
         [DataMember] public string UGCServerUrl;
@@ -86,6 +88,66 @@ namespace AccelByte.Models
         [DataMember] public SDKConfigArgs Development;
         [DataMember] public SDKConfigArgs Certification;
         [DataMember] public SDKConfigArgs Production;
+        [DataMember] public SDKConfigArgs Sandbox;
+        [DataMember] public SDKConfigArgs Integration;
+        [DataMember] public SDKConfigArgs QA;
         [DataMember] public SDKConfigArgs Default;
+
+        public void InitializeNullEnv()
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                SDKConfigArgs envConfig = fieldInfo.GetValue(this) as SDKConfigArgs;
+                if (envConfig == null)
+                {
+                    envConfig = new SDKConfigArgs();
+                    fieldInfo.SetValue(this, envConfig);
+                }
+            }
+        }
+
+        public void SetFieldValueToAllEnv(string fieldName, object value)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                SDKConfigArgs envConfig = fieldInfo.GetValue(this) as SDKConfigArgs;
+                if (envConfig != null)
+                {
+                    System.Reflection.FieldInfo targetField = envConfig.GetType().GetField(fieldName);
+                    if(targetField != null)
+                    {
+                        targetField.SetValue(envConfig, value);
+                        fieldInfo.SetValue(this, envConfig);
+                    }
+                }
+            }
+        }
+
+        public void SetConfigValueToAllEnv(SDKConfigArgs newConfig)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                fieldInfo.SetValue(this, newConfig);
+            }
+        }
+
+        public SDKConfigArgs GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
+        {
+            SDKConfigArgs retval = null;
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
+            {
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    retval = fieldInfo.GetValue(this) as SDKConfigArgs;
+                    break;
+                }
+            }
+
+            return retval;
+        }
     }
 }

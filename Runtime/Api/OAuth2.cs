@@ -452,7 +452,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("username", username)
             .WithFormParam("password", password)
             .WithFormParam("linkingToken", linkingToken)
-            .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
@@ -496,7 +496,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("username", username)
             .WithFormParam("password", password)
             .WithFormParam("linkingToken", linkingToken)
-            .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 
@@ -1142,7 +1142,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("username", email)
             .WithFormParam("password", password)
             .WithFormParam("linkingToken", linkingToken)
-            .WithFormParam("client_id", AccelBytePlugin.OAuthConfig.ClientId)
+            .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
 

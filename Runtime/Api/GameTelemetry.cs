@@ -20,16 +20,15 @@ namespace AccelByte.Api
     {
         private readonly GameTelemetryApi api;
         private readonly UserSession session;
-        private readonly CoroutineRunner coroutineRunner;
 
         private TimeSpan telemetryInterval = TimeSpan.FromMinutes(1);
         private HashSet<string> immediateEvents = new HashSet<string>();
-        private ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue = 
+        private ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue =
             new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
+
         private List<TelemetryBody> eventList = new List<TelemetryBody>();
         
-        private Coroutine telemetryCoroutine = null;
-        private bool isTelemetryJobStarted = false;
+        private bool isSchedulerRunning = false;
         private static readonly TimeSpan minimumTelemetryInterval = 
             new TimeSpan(0, 0, 5);
 
@@ -50,11 +49,9 @@ namespace AccelByte.Api
             , CoroutineRunner inCoroutineRunner )
         {
             Assert.IsNotNull(inApi, "inApi parameter can not be null.");
-            Assert.IsNotNull(inCoroutineRunner, "inCoroutineRunner parameter can not be null");
 
             api = inApi;
             session = inSession;
-            coroutineRunner = inCoroutineRunner;
 
             cacheStorage = session.DataStorage;
             cacheTableName = $"GameTelemetryCache/{AccelByteSDK.Environment.Current}.cache";
@@ -73,6 +70,11 @@ namespace AccelByte.Api
                 };
                 session.RefreshTokenCallback += onGetRefreshToken;
             }
+        }
+
+        ~GameTelemetry()
+        {
+            isSchedulerRunning = false;
         }
 
         /// <summary>
@@ -117,7 +119,7 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Send/enqueue a single authorized telemetry data. 
-        /// Server should be logged in. See DedicatedServer::LoginWithClientCredentials()
+        /// Server should be logged in. See DedicatedServer.LoginWithClientCredentials()
         /// </summary>
         /// <param name="telemetryBody">Telemetry request with arbitrary payload. </param>
         /// <param name="callback">Returns boolean status via callback when completed. </param>
@@ -128,90 +130,118 @@ namespace AccelByte.Api
 
             if (immediateEvents.Contains(telemetryBody.EventName))
             {
-                coroutineRunner.Run(
-                    api.SendProtectedEvents(
-                        new List<TelemetryBody> { telemetryBody }, 
-                        callback));
+                SendTelemetryRequest(
+                    new List<TelemetryBody> { telemetryBody }
+                    , callback
+                );
             }
             else
             {
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
                 AppendEventToCache(telemetryBody);
 
-                if (isTelemetryJobStarted == false)
+                if (!isSchedulerRunning)
                 {
-                    StartTelemetryScheduler();
+                    RunPeriodicTelemetry();
                 }
             }
         }
 
-        private void Send(List<TelemetryBody> telemetryBodies, ResultCallback callback)
+        /// <summary>
+        /// Send telemetry data in the btach
+        /// </summary>
+        /// <param name="callback">Callback after sending telemetry data is complete</param>
+        public void SendTelemetryBatch(ResultCallback callback)
         {
-            if (telemetryBodies != null && telemetryBodies.Count > 0)
+            ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> queue = null;
+            lock (jobQueue)
             {
-                coroutineRunner.Run(
-                    api.SendProtectedEvents(telemetryBodies, callback)
-                );
+                if (jobQueue == null || jobQueue.IsEmpty)
+                {
+                    callback?.Invoke(Result.CreateOk());
+                    return;
+                }
+
+                queue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(jobQueue);
+                jobQueue.Clear();
             }
+
+            var queueBackup = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(queue);
+
+            List<TelemetryBody> telemetryBodies = new List<TelemetryBody>();
+            List<ResultCallback> telemetryCallbacks = new List<ResultCallback>();
+            while (!queue.IsEmpty)
+            {
+                if (queue.TryDequeue(out var dequeueResult))
+                {
+                    telemetryBodies.Add(dequeueResult.Item1);
+                    telemetryCallbacks.Add(dequeueResult.Item2);
+                }
+            }
+
+            eventList.Clear();
+            SendTelemetryRequest(telemetryBodies, result =>
+            {
+                if (result.IsError)
+                {
+                    lock (jobQueue)
+                    {
+                        foreach (var unsentQueue in queueBackup)
+                        {
+                            jobQueue.Enqueue(unsentQueue);
+                        }
+                    }
+                }
+                else
+                {
+                    RemoveEventsFromCache();
+                }
+
+                foreach (var telemetryCallback in telemetryCallbacks)
+                {
+                    telemetryCallback?.Invoke(result);
+                }
+                callback?.Invoke(result);
+            });
         }
 
         private void SendCachedTelemetry()
         {
             LoadEventsFromCache(telemetryBodies =>
             {
-                Send(telemetryBodies, cb =>
+                SendTelemetryRequest(telemetryBodies, cb =>
                 {
-                    RemoveEventsFromCache();
+                    if (!cb.IsError)
+                    {
+                        RemoveEventsFromCache();
+                    }
                 });
             });
         }
 
-        private IEnumerator RunPeriodicTelemetry()
+        internal void ClearQueuedTelemetry()
         {
-            while (session.IsValid())
+            lock(jobQueue)
             {
-                if (!jobQueue.IsEmpty)
-                {
-                    Report.GetFunctionLog(GetType().Name);
+                jobQueue.Clear();
+            }
+        }
 
-                    List<TelemetryBody> telemetryBodies = new List<TelemetryBody>(); 
-                    List<ResultCallback> telemetryCallbacks = new List<ResultCallback>();
-                    while (!jobQueue.IsEmpty)
-                    {
-                        if (jobQueue.TryDequeue(out var dequeueResult))
-                        {
-                            telemetryBodies.Add(dequeueResult.Item1);
-                            telemetryCallbacks.Add(dequeueResult.Item2);
-                        }
-                    }
-
-                    eventList.Clear();
-                    yield return api.SendProtectedEvents(telemetryBodies, result =>
-                    {
-                        RemoveEventsFromCache();
-                        foreach (var callback in telemetryCallbacks)
-                        {
-                            callback.Invoke(result);
-                        }
-                    });
-                }
-                
-                yield return new WaitForSeconds((float)telemetryInterval.TotalSeconds);
+        private async void RunPeriodicTelemetry()
+        {
+            if(isSchedulerRunning)
+            {
+                return;
             }
 
-            ResetTelemetryScheduler();
-        }
+            isSchedulerRunning = true;
+            while (isSchedulerRunning && session != null && session.IsValid())
+            {
+                SendTelemetryBatch(callback: null);
 
-        private void StartTelemetryScheduler()
-        {
-            telemetryCoroutine = coroutineRunner.Run(RunPeriodicTelemetry());
-            isTelemetryJobStarted = true;
-        }
-
-        private void ResetTelemetryScheduler()
-        {
-            isTelemetryJobStarted = false;
-            telemetryCoroutine = null;
+                await System.Threading.Tasks.Task.Delay(telemetryInterval);
+            }
+            isSchedulerRunning = false;
         }
 
         internal void LoadEventsFromCache(Action<List<TelemetryBody>> onLoadCacheDone)
@@ -279,12 +309,24 @@ namespace AccelByte.Api
 
         private void RemoveEventsFromCache()
         {
-            if (!session.IsValid())
+            if (session != null && !session.IsValid())
             {
                 return;
             }
 
             cacheStorage.DeleteItem(session.UserId, onDone: null, tableName:cacheTableName);
+        }
+
+        private void SendTelemetryRequest(List<TelemetryBody> telemetryBodies, ResultCallback callback)
+        {
+            if (telemetryBodies != null && telemetryBodies.Count > 0)
+            {
+                api.SendProtectedEventsV1(telemetryBodies, callback);
+            }
+            else
+            {
+                callback?.Invoke(Result.CreateOk());
+            }
         }
     }
 }

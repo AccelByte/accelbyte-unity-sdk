@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Models;
 using AccelByte.Server;
+using AccelByte.Api.Interface;
 
 namespace AccelByte.Core
 {
@@ -46,7 +47,7 @@ namespace AccelByte.Core
         #region Constructor
         public ApiClient( UserSession inSession
             , IHttpClient inHttpClient
-            , CoroutineRunner inCoroutineRunner ) : this(inSession, inHttpClient, inCoroutineRunner, AccelBytePlugin.Config, AccelBytePlugin.OAuthConfig)
+            , CoroutineRunner inCoroutineRunner ) : this(inSession, inHttpClient, inCoroutineRunner, AccelByteSDK.GetClientConfig(), AccelByteSDK.GetClientOAuthConfig())
         {
         }
 
@@ -194,6 +195,7 @@ namespace AccelByte.Core
         }
         public UserProfiles GetUserProfiles() { return GetApi<UserProfiles, UserProfilesApi>(); }
         public Categories GetCategories() { return GetApi<Categories, CategoriesApi>(); }
+        public IClientChallenge GetChallenge() { return GetApi<Challenge, ChallengeApi>(); }
         public Items GetItems() { return GetApi<Items, ItemsApi>(); }
         public Currencies GetCurrencies() { return GetApi<Currencies, CurrenciesApi>(); }
         public Orders GetOrders() { return GetApi<Orders, OrdersApi>(); }
@@ -225,12 +227,18 @@ namespace AccelByte.Core
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, AnalyticsApi>(); }
         public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }
+        [Obsolete("This API is deprecated and will be removed on July Release, please use GetVersionService instead")]
+        public Api.ServiceVersion GetServiceVersion() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
         public Api.ServiceVersion GetVersionService() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
+        [Obsolete("This API is deprecated and will be removed on July Release, Please use GetHeartBeatService instead")]
+        public HeartBeat GetHeartBeat() { return GetApi<HeartBeat, HeartBeatApi>(); }
         public HeartBeat GetHeartBeatService(bool autoCreate = true)
         {
             HeartBeat retval = GetApi<HeartBeat, HeartBeatApi>(autoCreate);
             return retval;
         }
+        [Obsolete("This API is deprecated and will be removed on July Release, Please use GetStoreDisplayService instead")]
+        public StoreDisplay GetStoreDisplay() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         public StoreDisplay GetStoreDisplayService() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         #endregion
 

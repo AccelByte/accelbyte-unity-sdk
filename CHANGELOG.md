@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.1%0D16.19.0) (2024-04-08)
+
+## [16.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.0%0D16.18.0) (2024-04-05)
+
+
+### Features
+
+* add a feature to immediately sending telemetry data in the queue ([9bf3920](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9bf3920bba0f23d235e2fb5cd549bfe27375a064))
+* add additional config types: Sandbox, Integration, QA ([056cbfe](https://github.com/AccelByte/accelbyte-unity-sdk/commits/056cbfe0304c6464e2bb35d78eeccadbe1bd7b93))
+* add get oauth config interface ([02f303a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/02f303ab92550d410d88ccd3afe5bd24394157eb))
+* add google play wrapper ([aa957fb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa957fb7d8c95e795929cfab8b40163eded560a7))
+* add switch save cache and handle game exit API ([104b7cd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/104b7cd1e73b37e877f89900511a418cca41e905))
+* implement challenge api ([cdc23a8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cdc23a805c01f92b37084558ce168b5a93fa7880))
+* **Item:** add autoCalcEstimatedPrice param to some item endpoint ([e7c5bc2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e7c5bc2c0b122d7056d1487c6d0e9f4bb6607956))
+
 ## [16.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.18.0%0D16.17.1) (2024-03-24)
 
 

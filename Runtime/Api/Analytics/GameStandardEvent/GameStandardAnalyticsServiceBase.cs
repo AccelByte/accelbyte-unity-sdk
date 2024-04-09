@@ -26,6 +26,21 @@ namespace AccelByte.Api
             Initialize(inApi);
         }
 
+        /// <summary>
+        /// Send telemetry data in the batch
+        /// </summary>
+        /// <param name="callback">Callback after sending telemetry data is complete</param>
+        public void SendTelemetryBatch(ResultCallback callback)
+        {
+            if(Scheduler == null)
+            {
+                callback?.Invoke(Result.CreateOk());
+                return;
+            }
+
+            Scheduler.SendQueuedEvent(callback);
+        }
+
         internal void Initialize(TAnalyticsWrapper inApi)
         {
             Scheduler = new GameStandardEventScheduler<TAnalyticsWrapper>(inApi);
@@ -78,6 +93,11 @@ namespace AccelByte.Api
         internal virtual void SendEvent(GameStandardEventPayload payload)
         {
             var telemetryEvent = new AccelByteTelemetryEvent(payload);
+            SendEvent(telemetryEvent);
+        }
+
+        internal void SendEvent(AccelByteTelemetryEvent telemetryEvent)
+        {
             ResultCallback callback = null;
             Scheduler.SendEvent(telemetryEvent, callback);
 

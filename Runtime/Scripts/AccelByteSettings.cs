@@ -17,7 +17,7 @@ namespace AccelByte.Api
 {
     /// <summary>
     /// Primarily used by the Editor for the config in the popup menu.
-    /// <para>Looking for runtime settings? See static AccelBytePlugin.Config</para>
+    /// <para>Looking for runtime settings? See static AccelByteSDK.GetClientConfig()</para>
     /// </summary>
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]

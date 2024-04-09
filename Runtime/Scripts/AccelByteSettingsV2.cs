@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Text;
@@ -204,46 +204,16 @@ namespace AccelByte.Api
             {
                 return null;
             }
-
-            OAuthConfig retval;
-            switch (environment)
-            {
-                case SettingsEnvironment.Development:
-                    retval = multiOAuthConfigs.Development;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval = multiOAuthConfigs.Certification;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval = multiOAuthConfigs.Production;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval = multiOAuthConfigs.Default;
-                    break;
-            }
-
+            OAuthConfig retval = multiOAuthConfigs.GetConfigFromEnvironment(environment);
             return retval;
         }
 
         public static MultiOAuthConfigs SetOAuthByEnvironment(MultiOAuthConfigs multiOAuthConfigs, OAuthConfig newOauthConfig, SettingsEnvironment environment)
         {
             MultiOAuthConfigs retval = multiOAuthConfigs;
-            switch (environment)
+            if(retval != null)
             {
-                case SettingsEnvironment.Development:
-                    retval.Development = newOauthConfig;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval.Certification = newOauthConfig;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval.Production = newOauthConfig;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval.Default = newOauthConfig;
-                    break;
+                retval.SetConfigToEnv(newOauthConfig, environment);
             }
 
             return retval;
@@ -379,25 +349,7 @@ namespace AccelByte.Api
             {
                 return null;
             }
-
-            Config retval;
-            switch (environment)
-            {
-                case SettingsEnvironment.Development:
-                    retval = multiSDKConfigs.Development;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval = multiSDKConfigs.Certification;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval = multiSDKConfigs.Production;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval = multiSDKConfigs.Default;
-                    break;
-            }
-
+            Config retval = multiSDKConfigs.GetConfigFromEnvironment(environment);
             return retval;
         }
 
@@ -408,70 +360,27 @@ namespace AccelByte.Api
                 return null;
             }
 
-            ServerConfig retval;
-            switch (environment)
-            {
-                case SettingsEnvironment.Development:
-                    retval = multiSDKConfigs.Development;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval = multiSDKConfigs.Certification;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval = multiSDKConfigs.Production;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval = multiSDKConfigs.Default;
-                    break;
-            }
-
+            ServerConfig retval = multiSDKConfigs.GetConfigFromEnvironment(environment);
             return retval;
         }
 
         public static MultiConfigs SetSDKConfigByEnvironment(MultiConfigs multiSDKConfig, Config newSDKConfig, SettingsEnvironment environment)
         {
             var retval = multiSDKConfig;
-            switch (environment)
+            if(retval != null)
             {
-                case SettingsEnvironment.Development:
-                    retval.Development = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval.Certification = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval.Production = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval.Default = newSDKConfig;
-                    break;
+                retval.SetConfigToEnv(newSDKConfig, environment);
             }
-
             return retval;
         }
 
         public static MultiServerConfigs SetSDKConfigByEnvironment(MultiServerConfigs multiSDKConfig, ServerConfig newSDKConfig, SettingsEnvironment environment)
         {
             var retval = multiSDKConfig;
-            switch (environment)
+            if (retval != null)
             {
-                case SettingsEnvironment.Development:
-                    retval.Development = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Certification:
-                    retval.Certification = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Production:
-                    retval.Production = newSDKConfig;
-                    break;
-                case SettingsEnvironment.Default:
-                default:
-                    retval.Default = newSDKConfig;
-                    break;
+                retval.SetConfigToEnv(newSDKConfig, environment);
             }
-
             return retval;
         }
 

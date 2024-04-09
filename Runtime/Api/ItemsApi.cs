@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -33,22 +33,27 @@ namespace AccelByte.Api
             , string storeId
             , bool populateBundle )
         {
+            yield return GetItem(itemId, region, language, false, callback , storeId, populateBundle);
+        }
+
+        public IEnumerator GetItem( string itemId
+            , string region
+            , string language
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<PopulatedItemInfo> callback
+            , string storeId
+            , bool populateBundle )
+        {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(itemId
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(itemId))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(itemId) + " cannot be null or empty"));
-                yield break;
-            } 
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/{itemId}/locale")
@@ -58,6 +63,7 @@ namespace AccelByte.Api
                 .WithQueryParam("language", language)
                 .WithQueryParam("storeId", storeId)
                 .WithQueryParam("populateBundle", populateBundle ? "true" : "false")
+                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -72,7 +78,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PopulatedItemInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         /// <summary>
@@ -90,21 +96,16 @@ namespace AccelByte.Api
             , string region )
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(publisherNamespace))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(publisherNamespace
+                , appId
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(publisherNamespace) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(appId))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(appId) + " cannot be null or empty"));
-                yield break;
-            } 
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byAppId")
@@ -125,28 +126,23 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ItemInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetItemsByCriteria( ItemCriteria criteria
             , ResultCallback<ItemPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(criteria
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (criteria == null)
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(criteria) + " cannot be null"));
-                yield break;
-            } 
 
             var queries = new Dictionary<string, string>();
 
@@ -214,6 +210,8 @@ namespace AccelByte.Api
                 queries.Add("storeId", criteria.storeId);
             }
 
+            queries.Add("autoCalcEstimatedPrice", criteria.AutoCalcEstimatedPrice ? "true" : "false");
+
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/byCriteria")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueries(queries)
@@ -230,7 +228,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ItemPagingSlicedResult>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchItem(string language
@@ -240,25 +238,27 @@ namespace AccelByte.Api
             , string region
             , ResultCallback<ItemPagingSlicedResult> callback )
         {
+            yield return SearchItem(language, keyword, offset, limit, region, false, callback);
+        }
+
+        public IEnumerator SearchItem(string language
+            , string keyword
+            , int offset
+            , int limit
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemPagingSlicedResult> callback )
+        {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(language
+                , keyword
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(language))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(language) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(keyword))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(keyword) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -270,6 +270,7 @@ namespace AccelByte.Api
                 .WithQueryParam("region", region)
                 .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
                 .WithQueryParam("limit", (limit >= 0) ? limit.ToString() : "")
+                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -284,7 +285,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ItemPagingSlicedResult>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetItemBySku(string sku
@@ -292,20 +293,24 @@ namespace AccelByte.Api
             , string region
             , ResultCallback<ItemInfo> callback)
         {
+            yield return GetItemBySku(sku, language, region, false, callback);
+        }
+
+        public IEnumerator GetItemBySku(string sku
+            , string language
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemInfo> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sku
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(sku))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sku) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -315,6 +320,7 @@ namespace AccelByte.Api
                 .WithQueryParam("sku", sku)
                 .WithQueryParam("language", language)
                 .WithQueryParam("region", region)
+                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -329,7 +335,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ItemInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkGetLocaleItems(string[] itemIds
@@ -338,20 +344,29 @@ namespace AccelByte.Api
             , ResultCallback<ItemInfo[]> callback
             , string storeId)
         {
+            yield return BulkGetLocaleItems(itemIds, language, region, false, callback, storeId);
+        }
+
+        public IEnumerator BulkGetLocaleItems(string[] itemIds
+            , string language
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemInfo[]> callback
+            , string storeId)
+        {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(itemIds, Namespace_, AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
-            if (string.IsNullOrEmpty(AuthToken))
+
+            if (itemIds.Length <= 0)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (itemIds == null || itemIds.Length == 0)
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(itemIds) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -361,13 +376,10 @@ namespace AccelByte.Api
                 .WithQueryParam("storeId", storeId)
                 .WithQueryParam("region", region)
                 .WithQueryParam("language", language)
+                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false")
+                .WithQueryParam("itemIds", string.Join(",", itemIds))
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
-
-            if (itemIds != null && itemIds.Length > 0)
-            {
-                builder.WithQueryParam("itemIds", string.Join(",", itemIds));
-            }
 
             var request = builder.GetResult();
 
@@ -378,20 +390,18 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ItemInfo[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListAllStore(ResultCallback<PlatformStore[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -412,27 +422,28 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PlatformStore[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetEstimatedPrice(string[] itemIds, string region, ResultCallback<EstimatedPricesInfo[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(itemIds
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
-            if (string.IsNullOrEmpty(AuthToken))
+
+            if (itemIds.Length <= 0)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(itemIds) + " cannot be null or empty"));
                 yield break;
             }
-            if (itemIds == null || itemIds.Length == 0)
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(itemIds) + " cannot be null or empty"));
-                yield break;
-            } 
 
             // There will only one published stored in a live game environment. 
             // Here the StoreId is not included on the query param, 
@@ -442,12 +453,8 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken) 
                 .WithPathParam("region", region)
+                .WithQueryParam("itemIds", string.Join(",", itemIds))
                 .Accepts(MediaType.ApplicationJson);
-
-            if (itemIds != null && itemIds.Length > 0)
-            {
-                builder.WithQueryParam("itemIds", string.Join(",", itemIds));
-            }
 
             var request = builder.GetResult();
             IHttpResponse response = null;
@@ -459,7 +466,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<EstimatedPricesInfo[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

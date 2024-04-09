@@ -32,6 +32,7 @@ namespace AccelByte.Models {
         [DataMember] public string LobbyServerUrl;
         [DataMember] public string SessionServerUrl;
         [DataMember] public string CloudSaveServerUrl;
+        [DataMember] public string ChallengeServerUrl;
         [DataMember] public string RedirectUri;
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
@@ -89,6 +90,8 @@ namespace AccelByte.Models {
             this.SessionServerUrl = this.ExpanServiceApiUrl(this.SessionServerUrl, "/session", forceExpandServiceApiUrl);
 
             this.CloudSaveServerUrl = this.ExpanServiceApiUrl(this.CloudSaveServerUrl, "/cloudsave", forceExpandServiceApiUrl);
+
+            this.ChallengeServerUrl = this.ExpanServiceApiUrl(this.ChallengeServerUrl, "/challenge", forceExpandServiceApiUrl);
 
             this.MatchmakingServerUrl = this.ExpanServiceApiUrl(this.MatchmakingServerUrl, "/matchmaking", forceExpandServiceApiUrl);
             
@@ -148,6 +151,8 @@ namespace AccelByte.Models {
             if (this.SessionServerUrl == httpBaseUrl + "/session") this.SessionServerUrl = null;
 
             if (this.CloudSaveServerUrl == httpBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
+
+            if (this.ChallengeServerUrl == httpBaseUrl + "/challenge") this.ChallengeServerUrl= null;
 
             if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
             
@@ -212,49 +217,81 @@ namespace AccelByte.Models {
         [DataMember] public ServerConfig Development;
         [DataMember] public ServerConfig Certification;
         [DataMember] public ServerConfig Production;
+        [DataMember] public ServerConfig Sandbox;
+        [DataMember] public ServerConfig Integration;
+        [DataMember] public ServerConfig QA;
         [DataMember] public ServerConfig Default;
 
         public void Expand(bool forceExpandServiceApiUrl = false)
         {
-            if (Development == null)
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Development = new ServerConfig();
+                ServerConfig envConfig = fieldInfo.GetValue(this) as ServerConfig;
+                if (envConfig == null)
+                {
+                    envConfig = new ServerConfig();
+                }
+                envConfig.SanitizeBaseUrl();
+                envConfig.Expand(forceExpandServiceApiUrl);
+
+                fieldInfo.SetValue(this, envConfig);
             }
-            Development.SanitizeBaseUrl();
-            Development.Expand(forceExpandServiceApiUrl);
-            if (Certification == null)
+        }
+
+        public void InitializeNullEnv()
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Certification = new ServerConfig();
+                var envConfig = fieldInfo.GetValue(this) as ServerConfig;
+                if (envConfig == null)
+                {
+                    envConfig = new ServerConfig();
+                    fieldInfo.SetValue(this, envConfig);
+                }
             }
-            Certification.SanitizeBaseUrl();
-            Certification.Expand(forceExpandServiceApiUrl);
-            if (Production == null)
+        }
+
+        public ServerConfig GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
+        {
+            ServerConfig retval = null;
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Production = new ServerConfig();
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    retval = fieldInfo.GetValue(this) as ServerConfig;
+                    break;
+                }
             }
-            Production.SanitizeBaseUrl();
-            Production.Expand(forceExpandServiceApiUrl);
-            if (Default == null)
+
+            return retval;
+        }
+
+        public void SetConfigToEnv(ServerConfig newConfig, SettingsEnvironment targetEnvironment)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Default = new ServerConfig();
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    fieldInfo.SetValue(this, newConfig);
+                    break;
+                }
             }
-            Default.SanitizeBaseUrl();
-            Default.Expand(forceExpandServiceApiUrl);
         }
 
         IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
         {
-            switch (targetEnvironment)
+            return GetConfigFromEnvironment(targetEnvironment);
+        }
+
+        void IAccelByteMultiConfigs.SetConfigToEnv(IAccelByteConfig newConfig, SettingsEnvironment targetEnvironment)
+        {
+            if (newConfig is ServerConfig)
             {
-                case SettingsEnvironment.Development:
-                    return Development;
-                case SettingsEnvironment.Certification:
-                    return Certification;
-                case SettingsEnvironment.Production:
-                    return Production;
-                case SettingsEnvironment.Default:
-                default:
-                    return Default;
+                SetConfigToEnv(newConfig as ServerConfig, targetEnvironment);
             }
         }
     }

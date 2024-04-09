@@ -25,7 +25,12 @@ namespace AccelByte.Core
             }
 
             bool isDirectoryFound = false;
-            foreach (string key in saveMem.Keys)
+            List<string> keys = new List<string>();
+            foreach(string key in saveMem.Keys)
+            {
+                keys.Add(key);
+            }
+            foreach (string key in keys)
             {
                 if (key.StartsWith(directory))
                 {

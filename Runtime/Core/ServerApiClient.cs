@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using AccelByte.Models;
 using AccelByte.Server;
+using AccelByte.Server.Interface;
 
 namespace AccelByte.Core
 {
@@ -30,7 +31,7 @@ namespace AccelByte.Core
 
         public ServerApiClient(ServerOauthLoginSession inSession
             , IHttpClient inHttpClient
-            , CoroutineRunner inCoroutinerunner) : this(inSession, inHttpClient, inCoroutinerunner, AccelByteServerPlugin.Config, AccelByteServerPlugin.OAuthConfig)
+            , CoroutineRunner inCoroutinerunner) : this(inSession, inHttpClient, inCoroutinerunner, AccelByteSDK.GetServerConfig(), AccelByteSDK.GetServerOAuthConfig())
         {
         }
 
@@ -163,6 +164,7 @@ namespace AccelByte.Core
         public ServerAchievement GetAchievement() { return GetServerApi<ServerAchievement, ServerAchievementApi>(); }
         public ServerLobby GetLobby() { return GetServerApi<ServerLobby, ServerLobbyApi>(); }
         public ServerCloudSave GetCloudSave() { return GetServerApi<ServerCloudSave, ServerCloudSaveApi>(); }
+        public IServerChallenge GetChallenge() { return GetServerApi<ServerChallenge, ServerChallengeApi>(); }
         public ServerMatchmaking GetMatchmaking() { return GetServerApi<ServerMatchmaking, ServerMatchmakingApi>(); }
         public ServerUserAccount GetUserAccount() { return GetServerApi<ServerUserAccount, ServerUserAccountApi>(); }
         public ServerSeasonPass GetSeasonPass() { return GetServerApi<ServerSeasonPass, ServerSeasonPassApi>(); }
@@ -189,7 +191,7 @@ namespace AccelByte.Core
         
         internal void environmentChanged()
         {
-            session = AccelByteServerPlugin.GetDedicatedServer().Session as ServerOauthLoginSession;
+            session = AccelByteSDK.GetServerRegistry().GetApi().session;
             httpClient.SetCredentials(serverOAuthConfig.ClientId, serverOAuthConfig.ClientSecret);
             httpClient.SetBaseUri(new Uri(serverConfig.BaseUrl));
         }

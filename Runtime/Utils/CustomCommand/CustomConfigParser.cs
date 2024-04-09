@@ -89,10 +89,7 @@ namespace AccelByte.Utils
             if (configArgs != null)
             {
                 retval = new MultiSDKConfigsArgs();
-                retval.Default = configArgs;
-                retval.Certification = configArgs;
-                retval.Development = configArgs;
-                retval.Production = configArgs;
+                retval.SetConfigValueToAllEnv(configArgs);
             }
             return retval;
         }
@@ -110,10 +107,7 @@ namespace AccelByte.Utils
                 var oAuthArgs = configArgs.CopyToConfig(new OAuthConfig());
                 
                 retval = new MultiOAuthConfigs();
-                retval.Default = oAuthArgs;
-                retval.Certification = oAuthArgs;
-                retval.Development = oAuthArgs;
-                retval.Production = oAuthArgs;
+                retval.SetConfigValueToAllEnv(oAuthArgs);
             }
             return retval;
         }

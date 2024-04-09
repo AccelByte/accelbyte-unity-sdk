@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -18,6 +18,8 @@ namespace AccelByte.Api
         private readonly ItemsApi api;
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
+
+        private const bool autoCalcEstimatedPriceDefault = false;
 
         [UnityEngine.Scripting.Preserve]
         internal Items( ItemsApi inApi
@@ -63,6 +65,27 @@ namespace AccelByte.Api
             , string storeId = ""
             , bool populateBundle = false )
         {
+            GetItemById(itemId, region, language, autoCalcEstimatedPriceDefault, callback, storeId, populateBundle);
+        }
+
+        /// <summary>
+        /// Get ItemInfo by itemId
+        /// </summary>
+        /// <param name="itemId">Item ID to get item with</param>
+        /// <param name="region">Region of the item</param>
+        /// <param name="language">Display language</param>
+        /// <param name="autoCalcEstimatedPrice">Auto Calculate Estimated Price. If autoCalcEstimatedPrice is true and item is flexible bundle, will auto calc price.</param>
+        /// <param name="callback">Returns a Result that contains ItemInfo via callback when completed.</param>
+        /// <param name="storeId">If it's leaved string empty, the value will be got from published store id on the namespace</param>
+        /// <param name="populateBundle">Whether populate bundled items if it's a bundle, default value is false</param>
+        public void GetItemById( string itemId
+            , string region
+            , string language
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<PopulatedItemInfo> callback
+            , string storeId = ""
+            , bool populateBundle = false )
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -72,7 +95,7 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetItem(itemId, region, language, callback, storeId, populateBundle));
+                api.GetItem(itemId, region, language, autoCalcEstimatedPrice, callback, storeId, populateBundle));
         }
 
         /// <summary>
@@ -118,7 +141,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetItemByAppId(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                    api.Config.PublisherNamespace,
                     appId,
                     callback,
                     language,
@@ -141,6 +164,27 @@ namespace AccelByte.Api
             , string region
             , ResultCallback<ItemPagingSlicedResult> callback)
         {
+            SearchItem(language, keyword, offset, limit, region, autoCalcEstimatedPriceDefault, callback);
+        }
+
+        /// <summary>
+        /// Search Item.
+        /// </summary>
+        /// <param name="language">display language</param>
+        /// <param name="keyword">Keyword Item's keyword in title or description or long description</param>
+        /// <param name="offset">offset of items</param>
+        /// <param name="limit">limit of items</param>
+        /// <param name="region">Region ISO 3166-1 alpha-2 country tag, e.g., "US", "CN".</param>
+        /// <param name="autoCalcEstimatedPrice">Auto Calculate Estimated Price. If autoCalcEstimatedPrice is true and item is flexible bundle, will auto calc price.</param>
+        /// <param name="callback">Returns a result that contain ItemPagingSlicedResult via callback when completed.</param>
+        public void SearchItem(string language
+            , string keyword
+            , int offset
+            , int limit
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemPagingSlicedResult> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -150,13 +194,13 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.SearchItem(
-                    language,
-                    keyword,
-                    offset,
-                    limit,
-                    region,
-                    callback));
+                api.SearchItem(language
+                    , keyword
+                    , offset
+                    , limit
+                    , region
+                    , autoCalcEstimatedPrice
+                    , callback));
         }
 
         /// <summary>
@@ -171,6 +215,23 @@ namespace AccelByte.Api
             , string region
             , ResultCallback<ItemInfo> callback)
         {
+            GetItemBySku(sku, language, region, autoCalcEstimatedPriceDefault, callback);
+        }
+
+        /// <summary>
+        /// Get item info by sku.
+        /// </summary>
+        /// <param name="sku">Sku should contain specific number of item Sku</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        /// <param name="autoCalcEstimatedPrice">Auto Calculate Estimated Price. If autoCalcEstimatedPrice is true and item is flexible bundle, will auto calc price.</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        public void GetItemBySku(string sku
+            , string language
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemInfo> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -180,11 +241,11 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.GetItemBySku(
-                    sku,
-                    language,
-                    region,
-                    callback ));
+                api.GetItemBySku(sku
+                    , language
+                    , region
+                    , autoCalcEstimatedPrice
+                    , callback ));
         }
 
         /// <summary>
@@ -198,6 +259,25 @@ namespace AccelByte.Api
         public void BulkGetLocaleItems(string[] itemIds
             , string language
             , string region
+            , ResultCallback<ItemInfo[]> callback
+            , string storeId = "" )
+        {
+            BulkGetLocaleItems(itemIds, language, region, autoCalcEstimatedPriceDefault, callback, storeId);
+        }
+
+        /// <summary>
+        /// Bulk Get Locale Items.
+        /// </summary>
+        /// <param name="itemIds">Item IDs to get item</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        /// <param name="autoCalcEstimatedPrice">Auto Calculate Estimated Price. If autoCalcEstimatedPrice is true and item is flexible bundle, will auto calc price.</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        /// <param name="storeId">If it's leaved string empty, the value will be got from published store id on the namespace</param>
+        public void BulkGetLocaleItems(string[] itemIds
+            , string language
+            , string region
+            , bool autoCalcEstimatedPrice
             , ResultCallback<ItemInfo[]> callback
             , string storeId = "" )
         {
@@ -217,12 +297,12 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(
-                api.BulkGetLocaleItems(
-                    itemIds,
-                    language,
-                    region,
-                    callback,
-                    storeId ));
+                api.BulkGetLocaleItems(itemIds
+                    , language
+                    , region
+                    , autoCalcEstimatedPrice
+                    , callback
+                    , storeId ));
         }
 
         /// <summary>

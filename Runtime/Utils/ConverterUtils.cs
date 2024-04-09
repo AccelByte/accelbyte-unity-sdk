@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.ComponentModel;
 
 namespace AccelByte.Utils
 {
@@ -40,6 +41,13 @@ namespace AccelByte.Utils
             }
 
             return byteArray;
+        }
+
+        internal static string EnumToDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+            return attribute == null ? value.ToString() : attribute.Description;
         }
     }
 }

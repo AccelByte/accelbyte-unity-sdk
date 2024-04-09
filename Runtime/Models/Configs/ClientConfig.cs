@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -33,6 +33,7 @@ namespace AccelByte.Models
         [DataMember] public string IamServerUrl = "";
         [DataMember] public string PlatformServerUrl = "";
         [DataMember] public string BasicServerUrl = "";
+        [DataMember] public string ChallengeServerUrl = "";
         [DataMember] public string LobbyServerUrl = "";
         [DataMember] public string CloudStorageServerUrl = "";
         [DataMember] public string GameProfileServerUrl = "";
@@ -100,6 +101,7 @@ namespace AccelByte.Models
                    this.BasicServerUrl == anotherConfig.BasicServerUrl &&
                    this.LobbyServerUrl == anotherConfig.LobbyServerUrl &&
                    this.CloudStorageServerUrl == anotherConfig.CloudStorageServerUrl &&
+                   this.ChallengeServerUrl == anotherConfig.ChallengeServerUrl &&
                    this.GameProfileServerUrl == anotherConfig.GameProfileServerUrl &&
                    this.StatisticServerUrl == anotherConfig.StatisticServerUrl &&
                    this.QosManagerServerUrl == anotherConfig.QosManagerServerUrl &&
@@ -270,6 +272,10 @@ namespace AccelByte.Models
             {
                 ChatServerUrl = "";
             }
+            if (ChallengeServerUrl == null)
+            {
+                ChallengeServerUrl = "";
+            }
             if (RedirectUri == null)
             {
                 RedirectUri = "";
@@ -358,6 +364,8 @@ namespace AccelByte.Models
                 this.TurnManagerServerUrl = ExpandServiceApiUrl(this.TurnManagerServerUrl, "/turnmanager", forceExpandServiceApiUrl);
 
                 this.ChatServerUrl = ExpandServiceApiUrl(this.ChatServerUrl, "/chat", forceExpandServiceApiUrl);
+                
+                this.ChallengeServerUrl = ExpandServiceApiUrl(this.ChallengeServerUrl, "/challenge", forceExpandServiceApiUrl);
 
                 this.LoginQueueServerUrl = ExpandServiceApiUrl(this.LoginQueueServerUrl, "/login-queue", forceExpandServiceApiUrl);
 
@@ -406,6 +414,8 @@ namespace AccelByte.Models
                 if (this.LeaderboardServerUrl == httpsBaseUrl + "/leaderboard") this.LeaderboardServerUrl = null;
 
                 if (this.CloudSaveServerUrl == httpsBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
+                
+                if (this.ChallengeServerUrl == httpsBaseUrl + "/challenge") this.ChallengeServerUrl = null;
 
                 if (this.GameTelemetryServerUrl == httpsBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
 
@@ -506,49 +516,81 @@ namespace AccelByte.Models
         [DataMember] public Config Development;
         [DataMember] public Config Certification;
         [DataMember] public Config Production;
+        [DataMember] public Config Sandbox;
+        [DataMember] public Config Integration;
+        [DataMember] public Config QA;
         [DataMember] public Config Default;
 
         public void Expand(bool forceExpandServiceUrl = false)
         {
-            if(Development == null)
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Development = new Config();
+                Config envConfig = fieldInfo.GetValue(this) as Config;
+                if (envConfig == null)
+                {
+                    envConfig = new Config();
+                }
+                envConfig.SanitizeBaseUrl();
+                envConfig.Expand(forceExpandServiceUrl);
+
+                fieldInfo.SetValue(this, envConfig);
             }
-            Development.SanitizeBaseUrl();
-            Development.Expand(forceExpandServiceUrl);
-            if (Certification == null)
+        }
+
+        public void InitializeNullEnv()
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Certification = new Config();
+                var envConfig = fieldInfo.GetValue(this) as Config;
+                if (envConfig == null)
+                {
+                    envConfig = new Config();
+                    fieldInfo.SetValue(this, envConfig);
+                }
             }
-            Certification.SanitizeBaseUrl();
-            Certification.Expand(forceExpandServiceUrl);
-            if (Production == null)
+        }
+
+        public Config GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
+        {
+            Config retval = null;
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Production = new Config();
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    retval = fieldInfo.GetValue(this) as Config;
+                    break;
+                }
             }
-            Production.SanitizeBaseUrl();
-            Production.Expand(forceExpandServiceUrl);
-            if (Default == null)
+
+            return retval;
+        }
+
+        public void SetConfigToEnv(Config newConfig, SettingsEnvironment targetEnvironment)
+        {
+            System.Reflection.FieldInfo[] fieldInfos = GetType().GetFields();
+            foreach (System.Reflection.FieldInfo fieldInfo in fieldInfos)
             {
-                Default = new Config();
+                if (fieldInfo.Name == targetEnvironment.ToString())
+                {
+                    fieldInfo.SetValue(this, newConfig);
+                    break;
+                }
             }
-            Default.SanitizeBaseUrl();
-            Default.Expand(forceExpandServiceUrl);
         }
 
         IAccelByteConfig IAccelByteMultiConfigs.GetConfigFromEnvironment(SettingsEnvironment targetEnvironment)
         {
-            switch (targetEnvironment)
+            return GetConfigFromEnvironment(targetEnvironment);
+        }
+
+        void IAccelByteMultiConfigs.SetConfigToEnv(IAccelByteConfig newConfig, SettingsEnvironment targetEnvironment)
+        {
+            if (newConfig is Config)
             {
-                case SettingsEnvironment.Development:
-                    return Development;
-                case SettingsEnvironment.Certification:
-                    return Certification;
-                case SettingsEnvironment.Production:
-                    return Production;
-                case SettingsEnvironment.Default:
-                default:
-                    return Default;
+                SetConfigToEnv(newConfig as Config, targetEnvironment);
             }
         }
     }

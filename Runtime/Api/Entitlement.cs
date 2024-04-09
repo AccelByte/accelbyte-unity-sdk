@@ -159,7 +159,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserEntitlementOwnershipByAppId(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                   api.Config.PublisherNamespace,
                     session.UserId,
                     appId,
                     callback));
@@ -191,7 +191,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserEntitlementOwnershipBySku(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                    api.Config.PublisherNamespace,
                     session.UserId,
                     sku,
                     callback));
@@ -261,7 +261,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserEntitlementOwnershipAny(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                    api.Config.PublisherNamespace,
                     session.UserId,
                     itemIds,
                     appIds,
@@ -340,7 +340,7 @@ namespace AccelByte.Api
             Result<OwnershipToken> result = null;
 
             yield return api.GetUserEntitlementOwnershipToken(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                    api.Config.PublisherNamespace,
                     itemIds,
                     appIds,
                     skus,
@@ -405,7 +405,7 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 api.GetUserEntitlementOwnershipToken(
-                    AccelBytePlugin.Config.PublisherNamespace,
+                    api.Config.PublisherNamespace,
                     itemIds,
                     appIds,
                     skus,
