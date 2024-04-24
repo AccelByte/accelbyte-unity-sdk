@@ -24,6 +24,7 @@ namespace AccelByte.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SessionV2Joinability
     {
+        None,
         EMPTY,
         CLOSED,
         INVITE_ONLY,
@@ -273,6 +274,7 @@ namespace AccelByte.Models
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SessionV2DsStatus
     {
+        None,
         EMPTY,
         NEED_TO_REQUEST,
         REQUESTED,
@@ -288,6 +290,13 @@ namespace AccelByte.Models
     {
         createdAt,
         updatedAt
+    };
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SessionV2AttributeOrder
+    {
+        Asc,
+        Desc
     };
 
     [DataContract, Preserve]
@@ -334,6 +343,13 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt;
         [DataMember] public int version;
         [DataMember(Name = "storage")] public SessionV2Storage Storage;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2GameSessionPagingResponse
+    {
+        [DataMember(Name = "data")] public SessionV2GameSession[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 
     [DataContract, Preserve]

@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -25,7 +26,78 @@ namespace AccelByte.Server
             _session = inSession;
             _coroutineRunner = inCoroutineRunner;
         }
-        
+
+        /// <summary>
+        /// Get all game session details.
+        /// Session service has several DSInformation status to track DS request to DSMC
+        /// </summary>
+        /// <param name="callback">Returns a paging result of SessionV2GameSession via callback when completed.</param>
+        /// <param name="configurationName">(Optional)Filter result by configuration name</param>
+        /// <param name="dsPodName">(Optional) Filter result by DS pod name</param>
+        /// <param name="fromTime">(Optional) Filter result by time when session is created</param>
+        /// <param name="gameMode">(Optional) Filter result by game mode</param>
+        /// <param name="isPersistent">(Optional) Filter result by is persistent flag</param>
+        /// <param name="isSoftDeleted">(Optional) Filter result by is soft deleted flag</param>
+        /// <param name="joinability">(Optional) Filter result by joinability</param>
+        /// <param name="limit">(Optional) Number of results to be returned per page</param>
+        /// <param name="matchPool">(Optional) Filter result by match pool name</param>
+        /// <param name="memberId">(Optional) Filter result by member id</param>
+        /// <param name="offset">(Optional) Number of results to offset from</param>
+        /// <param name="order">(Optional) Order of results by asc or desc</param>
+        /// <param name="orderBy">(Optional) Results ordered by</param>\
+        /// <param name="sessionId">(Optional) Filter result by session id</param>
+        /// <param name="statusV2">(Optional) Filter result by ds status</param>
+        /// <param name="toTime">(Optional) Filter result by time when session is created</param>
+        public void GetAllGameSessions(
+            ResultCallback<SessionV2GameSessionPagingResponse> callback
+            , SessionV2DsStatus statusV2 = SessionV2DsStatus.None
+            , string sessionId = ""
+            , string matchPool = ""
+            , string gameMode = ""
+            , SessionV2Joinability joinability = SessionV2Joinability.None
+            , string memberId = ""
+            , string configurationName = ""
+            , DateTime fromTime = default
+            , DateTime toTime = default
+            , string dsPodName = ""
+            , bool isSoftDeleted = false
+            , bool isPersistent = false
+            , SessionV2AttributeOrderBy orderBy = SessionV2AttributeOrderBy.createdAt
+            , SessionV2AttributeOrder order = SessionV2AttributeOrder.Desc
+            , int offset = 0
+            , int limit = 20
+        )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            _coroutineRunner.Run(
+                _sessionApi.GetAllGameSessions(
+                    callback
+                    , statusV2
+                    , sessionId
+                    , matchPool
+                    , gameMode
+                    , joinability
+                    , memberId
+                    , configurationName
+                    , fromTime
+                    , toTime
+                    , dsPodName
+                    , isSoftDeleted
+                    , isPersistent
+                    , orderBy
+                    , order
+                    , offset
+                    , limit
+                )
+            );
+        }
 
         /// <summary>
         /// Get game session detail by sessionId.

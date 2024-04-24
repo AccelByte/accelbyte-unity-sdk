@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.19.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.2%0D16.19.1) (2024-04-24)
+
+
+### Features
+
+* exposed get all server session endpoint for server session service ([ae8fc29](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ae8fc296e3eb2a74736f9b9509592b8a75bce055))
+
 ### [16.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.1%0D16.19.0) (2024-04-08)
 
 ## [16.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.0%0D16.18.0) (2024-04-05)
