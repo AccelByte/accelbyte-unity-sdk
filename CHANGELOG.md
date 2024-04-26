@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.20.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.0%0D16.19.2) (2024-04-26)
+
+
+### Features
+
+* implemented inventory service wrapper ([6711afc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6711afca2be812a08183a3bf12c255309128f634))
+
+
+### Bug Fixes
+
+* rename editor variable into namespace id ([7423f71](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7423f717229d8c7771345f77dec13acde29be665))
+
+
+### Refactors
+
+* add null check on get refresh token info ([7c70fd0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c70fd0b5fcaf1028cf543397fcf8642ecb84c76))
+
 ### [16.19.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.2%0D16.19.1) (2024-04-24)
 
 

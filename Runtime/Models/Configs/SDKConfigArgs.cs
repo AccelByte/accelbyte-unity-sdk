@@ -28,6 +28,7 @@ namespace AccelByte.Models
         [DataMember] public string LeaderboardServerUrl;
         [DataMember] public string CloudSaveServerUrl;
         [DataMember] public string ChallengeServerUrl;
+        [DataMember] public string InventoryServerUrl;
         [DataMember] public string GameTelemetryServerUrl;
         [DataMember] public string AchievementServerUrl;
         [DataMember] public string UGCServerUrl;

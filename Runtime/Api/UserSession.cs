@@ -49,9 +49,23 @@ namespace AccelByte.Api
             set => tokenData.access_token = value;
         }
 
-        public string refreshToken => tokenData.refresh_token;
+        public string refreshToken
+        {
+            get
+            {
+                string retval = tokenData != null ? tokenData.refresh_token : null;
+                return retval;
+            }
+        }
 
-        public int refreshExpiresIn => tokenData.refresh_expires_in;
+        public int refreshExpiresIn
+        {
+            get
+            {
+                int retval = tokenData != null ? tokenData.refresh_expires_in : -1;
+                return retval;
+            }
+        }
 
         public override string UserId
         {

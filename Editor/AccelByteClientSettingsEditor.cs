@@ -239,8 +239,8 @@ namespace AccelByte.Editor
 
             EditorCommon.CreateTextInput((newValue) => editedSdkConfig.BaseUrl = newValue, editedSdkConfig.BaseUrl, "Base Url", required: true);
             EditorCommon.CreateTextInput((newValue) => editedSdkConfig.RedirectUri = newValue, editedSdkConfig.RedirectUri, "Redirect Uri", required: true);
-            EditorCommon.CreateTextInput((newValue) => editedSdkConfig.Namespace = newValue, editedSdkConfig.Namespace, "Namespace", required: true);
-            EditorCommon.CreateTextInput((newValue) => editedSdkConfig.PublisherNamespace = newValue, editedSdkConfig.PublisherNamespace, "Publisher Namespace", required: true);
+            EditorCommon.CreateTextInput((newValue) => editedSdkConfig.Namespace = newValue, editedSdkConfig.Namespace, "Namespace Id", required: true);
+            EditorCommon.CreateTextInput((newValue) => editedSdkConfig.PublisherNamespace = newValue, editedSdkConfig.PublisherNamespace, "Publisher Namespace Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedClientOAuthConfig.ClientId = newValue, editedClientOAuthConfig.ClientId, "Client Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedClientOAuthConfig.ClientSecret = newValue, editedClientOAuthConfig.ClientSecret, "Client Secret");
             EditorCommon.CreateTextInput((newValue) => editedSdkConfig.AppId = newValue, editedSdkConfig.AppId, "App Id");

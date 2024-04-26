@@ -41,6 +41,7 @@ namespace AccelByte.Models
         [DataMember] public string QosManagerServerUrl = "";
         [DataMember] public string AgreementServerUrl = "";
         [DataMember] public string LeaderboardServerUrl = "";
+        [DataMember] public string InventoryServerUrl = "";
         [DataMember] public string CloudSaveServerUrl = "";
         [DataMember] public string GameTelemetryServerUrl = "";
         [DataMember] public string AchievementServerUrl = "";
@@ -108,6 +109,7 @@ namespace AccelByte.Models
                    this.AgreementServerUrl == anotherConfig.AgreementServerUrl &&
                    this.LeaderboardServerUrl == anotherConfig.LeaderboardServerUrl &&
                    this.CloudSaveServerUrl == anotherConfig.CloudSaveServerUrl &&
+                   this.InventoryServerUrl == anotherConfig.InventoryServerUrl &&
                    this.GameTelemetryServerUrl == anotherConfig.GameTelemetryServerUrl &&
                    this.AchievementServerUrl == anotherConfig.AchievementServerUrl &&
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
@@ -276,6 +278,10 @@ namespace AccelByte.Models
             {
                 ChallengeServerUrl = "";
             }
+            if (InventoryServerUrl == null)
+            {
+                InventoryServerUrl = "";
+            }
             if (RedirectUri == null)
             {
                 RedirectUri = "";
@@ -367,6 +373,8 @@ namespace AccelByte.Models
                 
                 this.ChallengeServerUrl = ExpandServiceApiUrl(this.ChallengeServerUrl, "/challenge", forceExpandServiceApiUrl);
 
+                this.InventoryServerUrl = ExpandServiceApiUrl(this.InventoryServerUrl, "/inventory", forceExpandServiceApiUrl);
+
                 this.LoginQueueServerUrl = ExpandServiceApiUrl(this.LoginQueueServerUrl, "/login-queue", forceExpandServiceApiUrl);
 
                 if (string.IsNullOrEmpty(this.ChatServerWsUrl) || forceExpandServiceApiUrl)
@@ -416,6 +424,8 @@ namespace AccelByte.Models
                 if (this.CloudSaveServerUrl == httpsBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
                 
                 if (this.ChallengeServerUrl == httpsBaseUrl + "/challenge") this.ChallengeServerUrl = null;
+
+                if (this.InventoryServerUrl == httpsBaseUrl + "/inventory") this.InventoryServerUrl = null;
 
                 if (this.GameTelemetryServerUrl == httpsBaseUrl + "/game-telemetry") this.GameTelemetryServerUrl = null;
 

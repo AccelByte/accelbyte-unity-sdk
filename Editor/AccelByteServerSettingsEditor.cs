@@ -161,7 +161,7 @@ namespace AccelByte.Editor
 
             EditorCommon.CreateTextInput((newValue) => editedServerConfig.BaseUrl = newValue, editedServerConfig.BaseUrl, "Base Url", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerConfig.RedirectUri = newValue, editedServerConfig.RedirectUri, "Redirect Uri", required: true);
-            EditorCommon.CreateTextInput((newValue) => editedServerConfig.Namespace = newValue, editedServerConfig.Namespace, "Namespace", required: true);
+            EditorCommon.CreateTextInput((newValue) => editedServerConfig.Namespace = newValue, editedServerConfig.Namespace, "Namespace Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerOAuthConfig.ClientId = newValue, editedServerOAuthConfig.ClientId, "Client Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerOAuthConfig.ClientSecret = newValue, editedServerOAuthConfig.ClientSecret, "Client Secret");
 

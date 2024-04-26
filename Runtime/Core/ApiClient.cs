@@ -197,6 +197,7 @@ namespace AccelByte.Core
         public Categories GetCategories() { return GetApi<Categories, CategoriesApi>(); }
         public IClientChallenge GetChallenge() { return GetApi<Challenge, ChallengeApi>(); }
         public Items GetItems() { return GetApi<Items, ItemsApi>(); }
+        public IClientInventory GetInventory() { return GetApi<Inventory, InventoryApi>();  }
         public Currencies GetCurrencies() { return GetApi<Currencies, CurrenciesApi>(); }
         public Orders GetOrders() { return GetApi<Orders, OrdersApi>(); }
         public Reward GetReward() { return GetApi<Reward, RewardApi>(); }
