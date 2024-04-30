@@ -306,6 +306,8 @@ namespace AccelByte.Editor
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.PlatformServerUrl = newValue, editedSdkConfig.PlatformServerUrl, "Platform Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.BasicServerUrl = newValue, editedSdkConfig.BasicServerUrl, "Basic Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.LobbyServerUrl = newValue, editedSdkConfig.LobbyServerUrl, "Lobby Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedSdkConfig.ChatServerUrl = newValue, editedSdkConfig.ChatServerUrl, "Chat Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedSdkConfig.ChatServerWsUrl = newValue, editedSdkConfig.ChatServerWsUrl, "Chat Server Websocket Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.CloudStorageServerUrl = newValue, editedSdkConfig.CloudStorageServerUrl, "Cloud Storage Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.GameProfileServerUrl = newValue, editedSdkConfig.GameProfileServerUrl, "Game Profile Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.StatisticServerUrl = newValue, editedSdkConfig.StatisticServerUrl, "Statistic Server Url", false, generateServiceUrl, indentLevel: 1);

@@ -379,7 +379,7 @@ namespace AccelByte.Models
 
                 if (string.IsNullOrEmpty(this.ChatServerWsUrl) || forceExpandServiceApiUrl)
                 {
-                    this.ChatServerWsUrl = wssBaseUrl + "/chat";
+                    this.ChatServerWsUrl = wssBaseUrl + "/chat/";
                 }
 
                 this.GdprServerUrl = ExpandServiceApiUrl(this.GdprServerUrl, "/gdpr", forceExpandServiceApiUrl);
@@ -447,9 +447,9 @@ namespace AccelByte.Models
 
                 if (this.TurnManagerServerUrl == httpsBaseUrl + "/turnmanager") this.TurnManagerServerUrl = null;
 
-                if (this.ChatServerWsUrl == wssBaseUrl + "/chat") this.ChatServerWsUrl = null;
+                if (this.ChatServerWsUrl == wssBaseUrl + "/chat/") this.ChatServerWsUrl = null;
 
-                if (this.ChatServerUrl == httpsBaseUrl + "chat") this.ChatServerUrl = null;
+                if (this.ChatServerUrl == httpsBaseUrl + "/chat") this.ChatServerUrl = null;
 
                 if (this.LoginQueueServerUrl == httpsBaseUrl + "/login-queue")
                 {

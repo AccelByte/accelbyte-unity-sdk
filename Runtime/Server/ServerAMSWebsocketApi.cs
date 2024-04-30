@@ -33,14 +33,14 @@ namespace AccelByte.Server
         private string amsWatchdogUrl;
         private string dsId = string.Empty;
 
-        public ServerAMSWebsocketApi(CoroutineRunner inCoroutineRunner, string inAMSWatchdogUrl)
+        public ServerAMSWebsocketApi(CoroutineRunner inCoroutineRunner, string inAMSWatchdogUrl, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
             amsWatchdogUrl = inAMSWatchdogUrl;
             IWebSocket webSocket = new WebSocket();
-            OverrideWebsocket(webSocket);
+            OverrideWebsocket(webSocket, inWebsocketConnectionTimeoutMs);
         }
 
         public void OverrideWebsocket(IWebSocket inWebSocket

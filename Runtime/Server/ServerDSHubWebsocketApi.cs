@@ -36,13 +36,16 @@ namespace AccelByte.Server
         private readonly string websocketUrl;
         private AccelByteWebSocket webSocket;
 
-        public ServerDSHubWebsocketApi(CoroutineRunner inCoroutineRunner, string inWebsocketUrl, ISession inSession)
+        private int websocketConnectionTimeoutMs = 60000;
+
+        public ServerDSHubWebsocketApi(CoroutineRunner inCoroutineRunner, string inWebsocketUrl, ISession inSession, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
             websocketUrl = inWebsocketUrl.Replace("https://", "wss://");
             session = inSession;
+            websocketConnectionTimeoutMs = inWebsocketConnectionTimeoutMs;
         }
 
         private void CreateWebsocket(string serverName)
@@ -194,7 +197,7 @@ namespace AccelByte.Server
         {
             if (inWs != null)
             {
-                this.webSocket = new AccelByteWebSocket(inWs);
+                this.webSocket = new AccelByteWebSocket(inWs, websocketConnectionTimeoutMs);
             }
             else
             {

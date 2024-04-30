@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.20.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.1%0D16.20.0) (2024-04-30)
+
+
+### Features
+
+* added config for custom reconnect timeout for dshub and ams ([ba44528](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ba4452890fe16ec79ad3227017e684cde5fdb8ef))
+
+
+### Bug Fixes
+
+* added missing leading/trailing slashes to config urls ([52a1087](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52a1087890a537da15ae39058163b58267837569))
+* remove nunit assert ([e5b863e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e5b863e253d51bf0dfaae4f16f1dc9b27c4878e8))
+* **WebSocket:** missing close code on websocket retry ([3481c97](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3481c97a57dc97be0df108cdb02dfb0cb8f302c7))
+
 ## [16.20.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.0%0D16.19.2) (2024-04-26)
 
 

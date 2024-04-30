@@ -254,6 +254,16 @@ namespace AccelByte.Editor
                 EditorCommon.CreateNumberInput(onCacheLifeTimeChanged, editedServerConfig.MaximumCacheLifeTime, "Cache Life Time (Seconds)", indentLevel: 1);
             }
 
+            if (EditorCommon.CreateFoldout("Websocket Configs", foldoutConfigStatus))
+            {
+                EditorCommon.CreateNumberInput((newValue) => editedServerConfig.DSHubReconnectTotalTimeout = 
+                    (int)newValue, editedServerConfig.DSHubReconnectTotalTimeout, "DS Hub Reconnect Total Timeout (ms)"
+                    , indentLevel: 1);
+                EditorCommon.CreateNumberInput((newValue) => editedServerConfig.AMSReconnectTotalTimeout = 
+                    (int)newValue, editedServerConfig.AMSReconnectTotalTimeout, "AMS Reconnect Total Timeout (ms)"
+                    , indentLevel: 1);
+            }
+
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space();

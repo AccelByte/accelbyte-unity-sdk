@@ -63,12 +63,12 @@ namespace AccelByte.Server
         /// </summary>
         public bool IsConnected => websocketApi.IsConnected;
 
-        internal ServerAMS(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.AMSServerUrl, config.AMSHeartbeatInterval, inCoroutineRunner)
+        internal ServerAMS(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.AMSServerUrl, config.AMSHeartbeatInterval, inCoroutineRunner, config.AMSReconnectTotalTimeout)
         { 
         
         }
 
-        internal ServerAMS(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner)
+        internal ServerAMS(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
 

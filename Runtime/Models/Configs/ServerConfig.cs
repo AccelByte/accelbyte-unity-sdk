@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -50,6 +50,8 @@ namespace AccelByte.Models {
         [DataMember] public string DsId;
         [DataMember] public bool EnableDebugLog = true;
         [DataMember] public string DebugLogFilter = "Verbose";
+        [DataMember] public int DSHubReconnectTotalTimeout = 60000;
+        [DataMember] public int AMSReconnectTotalTimeout = 60000;
 
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace AccelByte.Models {
             
             this.IamServerUrl = this.ExpanServiceApiUrl(this.IamServerUrl, "/iam", forceExpandServiceApiUrl);
 
-            this.DSHubServerUrl = this.ExpanServiceApiUrl(this.DSHubServerUrl, "/dshub", forceExpandServiceApiUrl);
+            this.DSHubServerUrl = this.ExpanServiceApiUrl(this.DSHubServerUrl, "/dshub/", forceExpandServiceApiUrl);
             
             this.DSMControllerServerUrl = this.ExpanServiceApiUrl(this.DSMControllerServerUrl, "/dsmcontroller", forceExpandServiceApiUrl);
 
@@ -130,7 +132,7 @@ namespace AccelByte.Models {
 
             if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
 
-            if (this.DSHubServerUrl == httpBaseUrl + "/dshub") this.DSMControllerServerUrl = null;
+            if (this.DSHubServerUrl == httpBaseUrl + "/dshub/") this.DSMControllerServerUrl = null;
             
             if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
 

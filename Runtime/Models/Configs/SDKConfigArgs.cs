@@ -77,6 +77,8 @@ namespace AccelByte.Models
         [DataMember] public string StatsDServerUrl;
         [DataMember] public int? StatsDServerPort;
         [DataMember] public int? StatsDMetricInterval;
+        [DataMember] public int? DSHubReconnectTotalTimeout;
+        [DataMember] public int? AMSReconnectTotalTimeout;
         [DataMember] public string DsId;
         [DataMember] public string ClientId;
         [DataMember] public string ClientSecret;

@@ -55,14 +55,15 @@ namespace Core
             , ISession inSession
             , IWebSocket inWebSocket
             , string inWebsocketUrl
-            , string inNamespace)
+            , string inNamespace
+            , int inWebsocketConnectionTimeoutMs = 60000)
         {
             coroutineRunner = inCoroutineRunner;
             session = inSession;
             websocketUrl = inWebsocketUrl;
             namespace_ = inNamespace;
 
-            OverrideWebsocket(inWebSocket);
+            OverrideWebsocket(inWebSocket, inTotalTimeout: inWebsocketConnectionTimeoutMs);
         }
         #endregion
         

@@ -128,7 +128,7 @@ namespace AccelByte.Api
             }
         }
 
-        public AccelByteWebSocket(IWebSocket webSocket)
+        public AccelByteWebSocket(IWebSocket webSocket, int connectionTimeoutMs = 60000)
         {
             if(webSocket == null)
             {
@@ -142,6 +142,8 @@ namespace AccelByte.Api
             this.webSocket.OnMessage += OnMessageReceived;
             this.webSocket.OnError += OnErrorReceived;
             this.webSocket.OnClose += OnCloseReceived;
+
+            totalTimeout = connectionTimeoutMs;
 
             ReconnectCustomHeaders = new Dictionary<string, string>();
         }
@@ -166,19 +168,7 @@ namespace AccelByte.Api
 
         private bool IsReconnectable(WsCloseCode code)
         {
-
-            switch (code)
-            {
-                case WsCloseCode.Abnormal:
-                case WsCloseCode.ServerError:
-                case WsCloseCode.ServiceRestart:
-                case WsCloseCode.TryAgainLater:
-                case WsCloseCode.TlsHandshakeFailure:
-                case WsCloseCode.ServerShuttingDown:  
-                    return true;
-                
-                default: return false;
-            }
+            return code <= WsCloseCode.ServerShuttingDown;
         }
 
         private Dictionary<string, string> ApplyAdditionalData(Dictionary<string, string> header)

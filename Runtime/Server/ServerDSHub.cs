@@ -74,7 +74,7 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
 
             serverDSHubWebsocketApi =
-                new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerUrl, inSession);
+                new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerUrl, inSession, inApi.ServerConfig.DSHubReconnectTotalTimeout);
 
             serverDSHubWebsocketApi.AddOnOpenHandlerListener(HandleOnOpen);
             serverDSHubWebsocketApi.AddOnCloseHandlerListener(HandleOnClose);
