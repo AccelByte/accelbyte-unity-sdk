@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using System;
@@ -218,6 +219,60 @@ namespace AccelByte.Server
                     sessionId,
                     isDsSessionReady,
                     callback));
+        }
+
+        /// <summary>
+        /// Get Member Active Session.
+        /// </summary>
+        /// <param name="userId">Targeted User ID</param>
+        /// <param name="configurationName">Session configuration name</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void GetMemberActiveSession(string userId
+            , string configurationName
+            , ResultCallback<SessionV2MemberActiveSession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            _sessionApi.GetMemberActiveSession(userId, configurationName, callback);
+        }
+
+        /// <summary>
+        /// Reconcile Max Active Session.
+        /// </summary>
+        /// <param name="userId">Targeted User ID</param>
+        /// <param name="configurationName">Session configuration name</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void ReconcileMaxActiveSession(string userId
+            , string configurationName
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            _sessionApi.ReconcileMaxActiveSession(userId, configurationName, callback);
         }
     }
 }

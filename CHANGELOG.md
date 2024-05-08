@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.20.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.2%0D16.20.1) (2024-05-08)
+
+
+### Features
+
+* **session:** expose Session Endpoints to query active session ([6bf76c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6bf76c5f5efb2830e7b9c9a02dff46c6642864a1))
+
+
+### Refactors
+
+* modify native websocket lib to return any ws close code ([25aeace](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25aeace7868d408bcb8781e943f362a37b5f072e))
+
 ### [16.20.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.1%0D16.20.0) (2024-04-30)
 
 

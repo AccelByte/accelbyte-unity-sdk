@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Xml;
 using AccelByte.Core;
 using AccelByte.Models;
@@ -287,6 +288,61 @@ namespace AccelByte.Server
             var result = response.TryParse();
 
             callback.Try(result);
+        }
+
+        public void GetMemberActiveSession(string userId
+            , string configurationName
+            , ResultCallback<SessionV2MemberActiveSession> callback)
+        {
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/memberactivesession/{userId}")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", serverConfig.Namespace)
+                .WithPathParam("name", configurationName)
+                .WithPathParam("userId", userId);
+
+            IHttpRequest request = builder.GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SessionV2MemberActiveSession>();
+                if (!result.IsError)
+                {
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    callback.TryError(result.Error);
+                };
+            });
+        }
+
+        public void ReconcileMaxActiveSession(string userId
+            , string configurationName
+            , ResultCallback callback)
+        {
+            var builder = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/reconcile")
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithPathParam("namespace", serverConfig.Namespace)
+                .WithPathParam("name", configurationName)
+                .Accepts(MediaType.ApplicationJson);
+
+            var body = new
+            {
+                UserId = userId
+            };
+
+            builder.WithBody(body.ToUtf8Json());
+            IHttpRequest request = builder.GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback.Try(result);
+            });
         }
     }
 }

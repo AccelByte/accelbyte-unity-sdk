@@ -454,6 +454,19 @@ namespace AccelByte.Models
         [DataMember(Name = "leaderID")] public string LeaderId;
     }
 
+    [DataContract, Preserve]
+    public class SessionV2MemberActiveSession
+    {
+        [DataMember(Name = "CreatedAt")] public string CreatedAt;
+        [DataMember(Name = "ID")] public string Id;
+        [DataMember(Name = "MemberID")] public string MemberId;
+        [DataMember(Name = "Namespace")] public string Namespace;
+        [DataMember(Name = "SessionIDs")] public string[] SessionIds;
+        [DataMember(Name = "SessionTemplate")] public string SessionTemplate;
+        [DataMember(Name = "Total")] public int Total;
+        [DataMember(Name = "UpdatedAt")] public DateTime UpdatedAt;
+    }
+
     #region Notification
 
     [DataContract, Preserve]
