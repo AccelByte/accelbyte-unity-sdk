@@ -52,7 +52,11 @@ namespace AccelByte.Models {
         [DataMember] public string DebugLogFilter = "Verbose";
         [DataMember] public int DSHubReconnectTotalTimeout = 60000;
         [DataMember] public int AMSReconnectTotalTimeout = 60000;
-
+        public string DSHubServerWsUrl
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         ///  Copy member values
@@ -67,12 +71,26 @@ namespace AccelByte.Models {
         /// </summary>
         public void Expand(bool forceExpandServiceApiUrl = false)
         {
-            if (this.BaseUrl == null) return;
+            if (this.BaseUrl == null)
+            {
+                return;
+            }
             
             this.IamServerUrl = this.ExpanServiceApiUrl(this.IamServerUrl, "/iam", forceExpandServiceApiUrl);
 
-            this.DSHubServerUrl = this.ExpanServiceApiUrl(this.DSHubServerUrl, "/dshub/", forceExpandServiceApiUrl);
-            
+            this.DSHubServerUrl = this.ExpanServiceApiUrl(this.DSHubServerUrl, "/dshub", forceExpandServiceApiUrl);
+
+            if (!string.IsNullOrEmpty(DSHubServerUrl))
+            {
+                if(DSHubServerUrl.EndsWith('/'))
+                {
+                    DSHubServerUrl = DSHubServerUrl.Remove(DSHubServerUrl.Length - 1);
+                }
+
+                this.DSHubServerWsUrl = DSHubServerUrl.Replace("https://", "wss://");
+                DSHubServerWsUrl += '/';
+            }
+
             this.DSMControllerServerUrl = this.ExpanServiceApiUrl(this.DSMControllerServerUrl, "/dsmcontroller", forceExpandServiceApiUrl);
 
             this.PlatformServerUrl = this.ExpanServiceApiUrl(this.PlatformServerUrl, "/platform", forceExpandServiceApiUrl);
@@ -132,7 +150,7 @@ namespace AccelByte.Models {
 
             if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
 
-            if (this.DSHubServerUrl == httpBaseUrl + "/dshub/") this.DSMControllerServerUrl = null;
+            if (this.DSHubServerUrl == httpBaseUrl + "/dshub") this.DSMControllerServerUrl = null;
             
             if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
 

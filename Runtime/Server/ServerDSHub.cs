@@ -74,7 +74,7 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
 
             serverDSHubWebsocketApi =
-                new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerUrl, inSession, inApi.ServerConfig.DSHubReconnectTotalTimeout);
+                new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerWsUrl, inSession, inApi.ServerConfig.DSHubReconnectTotalTimeout);
 
             serverDSHubWebsocketApi.AddOnOpenHandlerListener(HandleOnOpen);
             serverDSHubWebsocketApi.AddOnCloseHandlerListener(HandleOnClose);
@@ -90,6 +90,16 @@ namespace AccelByte.Server
             serverDSHubWebsocketApi.AddOnMessageHandlerListener(HandleOnMessage);
         }
 
+        internal void SetAccelByteWebsocketFactory(Func<Api.AccelByteWebSocket> websocketFactory)
+        {
+            serverDSHubWebsocketApi.SetWebsocketFactory(websocketFactory);
+        }
+
+        internal void SetAccelByteWebsocket(Api.AccelByteWebSocket inAbWebsocket)
+        {
+            serverDSHubWebsocketApi.SetCurrentWebsocket(inAbWebsocket);
+        }
+
         /// <summary>
         /// Connect to DSHub
         /// </summary>
@@ -99,7 +109,15 @@ namespace AccelByte.Server
             Report.GetFunctionLog(GetType().Name);
 
             podName = serverName;
-            serverDSHubWebsocketApi.Connect(serverName);
+
+            try
+            {
+                serverDSHubWebsocketApi.Connect(serverName);
+            }
+            catch(Exception ex)
+            {
+                AccelByteDebug.LogWarning($"DsHub connect failed.\n{ex.Message}");
+            }
         }
 
         /// <summary>
@@ -109,7 +127,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            serverDSHubWebsocketApi.Disconnect();
+            try
+            {
+                serverDSHubWebsocketApi.Disconnect();
+            }
+            catch (Exception ex)
+            {
+                AccelByteDebug.LogWarning($"DsHub disconnect failed.\n{ex.Message}");
+            }
         }
 
 

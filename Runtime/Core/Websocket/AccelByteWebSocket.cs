@@ -20,10 +20,10 @@ namespace AccelByte.Api
         internal const string GameClientVersionHeaderName = "Game-Client-Version";
         internal const string SDKVersionHeaderName = "AccelByte-SDK-Version";
 
-        protected int pingDelay = 4000;
-        protected int totalTimeout = 60000;
-        protected int backoffDelay = 1000;
-        protected int maxDelay = 30000;
+        internal int PingDelay = 4000;
+        internal int TotalTimeout = 60000;
+        internal int BackoffDelay = 1000;
+        internal int MaxDelay = 30000;
 
         protected IWebSocket webSocket;
         protected string webSocketUrl;
@@ -98,7 +98,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Get websocket connection state
         /// </summary>
-        public WsState State
+        public virtual WsState State
         {
             get
             {
@@ -143,7 +143,7 @@ namespace AccelByte.Api
             this.webSocket.OnError += OnErrorReceived;
             this.webSocket.OnClose += OnCloseReceived;
 
-            totalTimeout = connectionTimeoutMs;
+            TotalTimeout = connectionTimeoutMs;
 
             ReconnectCustomHeaders = new Dictionary<string, string>();
         }
@@ -187,7 +187,7 @@ namespace AccelByte.Api
         /// <param name="url">url of the websocket server</param>
         /// <param name="authorizationToken">user authorization token</param>
         /// <param name="sessionId">Lobby's session id header</param>
-        public void Connect(string url, string authorizationToken, string sessionId = "")
+        public virtual void Connect(string url, string authorizationToken, string sessionId = "")
         {
             Dictionary<string, string> customHeader = new Dictionary<string, string>()
             {
@@ -197,7 +197,7 @@ namespace AccelByte.Api
             Connect(url, authorizationToken, customHeader);
         }
 
-        public void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders)
+        public virtual void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders)
         {
             if(State == WsState.Connecting || State == WsState.Open)
             {
@@ -238,7 +238,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Disconnect websocket
         /// </summary>
-        public void Disconnect()
+        public virtual void Disconnect()
         {
             StopMaintainConnection();
 
@@ -262,17 +262,17 @@ namespace AccelByte.Api
                 return;
             }
 
-            this.totalTimeout = totalTimeout;
-            this.backoffDelay = backoffDelay;
-            this.maxDelay = maxDelay;
-            this.pingDelay = pingDelay;
+            this.TotalTimeout = totalTimeout;
+            this.BackoffDelay = backoffDelay;
+            this.MaxDelay = maxDelay;
+            this.PingDelay = pingDelay;
         }
 
         /// <summary>
         /// Send message to websocket server
         /// </summary>
         /// <param name="message">message to be sent</param>
-        public async void Send(string message)
+        public virtual async void Send(string message)
         {
             await RetryBackoffUtils.Run<int>(() => WebsocketSend(message));
         }
@@ -319,7 +319,7 @@ namespace AccelByte.Api
                 OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
             };
 
-            maintainer = new WebstocketMaintainer(ref webSocket, ref pingDelay, ref backoffDelay, ref maxDelay, ref totalTimeout, reconnectOnClose, OnPreReconnectAction, reconnectAction, onReconnectFailed);
+            maintainer = new WebstocketMaintainer(ref webSocket, ref PingDelay, ref BackoffDelay, ref MaxDelay, ref TotalTimeout, reconnectOnClose, OnPreReconnectAction, reconnectAction, onReconnectFailed);
         }
 
         private void StopMaintainConnection()

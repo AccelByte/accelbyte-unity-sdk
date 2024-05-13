@@ -201,6 +201,14 @@ namespace AccelByte.Editor
                     , indentLevel: 1
                 );
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.DSHubServerUrl = newValue, editedServerConfig.DSHubServerUrl, "DS Hub Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput(
+                    (newValue) => { }
+                    , defaultValue: editedServerConfig.DSHubServerWsUrl
+                    , fieldLabel: "DS Hub Server Websocket Url"
+                    , required: false
+                    , @readonly: true
+                    , indentLevel: 1
+                );
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.DSMControllerServerUrl = newValue, editedServerConfig.DSMControllerServerUrl, "DSM Controller Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.StatisticServerUrl = newValue, editedServerConfig.StatisticServerUrl, "Statistic Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.UGCServerUrl = newValue, editedServerConfig.UGCServerUrl, "UGC Server Url", false, generateServiceUrl, indentLevel: 1);

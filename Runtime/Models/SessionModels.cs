@@ -143,6 +143,14 @@ namespace AccelByte.Models
         [DataMember(Name = "storage")] public SessionV2Storage Storage;
     }
 
+    [DataContract, Preserve]
+    public class SessionV2ImpactedUserIds
+    {
+        [DataMember] public string[] InvitedUserIds;
+        [DataMember] public string[] LeftUserIds;
+        [DataMember] public string[] KickedUserIds;
+    }
+
     #endregion
 
     #region PartySession
@@ -224,6 +232,7 @@ namespace AccelByte.Models
         [DataMember] public SessionV2PartySession session;
         [DataMember] public string joinerId;
         [DataMember] public string leaderId;
+        [DataMember] public SessionV2ImpactedUserIds ImpactedUserIds;
     }    
     
     [DataContract, Preserve]
@@ -502,6 +511,7 @@ namespace AccelByte.Models
         [DataMember] public SessionV2GameSession session;
         [DataMember] public string joinerId;
         [DataMember] public string leaderId;
+        [DataMember] public SessionV2ImpactedUserIds ImpactedUserIds;
     }
 
     [DataContract, Preserve]

@@ -38,47 +38,54 @@ namespace AccelByte.Server
 
         private int websocketConnectionTimeoutMs = 60000;
 
+        private Func<AccelByteWebSocket> websocketFactory;
+
         public ServerDSHubWebsocketApi(CoroutineRunner inCoroutineRunner, string inWebsocketUrl, ISession inSession, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
             coroutineRunner = inCoroutineRunner;
-            websocketUrl = inWebsocketUrl.Replace("https://", "wss://");
+            websocketUrl = inWebsocketUrl;
             session = inSession;
             websocketConnectionTimeoutMs = inWebsocketConnectionTimeoutMs;
         }
 
-        private void CreateWebsocket(string serverName)
+        private AccelByteWebSocket CreateWebsocket()
         {
-            Dictionary<string, string> headers = new Dictionary<string, string>()
+            if(websocketFactory != null)
             {
-                { "Authorization", $"Bearer {session.AuthorizationToken}"},
-                { "X-Ab-ServerID", serverName }
-            };
-
-            SetCurrentWebsocket(new HybridWebSocket.WebSocket());
-
-            GetCurrentWebsocket().OnOpen += () =>
+                SetCurrentWebsocket(websocketFactory.Invoke());
+            }
+            else
             {
-                OnOpen?.Invoke();
-            };
+                SetCurrentWebsocket(new HybridWebSocket.WebSocket());
+            }
 
-            GetCurrentWebsocket().OnClose += code =>
+            AccelByteWebSocket retval = GetCurrentWebsocket();
+            if (retval != null)
             {
-                OnClose?.Invoke((ushort)code);
-            };
+                retval.OnOpen += () =>
+                {
+                    OnOpen?.Invoke();
+                };
 
-            GetCurrentWebsocket().OnError += msg =>
-            {
-                OnError?.Invoke(msg);
-            };
+                retval.OnClose += code =>
+                {
+                    OnClose?.Invoke((ushort)code);
+                };
 
-            GetCurrentWebsocket().OnMessage += data =>
-            {
-                OnMessage?.Invoke(data);
-            };
+                retval.OnError += msg =>
+                {
+                    OnError?.Invoke(msg);
+                };
 
-            GetCurrentWebsocket().Connect(websocketUrl, "", headers);
+                retval.OnMessage += data =>
+                {
+                    OnMessage?.Invoke(data);
+                };
+            }
+
+            return retval;
         }
 
         public void Connect(string serverName)
@@ -102,14 +109,24 @@ namespace AccelByte.Server
                             return;
                         case WsState.Closing:
                         case WsState.Closed:
-                            SetCurrentWebsocket(null);
+                            SetCurrentWebsocket(inWs: null);
                             break;
                         default:
                             throw new NativeWebSocket.WebSocketInvalidStateException("[Server DS Hub] Websocket in invalid state.");
                     }
                 }
 
-                CreateWebsocket(serverName);
+                AccelByteWebSocket newWebsocket = CreateWebsocket();
+
+                if (newWebsocket != null)
+                {
+                    Dictionary<string, string> headers = new Dictionary<string, string>()
+                    {
+                        { "Authorization", $"Bearer {session.AuthorizationToken}"},
+                        { "X-Ab-ServerID", serverName }
+                    };
+                    newWebsocket.Connect(websocketUrl, string.Empty, headers);
+                }
             }
             catch (Exception e)
             {
@@ -133,7 +150,7 @@ namespace AccelByte.Server
                 throw new NativeWebSocket.WebSocketUnexpectedException("Failed to close the connection.", e);
             }
 
-            SetCurrentWebsocket(null);
+            SetCurrentWebsocket(inWs: null);
         }
 
         public void HandleNotification<T>(T payload, ResultCallback<T> handler) where T : class, new()
@@ -146,6 +163,11 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(() => handler(Result<T>.CreateOk(payload)));
+        }
+
+        internal void SetWebsocketFactory(Func<AccelByteWebSocket> websocketFactory)
+        {
+            this.websocketFactory = websocketFactory;
         }
 
         internal virtual void AddOnOpenHandlerListener(OnOpenHandler handleOnOpen)
@@ -203,6 +225,11 @@ namespace AccelByte.Server
             {
                 this.webSocket = null;
             }
+        }
+
+        internal void SetCurrentWebsocket(AccelByteWebSocket inAbWebsocket)
+        {
+            this.webSocket = inAbWebsocket;
         }
     }
 }

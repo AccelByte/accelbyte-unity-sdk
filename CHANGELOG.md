@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.21.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.21.0%0D16.20.2) (2024-05-13)
+
+
+### Features
+
+* add dshub websocket url ([37b1cd6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/37b1cd6d52259263bdd11a90c3450b1446f0d18b))
+* add impacted user information ([b6e0c14](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b6e0c14be6863e5e3ffddc7a656dd46b1ff4b47b))
+
 ### [16.20.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.2%0D16.20.1) (2024-05-08)
 
 
