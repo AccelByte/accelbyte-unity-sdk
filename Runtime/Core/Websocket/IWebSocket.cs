@@ -36,8 +36,8 @@ namespace AccelByte.Core {
 
     public interface IWebSocket
     {
-        void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null);
-        void Connect(string url, string protocols, string sessionId, string entitlementToken = null);
+        void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null, ResultCallback callback = null);
+        void Connect(string url, string protocols, string sessionId, string entitlementToken = null, ResultCallback callback = null);
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);
 

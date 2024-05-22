@@ -20,6 +20,11 @@ namespace AccelByte.Server
         public event Action OnConnected;
 
         /// <summary>
+        /// Event triggered when there's an error when connecting to DSHub
+        /// </summary>
+        public event Action<Error> OnConnectionError;
+
+        /// <summary>
         /// Event triggered when disconnected from DSHub
         /// </summary>
         public event Action<WsCloseCode> OnDisconnected;
@@ -112,10 +117,17 @@ namespace AccelByte.Server
 
             try
             {
-                serverDSHubWebsocketApi.Connect(serverName);
+                serverDSHubWebsocketApi.Connect(serverName, result =>
+                {
+                    if (result.IsError)
+                    {
+                        OnConnectionError?.Invoke(result.Error);
+                    }
+                });
             }
             catch(Exception ex)
             {
+                OnConnectionError?.Invoke(new Error(ErrorCode.InvalidResponse, $"DsHub connect failed: {ex.Message}"));
                 AccelByteDebug.LogWarning($"DsHub connect failed.\n{ex.Message}");
             }
         }

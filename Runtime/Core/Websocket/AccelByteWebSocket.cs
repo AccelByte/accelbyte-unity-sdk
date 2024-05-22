@@ -5,7 +5,6 @@
 using AccelByte.Core;
 using AccelByte.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -41,7 +40,7 @@ namespace AccelByte.Api
         internal event Action OnPreReconnectAction;
 
         /// <summary>
-        /// Raised when websocket connection succesfully connected
+        /// Raised when websocket connection successfully connected
         /// </summary>
         public event OnOpenHandler OnOpen;
 
@@ -187,17 +186,25 @@ namespace AccelByte.Api
         /// <param name="url">url of the websocket server</param>
         /// <param name="authorizationToken">user authorization token</param>
         /// <param name="sessionId">Lobby's session id header</param>
-        public virtual void Connect(string url, string authorizationToken, string sessionId = "")
+        /// <param name="callback">A callback that will be triggered when error happens during connect</param>
+        public virtual void Connect(string url, string authorizationToken, string sessionId = "", ResultCallback callback = null)
         {
             Dictionary<string, string> customHeader = new Dictionary<string, string>()
             {
                 { LobbySessionIdHeaderName, sessionId }
             };
             
-            Connect(url, authorizationToken, customHeader);
+            Connect(url, authorizationToken, customHeader, callback);
         }
 
-        public virtual void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders)
+        /// <summary>
+        /// Establish websocket connection through assigned IWebsocket
+        /// </summary>
+        /// <param name="url">url of the websocket server</param>
+        /// <param name="authorizationToken">user authorization token</param>
+        /// <param name="customHeaders">Additional header to be sent</param>
+        /// <param name="callback">a callback that will be triggered when Connect is done</param>
+        public virtual void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders, ResultCallback callback = null)
         {
             if(State == WsState.Connecting || State == WsState.Open)
             {
@@ -225,8 +232,23 @@ namespace AccelByte.Api
 
             customHeaders = ApplyAdditionalData(customHeaders);
 
+            OnRetryAttemptFailed += (sender, e) =>
+            {
+                callback?.TryError(new Error(ErrorCode.InvalidResponse, "Reconnect attempts failed"));
+            };
+
             AccelByteDebug.LogVerbose($"Connecting websocket to {url}");
-            webSocket.Connect(url, this.authorizationToken, customHeaders);
+            webSocket.Connect(url: url, 
+                protocols: this.authorizationToken, 
+                customHeaders: customHeaders, 
+                entitlementToken: string.Empty,
+                callback: result =>
+                {
+                    if (!result.IsError)
+                    {
+                        callback?.TryOk();
+                    }
+                });
 
             // check status after connect, only maintain connection when close code is reconnectable
             if (this.closeCodeCurrent == WsCloseCode.NotSet || IsReconnectable(this.closeCodeCurrent))
@@ -348,8 +370,10 @@ namespace AccelByte.Api
             private readonly int maxDelay;
             private readonly int totalTimeout;
             bool isMaintaining = false;
+            private int currentRetryAttempt;
+            private int maxReconnectRetries;
 
-            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action setupReconnectAction, System.Action reconnectAction, System.Action onReconnectFailed)
+            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action setupReconnectAction, System.Action reconnectAction, System.Action onReconnectFailed, int maxReconnectRetries = 5)
             {
                 this.webSocket = webSocket;
                 this.pingDelay = pingDelay;
@@ -360,6 +384,8 @@ namespace AccelByte.Api
                 this.reconnectOnClose = reconnectOnClose;
                 this.reconnectAction = reconnectAction;
                 this.onReconnectFailed = onReconnectFailed;
+                this.maxReconnectRetries = maxReconnectRetries;
+                currentRetryAttempt = 0;
                 MaintainLoop();
             }
 
@@ -433,9 +459,14 @@ namespace AccelByte.Api
                                 {
                                     nextDelay = maxDelay;
                                 }
+
+                                currentRetryAttempt++;
+#if DEBUG
+                                AccelByteDebug.LogVerbose("[WS] Current retry attempt: " + currentRetryAttempt);
+#endif
                             }
 
-                            if (reconnectOnClose && webSocket.ReadyState == WsState.Closed)
+                            if ((reconnectOnClose && webSocket.ReadyState == WsState.Closed) || currentRetryAttempt >= maxReconnectRetries)
                             {
                                 onReconnectFailed?.Invoke();
                                 return;

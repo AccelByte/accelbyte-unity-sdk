@@ -33,6 +33,7 @@ namespace AccelByte.Models {
         [DataMember] public string SessionServerUrl;
         [DataMember] public string CloudSaveServerUrl;
         [DataMember] public string ChallengeServerUrl;
+        [DataMember] public string InventoryServerUrl;
         [DataMember] public string RedirectUri;
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
@@ -112,6 +113,8 @@ namespace AccelByte.Models {
             this.CloudSaveServerUrl = this.ExpanServiceApiUrl(this.CloudSaveServerUrl, "/cloudsave", forceExpandServiceApiUrl);
 
             this.ChallengeServerUrl = this.ExpanServiceApiUrl(this.ChallengeServerUrl, "/challenge", forceExpandServiceApiUrl);
+            
+            this.InventoryServerUrl = this.ExpanServiceApiUrl(this.InventoryServerUrl, "/inventory", forceExpandServiceApiUrl);
 
             this.MatchmakingServerUrl = this.ExpanServiceApiUrl(this.MatchmakingServerUrl, "/matchmaking", forceExpandServiceApiUrl);
             
@@ -172,7 +175,9 @@ namespace AccelByte.Models {
 
             if (this.CloudSaveServerUrl == httpBaseUrl + "/cloudsave") this.CloudSaveServerUrl = null;
 
-            if (this.ChallengeServerUrl == httpBaseUrl + "/challenge") this.ChallengeServerUrl= null;
+            if (this.ChallengeServerUrl == httpBaseUrl + "/challenge") this.ChallengeServerUrl = null;
+
+            if (this.InventoryServerUrl == httpBaseUrl + "/inventory") this.InventoryServerUrl = null;
 
             if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
             

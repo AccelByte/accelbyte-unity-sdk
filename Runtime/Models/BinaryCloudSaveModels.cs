@@ -1,14 +1,22 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine.Scripting;
-using AccelByte.Core;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 
 namespace AccelByte.Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum TTLConfigAction
+    {
+        None,
+        [EnumMember(Value = "DELETE")]
+        Delete,
+    }
+
     [DataContract, Preserve]
     public class SaveUserBinaryRecordRequest
     {
@@ -84,6 +92,37 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "set_by")] public string SetBy;
         [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+    }
+
+    [DataContract, Preserve]
+    public class TTLConfig
+    {
+        [DataMember(Name = "action")] public TTLConfigAction Action;
+        [DataMember(Name = "expires_at")] public DateTime ExpiresAt;
+    }
+
+    [DataContract, Preserve]
+    internal class CreateAdminGameBinaryRecordRequest
+    {
+        [DataMember(Name = "file_type")] public FileType FileType;
+        [DataMember(Name = "key")] public string Key;
+        [DataMember(Name = "set_by")] public RecordSetBy SetBy;
+        [DataMember(Name = "ttl_config")] public TTLConfig TtlConfig;
+    }
+
+    [DataContract, Preserve]
+    internal class UpdateGameBinaryRecordFileRequest
+    {
+        [DataMember(Name = "content_type")] public FileType ContentType;
+        [DataMember(Name = "file_location")] public string FileLocation;
+    }
+
+    [DataContract, Preserve]
+    internal class UpdateGameBinaryRecordMetadataRequest
+    {
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "set_by")] public RecordSetBy SetBy;
+        [DataMember(Name = "ttl_config")] public TTLConfig TtlConfig;
     }
 
     [DataContract, Preserve]

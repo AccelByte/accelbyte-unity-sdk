@@ -163,8 +163,10 @@ namespace AccelByte.Core
         public ServerGameTelemetry GetGameTelemetry() { return GetServerApi<ServerGameTelemetry, ServerGameTelemetryApi>(); }
         public ServerAchievement GetAchievement() { return GetServerApi<ServerAchievement, ServerAchievementApi>(); }
         public ServerLobby GetLobby() { return GetServerApi<ServerLobby, ServerLobbyApi>(); }
+        public IServerBinaryCloudSave GetBinaryCloudSave() { return GetServerApi<ServerBinaryCloudSave, ServerBinaryCloudSaveApi>(); }
         public ServerCloudSave GetCloudSave() { return GetServerApi<ServerCloudSave, ServerCloudSaveApi>(); }
         public IServerChallenge GetChallenge() { return GetServerApi<ServerChallenge, ServerChallengeApi>(); }
+        public IServerInventory GetInventory() { return GetServerApi<ServerInventory, ServerInventoryApi>(); }
         public ServerMatchmaking GetMatchmaking() { return GetServerApi<ServerMatchmaking, ServerMatchmakingApi>(); }
         public ServerUserAccount GetUserAccount() { return GetServerApi<ServerUserAccount, ServerUserAccountApi>(); }
         public ServerSeasonPass GetSeasonPass() { return GetServerApi<ServerSeasonPass, ServerSeasonPassApi>(); }

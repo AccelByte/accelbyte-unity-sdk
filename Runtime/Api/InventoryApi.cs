@@ -111,7 +111,7 @@ namespace AccelByte.Api
             }
 
             var builder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/" +
-                "inventories/{inventoryId}/items/consume")
+                "inventories/{inventoryId}/consume")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)

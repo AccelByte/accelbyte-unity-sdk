@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,6 +14,8 @@ namespace AccelByte.Api
 {
     public class EntitlementApi : ApiBase
     {
+        protected HttpOperator httpOperator;
+
         /// <summary>
         /// </summary>
         /// <param name="httpClient"></param>
@@ -25,6 +27,7 @@ namespace AccelByte.Api
             , ISession session ) 
             : base( httpClient, config, config.PlatformServerUrl, session )
         {
+            this.httpOperator = httpOperator != null ? httpOperator : new HttpAsyncOperator(httpClient);
         }
 
         public IEnumerator QueryUserEntitlements(string userId
@@ -1015,6 +1018,30 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SyncEpicGamesInventoryResponse[]>();
             callback.Try(result);
+        }
+
+        public void GetDlcDurableRewardSimpleMap(string platformType, ResultCallback<DlcConfigRewardShortInfo> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, platformType);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/dlc/rewards/durable/map")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("dlcType", platformType.ToUpper())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+
+            httpOperator.SendRequest(request, response => 
+            {
+                var result = response.TryParseJson<DlcConfigRewardShortInfo>();
+                callback?.Try(result);
+            });
         }
     }
 }

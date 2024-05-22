@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -215,46 +215,54 @@ namespace AccelByte.Api
             , ResultCallback<OrderPagingSlicedResult> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(Namespace_))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId
+                , userOrderRequest
+                , userAccessToken
+                , Namespace_);
+
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userAccessToken))
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (userOrderRequest == null)
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userOrderRequest) + " cannot be null"));
-                yield break;
-            }
-            if (userOrderRequest.Status == OrderStatus.NONE)
-            {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be OrderStatus.NONE"));
+                callback?.TryError(error);
                 yield break;
             }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(userAccessToken)
-                .WithQueryParam("itemId", userOrderRequest.ItemId)
-                .WithQueryParam("status", userOrderRequest.Status.ToString())
-                .WithQueryParam("offset", userOrderRequest.Offset.ToString())
-                .WithQueryParam("limit", userOrderRequest.Limit.ToString())
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult(); 
+                .Accepts(MediaType.ApplicationJson);
+            
+            if (userOrderRequest.ItemId != null)
+            {
+                builder.WithQueryParam("itemId", userOrderRequest.ItemId);
+            }
+
+            if (userOrderRequest.Status != OrderStatus.NONE)
+            {
+                builder.WithQueryParam("status", userOrderRequest.Status.ToString());
+            }
+
+            if (userOrderRequest.Offset != 0)
+            {
+                builder.WithQueryParam("offset", userOrderRequest.Offset.ToString());
+            }
+
+            if (userOrderRequest.Limit != 0)
+            {
+                builder.WithQueryParam("limit", userOrderRequest.Limit.ToString());
+            }
+
+            var request = builder.GetResult(); 
             IHttpResponse response = null;
 
             yield return HttpClient.SendRequest(request, 
                 rsp => response = rsp);
 
             var result = response.TryParseJson<OrderPagingSlicedResult>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserOrderHistory( string userId
@@ -301,6 +309,60 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderHistoryInfo[]>();
             callback.Try(result);
+        }
+
+        internal void PreviewOrderPriceWithDiscountCode(string itemId
+            , int quantity
+            , int price
+            , int discountedPrice
+            , string currencyCode
+            , string[] discountCodes
+            , ResultCallback<OrderDiscountPreviewResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(itemId
+                , Namespace_
+                , AuthToken
+                , Session.UserId);
+            
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var previewRequest = new OrderDiscountPreviewRequest()
+            {
+                ItemId = itemId,
+                Quantity = quantity,
+                Price = price,
+                DiscountedPrice = discountedPrice,
+                CurrencyCode = currencyCode,
+                DiscountCodes = (string[])discountCodes
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/orders/discount/preview")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .WithJsonBody(previewRequest)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<OrderDiscountPreviewResponse>();
+
+                if (result.IsError)
+                {
+                    callback?.TryError(result.Error);
+                    return;
+                }
+
+                callback?.TryOk(result.Value);
+            });
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using System.Collections.Generic;
 using AccelByte.Core;
@@ -284,6 +285,42 @@ namespace AccelByte.Api
                     session.AuthorizationToken,
                     userOrderRequest,
                     callback));
+        }
+
+        /// <summary>
+        /// Preview order price with discount code, this api is used to auto calc order price with discount code.
+        /// Notes: this api don't do full order validation, only check discount code and calc final order price.
+        /// </summary>
+        /// <param name="itemId">Item id</param>
+        /// <param name="quantity">Item quantity</param>
+        /// <param name="price">Item price</param>
+        /// <param name="discountedPrice">Item discounted price</param>
+        /// <param name="currencyCode">Currency code</param>
+        /// <param name="discountCodes">List of discount code to apply</param>
+        /// <param name="callback">Returns a Result that contains OrderDiscountPreviewResponse via callback when completed.</param>
+        public void PreviewOrderPriceWithDiscountCode(string itemId
+            , int quantity
+            , int price
+            , int discountedPrice
+            , string currencyCode
+            , string[] discountCodes
+            , ResultCallback<OrderDiscountPreviewResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.PreviewOrderPriceWithDiscountCode(itemId
+                , quantity
+                , price
+                , discountedPrice
+                , currencyCode
+                , discountCodes
+                , callback);
         }
 
         #region PredefinedEvents

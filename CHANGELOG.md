@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.22.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.0%0D16.21.0) (2024-05-22)
+
+
+### Features
+
+* add connect failed warning callback ([927fc5c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/927fc5c4c6f705e19dfcca3e9ebd64e2c4885fcb))
+* add get dlc mapping endpoint ([0ce64aa](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0ce64aafa639ae5abd210e64a7f005ea087040a5))
+* add more error codes ([aa0b91c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa0b91cfaad6ef0afa427b3369d8f5274d18c68a))
+* **BinaryCloudSave:** add server binary cloudsave interface ([7f4b77f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f4b77fcbb33eed730217964a4d4b5b0ef87a808))
+* **Order:** discount code redemption order preview order price with discount code API ([f648016](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f64801660beb01e32294dbfc69a4a554e4e94257))
+* server inventory service and api implementation ([e863966](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8639664df8a7b5cb89f04886faa1c66e6e7a407))
+
+
+### Bug Fixes
+
+* broken revoke token endpoint ([8eb68a7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8eb68a750b3a2336d86fb3df071a55414890a4b4))
+* fix websocket implementation on webgl build ([4d40f7f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d40f7f0b0589c8c55c84091302e4d293912b147))
+
 ## [16.21.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.21.0%0D16.20.2) (2024-05-13)
 
 

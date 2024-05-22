@@ -450,7 +450,7 @@ namespace AccelByte.Models
         [DataMember] public ItemRecurring recurring;
         [DataMember] public RegionDataItem regionDataItem;
         [DataMember] public string[] itemIds;
-        [DataMember] public string itemQty;
+        [DataMember] public Dictionary<string, int> itemQty;
         [DataMember] public string[] features;
         [DataMember] public int maxCountPerUser;
         [DataMember] public int maxCount;
@@ -858,6 +858,33 @@ namespace AccelByte.Models
 
     #region Orders
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum OrderDeductionType
+    {
+        None,
+        [EnumMember(Value = "DISCOUNT_CODE")]
+        DiscountCode,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum OrderDiscountType
+    {
+        None,
+        [EnumMember(Value = "AMOUNT")]
+        Amount,
+        [EnumMember(Value = "PERCENTAGE")]
+        Percentage,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum OrderRestrictType
+    {
+        [EnumMember(Value = "NONE")]
+        None,
+        [EnumMember(Value = "ITEMS_AND_CATEGORIES")]
+        ItemsAndCategories,
+    }
+
     [DataContract, Preserve]
     public class PaymentUrl
     {
@@ -901,6 +928,61 @@ namespace AccelByte.Models
         [DataMember(Name = "quantity")] public int Quantity;
         [DataMember(Name = "purchased")] public bool Purchased; 
     }
+    
+    [DataContract, Preserve]
+    public class OrderDiscountItem
+    {
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "itemName")] public string ItemName;
+    }
+    
+    [DataContract, Preserve]
+    public class OrderDiscountCategory
+    {
+        [DataMember(Name = "categoryPath")] public string CategoryPath;
+        [DataMember(Name = "includeSubCategories")] public bool IncludeSubCategories;
+    }
+    
+    [DataContract, Preserve]
+    public class OrderDiscountConfig
+    {
+        [DataMember(Name = "currencyNamespace")] public string CurrencyNamespace;
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+        [DataMember(Name = "discountType")] public OrderDiscountType DiscountType;
+        [DataMember(Name = "discountPercentage")] public int DiscountPercentage;
+        [DataMember(Name = "discountAmount")] public int DiscountAmount;
+        [DataMember(Name = "stackable")] public bool Stackable;
+        [DataMember(Name = "restrictType")] public OrderRestrictType RestrictType;
+        [DataMember(Name = "items")] public OrderDiscountItem[] Items;
+        [DataMember(Name = "categories")] public OrderDiscountCategory[] Categories;
+    }
+    
+    [DataContract, Preserve]
+    public class OrderDiscountCodeInfo
+    {
+        [DataMember(Name = "code")] public string Code;
+        [DataMember(Name = "campaignId")] public string CampaignId;
+        [DataMember(Name = "campaignName")] public string CampaignName;
+        [DataMember(Name = "deduction")] public int Deduction;
+        [DataMember(Name = "discountConfig")] public OrderDiscountConfig DiscountConfig;
+    }
+    
+    [DataContract, Preserve]
+    public class OrderDiscountCodeDeductionDetail
+    {
+        [DataMember(Name = "totalDeduction")] public int TotalDeduction;
+        [DataMember(Name = "totalPercentageDeduction")] public int TotalPercentageDeduction;
+        [DataMember(Name = "totalAmountDeduction")] public int TotalAmountDeduction;
+        [DataMember(Name = "discountPercentageCodes")] public OrderDiscountCodeInfo[] DiscountPercentageCodes;
+        [DataMember(Name = "discountAmountCodes")] public OrderDiscountCodeInfo[] DiscountAmountCodes;
+    }
+    
+    [DataContract, Preserve]
+    public class OrderDeductionDetail
+    {
+        [DataMember(Name = "deductionType")] public OrderDeductionType DeductionType;
+        [DataMember(Name = "discountCodeDeductionDetail")] public OrderDiscountCodeDeductionDetail DiscountCodeDeductionDetail;
+    }
 
     [DataContract, Preserve]
     public class OrderInfo
@@ -941,6 +1023,8 @@ namespace AccelByte.Models
         [DataMember(Name = "orderBundleItemInfos")] public OrderBundleItemInfo[] OrderBundleItemInfos;
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
+        [DataMember(Name = "deduction")] public int Deduction;
+        [DataMember(Name = "deductionDetails")] public OrderDeductionDetail[] DeductionDetails;
     }
 
     [DataContract, Preserve]
@@ -962,6 +1046,30 @@ namespace AccelByte.Models
         [DataMember] public string language;
         [DataMember] public string returnUrl;
         [DataMember(Name = "sectionId")] public string SectionId;
+        [DataMember(Name = "discountCodes")] public string[] DiscountCodes;
+    }
+
+    [DataContract, Preserve]
+    public class OrderDiscountPreviewRequest
+    {
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "quantity")] public int Quantity;
+        [DataMember(Name = "price")] public int Price;
+        [DataMember(Name = "discountedPrice")] public int DiscountedPrice;
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+        [DataMember(Name = "discountCodes")] public string[] DiscountCodes;
+    }
+
+    [DataContract, Preserve]
+    public class OrderDiscountPreviewResponse
+    {
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "quantity")] public int Quantity;
+        [DataMember(Name = "price")] public int Price;
+        [DataMember(Name = "discountedPrice")] public int DiscountedPrice;
+        [DataMember(Name = "deduction")] public int Deduction;
+        [DataMember(Name = "deductionDetails")] public OrderDeductionDetail[] DeductionDetails;
+        [DataMember(Name = "finalPrice")] public int FinalPrice;
     }
 
     [DataContract, Preserve]
@@ -1272,6 +1380,13 @@ namespace AccelByte.Models
         [DataMember(Name = "status")] public EntitlementIAPOrderStatus Status;
     }
 
+    [DataContract, Preserve]
+    public class DlcConfigRewardShortInfo
+    {
+        [DataMember(Name = "dlcType")] public string DlcType;
+        [DataMember(Name = "data")] public Dictionary<string, object> Data;
+    }
+
     #endregion
 
     #region Fulfillment
@@ -1493,6 +1608,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class UserOrdersRequest
     {
+        [DataMember] public bool Discounted;
         [DataMember] public string ItemId;
         [DataMember] public OrderStatus Status = OrderStatus.INIT;
         [DataMember] public int Offset = 0;

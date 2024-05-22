@@ -88,7 +88,7 @@ namespace AccelByte.Server
             return retval;
         }
 
-        public void Connect(string serverName)
+        public void Connect(string serverName, ResultCallback callback = null)
         {
             if (!session.IsValid())
             {
@@ -125,7 +125,7 @@ namespace AccelByte.Server
                         { "Authorization", $"Bearer {session.AuthorizationToken}"},
                         { "X-Ab-ServerID", serverName }
                     };
-                    newWebsocket.Connect(websocketUrl, string.Empty, headers);
+                    newWebsocket.Connect(websocketUrl, string.Empty, headers, callback);
                 }
             }
             catch (Exception e)

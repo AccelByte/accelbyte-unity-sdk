@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -957,5 +957,77 @@ namespace AccelByte.Api
                     callback
                 ));
         }
+
+        /// <summary>
+        /// Get any "Durable" DLC type from a specific namespace
+        /// It will not get "Consumables"
+        /// </summary>
+        /// <param name="platformType">Target platform to be queried</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetDlcDurableRewardSimpleMap(PlatformType platformType, ResultCallback<DlcConfigRewardShortInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            string targetPlatform = ConvertActivePlatformToGetDlcDurableReward(platformType);
+
+            if (string.IsNullOrEmpty(targetPlatform))
+            {
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Available Platforms: STEAM, EPICGAMES, OCULUS, PS4, PS5, LIVE"));
+                return;
+            }
+
+            GetDlcDurableRewardSimpleMap(targetPlatform, callback);
+        }
+
+        /// <summary>
+        /// Get any "Durable" DLC type from a specific namespace
+        /// It will not get "Consumables"
+        /// </summary>
+        /// <param name="platformTypeId">Target platform to be queried</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetDlcDurableRewardSimpleMap(string platformTypeId, ResultCallback<DlcConfigRewardShortInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(platformTypeId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            api.GetDlcDurableRewardSimpleMap(platformTypeId, callback);
+        }
+
+        #region Utils
+        static public string ConvertActivePlatformToGetDlcDurableReward(PlatformType platformType)
+        {
+            string targetPlatform = string.Empty;
+            switch (platformType)
+            {
+                case PlatformType.Steam:
+                case PlatformType.EpicGames:
+                case PlatformType.Oculus:
+                    targetPlatform = platformType.ToString().ToUpper();
+                    break;
+                case PlatformType.PS4:
+                case PlatformType.PS5:
+                    targetPlatform = "PSN";
+                    break;
+                case PlatformType.Live:
+                    targetPlatform = "XBOX";
+                    break;
+                default:
+                    break;
+            }
+
+            return targetPlatform;
+        }
+        #endregion
     }
 }
