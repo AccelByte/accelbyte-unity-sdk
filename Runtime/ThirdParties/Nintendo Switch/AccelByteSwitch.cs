@@ -31,48 +31,20 @@ namespace AccelByte.ThirdParties.NintendoSwitch
         private static ISwitchImp defaultWrapper;
 
         /// <summary>
-        /// Get Switch user access token
-        /// </summary>
-        public static Models.AccelByteResult<GetSwitchTokenResult, Core.Error> GetAccelBytePlatformLoginToken()
-        {
-            return Wrapper.GetNsaToken();
-        }
-
-        /// <summary>
         /// Initialize AccelByte Switch SDK
         /// </summary>
         /// <param name="mountName">Mount name</param>
         public static Models.AccelByteResult<Core.Error> Initialize(string mountName)
         {
-            return Initialize(mountName, handleOnExit: true);
+            return Wrapper.Initialize(mountName);
         }
 
         /// <summary>
-        /// Initialize AccelByte Switch SDK
+        /// Get Switch user access token
         /// </summary>
-        /// <param name="mountName">Mount name</param>
-        /// <param name="handleOnExit">Give permission to AccelByte SDK to handle Switch exit notification</param>
-        public static Models.AccelByteResult<Core.Error> Initialize(string mountName, bool handleOnExit)
+        public static Models.AccelByteResult<GetSwitchTokenResult, Core.Error> GetAccelBytePlatformLoginToken(string userHandle)
         {
-            return Wrapper.Initialize(mountName, handleOnExit);
-        }
-
-        /// <summary>
-        /// Mount switch storage
-        /// </summary>
-        /// <param name="mountName">Mount Name</param>
-        public static Models.AccelByteResult<Core.Error> MountStorage(string mountName)
-        {
-            return Wrapper.MountStorage(mountName);
-        }
-
-        /// <summary>
-        /// Unmount switch storage
-        /// </summary>
-        /// <param name="mountName">Mount Name</param>
-        public static Models.AccelByteResult<Core.Error> UnmountStorage(string mountName)
-        {
-            return Wrapper.UnmountStorage(mountName);
+            return Wrapper.GetNsaToken(userHandle);
         }
 
         /// <summary>

@@ -6,5 +6,6 @@ namespace AccelByte.ThirdParties.NintendoSwitch
     public class GetSwitchTokenResult
     {
         public string AccelByteLoginToken;
+        public string NetworkServiceAccountId;
     }
 }

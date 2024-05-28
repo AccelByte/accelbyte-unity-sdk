@@ -8,6 +8,7 @@ namespace AccelByte.Core
     {
         public IFileStream CreateFileStream()
         {
+            AccelByteDebug.LogVerbose("Create AccelByte Default FileStream");
 #if UNITY_SWITCH && !UNITY_EDITOR
             var retval = new NullFileStream();
 #else

@@ -13,6 +13,8 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSwitch")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKAndroid")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.gametest")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
 namespace AccelByte.Core
 {
 #if !UNITY_EDITOR && UNITY_STANDALONE_WIN

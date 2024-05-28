@@ -12,6 +12,13 @@ namespace AccelByte.ThirdParties.NintendoSwitch
             return result;
         }
 
+        public Models.AccelByteResult<GetSwitchTokenResult, Core.Error> GetNsaToken(string userHandle)
+        {
+            var result = new Models.AccelByteResult<GetSwitchTokenResult, Core.Error>();
+            result.Reject(new Core.Error(Core.ErrorCode.NotImplemented, "AccelByte Switch Extension is not installed. Please contact AccelByte support."));
+            return result;
+        }
+        
         public Models.AccelByteResult<Core.Error> HandleGameExit()
         {
             var result = new Models.AccelByteResult<Core.Error>();
@@ -21,7 +28,9 @@ namespace AccelByte.ThirdParties.NintendoSwitch
 
         public Models.AccelByteResult<Core.Error> Initialize(string mountName)
         {
-            return Initialize(mountName, false);
+            var result = new Models.AccelByteResult<Core.Error>();
+            result.Reject(new Core.Error(Core.ErrorCode.NotImplemented, "AccelByte Switch Extension is not installed. Please contact AccelByte support."));
+            return result;
         }
 
         public Models.AccelByteResult<Core.Error> Initialize(string mountName, bool autoHandleOnExit)
@@ -31,14 +40,14 @@ namespace AccelByte.ThirdParties.NintendoSwitch
             return result;
         }
 
-        public Models.AccelByteResult<Core.Error> MountStorage(string mountName)
+        public Models.AccelByteResult<Core.Error> SaveCacheFiles()
         {
             var result = new Models.AccelByteResult<Core.Error>();
             result.Reject(new Core.Error(Core.ErrorCode.NotImplemented, "AccelByte Switch Extension is not installed. Please contact AccelByte support."));
             return result;
         }
-
-        public Models.AccelByteResult<Core.Error> SaveCacheFiles()
+        
+        public Models.AccelByteResult<Core.Error> MountStorage(string mountName)
         {
             var result = new Models.AccelByteResult<Core.Error>();
             result.Reject(new Core.Error(Core.ErrorCode.NotImplemented, "AccelByte Switch Extension is not installed. Please contact AccelByte support."));

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.22.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.1%0D16.22.0) (2024-05-28)
+
+
+### Refactors
+
+* deprecate few nintendo switch interfaces ([790ac15](https://github.com/AccelByte/accelbyte-unity-sdk/commits/790ac15c1683bcbdf6c26c66c503ed97e2a0f6ca))
+
 ## [16.22.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.0%0D16.21.0) (2024-05-22)
 
 
