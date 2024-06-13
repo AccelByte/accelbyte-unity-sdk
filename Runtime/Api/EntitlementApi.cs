@@ -41,32 +41,72 @@ namespace AccelByte.Api
             , ResultCallback<EntitlementPagingSlicedResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get user entitlements! Namespace_ from parent  is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user entitlements! AccessToken from parent is null!");
-            Assert.IsNotNull(userId, "Can't get user entitlements! UserId parameter is null!");
 
-            var request = HttpRequestBuilder
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback.TryError(error);
+                yield break;
+            }
+
+            var httpBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithQueryParam("entitlementClazz", 
-                    (entitlementClazz == EntitlementClazz.NONE) ? "" : entitlementClazz.ToString())
-                .WithQueryParam("entitlementAppType", 
-                    (entitlementAppType == EntitlementAppType.NONE) ? "" : entitlementAppType.ToString())
-                .WithQueryParam("entitlementName", entitlementName)
-                .WithQueryParam("itemId", itemId) 
-                .WithQueryParam("features", features == null ? new string[] { } : features)
-                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
-                .WithQueryParam("limit", (limit >= 0)? limit.ToString() : "")
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
+            if (offset >= 0)
+            {
+                httpBuilder.WithQueryParam("offset", offset.ToString());
+            }
+            else
+            {
+                httpBuilder.WithQueryParam("offset", "0");
+            }
+
+            if (limit >= 0)
+            {
+                httpBuilder.WithQueryParam("limit", limit.ToString());
+            }
+            else
+            {
+                httpBuilder.WithQueryParam("limit", "20");
+            }
+
+            if (features != null && features.Length > 0)
+            {
+                httpBuilder.WithQueryParam("features", features);
+            }
+
+            if (entitlementClazz != EntitlementClazz.NONE)
+            {
+                httpBuilder.WithQueryParam("entitlementClazz", entitlementClazz.ToString());
+            }
+
+            if (entitlementAppType != EntitlementAppType.NONE)
+            {
+                httpBuilder.WithQueryParam("entitlementAppType", entitlementAppType.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(entitlementName))
+            {
+                httpBuilder.WithQueryParam("entitlementName", entitlementName);
+            }
+
+            if (!string.IsNullOrEmpty(itemId))
+            {
+                httpBuilder.WithQueryParam("itemId", itemId);
+            }
+
+            IHttpRequest request = httpBuilder.GetResult();
             IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            yield return HttpClient.SendRequest(request, result =>
+            {
+                response = result;
+            });
 
             var result = response.TryParseJson<EntitlementPagingSlicedResult>();
             callback.Try(result);

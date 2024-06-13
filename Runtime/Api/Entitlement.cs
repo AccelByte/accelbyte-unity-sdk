@@ -63,22 +63,16 @@ namespace AccelByte.Api
         /// <param name="entitlementClazz">Class of the entitlement (optional)</param>
         /// <param name="entitlementAppType">This is the type of application that entitled (optional)</param>
         /// <param name="features">The feature array</param>
-        public void QueryUserEntitlements(string entitlementName
-            , string itemId
-            , int offset
-            , int limit
-            , ResultCallback<EntitlementPagingSlicedResult> callback
+        public void QueryUserEntitlements(string entitlementName = null
+            , string itemId = null
+            , int offset = 0
+            , int limit = 20
+            , ResultCallback<EntitlementPagingSlicedResult> callback = null
             , EntitlementClazz entitlementClazz = EntitlementClazz.NONE
             , EntitlementAppType entitlementAppType = EntitlementAppType.NONE
             , string[] features = null)
         {
             Report.GetFunctionLog(GetType().Name);
-            var error = ApiHelperUtils.CheckForNullOrEmpty(entitlementName, itemId);
-            if (error != null)
-            {
-                callback.TryError(error);
-                return;
-            }
 
             if (!session.IsValid())
             {

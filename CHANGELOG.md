@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.22.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.2%0D16.22.1) (2024-06-13)
+
+
+### Bug Fixes
+
+* skip check null value for optional parameter in Entitlement ([e8dd1d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8dd1d78793e2cddcd40c07e1588ef027f8f711e))
+
 ### [16.22.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.1%0D16.22.0) (2024-05-28)
 
 
