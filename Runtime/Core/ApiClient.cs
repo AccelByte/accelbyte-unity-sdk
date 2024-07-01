@@ -82,6 +82,8 @@ namespace AccelByte.Core
             {
                 session.ClearSession();
             }
+
+            sharedMemory.MessagingSystem.UnsubscribeAll();
         }
         
         /// <summary>

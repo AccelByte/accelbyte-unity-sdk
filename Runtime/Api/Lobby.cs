@@ -1,20 +1,18 @@
 // Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
-using AccelByte.Server;
 using UnityEngine;
 using UnityEngine.Assertions;
-using HybridWebSocket;
 using Newtonsoft.Json;
 using Random = System.Random;
+using Core.Websocket;
 
 namespace AccelByte.Api
 {
@@ -281,6 +279,9 @@ namespace AccelByte.Api
         private readonly UserSession session;
         private readonly CoroutineRunner coroutineRunner;
 
+        private AccelByteMessagingSystem messagingSystem;
+        private AccelByteNotificationBuffer notificationBuffer;
+
         private int backoffDelay;
         
         private bool reconnectsOnBans;
@@ -313,12 +314,17 @@ namespace AccelByte.Api
 
             websocketSerializer = new Utils.AwesomeFormat();
 
-            IWebSocket webSocket = new WebSocket();
+            IWebSocket webSocket = new NativeWebSocketWrapper();
             websocketApi = new LobbyWebsocketApi(coroutineRunner, api.GetConfig().LobbyServerUrl, webSocket, session, api.GetConfig().Namespace);
             
             websocketApi.OnOpen += HandleOnOpen;
-            websocketApi.OnMessage += HandleOnMessage;
+            websocketApi.OnMessage += message =>
+            {
+                HandleOnMessage(message, false);
+            };
             websocketApi.OnClose += HandleOnClose;
+
+            notificationBuffer = new AccelByteNotificationBuffer();
 
             OverrideWebsocket(webSocket);
         }
@@ -414,6 +420,31 @@ namespace AccelByte.Api
                 UserRegion = region;
                 callback.TryOk();
             });
+        }
+
+        /// <summary>
+        /// Get list of notifications from user from specified time.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="startTime">Start time to filter notifications from</param>
+        /// <param name="endTime">End time to filter notifications to</param>
+        /// <param name="offset">Offset of result array value. Default value is 0.</param>
+        /// <param name="limit">Offset of result array value. Default value is 25.</param>
+        public void GetNotifications(ResultCallback<GetUserNotificationsResponse> callback
+            , DateTime startTime = default
+            , DateTime endTime = default
+            , int offset = 0
+            , int limit = 25)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetNotifications(callback, startTime, endTime, offset, limit);
         }
 
         #region Party
@@ -1762,17 +1793,15 @@ namespace AccelByte.Api
 #if DEBUG
             AccelByteDebug.LogVerbose("[WS] Connection open");
 #endif
-            Action handler = Connected;
-
-            if (handler != null)
-            {
-                handler();
-            }
+            Connected?.Invoke();
 
             if (session != null)
             {
                 session.RefreshTokenCallback += LoginSession_RefreshTokenCallback;
             }
+
+            messagingSystem?.SendMessage(AccelByteMessagingTopic.LobbyConnected);
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
         }
 
         private void LoginSession_RefreshTokenCallback(string accessToken)
@@ -1810,6 +1839,8 @@ namespace AccelByte.Api
 
             Disconnected?.Invoke(code);
 
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
+
             if (reconnectsOnBans)
             {
                 reconnectsOnBans = false;
@@ -1828,7 +1859,99 @@ namespace AccelByte.Api
             Connect();
         }
 
-        private void HandleOnMessage(string message)
+        private void SendBufferedNotifications()
+        {
+            var bufferedNotifications = notificationBuffer.GetSortedBuffer();
+            messagingSystem?.SendMessage(AccelByteMessagingTopic.NotificationBufferSent, bufferedNotifications.ToJsonString());
+            notificationBuffer.Clear();
+
+            foreach (var notification in bufferedNotifications)
+            {
+                string lobbyMessage = null;
+
+                switch (Enum.Parse(typeof(MessageType), notification.Type))
+                {
+                    case MessageType.connectNotif:
+                        lobbyMessage = 
+                            AccelByteNotificationSenderUtility.ComposeConnectedNotification(
+                                notification.LobbySessionId
+                                , notification.LoginType
+                                , notification.ReconnectFromCode);
+                        break;
+                    case MessageType.messageNotif:
+                        lobbyMessage =
+                            AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                                notification.Topic
+                                , notification.Payload);
+                        break;
+                    case MessageType.messageSessionNotif:
+                        lobbyMessage =
+                            AccelByteNotificationSenderUtility.ComposeSessionNotification(
+                                notification.Topic
+                                , notification.Payload);
+                        break;
+                }
+
+                if (string.IsNullOrEmpty(lobbyMessage))
+                {
+                    continue;
+                }
+
+                HandleOnMessage(lobbyMessage, true);
+            }
+        }
+
+        private bool TryBufferNotification(string parsedJsonString)
+        {
+            if (notificationBuffer == null)
+            {
+                return false;
+            }
+
+            UserNotification receivedNotification = null;
+            try
+            {
+                receivedNotification = parsedJsonString.ToObject<UserNotification>();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            if (receivedNotification == null)
+            {
+                return false;
+            }
+
+            if (notificationBuffer.IsBuffering)
+            {
+                return notificationBuffer.TryAddBuffer(receivedNotification);
+            }
+
+            if (notificationBuffer.TryAddBuffer(receivedNotification))
+            {
+                AccelByteDebug.LogWarning($"Missing notification(s) detected, received:\n" +
+                    $"{parsedJsonString}");
+
+                GetNotifications(OnGetMissingNotification);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void OnGetMissingNotification(Result<GetUserNotificationsResponse> missingNotifications)
+        {
+            if (!missingNotifications.IsError)
+            {
+                notificationBuffer.TryAddMissingNotifications(missingNotifications.Value.Notifications);
+            }
+
+            SendBufferedNotifications();
+        }
+
+        private void HandleOnMessage(string message, bool isSkipConditioner = false)
         {
             Report.GetWebSocketResponse(message);
 
@@ -1837,10 +1960,18 @@ namespace AccelByte.Api
             ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
 
             string lobbyNotification = messageType.ToString();
-            if (SharedMemory.NetworkConditioner != null 
+            if (!isSkipConditioner
+                && SharedMemory.NetworkConditioner != null 
                 && SharedMemory.NetworkConditioner.CalculateFailRate(lobbyNotification))
             {
                 AccelByteDebug.Log($"[AccelByteNetworkConditioner] Dropped lobby notification {lobbyNotification}.");
+                return;
+            }
+
+            websocketSerializer.ReadPayload(message, out Notification userNotif);
+
+            if (TryBufferNotification(userNotif.ToJsonString()))
+            {
                 return;
             }
 
@@ -2157,14 +2288,33 @@ namespace AccelByte.Api
             }
         }
 
-        private void HandleOnClosestRegionChanged(string newRegion)
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
         {
-            if (string.IsNullOrEmpty(newRegion))
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
+            base.SetSharedMemory(newSharedMemory);
+
+            messagingSystem = newSharedMemory.MessagingSystem;
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
+        }
+
+        private void OnReceivedQosLatenciesUpdatedHandle(string payload)
+        {
+            if (!IsConnected || string.IsNullOrEmpty(payload))
             {
                 return;
             }
 
-            ChangeUserRegion(newRegion, result => {});
+            ChangeUserRegion(payload, null);
+        }
+
+        private void OnNotificationSenderMessageReceivedHandle(string payload)
+        {
+            if (!IsConnected || string.IsNullOrEmpty(payload))
+            {
+                return;
+            }
+
+            HandleOnMessage(payload, true);
         }
 
         #region PredefinedEvents
@@ -2321,29 +2471,6 @@ namespace AccelByte.Api
             }
 
             return payload;
-        }
-
-        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
-        {
-            base.SetSharedMemory(newSharedMemory);
-            Connected += () =>
-            {
-                SharedMemory.LobbyConnected = true;
-            };
-
-            Disconnected += (WsCloseCode) =>
-            {
-                SharedMemory.LobbyConnected = false;
-            };
-            SharedMemory.OnClosestRegionChanged += HandleOnClosestRegionChanged;
-
-            if (!string.IsNullOrEmpty(SharedMemory.ClosestRegion) && IsConnected)
-            {
-                ChangeUserRegion(SharedMemory.ClosestRegion, result =>
-                {
-                    UserRegion = SharedMemory.ClosestRegion;
-                });
-            }
         }
 
         internal void SendPredefinedConnectedEvent()

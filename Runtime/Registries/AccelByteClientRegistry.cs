@@ -27,6 +27,9 @@ namespace AccelByte.Api
         internal AccelByteGameStandardEventCacheImp GameStandardCacheImp;
 
         private AccelByteNetworkConditioner networkConditioner;
+        private AccelByteMessagingSystem messagingSystem;
+        private AccelByteNotificationSender notificationSender;
+        private AccelByteNotificationBuffer notificationBuffer;
 
         IHttpClient httpClient;
 
@@ -94,6 +97,16 @@ namespace AccelByte.Api
             return networkConditioner;
         }
 
+        public AccelByteMessagingSystem GetMessagingSystem()
+        {
+            return messagingSystem;
+        }
+
+        public AccelByteNotificationSender GetNotificationSender()
+        {
+            return notificationSender;
+        }
+
         public PresenceBroadcastEventScheduler GetPresenceBroadcastEvent()
         {
             return presenceEventScheduler;
@@ -126,6 +139,8 @@ namespace AccelByte.Api
             this.environment = environment;
 
             InitializeNetworkConditioner();
+            InitializeMessagingSystem();
+            InitializeNotificationSender();
             InitializeAnalytics(config);
 
             System.Net.ServicePointManager.ServerCertificateValidationCallback += OnCertificateValidated;
@@ -134,7 +149,9 @@ namespace AccelByte.Api
             {
                 IdValidator = new Utils.AccelByteIdValidator(),
                 PredefinedEventScheduler = predefinedEventScheduler,
-                NetworkConditioner =  networkConditioner
+                NetworkConditioner =  networkConditioner,
+                MessagingSystem = messagingSystem,
+                NotificationSender = notificationSender,
             };
 
             SendSDKInitializedEvent(AccelByteSDK.Version);
@@ -459,6 +476,21 @@ namespace AccelByte.Api
         private void InitializeNetworkConditioner()
         {
             networkConditioner = new AccelByteNetworkConditioner();
+        }
+
+        private void InitializeMessagingSystem()
+        {
+            messagingSystem = new AccelByteMessagingSystem();
+        }
+
+        private void InitializeNotificationSender()
+        {
+            notificationSender = new AccelByteNotificationSender(ref messagingSystem);
+        }
+
+        private void InitializeNotificationBuffer()
+        {
+            notificationBuffer = new AccelByteNotificationBuffer();
         }
 
         internal static PresenceBroadcastEventScheduler CreatePresenceBroadcastEventScheduler(AnalyticsService analyticsService, Config config)

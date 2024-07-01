@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -124,6 +124,16 @@ namespace AccelByte.Core
         public static byte[] ToUtf8Json<T>( this T obj, Formatting format = Formatting.None )
         {
             return System.Text.Encoding.UTF8.GetBytes( obj.ToJsonString() );
+        }
+
+        public static byte[] ToBytes(this string obj)
+        {
+            return System.Text.Encoding.UTF8.GetBytes(obj);
+        }
+
+        public static string ToBase64(this byte[] obj)
+        {
+            return Convert.ToBase64String(obj);
         }
 
         public static T ToObject<T>( this string data )

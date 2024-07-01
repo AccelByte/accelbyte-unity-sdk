@@ -50,7 +50,6 @@ namespace AccelByte.Server
         public void GetUserData( string userAuthToken
             , ResultCallback<UserData> callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(userAuthToken), "parameter " + nameof(userAuthToken) + " is null");
             coroutineRunner.Run(api.GetUserData(userAuthToken, callback));
         }
 

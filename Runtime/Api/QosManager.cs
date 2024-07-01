@@ -1,6 +1,7 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace AccelByte.Api
     {
         private readonly CoroutineRunner coroutineRunner;
         private readonly QosManagerApi api;
+
+        private AccelByteMessagingSystem messagingSystem;
 
         [UnityEngine.Scripting.Preserve]
         internal QosManager( QosManagerApi inApi
@@ -111,10 +114,12 @@ namespace AccelByte.Api
 
         internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
         {
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.LobbyConnected, OnLobbyConnectedHandle);
             base.SetSharedMemory(newSharedMemory);
-            SharedMemory.OnLobbyConnected += HandleOnLobbyConnected;
+
+            messagingSystem = newSharedMemory.MessagingSystem;
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.LobbyConnected, OnLobbyConnectedHandle);
         }
-        
 
         private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
         {
@@ -132,21 +137,29 @@ namespace AccelByte.Api
             yield return CalculateServerLatencies(getQosServersResult.Value.servers, callback);
         }
 
-        private void HandleOnLobbyConnected()
+        private void OnLobbyConnectedHandle(string payload)
         {
             GetAllServerLatencies(result =>
             {
-                if(result.IsError)
+                if (result.IsError)
                 {
                     return;
                 }
 
-                SharedMemory.ClosestRegion = GetClosestRegion(result.Value);
+                string closestRegion = GetClosestRegion(result.Value);
+                messagingSystem?.SendMessage(AccelByteMessagingTopic.QosRegionLatenciesUpdated, closestRegion);
             });
         }
 
         private string GetClosestRegion(Dictionary<string, int> listRegion)
         {
+            if (listRegion.Count == 0)
+            {
+                AccelByteDebug.LogWarning(
+                    $"No region servers found.");
+                return string.Empty;
+            }
+
             var closestRegion = listRegion.First();
             foreach (var serverLatency in listRegion)
             {

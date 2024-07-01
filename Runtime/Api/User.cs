@@ -1213,6 +1213,13 @@ namespace AccelByte.Api
                 return;
             }
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(platformId, userIds);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var request = new PlatformAccountInfoRequest
             {
                 PlatformId = platformId,

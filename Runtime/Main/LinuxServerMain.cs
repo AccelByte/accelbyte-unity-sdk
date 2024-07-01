@@ -2,7 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-#if (UNITY_STANDALONE_LINUX && UNITY_SERVER) 
+#if (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX) && UNITY_SERVER 
 using AccelByte.Server;
 
 namespace AccelByte.Core

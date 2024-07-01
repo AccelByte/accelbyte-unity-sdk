@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Server
 {
@@ -27,8 +26,13 @@ namespace AccelByte.Server
         public IEnumerator GetUserData( string userAuthToken
             , ResultCallback<UserData> callback )
         {
-            Assert.IsFalse(string.IsNullOrEmpty(userAuthToken), 
-                "Parameter " + nameof(userAuthToken) + " is null or empty");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userAuthToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/iam/v3/public/users/me")
@@ -42,7 +46,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchUserOtherPlatformDisplayName( string platformDisplayName
@@ -51,13 +55,20 @@ namespace AccelByte.Server
             , int limit
             , int offset )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(platformDisplayName, nameof(platformDisplayName) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , platformDisplayName);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             if (platformType == PlatformType.Nintendo || platformType == PlatformType.Oculus || platformType == PlatformType.Apple)
             {
-                Debug.Log("Can not search user using this function. Use SearchUserOtherPlatformUserId instead.");
+                callback?.TryError(new Error(ErrorCode.InvalidRequest
+                    , $"Can not search user using this function. Use SearchUserOtherPlatformUserId instead."));
                 yield break;
             }
 
@@ -83,16 +94,22 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PagedUserOtherPlatformInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchUserOtherPlatformUserId( string platformUserId
             , PlatformType platformType
             , ResultCallback<UserOtherPlatformInfo> callback )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(platformUserId, nameof(platformUserId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , platformUserId);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace_}/platforms/{platformId}/users/{platformUserId}")
@@ -109,15 +126,21 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserOtherPlatformInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BanUser(string userId, BanCreateRequest banRequest, ResultCallback<UserBanResponseV3> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(banRequest, nameof(banRequest) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , userId
+                , banRequest);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                .CreatePost(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/bans")
@@ -132,15 +155,21 @@ namespace AccelByte.Server
             IHttpResponse response = null;
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<UserBanResponseV3>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ChangeUserBanStatus(string userId, string banId, bool enabled, ResultCallback<UserBanResponseV3> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(banId, nameof(banId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , userId
+                , banId);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             UserEnableBan changeRequest = new UserEnableBan { enabled = enabled };
 
@@ -158,12 +187,18 @@ namespace AccelByte.Server
             IHttpResponse response = null;
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<UserBanResponseV3>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserBanInfo(string userId, bool activeOnly, ResultCallback<UserBanPagedList> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/bans")
@@ -178,13 +213,18 @@ namespace AccelByte.Server
             IHttpResponse response = null;
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<UserBanPagedList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserBannedList(bool activeOnly, BanType banType, int offset, int limit, ResultCallback<UserBanPagedList> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null"); 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/bans/users")
@@ -201,15 +241,21 @@ namespace AccelByte.Server
             IHttpResponse response = null;
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<UserBanPagedList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserByUserId(string userId 
             , ResultCallback<UserData> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , userId);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/iam/v3/namespaces/{namespace}/users/{userId}")
@@ -225,14 +271,20 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserData>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ListUserByUserId(ListUserDataRequest listUserDataRequest, ResultCallback<ListUserDataResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(listUserDataRequest, nameof(listUserDataRequest) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , listUserDataRequest);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                .CreatePost(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/bulk")
@@ -246,7 +298,7 @@ namespace AccelByte.Server
             IHttpResponse response = null;
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<ListUserDataResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

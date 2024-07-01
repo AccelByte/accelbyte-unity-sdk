@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -285,6 +285,53 @@ namespace AccelByte.Api
             var result = response.TryParseJson<SyncThirdPartyFriendsResponse[]>();
 
             callback.Try(result);
+        }
+
+        public void GetNotifications(ResultCallback<GetUserNotificationsResponse> callback
+            , DateTime startTime = default
+            , DateTime endTime = default
+            , int offset = 0
+            , int limit = 25)
+        {
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/notification/namespaces/{namespace}/me")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Namespace_);
+
+            if (startTime != default)
+            {
+                builder.WithQueryParam("startTime", ((long)startTime.Subtract(DateTime.UnixEpoch).TotalSeconds).ToString());
+            }
+
+            if (endTime != default)
+            {
+                builder.WithQueryParam("endTime", ((long)endTime.Subtract(DateTime.UnixEpoch).TotalSeconds).ToString());
+            }
+
+            if (offset > 0)
+            {
+                builder.WithQueryParam("offset", offset.ToString());
+            }
+
+            if (limit > 20)
+            {
+                builder.WithQueryParam("limit", limit.ToString());
+            }
+
+            var request = builder.GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetUserNotificationsResponse>();
+                
+                if (result.IsError)
+                {
+                    callback?.TryError(result.Error);
+                    return;
+                }
+                callback?.TryOk(result.Value);
+            });
         }
 
         public void OnBanNotificationReceived( Action<string> callback )

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.23.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.0%0D16.22.2) (2024-07-01)
+
+
+### Features
+
+* implemented network maintainer ([fb9e5c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb9e5c40cb677b27fe16f288dc99e28c5d48acdf))
+
+
+### Bug Fixes
+
+* add editor dedicated server macro to linux server bootstrap ([4efdece](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4efdecea56adaee936b362f25efefa8f166e7b3d))
+* add missing storeId param and fix false serverEcommerce endpoint ([32a60f5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/32a60f5b3ba576f186ec373d6a5bdb36906a7d21))
+* broken endpoint name in UserApi ([870a143](https://github.com/AccelByte/accelbyte-unity-sdk/commits/870a143a4b9f6e77180ead5b409ae6ac5028753d))
+
 ### [16.22.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.2%0D16.22.1) (2024-06-13)
 
 

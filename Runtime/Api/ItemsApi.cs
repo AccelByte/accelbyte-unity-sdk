@@ -302,6 +302,16 @@ namespace AccelByte.Api
             , bool autoCalcEstimatedPrice
             , ResultCallback<ItemInfo> callback)
         {
+            yield return GetItemBySku(sku: sku, storeId: null, language: language, region: region, autoCalcEstimatedPrice: autoCalcEstimatedPrice, callback: callback);
+        }
+
+        public IEnumerator GetItemBySku(string sku
+            , string storeId
+            , string language
+            , string region
+            , bool autoCalcEstimatedPrice
+            , ResultCallback<ItemInfo> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(sku
@@ -314,15 +324,28 @@ namespace AccelByte.Api
                 yield break;
             }
 
-            var builder = HttpRequestBuilder
+            HttpRequestBuilder builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/items/bySku")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("sku", sku)
-                .WithQueryParam("language", language)
-                .WithQueryParam("region", region)
-                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false")
-                .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson);
+                .WithQueryParam("autoCalcEstimatedPrice", autoCalcEstimatedPrice ? "true" : "false");
+
+            if (!string.IsNullOrEmpty(storeId))
+            {
+                builder.WithQueryParam("storeId", storeId);
+            }
+
+            if (!string.IsNullOrEmpty(language))
+            {
+                builder.WithQueryParam("language", language);
+            }
+
+            if (!string.IsNullOrEmpty(region))
+            {
+                builder.WithQueryParam("region", region);
+            }
 
             var request = builder.GetResult();
 

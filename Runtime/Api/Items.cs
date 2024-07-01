@@ -129,7 +129,7 @@ namespace AccelByte.Api
         public void GetItemByAppId( string appId
             , ResultCallback<ItemInfo> callback
             , string language = ""
-            , string region = "" )
+            , string region = "" )  
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -232,20 +232,52 @@ namespace AccelByte.Api
             , bool autoCalcEstimatedPrice
             , ResultCallback<ItemInfo> callback)
         {
+            GetItemBySku(sku: sku
+                , storeId: null
+                , language: language
+                , region: region
+                , autoCalcEstimatedPrice: autoCalcEstimatedPrice
+                , callback : callback);
+        }
+
+        /// <summary>
+        /// Get item info by sku.
+        /// </summary>
+        /// <param name="sku">Sku should contain specific number of item Sku</param>
+        /// <param name="storeId">store id to be queried</param>
+        /// <param name="language">display language</param>
+        /// <param name="region">region of items</param>
+        /// <param name="autoCalcEstimatedPrice">Auto Calculate Estimated Price. If autoCalcEstimatedPrice is true and item is flexible bundle, will auto calc price.</param>
+        /// <param name="callback">Returns a result that contain ItemInfo via callback when completed.</param>
+        public void GetItemBySku(string sku
+            , ResultCallback<ItemInfo> callback
+            , bool autoCalcEstimatedPrice = false
+            , string storeId = null
+            , string language = null
+            , string region = null)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sku);
+            if (error != null)
+            {
+                callback?.TryError(error);
                 return;
             }
 
             coroutineRunner.Run(
                 api.GetItemBySku(sku
+                    , storeId
                     , language
                     , region
                     , autoCalcEstimatedPrice
-                    , callback ));
+                    , callback));
         }
 
         /// <summary>

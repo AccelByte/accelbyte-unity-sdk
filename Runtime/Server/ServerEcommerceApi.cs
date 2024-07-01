@@ -1,10 +1,12 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -237,12 +239,16 @@ namespace AccelByte.Server
             , ResultCallback<ItemPagingSlicedResultV2> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get items by criteria! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get items by criteria! AccessToken parameter is null!");
-            Assert.IsNotNull(criteria, "Can't get items by criteria! Criteria parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if(error != null )
+            {
+                callback?.TryError(error);
+                yield break;
+            }
             
             string availableDate = criteria.AvailableDate.ToUniversalTime().ToString("u").Replace(" ", "T");
-            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/admin/namespaces/{namespace}/items/byCriteria")
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v2/admin/namespaces/{namespace}/items/byCriteria")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("storeId", (criteria.StoreId != null)? criteria.StoreId : string.Empty)
                 .WithQueryParam("categoryPath",(criteria.CategoryPath != null)? criteria.CategoryPath : string.Empty)

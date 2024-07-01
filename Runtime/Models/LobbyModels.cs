@@ -1,6 +1,7 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -181,6 +182,8 @@ namespace AccelByte.Models
     public class LobbySessionId
     {
         [DataMember] public string lobbySessionID;
+        [DataMember(Name = "sequenceID")] public string SequenceId;
+        [DataMember(Name = "sequenceNumber")] public int SequenceNumber;
     }
 
     #endregion
@@ -196,6 +199,9 @@ namespace AccelByte.Models
         [DataMember] public string topic;
         [DataMember] public string payload;
         [DataMember] public string sentAt;
+        [DataMember] public string sequenceID;
+        [DataMember] public int sequenceNumber;
+        [DataMember] public string type;
     }
 
     [DataContract, Preserve]
@@ -205,6 +211,46 @@ namespace AccelByte.Models
         [DataMember] public string requestType;
         [DataMember] public string message;
         [DataMember] public int code;
+    }
+
+    [DataContract, Preserve]
+    public class UserNotification
+    {
+        [DataMember(Name = "from")] public string From;
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "lobbySessionId")] public string LobbySessionId;
+        [DataMember(Name = "loginType")] public string LoginType;
+        [DataMember(Name = "payload")] public string Payload;
+        [DataMember(Name = "reconnectFromCode")] public int ReconnectFromCode;
+        [DataMember(Name = "sentAt")] public DateTime SentAt;
+        [DataMember(Name = "sequenceID")] public string SequenceId;
+        [DataMember(Name = "sequenceNumber")] public int SequenceNumber;
+        [DataMember(Name = "to")] public string To;
+        [DataMember(Name = "topic")] public string Topic;
+        [DataMember(Name = "type")] public string Type;
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(SequenceId, SequenceNumber);
+        }
+
+        public override bool Equals(object obj)
+        {
+            UserNotification otherNotif = obj as UserNotification;
+
+            bool retVal = 
+                otherNotif != null
+                && SequenceId == otherNotif.SequenceId
+                && SequenceNumber == otherNotif.SequenceNumber;
+
+            return retVal;
+        }
+    }
+
+    [DataContract, Preserve]
+    public class GetUserNotificationsResponse
+    {
+        [DataMember(Name = "notifications")] public UserNotification[] Notifications;
     }
 
     #endregion

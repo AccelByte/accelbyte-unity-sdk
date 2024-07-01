@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -12,39 +12,8 @@ namespace AccelByte.Core
         public Action OnLobbyConnected;
         public PredefinedEventScheduler PredefinedEventScheduler;
         public AccelByteNetworkConditioner NetworkConditioner;
-
-        public string ClosestRegion
-        {
-            get
-            {
-                return closestRegion;
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value) || closestRegion == value)
-                {
-                    return;
-                }
-                closestRegion = value;
-                OnClosestRegionChanged?.Invoke(closestRegion);
-            }
-        }
-
-        public bool LobbyConnected
-        {
-            get
-            {
-                return lobbyConnected;
-            }
-            set
-            {
-                lobbyConnected = value;
-                if(lobbyConnected)
-                {
-                    OnLobbyConnected?.Invoke();
-                }
-            }
-        }
+        public AccelByteMessagingSystem MessagingSystem;
+        public AccelByteNotificationSender NotificationSender;
 
         public Utils.AccelByteIdValidator IdValidator
         {
@@ -62,7 +31,5 @@ namespace AccelByte.Core
             }
         }
         Utils.AccelByteIdValidator accelByteIdValidator;
-        private string closestRegion;
-        private bool lobbyConnected;
     }
 }

@@ -1250,7 +1250,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/namespace/{namespace}/users/platforms")
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/platforms")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
