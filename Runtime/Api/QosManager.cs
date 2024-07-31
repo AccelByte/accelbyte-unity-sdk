@@ -48,7 +48,7 @@ namespace AccelByte.Api
             {
                 using (var udpClient = new UdpClient(server.port))
                 {
-                    udpClient.Connect(new IPEndPoint(IPAddress.Parse(server.ip), server.port));
+                    udpClient.Connect(server.ip, server.port);
                     byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
                     stopwatch.Restart();
                     
@@ -75,7 +75,7 @@ namespace AccelByte.Api
                 }
             }
 
-            callback.TryOk(latencies);
+            callback?.TryOk(latencies);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace AccelByte.Api
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.LobbyConnected, OnLobbyConnectedHandle);
         }
 
-        private IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
+        internal virtual IEnumerator GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
         {
             Result<QosServerList> getQosServersResult = null;
 
@@ -139,7 +139,7 @@ namespace AccelByte.Api
 
         private void OnLobbyConnectedHandle(string payload)
         {
-            GetAllServerLatencies(result =>
+            GetServerLatencies(result =>
             {
                 if (result.IsError)
                 {

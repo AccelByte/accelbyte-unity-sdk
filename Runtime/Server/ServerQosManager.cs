@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -41,7 +41,7 @@ namespace AccelByte.Server
             {
                 using (var udpClient = new UdpClient(server.port))
                 {
-                    udpClient.Connect(new IPEndPoint(IPAddress.Parse(server.ip), server.port));
+                    udpClient.Connect(server.ip, server.port);
                     byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
                     stopwatch.Restart();
                     IAsyncResult asyncResult = udpClient.BeginSend(sendBytes, sendBytes.Length, null, null);
@@ -63,7 +63,7 @@ namespace AccelByte.Server
                 }
             }
 
-            callback.TryOk(latencies);
+            callback?.TryOk(latencies);
         }
 
         /// <summary>

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.23.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.1%0D16.23.0) (2024-07-31)
+
+
+### Bug Fixes
+
+* **QoS:** unable parse DNS address to get latency ([b2b720d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b2b720d832314da74ce3f8bd22393554610745e5))
+
 ## [16.23.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.0%0D16.22.2) (2024-07-01)
 
 
