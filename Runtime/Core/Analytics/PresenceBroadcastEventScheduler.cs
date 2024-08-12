@@ -168,6 +168,10 @@ namespace AccelByte.Core
                 EventName = PresenceBroadcastEventGatherer.EventName,
                 Payload = presenceBroadcastPayloadModel
             };
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref body, ref SharedMemory.TimeManager);
+            }
 
             return body;
         }
@@ -181,6 +185,10 @@ namespace AccelByte.Core
                 EventName = PresenceBroadcastEventGatherer.EventName,
                 Payload = presenceBroadcastPayloadModel
             };
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref body, ref SharedMemory.TimeManager);
+            }
 
             return body;
         }

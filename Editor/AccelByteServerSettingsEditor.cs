@@ -192,6 +192,7 @@ namespace AccelByte.Editor
                 EditorCommon.CreateToggleInput((newValue) => generateServiceUrl = newValue, generateServiceUrl, "Auto Generate Service Url", indentLevel: 1);
 
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.IamServerUrl = newValue, editedServerConfig.IamServerUrl, "IAM Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedServerConfig.BasicServerUrl = newValue, editedServerConfig.BasicServerUrl, "Basic Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput(
                     (newValue) => editedServerConfig.AMSServerUrl = newValue
                     , defaultValue: editedServerConfig.AMSServerUrl

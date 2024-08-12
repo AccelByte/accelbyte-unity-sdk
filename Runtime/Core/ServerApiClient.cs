@@ -1,4 +1,4 @@
-// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -173,7 +173,8 @@ namespace AccelByte.Core
         public ServerDSHub GetDsHub() { return GetServerApi<ServerDSHub, ServerDSHubApi>(); }
         public ServerSession GetSession() { return GetServerApi<ServerSession, ServerSessionApi>(); }
         public ServerMatchmakingV2 GetMatchmakingV2() { return GetServerApi<ServerMatchmakingV2, ServerMatchmakingV2Api>(); }
-        public ServerAnalyticsService GetAnalyticsService() { return GetServerApi<ServerAnalyticsService, ServerAnalyticsApi>(); }
+        public ServerAnalyticsService GetAnalyticsService() { return GetServerApi<ServerAnalyticsService, ServerGameTelemetryApi>(); }
+        public IServerMiscellaneousWrapper GetMiscellaneous() { return GetServerApi<ServerMiscellaneous, ServerMiscellaneousApi>(); }
         public ServiceVersion GetVersionService() { return GetServerApi<ServiceVersion, ServiceVersionApi>(); }
 
         public AccelByteStatsDMetricExporterApi GetStatsMetricExporterService()

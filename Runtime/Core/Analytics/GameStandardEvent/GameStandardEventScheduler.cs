@@ -39,7 +39,11 @@ namespace AccelByte.Core
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
-
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref eventBody, ref SharedMemory.TimeManager);
+            }
+            
             lock (jobQueue)
             {
                 jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
@@ -60,6 +64,20 @@ namespace AccelByte.Core
                 jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
             }
             OnTelemetryEventAdded?.Invoke(eventBody);
+        }
+
+        internal void ImmediateBatchSend(ResultCallback callback)
+        {
+            ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
+            bool currentSessionValid = session != null ? session.IsValid() : false;
+
+            if (!currentSessionValid)
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            SendQueuedEvent(callback);
         }
 
         /// <summary>

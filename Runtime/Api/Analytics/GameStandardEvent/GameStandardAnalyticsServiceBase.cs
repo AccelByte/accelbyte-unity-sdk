@@ -38,7 +38,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            Scheduler.SendQueuedEvent(callback);
+            Scheduler.ImmediateBatchSend(callback);
         }
 
         internal void Initialize(TAnalyticsWrapper inApi)

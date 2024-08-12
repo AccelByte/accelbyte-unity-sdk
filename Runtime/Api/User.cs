@@ -27,6 +27,7 @@ namespace AccelByte.Api
     {
         //Constants
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
+        public const int MaxNumOfBulkGetUserByOtherPlatformUserId = 100;
 
 #if UNITY_SWITCH && !UNITY_EDITOR
         internal static readonly string DefaultPlatformCacheDirectory = "AccelByte/PlatformLoginCache/";
@@ -438,17 +439,44 @@ namespace AccelByte.Api
         /// is called a headless account because it doesn't have username yet.
         /// </summary>
         /// <param name="platformType">Other platform type</param>
-        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        public void LoginWithOtherPlatform( PlatformType platformType
+        public void LoginWithOtherPlatform(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
-            , bool createHeadless = true )
+            , bool createHeadless = true)
         {
             Report.GetFunctionLog(GetType().Name);
 
             string platformId = platformType.ToString().ToLower();
-            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
+            LoginWithOtherPlatformId(platformId: platformId
+                , platformToken: platformToken
+                , callback: callback
+                , createHeadless: createHeadless);
+        }
+
+        /// <summary>
+        /// Login with token from PS4/PS5 platforms. This will automatically register a user if the user
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// </summary>
+        /// <param name="platformType">Other platform type</param>
+        /// <param name="platformToken">Token for other platform type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatform(PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless
+            , string serviceLabel)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            string platformId = platformType.ToString().ToLower();
+#pragma warning disable AB0001
+            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless, serviceLabel);
+#pragma warning restore AB0001
         }
 
         public void ReloginWithOtherPlatform(PlatformType platformType, ResultCallback<TokenData, OAuthError> callback)
@@ -513,13 +541,39 @@ namespace AccelByte.Api
         /// is called a headless account because it doesn't have username yet.
         /// </summary>
         /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
-        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
             , bool createHeadless = true)
+        {
+#pragma warning disable AB0001
+            LoginWithOtherPlatformId(platformId: platformId
+                , platformToken: platformToken
+                , callback: callback
+                , createHeadless: createHeadless
+                , serviceLabel: null);
+#pragma warning restore AB0001
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformToken">Token for other platform type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
+        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatformId(string platformId
+            , string platformToken
+            , ResultCallback<TokenData, OAuthError> callback
+            , bool createHeadless
+            , string serviceLabel)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -546,13 +600,12 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless);
+                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless, serviceLabel);
                 }
                 , onAlreadyLogin
                 , onLoginFailed
                 , onLoginSuccess
             );
-
         }
 
         /// <summary>
@@ -1998,6 +2051,13 @@ namespace AccelByte.Api
                 return;
             }
 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(otherPlatformUserId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var requestModel = new BulkPlatformUserIdRequest
             {
                 platformUserIDs = otherPlatformUserId,
@@ -2008,7 +2068,15 @@ namespace AccelByte.Api
                 PlatformId = platformType.ToString().ToLower()
             };
 
-            api.BulkGetUserByOtherPlatformUserIds(requestModel, requestParameter, callback);
+            if (otherPlatformUserId.Length > MaxNumOfBulkGetUserByOtherPlatformUserId)
+            {
+                UnityEngine.Debug.LogWarning($"otherPlatformUserId exceeded limit ({MaxNumOfBulkGetUserByOtherPlatformUserId}). Sending more than {MaxNumOfBulkGetUserByOtherPlatformUserId} userIds will be DEPRECATED");
+                api.BulkGetUserByOtherPlatformUserIds(requestModel, requestParameter, callback);
+            }
+            else
+            {
+                api.BulkGetUserByOtherPlatformUserIdsV4(requestModel, requestParameter, callback);
+            }
         }
         
         /// <summary>
@@ -2978,7 +3046,7 @@ namespace AccelByte.Api
         /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
         /// </summary>
         /// <param name="platformType">Other platform type</param>
-        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
@@ -2989,8 +3057,45 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+#pragma warning disable AB0001
+            LoginWithOtherPlatformV4(platformType: platformType
+                , platformToken: platformToken
+                , callback: callback
+                , createHeadless:createHeadless
+                , serviceLabel: null);
+#pragma warning restore AB0001
+        }
+
+        /// <summary>
+        /// Login with token from PS4/PS5 platforms. This will automatically register a user if the user
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="platformType">Other platform type</param>
+        /// <param name="platformToken">Token for other platform type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatformV4(PlatformType platformType
+            , string platformToken
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool createHeadless
+            , string serviceLabel)
+        {
             string platformId = platformType.ToString().ToLower();
-            LoginWithOtherPlatformIdV4(platformId, platformToken, callback, createHeadless);
+
+#pragma warning disable AB0001
+            LoginWithOtherPlatformIdV4(platformId: platformId
+                , platformToken: platformToken
+                , callback: callback
+                , createHeadless: createHeadless
+                , serviceLabel: serviceLabel);
+#pragma warning restore AB0001
         }
 
         /// <summary>
@@ -3003,7 +3108,7 @@ namespace AccelByte.Api
         /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
         /// </summary>
         /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
-        /// <param name="platformToken">Token for other platfrom type</param>
+        /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
@@ -3011,6 +3116,36 @@ namespace AccelByte.Api
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
             , bool createHeadless = true)
+        {
+#pragma warning disable AB0001
+            LoginWithOtherPlatformIdV4(platformId: platformId
+                , platformToken: platformToken
+                , callback: callback
+                , createHeadless: createHeadless
+                , serviceLabel: null);
+#pragma warning restore AB0001
+        }
+
+        /// <summary>
+        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
+        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
+        /// is called a headless account because it doesn't have username yet.
+        /// The callback will consist of login queue ticket and token data.
+        /// If token data is empty, game client is expected to poll the login ticket status
+        /// until they receive a response that their position is zero and then claim the ticket.
+        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
+        /// </summary>
+        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
+        /// <param name="platformToken">Token for other platform type</param>
+        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        [AccelByte.Utils.Attributes.AccelBytePreview]
+        public void LoginWithOtherPlatformIdV4(string platformId
+            , string platformToken
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool createHeadless
+            , string serviceLabel)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -3046,7 +3181,7 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, cb);
+                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, cb);
                 }
                 , onAlreadyLogin
                 , onLoginFailed

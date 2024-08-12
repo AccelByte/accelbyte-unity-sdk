@@ -4,6 +4,7 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 
@@ -11,11 +12,11 @@ namespace AccelByte.Api
 {
     public class AnalyticsService : WrapperBase, IAccelByteAnalyticsWrapper
     {
-        private readonly AnalyticsApi api = null;
+        private readonly ClientGameTelemetryApi api = null;
         private readonly ISession session = null;
 
         [UnityEngine.Scripting.Preserve]
-        public AnalyticsService(AnalyticsApi inApi,
+        public AnalyticsService(ClientGameTelemetryApi inApi,
             ISession inSession,
             CoroutineRunner runner)
         {
@@ -27,23 +28,74 @@ namespace AccelByte.Api
 
         public void SendData(List<TelemetryBody> data, ResultCallback callback)
         {
-            if (session.IsValid())
+            AccelByteTimeManager timeManager = SharedMemory?.TimeManager;
+            
+            if (timeManager != null)
             {
+                foreach (var telemetryBody in data)
+                {
+                    if (!telemetryBody.IsTimeStampSet && telemetryBody.CreatedElapsedTime == null)
+                    {
+                        telemetryBody.SetTimeReference(timeManager.TimelapseSinceSessionStart.Elapsed);
+                    }
+                }
+            }
 
-                api.SendData(data, callback);
+            if (timeManager != null)
+            {
+                System.Action sendTelemetryAfterFetchingServerTime = () =>
+                {
+                    foreach (var telemetryBody in data)
+                    {
+                        if (!telemetryBody.IsTimeStampSet)
+                        {
+                            telemetryBody.ClientTimestamp = telemetryBody.CalculateClientTimestampFromServerTime(timeManager.GetCachedServerTime());
+                        }
+                    }
+                    ApiSend(data, callback);
+                };
+                
+                if (timeManager.GetCachedServerTime() == null)
+                {
+                    Action<bool> onFetchingServerTimeDone = null;
+                    onFetchingServerTimeDone = success =>
+                    {
+                        if (success)
+                        {
+                            timeManager.OnFetchServerTimeComplete -= onFetchingServerTimeDone;
+                            sendTelemetryAfterFetchingServerTime?.Invoke();
+                        }
+                        else
+                        {
+                            ApiSend(data, callback);
+                        }
+                    };
+                    timeManager.OnFetchServerTimeComplete += onFetchingServerTimeDone;
+
+                    api.FetchServerTime(ref timeManager);
+                }
+                else
+                {
+                    sendTelemetryAfterFetchingServerTime?.Invoke();
+                }
             }
             else
             {
-                callback.TryError(ErrorCode.InvalidRequest, "User is not logged in.");
+                ApiSend(data, callback);
             }
         }
 
         public void SendData(TelemetryBody data, ResultCallback callback)
         {
+            List<TelemetryBody> dataList = new List<TelemetryBody>() { data };
+            SendData(dataList, callback);
+        }
+
+        private void ApiSend(List<TelemetryBody> data, ResultCallback callback)
+        {
             if (session.IsValid())
             {
-                List<TelemetryBody> dataList = new List<TelemetryBody>() { data };
-                api.SendData(dataList, callback);
+                api.SendData(data, callback);
             }
             else
             {

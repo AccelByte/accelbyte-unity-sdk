@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.24.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.24.0%0D16.23.1) (2024-08-12)
+
+
+### Features
+
+* add AppleExtension as InternalsVisibleTo ([2451d23](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2451d2377b5b2d888e5f0510c0629c247d48d287))
+* add flight id and device type into telemetry data ([5377697](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5377697ba001a6c00a044072c4325074cd8e07c8))
+* add friend related error code ([fd7e2c0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fd7e2c0889fec897734b15ae62907977e00837c4))
+* add login with apple ([6cb3805](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6cb38053ed4802568576ed396b282ef6805fdf5c))
+* add optional service label param ([8dab5b5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8dab5b56f09f26bc08538761fabaa8eac5dee096))
+* add server misc service ([2aa2b21](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2aa2b21c3b1f7cc712aabc519abbb9e4b8d8fc59))
+* add StatisticCodePredicate and Code field for purchasing requirement ([45171c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/45171c58847785860ba19c485070ee9affaf76c5))
+* add support for GooglePlayGames authentication ([a33f131](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a33f1318fdbd699b30ecab3d6e746e75f88f0179))
+* add unity switch token expired time ([bce2407](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bce24071d8a29cd16b2777f0bc940583479416ed))
+* implement BulkGetUserByOtherPlatformUserIdsV4 ([1c8b1e9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1c8b1e9dfe331f75273f5ac13d6605d8d7e87a5f))
+* set telemetry client timestamp with server time reference ([b0ad854](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b0ad854b6128384f2e1bf8aa5de3b8849cbef9cf))
+
+
+### Bug Fixes
+
+* fixed incorrect chat and server user account endpoints ([8ca8097](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8ca80975617426bd27967cebfdf875730a132484))
+
+
+### Refactors
+
+* refactor qos get latencies implementation ([0b6c597](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0b6c5977a626259508a19dca009f82fc36ea54c3))
+
 ### [16.23.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.1%0D16.23.0) (2024-07-31)
 
 

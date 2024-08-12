@@ -1,6 +1,8 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
+using System;
 
 namespace AccelByte.Core
 {
@@ -34,7 +36,7 @@ namespace AccelByte.Core
         public AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload)
         {
             Payload = payload;
-            CreatedTimestamp = System.DateTime.Now;
+            CreatedTimestamp = DateTime.Now;
         }
     }
 }

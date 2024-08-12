@@ -5,17 +5,21 @@ using System;
 
 namespace AccelByte.Models
 {
-    public class AccelByteResult<ResultType,ErrorType> where ResultType : class where ErrorType : class
+    public class AccelByteResult<ResultType,ErrorType>
     {
         private Action<ResultType> successDelegates;
         private Action<ErrorType> errorDelegates;
         private Action finalDelegates;
-        private ResultType queuedData = null;
-        private ErrorType queuedError = null;
+        private ResultType queuedData;
+        private ErrorType queuedError;
+
+        private bool isSuccess;
+        private bool isError;
 
         internal void Resolve(ResultType result)
         {
             queuedData = result;
+            isSuccess = true;
             successDelegates?.Invoke(result);
             finalDelegates?.Invoke();
         }
@@ -23,6 +27,7 @@ namespace AccelByte.Models
         internal void Reject(ErrorType error)
         {
             queuedError = error;
+            isError = true;
             errorDelegates?.Invoke(error);
             finalDelegates?.Invoke();
         }
@@ -37,7 +42,7 @@ namespace AccelByte.Models
             if (onSuccess != null)
             {
                 successDelegates += onSuccess;
-                if (queuedData != null)
+                if (isSuccess)
                 {
                     onSuccess?.Invoke(queuedData);
                 }
@@ -56,7 +61,7 @@ namespace AccelByte.Models
             {
                 errorDelegates += onError;
                 // to avoid race conditions for early returns
-                if (queuedError != null)
+                if (isError)
                 {
                     onError.Invoke(queuedError);
                 }
@@ -75,7 +80,7 @@ namespace AccelByte.Models
             {
                 finalDelegates += onComplete;
                 // to avoid race conditions for early returns
-                if (queuedError != null || queuedData != null)
+                if (isSuccess || isError)
                 {
                     onComplete?.Invoke();
                 }
@@ -84,23 +89,26 @@ namespace AccelByte.Models
         }
     }
 
-    public class AccelByteResult<ErrorType> where ErrorType : class
+    public class AccelByteResult<ErrorType>
     {
         private Action successDelegates;
         private Action<ErrorType> errorDelegates;
         private Action finalDelegates;
-        private bool hasSuccess;
-        private ErrorType queuedError = null;
+        private bool isSuccess;
+        private bool isError;
+        
+        private ErrorType queuedError;
 
         internal void Resolve()
         {
-            hasSuccess = true;
+            isSuccess = true;
             successDelegates?.Invoke();
             finalDelegates?.Invoke();
         }
 
         internal void Reject(ErrorType error)
         {
+            isError = true;
             queuedError = error;
             errorDelegates?.Invoke(error);
             finalDelegates?.Invoke();
@@ -116,7 +124,7 @@ namespace AccelByte.Models
             if (onSuccess != null)
             {
                 successDelegates += onSuccess;
-                if (hasSuccess)
+                if (isSuccess)
                 {
                     onSuccess?.Invoke();
                 }
@@ -135,7 +143,7 @@ namespace AccelByte.Models
             {
                 errorDelegates += onError;
                 // to avoid race conditions for early returns
-                if (queuedError != null)
+                if (isError)
                 {
                     onError.Invoke(queuedError);
                 }
@@ -154,7 +162,7 @@ namespace AccelByte.Models
             {
                 finalDelegates += onComplete;
                 // to avoid race conditions for early returns
-                if (queuedError != null || hasSuccess)
+                if (isError || isSuccess)
                 {
                     onComplete?.Invoke();
                 }

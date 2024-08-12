@@ -54,6 +54,10 @@ namespace AccelByte.Core
             {
                 EventNamespace = eventNamespace
             };
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref eventBody, ref SharedMemory.TimeManager);
+            }
 
             jobQueue.Enqueue(new System.Tuple<TelemetryBody, ResultCallback>(eventBody, callback));
             OnTelemetryEventAdded?.Invoke(eventBody);

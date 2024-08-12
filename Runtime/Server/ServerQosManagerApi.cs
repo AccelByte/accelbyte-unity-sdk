@@ -25,25 +25,23 @@ namespace AccelByte.Server
             : base( httpClient, config, config.QosManagerServerUrl, session )
         {
         }
-
-        public IEnumerator GetAllQosServers( ResultCallback<QosServerList> callback )
+        
+        public void RequestGetAllQosServers(ResultCallback<QosServerList> callback)
         {
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/qos")
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-            
-            var result = response.TryParseJson<QosServerList>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<QosServerList>();
+                callback?.Try(result);
+            });
         }
-
-        public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
+        
+        public void RequestGetQosServers(ResultCallback<QosServerList> callback)
         {
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
@@ -53,13 +51,11 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<QosServerList>();
-            callback.Try(result);
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<QosServerList>();
+                callback?.Try(result);
+            });
         }
     }
 }

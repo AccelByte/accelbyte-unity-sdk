@@ -743,6 +743,42 @@ namespace AccelByte.Api
             });
         }
 
+        public void BulkGetUserByOtherPlatformUserIdsV4(BulkPlatformUserIdRequest requestModel, BulkPlatformUserIdParameter requestParameter, ResultCallback<BulkPlatformUserIdResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (requestModel == null)
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.PlatformId))
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform Id is null!"));
+                return;
+            }
+            if (requestModel.platformUserIDs == null || requestModel.platformUserIDs.Length == 0)
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform User Ids are null!"));
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v4/public/namespaces/{namespace}/platforms/{platformId}/users")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("platformId", requestParameter.PlatformId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestModel.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<BulkPlatformUserIdResponse>();
+                callback?.Try(result);
+            });
+        }
+
         public void GetCountryFromIP(ResultCallback<CountryInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name);

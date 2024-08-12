@@ -159,7 +159,7 @@ namespace AccelByte.Server
             , ResultCallback callback )
         {
             string ip = "";
-            AccelByteNetUtilities.GetPublicIp(getPublicIpResult =>
+            AccelByteNetUtilities.GetPublicIpWithIpify(httpOperator, getPublicIpResult =>
             {
                 ip = getPublicIpResult.Value.ip;
             });

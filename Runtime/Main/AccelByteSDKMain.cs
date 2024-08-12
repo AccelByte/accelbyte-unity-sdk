@@ -11,7 +11,10 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKPS5")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGameCore")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKSwitch")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKAndroid")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKApple")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.AppleExtension")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGooglePlayGames")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.GooglePlayGamesExtension")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.gametest")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
@@ -96,9 +99,10 @@ namespace AccelByte.Core
         private static void StopSDK()
         {
             OnSDKStopped?.Invoke();
-            EnvrionmentBootstrap.Stop();
+            EnvironmentBootstrap.Stop();
             ClientAnaylticsBootstrap.Stop();
             SdkInterfaceBootstrap.Stop();
+            TimeManagerBootstrap.Stop();
             DetachGameUpdateSignaller();
 
             Main.Stop();
@@ -109,7 +113,8 @@ namespace AccelByte.Core
 
         private static void ExecuteBootstraps()
         {
-            EnvrionmentBootstrap.Execute();
+            TimeManagerBootstrap.Execute();
+            EnvironmentBootstrap.Execute();
             ClientAnaylticsBootstrap.Execute();
             FlightIDBootstrap.Execute();
             SdkInterfaceBootstrap.Execute();

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -6,8 +6,8 @@ using AccelByte.Core;
 using System;
 
 namespace AccelByte.Utils
-{
-	internal class AccelByteTimer
+{ 
+    internal class AccelByteTimer
     {
         readonly float targetTimerInSecond;
         readonly Action onTimerComplete;

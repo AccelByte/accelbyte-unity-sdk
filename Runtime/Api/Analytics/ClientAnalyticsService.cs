@@ -15,8 +15,9 @@ namespace AccelByte.Core
         private ClientAnalyticsEventScheduler analyticsControllerEventScheduler;
         private IHttpClient httpClient;
         AccelByteAnalyticsSettings analyticsSettings;
-
-        public ClientAnalyticsService(IHttpClient httpClient = null)
+        private ApiSharedMemory sharedMemory;
+        
+        public ClientAnalyticsService(IHttpClient httpClient = null, AccelByteTimeManager timeManager = null)
         {
             if (httpClient == null)
             {
@@ -30,6 +31,11 @@ namespace AccelByte.Core
             }
 
             analyticsSettings = new AccelByteAnalyticsSettings();
+
+            sharedMemory = new ApiSharedMemory()
+            {
+                TimeManager = timeManager
+            };
         }
 
         /// <summary>
@@ -160,7 +166,7 @@ namespace AccelByte.Core
                     httpClient,
                     taskRunner);
 
-                AnalyticsApi analyticsApi = new AnalyticsApi(
+                var analyticsApi = new ClientGameTelemetryApi(
                         httpClient,
                         clientConfig,
                         analyticsControllerSession);
@@ -169,6 +175,7 @@ namespace AccelByte.Core
                                     analyticsApi,
                                     analyticsControllerSession,
                                     taskRunner);
+                analyticsService.SetSharedMemory(sharedMemory);
 
                 CreateAnalyticsControllerEventScheduler(analyticsControllerSession, analyticsService, clientConfig.ClientAnalyticsEventInterval);
             }
@@ -210,6 +217,7 @@ namespace AccelByte.Core
         private void CreateAnalyticsControllerEventScheduler(Server.ServerOauthLoginSession analyticsControllerSession, AnalyticsService analyticsService, float intervalInMs)
         {
             analyticsControllerEventScheduler = new ClientAnalyticsEventScheduler(analyticsService);
+            analyticsControllerEventScheduler.SetSharedMemory(ref sharedMemory);
             analyticsControllerEventScheduler.SetInterval(intervalInMs);
             analyticsControllerEventScheduler.SetEventEnabled(true);
             System.Action<ResultCallback<TokenData>> onAutoLoginDelegate = (callback) =>

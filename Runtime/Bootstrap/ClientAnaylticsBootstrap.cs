@@ -10,7 +10,7 @@ namespace AccelByte.Core
 
         internal static void Execute()
         {
-            analyticsController = new ClientAnalyticsService();
+            analyticsController = new ClientAnalyticsService(timeManager: AccelByteSDK.TimeManager);
             analyticsController.Initialize();
             AccelByteSDK.ClientAnalytics = analyticsController;
 

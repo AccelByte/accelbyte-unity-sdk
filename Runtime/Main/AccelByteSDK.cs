@@ -98,7 +98,8 @@ namespace AccelByte.Core
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             AccelByteDebug.Initialize(settings.SDKConfig.EnableDebugLog, settings.SDKConfig.DebugLogFilter);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory);
+            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager);
+            
             return newClientRegistry;
         }
 
@@ -108,8 +109,9 @@ namespace AccelByte.Core
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             AccelByteDebug.Initialize(settings.ServerSdkConfig.EnableDebugLog, settings.ServerSdkConfig.DebugLogFilter);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newClientRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory);
-            return newClientRegistry;
+            var newServerRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager);
+            
+            return newServerRegistry;
         }
 
         internal static void ChangeInterfaceEnvironment(Models.SettingsEnvironment newEnvironment)
@@ -242,5 +244,24 @@ namespace AccelByte.Core
                 return platformHandler;
             }
         }
+
+        public static AccelByteTimeManager TimeManager
+        {
+            get
+            {
+                if (GlobalTimeManager == null)
+                {
+                    GlobalTimeManager = new AccelByteTimeManager();
+                }
+
+                return GlobalTimeManager;
+            }
+            internal set
+            {
+                GlobalTimeManager = value;
+            }
+        }
+        
+        internal static AccelByteTimeManager GlobalTimeManager;
     }
 }

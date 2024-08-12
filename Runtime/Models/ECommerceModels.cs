@@ -191,7 +191,8 @@ namespace AccelByte.Models
     {
         EntitlementPredicate,
         SeasonPassPredicate,
-        SeasonTierPredicate
+        SeasonTierPredicate,
+        StatisticCodePredicate
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -552,6 +553,7 @@ namespace AccelByte.Models
         [DataMember] public int anyOf;
         [DataMember] public string[] values;
         [DataMember] public string value;
+        [DataMember(Name = "code")] public string Code;
     }
 
     [DataContract, Preserve]
@@ -658,7 +660,7 @@ namespace AccelByte.Models
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
         [DataMember] public ItemInfo[] items;
-        [DataMember] public string localExt;
+        [DataMember] public Dictionary<string, object> localExt;
         [DataMember] public Dictionary<string, int> itemQty;
         [DataMember(Name = "flexible")] public bool Flexible;
     }

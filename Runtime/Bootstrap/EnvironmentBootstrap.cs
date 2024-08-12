@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace AccelByte.Core
 {
-    internal static class EnvrionmentBootstrap
+    internal static class EnvironmentBootstrap
     {
         internal static void Execute()
         {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -64,12 +64,35 @@ namespace AccelByte.Api
 
         private readonly IHttpRequestSenderFactory requestSenderFactory;
 
-        internal AccelByteClientRegistry(SettingsEnvironment environment, Config config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory)
+        private AccelByteTimeManager timeManager;
+
+        internal AccelByteTimeManager TimeManager
+        {
+            get
+            {
+                if (timeManager == null)
+                {
+                    timeManager = new AccelByteTimeManager();
+                }
+
+                return timeManager;
+            }
+            set
+            {
+                timeManager = value;
+                sharedMemory.TimeManager = timeManager;
+            }
+        }
+
+        internal AccelByteClientRegistry(SettingsEnvironment environment, Config config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager)
         {
             clientApiInstances = new Dictionary<string, ApiClient>();
             loginUserClientApis = new List<ApiClient>();
             this.requestSenderFactory = requestSenderFactory;
+            this.timeManager = timeManager;
             Initialize(environment, config, oAuthConfig);
+            
+            UpdateServerTime(ref timeManager, CreateHtppClient(), ref config);
         }
 
         /// <summary>
@@ -122,6 +145,7 @@ namespace AccelByte.Api
                     analyticsApiWrapper = loginUserClientApis[0].GetAnalyticsService();
                 }
                 gameStandardAnalyticsService = new GameStandardAnalyticsClientService(analyticsApiWrapper, Config);
+                gameStandardAnalyticsService.Scheduler.SetSharedMemory(ref sharedMemory);
                 LoadGameStandardAnalyticsCache(GameStandardCacheImp, gameStandardAnalyticsService, environment.ToString());
             }
             return gameStandardAnalyticsService;
@@ -138,6 +162,8 @@ namespace AccelByte.Api
             this.OAuthConfig = oAuthConfig;
             this.environment = environment;
 
+            sharedMemory = new ApiSharedMemory();
+            
             InitializeNetworkConditioner();
             InitializeMessagingSystem();
             InitializeNotificationSender();
@@ -145,14 +171,12 @@ namespace AccelByte.Api
 
             System.Net.ServicePointManager.ServerCertificateValidationCallback += OnCertificateValidated;
 
-            sharedMemory = new ApiSharedMemory()
-            {
-                IdValidator = new Utils.AccelByteIdValidator(),
-                PredefinedEventScheduler = predefinedEventScheduler,
-                NetworkConditioner =  networkConditioner,
-                MessagingSystem = messagingSystem,
-                NotificationSender = notificationSender,
-            };
+            sharedMemory.IdValidator = new Utils.AccelByteIdValidator();
+            sharedMemory.PredefinedEventScheduler = predefinedEventScheduler;
+            sharedMemory.NetworkConditioner = networkConditioner;
+            sharedMemory.MessagingSystem = messagingSystem;
+            sharedMemory.NotificationSender = notificationSender;
+            sharedMemory.TimeManager = this.TimeManager;
 
             SendSDKInitializedEvent(AccelByteSDK.Version);
         }
@@ -262,6 +286,7 @@ namespace AccelByte.Api
             };
 
             clientApiInstances[id] = newApiClient;
+            
             return true;
         }
 
@@ -328,7 +353,10 @@ namespace AccelByte.Api
         {
             const AnalyticsService analyticsApiWrapper = null;
             predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsApiWrapper, config);
+            predefinedEventScheduler.SetSharedMemory(ref sharedMemory);
             presenceEventScheduler = CreatePresenceBroadcastEventScheduler(analyticsApiWrapper, config);
+            presenceEventScheduler.SetSharedMemory(ref sharedMemory);
+            
             if(gameStandardAnalyticsService != null)
             {
                 gameStandardAnalyticsService.Initialize(analyticsApiWrapper, config);
@@ -531,6 +559,14 @@ namespace AccelByte.Api
                 dataStorage);
 
             return newSession;
+        }
+        
+        private void UpdateServerTime(ref AccelByteTimeManager timeManager, IHttpClient httpClient, ref Config config)
+        {
+            if (httpClient != null && timeManager != null && config != null && timeManager.GetCachedServerTime() == null)
+            {
+                TimeManager.FetchServerTime(httpClient, config.Namespace, config.BasicServerUrl);
+            }
         }
     }
 }

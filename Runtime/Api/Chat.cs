@@ -386,6 +386,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
             if (!ValidateAccelByteId(chatId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetChatIdInvalidMessage(chatId), callback))
             {
                 return;
@@ -408,6 +414,12 @@ namespace AccelByte.Api
         public void MuteGroupUserChat(string groupId, string userId, int durationInSeconds, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
 
             MuteGroupChatRequest req = new MuteGroupChatRequest
             {
@@ -432,6 +444,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
             UnmuteGroupChatRequest req = new UnmuteGroupChatRequest { UserId = userId };
 
             coroutineRunner.Run(api.UnmuteGroupUserChat(groupId, req, cb =>
@@ -451,6 +469,12 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
             if (!ValidateAccelByteId(chatId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetChatIdInvalidMessage(chatId), callback))
             {
                 return;
@@ -468,6 +492,12 @@ namespace AccelByte.Api
         public void BanGroupUserChat(string groupId, List<string> userIds, ResultCallback<BanGroupChatResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
 
             BanGroupChatRequest req = new BanGroupChatRequest
             {
@@ -490,6 +520,12 @@ namespace AccelByte.Api
         public void UnbanGroupUserChat(string groupId, List<string> userIds, ResultCallback<UnbanGroupChatResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
 
             UnbanGroupChatRequest req = new UnbanGroupChatRequest
             {

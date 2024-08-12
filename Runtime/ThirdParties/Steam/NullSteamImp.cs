@@ -40,44 +40,6 @@ namespace AccelByte.ThirdParties.Steam
             result.Reject(new Error(ErrorCode.NotImplemented, "AccelByte Steam Extension is not installed. Please contact AccelByte support."));
             return result;
         }
-
-        public void GetAccelByteSteamToken(Action<GetSteamTokenResult> onGetPlatformTokenFinished)
-        {
-            GetAccelByteSteamToken()
-                .OnSuccess(tokenResult =>
-                {
-                    onGetPlatformTokenFinished?.Invoke(tokenResult);
-                })
-                .OnFailed(error =>
-                {
-                    AccelByteDebug.LogWarning(error.Message);
-                    onGetPlatformTokenFinished?.Invoke(null);
-                });
-        }
-
-        public void GetAccelByteSteamToken(string serviceIdentity, Action<GetSteamTokenResult> onGetPlatformTokenFinished)
-        {
-            GetAccelByteSteamToken(serviceIdentity)
-                .OnSuccess(tokenResult =>
-                {
-                    onGetPlatformTokenFinished?.Invoke(tokenResult);
-                })
-                .OnFailed(error =>
-                {
-                    AccelByteDebug.LogWarning(error.Message);
-                    onGetPlatformTokenFinished?.Invoke(null);
-                });
-        }
-
-        public void AuthenticateSteamTicket(string appid, string steamTicket, string webkey, string identity, Action onSuccess = null, Action<string> onFailed = null)
-        {
-            AuthenticateSteamTicket(appid, steamTicket, webkey, identity)
-                .OnSuccess(onSuccess)
-                .OnFailed(error =>
-                {
-                    onFailed?.Invoke(error.Message);
-                });
-        }
 #pragma warning restore IDE0060 // Remove unused parameter
     }
 }

@@ -33,7 +33,7 @@ namespace AccelByte.Server
 
         static AccelByteServerPlugin()
         {
-            const string deprecatedWarning = "AccelByteServerPlugin is deprecated and will be removed on July release. Please migrate to AccelByteSDK.GetServerRegistry.\nGuideline how to migrate: https://docs.accelbyte.io/gaming-services/developers/sdk-tools/sdk-guides/multiple-registries/migrate-to-multiple-registry-unity/";
+            const string deprecatedWarning = "AccelByteServerPlugin is deprecated and will be sunset on 3.79 release. Please migrate to AccelByteSDK.GetServerRegistry.\nGuideline how to migrate: https://docs.accelbyte.io/gaming-services/developers/sdk-tools/sdk-guides/multiple-registries/migrate-to-multiple-registry-unity/";
             UnityEngine.Debug.LogWarning(deprecatedWarning);
             AccelByteSDK.Environment.OnEnvironmentChanged += environmentChanged;
         }

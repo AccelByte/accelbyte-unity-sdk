@@ -14,6 +14,7 @@ namespace AccelByte.Core
         public AccelByteNetworkConditioner NetworkConditioner;
         public AccelByteMessagingSystem MessagingSystem;
         public AccelByteNotificationSender NotificationSender;
+        public AccelByteTimeManager TimeManager;
 
         public Utils.AccelByteIdValidator IdValidator
         {

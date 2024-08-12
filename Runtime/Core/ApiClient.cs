@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Models;
-using AccelByte.Server;
 using AccelByte.Api.Interface;
 
 namespace AccelByte.Core
@@ -214,7 +213,7 @@ namespace AccelByte.Core
         public Agreement GetAgreement() { return GetApi<Agreement, AgreementApi>(); }
         public Leaderboard GetLeaderboard() { return GetApi<Leaderboard, LeaderboardApi>(); }
         public CloudSave GetCloudSave() { return GetApi<CloudSave, CloudSaveApi>(); }
-        public GameTelemetry GetGameTelemetry() { return GetApi<GameTelemetry, GameTelemetryApi>(); }
+        public GameTelemetry GetGameTelemetry() { return GetApi<GameTelemetry, ClientGameTelemetryApi>(); }
         public Achievement GetAchievement() { return GetApi<Achievement, AchievementApi>(); }
         public Group GetGroup() { return GetApi<Group, GroupApi>(); }
         public UGC GetUgc() { return GetApi<UGC, UGCApi>(); }
@@ -222,25 +221,27 @@ namespace AccelByte.Core
         public SeasonPass GetSeasonPass() { return GetApi<SeasonPass, SeasonPassApi>(); }
         public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
         public TurnManager GetTurnManager() { return GetApi<TurnManager, TurnManagerApi>(); }
-        public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, MiscellaneousApi>(); }
+        public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, ClientMiscellaneousApi>(); }
         public Session GetSession() { return GetApi<Session, SessionApi>(); }
         public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
         public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
+        
+        [Obsolete("Duplicated Service. Please use GetAnalyticsService() to send telemetry data. Will be removed on September release")]
         public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
-        public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, AnalyticsApi>(); }
+        public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, ClientGameTelemetryApi>(); }
         public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }
-        [Obsolete("This API is deprecated and will be removed on July Release, please use GetVersionService instead")]
+        [Obsolete("This API renamed into GetVersionService and will be removed on 3.79 release")]
         public Api.ServiceVersion GetServiceVersion() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
         public Api.ServiceVersion GetVersionService() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
-        [Obsolete("This API is deprecated and will be removed on July Release, Please use GetHeartBeatService instead")]
+        [Obsolete("This API renamed into GetHeartBeatService and will be removed on 3.79 release")]
         public HeartBeat GetHeartBeat() { return GetApi<HeartBeat, HeartBeatApi>(); }
         public HeartBeat GetHeartBeatService(bool autoCreate = true)
         {
             HeartBeat retval = GetApi<HeartBeat, HeartBeatApi>(autoCreate);
             return retval;
         }
-        [Obsolete("This API is deprecated and will be removed on July Release, Please use GetStoreDisplayService instead")]
+        [Obsolete("This API renamed into GetStoreDisplayService and will be removed on 3.79 release")]
         public StoreDisplay GetStoreDisplay() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         public StoreDisplay GetStoreDisplayService() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         #endregion

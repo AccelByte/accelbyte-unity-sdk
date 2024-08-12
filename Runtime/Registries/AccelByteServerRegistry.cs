@@ -41,12 +41,35 @@ namespace AccelByte.Server
 
         private ApiSharedMemory sharedMemory;
 
-        internal AccelByteServerRegistry(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory)
+        private AccelByteTimeManager timeManager;
+
+        internal AccelByteTimeManager TimeManager
+        {
+            get
+            {
+                if (timeManager == null)
+                {
+                    timeManager = new AccelByteTimeManager();
+                }
+
+                return timeManager;
+            }
+            set
+            {
+                timeManager = value;
+                sharedMemory.TimeManager = timeManager;
+            }
+        }
+
+        internal AccelByteServerRegistry(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager)
         {
             serverApiClientInstances = new Dictionary<string, ServerApiClient>();
             loginUserClientApis = new List<ServerApiClient>();
             this.requestSenderFactory = requestSenderFactory;
+            this.timeManager = timeManager;
+            
             Initialize(environment, config, oAuthConfig);
+            UpdateServerTime(ref this.timeManager, CreateHtppClient(), ref Config);
         }
 
         /// <summary>
@@ -95,13 +118,13 @@ namespace AccelByte.Server
             OAuthConfig = oAuthConfig;
             this.environment = environment;
 
+            sharedMemory = new ApiSharedMemory();
+
             InitializeAnalytics(config);
 
-            sharedMemory = new ApiSharedMemory()
-            {
-                PredefinedEventScheduler = predefinedEventScheduler,
-                IdValidator = new Utils.AccelByteIdValidator()
-            };
+            sharedMemory.PredefinedEventScheduler = predefinedEventScheduler;
+            sharedMemory.IdValidator = new Utils.AccelByteIdValidator();
+            sharedMemory.TimeManager = this.TimeManager;
 
             SendSDKInitializedEvent(AccelByteSDK.Version);
         }
@@ -196,6 +219,7 @@ namespace AccelByte.Server
             };
 
             serverApiClientInstances[id] = newApiServer;
+            
             return true;
         }
 
@@ -259,6 +283,7 @@ namespace AccelByte.Server
         {
             const ServerAnalyticsService analyticsApiWrapper = null;
             predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsApiWrapper, config);
+            predefinedEventScheduler.SetSharedMemory(ref sharedMemory);
         }
 
         private void ClearAnalytics()
@@ -315,6 +340,14 @@ namespace AccelByte.Server
             var newPredefinedEventScheduler = new PredefinedEventScheduler(analyticsService);
             newPredefinedEventScheduler.SetEventEnabled(config.EnablePreDefinedEvent);
             return newPredefinedEventScheduler;
+        }
+
+        private void UpdateServerTime(ref AccelByteTimeManager timeManager, IHttpClient httpClient, ref ServerConfig config)
+        {
+            if (httpClient != null && timeManager != null && config != null && timeManager.GetCachedServerTime() == null)
+            {
+                TimeManager.FetchServerTime(httpClient, config.Namespace, config.BasicServerUrl);
+            }
         }
     }
 }

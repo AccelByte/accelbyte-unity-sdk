@@ -240,6 +240,8 @@ namespace AccelByte.Core
         PlayerBlockedUnableGet = 11818,
         ChannelChatSenderBanned = 11880,
         PartyNotFound = 11901,
+        FriendRequestAlreadySent = 11973,
+        FriendRequestAwaitingResponse = 11974,
         GameProfileAttributeMismatchException = 12022,
         GameProfileIdNotFoundException = 12041,
         EntitlementRequiredException = 12103,

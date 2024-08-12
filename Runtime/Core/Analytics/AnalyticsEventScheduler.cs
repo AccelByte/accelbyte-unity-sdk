@@ -35,6 +35,8 @@ namespace AccelByte.Core
         protected ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue =
             new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
 
+        internal ApiSharedMemory SharedMemory;
+
         internal Action<TelemetryBody> OnTelemetryEventAdded;
 
         public bool KeepValidating
@@ -109,6 +111,11 @@ namespace AccelByte.Core
         internal void SetAnalyticsApiWrapper(IAccelByteAnalyticsWrapper newAnalyticsWrapper)
         {
             analyticsWrapper = newAnalyticsWrapper;
+        }
+
+        internal void SetSharedMemory(ref ApiSharedMemory sharedMemory)
+        {
+            this.SharedMemory = sharedMemory;
         }
 
         internal void ClearTasks()
@@ -225,6 +232,10 @@ namespace AccelByte.Core
         protected void SendCommonEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref eventBody, ref SharedMemory.TimeManager);
+            }
 
             lock (jobQueue)
             {

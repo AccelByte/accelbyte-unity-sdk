@@ -46,7 +46,7 @@ namespace AccelByte.Api
 
         static AccelBytePlugin()
         {
-            const string deprecatedWarning = "AccelBytePlugin is deprecated and will be removed on July release. Please migrate to AccelByteSDK.GetClientRegistry.\nGuideline how to migrate: https://docs.accelbyte.io/gaming-services/developers/sdk-tools/sdk-guides/multiple-registries/migrate-to-multiple-registry-unity/";
+            const string deprecatedWarning = "AccelBytePlugin is deprecated and will be sunset on 3.79 release. Please migrate to AccelByteSDK.GetClientRegistry.\nGuideline how to migrate: https://docs.accelbyte.io/gaming-services/developers/sdk-tools/sdk-guides/multiple-registries/migrate-to-multiple-registry-unity/";
             UnityEngine.Debug.LogWarning(deprecatedWarning);
 
             if (!initialized)

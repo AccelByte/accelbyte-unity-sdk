@@ -38,6 +38,7 @@ namespace AccelByte.Models {
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
         [DataMember] public string SeasonPassServerUrl;
+        [DataMember] public string BasicServerUrl;
         [DataMember] public string AMSServerUrl = defaultAMSServerUrl;
         [DataMember] public string WatchdogUrl;
         [DataMember] public int AMSHeartbeatInterval = defaultAMSHeartbeatInterval;
@@ -121,6 +122,8 @@ namespace AccelByte.Models {
             this.MatchmakingV2ServerUrl = this.ExpanServiceApiUrl(this.MatchmakingV2ServerUrl, "/match2", forceExpandServiceApiUrl);
 
             this.SeasonPassServerUrl = this.ExpanServiceApiUrl(this.SeasonPassServerUrl, "/seasonpass", forceExpandServiceApiUrl);
+            
+            this.BasicServerUrl = this.ExpanServiceApiUrl(this.BasicServerUrl, "/basic", forceExpandServiceApiUrl);
 
             if (MaximumCacheSize <= 0)
             {
@@ -184,6 +187,11 @@ namespace AccelByte.Models {
             if (this.MatchmakingV2ServerUrl == httpBaseUrl + "/match2") this.MatchmakingV2ServerUrl = null;
 
             if (this.SeasonPassServerUrl == httpBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
+            
+            if(this.BasicServerUrl == httpBaseUrl + "/basic")
+            {
+                this.BasicServerUrl = null;
+            }
         }
 
         /// <summary>

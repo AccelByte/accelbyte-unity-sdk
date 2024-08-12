@@ -336,11 +336,24 @@ public class OAuth2 : ApiBase
         });
     }
 
+    public void LoginWithOtherPlatformId (string platformId
+        , string platformToken
+        , ResultCallback<TokenData, OAuthError> callback
+        , bool createHeadless = true)
+    {
+        LoginWithOtherPlatformId(platformId: platformId
+            , platformToken: platformToken
+            , callback: callback
+            , createHeadless: createHeadless
+            , serviceLabel: null);
+    }
+    
     public void LoginWithOtherPlatformId
         (string platformId
         , string platformToken
         , ResultCallback<TokenData, OAuthError> callback
-        , bool createHeadless = true)
+        , bool createHeadless
+        , string serviceLabel)
     {
         Report.GetFunctionLog(GetType().Name);
 
@@ -368,6 +381,11 @@ public class OAuth2 : ApiBase
         if(macAddresses != null && macAddresses.Length > 0)
         {
             requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
+        }
+
+        if (!string.IsNullOrEmpty(serviceLabel))
+        {
+            requestBuilder = requestBuilder.WithFormParam("serviceLabel", serviceLabel);
         }
 
         var request = requestBuilder.GetResult();
@@ -980,6 +998,19 @@ public class OAuth2 : ApiBase
         , bool createHeadless
         , ResultCallback<TokenDataV4, OAuthError> callback)
     {
+        LoginWithOtherPlatformIdV4(platformId: platformId
+            , platformToken: platformToken
+            , createHeadless: createHeadless
+            , serviceLabel: null
+            , callback: callback);
+    }
+
+    public void LoginWithOtherPlatformIdV4(string platformId
+        , string platformToken
+        , bool createHeadless
+        , string serviceLabel
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
         Report.GetFunctionLog(GetType().Name);
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/{platformId}/token")
@@ -996,6 +1027,11 @@ public class OAuth2 : ApiBase
         if (macAddresses != null && macAddresses.Length > 0)
         {
             requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
+        }
+
+        if (!string.IsNullOrEmpty(serviceLabel))
+        {
+            requestBuilder = requestBuilder.WithFormParam("serviceLabel", serviceLabel);
         }
 
         var request = requestBuilder.GetResult();

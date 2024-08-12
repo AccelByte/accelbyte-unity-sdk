@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine.Assertions;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -47,10 +48,12 @@ namespace AccelByte.Api
 
         public IEnumerator DeleteGroupChat(string groupId, string chatId, ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(chatId, nameof(chatId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId, chatId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/chats/{chats}")
@@ -77,12 +80,30 @@ namespace AccelByte.Api
         public IEnumerator MuteGroupUserChat(string groupId, MuteGroupChatRequest muteGroupChatRequest,
             ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(muteGroupChatRequest.UserId, nameof(muteGroupChatRequest.UserId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , groupId
+                , muteGroupChatRequest
+                , muteGroupChatRequest?.UserId
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
+
             bool durationIsPositive = muteGroupChatRequest.Duration > 0;
-            Assert.IsTrue(durationIsPositive, nameof(muteGroupChatRequest.Duration) + " cannot be less than or equal 0");
+            if (!durationIsPositive)
+            {
+                callback?.TryError(
+                    new Error(
+                        ErrorCode.InvalidRequest
+                        , message: $"{nameof(muteGroupChatRequest.Duration)} cannot be less than or equal to 0"
+                    )
+                );
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/mute")
@@ -108,10 +129,18 @@ namespace AccelByte.Api
 
         public IEnumerator UnmuteGroupUserChat(string groupId, UnmuteGroupChatRequest unmuteGroupChatRequest, ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(unmuteGroupChatRequest.UserId, nameof(unmuteGroupChatRequest.UserId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , groupId
+                , unmuteGroupChatRequest
+                , unmuteGroupChatRequest?.UserId
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/unmute")
@@ -138,16 +167,18 @@ namespace AccelByte.Api
         public IEnumerator GetGroupChatSnapshot(string groupId, string chatId,
             ResultCallback<ChatSnapshotResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(chatId, nameof(chatId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId, chatId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/unmute/snapshot/{snapshot}")
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/snapshot/{chatId}")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("topic", GenerateGroupTopicId(groupId))
-                .WithPathParam("snapshot", chatId)
+                .WithPathParam("chatId", chatId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
@@ -168,10 +199,18 @@ namespace AccelByte.Api
         public IEnumerator BanGroupUserChat(string groupId, BanGroupChatRequest banGroupChatRequest,
             ResultCallback<BanGroupChatResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(banGroupChatRequest.UserIds, nameof(banGroupChatRequest.UserIds) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , groupId
+                , banGroupChatRequest
+                , banGroupChatRequest?.UserIds
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/ban-members")
@@ -198,10 +237,18 @@ namespace AccelByte.Api
         public IEnumerator UnbanGroupUserChat(string groupId, UnbanGroupChatRequest unbanGroupChatRequest,
             ResultCallback<UnbanGroupChatResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(groupId, nameof(groupId) + " cannot be null");
-            Assert.IsNotNull(unbanGroupChatRequest.UserIds, nameof(unbanGroupChatRequest.UserIds) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , groupId
+                , unbanGroupChatRequest
+                , unbanGroupChatRequest?.UserIds
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/topic/{topic}/unban-members")

@@ -4,11 +4,13 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
+    [Obsolete("Duplicated implementation. Please use AnalyticsService to send telemetry data. Will be removed on September release")]
     public class PresenceBroadcastEvent : WrapperBase, IAccelByteAnalyticsWrapper
     {
         private readonly PresenceBroadcastEventApi api = null;

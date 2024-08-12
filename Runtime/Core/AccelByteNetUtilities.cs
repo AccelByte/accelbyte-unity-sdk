@@ -26,6 +26,20 @@ namespace AccelByte.Core
             coroutineRunner.Run(GetPublicIpAsync(callback));
         }
 
+        internal static void GetPublicIpWithIpify(HttpOperator httpOperator, ResultCallback<PublicIp> callback)
+        {
+            var getPubIpRequest = HttpRequestBuilder.CreateGet("https://api.ipify.org?format=json")
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(getPubIpRequest, response =>
+            {
+                var result = response.TryParseJson<PublicIp>();
+                callback?.Try(result);
+            });
+        }
+
         private static IEnumerator GetPublicIpAsync(ResultCallback<PublicIp> callback)
         {
             var getPubIpRequest = HttpRequestBuilder.CreateGet("https://api.ipify.org?format=json")

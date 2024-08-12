@@ -60,8 +60,9 @@ namespace AccelByte.Core
         {
             var responseLog = "HTTP Response: \n" +
                 "---\n" +
+                unityWebRequest.method + " " + unityWebRequest.url + "\n" +
                 "HTTP/1.1 " + unityWebRequest.responseCode + "\n" +
-                "Date : " + System.DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
+                "Date : " + System.DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ") + "\n" +
                 "Content-Length : " + unityWebRequest.downloadedBytes + "\n\n" +
                 unityWebRequest.downloadHandler.text +
                 "\n---\n";

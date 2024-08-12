@@ -40,7 +40,22 @@ namespace AccelByte.Api
                 rsp => response = rsp);
             
             var result = response.TryParseJson<QosServerList>();
-            callback.Try(result);
+            callback?.Try(result);
+        }
+        
+        internal void RequestGetAllQosServers( ResultCallback<QosServerList> callback )
+        {
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/qos")
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<QosServerList>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
@@ -59,7 +74,24 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<QosServerList>();
-            callback.Try(result);
+            callback?.Try(result);
+        }
+
+        internal void RequestGetQosServers(ResultCallback<QosServerList> callback)
+        {
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("status", "ACTIVE")
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<QosServerList>();
+                callback?.Try(result);
+            });
         }
     }
 }

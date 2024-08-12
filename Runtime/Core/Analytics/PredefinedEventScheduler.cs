@@ -24,6 +24,11 @@ namespace AccelByte.Core
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
+            if (SharedMemory != null && SharedMemory.TimeManager != null)
+            {
+                AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref eventBody, ref SharedMemory.TimeManager);
+            }
+            
             if(analyticsWrapper != null && analyticsWrapper.GetSession().IsValid())
             {
                 eventBody.EventNamespace = analyticsWrapper.GetSession().Namespace;

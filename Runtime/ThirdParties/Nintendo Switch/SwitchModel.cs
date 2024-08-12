@@ -7,5 +7,6 @@ namespace AccelByte.ThirdParties.NintendoSwitch
     {
         public string AccelByteLoginToken;
         public string NetworkServiceAccountId;
+        public System.DateTime TokenExpiresIn;
     }
 }

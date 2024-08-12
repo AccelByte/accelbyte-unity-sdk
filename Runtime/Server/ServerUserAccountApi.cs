@@ -258,7 +258,7 @@ namespace AccelByte.Server
             }
 
             var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/iam/v3/namespaces/{namespace}/users/{userId}")
+                .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithContentType(MediaType.ApplicationJson)
