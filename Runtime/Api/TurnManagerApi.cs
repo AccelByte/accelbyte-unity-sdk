@@ -1,9 +1,10 @@
 // Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -135,6 +136,36 @@ namespace AccelByte.Api
 
             callback.Try(result);
         }
-    }
 
+        public void Disconnect(ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var data = new DisconnectTurnServerRequest()
+            {
+                UserId = Session.UserId
+            };
+
+            var httpBuilder = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/metrics/namespaces/{namespace}/disconnected")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+            .GetResult();
+
+            IHttpRequest request = httpBuilder;
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+    }
 }

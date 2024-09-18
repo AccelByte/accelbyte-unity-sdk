@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -38,9 +38,18 @@ namespace AccelByte.Server
 
         private int websocketConnectionTimeoutMs = 60000;
 
-        private Func<AccelByteWebSocket> websocketFactory;
+        private Models.ServerConfig serverConfig;
 
-        public ServerDSHubWebsocketApi(CoroutineRunner inCoroutineRunner, string inWebsocketUrl, ISession inSession, int inWebsocketConnectionTimeoutMs = 60000)
+        private Func<AccelByteWebSocket> websocketFactory;
+        
+        private ApiSharedMemory sharedMemory;
+        
+        public ServerDSHubWebsocketApi(
+            CoroutineRunner inCoroutineRunner
+            , string inWebsocketUrl
+            , ISession inSession
+            , int inWebsocketConnectionTimeoutMs = 60000
+            , Models.ServerConfig serverConfig = null)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
@@ -48,6 +57,12 @@ namespace AccelByte.Server
             websocketUrl = inWebsocketUrl;
             session = inSession;
             websocketConnectionTimeoutMs = inWebsocketConnectionTimeoutMs;
+            this.serverConfig = serverConfig;
+        }
+
+        internal void SetSharedMemory(ApiSharedMemory sharedMemory)
+        {
+            this.sharedMemory = sharedMemory;
         }
 
         private AccelByteWebSocket CreateWebsocket()
@@ -102,10 +117,10 @@ namespace AccelByte.Server
                     switch (GetCurrentWebsocket().State)
                     {
                         case WsState.Open:
-                            AccelByteDebug.LogWarning("[Server DS Hub] Websocket is connected");
+                            sharedMemory?.Logger?.LogWarning("[Server DS Hub] Websocket is connected");
                             return;
                         case WsState.Connecting:
-                            AccelByteDebug.LogWarning("[Server DS Hub] Websocket is connecting");
+                            sharedMemory?.Logger?.LogWarning("[Server DS Hub] Websocket is connecting");
                             return;
                         case WsState.Closing:
                         case WsState.Closed:
@@ -120,11 +135,19 @@ namespace AccelByte.Server
 
                 if (newWebsocket != null)
                 {
+                    string isUsingCustomService = "false";
+                    if (serverConfig != null)
+                    {
+                        isUsingCustomService = (!serverConfig.ServerUseAMS).ToString().ToLower();
+                    }
+
                     Dictionary<string, string> headers = new Dictionary<string, string>()
                     {
                         { "Authorization", $"Bearer {session.AuthorizationToken}"},
-                        { "X-Ab-ServerID", serverName }
+                        { "X-Ab-ServerID", serverName },
+                        { "X-Ab-Custom", isUsingCustomService }
                     };
+
                     newWebsocket.Connect(websocketUrl, string.Empty, headers, callback);
                 }
             }
@@ -220,6 +243,7 @@ namespace AccelByte.Server
             if (inWs != null)
             {
                 this.webSocket = new AccelByteWebSocket(inWs, websocketConnectionTimeoutMs);
+                this.webSocket.SetLogger(sharedMemory?.Logger);
             }
             else
             {

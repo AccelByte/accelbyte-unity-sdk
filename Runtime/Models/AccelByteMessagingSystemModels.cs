@@ -13,7 +13,10 @@ namespace AccelByte.Models
         LobbyConnected,
         QosRegionLatenciesUpdated,
         NotificationSenderLobby,
-        NotificationBufferSent
+        NotificationBufferSent,
+        MatchmakingStarted,
+        MatchFoundOnPoll,
+        MatchFoundOnGetSessionDetails
     }
 
     [DataContract, Preserve]

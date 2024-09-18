@@ -96,6 +96,12 @@ namespace AccelByte.Api
         {
             // Curry this obsolete data to the new overload ->
         }
+        
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            oAuth2?.SetSharedMemory(newSharedMemory);
+        }
 
         /// <summary>
         /// Login to AccelByte account with username (e.g. email) and password.
@@ -271,7 +277,7 @@ namespace AccelByte.Api
         {
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
             }
 
             Action<Error> onAlreadyLogin = (error) =>
@@ -314,7 +320,7 @@ namespace AccelByte.Api
         {
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
             }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
@@ -350,7 +356,7 @@ namespace AccelByte.Api
         {
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
             }
 
             Action<Error> onAlreadyLogin = (error) =>
@@ -365,17 +371,24 @@ namespace AccelByte.Api
             Action onLoginSuccess = () =>
             {
                 const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                Session.SaveAuthTrustId(onDone: isSuccess =>
                 {
-                    OnLoginSuccess?.Invoke(Session.TokenData);
-                    SendLoginSuccessPredefinedEventFromCurrentSession();
-                    callback.TryOk();
+                    Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(Session.TokenData);
+                        SendLoginSuccessPredefinedEventFromCurrentSession();
+                        callback.TryOk();
+                    });
                 });
+                
             };
-            Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
-                , onAlreadyLogin
-                , onLoginFailed
-                , onLoginSuccess);
+            Session.LoadAuthTrustId((isSuccess, authTrustId) =>
+            {
+                Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe, authTrustId)
+                    , onAlreadyLogin
+                    , onLoginFailed
+                    , onLoginSuccess);
+            });
         }
         
         private void LoginWithUserNameV3( string email
@@ -385,7 +398,7 @@ namespace AccelByte.Api
         {
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
             }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
@@ -400,17 +413,23 @@ namespace AccelByte.Api
             Action<TokenData> onLoginSuccess = (tokenData) =>
             {
                 const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                Session.SaveAuthTrustId(isSuccess =>
                 {
-                    OnLoginSuccess?.Invoke(tokenData);
-                    SendLoginSuccessPredefinedEvent(tokenData);
-                    callback.TryOk(tokenData);
+                    Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                        callback.TryOk(tokenData);
+                    });
                 });
             };
-            Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe)
-                , onAlreadyLogin
-                , onLoginFailed
-                , onLoginSuccess);
+            Session.LoadAuthTrustId((isSuccess, authTrustId) =>
+            {
+                Login(cb => oAuth2.LoginWithUsernameV3(email, password, cb, rememberMe, authTrustId)
+                    , onAlreadyLogin
+                    , onLoginFailed
+                    , onLoginSuccess);
+            });
         }
 
         /// <summary>
@@ -1366,7 +1385,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(userName))
             {
-                AccelByteDebug.LogWarning("Upgrade username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Upgrade username is deprecated, please use email for the replacement.");
             }
 
             api.Upgrade(requestModel, requestParameter, result =>
@@ -1549,7 +1568,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(userName))
             {
-                AccelByteDebug.LogWarning("username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("username is deprecated, please use email for the replacement.");
             }
 
             var requestModel = new SendPasswordResetCodeRequest
@@ -1575,7 +1594,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(userName))
             {
-                AccelByteDebug.LogWarning("username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("username is deprecated, please use email for the replacement.");
             }
 
             var requestModel = new ResetPasswordRequest
@@ -1893,7 +1912,7 @@ namespace AccelByte.Api
 
             if (searchBy == SearchType.USERNAME)
             {
-                AccelByteDebug.LogWarning("Search by Username is deprecated, please use other search type for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Search by Username is deprecated, please use other search type for the replacement.");
             }
 
             var requestModel = new SearchUsersRequest
@@ -2556,7 +2575,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Authentication using username is deprecated, please use user's email.");
+                SharedMemory?.Logger?.LogWarning("Authentication using username is deprecated, please use user's email.");
             }
 
             Action<Error> onAlreadyLogin = (error) =>
@@ -2601,7 +2620,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Authentication using username is deprecated, please use user's email.");
+                SharedMemory?.Logger?.LogWarning("Authentication using username is deprecated, please use user's email.");
             }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
@@ -2661,7 +2680,7 @@ namespace AccelByte.Api
                     {
                         callback.TryError(new Error(ErrorCode.GameRecordNotFound, "avatarUrl value is null or empty"));
                     }
-                    ABUtilities.DownloadTexture2DAsync(result.Value.avatarUrl, callback);
+                    ABUtilities.DownloadTexture2DAsync(result.Value.avatarUrl, callback, SharedMemory?.Logger);
                 }
             });
         }
@@ -2777,12 +2796,18 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (userSession.IsValid())
             {
-                callback.TryError(ErrorCode.InvalidRequest,
+                callback?.TryError(ErrorCode.InvalidRequest,
                     "User is already logged in.");
                 return;
             }
 
-            oAuth2.GenerateGameToken(code, callback);
+            oAuth2.GenerateGameToken(code, generateGameTokenResult =>
+            {
+                Session.SaveAuthTrustId(onDone: isSuccess =>
+                {
+                    callback?.Try(generateGameTokenResult);
+                });
+            });
         }
         
         /// <summary>
@@ -2941,7 +2966,7 @@ namespace AccelByte.Api
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
-                AccelByteDebug.LogWarning("Login using username is deprecated, please use email for the replacement.");
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
             }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
@@ -2960,10 +2985,13 @@ namespace AccelByte.Api
                 if (tokenData.Queue == null)
                 {
                     const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                    Session.SaveAuthTrustId(isSuccess =>
                     {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
+                        Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                        {
+                            OnLoginSuccess?.Invoke(tokenData);
+                            SendLoginSuccessPredefinedEvent(tokenData);
+                        });
                     });
                 }
                 else
@@ -2976,7 +3004,10 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithEmailV4(email, password, rememberMe, cb);
+                    Session.LoadAuthTrustId((isSuccess, authTrustId) =>
+                    {
+                        oAuth2.LoginWithEmailV4(email, password, rememberMe, cb, authTrustId);
+                    });
                 }
                 , onAlreadyLogin
                 , onLoginFailed
@@ -3589,27 +3620,30 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            oAuth2.GetTokenWithLoginTicket(loginTicket.Queue.Ticket, result =>
+            Session.LoadAuthTrustId((isSuccess, authTrustId) =>
             {
-                if(result.IsError)
+                oAuth2.GetTokenWithLoginTicket(loginTicket: loginTicket.Queue.Ticket, authTrustId: authTrustId, callback: result =>
                 {
-                    callback.TryError(result.Error);
-                    return;
-                }
+                    if(result.IsError)
+                    {
+                        callback.TryError(result.Error);
+                        return;
+                    }
 
-                if (loginTicket.Queue.Identifier == string.Empty)
-                {
-                    loginTicket.Queue.Identifier = result.Value.user_id;
-                }
+                    if (loginTicket.Queue.Identifier == string.Empty)
+                    {
+                        loginTicket.Queue.Identifier = result.Value.user_id;
+                    }
 
-                const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(loginTicket.Queue.Identifier, saveTokenAsLatestUser, (saveSuccess) =>
-                {
-                    OnLoginSuccess?.Invoke(result.Value);
-                    SendLoginSuccessPredefinedEvent(result.Value);
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(loginTicket.Queue.Identifier, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(result.Value);
+                        SendLoginSuccessPredefinedEvent(result.Value);
+                    });
+
+                    callback.TryOk(result.Value);
                 });
-
-                callback.TryOk(result.Value);
             });
         }
 

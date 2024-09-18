@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -25,7 +25,8 @@ namespace AccelByte.Utils
         public static async Task<T> Run<T>(Func<Task<T>> operation,
             int initialDelayInMs = 1000,
             int maxDelayInMs = 2000,
-            int maxRetries = 5)
+            int maxRetries = 5,
+            IDebugger logger = null)
         {
             int retryCount = 0;
             int currentDelay = initialDelayInMs;
@@ -49,7 +50,7 @@ namespace AccelByte.Utils
                     retryCount++;
                     if (retryCount < maxRetries)
                     {
-                        AccelByteDebug.LogVerbose($"[{retryCount}/{maxRetries}] Received Exception {e.Message}. Attempting to retry");
+                        logger?.LogVerbose($"[{retryCount}/{maxRetries}] Received Exception {e.Message}. Attempting to retry");
 
                         // Calculate the next delay using exponential backoff
                         currentDelay = Math.Min(currentDelay * 2, maxDelayInMs);

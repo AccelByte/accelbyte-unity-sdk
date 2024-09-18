@@ -12,7 +12,7 @@ namespace AccelByte.Core
 
         public void Stop()
         {
-            AccelByteSDK.DisposeFileStream();
+            AccelByteSDK.Implementation.DisposeFileStream();
         }
     }
 }

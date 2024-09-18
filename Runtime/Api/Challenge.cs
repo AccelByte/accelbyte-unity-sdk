@@ -141,5 +141,41 @@ namespace AccelByte.Api
             api.ClaimReward(body
                 , callback);
         }
+
+        public void GetChallengeProgress(string challengeCode
+            , int rotationIndex
+            , ResultCallback<GoalProgressionResponse> callback
+            , string goalCode = ""
+            , int offset = 0
+            , int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetChallengeProgress(challengeCode
+                , rotationIndex
+                , callback
+                , goalCode
+                , offset
+                , limit);
+        }
+
+        public void EvaluateChallengeProgress(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.EvaluateChallengeProgress(callback);
+        }
     }
 }

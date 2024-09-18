@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
@@ -22,7 +22,7 @@ namespace AccelByte.Utils.Infoware
 
         internal override string GetMacAddress()
         {
-            AccelByteDebug.LogWarning("Incomplete implementation for PlayStation 4 platform");
+            logger?.LogWarning("Incomplete implementation for PlayStation 4 platform");
             return "";
         }
 

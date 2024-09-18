@@ -10,6 +10,7 @@ namespace AccelByte.Api
 {
     internal class InventoryApi : ApiBase
     {
+        [UnityEngine.Scripting.Preserve]
         internal InventoryApi(
             IHttpClient inHttpClient
             , Config inConfig

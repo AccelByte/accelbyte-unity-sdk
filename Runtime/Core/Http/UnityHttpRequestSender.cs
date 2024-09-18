@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
-using System.Collections;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace AccelByte.Core
@@ -12,31 +10,46 @@ namespace AccelByte.Core
     internal class UnityHttpRequestSender : IHttpRequestSender
     {
         WebRequestScheduler httpTaskScheduler;
+
+        private IDebugger logger;
+        private CoreHeartBeat heartBeat;
+        
         public UnityHttpRequestSender(WebRequestScheduler httpTaskScheduler)
         {
             this.httpTaskScheduler = httpTaskScheduler;
         }
 
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
+            httpTaskScheduler?.SetLogger(logger);
+        }
+
+        internal void SetHeartBeat(CoreHeartBeat coreHeartBeat)
+        {
+            heartBeat = coreHeartBeat;
+        }
+
         public void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs = 0)
         {
-            System.Action<float> onGameUpdate = null;
-
-            onGameUpdate = (deltaTime) =>
+            if (heartBeat != null)
             {
-                AccelByteSDKMain.OnGameUpdate -= onGameUpdate;
-
-                WebRequestTask newTask = new WebRequestTask(request, timeoutMs, delayTimeMs)
+                Action onNextFrame = () =>
                 {
-                    OnComplete = (sentWebRequest) =>
+                    WebRequestTask newTask = new WebRequestTask(request, timeoutMs, delayTimeMs)
                     {
-                        HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
-                        callback?.Invoke(responseResult);
-                    }
+                        OnComplete = (sentWebRequest) =>
+                        {
+                            HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
+                            callback?.Invoke(responseResult);
+                        }
+                    };
+                    httpTaskScheduler.AddTask(newTask);
                 };
-                httpTaskScheduler.AddTask(newTask);
-            };
-
-            AccelByteSDKMain.OnGameUpdate += onGameUpdate;
+                var cancelTokenSource = new System.Threading.CancellationTokenSource();
+                WaitAFrameCommand waitCommand = new WaitAFrameCommand(onNextFrame, cancelTokenSource.Token);
+                heartBeat.Wait(waitCommand);
+            }
         }
 
         public void ClearTasks()

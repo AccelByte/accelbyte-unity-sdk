@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,6 +10,13 @@ namespace AccelByte.Core
 {
     public abstract class AccelByteGameStandardEventCacheImpTemplate
     {
+        private IDebugger logger;
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
+        }
+        
         internal virtual void LoadCache(string environment, Action<List<TelemetryBody>> callback)
         {
             LoadTelemetryEventsCache(environment, (fileText) =>
@@ -29,7 +36,7 @@ namespace AccelByte.Core
                     }
                     catch (System.Exception ex)
                     {
-                        AccelByteDebug.LogWarning($"Failed loading standard event file.\n{ex.Message}");
+                        logger?.LogWarning($"Failed loading standard event file.\n{ex.Message}");
                     }
                     callback?.Invoke(queueCollection);
                 });

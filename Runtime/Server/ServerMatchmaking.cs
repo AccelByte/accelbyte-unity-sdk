@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using UnityEngine;
@@ -160,7 +160,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                AccelByteDebug.Log("Server session is not valid");
+                SharedMemory?.Logger?.Log("Server session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }

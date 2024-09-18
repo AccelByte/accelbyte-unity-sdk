@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -20,12 +20,16 @@ namespace AccelByte.Core
             }
         }
 
-        public SteamWrapper() 
+        private IDebugger logger;
+
+        public SteamWrapper(IDebugger logger = null)
         {
+            this.logger = logger;
         }
 
-        public SteamWrapper(string authTicketIdentity)
+        public SteamWrapper(string authTicketIdentity, IDebugger logger = null)
         {
+            this.logger = logger;
             this.authTicketIdentity = authTicketIdentity;
         }
 
@@ -60,7 +64,7 @@ namespace AccelByte.Core
                 })
                 .OnFailed(error =>
                 {
-                    AccelByteDebug.LogWarning(error.Message);
+                    logger?.LogWarning(error.Message);
                     callback?.Invoke(null);
                 });
             }

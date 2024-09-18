@@ -117,6 +117,7 @@ namespace AccelByte.Core
                 binder: null,
                 args: apiArgs,
                 culture: null);
+            api.SetSharedMemory(sharedMemory);
 
             object[] wrapperArgs =
             {

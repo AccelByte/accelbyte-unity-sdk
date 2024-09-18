@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,11 +14,18 @@ namespace AccelByte.Core
         internal abstract void StopScheduler();
 
         private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
+
+        protected IDebugger logger;
         
         ~WebRequestScheduler()
         {
             StopScheduler();
             CleanTask();
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            this.logger = newLogger;
         }
 
         internal void AddTask(WebRequestTask newTask)

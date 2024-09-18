@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,12 +10,19 @@ namespace Core
     {
         private string fragmentedMessageCache;
 
+        private IDebugger logger;
+        
+        public void Setlogger(IDebugger logger = null)
+        {
+            this.logger = logger;
+        }
+
         public bool Process(string message, out string completeMessage)
         {
             // if we don't have envelope start or end set, then we assume it's a complete message
             if (string.IsNullOrEmpty(envelopeStart) || string.IsNullOrEmpty(envelopeEnd))
             {
-                AccelByteDebug.Log("envelope start or end is empty, skipping message fragment processing");
+                logger?.Log("envelope start or end is empty, skipping message fragment processing");
                 
                 // remove start if it's set
                 if (!string.IsNullOrEmpty(envelopeStart) && message.StartsWith(envelopeStart))

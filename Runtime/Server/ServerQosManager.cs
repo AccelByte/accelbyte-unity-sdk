@@ -110,7 +110,7 @@ namespace AccelByte.Server
                 }
                 catch (Exception ex)
                 {
-                    AccelByteDebug.LogWarning($"Encounter issue on calculating serevr latency. {ex.Message}");
+                    SharedMemory?.Logger?.LogWarning($"Encounter issue on calculating serevr latency. {ex.Message}");
                 }
             }
 

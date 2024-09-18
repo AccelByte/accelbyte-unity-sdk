@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -40,7 +40,7 @@ namespace AccelByte.Core {
         void Connect(string url, string protocols, string sessionId, string entitlementToken = null, ResultCallback callback = null);
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);
-
+        void SetLogger(IDebugger logger);
         void SetProxy(string url, string username, string password);
 
         void Ping();

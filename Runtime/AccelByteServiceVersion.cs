@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -42,7 +42,7 @@ namespace AccelByte.Core
             }
         }
 
-        public bool IsCompatible(string serviceName, string serviceVersion)
+        public bool IsCompatible(string serviceName, string serviceVersion, IDebugger logger = null)
         {
             bool isCompatible = false;
             try
@@ -80,7 +80,7 @@ namespace AccelByte.Core
             }
             catch (Exception e)
             {
-                AccelByteDebug.LogWarning(e.Message);
+                logger?.LogWarning(e.Message);
             }
             return isCompatible;
         }

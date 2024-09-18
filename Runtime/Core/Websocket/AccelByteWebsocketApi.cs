@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -45,9 +45,11 @@ namespace Core
         protected CoroutineRunner coroutineRunner;
         protected AccelByteWebSocket webSocket;
         protected string namespace_;
+        internal ApiSharedMemory SharedMemory;
         
         protected readonly object syncToken = new object();
         private long messageId;
+        private IDebugger logger;
         #endregion
         
         #region constructor
@@ -110,6 +112,15 @@ namespace Core
         public virtual void SendMessage(string message)
         {
             webSocket.Send(message);
+        }
+        #endregion
+
+        #region internal method
+
+        internal virtual void SetSharedMemory(ApiSharedMemory sharedMemory)
+        {
+            this.SharedMemory = sharedMemory;
+            webSocket?.SetLogger(sharedMemory?.Logger);
         }
         #endregion
         

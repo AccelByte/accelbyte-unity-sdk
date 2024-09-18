@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -85,9 +85,8 @@ namespace AccelByte.Core
                         retval = bodyResponseNullOrEmpty ? Result<T, U>.CreateOk() : Result<T, U>.CreateOk(response.BodyBytes.ToObject<T>());
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    AccelByteDebug.LogWarning($"Failed parsing response.\nException: {e.Message}");
                     retval = Result<T, U>.CreateError(new U());
                 }
             }

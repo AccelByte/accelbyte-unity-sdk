@@ -1,4 +1,4 @@
-// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -94,7 +94,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="turnServerRegion">Region of the selected turn server</param>
         /// <param name="connectionType">P2P connection type</param>
-        /// /// <param name="callback">callback to trigger with operation result</param>
+        /// <param name="callback">callback to trigger with operation result</param>
         public void SendMetric(string turnServerRegion, P2PConnectionType connectionType, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -116,7 +116,7 @@ namespace AccelByte.Api
 
             if (getResult.IsError)
             {
-                AccelByte.Core.AccelByteDebug.LogWarning("TURN Manager error on getting closest TURN server");
+                SharedMemory?.Logger?.LogWarning("TURN Manager error on getting closest TURN server");
                 callback.TryError(getResult.Error.Code);
                 yield break;
             }
@@ -165,6 +165,22 @@ namespace AccelByte.Api
             {
                 callback.TryOk(currentClosestServer);
             }
+        }
+
+        /// <summary>
+        /// Send disconnected metric
+        /// </summary>
+        /// <param name="callback">callback to trigger with operation result</param>
+        public void SendDisconnectedMetric(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.Disconnect(callback);
         }
     }
 }

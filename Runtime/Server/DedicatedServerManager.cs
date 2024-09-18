@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -35,8 +35,8 @@ namespace AccelByte.Server
             session = inSession;
             api = inApi;
 
-            AccelByteDebug.Log("Server init sessionAdapter: " + session.AuthorizationToken);
-            AccelByteDebug.Log("Server init podName: " + serverName);
+            api.SharedMemory?.Logger?.Log("Server init sessionAdapter: " + session.AuthorizationToken);
+            api.SharedMemory?.Logger?.Log("Server init podName: " + serverName);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                AccelByteDebug.Log("Server RegisterServer session is not valid");
+                SharedMemory?.Logger?.Log("Server RegisterServer session is not valid");
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }

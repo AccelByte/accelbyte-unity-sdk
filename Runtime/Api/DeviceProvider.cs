@@ -17,13 +17,22 @@ namespace AccelByte.Api
         public readonly string DeviceId;
         public readonly string DeviceType;
         public readonly string UniqueId;
+        internal readonly bool IsGenerated;
 
 #if UNITY_SWITCH && !UNITY_EDITOR
         public static readonly string DefaultGeneratedIdCacheFileDir = "AccelByte/";
 #else
-        public static string DefaultGeneratedIdCacheFileDir = $"{Application.persistentDataPath}/AccelByte/{Application.productName}/";
+        public static string DefaultGeneratedIdCacheFileDir = $"{Application.persistentDataPath}/AccelByte/";
 #endif
         public static string CacheFileName = "DeviceId";
+
+        private readonly static char[] eligibleCharacters =
+        {
+            '0', '1', '2', '3', '4', '5', '6','7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+            'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        };
+        private static System.Random randomizer;
+        private static int randomDeviceIdSeed;
 
         public static string EncodeHMAC(string macAddress, string key)
         {
@@ -49,7 +58,14 @@ namespace AccelByte.Api
 
         public DeviceProvider(string deviceType
             , string identifier
-            , string uniqueId)
+            , string uniqueId) : this(deviceType, identifier, uniqueId, isGenerated: false)
+        {
+        }
+        
+        internal DeviceProvider(string deviceType
+            , string identifier
+            , string uniqueId
+            , bool isGenerated)
         {
             Assert.IsNotNull(deviceType, "Device Type is null!");
             Assert.IsNotNull(identifier, "Device Id is null!");
@@ -57,13 +73,16 @@ namespace AccelByte.Api
             this.DeviceType = deviceType;
             this.DeviceId = identifier + "_" + uniqueId;
             this.UniqueId = uniqueId;
+            this.IsGenerated = isGenerated;
         }
 
-        public static DeviceProvider GetFromSystemInfo(string encodeKey, string generatedIdCacheFileDir = null)
+        public static DeviceProvider GetFromSystemInfo(string encodeKey, string generatedIdCacheFileDir = null, IDebugger logger = null, IFileStream fs = null, Models.DeviceIdGeneratorConfig deviceIdGeneratorConfig = null)
         {
-            string platformUniqueIdentifier = GetDeviceId(encodeKey);
+            bool randomizeUniqueIdentifier = deviceIdGeneratorConfig != null ? deviceIdGeneratorConfig.RandomizeDeviceId : false;
+            string platformUniqueIdentifier = !randomizeUniqueIdentifier ? GetDeviceId(encodeKey, logger: logger) : null;
+            bool isIdentifierGenerated = string.IsNullOrEmpty(platformUniqueIdentifier);
 
-            if (string.IsNullOrEmpty(platformUniqueIdentifier))
+            if (isIdentifierGenerated)
             {
 #if !UNITY_WEBGL
                 try
@@ -72,43 +91,45 @@ namespace AccelByte.Api
                     {
                         generatedIdCacheFileDir = DefaultGeneratedIdCacheFileDir;
                     }
-                    AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir);
+                    AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir, fs, logger);
                     if (fileCache.Contains(CacheFileName))
                     {
                         platformUniqueIdentifier = fileCache.Retrieve(CacheFileName);
-                        AccelByteDebug.LogVerbose($"Retrieve cached device id: {platformUniqueIdentifier}");
+                        logger?.LogVerbose($"Retrieve cached device id: {platformUniqueIdentifier}");
                     }
                     else
                     {
                         platformUniqueIdentifier = GenerateDeviceId();
                         fileCache.Emplace(CacheFileName, platformUniqueIdentifier);
-                        AccelByteDebug.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
+                        logger?.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
                     }
                 } 
                 catch(System.Exception exception)
                 {
-                    AccelByteDebug.LogWarning($"Unable to access device id cache, {exception.Message}");
+                    logger?.LogWarning($"Unable to access device id cache, {exception.Message}");
                     if(string.IsNullOrEmpty(platformUniqueIdentifier))
                     {
                         platformUniqueIdentifier = GenerateDeviceId();
                     }
-                    AccelByteDebug.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
+                    logger?.LogVerbose($"Generate new device id: {platformUniqueIdentifier}");
                 }
 #else
                 platformUniqueIdentifier = System.Guid.NewGuid().ToString();
 #endif
             }
 
-            string identifier = "unity_" + SystemInfo.deviceType + "_" + GetPlatformName();
+            string identifier = "unity_" + GameCommonInfo.DeviceType + "_" + GetPlatformName();
 
-            return new DeviceProvider(
-                "device",
+            var retval = new DeviceProvider(
+                deviceType:"device",
                 identifier,
-                platformUniqueIdentifier);
+                platformUniqueIdentifier,
+                isIdentifierGenerated);
+            return retval;
         }
 
 #if !UNITY_WEBGL
-        public static void CacheDeviceId(string cachedDeviceId, string generatedIdCacheFileDir = null)
+        public static void CacheDeviceId(string cachedDeviceId, string generatedIdCacheFileDir = null, IDebugger logger = null, IFileStream fs = null)
         {
             try
             {
@@ -116,17 +137,17 @@ namespace AccelByte.Api
                 {
                     generatedIdCacheFileDir = DefaultGeneratedIdCacheFileDir;
                 }
-                AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir);
+                AccelByteFileCacheImplementation fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir, fs, logger);
                 fileCache.Emplace(CacheFileName, cachedDeviceId);
             }
             catch (System.Exception exception)
             {
-                AccelByteDebug.LogWarning($"Unable to cache device id, {exception.Message}");
+                logger?.LogWarning($"Unable to cache device id, {exception.Message}");
             }
         }
 #endif
 
-        private static string GetDeviceId(string encodeKey)
+        private static string GetDeviceId(string encodeKey, IDebugger logger)
         {
             Utils.Infoware.InfowareUtils iware;
             string platformUniqueIdentifier;
@@ -224,7 +245,7 @@ namespace AccelByte.Api
             }
             catch (System.Exception ex)
             {
-                AccelByteDebug.LogVerbose(ex.Message);
+                logger?.LogVerbose(ex.Message);
                 platformUniqueIdentifier = null;
             }
 
@@ -261,7 +282,7 @@ namespace AccelByte.Api
 
         internal static string GetPlatformName()
         {
-            return Application.platform.ToString();
+            return GameCommonInfo.PlatformName;
         }
 
         private static string GenerateDeviceId()

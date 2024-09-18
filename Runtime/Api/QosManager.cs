@@ -38,7 +38,7 @@ namespace AccelByte.Api
             api = inApi;
             coroutineRunner = inCoroutineRunner;
         }
-
+        
         /// <summary>
         /// Get all server latencies available
         /// </summary>
@@ -111,7 +111,7 @@ namespace AccelByte.Api
         {
             if (listRegion.Count == 0)
             {
-                AccelByteDebug.LogWarning(
+                SharedMemory?.Logger?.LogWarning(
                     $"No region servers found.");
                 return string.Empty;
             }
@@ -158,7 +158,7 @@ namespace AccelByte.Api
                 }
                 catch (Exception ex)
                 {
-                    AccelByteDebug.LogWarning($"Encounter issue on calculating serevr latency. {ex.Message}");
+                    SharedMemory?.Logger?.LogWarning($"Encounter issue on calculating serevr latency. {ex.Message}");
                 }
             }
 

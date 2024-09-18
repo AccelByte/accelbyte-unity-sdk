@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -79,7 +79,12 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
 
             serverDSHubWebsocketApi =
-                new ServerDSHubWebsocketApi(inCoroutineRunner, inApi.ServerConfig.DSHubServerWsUrl, inSession, inApi.ServerConfig.DSHubReconnectTotalTimeout);
+                new ServerDSHubWebsocketApi(
+                    inCoroutineRunner
+                    , inApi.ServerConfig.DSHubServerWsUrl
+                    , inSession
+                    , inApi.ServerConfig.DSHubReconnectTotalTimeout
+                    , inApi.ServerConfig);
 
             serverDSHubWebsocketApi.AddOnOpenHandlerListener(HandleOnOpen);
             serverDSHubWebsocketApi.AddOnCloseHandlerListener(HandleOnClose);
@@ -108,7 +113,7 @@ namespace AccelByte.Server
         /// <summary>
         /// Connect to DSHub
         /// </summary>
-        /// <param name="serverName">this server's  name</param>
+        /// <param name="serverName">this server's name</param>
         public void Connect(string serverName)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -128,7 +133,7 @@ namespace AccelByte.Server
             catch(Exception ex)
             {
                 OnConnectionError?.Invoke(new Error(ErrorCode.InvalidResponse, $"DsHub connect failed: {ex.Message}"));
-                AccelByteDebug.LogWarning($"DsHub connect failed.\n{ex.Message}");
+                SharedMemory?.Logger?.LogWarning($"DsHub connect failed.\n{ex.Message}");
             }
         }
 
@@ -145,7 +150,7 @@ namespace AccelByte.Server
             }
             catch (Exception ex)
             {
-                AccelByteDebug.LogWarning($"DsHub disconnect failed.\n{ex.Message}");
+                SharedMemory?.Logger?.LogWarning($"DsHub disconnect failed.\n{ex.Message}");
             }
         }
 
@@ -153,7 +158,7 @@ namespace AccelByte.Server
         private void HandleOnOpen()
         {
 #if DEBUG
-            AccelByteDebug.Log("[Server DS Hub] Websocket connection open");
+            SharedMemory?.Logger?.Log("[Server DS Hub] Websocket connection open");
 #endif
             OnConnected?.Invoke();
         }
@@ -163,11 +168,11 @@ namespace AccelByte.Server
 #if DEBUG
             if (Enum.TryParse(closeCode.ToString(), out WsCloseCode verboseCode))
             {
-                AccelByteDebug.Log($"[Server DS Hub] Websocket connection close: {closeCode} named {verboseCode.ToString()}");
+                SharedMemory?.Logger?.Log($"[Server DS Hub] Websocket connection close: {closeCode} named {verboseCode.ToString()}");
             }
             else
             {
-                AccelByteDebug.Log($"[Server DS Hub] Websocket connection close: {closeCode}. Please refers https://demo.accelbyte.io/dshub/v1/messages for more info");
+                SharedMemory?.Logger?.Log($"[Server DS Hub] Websocket connection close: {closeCode}. Please refers https://demo.accelbyte.io/dshub/v1/messages for more info");
             }
 #endif
             var code = (WsCloseCode)closeCode;
@@ -212,7 +217,7 @@ namespace AccelByte.Server
                 case DsHubNotificationTopic.EMPTY:
                     break;
                 default:
-                    AccelByteDebug.Log(
+                    SharedMemory?.Logger?.Log(
                         $"Server DS Hub notification topic not supported: {notification.topic}");
                     break;
             }

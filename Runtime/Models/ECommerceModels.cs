@@ -1536,6 +1536,60 @@ namespace AccelByte.Models
         [DataMember] public bool excludeOldTransactions;
         [DataMember] public string region; //optional
         [DataMember] public string language; //optional
+
+        public PlatformSyncMobileApple()
+        {
+        }
+
+        internal PlatformSyncMobileApple(string productId, string transactionId, string receiptData, PlatformSyncMobileAppleOptionalParam optionalParam)
+        {
+            this.productId = productId;
+            this.transactionId = transactionId;
+            this.receiptData = receiptData;
+            this.excludeOldTransactions = optionalParam == null? true : optionalParam.ExcludeOldTransactions;
+            this.region = optionalParam?.Region;
+            this.language = optionalParam?.Language;
+
+            if (string.IsNullOrEmpty(region))
+            {
+                this.region = null;
+            }
+
+            if (string.IsNullOrEmpty(language))
+            {
+                this.language = null;
+            }
+        }
+    }
+
+    [Preserve]
+    public class PlatformSyncMobileAppleOptionalParam : PlatformSyncMobileApple
+    {
+        /// <summary>
+        /// Either exclude or include old transaction
+        /// </summary>
+        public bool ExcludeOldTransactions = true;
+        /// <summary>
+        /// Optional param for product region
+        /// </summary>
+        public string Region = null;
+        /// <summary>
+        /// Optional param for product language
+        /// </summary>
+        public string Language = null;
+    }
+
+    [Preserve]
+    public class PlatformSyncMobileGoogleOptionalParameters
+    {
+        /// <summary>
+        /// Optional param for product region
+        /// </summary>
+        public string Region = null;
+        /// <summary>
+        /// Optional param for product language
+        /// </summary>
+        public string Language = null;
     }
 
     [DataContract, Preserve]
@@ -1549,6 +1603,39 @@ namespace AccelByte.Models
         [DataMember] public string region; //optional
         [DataMember] public string language; //optional
         [DataMember] public bool autoAck;  //should be true for sync DURABLE item entitlement
+        
+        public PlatformSyncMobileGoogle()
+        {
+            
+        }
+
+        internal PlatformSyncMobileGoogle(string orderId, string packageName, string productId, long purchaseTime, string purchaseToken, bool autoAck, PlatformSyncMobileGoogleOptionalParameters optionalParameters)
+        {
+            this.orderId = orderId;
+            this.packageName = packageName;
+            this.productId = productId;
+            this.purchaseTime = purchaseTime;
+            this.purchaseToken = purchaseToken;
+            this.autoAck = autoAck;
+            this.region = optionalParameters?.Region;
+            this.language = optionalParameters?.Language;
+
+            if (region == "")
+            {
+                region = null;
+            }
+
+            if (language == "")
+            {
+                language = null;
+            }
+        }
+    }
+
+    [DataContract, Preserve]
+    public class GoogleReceiptResolveResult
+    {
+        [DataMember(Name = "needConsume")] public bool NeedConsume;
     }
 
     #endregion

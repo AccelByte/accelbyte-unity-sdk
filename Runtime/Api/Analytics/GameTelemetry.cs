@@ -90,7 +90,7 @@ namespace AccelByte.Api
             }
             else
             {
-                AccelByteDebug.LogWarning($"Telemetry schedule interval is too small! " +
+                SharedMemory?.Logger?.LogWarning($"Telemetry schedule interval is too small! " +
                     $"Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
                 telemetryInterval = minimumTelemetryInterval;
             }

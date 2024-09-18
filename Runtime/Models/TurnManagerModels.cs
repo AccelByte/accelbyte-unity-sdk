@@ -32,6 +32,10 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class TurnServer
     {
+        [DataMember(Name = "alias")] public string Alias;
+        [DataMember(Name = "cpu_usage")] public float CpuUsage;
+        [DataMember(Name = "mem_usage")] public TurnServerMemoryUsage MemUsage;
+        [DataMember(Name = "net_usage")] public TurnServerNetUsage NetUsage;
         [DataMember] public string ip;
         [DataMember] public int port;
         [DataMember] public int qos_port;
@@ -39,6 +43,20 @@ namespace AccelByte.Models
         [DataMember] public TurnServerStatus status;
         [DataMember] public string last_update;
         [DataMember] public int current_time;
+    }
+
+    [DataContract, Preserve]
+    public class TurnServerMemoryUsage
+    {
+        [DataMember(Name = "total")] public int Total;
+        [DataMember(Name = "used")] public int Used;
+    }
+
+    [DataContract, Preserve]
+    public class TurnServerNetUsage
+    {
+        [DataMember(Name = "rx")] public int Rx;
+        [DataMember(Name = "tx")] public int Tx;
     }
 
     [DataContract, Preserve]
@@ -56,5 +74,11 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "region")] public string Region;
         [DataMember(Name = "type")] public P2PConnectionType Type;
+    }
+
+    [DataContract, Preserve]
+    public class DisconnectTurnServerRequest
+    {
+        [DataMember(Name = "user_id")] public string UserId;
     }
 }

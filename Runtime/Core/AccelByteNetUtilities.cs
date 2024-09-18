@@ -16,7 +16,7 @@ namespace AccelByte.Core
 
         static AccelByteNetUtilities()
         {
-            IHttpRequestSender httpSender = AccelByteSDK.SdkHttpSenderFactory.CreateHttpRequestSender();
+            IHttpRequestSender httpSender = AccelByteSDK.Implementation.SdkHttpSenderFactory.CreateHttpRequestSender();
             httpClient = new AccelByteHttpClient(httpSender);
         }
 

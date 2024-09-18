@@ -8,6 +8,7 @@ using AccelByte.Api.Interface;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
+using System.Threading.Tasks;
 
 namespace AccelByte.Api
 {
@@ -27,6 +28,14 @@ namespace AccelByte.Api
             sessionApi = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
+        }
+
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            SharedMemory?.MessagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.MatchFoundOnPoll, OnTicketPollMatchFound);
+            base.SetSharedMemory(newSharedMemory);
+
+            SharedMemory?.MessagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchFoundOnPoll, OnTicketPollMatchFound);
         }
 
         #region PartySession
@@ -742,6 +751,110 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 sessionApi.PromoteUserToGameSessionLeader(sessionId, leaderId, callback));
+        }
+
+        private async void OnTicketPollMatchFound(string sessionId)
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                AccelByteDebug.LogError("Session ID from polled ticket is invalid");
+                return;
+            }
+
+            bool isMatchFoundNotifSent = false;
+            bool isDsStatusChangedNotifSent = false;
+            bool shouldContinuePolling = true;
+            while (shouldContinuePolling)
+            {
+                coroutineRunner.Run(
+                    sessionApi.GetGameSessionDetailsBySessionId(sessionId, result =>
+                    {
+                        if (result.IsError)
+                        {
+                            shouldContinuePolling = false;
+                            return;
+                        }
+
+                        if (!isMatchFoundNotifSent)
+                        {
+                            var tickets = new MatchmakingV2Ticket[result.Value.ticketIds.Length];
+                            for (int i = 0; i < result.Value.ticketIds.Length; i++)
+                            {
+                                tickets[i] = new MatchmakingV2Ticket()
+                                {
+                                    ticketId = result.Value.ticketIds[i]
+                                };
+                            }
+                            var matchFoundNotif = new MatchmakingV2MatchFoundNotification()
+                            {
+                                id = result.Value.id,
+                                teams = result.Value.teams,
+                                matchPool = result.Value.matchPool,
+                                tickets = tickets,
+                                namespace_ = sessionApi.Config.Namespace,
+                                createdAt = System.DateTime.UtcNow
+                            };
+
+                            var matchFoundNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                                "OnMatchFound"
+                                , matchFoundNotif.ToJsonString()
+                                , isEncoded: true);
+                            SharedMemory.NotificationSender.SendLobbyNotification(matchFoundNotifMessage);
+
+                            isMatchFoundNotifSent = true;
+                        }
+
+                        if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.ENDED)
+                        {
+                            shouldContinuePolling = false;
+                            return;
+                        }
+
+                        if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE ||
+                            result.Value.dsInformation.StatusV2 == SessionV2DsStatus.FAILED_TO_REQUEST)
+                        {
+                            if (!isDsStatusChangedNotifSent)
+                            {
+                                var dsStatusChangedNotif = new SessionV2DsStatusUpdatedNotification()
+                                {
+                                    session = result.Value,
+                                    sessionId = result.Value.id,
+                                    error = null
+                                };
+                                var dsStatusChangedNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                                    "OnDSStatusChanged"
+                                    , dsStatusChangedNotif.ToJsonString()
+                                    , isEncoded: true);
+
+                                SharedMemory.NotificationSender.SendLobbyNotification(dsStatusChangedNotifMessage);
+
+                                isDsStatusChangedNotifSent = true;
+                            }
+
+                            if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE)
+                            {
+                                var sessionInviteNotif = new SessionV2GameInvitationNotification()
+                                {
+                                    sessionId = result.Value.id
+                                };
+
+                                var sessionInviteNotifMessage = AccelByteNotificationSenderUtility.ComposeSessionNotification(
+                                    "OnSessionInvited"
+                                    , sessionInviteNotif.ToJsonString()
+                                    , isEncoded: true);
+                                SharedMemory.NotificationSender.SendLobbyNotification(sessionInviteNotifMessage);
+                            }
+
+                            shouldContinuePolling = false;
+                            return;
+                        }
+                    }));
+
+                if (shouldContinuePolling)
+                {
+                    await Task.Delay(sessionApi.Config.MatchmakingTicketCheckPollRate);
+                }
+            }
         }
 
         #endregion

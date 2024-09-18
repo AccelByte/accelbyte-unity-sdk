@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -33,6 +33,8 @@ namespace AccelByte.Server
         private string amsWatchdogUrl;
         private string dsId = string.Empty;
 
+        private ApiSharedMemory sharedMemory;
+
         public ServerAMSWebsocketApi(CoroutineRunner inCoroutineRunner, string inAMSWatchdogUrl, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
@@ -56,22 +58,23 @@ namespace AccelByte.Server
             webSocket.OnError += HandleOnError;
 
             webSocket.SetRetryParameters(inTotalTimeout, inBackoffDelay, inMaxDelay, inPingDelay);
+            webSocket.SetLogger(sharedMemory?.Logger);
         }
 
         public void Connect(string id)
         {
             dsId = id;
-            AccelByteDebug.Log(string.Format("Connecting to AMS with id: {0}", dsId));
+            sharedMemory?.Logger?.Log(string.Format("Connecting to AMS with id: {0}", dsId));
 
             if (IsConnected)
             {
-                AccelByteDebug.Log("[AMS] already connected");
+                sharedMemory?.Logger?.Log("[AMS] already connected");
                 return;
             }
 
             if (webSocket.IsConnecting)
             {
-                AccelByteDebug.Log("[AMS] connecting to AMS");
+                sharedMemory?.Logger?.Log("[AMS] connecting to AMS");
                 return;
             }
 
@@ -116,6 +119,12 @@ namespace AccelByte.Server
         public void SendMessage(string msg)
         {
             webSocket.Send(msg);
+        }
+
+        internal void SetSharedMemory(ApiSharedMemory sharedMem)
+        {
+            this.sharedMemory = sharedMem;
+            webSocket?.SetLogger(sharedMem?.Logger);
         }
 
         #region private methods

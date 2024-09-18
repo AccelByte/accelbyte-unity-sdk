@@ -4,12 +4,10 @@
 
 using System;
 using System.Collections;
-using UnityEngine;
 using UnityEngine.Assertions;
-using AccelByte.Core;
 using AccelByte.Models;
-using Random = System.Random;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace AccelByte.Core
 {
@@ -20,8 +18,12 @@ namespace AccelByte.Core
         const uint WaitExpiryDelay = 100;
         readonly TimeSpan MaxBackoffInterval = TimeSpan.FromDays(1);
 
+        internal LoginSessionMaintainer SessionMaintainer
+        {
+            get;
+            private set;
+        }
 
-        protected CoroutineRunner coroutineRunner { get; set; }
         protected TokenData tokenData { get; set; }
         internal TokenData TokenData
         {
@@ -30,7 +32,7 @@ namespace AccelByte.Core
                 return tokenData;
             }
         }
-        protected Coroutine maintainAccessTokenCoroutine { get; set; }
+
         protected DateTime nextRefreshTime { get; set; }
         protected Dictionary<string, ThirdPartyPlatformTokenData> thirdPartyPlatformTokenData { get; set; }
             = new Dictionary<string, ThirdPartyPlatformTokenData>();
@@ -55,11 +57,19 @@ namespace AccelByte.Core
                 return retval;
             }
         }
+        
+        internal ApiSharedMemory SharedMemory;
 
         bool twoFAEnable { get; set; } = false; //Set false for DSSession
 
         // To be set by OAuth and allow UserSession call the Refresh API call
         internal System.Action<string, ResultCallback<TokenData, OAuthError>> CallRefresh;
+
+        internal void CreateSessionMaintainer()
+        {
+            SessionMaintainer = new LoginSessionMaintainer();
+            SessionMaintainer.RefreshSession = RefreshSessionApiCall;
+        }
 
         //Token Related Functions
 
@@ -71,17 +81,30 @@ namespace AccelByte.Core
         /// <returns></returns>
         public IEnumerator RefreshSession(ResultCallback<TokenData, OAuthError> callback)
         {
-            yield return RefreshSessionApiCall(result =>
-            {
-                if (!result.IsError && result.Value != null)
+            Result<TokenData, OAuthError> result = null; 
+            bool refreshSessionCompleted = false;
+            RefreshSessionApiCall()
+                .OnSuccess((token) =>
                 {
-                    SetSession(result.Value);
-                }
-                callback.Invoke(result);
-            });
+                    SetSession(token);
+                    result = Result<TokenData, OAuthError>.CreateOk(token);
+                })
+                .OnFailed((error) =>
+                {
+                    result = Result<TokenData, OAuthError>.CreateError(error);
+                })
+                .OnComplete(() =>
+                {
+                    refreshSessionCompleted = true;
+                });
+
+            yield return new WaitUntil(() => refreshSessionCompleted);
+
+            callback?.Invoke(result);
         }
 
         public abstract IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback);
+        public abstract AccelByteResult<TokenData, OAuthError> RefreshSessionApiCall();
 
         //UserSession please implement this
         public abstract void SetSession(TokenData loginResponse);
@@ -101,66 +124,6 @@ namespace AccelByte.Core
             thirdPartyPlatformTokenData.Clear();
         }
 
-        protected virtual IEnumerator MaintainToken()
-        {
-            nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
-            TimeSpan refreshBackoff = TimeSpan.FromSeconds(10);
-            var rand = new Random();
-
-            while (tokenData != null)
-            {
-                if (refreshBackoff >= MaxBackoffInterval)
-                {
-                    yield break;
-                }
-
-                if (tokenData.access_token == null || DateTime.UtcNow < nextRefreshTime)
-                {
-                    yield return new WaitForSeconds(WaitExpiryDelay / 1000f);
-
-                    continue;
-                }
-
-                if (twoFAEnable)
-                {
-                    Result<TokenData, OAuthError> refreshResult = null;
-
-                    yield return RefreshSession(result => refreshResult = result);
-
-                    if (!refreshResult.IsError)
-                    {
-                        nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
-                    }
-                    else
-                    {
-                        refreshBackoff = CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
-
-                        nextRefreshTime = DateTime.UtcNow + refreshBackoff;
-                    }
-                }
-                else
-                {
-                    Result<TokenData, OAuthError> refreshResult = null;
-
-                    yield return RefreshSession(result =>
-                    {
-                        refreshResult = result;
-                    });
-
-                    if (!refreshResult.IsError)
-                    {
-                        nextRefreshTime = ScheduleNormalRefresh(tokenData.expires_in);
-                    }
-                    else
-                    {
-                        refreshBackoff = CalculateBackoffInterval(refreshBackoff, rand.Next(1, 60));
-
-                        nextRefreshTime = DateTime.UtcNow + refreshBackoff;
-                    }
-                }
-            }
-        }
-        
         //set public to allow override for testing purpose
         protected virtual DateTime ScheduleNormalRefresh(int expiresIn)
         {
@@ -171,11 +134,10 @@ namespace AccelByte.Core
         {
             thirdPartyPlatformTokenData[key] = inThirdPartyPlatformTokenData;
         }
-
-        TimeSpan CalculateBackoffInterval(TimeSpan previousRefreshBackoff, int randomNum)
+        
+        internal void SetSharedMemory(ApiSharedMemory sharedMemory)
         {
-            previousRefreshBackoff = TimeSpan.FromSeconds(previousRefreshBackoff.Seconds * 2);
-            return previousRefreshBackoff + TimeSpan.FromSeconds(randomNum);
+            this.SharedMemory = sharedMemory;
         }
     }
 

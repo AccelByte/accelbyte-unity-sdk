@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -30,6 +30,24 @@ namespace AccelByte.Core
         /// </summary>
         protected readonly string BaseUrl;
 
+        private ApiSharedMemory sharedMemory;
+        
+        internal ApiSharedMemory SharedMemory
+        {
+            get
+            {
+                if(sharedMemory == null)
+                {
+                    sharedMemory = new ApiSharedMemory();
+                }
+                return sharedMemory;
+            }
+            set
+            {
+                sharedMemory = value;
+            }
+        }
+
         public IHttpClient HttpClient
         {
             get
@@ -56,7 +74,6 @@ namespace AccelByte.Core
             BaseUrl = inBaseUrl;
         }
         #endregion /Constructor
-
         
         #region Child Constructor
 
@@ -68,7 +85,6 @@ namespace AccelByte.Core
         //     Assert.IsNotNull(BaseUrl, $"Creating {_childTypeName} failed. Parameter baseUrl is null");
         // }
         #endregion /Child Constructor
-
         
         #region High-Level Shortcuts
         /// <summary>
@@ -77,5 +93,10 @@ namespace AccelByte.Core
         /// </summary>
         protected string AuthToken => Session.AuthorizationToken;
         #endregion /High-Level Shortcuts
+        
+        internal virtual void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            SharedMemory = newSharedMemory;
+        }
     }
 }

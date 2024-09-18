@@ -53,48 +53,48 @@ namespace AccelByte.Core
             Models.MultiSDKConfigsArgs configArgs = argsConfigParser.ParseSDKConfigFromArgs();
             if (configArgs != null)
             {
-                AccelByteSDK.OverrideConfigs.SDKConfigOverride = configArgs;
+                AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride = configArgs;
             }
             else
             {
-                AccelByteSDK.OverrideConfigs.SDKConfigOverride = new Models.MultiSDKConfigsArgs();
-                AccelByteSDK.OverrideConfigs.SDKConfigOverride.InitializeNullEnv();
+                AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride = new Models.MultiSDKConfigsArgs();
+                AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.InitializeNullEnv();
             }
 
             Models.MultiOAuthConfigs oAuthArgs = argsConfigParser.ParseOAuthConfigFromArgs();
             if (oAuthArgs != null)
             {
-                AccelByteSDK.OverrideConfigs.OAuthConfigOverride = oAuthArgs;
+                AccelByteSDK.Implementation.OverrideConfigs.OAuthConfigOverride = oAuthArgs;
             }
             else
             {
-                AccelByteSDK.OverrideConfigs.OAuthConfigOverride = new Models.MultiOAuthConfigs();
-                AccelByteSDK.OverrideConfigs.OAuthConfigOverride.InitializeNullEnv();
+                AccelByteSDK.Implementation.OverrideConfigs.OAuthConfigOverride = new Models.MultiOAuthConfigs();
+                AccelByteSDK.Implementation.OverrideConfigs.OAuthConfigOverride.InitializeNullEnv();
             }
 
             string amsServerUrl = null;
             if (!string.IsNullOrEmpty(GetOverrideConfigWatchdogURL()))
             {
-                amsServerUrl = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl;
+                amsServerUrl = AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl;
             }
-            else if (!string.IsNullOrEmpty(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl))
+            else if (!string.IsNullOrEmpty(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl))
             {
-                amsServerUrl = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl;
+                amsServerUrl = AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl;
             }
             else
             {
                 amsServerUrl = GetCommandLineArg(ServerAMS.CommandLineAMSWatchdogUrlId);
                 if (!string.IsNullOrEmpty(amsServerUrl))
                 {
-                    string fieldName = nameof(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl);
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, amsServerUrl);
+                    string fieldName = nameof(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl);
+                    AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, amsServerUrl);
                 }
             }
 
             int heartbeatInterval = 0;
             if (GetOverrideConfigAMSInterval().HasValue)
             {
-                heartbeatInterval = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval.Value;
+                heartbeatInterval = AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval.Value;
             }
             else
             {
@@ -103,8 +103,8 @@ namespace AccelByte.Core
                 {
                     if (int.TryParse(amsHeartbeatInterval, out heartbeatInterval))
                     {
-                        string fieldName = nameof(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval);
-                        AccelByteSDK.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, heartbeatInterval);
+                        string fieldName = nameof(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval);
+                        AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, heartbeatInterval);
                     }
                 }
             }
@@ -112,15 +112,15 @@ namespace AccelByte.Core
             string dsId = null;
             if (!string.IsNullOrEmpty(GetOverrideConfigDsId()))
             {
-                dsId = AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId;
+                dsId = AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.DsId;
             }
             else
             {
                 dsId = GetCommandLineArg(DedicatedServer.CommandLineDsId);
                 if (!string.IsNullOrEmpty(dsId))
                 {
-                    string fieldName = nameof(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId);
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, dsId);
+                    string fieldName = nameof(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.DsId);
+                    AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, dsId);
                 }
             }
 
@@ -129,15 +129,15 @@ namespace AccelByte.Core
                 if (string.IsNullOrEmpty(amsServerUrl))
                 {
                     amsServerUrl = ServerAMS.DefaultServerUrl;
-                    string fieldName = nameof(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl);
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, amsServerUrl);
+                    string fieldName = nameof(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSServerUrl);
+                    AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, amsServerUrl);
                 }
 
                 if (heartbeatInterval == 0)
                 {
                     heartbeatInterval = ServerAMS.DefaulHeatbeatSeconds;
-                    string fieldName = nameof(AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval);
-                    AccelByteSDK.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, heartbeatInterval);
+                    string fieldName = nameof(AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval);
+                    AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.SetFieldValueToAllEnv(fieldName, heartbeatInterval);
                 }
 
                 ServerAMS ams = AccelByteSDK.GetServerRegistry().GetAMS(autoCreate: false);
@@ -202,17 +202,17 @@ namespace AccelByte.Core
 
         protected virtual string GetOverrideConfigWatchdogURL()
         {
-            return AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl;
+            return AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.WatchdogUrl;
         }
 
         protected virtual string GetOverrideConfigDsId()
         {
-            return AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.DsId;
+            return AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.DsId;
         }
 
         protected virtual int? GetOverrideConfigAMSInterval()
         {
-            return AccelByteSDK.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval;
+            return AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride.Default.AMSHeartbeatInterval;
         }
     }
 }

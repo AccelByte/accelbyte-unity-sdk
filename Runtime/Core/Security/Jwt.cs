@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -21,12 +21,14 @@ namespace AccelByte.Core
         private int payloadEnd { get; }
         private JObject headerJsonPtr { get; }
         private JObject payloadJsonPtr { get; }
+        private IDebugger logger;
 
-        public Jwt(string inJwtString)
+        public Jwt(string inJwtString, IDebugger logger = null)
         {
+            this.logger = logger;
             if (string.IsNullOrEmpty(inJwtString))
             {
-                AccelByteDebug.LogWarning($"Jwt: JwtString is null or empty.");
+                logger?.LogWarning($"Jwt: JwtString is null or empty.");
                 return;
             }
 
@@ -50,28 +52,33 @@ namespace AccelByte.Core
                 }
                 catch (Newtonsoft.Json.JsonReaderException)
                 {
-                    AccelByteDebug.LogWarning($"Jwt: Failed to parse header or payload JSON.");
+                    logger?.LogWarning($"Jwt: Failed to parse header or payload JSON.");
                 }
             }
+        }
+
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
         }
 
         public EJwtResult VerifyWith(RsaPublicKey key)
         {
             if (!IsValid())
             {
-                AccelByteDebug.LogWarning($"Jwt: FAIL: MalformedJwt.");
+                logger?.LogWarning($"Jwt: FAIL: MalformedJwt.");
                 return EJwtResult.MalformedJwt;
             }
 
             if (!key.IsValid())
             {
-                AccelByteDebug.LogWarning($"Jwt: FAIL: MalformedPublicKey.");
+                logger?.LogWarning($"Jwt: FAIL: MalformedPublicKey.");
                 return EJwtResult.MalformedPublicKey;
             }
 
             if (!headerJsonPtr.ContainsKey("alg") || headerJsonPtr["alg"].ToString() != "RS256")
             {
-                AccelByteDebug.LogWarning($"Jwt: FAIL: AlgorithmMismatch.");
+                logger?.LogWarning($"Jwt: FAIL: AlgorithmMismatch.");
                 return EJwtResult.AlgorithmMismatch;
             }
 
@@ -97,7 +104,7 @@ namespace AccelByte.Core
 
                     if (!verifyResult)
                     {
-                        AccelByteDebug.LogWarning($"Jwt: FAIL: SignatureMismatch.");
+                        logger?.LogWarning($"Jwt: FAIL: SignatureMismatch.");
                         return EJwtResult.SignatureMismatch;
                     }
                 }

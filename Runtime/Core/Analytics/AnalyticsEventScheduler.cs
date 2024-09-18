@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -130,7 +130,7 @@ namespace AccelByte.Core
         {
             if (eventIntervalInlMs < defaultMinimumEventIntervalInMs)
             {
-                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
+                SharedMemory?.Logger?.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
                 this.eventIntervalInlMs = defaultMinimumEventIntervalInMs;
             }
             else
@@ -186,9 +186,9 @@ namespace AccelByte.Core
             if(heartbeatInterval < defaultMinimumEventIntervalInMs)
             {
                 heartbeatInterval = defaultEventIntervalInMs;
-                AccelByteDebug.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
+                SharedMemory?.Logger?.LogWarning($"The interval is lower than the allowed. The interval will be changed into {defaultMinimumEventIntervalInMs} ms");
             }
-            maintainer = new AccelByteHeartBeat(heartbeatInterval);
+            maintainer = new AccelByteHeartBeat(heartbeatInterval, SharedMemory?.Logger);
             maintainer.OnHeartbeatTrigger += () =>
             {
                 if (analyticsWrapper != null && analyticsWrapper.GetSession().IsValid())

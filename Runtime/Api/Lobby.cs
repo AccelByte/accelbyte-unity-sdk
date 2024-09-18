@@ -288,6 +288,8 @@ namespace AccelByte.Api
 
         private Utils.IAccelByteWebsocketSerializer websocketSerializer;
 
+        private HashSet<string> processedMatchmakingMessages = new HashSet<string>();
+
         internal string UserRegion;
 
         /// <summary>
@@ -324,7 +326,7 @@ namespace AccelByte.Api
             };
             websocketApi.OnClose += HandleOnClose;
 
-            notificationBuffer = new AccelByteNotificationBuffer();
+            notificationBuffer = new AccelByteNotificationBuffer(inApi?.SharedMemory?.Logger);
 
             OverrideWebsocket(webSocket);
         }
@@ -345,6 +347,7 @@ namespace AccelByte.Api
         {
             backoffDelay = inBackoffDelay;
             websocketApi.OverrideWebsocket(inWebSocket, inPingDelay, inMaxDelay, inTotalTimeout);
+            websocketApi.SetLogger(SharedMemory?.Logger);
         }
 
         /// <summary>
@@ -1791,7 +1794,7 @@ namespace AccelByte.Api
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.LogVerbose("[WS] Connection open");
+            SharedMemory?.Logger?.LogVerbose("[WS] Connection open");
 #endif
             Connected?.Invoke();
 
@@ -1813,7 +1816,7 @@ namespace AccelByte.Api
                 string resultMsg = result.IsError
                     ? $"Error with code {result.Error.Code}, message {result.Error.Message}"
                     : "Success";
-                AccelByteDebug.Log($"Updating access token in lobby {resultMsg}");
+                SharedMemory?.Logger?.Log($"Updating access token in lobby {resultMsg}");
             });
         }
 
@@ -1823,11 +1826,11 @@ namespace AccelByte.Api
 #if DEBUG
             if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
             {
-                AccelByteDebug.LogVerbose($"[WS Lobby] Connection close: {closecode} named {verboseCode.ToString()}");
+                SharedMemory?.Logger?.LogVerbose($"[WS Lobby] Connection close: {closecode} named {verboseCode.ToString()}");
             }
             else
             {
-                AccelByteDebug.LogVerbose($"[WS Lobby] Connection close: {closecode}. Please refers https://demo.accelbyte.io/lobby/v1/messages for more info");
+                SharedMemory?.Logger?.LogVerbose($"[WS Lobby] Connection close: {closecode}. Please refers https://demo.accelbyte.io/lobby/v1/messages for more info");
             }
 #endif
             var code = (WsCloseCode)closecode;
@@ -1913,7 +1916,7 @@ namespace AccelByte.Api
             {
                 receivedNotification = parsedJsonString.ToObject<UserNotification>();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -1930,7 +1933,7 @@ namespace AccelByte.Api
 
             if (notificationBuffer.TryAddBuffer(receivedNotification))
             {
-                AccelByteDebug.LogWarning($"Missing notification(s) detected, received:\n" +
+                SharedMemory?.Logger?.LogWarning($"Missing notification(s) detected, received:\n" +
                     $"{parsedJsonString}");
 
                 GetNotifications(OnGetMissingNotification);
@@ -1964,7 +1967,7 @@ namespace AccelByte.Api
                 && SharedMemory.NetworkConditioner != null 
                 && SharedMemory.NetworkConditioner.CalculateFailRate(lobbyNotification))
             {
-                AccelByteDebug.Log($"[AccelByteNetworkConditioner] Dropped lobby notification {lobbyNotification}.");
+                SharedMemory?.Logger?.Log($"[AccelByteNetworkConditioner] Dropped lobby notification {lobbyNotification}.");
                 return;
             }
 
@@ -1982,7 +1985,7 @@ namespace AccelByte.Api
                     if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
                             out MultiplayerV2NotifType sessionV2NotificationType))
                     {
-                        AccelByteDebug.LogWarning(
+                        SharedMemory?.Logger?.LogWarning(
                             $"SessionV2 notification topic not recognized: {sessionNotification.topic}");
                         return;
                     }
@@ -2146,7 +2149,7 @@ namespace AccelByte.Api
 
             if (errorCode != ErrorCode.None)
             {
-                AccelByteDebug.LogWarning($"Error {errorCode}: Failed to read payload of MultiplayerV2 notification");
+                SharedMemory?.Logger?.LogWarning($"Error {errorCode}: Failed to read payload of MultiplayerV2 notification");
                 return;
             }
 
@@ -2166,7 +2169,7 @@ namespace AccelByte.Api
             }
             catch (Exception)
             {
-                AccelByteDebug.LogWarning(
+                SharedMemory?.Logger?.LogWarning(
                     $"Error {ErrorCode.ErrorFromException}: Failed to decode MultiplayerV2 notification from Base64: {notificationPayload}");
                 return;
             }
@@ -2214,8 +2217,11 @@ namespace AccelByte.Api
                 case MultiplayerV2NotifType.OnSessionInvited:
                     var gameSessionNotificationUserInvited =
                         JsonConvert.DeserializeObject<SessionV2GameInvitationNotification>(jsonString);
-                    websocketApi.DispatchNotification(gameSessionNotificationUserInvited,
-                        SessionV2InvitedUserToGameSession);
+                    if (processedMatchmakingMessages.Add($"sessionInvited_{gameSessionNotificationUserInvited.sessionId}"))
+                    {
+                        websocketApi.DispatchNotification(gameSessionNotificationUserInvited,
+                            SessionV2InvitedUserToGameSession);
+                    }
                     break;
                 case MultiplayerV2NotifType.OnSessionJoined:
                     var gameSessionNotificationUserJoined =
@@ -2256,26 +2262,38 @@ namespace AccelByte.Api
                 case MultiplayerV2NotifType.OnDSStatusChanged:
                     var dSStatusChangedNotification =
                         JsonConvert.DeserializeObject<SessionV2DsStatusUpdatedNotification>(jsonString);
-                    websocketApi.DispatchNotification(dSStatusChangedNotification,
-                        SessionV2DsStatusChanged);
+                    if (processedMatchmakingMessages.Add($"dsStatusChanged_" +
+                        $"{dSStatusChangedNotification.sessionId}_" +
+                        $"{dSStatusChangedNotification.session.dsInformation.StatusV2}"))
+                    {
+                        websocketApi.DispatchNotification(dSStatusChangedNotification,
+                            SessionV2DsStatusChanged);
+                    }
                     break;
                 case MultiplayerV2NotifType.OnMatchFound:
                     var matchFoundNotification =
                         JsonConvert.DeserializeObject<MatchmakingV2MatchFoundNotification>(jsonString);
-                    websocketApi.DispatchNotification(matchFoundNotification,
-                        MatchmakingV2MatchFound);
+                    if (processedMatchmakingMessages.Add($"matchFound_{matchFoundNotification.id}"))
+                    {
+                        websocketApi.DispatchNotification(matchFoundNotification,
+                            MatchmakingV2MatchFound);
+                    }
                     break;
                 case MultiplayerV2NotifType.OnMatchmakingStarted:
                     var matchmakingStartedNotification =
                         JsonConvert.DeserializeObject<MatchmakingV2MatchmakingStartedNotification>(jsonString);
+                    OnMatchmakingStartedHandle(matchmakingStartedNotification.ticketId);
                     websocketApi.DispatchNotification(matchmakingStartedNotification,
                         MatchmakingV2MatchmakingStarted);
                     break;
                 case MultiplayerV2NotifType.OnMatchmakingTicketExpired:
                     var ticketExpiredNotification =
                         JsonConvert.DeserializeObject<MatchmakingV2TicketExpiredNotification>(jsonString);
-                    websocketApi.DispatchNotification(ticketExpiredNotification,
-                        MatchmakingV2TicketExpired);
+                    if (processedMatchmakingMessages.Add($"ticketExpired_{ticketExpiredNotification.ticketId}"))
+                    {
+                        websocketApi.DispatchNotification(ticketExpiredNotification,
+                            MatchmakingV2TicketExpired);
+                    }
                     break;
                 case MultiplayerV2NotifType.OnSessionStorageChanged:
                     var sessionStorageChangedNotification =
@@ -2283,7 +2301,7 @@ namespace AccelByte.Api
                     websocketApi.DispatchNotification(sessionStorageChangedNotification, SessionV2StorageChanged);
                     break;
                 default:
-                    AccelByteDebug.LogWarning($"MultiplayerV2 notification type {notificationType} not supported");
+                    SharedMemory?.Logger?.LogWarning($"MultiplayerV2 notification type {notificationType} not supported");
                     return;
             }
         }
@@ -2291,10 +2309,15 @@ namespace AccelByte.Api
         internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
         {
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
+            
             base.SetSharedMemory(newSharedMemory);
 
             messagingSystem = newSharedMemory.MessagingSystem;
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
+            notificationBuffer?.SetLogger(SharedMemory?.Logger);
+            websocketApi?.SetLogger(SharedMemory?.Logger);
         }
 
         private void OnReceivedQosLatenciesUpdatedHandle(string payload)
@@ -2305,6 +2328,11 @@ namespace AccelByte.Api
             }
 
             ChangeUserRegion(payload, null);
+        }
+
+        private void OnMatchmakingStartedHandle(string payload)
+        {
+            processedMatchmakingMessages.Clear();
         }
 
         private void OnNotificationSenderMessageReceivedHandle(string payload)

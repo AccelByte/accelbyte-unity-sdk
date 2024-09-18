@@ -13,8 +13,7 @@ namespace AccelByte.Core
         {
             if (telemetryBodies == null)
             {
-                AccelByteDebug.LogError(nameof(telemetryBodies) + " is null.");
-                callback?.TryError(ErrorCode.InvalidArgument);
+                callback?.TryError(ErrorCode.InvalidArgument, errorMessage: $"{nameof(telemetryBodies)} is null.");
                 return;
             }
             

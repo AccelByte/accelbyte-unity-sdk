@@ -1,9 +1,10 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -235,6 +236,24 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(api.GetLegalDocument(url, callback));
+        }
+
+        /// <summary>
+        /// Accept/Revoke Marketing Preference Consent
+        /// </summary>
+        /// <param name="requestBody">Request body to be sent</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ChangePolicyPreferences(ChangeAgreementRequest[] requestBody, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.ChangePolicyPreferences(requestBody, callback);
         }
     }
 }

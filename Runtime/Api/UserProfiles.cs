@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -308,13 +308,13 @@ namespace AccelByte.Api
                 {
                     if (result.IsError)
                     {
-                        AccelByteDebug.LogError(
+                        SharedMemory?.Logger?.LogError(
                             $"Unable to get Public User Profile Code:{result.Error.Code} Message:{result.Error.Message}");
                         callback.TryError(result.Error);
                     }
                     else
                     {
-                        coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback));
+                        coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback, SharedMemory?.Logger));
                     }
                 });
         }

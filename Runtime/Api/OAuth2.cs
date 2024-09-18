@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -102,7 +102,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(password, "Password parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -124,14 +124,15 @@ public class OAuth2 : ApiBase
         (string username
         , string password
         , ResultCallback callback
-        , bool rememberMe = false)
+        , bool rememberMe = false
+        , string authTrustId = null)
     {
         Report.GetFunctionLog(GetType().Name);
         Assert.IsNotNull(username, "Username parameter is null.");
         Assert.IsNotNull(password, "Password parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig, authTrustId)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -148,7 +149,6 @@ public class OAuth2 : ApiBase
 
             if (!result.IsError)
             {
-                SaveAuthTrustId(result.Value);
                 OnNewTokenObtained?.Invoke(result.Value);
                 Session.CallRefresh = (refreshToken, callback) =>
                 {
@@ -167,7 +167,8 @@ public class OAuth2 : ApiBase
         (string username
         , string password
         , ResultCallback<TokenData, OAuthError> callback
-        , bool rememberMe = false)
+        , bool rememberMe = false
+        , string authTrustId = null)
     {
         Report.GetFunctionLog(GetType().Name);
 
@@ -191,7 +192,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig, authTrustId)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -212,7 +213,7 @@ public class OAuth2 : ApiBase
     public void LoginWithDeviceId(ResultCallback callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
         IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/device/token")
             .WithPathParam("platformId", deviceProvider.DeviceType)
@@ -243,12 +244,12 @@ public class OAuth2 : ApiBase
     public void LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
         string targetUri = BaseUrl + "/v3/oauth/platforms/device/token";
         IHttpRequest request = HttpRequestBuilder.CreatePost(targetUri)
             .WithPathParam("platformId", deviceProvider.DeviceType)
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("device_id", deviceProvider.DeviceId)
@@ -369,7 +370,7 @@ public class OAuth2 : ApiBase
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
@@ -567,7 +568,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(code, "Code parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "authorization_code")
@@ -598,7 +599,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "authorization_code")
@@ -661,7 +662,7 @@ public class OAuth2 : ApiBase
     public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
     {
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "refresh_token")
@@ -690,7 +691,7 @@ public class OAuth2 : ApiBase
         Assert.IsNotNull(code, "code parameter is null.");
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/mfa/verify")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("mfaToken", mfaToken)
@@ -713,7 +714,7 @@ public class OAuth2 : ApiBase
 
         var request = HttpRequestBuilder
             .CreatePost(BaseUrl + "/v3/oauth/verify")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("token", token)
@@ -800,15 +801,6 @@ public class OAuth2 : ApiBase
             callback?.Try(result);
         });
     }
-
-    private void SaveAuthTrustId(TokenData tokenData)
-    {
-        string authTrustId = tokenData.auth_trust_id;
-        if (!string.IsNullOrEmpty(authTrustId))
-        {
-            PlayerPrefs.SetString(UserSession.AuthTrustIdKey, authTrustId);
-        }
-    }
     
     public void GenerateGameToken(string code
         , ResultCallback callback)
@@ -829,7 +821,6 @@ public class OAuth2 : ApiBase
             var result = response.TryParseJson<TokenData>();
             if (!result.IsError)
             {
-                SaveAuthTrustId(result.Value);
                 OnNewTokenObtained?.Invoke(result.Value);
                 callback.TryOk();
             }
@@ -939,7 +930,8 @@ public class OAuth2 : ApiBase
     public void LoginWithEmailV4(string emailAddress
         , string password
         , bool rememberMe
-        , ResultCallback<TokenDataV4, OAuthError> callback)
+        , ResultCallback<TokenDataV4, OAuthError> callback
+        , string authTrustId = null)
     {
         Report.GetFunctionLog(GetType().Name);
 
@@ -955,7 +947,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig, authTrustId)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "password")
@@ -975,11 +967,11 @@ public class OAuth2 : ApiBase
     public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
         IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/device/token")
             .WithPathParam("platformId", deviceProvider.DeviceType)
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("device_id", deviceProvider.DeviceId)
@@ -1015,7 +1007,7 @@ public class OAuth2 : ApiBase
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
@@ -1056,7 +1048,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "authorization_code")
@@ -1074,7 +1066,7 @@ public class OAuth2 : ApiBase
     public void RefreshSessionV4(string refreshToken, ResultCallback<TokenDataV4, OAuthError> callback)
     {
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "refresh_token")
@@ -1110,7 +1102,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/mfa/verify")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("mfaToken", mfaToken)
@@ -1142,7 +1134,7 @@ public class OAuth2 : ApiBase
 
         var request = HttpRequestBuilder
             .CreatePost(BaseUrl + "/v4/oauth/token/exchange")
-            .WithBasicAuthWithCookie(Config.PublisherNamespace)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("code", code)
@@ -1189,7 +1181,8 @@ public class OAuth2 : ApiBase
     }
 
     public void GetTokenWithLoginTicket(string loginTicket
-        , ResultCallback<TokenDataV4, OAuthError> callback)
+        , ResultCallback<TokenDataV4, OAuthError> callback
+        , string authTrustId = null)
     {
         Report.GetFunctionLog(GetType().Name);
         var error = ApiHelperUtils.CheckForNullOrEmpty(loginTicket);
@@ -1204,7 +1197,7 @@ public class OAuth2 : ApiBase
         }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
-            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace)
+            .WithBasicAuthWithCookieAndAuthTrustId(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig, authTrustId)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("grant_type", "urn:ietf:params:oauth:grant-type:login_queue_ticket")
@@ -1279,7 +1272,6 @@ public class OAuth2 : ApiBase
         if (!tokenDataResult.IsError)
         {
             tokenData = tokenDataResult.Value;
-            SaveAuthTrustId(tokenDataResult.Value);
             OnNewTokenObtained?.Invoke(tokenDataResult.Value);
             Session.CallRefresh = (refreshToken, callback) =>
             {
@@ -1289,12 +1281,12 @@ public class OAuth2 : ApiBase
                     callback.Try(refreshTokenData);
                 });
             };
-            callback.TryOk(tokenData);
+            callback?.TryOk(tokenData);
         }
         else
         {
             OAuthError errorResult = GenerateOAuthError(tokenDataResult.Error, request, requestError, httpOperator);
-            callback.TryError(errorResult);
+            callback?.TryError(errorResult);
         }
     }
     #endregion
@@ -1318,18 +1310,17 @@ public class OAuth2 : ApiBase
 
         if (!result.IsError)
         {
-            SaveAuthTrustId(result.Value);
             OnNewTokenObtained?.Invoke(result.Value);
             Session.CallRefresh = (refreshToken, callback) =>
             {
                 RefreshSession(refreshToken, callback);
             };
-            callback.TryOk(result.Value);
+            callback?.TryOk(result.Value);
         }
         else
         {
             OAuthError errorResult = GenerateOAuthError(result.Error, request, requestError, httpOperator);
-            callback.TryError(errorResult);
+            callback?.TryError(errorResult);
         }
     }
 }

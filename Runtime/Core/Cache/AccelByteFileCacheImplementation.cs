@@ -13,19 +13,29 @@ namespace AccelByte.Core
         readonly string cacheDirectory = string.Empty;
         const int readWriteAsyncWaitMs = 100;
 
-        public AccelByteFileCacheImplementation(string cacheDirectory)
+        private IFileStream fs;
+        private IDebugger logger;
+        
+        public AccelByteFileCacheImplementation(string cacheDirectory, IFileStream fs = null, IDebugger logger = null)
         {
+            if (fs == null)
+            {
+                fs = AccelByteSDK.Implementation.FileStream;
+            }
+            
             if (string.IsNullOrEmpty(cacheDirectory))
             {
                 throw new System.InvalidOperationException("Cache directory is empty.");
             }
             this.cacheDirectory = cacheDirectory;
+            this.fs = fs;
+            this.logger = logger;
         }
 
         public bool Contains(string key)
         {
             string itemPath = GetFileFullPath(key);
-            var retval = AccelByteSDK.FileStream.IsFileExist(itemPath);
+            var retval = fs.IsFileExist(itemPath);
             return retval;
         }
 
@@ -34,11 +44,11 @@ namespace AccelByte.Core
             try
             {
                 string itemSavePath = GetFileFullPath(key);
-                AccelByteSDK.FileStream.WriteFile(formatter: null, item, path: itemSavePath, onDone: null, instantWrite: true);
+                fs.WriteFile(formatter: null, item, path: itemSavePath, onDone: null, instantWrite: true);
             }
             catch (System.Exception ex)
             {
-                AccelByteDebug.LogWarning(ex.Message);
+                logger?.LogWarning(ex.Message);
                 return false;
             }
             return true;
@@ -52,7 +62,7 @@ namespace AccelByte.Core
             {
                 try
                 {
-                    AccelByteSDK.FileStream.WriteFileAsync(item, filePath, (success) =>
+                    fs.WriteFileAsync(item, filePath, (success) =>
                     {
                         writeSuccess = success;
                     });
@@ -78,11 +88,11 @@ namespace AccelByte.Core
         {
             try
             {
-                AccelByteSDK.FileStream.DeleteDirectory(cacheDirectory, onDone: null);
+                fs.DeleteDirectory(cacheDirectory, onDone: null);
             }
             catch (System.Exception exception)
             {
-                AccelByteDebug.LogWarning($"Failed to delete cache directory: {cacheDirectory}.\n{exception.Message}");
+                logger?.LogWarning($"Failed to delete cache directory: {cacheDirectory}.\n{exception.Message}");
             }
         }
 
@@ -93,7 +103,7 @@ namespace AccelByte.Core
 
             try
             {
-                AccelByteSDK.FileStream.ReadFile(formatter: null, filePath, instantRead: true, onDone: (isSucess, readResult)=>
+                fs.ReadFile(formatter: null, filePath, instantRead: true, onDone: (isSucess, readResult)=>
                 {
                     if(isSucess)
                     {
@@ -103,7 +113,7 @@ namespace AccelByte.Core
             }
             catch (System.Exception ex)
             {
-                AccelByteDebug.LogWarning(ex.Message);
+                logger?.LogWarning(ex.Message);
             }
             return retval;
         }
@@ -113,7 +123,7 @@ namespace AccelByte.Core
             if (callback != null)
             {
                 string filePath = GetFileFullPath(key);
-                AccelByteSDK.FileStream.ReadFileAsync(filePath, (success, readResult) =>
+                fs.ReadFileAsync(filePath, (success, readResult) =>
                 {
                     callback?.Invoke(readResult);
                 });
@@ -131,14 +141,14 @@ namespace AccelByte.Core
             try
             {
                 string filePath = GetFileFullPath(key);
-                AccelByteSDK.FileStream.DeleteFile(filePath, instantDelete: true, onDone: (isSuccess) =>
+                fs.DeleteFile(filePath, instantDelete: true, onDone: (isSuccess) =>
                 {
                     result = isSuccess;
                 });
             }
             catch(System.Exception ex)
             {
-                AccelByteDebug.LogWarning($"Failed to delete cache file.\n{ex.Message}");
+                logger?.LogWarning($"Failed to delete cache file.\n{ex.Message}");
             }
             return result;
         }

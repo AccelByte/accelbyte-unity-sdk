@@ -7,19 +7,21 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using UnityEngine.Scripting;
 using System.ComponentModel;
+using System;
+using System.Collections.Generic;
 
 namespace AccelByte.Models
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ChallengeSortBy
     {
-        [Description("updatedAt:asc")]
+        [Description("updatedAt:asc"), EnumMember(Value = "updatedAt:asc")]
         UpdatedAtAsc,
-        [Description("updatedAt:desc")]
+        [Description("updatedAt:desc"), EnumMember(Value = "updatedAt:desc")]
         UpdatedAtDesc,
-        [Description("createdAt:asc")]
+        [Description("createdAt:asc"), EnumMember(Value = "createdAt:asc")]
         CreatedAtAsc,
-        [Description("createdAt:desc")]
+        [Description("createdAt:desc"), EnumMember(Value = "createdAt:desc")]
         CreatedAtDesc,
     }
 
@@ -27,11 +29,11 @@ namespace AccelByte.Models
     public enum ChallengeStatus
     {
         None,
-        [Description("INIT")]
+        [Description("INIT"), EnumMember(Value = "INIT")]
         Init,
-        [Description("RETIRED")]
+        [Description("RETIRED"), EnumMember(Value = "RETIRED")]
         Retired,
-        [Description("TIED")]
+        [Description("TIED"), EnumMember(Value = "TIED")]
         Tied
     }
 
@@ -39,16 +41,15 @@ namespace AccelByte.Models
     public enum ChallengeRewardStatus
     {
         None,
-        [Description("CLAIMED")]
+        [Description("CLAIMED"), EnumMember(Value = "CLAIMED")]
         Claimed,
-        [Description("UNCLAIMED")]
+        [Description("UNCLAIMED"), EnumMember(Value = "UNCLAIMED")]
         Unclaimed
     }
 
     [DataContract, Preserve]
     public class ChallengeMeta
     {
-        [DataMember(Name = "code")] public string Code;
         [DataMember(Name = "description")] public string Description;
         [DataMember(Name = "endDate")] public string EndDate;
         [DataMember(Name = "name")] public string Name;
@@ -58,6 +59,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ChallengeMetaResponse : ChallengeMeta
     {
+        [DataMember(Name = "code")] public string Code;
         [DataMember(Name = "userId")] public string UserId;
     }
 
@@ -69,18 +71,36 @@ namespace AccelByte.Models
         [DataMember(Name = "endAfter")] public int EndAfter;
         [DataMember(Name = "goalsVisibility")] public string GoalsVisibility;
         [DataMember(Name = "rotation")] public string Rotation;
+        [DataMember(Name = "resetConfig")] public ChallengeResetConfig ResetConfig;
+        [DataMember(Name = "repeatAfter")] public int RepeatAfter;
+        [DataMember(Name = "randomizedPerRotation")] public bool RandomizedPerRotation;
     }
 
     [DataContract, Preserve]
     public class ChallengeResponseInfo : ChallengeBase
     {
+        [DataMember(Name = "code")] public string Code;
         [DataMember(Name = "status")] public string Status;
         [DataMember(Name = "updatedAt")] public string UpdatedAt;
         [DataMember(Name = "createdAt")] public string CreatedAt;
     }
 
     [DataContract, Preserve]
+    public class ChallengeResetConfig
+    {
+        [DataMember(Name = "resetDate")] public int ResetDate;
+        [DataMember(Name = "resetDay")] public int ResetDay;
+        [DataMember(Name = "resetTime")] public string ResetTime;
+    }
+
+    [DataContract, Preserve]
     public class CreateChallengeRequest : ChallengeBase
+    {
+        [DataMember(Name = "code")] public string Code;
+    }
+
+    [DataContract, Preserve]
+    public class UpdateChallengeRequest : ChallengeBase
     {
     }
 
@@ -126,6 +146,44 @@ namespace AccelByte.Models
     public class GoalResponse
     {
         [DataMember(Name = "data")] public GoalResponseInfo[] Data;
+        [DataMember(Name = "meta")] public ChallengeResponseInfo Meta;
+        [DataMember(Name = "paging")] public Paging Paging;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeGoalRequestBase
+    {
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "isActive")] public bool IsActive;
+        [DataMember(Name = "name")] public string Name;
+        [DataMember(Name = "requirementGroups")] public ChallengeRequirement[] RequirementGroups;
+        [DataMember(Name = "rewards")] public ChallengeReward[] Rewards;
+        [DataMember(Name = "schedule")] public ChallengeGoalSchedule Schedule;
+        [DataMember(Name = "tags")] public string[] Tags;
+    }
+
+    [DataContract, Preserve]
+    public class CreateChallengeGoalRequest : ChallengeGoalRequestBase
+    {
+        [DataMember(Name = "code")]public string Code;
+    }
+    [DataContract, Preserve]
+    public class UpdateChallengeGoalRequest : ChallengeGoalRequestBase
+    {
+    }
+
+    [DataContract, Preserve]
+    public class ChallengePeriod
+    {
+        [DataMember(Name = "startTime")] public string StartTime;
+        [DataMember(Name = "endTime")] public string EndTime;
+        [DataMember(Name = "slot")] public int Slot;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengePeriodResponse
+    {
+        [DataMember(Name = "data")] public ChallengePeriod[] Data;
         [DataMember(Name = "paging")] public Paging Paging;
     }
 
@@ -133,7 +191,7 @@ namespace AccelByte.Models
     public class ChallengeGoalSchedule
     {
         [DataMember(Name = "endTime")] public string EndTime;
-        [DataMember(Name = "order")] public string Order;
+        [DataMember(Name = "order")] public int Order;
         [DataMember(Name = "startTime")] public string StartTime;
     }
 
@@ -142,7 +200,7 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "itemId")] public string ItemId;
         [DataMember(Name = "itemName")] public string ItemName;
-        [DataMember(Name = "qty")] public string Quantity;
+        [DataMember(Name = "qty")] public float Quantity;
         [DataMember(Name = "type")] public string Type;
     }
 
@@ -176,6 +234,7 @@ namespace AccelByte.Models
         [DataMember(Name = "parameterName")] public string ParameterName;
         [DataMember(Name = "parameterType")] public string ParameterType;
         [DataMember(Name = "targetValue")] public double TargetValue;
+        [DataMember(Name = "statCycleId")] public string StatCycleId;
     }
 
     [DataContract, Preserve]
@@ -205,6 +264,30 @@ namespace AccelByte.Models
     public class ClaimRewardRequest
     {
         [DataMember(Name = "rewardIDs")] public string[] RewardIDs;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeBulkClaimRewardRequest : ClaimRewardRequest
+    {
+        [DataMember(Name = "userId")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeBulkClaimRewardResponse
+    {
+        [DataMember(Name = "errorDetail")] public ChallengeBulkClaimError ErrorDetail;
+        [DataMember(Name = "isSuccess")] public bool IsSuccess;
+        [DataMember(Name = "rewards")] public UserReward[] Rewards;
+        [DataMember(Name = "userId")] public string UserId;
+    }
+
+    public class ChallengeBulkClaimError
+    {
+        [DataMember(Name = "attributes")] public Dictionary<string, string> Attributes;
+        [DataMember(Name = "errorCode")] public int ErrorCode;
+        [DataMember(Name = "errorMessage")] public string ErrorMessage;
+        [DataMember(Name = "message")] public string Message;
+        [DataMember(Name = "name")] public string Name;
     }
     
     [DataContract, Preserve]

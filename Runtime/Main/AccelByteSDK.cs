@@ -8,48 +8,64 @@ namespace AccelByte.Core
 {
     public static class AccelByteSDK
     {
+        private static AccelByteSDKImplementator implementation;
+
+        internal static AccelByteSDKImplementator Implementation
+        {
+            get
+            {
+                if (implementation == null)
+                {
+                    implementation = new AccelByteSDKImplementator();
+                }
+                return implementation;
+            }
+            set
+            {
+                implementation = value;
+            }
+        }
+        
         public static AccelByteEnvironment Environment
         {
-            internal set;
-            get;
+            get
+            {
+                return Implementation.Environment;
+            }
         }
 
         public static ClientAnalyticsService ClientAnalytics
         {
-            internal set;
-            get;
+            get
+            {
+                return Implementation.ClientAnalytics;
+            }
         }
 
         public static string FlightId
         {
-            internal set;
-            get;
+            get
+            {
+                return Implementation.FlightId;
+            }
         }
 
         public static string Version
         {
             get
             {
-                return AccelByteSettingsV2.AccelByteSDKVersion;
+                return Implementation.Version;
             }
         }
 
         public static AccelByteClientRegistry GetClientRegistry()
         {
-            if (ClientRegistry == null)
-            {
-                ClientRegistry = CreateClientRegistry(Environment.Current);
-            }
-            return ClientRegistry;
+            return Implementation.GetClientRegistry();
         }
 
         public static Server.AccelByteServerRegistry GetServerRegistry()
         {
-            if (ServerRegistry == null)
-            {
-                ServerRegistry = CreateServerRegistry(Environment.Current);
-            }
-            return ServerRegistry;
+            return Implementation.GetServerRegistry();
         }
 
         /// <summary>
@@ -57,9 +73,7 @@ namespace AccelByte.Core
         /// </summary>
         public static Models.Config GetClientConfig()
         {
-            Models.Config retval = GetClientRegistry().Config;
-            retval = retval.ShallowCopy();
-            return retval;
+            return Implementation.GetClientConfig();
         }
 
         /// <summary>
@@ -67,9 +81,7 @@ namespace AccelByte.Core
         /// </summary>
         public static Models.OAuthConfig GetClientOAuthConfig()
         {
-            Models.OAuthConfig retval = GetClientRegistry().OAuthConfig;
-            retval = retval.ShallowCopy();
-            return retval;
+            return Implementation.GetClientOAuthConfig();
         }
 
         /// <summary>
@@ -77,9 +89,7 @@ namespace AccelByte.Core
         /// </summary>
         public static Models.ServerConfig GetServerConfig()
         {
-            Models.ServerConfig retval = GetServerRegistry().Config;
-            retval = retval.ShallowCopy();
-            return retval;
+            return Implementation.GetServerConfig();
         }
 
         /// <summary>
@@ -87,161 +97,34 @@ namespace AccelByte.Core
         /// </summary>
         public static Models.OAuthConfig GetServerOAuthConfig()
         {
-            Models.OAuthConfig retval = GetServerRegistry().OAuthConfig;
-            retval = retval.ShallowCopy();
-            return retval;
+            return Implementation.GetServerOAuthConfig();
         }
-
-        internal static AccelByteClientRegistry CreateClientRegistry(Models.SettingsEnvironment environment)
-        {
-            const bool getServerConfig = false;
-            AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
-            AccelByteDebug.Initialize(settings.SDKConfig.EnableDebugLog, settings.SDKConfig.DebugLogFilter);
-            IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager);
-            
-            return newClientRegistry;
-        }
-
-        internal static Server.AccelByteServerRegistry CreateServerRegistry(Models.SettingsEnvironment environment)
-        {
-            const bool getServerConfig = true;
-            AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
-            AccelByteDebug.Initialize(settings.ServerSdkConfig.EnableDebugLog, settings.ServerSdkConfig.DebugLogFilter);
-            IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newServerRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager);
-            
-            return newServerRegistry;
-        }
-
-        internal static void ChangeInterfaceEnvironment(Models.SettingsEnvironment newEnvironment)
-        {
-            Models.Config clientConfig = null;
-            Models.OAuthConfig clientOAuthConfig = null;
-            Models.ServerConfig serverConfig = null;
-            Models.OAuthConfig serverOAuthConfig = null;
-
-            if (ClientRegistry != null)
-            {
-                const bool getServerConfig = false;
-                AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(newEnvironment, OverrideConfigs, getServerConfig);
-                clientConfig = settings.SDKConfig;
-                clientOAuthConfig = settings.OAuthConfig;
-            }
-
-            if (ServerRegistry != null)
-            {
-                const bool getServerConfig = true;
-                AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(newEnvironment, OverrideConfigs, getServerConfig);
-                serverConfig = settings.ServerSdkConfig;
-                serverOAuthConfig = settings.OAuthConfig;
-            }
-
-            ChangeInterfaceEnvironment(newEnvironment, clientConfig, clientOAuthConfig, serverConfig, serverOAuthConfig);
-        }
-
-        internal static void ChangeInterfaceEnvironment(Models.SettingsEnvironment newEnvironment, Models.Config clientConfig, Models.OAuthConfig clientOAuthConfig, Models.ServerConfig serverConfig, Models.OAuthConfig serverOAuthConfig)
-        {
-            if (ClientRegistry != null)
-            {
-                ClientRegistry.ChangeEnvironment(newEnvironment, clientConfig, clientOAuthConfig);
-            }
-
-            if (ServerRegistry != null)
-            {
-                ServerRegistry.ChangeEnvironment(newEnvironment, serverConfig, serverOAuthConfig);
-            }
-        }
-
-        internal static void Reset()
-        {
-            if (ClientRegistry != null)
-            {
-                ClientRegistry.Reset();
-                ClientRegistry = null;
-            }
-
-            if (ServerRegistry != null)
-            {
-                ServerRegistry.Reset();
-                ServerRegistry = null;
-            }
-
-            if (sdkHttpSenderFactory != null)
-            {
-                sdkHttpSenderFactory.ResetHttpRequestSenders();
-                sdkHttpSenderFactory = null;
-            }
-
-            AccelByteDebug.Reset();
-        }
-
-        internal static void DisposeFileStream()
-        {
-            if(fileStream != null)
-            {
-                fileStream.Dispose();
-            }
-        }
-
-        internal static AccelByteClientRegistry ClientRegistry;
-        internal static Server.AccelByteServerRegistry ServerRegistry;
-        internal static Models.OverrideConfigs OverrideConfigs;
-
-        #region File Stream
-        private static IFileStream fileStream;
+        
         internal static IFileStream FileStream
         {
             get
             {
-                if (fileStream == null)
-                {
-                    IFileStreamFactory fileStreamFactory = FileStreamFactory;
-                    if(fileStreamFactory == null)
-                    {
-                        fileStreamFactory = new AccelByteFileStreamFactory();
-                    }
-                    fileStream = fileStreamFactory.CreateFileStream();
-                    AccelByteSDKMain.OnGameUpdate += dt =>
-                    {
-                        fileStream.Pop();
-                    };
-                }
-                return fileStream;
+                return Implementation.FileStream;
             }
         }
-        public static IFileStreamFactory FileStreamFactory;
-        #endregion
 
-        private static IHttpRequestSenderFactory sdkHttpSenderFactory;
-
-        internal static IHttpRequestSenderFactory SdkHttpSenderFactory
+        public static IFileStreamFactory FileStreamFactory
         {
             get
             {
-                if (sdkHttpSenderFactory == null)
-                {
-                    sdkHttpSenderFactory = new AccelByteSDKHttpRequestFactory();
-                }
-                return sdkHttpSenderFactory;
+                return Implementation.FileStreamFactory;
             }
             set
             {
-                sdkHttpSenderFactory = value;
+                Implementation.FileStreamFactory = value;
             }
         }
-
-        private static AccelBytePlatformHandler platformHandler;
-
+        
         public static AccelBytePlatformHandler PlatformHandler
         {
             get
             {
-                if(platformHandler == null)
-                {
-                    platformHandler = new AccelBytePlatformHandler();
-                }
-                return platformHandler;
+                return Implementation.PlatformHandler;
             }
         }
 
@@ -249,19 +132,8 @@ namespace AccelByte.Core
         {
             get
             {
-                if (GlobalTimeManager == null)
-                {
-                    GlobalTimeManager = new AccelByteTimeManager();
-                }
-
-                return GlobalTimeManager;
-            }
-            internal set
-            {
-                GlobalTimeManager = value;
+                return Implementation.TimeManager;
             }
         }
-        
-        internal static AccelByteTimeManager GlobalTimeManager;
     }
 }

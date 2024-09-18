@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -52,9 +52,9 @@ namespace AccelByte.Core
 
                     using (UnityEngine.Networking.UnityWebRequest webRequest = executedTask.CreateWebRequest())
                     {
-                        Report.GetHttpRequest(executedTask.HttpRequest, webRequest);
+                        Report.GetHttpRequest(executedTask.HttpRequest, webRequest, logger);
                         yield return ExecuteWebRequest(webRequest);
-                        Report.GetHttpResponse(webRequest);
+                        Report.GetHttpResponse(webRequest, logger);
                         executedTask.SetComplete(webRequest);
                     }
                 }

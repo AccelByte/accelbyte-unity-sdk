@@ -29,6 +29,7 @@ namespace AccelByte.Models
         [DataMember] public bool UsePlayerPrefs = false;
         [DataMember] public bool EnableDebugLog = true;
         [DataMember] public string DebugLogFilter = "Verbose";
+        [DataMember] public bool RandomizeDeviceId = false;
         [DataMember] public string BaseUrl = "";
         [DataMember] public string IamServerUrl = "";
         [DataMember] public string PlatformServerUrl = "";
@@ -81,13 +82,22 @@ namespace AccelByte.Models
         [DataMember] public bool EnableClientAnalyticsEvent = false;
         [DataMember] public float ClientAnalyticsEventInterval = defaultClientAnalyticsEventIntervalInSecond;
         [DataMember] public bool EnableAmsServerQos = false;
+        [DataMember] public bool EnableMatchmakingTicketCheck = true;
+        [DataMember] public int MatchmakingTicketCheckPollRate = 5000;
+        [DataMember] public int MatchmakingTicketCheckInitialDelay = 30000;
 
+        private IDebugger logger;
         /// <summary>
         ///  Copy member values
         /// </summary>
         public Config ShallowCopy()
         {
             return (Config) MemberwiseClone();
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
 
         public bool Compare(Config anotherConfig)
@@ -142,7 +152,10 @@ namespace AccelByte.Models
                    this.PresenceBroadcastEventInterval == anotherConfig.PresenceBroadcastEventInterval &&
                    this.PresenceBroadcastEventGameState == anotherConfig.PresenceBroadcastEventGameState &&
                    this.PresenceBroadcastEventGameStateDescription == anotherConfig.PresenceBroadcastEventGameStateDescription &&
-                   this.EnablePreDefinedEvent == anotherConfig.EnablePreDefinedEvent;
+                   this.EnablePreDefinedEvent == anotherConfig.EnablePreDefinedEvent &&
+                   this.EnableMatchmakingTicketCheck == anotherConfig.EnableMatchmakingTicketCheck &&
+                   this.MatchmakingTicketCheckPollRate == anotherConfig.MatchmakingTicketCheckPollRate &&
+                   this.MatchmakingTicketCheckInitialDelay == anotherConfig.MatchmakingTicketCheckInitialDelay;
         }
 
         /// <summary>
@@ -301,13 +314,13 @@ namespace AccelByte.Models
 
             if(MaximumCacheSize <= 0)
             {
-                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
+                logger?.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
                 MaximumCacheSize = defaultCacheSize;
             }
 
             if (MaximumCacheLifeTime <= 0)
             {
-                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
+                logger?.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
                 MaximumCacheLifeTime = defaultCacheLifeTime;
             }
 
@@ -514,7 +527,7 @@ namespace AccelByte.Models
             }
             catch (System.Exception ex)
             {
-                AccelByteDebug.LogWarning("Invalid Client Config BaseUrl: " + ex.Message);
+                logger?.LogWarning("Invalid Client Config BaseUrl: " + ex.Message);
             }
             this.BaseUrl = sanitizedUrl;
         }

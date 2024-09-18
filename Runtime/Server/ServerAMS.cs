@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -48,6 +48,7 @@ namespace AccelByte.Server
         private readonly CoroutineRunner coroutineRunner;
         private Coroutine heartBeatCoroutine;
         private TimeSpan heartBeatInterval = TimeSpan.FromSeconds(15);
+        private ApiSharedMemory sharedMemory;
 
         /// <summary>
         /// Event triggered each time a websocket reconnection attempt failed
@@ -63,17 +64,21 @@ namespace AccelByte.Server
         /// </summary>
         public bool IsConnected => websocketApi.IsConnected;
 
-        internal ServerAMS(ServerConfig config, CoroutineRunner inCoroutineRunner) : this(config.AMSServerUrl, config.AMSHeartbeatInterval, inCoroutineRunner, config.AMSReconnectTotalTimeout)
+        internal ServerAMS(ServerConfig config, CoroutineRunner inCoroutineRunner, ApiSharedMemory sharedMemory) : this(config.AMSServerUrl, config.AMSHeartbeatInterval, inCoroutineRunner, sharedMemory, config.AMSReconnectTotalTimeout)
         { 
         
         }
 
-        internal ServerAMS(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner, int inWebsocketConnectionTimeoutMs = 60000)
+        internal ServerAMS(string serverUrl, int heartbeatIntervalSecond, CoroutineRunner inCoroutineRunner, ApiSharedMemory sharedMemory, int inWebsocketConnectionTimeoutMs = 60000)
         {
             Assert.IsNotNull(inCoroutineRunner);
 
+            this.sharedMemory = sharedMemory;
+            
             coroutineRunner = inCoroutineRunner;
             websocketApi = new ServerAMSWebsocketApi(inCoroutineRunner, serverUrl);
+            websocketApi.SetSharedMemory(sharedMemory);
+            
             heartBeatInterval = TimeSpan.FromSeconds(heartbeatIntervalSecond);
             websocketApi.OnOpen += HandleOnOpen;
             websocketApi.OnMessage += HandleOnMessage;
@@ -90,7 +95,7 @@ namespace AccelByte.Server
 
             if (dsId == null || dsId.Length == 0)
             {
-                AccelByteDebug.LogWarning("dsid not provided, not connecting to AMS");
+                sharedMemory?.Logger?.LogWarning("dsid not provided, not connecting to AMS");
             }
             else
             {
@@ -127,8 +132,45 @@ namespace AccelByte.Server
         /// </summary>
         public void SendReadyMessage()
         {
-            AccelByteDebug.LogVerbose("Send ready to AMS");
+            sharedMemory?.Logger?.LogVerbose("Send ready to AMS");
             SendReadyMessageImplementation();
+        }
+
+        /// <summary>
+        /// Set DS session timeout to new value. Calling this will refresh the timeout timer.
+        /// </summary>
+        /// <param name="newTimeout">New timeout value in seconds</param>
+        public void SetDSTimeout(int newTimeout)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!IsConnected)
+            {
+                AccelByteDebug.LogWarning("Cannot set timeout, DS not connected to AMS yet.");
+                return;
+            }
+
+            string sessionTimeoutMessage =
+                string.Format("{{\"resetSessionTimeout\":{{\"newTimeout\":\"{0}\"}}}}", newTimeout);
+            websocketApi.SendMessage(sessionTimeoutMessage);
+        }
+
+        /// <summary>
+        /// Reset DS session timeout to default fleet setting. Calling this will refresh the timeout timer.
+        /// </summary>
+        public void ResetDSTimeout()
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!IsConnected)
+            {
+                AccelByteDebug.LogWarning("Cannot set timeout, DS not connected to AMS yet.");
+                return;
+            }
+
+            string sessionTimeoutMessage =
+                "{\"resetSessionTimeout\":{}}";
+            websocketApi.SendMessage(sessionTimeoutMessage);
         }
 
         protected virtual void SendReadyMessageImplementation()
@@ -142,7 +184,7 @@ namespace AccelByte.Server
         {
             // debug ws connection
 #if DEBUG
-            AccelByteDebug.LogVerbose("[WS] Connection open");
+            sharedMemory?.Logger?.LogVerbose("[WS] Connection open");
 #endif
             Action handler = OnOpen;
 
@@ -158,11 +200,11 @@ namespace AccelByte.Server
 #if DEBUG
             if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
             {
-                AccelByteDebug.Log($"[WS Server AMS] Websocket connection close: {closecode} named {verboseCode.ToString()}");
+                sharedMemory?.Logger?.Log($"[WS Server AMS] Websocket connection close: {closecode} named {verboseCode.ToString()}");
             }
             else
             {
-                AccelByteDebug.Log($"[WS Server AMS] Websocket connection close: {closecode}.");
+                sharedMemory?.Logger?.Log($"[WS Server AMS] Websocket connection close: {closecode}.");
             }
 #endif
             var code = (WsCloseCode)closecode;
@@ -193,13 +235,13 @@ namespace AccelByte.Server
             }
             catch (Exception ex)
             {
-                AccelByteDebug.LogWarning(ex.Message);
+                sharedMemory?.Logger?.LogWarning(ex.Message);
             }
         }
 
         protected void HandleDrain()
         {
-            AccelByteDebug.LogWarning("Enter drain mode");
+            sharedMemory?.Logger?.LogWarning("Enter drain mode");
             OnDrainReceived?.Invoke();
         }
 

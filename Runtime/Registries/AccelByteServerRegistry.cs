@@ -42,6 +42,7 @@ namespace AccelByte.Server
         private ApiSharedMemory sharedMemory;
 
         private AccelByteTimeManager timeManager;
+        private readonly CoreHeartBeat coreHeartBeat;
 
         internal AccelByteTimeManager TimeManager
         {
@@ -61,12 +62,20 @@ namespace AccelByte.Server
             }
         }
 
-        internal AccelByteServerRegistry(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager)
+        public IDebugger Logger
+        {
+            get;
+            private set;
+        }
+
+        internal AccelByteServerRegistry(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager, CoreHeartBeat coreHeartBeat)
         {
             serverApiClientInstances = new Dictionary<string, ServerApiClient>();
             loginUserClientApis = new List<ServerApiClient>();
             this.requestSenderFactory = requestSenderFactory;
             this.timeManager = timeManager;
+            this.Logger = new AccelByteDebuggerV2();
+            this.coreHeartBeat = coreHeartBeat;
             
             Initialize(environment, config, oAuthConfig);
             UpdateServerTime(ref this.timeManager, CreateHtppClient(), ref Config);
@@ -112,19 +121,41 @@ namespace AccelByte.Server
             return predefinedEventScheduler;
         }
 
+        internal void SetLogger(IDebugger newLogger)
+        {
+            if (sharedMemory != null)
+            {
+                Logger = newLogger;
+                sharedMemory.Logger = newLogger;
+            }
+        }
+
         private void Initialize(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig)
         {
             Config = config;
             OAuthConfig = oAuthConfig;
             this.environment = environment;
 
+            if (config != null)
+            {
+                Logger?.SetEnableLogging(config.EnableDebugLog);
+                if (Enum.TryParse(config.DebugLogFilter, out AccelByteLogType logTypeEnum))
+                {
+                    Logger?.SetFilterLogType(logTypeEnum);
+                }
+                AccelByteDebug.Initialize(config.EnableDebugLog, config.DebugLogFilter);
+            }
+
             sharedMemory = new ApiSharedMemory();
+            sharedMemory.Logger = Logger;
+            sharedMemory.CoreHeartBeat = coreHeartBeat;
 
             InitializeAnalytics(config);
 
             sharedMemory.PredefinedEventScheduler = predefinedEventScheduler;
             sharedMemory.IdValidator = new Utils.AccelByteIdValidator();
             sharedMemory.TimeManager = this.TimeManager;
+            sharedMemory.TimeManager?.SetLogger(Logger);
 
             SendSDKInitializedEvent(AccelByteSDK.Version);
         }
@@ -177,7 +208,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(newApiServer, "!apiClient @ RegisterServerApi");
             if (string.IsNullOrEmpty(id))
             {
-                AccelByteDebug.LogError("!id @ RegisterServerApi");
+                Logger?.LogError("!id @ RegisterServerApi");
                 return false;
             }
 
@@ -257,6 +288,7 @@ namespace AccelByte.Server
                 OAuthConfig.ClientSecret,
                 httpClient,
                 coroutineRunner);
+            session.SetSharedMemory(sharedMemory);
 
             var newApiServer = new ServerApiClient(session, httpClient, coroutineRunner, Config, OAuthConfig);
 
@@ -266,7 +298,8 @@ namespace AccelByte.Server
         protected virtual IHttpClient CreateHtppClient()
         {
             IHttpRequestSender requestSender = requestSenderFactory.CreateHttpRequestSender();
-            AccelByteHttpClient httpClient = new AccelByteHttpClient(requestSender);
+            requestSender.SetLogger(Logger);
+            AccelByteHttpClient httpClient = new AccelByteHttpClient(requestSender, Logger);
             var cacheImplementation = new AccelByteLRUMemoryCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>(Config.MaximumCacheSize);
             httpClient.SetCacheImplementation(cacheImplementation, Config.MaximumCacheLifeTime);
             httpClient.SetCredentials(OAuthConfig.ClientId, OAuthConfig.ClientSecret);
@@ -314,7 +347,7 @@ namespace AccelByte.Server
         {
             if (config.DsId == null)
             {
-                AccelByteDebug.LogWarning("dsid not provided, not connecting to ams");
+                Logger?.LogWarning("dsid not provided, not connecting to ams");
                 return null;
             }
 
@@ -331,7 +364,8 @@ namespace AccelByte.Server
         {
             var newAMS = new ServerAMS(
                 config,
-                coroutineRunner);
+                coroutineRunner,
+                sharedMemory);
             return newAMS;
         }
 

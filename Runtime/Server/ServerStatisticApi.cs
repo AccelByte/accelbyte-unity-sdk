@@ -539,14 +539,14 @@ namespace AccelByte.Server
             .WithContentType(MediaType.ApplicationJson)
             .Accepts(MediaType.ApplicationJson)
             .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+            
+            yield break;
         }
         
         public IEnumerator GetGlobalStatItemsByStatCode(string statCode, ResultCallback<GlobalStatItem> callback)

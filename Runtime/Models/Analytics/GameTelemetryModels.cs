@@ -14,7 +14,7 @@ namespace AccelByte.Models
         [DataMember] public string EventName;
         [DataMember] public string EventNamespace;
         [DataMember] public object Payload;
-        [DataMember(Name = "flightId")] internal string FlightId;
+        [DataMember(Name = "FlightId")] internal string FlightId;
         [DataMember(Name = "DeviceType")] internal string DeviceType;
         [DataMember(Name = "ClientTimestamp")] private DateTime clientTimestamp;
 

@@ -15,6 +15,7 @@ namespace AccelByte.Models
         [DataMember] public bool? UsePlayerPrefs;
         [DataMember] public bool? EnableDebugLog;
         [DataMember] public string DebugLogFilter;
+        [DataMember] public bool? RandomizeDeviceId;
         [DataMember] public string BaseUrl;
         [DataMember] public string IamServerUrl;
         [DataMember] public string PlatformServerUrl;
@@ -79,10 +80,14 @@ namespace AccelByte.Models
         [DataMember] public int? StatsDMetricInterval;
         [DataMember] public int? DSHubReconnectTotalTimeout;
         [DataMember] public int? AMSReconnectTotalTimeout;
+        [DataMember] public bool? ServerUseAMS;
         [DataMember] public string DsId;
         [DataMember] public string ClientId;
         [DataMember] public string ClientSecret;
         [DataMember] public bool? OverrideServiceUrl;
+        [DataMember] public bool? EnableMatchmakingTicketCheck;
+        [DataMember] public int? MatchmakingTicketCheckPollRate;
+        [DataMember] public int? MatchmakingTicketCheckInitialDelay;
     }
 
     [DataContract, Preserve]

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -19,11 +19,14 @@ namespace AccelByte.Core
             }
         }
 
-        public PS5Wrapper(string clientId)
+        private IDebugger logger;
+
+        public PS5Wrapper(string clientId, IDebugger logger = null)
         {
+            this.logger = logger;
             if (string.IsNullOrEmpty(clientId))
             {
-                AccelByteDebug.LogWarning($"clientId is null. Please check {nameof(PS5Wrapper)} constructor value");
+                logger?.LogWarning($"clientId is null. Please check {nameof(PS5Wrapper)} constructor value");
             }
             this.clientId = clientId;
         }
@@ -32,7 +35,7 @@ namespace AccelByte.Core
         {
             if (string.IsNullOrEmpty(clientId))
             {
-                AccelByteDebug.LogWarning($"clientId is null");
+                logger?.LogWarning($"clientId is null");
             }
 
             this.clientId = clientId;

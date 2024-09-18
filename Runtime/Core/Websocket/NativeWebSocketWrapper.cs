@@ -17,6 +17,13 @@ namespace Core.Websocket
         public event OnErrorHandler OnError;
         public event OnCloseHandler OnClose;
 
+        private IDebugger logger;
+
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
+        }
+
         ~NativeWebSocketWrapper()
         {
             OnOpen = null;
@@ -107,11 +114,11 @@ namespace Core.Websocket
             switch (webSocket.State)
             {
                 case NativeWebSocket.WebSocketState.Open:
-                        AccelByteDebug.Log($"Websocket connection to {url} already opened");
+                        logger?.Log($"Websocket connection to {url} already opened");
                         callback?.TryOk();
                         return;
                 case NativeWebSocket.WebSocketState.Connecting:
-                        AccelByteDebug.LogVerbose($"Websocket connection to {url} is connecting");
+                        logger?.LogVerbose($"Websocket connection to {url} is connecting");
                         callback?.TryOk();
                         break;
                 case NativeWebSocket.WebSocketState.Closing:

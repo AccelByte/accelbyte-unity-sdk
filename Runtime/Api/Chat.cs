@@ -576,6 +576,13 @@ namespace AccelByte.Api
             this.websocketApi.OnMessage += HandleOnMessage;
             this.websocketApi.OnClose += HandleOnClose;
         }
+
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            this.websocketApi.SetSharedMemory(newSharedMemory);
+        } 
+
         #endregion
         
         #region internal events
@@ -589,11 +596,11 @@ namespace AccelByte.Api
 #if DEBUG
             if (Enum.TryParse(closecode.ToString(), out WsCloseCode verboseCode))
             {
-                AccelByteDebug.Log($"[Ws Chat] Websocket connection close: {closecode} named {verboseCode.ToString()}");
+                SharedMemory?.Logger?.Log($"[Ws Chat] Websocket connection close: {closecode} named {verboseCode.ToString()}");
             }
             else
             {
-                AccelByteDebug.Log($"[Ws Chat] Websocket connection close: {closecode}. Please refers https://demo.accelbyte.io/chat/v1/messages for more info");
+                SharedMemory?.Logger?.Log($"[Ws Chat] Websocket connection close: {closecode}. Please refers https://demo.accelbyte.io/chat/v1/messages for more info");
             }
 #endif
 
@@ -608,7 +615,7 @@ namespace AccelByte.Api
             var payloadedMessage = JsonConvert.DeserializeObject<ChatWsMessage<T>>(message);
             if (payloadedMessage == null)
             {
-                AccelByteDebug.Log("chat failed to deserialize notification\n" + message);
+                SharedMemory?.Logger?.Log("chat failed to deserialize notification\n" + message);
                 return;
             }
 
@@ -617,13 +624,13 @@ namespace AccelByte.Api
 
         private void HandleOnMessage(string message)
         {
-            AccelByteDebug.Log("Chat received ws message\n" + message);
+            SharedMemory?.Logger?.Log("Chat received ws message\n" + message);
             
             // deserialize json
             ChatWsMessage messageJsonObjectMethod = JsonConvert.DeserializeObject<ChatWsMessage>(message);
             if (messageJsonObjectMethod == null)
             {
-                AccelByteDebug.Log("chat message deserialize message failed.");
+                SharedMemory?.Logger?.Log("chat message deserialize message failed.");
                 return;
             }
 
@@ -631,7 +638,7 @@ namespace AccelByte.Api
             if (SharedMemory.NetworkConditioner != null 
                 && SharedMemory.NetworkConditioner.CalculateFailRate(chatMessageMethod))
             {
-                AccelByteDebug.Log($"[AccelByteNetworkConditioner] Dropped chat message method {chatMessageMethod}.");
+                SharedMemory?.Logger?.Log($"[AccelByteNetworkConditioner] Dropped chat message method {chatMessageMethod}.");
                 return;
             }
 
@@ -647,11 +654,11 @@ namespace AccelByte.Api
                     }
                     else
                     {
-                        AccelByteDebug.Log("Failed to deserialize connection payload");
+                        SharedMemory?.Logger?.Log("Failed to deserialize connection payload");
                     }
 
                     Connected?.Invoke();
-                    AccelByteDebug.Log("connected to chat service with session id " + websocketApi.SessionId);
+                    SharedMemory?.Logger?.Log("connected to chat service with session id " + websocketApi.SessionId);
                     break;
                 case ChatMessageMethod.actionRefreshToken:
                     OnTokenRefreshed?.Invoke();
@@ -698,7 +705,7 @@ namespace AccelByte.Api
                     }
                     else
                     {
-                        AccelByteDebug.LogWarning("chat ws message method not supported! method is " 
+                        SharedMemory?.Logger?.LogWarning("chat ws message method not supported! method is " 
                             + messageJsonObjectMethod.method);
                     }
                     break;
@@ -713,7 +720,7 @@ namespace AccelByte.Api
                 session.RefreshTokenCallback += OnRefreshTokenCallback_RefreshToken;
             }
             
-            AccelByteDebug.Log("Connected to chat service");
+            SharedMemory?.Logger?.Log("Connected to chat service");
         }
 
         private void OnRefreshTokenCallback_RefreshToken(string newToken)
@@ -722,7 +729,7 @@ namespace AccelByte.Api
             {
                 if (result.IsError)
                 {
-                    AccelByteDebug.LogWarning($"Error sending new access token to chat service\n" +
+                    SharedMemory?.Logger?.LogWarning($"Error sending new access token to chat service\n" +
                                               $"code {result.Error.Code} with message {result.Error.Message}");
                 }
             }));

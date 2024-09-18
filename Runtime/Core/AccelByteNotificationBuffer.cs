@@ -11,7 +11,7 @@ namespace AccelByte.Core
 {
     public class AccelByteNotificationBuffer
     {
-        private string lastSequenceId = null;
+        private int lastSequenceId = default;
         private int lastSequenceNumber = default;
         private DateTime lastSentAt = default;
 
@@ -19,6 +19,13 @@ namespace AccelByte.Core
 
         private bool isBuffering = false;
         public bool IsBuffering => isBuffering;
+
+        private IDebugger logger;
+
+        internal AccelByteNotificationBuffer(IDebugger logger = null)
+        {
+            this.logger = logger;
+        }
 
         public bool TryAddBuffer(UserNotification userNotification)
         {
@@ -53,7 +60,7 @@ namespace AccelByte.Core
 
             foreach(var notif in userNotifications)
             {
-                if (notif.SequenceId == lastSequenceId && notif.SequenceNumber <= lastSequenceNumber)
+                if (notif.SequenceIdInt == lastSequenceId && notif.SequenceNumber <= lastSequenceNumber)
                 {
                     continue;
                 }
@@ -69,7 +76,7 @@ namespace AccelByte.Core
             return lastSentAt;
         }
 
-        public string GetLastNotificationSequenceId()
+        public int GetLastNotificationSequenceId()
         {
             return lastSequenceId;
         }
@@ -94,23 +101,23 @@ namespace AccelByte.Core
 
         public UserNotification[] GetSortedBuffer()
         {
-            return buffer
-                .OrderBy(notif => notif.SentAt)
-                .ThenBy(notif => notif.SequenceNumber).ToArray();
+            return buffer.OrderBy(notif => notif.SequenceIdInt)
+                .ThenBy(notif => notif.SequenceNumber)
+                .ToArray();
         }
 
         private void UpdateLastSequence(UserNotification userNotification)
         {
-            lastSequenceId = userNotification.SequenceId;
+            lastSequenceId = userNotification.SequenceIdInt;
             lastSequenceNumber = userNotification.SequenceNumber;
             lastSentAt = userNotification.SentAt;
         }
 
         private bool HasValidSequence(UserNotification userNotification)
         {
-            if (userNotification.SequenceNumber <= 0 || string.IsNullOrEmpty(userNotification.SequenceId))
+            if (userNotification.SequenceNumber <= 0 || userNotification.SequenceIdInt < 0)
             {
-                AccelByteDebug.LogVerbose(
+                logger?.LogVerbose(
                     $"Notification has no sequence identifiers, skipping.\n" +
                     $"sequenceId: {userNotification.SequenceId}\n" +
                     $"sequenceNumber: {userNotification.SequenceNumber}");
@@ -122,19 +129,19 @@ namespace AccelByte.Core
         private bool IsNotificationMissing(UserNotification userNotification)
         {
             // Default / initialized values
-            if (string.IsNullOrEmpty(lastSequenceId) && lastSequenceNumber == 0 && lastSentAt == default)
+            if (lastSequenceId <= 0 && lastSequenceNumber == 0 && lastSentAt == default)
             {
                 return false;
             }
 
             // No reconnection occured (same SequenceId) and SequenceNumber incremented by one.
-            if (lastSequenceId == userNotification.SequenceId 
+            if (lastSequenceId == userNotification.SequenceIdInt
                 && lastSequenceNumber == userNotification.SequenceNumber - 1)
             {
                 return false;
             }
 
-            AccelByteDebug.LogWarning(
+            logger?.LogWarning(
                 $"Missing notification(s) detected. Last valid notification:\n" +
                 $"SequenceId: {lastSequenceId}\n" +
                 $"SequenceNumber: {lastSequenceNumber}\n" +
@@ -148,9 +155,9 @@ namespace AccelByte.Core
 
         private bool IsDuplicateNotification(UserNotification userNotification)
         {
-            if (lastSequenceId == userNotification.SequenceId && userNotification.SequenceNumber <= lastSequenceNumber)
+            if (lastSequenceId == userNotification.SequenceIdInt && userNotification.SequenceNumber == lastSequenceNumber)
             {
-                AccelByteDebug.LogVerbose(
+                logger?.LogVerbose(
                     $"Duplicate notification detected:\n" +
                     $"{userNotification.ToJsonString()}");
                 return true;
@@ -161,6 +168,11 @@ namespace AccelByte.Core
         private bool AddToBuffer(UserNotification userNotification)
         {
             return buffer.Add(userNotification);
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
     }
 }

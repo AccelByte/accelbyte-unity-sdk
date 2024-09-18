@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -43,7 +44,26 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class Time
     {
-        [DataMember] public System.DateTime currentTime;
+        [DataMember(Name = "currentTime")] private System.DateTime? time;
+        
+        public System.DateTime currentTime
+        {
+            get
+            {
+                if (time == null)
+                {
+                    return new DateTime(1970, 1, 1);
+                }
+                else
+                {
+                    return time.Value;
+                }
+            }
+            set
+            {
+                time = value;
+            }
+        }
     }
 
     [DataContract, Preserve]

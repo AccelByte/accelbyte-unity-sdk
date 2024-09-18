@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -16,10 +16,11 @@ namespace AccelByte.Utils
         /// <param name="serviceVersionInterface"></param>
         /// <param name="abServiceVersion"></param>
         /// <returns></returns>
-        public static bool CheckServicesCompatibility(IServiceVersion serviceVersionInterface, AccelByteServiceVersion abServiceVersion)
+        public static bool CheckServicesCompatibility(IServiceVersion serviceVersionInterface, AccelByteServiceVersion abServiceVersion, IDebugger logger = null)
         {
             bool retval = true;
             var servicesName = abServiceVersion.ServicesName;
+            
             if (servicesName != null)
             {
                 foreach (var serviceName in servicesName)
@@ -31,10 +32,10 @@ namespace AccelByte.Utils
 
                     ResultCallback<ServiceVersionInfo> responseCallback = (result) =>
                     {
-                        bool matchResult = abServiceVersion.IsCompatible(serviceName, result.Value.Version);
+                        bool matchResult = abServiceVersion.IsCompatible(serviceName, result.Value.Version, logger);
                         if (!matchResult)
                         {
-                            AccelByteDebug.LogWarning($"Incompatible service: {result.Value.Name}");
+                            logger?.LogWarning($"Incompatible service: {result.Value.Name}");
                             retval = false;
                         }
                     };
@@ -43,7 +44,7 @@ namespace AccelByte.Utils
             }
             else
             {
-                AccelByteDebug.LogWarning($"Compatibility file not found!");
+                logger?.LogWarning($"Compatibility file not found!");
                 retval = false;
             }
 

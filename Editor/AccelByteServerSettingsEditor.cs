@@ -265,6 +265,9 @@ namespace AccelByte.Editor
 
             if (EditorCommon.CreateFoldout("Websocket Configs", foldoutConfigStatus))
             {
+                EditorCommon.CreateToggleInput((newValue) => editedServerConfig.ServerUseAMS =
+                    (bool)newValue, editedServerConfig.ServerUseAMS, "DS Connection Using AMS"
+                    , indentLevel: 1);
                 EditorCommon.CreateNumberInput((newValue) => editedServerConfig.DSHubReconnectTotalTimeout = 
                     (int)newValue, editedServerConfig.DSHubReconnectTotalTimeout, "DS Hub Reconnect Total Timeout (ms)"
                     , indentLevel: 1);

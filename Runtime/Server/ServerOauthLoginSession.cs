@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,16 +13,18 @@ namespace AccelByte.Server
     {
         internal System.Action OnLoginSuccess;
         internal System.Action OnLogoutSuccess;
+        internal readonly string BaseUrl;
+        internal readonly HttpOperator HttpOperator;
         private readonly string clientId;
         private readonly string clientSecret;
-        private readonly string baseUrl;
         private readonly IHttpClient httpClient;
 
         internal ServerOauthLoginSession( string inBaseUrl
             , string inClientId
             , string inClientSecret
             , IHttpClient inHttpClient
-            , CoroutineRunner inCoroutineRunner)
+            , CoroutineRunner inCoroutineRunner
+            , HttpOperator httpOperator = null)
         {
             Assert.IsNotNull(inBaseUrl, $"Creating {GetType().Name} failed. Parameter inBaseUrl is null");
             Assert.IsNotNull(inClientId, "Creating " + GetType().Name + " failed. inClientId parameter is null!");
@@ -30,11 +32,16 @@ namespace AccelByte.Server
             Assert.IsNotNull(inHttpClient, "Creating " + GetType().Name + " failed. Parameter inHttpClient is null");
             Assert.IsNotNull(inCoroutineRunner, "Creating " + GetType().Name + " failed. Parameter inCoroutineRunner is null" );
 
-            baseUrl = inBaseUrl;
+            BaseUrl = inBaseUrl;
             clientId = inClientId;
             clientSecret = inClientSecret;
             httpClient = inHttpClient;
-            coroutineRunner = inCoroutineRunner;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            this.HttpOperator = httpOperator == null ? new HttpCoroutineOperator(httpClient, inCoroutineRunner) : httpOperator;
+#else
+            this.HttpOperator = httpOperator == null ? new HttpAsyncOperator(httpClient) : httpOperator;
+#endif
+            CreateSessionMaintainer();
         }
 
         public override string AuthorizationToken
@@ -45,57 +52,53 @@ namespace AccelByte.Server
 
         public IEnumerator LoginWithClientCredentials( ResultCallback callback )
         {
-            Result<TokenData> getClientTokenResult = null;
-
-            yield return GetClientToken(r => getClientTokenResult = r);
-
-            if (!getClientTokenResult.IsError)
+            ResultCallback<TokenData> getTokenCallback = result =>
             {
-                OnReceivedLoginToken(getClientTokenResult.Value);
-                callback.TryOk();
-            }
-            else
-            {
-                callback.TryError(getClientTokenResult.Error);
-            }
+                if (!result.IsError)
+                {
+                    callback?.TryOk();
+                }
+                else
+                {
+                    callback?.TryError(result.Error);
+                }
+            };
+            LoginWithClientCredentials(getTokenCallback);
+            yield break;
         }
 
-        internal async void LoginWithClientCredentials(ResultCallback<TokenData> callback)
+        internal void LoginWithClientCredentials(ResultCallback<TokenData> callback)
         {
             const bool clienSecretRequired = false;
-            IHttpRequest request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
+            IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
                 .WithBasicAuth(clientId, clientSecret, clienSecretRequired)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("grant_type", "client_credentials")
                 .GetResult();
-
-            HttpSendResult sendResult = await httpClient.SendRequestAsync(request);
-
-            IHttpResponse response = sendResult.CallbackResponse;
-            Result<TokenData> getClientTokenResult = response.TryParseJson<TokenData>();
-
-            if (!getClientTokenResult.IsError)
+            
+            HttpOperator.SendRequest(request, response =>
             {
-                SetSession(getClientTokenResult.Value);
-                if (maintainAccessTokenCoroutine == null)
+                Result<TokenData> getClientTokenResult = response.TryParseJson<TokenData>();
+
+                if (!getClientTokenResult.IsError)
                 {
-                    maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
-                }
+                    OnReceivedLoginToken(getClientTokenResult.Value);
+                    SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, tokenData.expires_in);
 
-                OnLoginSuccess?.Invoke();
-                callback.TryOk(getClientTokenResult.Value);
-            }
-            else
-            {
-                callback.TryError(getClientTokenResult.Error);
-            }
+                    callback?.TryOk(getClientTokenResult.Value);
+                }
+                else
+                {
+                    callback?.TryError(getClientTokenResult.Error);
+                }
+            });
         }
 
         private IEnumerator GetClientToken( ResultCallback<TokenData> callback )
         {
             const bool clienSecretRequired = false;
-            IHttpRequest request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/token")
+            IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
                 .WithBasicAuth(clientId, clientSecret, clienSecretRequired)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
@@ -113,55 +116,32 @@ namespace AccelByte.Server
 
         public IEnumerator Logout( ResultCallback callback )
         {
-            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/revoke")
-                .WithBasicAuth(clientId, clientSecret)
-                .WithContentType(MediaType.ApplicationForm)
-                .Accepts(MediaType.ApplicationJson)
-                .WithFormParam("token", AuthorizationToken)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return httpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-
-            if (!result.IsError)
-            {
-                tokenData = null;
-                coroutineRunner.Stop(maintainAccessTokenCoroutine);
-                maintainAccessTokenCoroutine = null;
-                OnLogoutSuccess?.Invoke();
-            }
-
-            callback.Try(result);
+            LogoutAsync(callback);
+            yield break;
         }
 
-        internal async void LogoutAsync(ResultCallback callback)
+        internal void LogoutAsync(ResultCallback callback)
         {
-            var request = HttpRequestBuilder.CreatePost(baseUrl + "/v3/oauth/revoke")
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/revoke")
                 .WithBasicAuth(clientId, clientSecret)
                 .WithContentType(MediaType.ApplicationForm)
                 .Accepts(MediaType.ApplicationJson)
                 .WithFormParam("token", AuthorizationToken)
                 .GetResult();
-
-            HttpSendResult sendResult = await httpClient.SendRequestAsync(request);
-
-            IHttpResponse response = sendResult.CallbackResponse;
-
-            var result = response.TryParse();
-
-            if (!result.IsError)
+            
+            HttpOperator.SendRequest(request, response =>
             {
-                tokenData = null;
-                coroutineRunner.Stop(maintainAccessTokenCoroutine);
-                maintainAccessTokenCoroutine = null;
-                OnLogoutSuccess?.Invoke();
-            }
+                var result = response.TryParse();
 
-            callback.Try(result);
+                if (!result.IsError)
+                {
+                    tokenData = null;
+                    SessionMaintainer?.Stop();
+                    OnLogoutSuccess?.Invoke();
+                }
+
+                callback?.Try(result);
+            });
         }
 
         public override IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback)
@@ -171,14 +151,18 @@ namespace AccelByte.Server
                 if (result.IsError || result.Value == null)
                 {
                     var error = new OAuthError();
-                    error.error = result.Error.Code.ToString();
-                    error.error_description = result.Error.Message?.ToString();
-                    callback.TryError(error);
+                    if (result.Error != null)
+                    {
+                        error.error = result.Error.Code.ToString();
+                        error.error_description = result.Error.Message?.ToString();
+                    }
+
+                    callback?.TryError(error);
                 }
                 else
                 {
                     SetSession(result.Value);
-                    callback.TryOk(result.Value);
+                    callback?.TryOk(result.Value);
                 }
             });
         }
@@ -186,7 +170,7 @@ namespace AccelByte.Server
         public IEnumerator GetJwks(ResultCallback<JwkSet> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            var request = HttpRequestBuilder.CreateGet(baseUrl + "/v3/oauth/jwks")
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/oauth/jwks")
                 .GetResult();
 
             IHttpResponse response = null;
@@ -205,29 +189,43 @@ namespace AccelByte.Server
         {
             httpClient.AddAdditionalHeaderInfo(AccelByteHttpClient.NamespaceHeaderKey, loginResponse.Namespace);
             tokenData = loginResponse;
+            SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, tokenData.expires_in * 0.8f);
         }
 
         internal void Reset()
         {
+            SessionMaintainer?.Stop();
             OnLoginSuccess = null;
             OnLogoutSuccess = null;
-            if (maintainAccessTokenCoroutine != null)
-            {
-                coroutineRunner.Stop(maintainAccessTokenCoroutine);
-                maintainAccessTokenCoroutine = null;
-            }
             tokenData = null;
         }
 
         internal void OnReceivedLoginToken(TokenData token)
         {
             SetSession(token);
-            if (maintainAccessTokenCoroutine == null)
-            {
-                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
-            }
-
             OnLoginSuccess?.Invoke();
+        }
+
+        public override AccelByteResult<TokenData, OAuthError> RefreshSessionApiCall()
+        {
+            var retval = new AccelByteResult<TokenData, OAuthError>();
+            LoginWithClientCredentials(result =>
+            {
+                if (result.IsError || result.Value == null)
+                {
+                    var error = new OAuthError();
+                    error.error = result.Error.Code.ToString();
+                    error.error_description = result.Error.Message?.ToString();
+                    retval.Reject(error);
+                }
+                else
+                {
+                    SetSession(result.Value);
+                    retval.Resolve(result.Value);
+                }
+            });
+
+            return retval;
         }
     }
 }

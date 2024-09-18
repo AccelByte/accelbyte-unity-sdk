@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -15,7 +15,7 @@ namespace AccelByte.Api
     {
         #region private properties
         
-        private WsMessageFragmentProcessor messageFragmentProcessor = new WsMessageFragmentProcessor();
+        private WsMessageFragmentProcessor messageFragmentProcessor;
         private Dictionary<string, Action<ErrorCode, string>> responseCallbacks = new Dictionary<string, Action<ErrorCode, string>>();
 
         private const string messageFragmentStart = "CaSr";
@@ -35,6 +35,7 @@ namespace AccelByte.Api
             , string inWebsocketUrl
             , string inNamespace) : base(inCoroutineRunner, inSession, inWebSocket, inWebsocketUrl, inNamespace)
         {
+            messageFragmentProcessor = new WsMessageFragmentProcessor();
         }
         #endregion
 
@@ -217,6 +218,13 @@ namespace AccelByte.Api
         #endregion
         
         #region protected methods
+
+        internal override void SetSharedMemory(ApiSharedMemory sharedMemory)
+        {
+            base.SetSharedMemory(sharedMemory);
+            messageFragmentProcessor?.Setlogger(sharedMemory?.Logger);
+        } 
+
         protected override void HandleOnMessage(string message)
         {
             // process if message is fragmented, wait until received full message
@@ -283,7 +291,7 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<ChatWsMessageResponse<U>>(message);
                     if (responsePayload == null)
                     {
-                        AccelByteDebug.Log("Chat failed to deserialize response payload from message\n" + message);
+                        SharedMemory?.Logger?.Log("Chat failed to deserialize response payload from message\n" + message);
                         return;
                     }
                     errorCode = responsePayload.error == null ? ErrorCode.None : responsePayload.error.Code;
@@ -318,7 +326,7 @@ namespace AccelByte.Api
                     ChatWsMessage responsePayload = JsonConvert.DeserializeObject<ChatWsMessage>(message);
                     if (responsePayload == null)
                     {
-                        AccelByteDebug.Log("Chat failed to deserialize response payload from message\n" + message);
+                        SharedMemory?.Logger?.Log("Chat failed to deserialize response payload from message\n" + message);
                         return;
                     }
                     errorCode = responsePayload.error == null ? ErrorCode.None : responsePayload.error.Code;
@@ -354,7 +362,7 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<ChatWsMessageResponse<U>>(message);
                     if (responsePayload == null)
                     {
-                        AccelByteDebug.Log("Chat failed to deserialize response payload from message\n" + message);
+                        SharedMemory?.Logger?.Log("Chat failed to deserialize response payload from message\n" + message);
                         return;
                     }
                     errorCode = responsePayload.error == null ? ErrorCode.None : responsePayload.error.Code;
@@ -389,7 +397,7 @@ namespace AccelByte.Api
                     ChatWsMessage responsePayload = JsonConvert.DeserializeObject<ChatWsMessage>(message);
                     if (responsePayload == null)
                     {
-                        AccelByteDebug.Log("Chat failed to deserialize response payload from message\n" + message);
+                        SharedMemory?.Logger?.Log("Chat failed to deserialize response payload from message\n" + message);
                         return;
                     }
                     errorCode = responsePayload.error == null ? ErrorCode.None : responsePayload.error.Code;

@@ -1,4 +1,4 @@
-// Copyright (c) 2022-2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022-2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -88,7 +88,7 @@ namespace AccelByte.Api
         {
             if(maintainer != null)
             {
-                AccelByteDebug.LogWarning("Heartbeat is still running, please stop heartbeat before changing the interval");
+                SharedMemory?.Logger?.LogWarning("Heartbeat is still running, please stop heartbeat before changing the interval");
                 return;
             }
             heartBeatIntervalMs = newIntervalMs;
@@ -150,13 +150,20 @@ namespace AccelByte.Api
             onHeartBeatResponse = callback;
         }
 
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            maintainer?.SetLogger(newSharedMemory?.Logger);
+        }
+
         private void StartHeartBeatScheduler(int intervalMs)
         {
             if(maintainer != null)
             {
                 maintainer.Stop();
             }
-            maintainer = new AccelByteHeartBeat(intervalMs);
+            maintainer = new AccelByteHeartBeat(intervalMs, SharedMemory?.Logger);
+            maintainer.SetLogger(SharedMemory?.Logger);
             maintainer.OnHeartbeatTrigger += () =>
             {
                 api.SendHeartBeatEvent(HeartBeatData, onHeartBeatResponse);

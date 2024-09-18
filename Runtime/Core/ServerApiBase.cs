@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Models;
+using JetBrains.Annotations;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Core
@@ -34,7 +35,6 @@ namespace AccelByte.Core
             this.httpOperator = httpOperator ?? new HttpAsyncOperator(inHttpClient);
         }
         #endregion /Constructor
-
         
         #region High-Level Shortcuts
         /// <summary>ServerConfig.Namespace wrapper</summary>

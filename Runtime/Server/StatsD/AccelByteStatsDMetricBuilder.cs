@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,6 +13,7 @@ namespace AccelByte.Server
         int tagIndex = 0;
         const int bufferSize = 1 << 16;
         internal StatsDMetric metric;
+        private IDebugger logger;
 
         public AccelByteStatsDMetricBuilder(string inName, string inValue)
         {
@@ -27,7 +28,7 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(tagValue))
             {
-                AccelByteDebug.LogError($"tagValue must not be empty or null!");
+                logger?.LogError($"tagValue must not be empty or null!");
                 return this;
             }
 
@@ -39,7 +40,7 @@ namespace AccelByte.Server
 
             if (tagList.Contains(tagValue))
             {
-                AccelByteDebug.LogError($"tagValue already exists on metric!");
+                logger?.LogError($"tagValue already exists on metric!");
                 return this;
             }
 
@@ -72,6 +73,11 @@ namespace AccelByte.Server
             }
 
             return builtString;
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
     }
 }

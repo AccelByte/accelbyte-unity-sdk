@@ -22,9 +22,14 @@ namespace AccelByte.Core
         private int totalSubscribers = 0;
         public int AllSubscribersCount => totalSubscribers;
 
-        public AccelByteMessagingSystem()
+        private IDebugger logger;
+
+        public AccelByteMessagingSystem(IDebugger logger = null)
         {
-            poller = new AccelByteHeartBeat(pollingIntervalMs);
+            this.logger = logger;
+            
+            poller = new AccelByteHeartBeat(pollingIntervalMs, logger);
+            poller.SetLogger(logger);
             poller.Start();
 
             poller.OnHeartbeatTrigger += PollMessages;
@@ -42,7 +47,7 @@ namespace AccelByte.Core
         {
             if (topic == AccelByteMessagingTopic.None)
             {
-                AccelByteDebug.LogWarning("[MessagingSystem] Unable to subscribe, topic is empty.");
+                logger?.LogWarning("[MessagingSystem] Unable to subscribe, topic is empty.");
                 return;
             }
 
@@ -59,7 +64,7 @@ namespace AccelByte.Core
         {
             if (topic == AccelByteMessagingTopic.None)
             {
-                AccelByteDebug.LogWarning("[MessagingSystem] Unable to unsubscribe, topic is empty.");
+                logger?.LogWarning("[MessagingSystem] Unable to unsubscribe, topic is empty.");
                 return;
             }
 

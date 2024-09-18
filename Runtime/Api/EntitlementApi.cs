@@ -495,6 +495,8 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+
+        [Obsolete("Please access the api from Api.GetEntitlement().SyncMobilePlatformPurchaseGoogle")]
         public IEnumerator SyncMobilePlatformPurchaseGoogle( string userId
             , PlatformSyncMobileGoogle syncRequest
             , ResultCallback callback )
@@ -517,9 +519,91 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
+        internal void SyncMobilePlatformPurchaseGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , PlatformSyncMobileGoogleOptionalParameters optionalParameters
+            , ResultCallback<GoogleReceiptResolveResult> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(orderId
+                , packageName
+                , productId
+                , purchaseTime
+                , purchaseToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var syncRequest = new PlatformSyncMobileGoogle(
+                orderId
+                , packageName
+                , productId
+                , purchaseTime
+                , purchaseToken
+                , autoAck
+                , optionalParameters);
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/google/receipt")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(syncRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GoogleReceiptResolveResult>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void SyncMobilePlatformPurchaseApple(string productId
+            , string transactionId
+            , string receiptData
+            , PlatformSyncMobileAppleOptionalParam optionalParam
+            , ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(productId, transactionId, receiptData, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+            
+            PlatformSyncMobileApple syncRequest = new PlatformSyncMobileApple(productId: productId
+                , transactionId: transactionId
+                , receiptData: receiptData
+                , optionalParam: optionalParam);
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/apple/receipt")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(syncRequest.ToUtf8Json())
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+        
+        [Obsolete("This interface will be removed on 3.80 release. Please access using Api.GetEntitlement().SyncMobilePlatformPurchaseApple")]
         public IEnumerator SyncMobilePlatformPurchaseApple( string userId
             , PlatformSyncMobileApple syncRequest
             , ResultCallback callback )

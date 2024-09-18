@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -61,6 +61,7 @@ namespace AccelByte.Api
         private Utils.IAccelByteWebsocketSerializer websocketSerializer;
 
         internal string ChannelSlug;
+        private IDebugger logger;
 
         #endregion private fields declaration
 
@@ -119,6 +120,11 @@ namespace AccelByte.Api
             webSocket.SetRetryParameters(inTotalTimeout, inBackoffDelay, inMaxDelay, inPingDelay);
         }
 
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
+        }
+
         /// <summary>
         /// Set custom header value for current websocket connection
         /// </summary>
@@ -161,19 +167,19 @@ namespace AccelByte.Api
         {
             if (!session.IsValid())
             {
-                AccelByteDebug.LogWarning("Cannot connect to websocket because user is not logged in.");
+                logger?.LogWarning("Cannot connect to websocket because user is not logged in.");
                 return;
             }
 
             if (IsConnected)
             {
-                AccelByteDebug.LogWarning("[Lobby] already connected");
+                logger?.LogWarning("[Lobby] already connected");
                 return;
             }
             
             if (webSocket.IsConnecting)
             {
-                AccelByteDebug.LogWarning("[Lobby] lobby is connecting");
+                logger?.LogWarning("[Lobby] lobby is connecting");
                 return;
             }
 

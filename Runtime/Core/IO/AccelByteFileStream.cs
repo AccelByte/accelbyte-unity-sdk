@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace AccelByte.Core
 {
@@ -13,10 +12,16 @@ namespace AccelByte.Core
     {
         internal Action OnPop;
         List<Action> ioQueue;
-
+        private IDebugger logger;
+        
         public AccelByteFileStream()
         {
             ioQueue = new List<Action>();
+        }
+
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
         }
 
         public bool IsFileExist(string path)
@@ -61,7 +66,7 @@ namespace AccelByte.Core
                 }
                 catch(Exception ex)
                 {
-                    AccelByteDebug.LogVerbose($"Write file failure.\n{ex.Message}");
+                    logger?.LogVerbose($"Write file failure.\n{ex.Message}");
                     onDone?.Invoke(false);
                 }
             };
@@ -98,7 +103,7 @@ namespace AccelByte.Core
             }
             catch (Exception ex)
             {
-                AccelByteDebug.LogVerbose($"Write file failure.\n{ex.Message}");
+                logger?.LogVerbose($"Write file failure.\n{ex.Message}");
                 onDone?.Invoke(false);
             }
         }
@@ -132,7 +137,7 @@ namespace AccelByte.Core
                 }
                 catch (Exception ex)
                 {
-                    AccelByteDebug.LogVerbose($"Read file failure.\n{ex.Message}");
+                    logger?.LogVerbose($"Read file failure.\n{ex.Message}");
                     onDone?.Invoke(false, null);
                 }
             };
@@ -169,7 +174,7 @@ namespace AccelByte.Core
             }
             catch (Exception ex)
             {
-                AccelByteDebug.LogVerbose($"Read file failure.\n{ex.Message}");
+                logger?.LogVerbose($"Read file failure.\n{ex.Message}");
                 onDone?.Invoke(false, null);
             }
         }
@@ -191,7 +196,7 @@ namespace AccelByte.Core
                 }
                 catch (Exception ex)
                 {
-                    AccelByteDebug.LogVerbose($"Delete file failure.\n{ex.Message}");
+                    logger?.LogVerbose($"Delete file failure.\n{ex.Message}");
                     onDone?.Invoke(false);
                 }
             };

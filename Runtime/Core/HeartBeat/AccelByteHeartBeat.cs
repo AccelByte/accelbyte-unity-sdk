@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,6 +14,8 @@ namespace AccelByte.Core
 
         private int intervalInMs;
         private IHeartBeatState state = null;
+
+        private IDebugger logger;
 
         public bool IsHeartBeatEnabled
         {
@@ -47,12 +49,13 @@ namespace AccelByte.Core
             }
         }
 
-        public AccelByteHeartBeat(int heartBeatIntervalMs)
+        public AccelByteHeartBeat(int heartBeatIntervalMs, IDebugger logger = null)
         {
+            this.logger = logger;
             if (heartBeatIntervalMs <= 0)
             {
                 this.intervalInMs = DefaultIntervalInMs;
-                AccelByteDebug.LogWarning($"The inputted interval {heartBeatIntervalMs} is not a valid interval");
+                logger?.LogWarning($"The inputted interval {heartBeatIntervalMs} is not a valid interval");
             }
             else
             {
@@ -60,6 +63,11 @@ namespace AccelByte.Core
             }
 
             this.state = new IdleState();
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
 
         ~AccelByteHeartBeat()

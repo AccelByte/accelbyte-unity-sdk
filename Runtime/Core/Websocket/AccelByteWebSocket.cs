@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -31,6 +31,7 @@ namespace AccelByte.Api
         protected WsCloseCode closeCodeCurrent = WsCloseCode.NotSet;
         protected ITokenGenerator tokenGenerator;
         private WebstocketMaintainer maintainer;
+        private IDebugger logger;
 
         public Dictionary<string, string> ReconnectCustomHeaders { get; set; }
 
@@ -147,6 +148,11 @@ namespace AccelByte.Api
             ReconnectCustomHeaders = new Dictionary<string, string>();
         }
 
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
+        }
+
         /// <summary>
         /// TokenGenerator is used for generate access token when connecting to lobby. 
         /// If token generator is not specified, no token will be used when connecting to lobby.
@@ -157,7 +163,7 @@ namespace AccelByte.Api
         {
             if(maintainer != null)
             {
-                AccelByteDebug.LogWarning("Can't set connection token generator! Lobby is already connected.");
+                logger?.LogWarning("Can't set connection token generator! Lobby is already connected.");
                 return;
             }
 
@@ -208,7 +214,7 @@ namespace AccelByte.Api
         {
             if(State == WsState.Connecting || State == WsState.Open)
             {
-                AccelByteDebug.LogVerbose("[AccelByteWebSocket] is connecting or already connected");
+                logger?.LogVerbose("[AccelByteWebSocket] is connecting or already connected");
                 return;
             }
 
@@ -237,7 +243,7 @@ namespace AccelByte.Api
                 callback?.TryError(new Error(ErrorCode.InvalidResponse, "Reconnect attempts failed"));
             };
 
-            AccelByteDebug.LogVerbose($"Connecting websocket to {url}");
+            logger?.LogVerbose($"Connecting websocket to {url}");
             webSocket.Connect(url: url, 
                 protocols: this.authorizationToken, 
                 customHeaders: customHeaders, 
@@ -280,7 +286,7 @@ namespace AccelByte.Api
         {
             if (maintainer != null)
             {
-                AccelByteDebug.LogWarning("Can't change retry parameters! Lobby is already connected.");
+                logger?.LogWarning("Can't change retry parameters! Lobby is already connected.");
                 return;
             }
 
@@ -296,7 +302,7 @@ namespace AccelByte.Api
         /// <param name="message">message to be sent</param>
         public virtual async void Send(string message)
         {
-            await RetryBackoffUtils.Run<int>(() => WebsocketSend(message));
+            await RetryBackoffUtils.Run<int>(() => WebsocketSend(message), logger: logger);
         }
 
         private Task<int> WebsocketSend(string message)
@@ -308,7 +314,7 @@ namespace AccelByte.Api
             }
             catch (Exception e)
             {
-                AccelByteDebug.LogWarning($"Sending failed with error : {e.Message}");
+                logger?.LogWarning($"Sending failed with error : {e.Message}");
                 errorCode = 1;
             }
             return Task.FromResult(errorCode);
@@ -341,7 +347,7 @@ namespace AccelByte.Api
                 OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
             };
 
-            maintainer = new WebstocketMaintainer(ref webSocket, ref PingDelay, ref BackoffDelay, ref MaxDelay, ref TotalTimeout, reconnectOnClose, OnPreReconnectAction, reconnectAction, onReconnectFailed);
+            maintainer = new WebstocketMaintainer(ref webSocket, ref PingDelay, ref BackoffDelay, ref MaxDelay, ref TotalTimeout, reconnectOnClose, logger, OnPreReconnectAction, reconnectAction, onReconnectFailed);
         }
 
         private void StopMaintainConnection()
@@ -372,8 +378,9 @@ namespace AccelByte.Api
             bool isMaintaining = false;
             private int currentRetryAttempt;
             private int maxReconnectRetries;
+            private IDebugger logger;
 
-            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, System.Action setupReconnectAction, System.Action reconnectAction, System.Action onReconnectFailed, int maxReconnectRetries = 5)
+            public WebstocketMaintainer(ref IWebSocket webSocket, ref int pingDelay, ref int backoffDelay, ref int maxDelay, ref int totalTimeout, bool reconnectOnClose, IDebugger logger, System.Action setupReconnectAction, System.Action reconnectAction, System.Action onReconnectFailed, int maxReconnectRetries = 5)
             {
                 this.webSocket = webSocket;
                 this.pingDelay = pingDelay;
@@ -385,6 +392,7 @@ namespace AccelByte.Api
                 this.reconnectAction = reconnectAction;
                 this.onReconnectFailed = onReconnectFailed;
                 this.maxReconnectRetries = maxReconnectRetries;
+                this.logger = logger;
                 currentRetryAttempt = 0;
                 MaintainLoop();
             }
@@ -441,7 +449,7 @@ namespace AccelByte.Api
                                 DateTime.Now - firstClosedTime < timeout)
                             {
 #if DEBUG
-                                AccelByteDebug.LogVerbose("[WS] Re-Connecting");
+                                logger?.LogVerbose("[WS] Re-Connecting");
 #endif
                                 setupReconnectAction?.Invoke();
 
@@ -449,7 +457,7 @@ namespace AccelByte.Api
 
                                 var randomizedDelay = Mathf.RoundToInt((float)(nextDelay + ((rand.NextDouble() * 0.5) - 0.5)));
 #if DEBUG
-                                AccelByteDebug.LogVerbose("[WS] Next reconnection in: " + randomizedDelay);
+                                logger?.LogVerbose("[WS] Next reconnection in: " + randomizedDelay);
 #endif
                                 await Task.Delay(randomizedDelay);
 
@@ -462,7 +470,7 @@ namespace AccelByte.Api
 
                                 currentRetryAttempt++;
 #if DEBUG
-                                AccelByteDebug.LogVerbose("[WS] Current retry attempt: " + currentRetryAttempt);
+                                logger?.LogVerbose("[WS] Current retry attempt: " + currentRetryAttempt);
 #endif
                             }
 

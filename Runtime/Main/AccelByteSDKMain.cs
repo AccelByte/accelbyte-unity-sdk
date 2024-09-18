@@ -15,6 +15,7 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.AppleExtension")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGooglePlayGames")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.GooglePlayGamesExtension")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.unittests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.gametest")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
@@ -99,10 +100,7 @@ namespace AccelByte.Core
         private static void StopSDK()
         {
             OnSDKStopped?.Invoke();
-            EnvironmentBootstrap.Stop();
-            ClientAnaylticsBootstrap.Stop();
             SdkInterfaceBootstrap.Stop();
-            TimeManagerBootstrap.Stop();
             DetachGameUpdateSignaller();
 
             Main.Stop();
@@ -113,10 +111,6 @@ namespace AccelByte.Core
 
         private static void ExecuteBootstraps()
         {
-            TimeManagerBootstrap.Execute();
-            EnvironmentBootstrap.Execute();
-            ClientAnaylticsBootstrap.Execute();
-            FlightIDBootstrap.Execute();
             SdkInterfaceBootstrap.Execute();
         }
 

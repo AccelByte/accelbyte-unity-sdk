@@ -225,18 +225,32 @@ namespace AccelByte.Core
 
         public HttpRequestBuilder WithBasicAuthWithCookie(string encodeKey)
         {
+            return WithBasicAuthWithCookie(encodeKey, deviceIdGeneratorConfig: null);
+        }
+        
+        internal HttpRequestBuilder WithBasicAuthWithCookie(string encodeKey, Models.DeviceIdGeneratorConfig deviceIdGeneratorConfig)
+        {
             this.result.AuthType = HttpAuth.Basic;
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey); 
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey, deviceIdGeneratorConfig: deviceIdGeneratorConfig); 
             this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;
             return this;
         }
 
-        public HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId(string encodeKey)
+        public HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId(string encodeKey, string authTrustId = null)
+        {
+            return WithBasicAuthWithCookieAndAuthTrustId(encodeKey, deviceIdGeneratorConfig: null, authTrustId: authTrustId);
+        }
+        
+        internal HttpRequestBuilder WithBasicAuthWithCookieAndAuthTrustId(string encodeKey, Models.DeviceIdGeneratorConfig deviceIdGeneratorConfig, string authTrustId)
         {
             this.result.AuthType = HttpAuth.Basic;
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey);
-            this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;     
-            this.result.Headers["Auth-Trust-Id"] = PlayerPrefs.GetString(UserSession.AuthTrustIdKey);
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeKey, deviceIdGeneratorConfig: deviceIdGeneratorConfig);
+            this.result.Headers["cookie"] = "device-token=" + deviceProvider.DeviceId;
+            if (!string.IsNullOrEmpty(authTrustId))
+            {
+                this.result.Headers["Auth-Trust-Id"] = authTrustId;
+            }
+
             return this;
         }
 

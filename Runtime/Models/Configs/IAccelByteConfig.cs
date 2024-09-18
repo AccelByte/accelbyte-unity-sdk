@@ -7,6 +7,7 @@ namespace AccelByte.Models
     internal interface IAccelByteConfig
     {
         public void SanitizeBaseUrl();
+        public void SetLogger(AccelByte.Core.IDebugger logger);
         public void Expand(bool forceExpandServiceUrl);
     }
 

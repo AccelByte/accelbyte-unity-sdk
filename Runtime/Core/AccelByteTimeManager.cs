@@ -28,6 +28,8 @@ namespace AccelByte.Core
 
         private bool isFetchingServerTime;
 
+        private IDebugger logger;
+
         public AccelByteTimeManager()
         {
             StartGameSession();
@@ -36,6 +38,11 @@ namespace AccelByte.Core
         ~AccelByteTimeManager()
         {
             StopGameSession();
+        }
+
+        internal void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
         }
         
         public AccelByteResult<AccelByteServerTimeData, Error> FetchServerTime(ICommonMiscellaneousWrapper miscWrapper)
@@ -107,7 +114,7 @@ namespace AccelByte.Core
                     cachedServerTimeData.ServerTime = callbackResult.Value.currentTime;
                     cachedServerTimeData.ServerTimeSpanSinceStartup = TimelapseSinceSessionStart.Elapsed;
 
-                    AccelByteDebug.LogVerbose($"Fetched Server Time {cachedServerTimeData.ServerTime}");
+                    logger?.LogVerbose($"Fetched Server Time {cachedServerTimeData.ServerTime}");
                     OnServerTimeUpdated?.Invoke(cachedServerTimeData);
                 }
             }

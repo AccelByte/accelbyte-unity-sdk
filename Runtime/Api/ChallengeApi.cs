@@ -164,6 +164,73 @@ namespace AccelByte.Api
             });
         }
 
+        public void GetChallengeProgress(string challengeCode
+            , int rotationIndex
+            , ResultCallback<GoalProgressionResponse> callback
+            , string goalCode = ""
+            , int offset = 0
+            , int limit = 20)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode);
+            error = (rotationIndex < 0) ? new Error(ErrorCode.InvalidRequest) : null;
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/{challengeCode}/index/{index}")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Config.Namespace)
+                .WithPathParam("challengeCode", challengeCode)
+                .WithPathParam("index", rotationIndex.ToString())
+                .WithQueryParam("goalCode", goalCode)
+                .WithQueryParam("offset", offset.ToString())
+                .WithQueryParam("limit", limit.ToString())
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GoalProgressionResponse>();
+                if (!result.IsError)
+                {
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    callback?.TryError(result.Error);
+                };
+            });
+        }
+
+        public void EvaluateChallengeProgress(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/evaluate")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Config.Namespace)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                if (!result.IsError)
+                {
+                    callback?.Invoke(result);
+                }
+                else
+                {
+                    callback?.TryError(result.Error);
+                };
+            });
+        }
+
         internal void ClaimReward(ClaimRewardRequest body
             , ResultCallback<UserReward[]> callback)
         {

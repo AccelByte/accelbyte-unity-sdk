@@ -1,18 +1,15 @@
-// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Random = System.Random;
 
 namespace AccelByte.Api
 {
@@ -30,7 +27,6 @@ namespace AccelByte.Api
         private readonly string encodeUniqueKey;
 
         public event Action<string> RefreshTokenCallback;
-        private Coroutine bearerAuthRejectedCoroutine;
         public string TokenTableName
         {
             get;
@@ -102,9 +98,9 @@ namespace AccelByte.Api
             (IHttpClient inHttpClient
             , CoroutineRunner inCoroutineRunner
             , string encodeUniqueKey
-            , bool inUsePlayerPrefs = false) : this(inHttpClient, inCoroutineRunner, encodeUniqueKey, inUsePlayerPrefs, "TokenCache/TokenData", new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.FileStream))
+            , bool inUsePlayerPrefs = false) : this(inHttpClient, inCoroutineRunner, encodeUniqueKey, inUsePlayerPrefs, "TokenCache/TokenData", new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.Implementation.FileStream))
         {
-
+            CreateSessionMaintainer();
         }
 
         [UnityEngine.Scripting.Preserve]
@@ -122,7 +118,6 @@ namespace AccelByte.Api
 
             usePlayerPrefs = inUsePlayerPrefs;
             httpClient = inHttpClient;
-            coroutineRunner = inCoroutineRunner;
             this.encodeUniqueKey = encodeUniqueKey;
 
             TokenTableName = tokenTableName;
@@ -130,6 +125,23 @@ namespace AccelByte.Api
 
             ((AccelByteHttpClient)httpClient).BearerAuthRejected += BearerAuthRejected;
             ((AccelByteHttpClient)httpClient).UnauthorizedOccured += UnauthorizedOccured;
+
+            CreateSessionMaintainer();
+        }
+
+        public override AccelByteResult<TokenData, OAuthError> RefreshSessionApiCall()
+        {
+            var retval = new AccelByteResult<TokenData, OAuthError>();
+            CallRefresh?.Invoke(tokenData.refresh_token, result =>
+            {
+                if (result.IsError)
+                {
+                    retval.Reject(result.Error);
+                    return;
+                }
+                retval.Resolve(result.Value);
+            });
+            return retval;
         }
 
         public void SetScheduleRefreshToken( DateTime time )
@@ -142,38 +154,28 @@ namespace AccelByte.Api
 
             nextRefreshTime = time;
 
-            AccelByteDebug.LogVerbose($"Set token refresh time to {nextRefreshTime}");
-
-            if (maintainAccessTokenCoroutine == null)
-            {
-                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
-            }
-        }
-
-        private IEnumerator BearerAuthRejectRefreshToken( Action<string> callback )
-        {
-            yield return RefreshSession(refreshResult =>
-            {
-                callback?.Invoke(refreshResult.IsError ? null : refreshResult.Value.access_token);
-
-                if (bearerAuthRejectedCoroutine != null)
-                {
-                    coroutineRunner.Stop(bearerAuthRejectedCoroutine);
-                    bearerAuthRejectedCoroutine = null;
-                }
-            });
+            float nextRefreshInSeconds = (float) (nextRefreshTime - DateTime.UtcNow).TotalSeconds;
+            SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, nextRefreshInSeconds);
         }
 
         private void BearerAuthRejected
             ( string accessToken
             , Action<string> callback )
         {
-            if (accessToken == tokenData?.access_token && 
-                bearerAuthRejectedCoroutine == null &&
-                maintainAccessTokenCoroutine != null)
+            if (accessToken == tokenData?.access_token)
             {
-                coroutineRunner.Stop(maintainAccessTokenCoroutine);
-                bearerAuthRejectedCoroutine = coroutineRunner.Run(BearerAuthRejectRefreshToken(callback));
+                SessionMaintainer?.Stop();
+                CallRefresh?.Invoke(tokenData.refresh_token, result =>
+                {
+                    string newAccessToken = null;
+                    if (!result.IsError && result.Value != null)
+                    {
+                        newAccessToken = result.Value.access_token;
+                        SetSession(result.Value);
+                    }
+
+                    callback?.Invoke(newAccessToken);
+                });
             }
         }
 
@@ -270,9 +272,14 @@ namespace AccelByte.Api
             }
         }
 
+        internal void SetDataStorage(IAccelByteDataStorage newDataStorage)
+        {
+            dataStorage = newDataStorage;
+        }
+
         private string EncodeToken(string refreshToken)
         {
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey);
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
             string encodedToken = XorString(deviceProvider.DeviceId, refreshToken);
             encodedToken = Convert.ToBase64String(encodedToken.ToUtf8Json());
             return encodedToken;
@@ -280,7 +287,7 @@ namespace AccelByte.Api
 
         private string DecodeToken(string encodedRefreshToken)
         {
-            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey);
+            DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(encodeUniqueKey, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
             string decodedRefreshToken = Convert.FromBase64String(encodedRefreshToken).ToObject<string>();
             decodedRefreshToken = XorString(deviceProvider.DeviceId, decodedRefreshToken);
             return decodedRefreshToken;
@@ -323,10 +330,7 @@ namespace AccelByte.Api
             httpClient.ClearCookies();
 
             RefreshTokenCallback?.Invoke(tokenData.refresh_token);
-            if (maintainAccessTokenCoroutine == null)
-            {
-                maintainAccessTokenCoroutine = coroutineRunner.Run(MaintainToken());
-            }
+            SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, tokenData.expires_in * 0.8f);
         }
 
         public override IEnumerator RefreshSessionApiCall(ResultCallback<TokenData, OAuthError> callback)
@@ -343,11 +347,7 @@ namespace AccelByte.Api
 
         public void ClearSession(bool deleteCache = false)
         {
-            if (maintainAccessTokenCoroutine != null)
-            {
-                coroutineRunner.Stop(maintainAccessTokenCoroutine);
-                maintainAccessTokenCoroutine = null;
-            }
+            SessionMaintainer?.Stop();
 
             ClearThirdPartyPlatformTokenData();
 
@@ -362,11 +362,40 @@ namespace AccelByte.Api
             }
 
             if (!usePlayerPrefs) return;
-
             PlayerPrefs.DeleteKey(RefreshTokenPlayerPrefKey);
             PlayerPrefs.Save();
         }
 
+        internal void DeleteCache(string key)
+        {
+            dataStorage.DeleteItem(key, null, TokenTableName);
+        }
+
+        internal void LoadAuthTrustId(Action<bool, string> onDone)
+        {
+            dataStorage.GetItem(AuthTrustIdKey, onDone, TokenTableName);
+        }
+        
+        internal void SaveAuthTrustId(string authTrustId, Action<bool> onDone)
+        {
+            if (!string.IsNullOrEmpty(authTrustId))
+            {
+                var keyValueSaveInfo = new List<Tuple<string, object>>()
+                {
+                    new Tuple<string, object>(AuthTrustIdKey, authTrustId)
+                };
+                dataStorage.SaveItems(keyValueSaveInfo, onDone, TokenTableName);
+            }
+            else
+            {
+                onDone?.Invoke(false);
+            }
+        }
+        
+        internal void SaveAuthTrustId(Action<bool> onDone)
+        {
+            SaveAuthTrustId(tokenData?.auth_trust_id, onDone);
+        }
     }
 
     public static class LoginSessionExtension

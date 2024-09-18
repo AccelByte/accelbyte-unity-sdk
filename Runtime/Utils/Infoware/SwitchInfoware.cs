@@ -23,7 +23,7 @@ namespace AccelByte.Utils.Infoware
 
         internal override string GetMacAddress()
         {
-            AccelByteDebug.LogWarning("Incomplete implementation for Switch platform");
+            logger?.LogWarning("Incomplete implementation for Switch platform");
             return "";
         }
 

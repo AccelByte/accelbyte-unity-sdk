@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -59,7 +59,7 @@ namespace AccelByte.Server
 
             else if (!IPAddress.TryParse(inAddress, out address))
             {
-                AccelByteDebug.LogWarning($"Invalid IPv4 Address Input - {inAddress}");
+                SharedMemory?.Logger.LogWarning($"Invalid IPv4 Address Input - {inAddress}");
                 return;
             }
 
@@ -170,6 +170,8 @@ namespace AccelByte.Server
         public void EnqueueMetric(string key, string value)
         {
             AccelByteStatsDMetricBuilder metricBuilder = new AccelByteStatsDMetricBuilder(key, value);
+            metricBuilder.SetLogger(SharedMemory?.Logger);
+            
             List<string> labels;
             metricLabel.TryGetValue(key, out labels);
 
@@ -215,6 +217,12 @@ namespace AccelByte.Server
         public void SetStatsDMetricCollector<T>(ref T collector) where T : IAccelByteStatsDMetricCollector
         {
             statsDMetricCollector = collector;
+        }
+
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            base.SetSharedMemory(newSharedMemory);
+            statsDMetricCollector?.SetLogger(newSharedMemory?.Logger);
         }
 
         internal IAccelByteStatsDMetricCollector GetStatsDMetricCollector()
@@ -279,7 +287,7 @@ namespace AccelByte.Server
             StopExporting();
 
             intervalInSeconds = inIntervalInSeconds;
-            maintainer = new AccelByteHeartBeat(intervalInSeconds * 1000);
+            maintainer = new AccelByteHeartBeat(intervalInSeconds * 1000, SharedMemory?.Logger);
             maintainer.OnHeartbeatTrigger += ExportMetrics;
 
             maintainer.Start();

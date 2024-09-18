@@ -54,11 +54,14 @@ namespace AccelByte.Models {
         [DataMember] public string DebugLogFilter = "Verbose";
         [DataMember] public int DSHubReconnectTotalTimeout = 60000;
         [DataMember] public int AMSReconnectTotalTimeout = 60000;
+        [DataMember] public bool ServerUseAMS = true;
         public string DSHubServerWsUrl
         {
             get;
             private set;
         }
+
+        private IDebugger logger;
 
         /// <summary>
         ///  Copy member values
@@ -66,6 +69,11 @@ namespace AccelByte.Models {
         public ServerConfig ShallowCopy()
         {
             return (ServerConfig) MemberwiseClone();
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
 
         /// <summary>
@@ -127,13 +135,13 @@ namespace AccelByte.Models {
 
             if (MaximumCacheSize <= 0)
             {
-                AccelByteDebug.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
+                logger?.LogWarning($"Invalid maximum cache size: ${MaximumCacheSize}\n. Set to default value: {defaultCacheSize}");
                 MaximumCacheSize = defaultCacheSize;
             }
 
             if (MaximumCacheLifeTime <= 0)
             {
-                AccelByteDebug.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
+                logger?.LogWarning($"Invalid maximum cache lifetime: ${MaximumCacheLifeTime}\n. Set to default value: {defaultCacheLifeTime}");
                 MaximumCacheLifeTime = defaultCacheLifeTime;
             }
                 
@@ -238,7 +246,7 @@ namespace AccelByte.Models {
             }
             catch (System.Exception ex)
             {
-                AccelByteDebug.LogWarning("Invalid Server Config BaseUrl: " + ex.Message);
+                logger?.LogWarning("Invalid Server Config BaseUrl: " + ex.Message);
             }
             this.BaseUrl = sanitizedUrl;
         }

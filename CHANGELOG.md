@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [16.25.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.0%0D16.24.0) (2024-09-18)
+
+
+### Features
+
+* add change policy preferences in agreement ([6a92961](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6a92961ed5ad62a80bfea9ec8097e406bf42fdb8))
+* add disconnect endpoint ([ca69d82](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ca69d8222c8673b74f8680aeff30dde35dac068b))
+* add overload function for sync apple purchase ([ed64ba2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed64ba209736a52ad1c996fb832f2520277bf1bb))
+* added additional header to ds hub connection request ([fb702c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb702c46b8a02daebc68c4265381a8c62fb4ba27))
+* added option to have randomized device id on development build and editor ([ac68ec6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ac68ec6ed7584e90816daec949febe0ba606d17e))
+* **entitlement:** add overload function for google sync ([83be33e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/83be33edd559d32bb33083bfcd28c23b2d9ed011))
+* exposed endpoint to set and reset session timeout for ams ds ([539429a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/539429ab268a5fe8820fa60b730cf0c824de191d))
+* exposed new challenge service endpoints ([bc9e3a5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc9e3a5887627be5a6a37d5b2a0731a801873a4f))
+* Implemented fallback ticket polling and ws notif spoofing for matchmaking ([8b0da44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8b0da4466b7343a38732ac0dad036cac036c426a))
+* update turn manager model ([682e80e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/682e80e7081c2b6034077f50e62dc0117433f111))
+
+
+### Bug Fixes
+
+* corrected sequenceId data type, changed buffer primary sort param from SentAt to SequenceId ([adfc488](https://github.com/AccelByte/accelbyte-unity-sdk/commits/adfc48810836589df67c2bbb43fabc38dd3fb8a1))
+* incorrect data type for GoogleReceiptResolveResult.NeedConsume ([bc4b221](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc4b2218f1ac3680944cfb50a5f1b57ec81b52e1))
+* preserve inventory api ([0fb1b3f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0fb1b3f599ffcf00abd50bce80f6deed4fd216f1))
+* set missing oauth api shared memory ([ad4c033](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ad4c03325f6858236f678132651edc3e9330e7ea))
+
+
+### Refactors
+
+* add defensive code for sync apple iap ([a9bc330](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a9bc33001157e20dc94d3d7ba1e8d0e9649a9a85))
+* refactor sdk heartbeat ([43d6a41](https://github.com/AccelByte/accelbyte-unity-sdk/commits/43d6a41f4b382a1a9da420e1d7dde8bc7a7fd5c3))
+* refactor sdk logging ([48cced6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/48cced6636c891f86e15145c38f0c1f62cf7196d))
+* refactor telemetry flightId payload field to camel case ([a256b82](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a256b82c845d2a5911d0ec418b483072bcb89727))
+* sdk refresh session improvement ([9f41571](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f41571af8639cf43cffb764f4fc94768fcc383e))
+
 ## [16.24.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.24.0%0D16.23.1) (2024-08-12)
 
 

@@ -560,6 +560,7 @@ namespace AccelByte.Api
         /// PurchaseTime, and PurchaseToken to verify and sync item user bought from Google Play.
         /// </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Please use SyncMobilePlatformPurchaseGoogle overload function with GoogleReceiptResolveResult model callback. This interface will be removed on 3.80 release.")]
         public void SyncMobilePlatformPurchaseGoogle( PlatformSyncMobileGoogle syncRequest
             , ResultCallback callback )
         {
@@ -579,6 +580,108 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Apple Store platform purchase. 
+        /// </summary>
+        /// <param name="productId">purchased product id or entitlement's SKU</param>
+        /// <param name="transactionId">purchased transaction id</param>
+        /// <param name="receiptData">purchased product Payload in form of encrypted Apple Receipt</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncMobilePlatformPurchaseApple(string productId
+            , string transactionId
+            , string receiptData
+            , ResultCallback callback)
+        {
+            SyncMobilePlatformPurchaseApple(productId, transactionId, receiptData, null, callback);
+        }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Apple Store platform purchase. 
+        /// </summary>
+        /// <param name="productId">purchased product id or entitlement's SKU</param>
+        /// <param name="transactionId">purchased transaction id</param>
+        /// <param name="receiptData">purchased product Payload in form of encrypted Apple Receipt</param>
+        /// <param name="optionalParameters">Optional parameters containing exclude old transaction, product region and language</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncMobilePlatformPurchaseApple(string productId
+            , string transactionId
+            , string receiptData
+            , PlatformSyncMobileAppleOptionalParam optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            api.SyncMobilePlatformPurchaseApple(productId
+                , transactionId
+                , receiptData
+                , optionalParameters 
+                , callback);
+        }
+        
+        /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Google Play platform purchase.
+        /// </summary>
+        /// <param name="orderId">Google receipt's order id</param>
+        /// <param name="packageName">Google receipt's package name</param>
+        /// <param name="productId">Google receipt's product id</param>
+        /// <param name="purchaseTime">Google receipt's purchase time</param>
+        /// <param name="purchaseToken">Google receipt's purchase token</param>
+        /// <param name="autoAck">Set true if it is a durable item</param>
+        /// <param name="callback">Returns a Result that contain whether client should confirm pending purchase or not</param>
+        public void SyncMobilePlatformPurchaseGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , ResultCallback<GoogleReceiptResolveResult> callback)
+        {
+            SyncMobilePlatformPurchaseGoogle(orderId, packageName, productId, purchaseTime, purchaseToken, autoAck,
+                null, callback);
+        }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item entitlement from Google Play platform purchase.
+        /// </summary>
+        /// <param name="orderId">Google receipt's order id</param>
+        /// <param name="packageName">Google receipt's package name</param>
+        /// <param name="productId">Google receipt's product id</param>
+        /// <param name="purchaseTime">Google receipt's purchase time</param>
+        /// <param name="purchaseToken">Google receipt's purchase token</param>
+        /// <param name="autoAck">Set true if it is a durable item</param>
+        /// <param name="optionalParameters">Optional parameters containing product region and language</param>
+        /// <param name="callback">Returns a Result that contain whether client should confirm pending purchase or not</param>
+        public void SyncMobilePlatformPurchaseGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , PlatformSyncMobileGoogleOptionalParameters optionalParameters
+            , ResultCallback<GoogleReceiptResolveResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.SyncMobilePlatformPurchaseGoogle(orderId
+                , packageName
+                , productId
+                , purchaseTime
+                , purchaseToken
+                , autoAck
+                , optionalParameters
+                , callback);
+        }
+
+        /// <summary>
         /// Sync (Verify and fulfil) item entitlement from Apple Store platform purchase.
         /// </summary>
         /// <param name="syncRequest">
@@ -586,6 +689,7 @@ namespace AccelByte.Api
         /// and ExcludeOldTransactions to verify and sync item user bought from Apple Store.
         /// </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This interface will be removed on 3.80 release. Please use Api.GetEntitlement().SyncMobilePlatformPurchaseApple with generic input")]
         public void SyncMobilePlatformPurchaseApple( PlatformSyncMobileApple syncRequest
             , ResultCallback callback )
         {

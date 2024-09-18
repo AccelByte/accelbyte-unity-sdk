@@ -202,6 +202,21 @@ namespace AccelByte.Models
         [DataMember] public string sequenceID;
         [DataMember] public int sequenceNumber;
         [DataMember] public string type;
+
+        internal int SequenceIdInt
+        {
+            get
+            {
+                int retVal = -1;
+
+                if (int.TryParse(this.sequenceID, out retVal))
+                {
+                    return retVal;
+                }
+
+                return retVal;
+            }
+        }
     }
 
     [DataContract, Preserve]
@@ -228,6 +243,21 @@ namespace AccelByte.Models
         [DataMember(Name = "to")] public string To;
         [DataMember(Name = "topic")] public string Topic;
         [DataMember(Name = "type")] public string Type;
+
+        internal int SequenceIdInt
+        {
+            get
+            {
+                int retVal = -1;
+
+                if (int.TryParse(this.SequenceId, out retVal))
+                {
+                    return retVal;
+                }
+
+                return retVal;
+            }
+        }
 
         public override int GetHashCode()
         {

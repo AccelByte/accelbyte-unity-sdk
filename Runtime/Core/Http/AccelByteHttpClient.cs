@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -39,8 +39,11 @@ namespace AccelByte.Core
 
         private AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>> httpCache;
 
-        public AccelByteHttpClient(IHttpRequestSender requestSender = null)
+        private IDebugger logger;
+
+        public AccelByteHttpClient(IHttpRequestSender requestSender = null, IDebugger logger = null)
         {
+            SetLogger(logger);
             if(requestSender != null)
             {
                 this.sender = requestSender;
@@ -48,7 +51,12 @@ namespace AccelByte.Core
             else
             {
                 var defaultSenderScheduler = new WebRequestSchedulerAsync();
-                var defaultSender = new UnityHttpRequestSender(defaultSenderScheduler);
+                UnityHttpRequestSender defaultSender = new UnityHttpRequestSender(defaultSenderScheduler);
+                defaultSenderScheduler.SetLogger(logger);
+                
+                CoreHeartBeat coreHeartBeat = new CoreHeartBeat();
+                defaultSender.SetLogger(logger);
+                defaultSender.SetHeartBeat(coreHeartBeat);
                 this.sender = defaultSender;
             }
             this.SetRetryParameters();
@@ -57,6 +65,11 @@ namespace AccelByte.Core
         internal void SetCacheImplementation(IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>> cacheImplementation, int cacheMaxLifeTime)
         {
             httpCache = new AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>>(cacheImplementation, cacheMaxLifeTime);
+        }
+
+        public void SetLogger(IDebugger newLogger)
+        {
+            logger = newLogger;
         }
 
         public void SetCredentials(string clientId, string clientSecret)
@@ -232,7 +245,7 @@ namespace AccelByte.Core
 
                         if (IsBearerAuthRequestPaused())
                         {
-                            AccelByteDebug.LogWarning("Failed retrieving new access token, resuming");
+                            logger?.LogWarning("Failed retrieving new access token, resuming");
                         }
                     }
 
@@ -261,7 +274,7 @@ namespace AccelByte.Core
                     uint delayMs = 0;
                     if (retryTimes > 0)
                     {
-                        AccelByteDebug.LogWarning($"Send request failed, Retrying {retryTimes}/{maxRetries}");
+                        logger?.LogWarning($"Send request failed, Retrying {retryTimes}/{maxRetries}");
                         request.Priority = AccelByteHttpHelper.HttpRequestDefaultPriority - 1;
 
                         int jitterMs = rand.Next((int)(-retryDelayMs / 4), (int)(retryDelayMs / 4));
@@ -318,7 +331,7 @@ namespace AccelByte.Core
                         }
                         if (IsBearerAuthRequestPaused())
                         {
-                            AccelByteDebug.LogWarning("Failed retrieving new access token");
+                            logger?.LogWarning("Failed retrieving new access token");
                             return new HttpSendResult(httpResponse, error);
                         }
                     }
@@ -410,7 +423,7 @@ namespace AccelByte.Core
 
                         if (IsBearerAuthRequestPaused())
                         {
-                            AccelByteDebug.LogWarning("Failed retrieving new access token, resuming");
+                            logger?.LogWarning("Failed retrieving new access token, resuming");
                         }
                     }
 
@@ -440,7 +453,7 @@ namespace AccelByte.Core
                     uint delayMs = 0;
                     if (retryTimes > 0)
                     {
-                        AccelByteDebug.LogWarning($"Send request failed, Retry {retryTimes}/{maxRetries}");
+                        logger?.LogWarning($"Send request failed, Retry {retryTimes}/{maxRetries}");
                         request.Priority = AccelByteHttpHelper.HttpRequestDefaultPriority - 1;
 
                         int jitterMs = rand.Next((int)(-retryDelayMs / 4), (int)(retryDelayMs / 4));
@@ -499,7 +512,7 @@ namespace AccelByte.Core
                         {
                             state = RequestState.Stoped;
                             callback?.Invoke(httpResponse, error);
-                            AccelByteDebug.LogWarning("Failed retrieving new access token");
+                            logger?.LogWarning("Failed retrieving new access token");
                             yield break;
                         }
                     }

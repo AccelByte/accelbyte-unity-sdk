@@ -20,13 +20,16 @@ namespace AccelByte.Core
         private int seed;
         System.Random random;
 
-        public AccelByteNetworkConditioner()
+        private IDebugger logger;
+
+        public AccelByteNetworkConditioner(IDebugger logger = null)
         {
             initialSeed = (int)System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             seed = initialSeed;
             random = new System.Random(seed);
+            this.logger = logger;
 
-            AccelByteDebug.LogVerbose(
+            logger?.LogVerbose(
                 $"[AccelByteNetworkConditioner] Initialized AccelByte network conditioner with seed {seed}."
             );
         }
@@ -46,7 +49,7 @@ namespace AccelByte.Core
         public void SetEnabled(bool inEnabled)
         {
             isEnabled = inEnabled;
-            AccelByteDebug.Log(
+            logger?.Log(
                 $"[AccelByteNetworkConditioner] {(isEnabled ? "Enabled" : "Disabled")} " +
                 $"with overall fail rate {overallFailRate}%."
             );
@@ -71,13 +74,13 @@ namespace AccelByte.Core
                 LimitCheckFailRate(failRate);
 
                 overallFailRate = failRate;
-                AccelByteDebug.Log($"Overall percentage failure rate set: {failRate}");
+                logger?.Log($"Overall percentage failure rate set: {failRate}");
 
                 return true;
             }
             catch (Exception exception)
             {
-                AccelByteDebug.LogWarning(exception.Message);
+                logger?.LogWarning(exception.Message);
                 return false;
             }
         }
@@ -97,13 +100,13 @@ namespace AccelByte.Core
                 LimitCheckFailRate(failRate);
 
                 messageFailRate.Add(messageType, failRate);
-                AccelByteDebug.Log($"[AccelByteNetworkConditioner] {messageType} percentage failure rate set: {failRate}");
+                logger?.Log($"[AccelByteNetworkConditioner] {messageType} percentage failure rate set: {failRate}");
 
                 return true;
             }
             catch (Exception exception)
             {
-                AccelByteDebug.LogWarning(exception.Message);
+                logger?.LogWarning(exception.Message);
                 return false;
             }
         }
@@ -117,7 +120,7 @@ namespace AccelByte.Core
         {
             if (!messageFailRate.ContainsKey(messageType))
             {
-                AccelByteDebug.LogWarning(
+                logger?.LogWarning(
                     $"[AccelByteNetworkConditioner] Get message fail rate with message type {messageType} not found."
                 );
 
@@ -143,7 +146,7 @@ namespace AccelByte.Core
         {
             messageFailRate.Clear();
 
-            AccelByteDebug.Log("[AccelByteNetworkConditioner] All notification percentage failure rates cleared.");
+            logger?.Log("[AccelByteNetworkConditioner] All notification percentage failure rates cleared.");
         }
 
         /// <summary>
@@ -155,7 +158,7 @@ namespace AccelByte.Core
         {
             if (!messageFailRate.ContainsKey(messageType))
             {
-                AccelByteDebug.LogWarning(
+                logger?.LogWarning(
                     $"[AccelByteNetworkConditioner] Failed to remove message fail rate " +
                     $"with message type {messageType} not found."
                 );
@@ -176,7 +179,7 @@ namespace AccelByte.Core
             this.seed = seed;
             random = new System.Random(seed);
 
-            AccelByteDebug.Log($"[AccelByteNetworkConditioner] Setting random seed as {seed}");
+            logger?.Log($"[AccelByteNetworkConditioner] Setting random seed as {seed}");
         }
 
         /// <summary>
@@ -217,7 +220,7 @@ namespace AccelByte.Core
 
             if (isFail)
             {
-                AccelByteDebug.Log($"[AccelByteNetworkConditioner] Killed message {messageType}");
+                logger?.Log($"[AccelByteNetworkConditioner] Killed message {messageType}");
             }
 
             OnFailRateCalculated?.Invoke(isFail, messageType);

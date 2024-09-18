@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -20,11 +20,14 @@ namespace AccelByte.Core
             }
         }
 
+        private IDebugger logger;
+
         public XboxWrapper(string baseUrl)
         {
+            logger = null;
             if (string.IsNullOrEmpty(baseUrl))
             {
-                AccelByteDebug.LogWarning($"baseUrl is null. Please check {nameof(XboxWrapper)} constructor value");
+                logger?.LogWarning($"baseUrl is null. Please check {nameof(XboxWrapper)} constructor value");
             }
 
             this.baseUrl = baseUrl;
@@ -34,7 +37,7 @@ namespace AccelByte.Core
         {
             if (string.IsNullOrEmpty(baseUrl))
             {
-                AccelByteDebug.LogWarning($"baseUrl is null. Please check {nameof(XboxWrapper)} constructor value");
+                logger?.LogWarning($"baseUrl is null. Please check {nameof(XboxWrapper)} constructor value");
             }
 
             this.baseUrl = baseUrl;

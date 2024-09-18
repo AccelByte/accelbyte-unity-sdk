@@ -52,6 +52,23 @@ namespace AccelByte.Api.Interface
             , int limit = 20);
 
         /// <summary>
+        /// Send a request to get progress for a specific challenge in a previous rotation cycle.
+        /// </summary>
+        /// <param name="challengeCode">String code for the challenge to check progress for</param>
+        /// <param name="rotationIndex">Index for rotation, treat rotation as an array sorted by the start time of a rotation in descending manner. 
+        /// 0 indicates current or latest active rotation. Increment the value to refer to specific past rotation</param>
+        /// <param name="callback">Api Result Callback</param>
+        /// <param name="goalCode">String code for the specific challenge goal to get progress for</param>
+        /// <param name="offset"></param>
+        /// <param name="limit"></param>
+        public void GetChallengeProgress(string challengeCode
+            , int rotationIndex
+            , ResultCallback<GoalProgressionResponse> callback
+            , string goalCode = ""
+            , int offset = 0
+            , int limit = 20);
+
+        /// <summary>
         /// Send a request to get status of all challenge rewards
         /// </summary>
         /// <param name="status">Determines what specific rewards should be included in the response</param>
@@ -72,5 +89,11 @@ namespace AccelByte.Api.Interface
         /// <param name="callback">Api Result Callback</param>
         public void ClaimReward(string[] rewardIDs
             , ResultCallback<UserReward[]> callback);
+
+        /// <summary>
+        /// Send a request to attempt to evaluate the current user's challenge progress
+        /// </summary>
+        /// <param name="callback">ResultCallback if operation is successful or not</param>
+        public void EvaluateChallengeProgress(ResultCallback callback);
     }
 }

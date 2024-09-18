@@ -5,6 +5,8 @@ using AccelByte.Core;
 using AccelByte.Models;
 using JetBrains.Annotations;
 using System;
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -14,6 +16,8 @@ namespace AccelByte.Api
         private readonly MatchmakingV2Api matchmakingV2Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
+        
+        internal Action<Result<MatchmakingV2MatchTicketStatus>> MatchmakingTicketPolled;
 
         [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
@@ -50,6 +54,11 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, cb => 
                 {
+                    if(!cb.IsError)
+                    {
+                        SharedMemory.MessagingSystem.SendMessage(AccelByteMessagingTopic.MatchmakingStarted, cb.Value.matchTicketId);
+                        StartMatchmakingTicketPoll(cb.Value.matchTicketId, matchPoolName);
+                    }
                     SendPredefinedEvent(matchPoolName, optionalParams, cb, callback);
                 }));
         }
@@ -149,6 +158,67 @@ namespace AccelByte.Api
 
             coroutineRunner.Run(
                 matchmakingV2Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
+        }
+
+        /// <summary>
+        /// Start polling for matchmaking ticket status when Enable Matchmaking Ticket Check is enabled on client config
+        /// </summary>
+        /// <param name="ticketId">String ID of ticket to poll status for.</param>
+        internal async void StartMatchmakingTicketPoll(string ticketId, string matchPoolName)
+        {
+            if (!matchmakingV2Api.Config.EnableMatchmakingTicketCheck)
+            {
+                return;
+            }    
+
+            await Task.Delay(matchmakingV2Api.Config.MatchmakingTicketCheckInitialDelay);
+
+            bool shouldContinuePolling = true;
+            while (shouldContinuePolling)
+            {
+                coroutineRunner.Run(
+                    matchmakingV2Api.GetMatchmakingTicket(ticketId, result =>
+                    {
+                        MatchmakingTicketPolled?.Invoke(result);
+
+                        if (result.IsError)
+                        {
+                            if (result.Error.Code == ErrorCode.NotFound)
+                            {
+                                var expiredNotif = new MatchmakingV2TicketExpiredNotification()
+                                {
+                                    ticketId = ticketId,
+                                    matchPool = matchPoolName,
+                                    namespace_ = matchmakingV2Api.Config.Namespace,
+                                    createdAt = DateTime.UtcNow
+                                };
+                                var expiredNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                                    "OnMatchmakingTicketExpired"
+                                    , expiredNotif.ToJsonString()
+                                    , isEncoded: true);
+                                SharedMemory.NotificationSender.SendLobbyNotification(expiredNotifMessage);
+
+                                shouldContinuePolling = false;
+                            }
+
+                            return;
+                        }
+
+                        if (result.Value.matchFound)
+                        {
+                            SharedMemory.MessagingSystem
+                                .SendMessage(AccelByteMessagingTopic.MatchFoundOnPoll, result.Value.sessionId);
+
+                            shouldContinuePolling = false;
+                            return;
+                        }
+                    }));
+
+                if (shouldContinuePolling)
+                {
+                    await Task.Delay(matchmakingV2Api.Config.MatchmakingTicketCheckPollRate);
+                }
+            }
         }
 
         #region PredefinedEvents

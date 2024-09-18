@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace AccelByte.Core
 {
@@ -45,9 +46,9 @@ namespace AccelByte.Core
 
                     using (UnityEngine.Networking.UnityWebRequest webRequest = executedTask.CreateWebRequest())
                     {
-                        Report.GetHttpRequest(executedTask.HttpRequest, webRequest);
+                        Report.GetHttpRequest(executedTask.HttpRequest, webRequest, logger);
                         await ExecuteWebRequest(webRequest);
-                        Report.GetHttpResponse(webRequest);
+                        Report.GetHttpResponse(webRequest, logger);
                         executedTask.SetComplete(webRequest);
                     }
                 }

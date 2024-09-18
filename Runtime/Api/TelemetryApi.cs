@@ -12,7 +12,19 @@ namespace AccelByte.Api
     internal class TelemetryApi : ApiBase
     {        
         private readonly uint agentType;
-        private readonly string deviceId;
+
+        private string cachedDeviceId;
+        private string deviceId
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(cachedDeviceId))
+                {
+                    cachedDeviceId = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig).DeviceId;
+                }
+                return cachedDeviceId;
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -28,7 +40,6 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             
             agentType = getAgentTypeByPlatform();
-            deviceId = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace).DeviceId;
         }
         
         private static uint getAgentTypeByPlatform()

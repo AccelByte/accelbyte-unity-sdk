@@ -16,6 +16,14 @@ namespace AccelByte.Server
 
         public ISession Session { get { return session; } }
 
+        internal ServerOauthLoginSession InternalSession
+        {
+            get
+            {
+                return session;
+            }
+        }
+
         public DedicatedServer( ServerOauthLoginSession inSession
             , CoroutineRunner inCoroutineRunner )
         {

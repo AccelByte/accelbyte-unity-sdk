@@ -272,10 +272,18 @@ namespace AccelByte.Editor
                 EditorCommon.CreateNumberInput(onCacheLifeTimeChanged, editedSdkConfig.MaximumCacheLifeTime, "Cache Life Time (Seconds)", indentLevel: 1);
             }
 
+            if (EditorCommon.CreateFoldout("Matchmaking Configs", foldoutConfigStatus))
+            {
+                EditorCommon.CreateToggleInput((newValue) => editedSdkConfig.EnableMatchmakingTicketCheck = newValue, editedSdkConfig.EnableMatchmakingTicketCheck, "Enable Fallback Ticket Poll Check", indentLevel: 1);
+                EditorCommon.CreateNumberInput((newValue) => editedSdkConfig.MatchmakingTicketCheckPollRate = (int)newValue, editedSdkConfig.MatchmakingTicketCheckPollRate, "Ticket Poll Rate", indentLevel: 1);
+            }
+
             if (EditorCommon.CreateFoldout("Other Configs", foldoutConfigStatus))
             {
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.CustomerName = newValue, editedSdkConfig.CustomerName, "Customer Name", indentLevel: 1);
                 EditorCommon.CreateToggleInput((newValue) => editedSdkConfig.UsePlayerPrefs = newValue, editedSdkConfig.UsePlayerPrefs, "Use PlayerPrefs", indentLevel: 1);
+                EditorCommon.CreateToggleInput((newValue) => editedSdkConfig.RandomizeDeviceId = newValue, editedSdkConfig.RandomizeDeviceId
+                    , "Randomize Device Id", indentLevel: 1);
             }
 
             if (EditorCommon.CreateFoldout("Log Configs", foldoutConfigStatus))

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -41,8 +41,6 @@ namespace AccelByte.Server
             , ISession session ) 
             : base( httpClient, config, config.DSMControllerServerUrl, session)
         {
-            AccelByteDebug.Log("ServerApi init serverapi start");
-            
             ServerSetup = new RegisterServerRequest() 
             {
                 game_version = "",
@@ -83,7 +81,7 @@ namespace AccelByte.Server
                 ServerSetup.pod_name = result.Value.pod_name;
                 ServerType = ServerType.CLOUDSERVER;
             }   
-            callback.Try(response.TryParse());
+            callback?.Try(response.TryParse());
         }
 
         public IEnumerator ShutdownServer( ShutdownServerRequest shutdownServerRequest
@@ -114,7 +112,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
             ServerType = ServerType.NONE;
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RegisterLocalServer( RegisterLocalServerRequest registerRequest
@@ -150,7 +148,7 @@ namespace AccelByte.Server
                 ServerSetup.pod_name = registerRequest.name;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         [Obsolete]
@@ -207,7 +205,7 @@ namespace AccelByte.Server
             var result = response.TryParse();
             ServerType = ServerType.NONE;
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetSessionId( ResultCallback<ServerSessionResponse> callback )
@@ -234,7 +232,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<ServerSessionResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetSessionTimeout( ResultCallback<ServerSessionTimeoutResponse> callback )
@@ -265,7 +263,7 @@ namespace AccelByte.Server
             });
 
             var result = response.TryParseJson<ServerSessionTimeoutResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public async void ServerHeartBeat(ResultCallback callback)
@@ -296,12 +294,13 @@ namespace AccelByte.Server
             HttpSendResult sendResult = await HttpClient.SendRequestAsync(request);
             IHttpResponse response = sendResult.CallbackResponse;
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         private void ParseArgsAndServerSetup()
         {
             string[] args = System.Environment.GetCommandLineArgs();
+            SharedMemory?.Logger?.Log($"parse server command arg: {args}");
             ServerSetupData serverSetupData = ParseCommandLine(args);
             
             region = serverSetupData.region;
@@ -325,7 +324,6 @@ namespace AccelByte.Server
             ServerSetupData serverSetupData = new ServerSetupData();
             foreach (string arg in args)
             {
-                AccelByteDebug.Log("arg: " + arg);
                 if (arg.Contains("provider"))
                 {
                     string[] split = arg.Split('=');

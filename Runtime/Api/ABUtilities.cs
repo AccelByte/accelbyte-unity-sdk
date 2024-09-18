@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -17,7 +17,7 @@ namespace AccelByte.Api
         /// <param name="url">The URL to download the Image from</param>
         /// <param name="callback">Returns a result that contains a <see cref="Texture2D"/></param>
         /// <returns></returns>
-        public static IEnumerator DownloadTexture2D(string url, ResultCallback<Texture2D> callback)
+        public static IEnumerator DownloadTexture2D(string url, ResultCallback<Texture2D> callback, IDebugger logger = null)
         {
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
@@ -25,7 +25,7 @@ namespace AccelByte.Api
 
                 if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    AccelByteDebug.LogWarning(request.error);
+                    logger?.LogWarning(request.error);
                     ErrorCode code;
                     if (request.result == UnityWebRequest.Result.ConnectionError)
                     {
@@ -53,7 +53,7 @@ namespace AccelByte.Api
         /// <param name="url">The URL to download the Image from</param>
         /// <param name="callback">Returns a result that contains a <see cref="Texture2D"/></param>
         /// <returns></returns>
-        public static async void DownloadTexture2DAsync(string url, ResultCallback<Texture2D> callback)
+        public static async void DownloadTexture2DAsync(string url, ResultCallback<Texture2D> callback, IDebugger logger = null)
         {
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
@@ -61,7 +61,7 @@ namespace AccelByte.Api
 
                 if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    AccelByteDebug.LogWarning(request.error);
+                    logger.LogWarning(request.error);
                     ErrorCode code;
                     if (request.result == UnityWebRequest.Result.ConnectionError)
                     {

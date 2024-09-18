@@ -87,7 +87,13 @@ namespace AccelByte.Models
         [DataMember] public string localizedPolicyVersionId;
         [DataMember] public string policyVersionId;
         [DataMember] public string policyId;
-        [DataMember] public bool isAccepted;
+        [DataMember] public bool isAccepted = false;
+    }
+
+    [DataContract, Preserve]
+    public class ChangeAgreementRequest : AcceptAgreementRequest
+    {
+        [DataMember (Name = "isNeedToSendEventMarketing")] public bool IsNeedToSendEventMarketing;
     }
     
     [DataContract, Preserve]

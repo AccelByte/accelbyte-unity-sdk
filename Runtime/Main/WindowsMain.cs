@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 namespace AccelByte.Core
@@ -12,12 +12,12 @@ namespace AccelByte.Core
             Models.MultiSDKConfigsArgs configArgs = argsConfigParser.ParseSDKConfigFromArgs();
             if(configArgs != null)
             {
-                AccelByteSDK.OverrideConfigs.SDKConfigOverride = configArgs;
+                AccelByteSDK.Implementation.OverrideConfigs.SDKConfigOverride = configArgs;
             }
             Models.MultiOAuthConfigs oAuthArgs = argsConfigParser.ParseOAuthConfigFromArgs();
             if (oAuthArgs != null)
             {
-                AccelByteSDK.OverrideConfigs.OAuthConfigOverride = oAuthArgs;
+                AccelByteSDK.Implementation.OverrideConfigs.OAuthConfigOverride = oAuthArgs;
             }
 #endif
         }

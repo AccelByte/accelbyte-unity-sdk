@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2021 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -183,6 +183,7 @@ namespace HybridWebSocket
     internal class WebSocket : IWebSocket
     {
         private uint? objectId;
+        private IDebugger logger;
 
         ~WebSocket()
         {
@@ -224,6 +225,11 @@ namespace HybridWebSocket
                     throw new WebSocketInvalidStateException("Unrecognized websocket ready state.");
                 }
             }
+        }
+
+        public void SetLogger(IDebugger logger)
+        {
+            this.logger = logger;
         }
 
         public void Connect(string url, string protocols, string sessionId, string entitlementToken = null, ResultCallback callback = null)
