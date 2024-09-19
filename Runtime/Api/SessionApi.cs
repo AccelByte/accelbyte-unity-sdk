@@ -143,6 +143,37 @@ namespace AccelByte.Api
             callback.Try(result);
         }
         
+        internal void InviteUserToParty(string partyId, string userId, ResultCallback<InviteUserToPartyResponse> callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, partyId, userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+            
+            var data = new SessionV2SessionInviteRequest
+            {
+                userId = userId
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/invite")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("partyId", partyId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(data.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<InviteUserToPartyResponse>();
+                callback?.Try(result);
+            });
+        }
+        
         public IEnumerator PromoteUserToPartyLeader(string partyId, string leaderId
             , ResultCallback<SessionV2PartySession> callback)
         {
@@ -605,6 +636,37 @@ namespace AccelByte.Api
             var result = response.TryParse();
 
             callback.Try(result);
+        }
+        
+        internal void InviteUserToGameSession(string sessionId, string userId, ResultCallback<InviteUserToGameSessionResponse> callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, sessionId, userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var data = new SessionV2SessionInviteRequest
+            {
+                userId = userId
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/invite")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithBody(data.ToUtf8Json())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            httpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<InviteUserToGameSessionResponse>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator JoinGameSession(string sessionId

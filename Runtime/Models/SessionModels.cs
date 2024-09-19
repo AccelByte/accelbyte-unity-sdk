@@ -175,7 +175,8 @@ namespace AccelByte.Models
         [DataMember] public string createdBy;
         [DataMember] public string id;
         [DataMember] public bool isActive;
-        [DataMember] public string leaderId;
+        [DataMember(Name = "isFull")] public bool IsFull;
+        [DataMember(Name = "leaderID")] public string leaderId;
         [DataMember] public SessionV2MemberData[] members;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public DateTime updatedAt;
@@ -186,9 +187,9 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2PartySessionKickResponse
     {
-        [DataMember] public string leaderId;
+        [DataMember(Name = "leaderID")] public string leaderId;
         [DataMember] public SessionV2MemberData[] members;
-        [DataMember] public string partyId;
+        [DataMember(Name = "partyID")] public string partyId;
     }
 
     [DataContract, Preserve]
@@ -334,24 +335,25 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2GameSession
     {
-        [DataMember] public SessionV2DsInformation dsInformation;
+        [DataMember(Name = "DSInformation")] public SessionV2DsInformation dsInformation;
         [DataMember] public Dictionary<string, object> attributes;
-        [DataMember] public string backfillTicketId;
+        [DataMember(Name = "backfillTicketID")] public string backfillTicketId;
         [DataMember(Name = "code")] public string Code;
         [DataMember] public SessionV2PublicConfiguration configuration;
         [DataMember] public DateTime createdAt;
         [DataMember] public string createdBy;
         [DataMember] public string id;
         [DataMember] public bool isActive;
-        [DataMember] public string leaderId;
+        [DataMember(Name = "isFull")] public bool IsFull;
+        [DataMember(Name = "leaderID")] public string leaderId;
         [DataMember] public string matchPool;
         [DataMember] public SessionV2MemberData[] members;
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public SessionV2TeamData[] teams;
-        [DataMember] public string[] ticketIds;
+        [DataMember(Name = "storage")] public SessionV2Storage Storage;
+        [DataMember(Name = "ticketIDs")] public string[] ticketIds;
         [DataMember] public DateTime updatedAt;
         [DataMember] public int version;
-        [DataMember(Name = "storage")] public SessionV2Storage Storage;
     }
 
     [DataContract, Preserve]
@@ -474,6 +476,18 @@ namespace AccelByte.Models
         [DataMember(Name = "SessionTemplate")] public string SessionTemplate;
         [DataMember(Name = "Total")] public int Total;
         [DataMember(Name = "UpdatedAt")] public DateTime UpdatedAt;
+    }
+    
+    [DataContract, Preserve]
+    public class InviteUserToPartyResponse
+    {
+        [DataMember(Name = "platformUserID")] public string PlatformUserID;
+    }
+    
+    [DataContract, Preserve]
+    public class InviteUserToGameSessionResponse
+    {
+        [DataMember(Name = "platformUserID")] public string PlatformUserID;
     }
 
     #region Notification

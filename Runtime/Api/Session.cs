@@ -123,28 +123,29 @@ namespace AccelByte.Api
 
             if(string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                sessionApi.InviteUserToParty(
-                    partyId,
-                    userId,
-                    cb =>
-                    {
-                        if (cb != null && !cb.IsError)
-                        {
-                            SendPredefinedEvent(PredefinedAnalyticsMode.PartySessionInvite, userId, partyId);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+            ResultCallback<InviteUserToPartyResponse> inviteUserCallback = (result) =>
+            {
+                if (result != null && !result.IsError)
+                {
+                    SendPredefinedEvent(PredefinedAnalyticsMode.PartySessionInvite, userId, partyId);
+                }
+
+                HandleCallback(result, callback);
+            };
+            sessionApi.InviteUserToParty(
+                partyId,
+                userId,
+                inviteUserCallback);
         }        
         
         public void PromoteUserToPartyLeader(string partyId, string leaderId,
@@ -547,28 +548,29 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+            
+            ResultCallback<InviteUserToGameSessionResponse> inviteUserCallback = (result) =>
+            {
+                if (result != null && !result.IsError)
+                {
+                    SendPredefinedEvent(PredefinedAnalyticsMode.GameSessionInvite, userId, sessionId);
+                }
 
-            coroutineRunner.Run(
-                sessionApi.InviteUserToGameSession(
-                    sessionId,
-                    userId,
-                    cb =>
-                    {
-                        if (!cb.IsError)
-                        {
-                            SendPredefinedEvent(PredefinedAnalyticsMode.GameSessionInvite, userId, sessionId);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                HandleCallback(result, callback);
+            };
+            sessionApi.InviteUserToGameSession(
+                sessionId,
+                userId,
+                inviteUserCallback);
         }
 
         public void JoinGameSession(string sessionId
@@ -1025,22 +1027,33 @@ namespace AccelByte.Api
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         private void HandleCallback(Result result, ResultCallback callback)
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
+        }
+        
+        private void HandleCallback<T>(Result<T> result, ResultCallback callback)
+        {
+            if (result.IsError)
+            {
+                callback?.TryError(result.Error);
+                return;
+            }
+
+            callback?.TryOk();
         }
 
         #endregion

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.25.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.1%0D16.25.0) (2024-09-19)
+
+
+### Bug Fixes
+
+* add various http response fields ([0cfb1b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0cfb1b2b4eaaf44e0c089c52a73e811afea33b69))
+* added missing parameter to set upload binary content type ([226474e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/226474ee03e1a102e01d3ecfadab8309448f42fd))
+* **BinaryCloudSave:** incorrect request presigned url callback model ([689912b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/689912b6fa4804cd834d284ca434df06c323ed90))
+* **BinaryCloudSave:** invalid callback model ([12cb6c1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/12cb6c1b4433c83a9e85951653c06761cbaf3c7a))
+
+
+### Refactors
+
+* change save binary and presigned url type ([f8e471d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f8e471d96208deb2a47a8232450d7d3160345092))
+
 ## [16.25.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.0%0D16.24.0) (2024-09-18)
 
 

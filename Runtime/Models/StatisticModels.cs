@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections.Generic;
@@ -87,21 +87,41 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class StatConfig
     {
-        [DataMember] public string createdAt;
-        [DataMember] public float defaultValue;
-        [DataMember] public string description;
-        [DataMember] public bool incrementOnly;
-        [DataMember] public float maximum;
-        [DataMember] public float minimum;
-        [DataMember] public string name;
-        [DataMember(Name = "namespace")] public string Namespace;
-        [DataMember] public bool setAsGlobal;
-        [DataMember] public StatisticSetBy setBy;
         [DataMember] public string statCode;
+        [DataMember] public string name;
+        [DataMember] public string description;
+        [DataMember] public float minimum;
+        [DataMember] public float maximum;
+        [DataMember] public float defaultValue;
+        [DataMember] public bool incrementOnly;
+        [DataMember] public bool setAsGlobal;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "globalAggregationMethod")] public StatConfigAggregationMethod GlobalAggregationMethod;
+        [DataMember] public StatisticSetBy setBy;
         [DataMember] public StatisticStatus status;
-        [DataMember] public string updatedAt;
         [DataMember] public string[] cycleIds;
         [DataMember] public string[] tags;
+        [DataMember] public string createdAt;
+        [DataMember] public string updatedAt;
+        [DataMember(Name = "isPublic")] public bool IsPublic;
+        [DataMember(Name = "ignoreAdditionalDataOnValueRejected")] public bool IgnoreAdditionalDataOnValueRejected;
+        [DataMember(Name = "visibility")] public StatConfigVisibility Visibility;
+    }
+
+    [Preserve]
+    public enum StatConfigVisibility
+    {
+        [EnumMember(Value = "SHOWALL")] ShowAll,
+        [EnumMember(Value = "SERVERONLY ")] ServerOnly
+    }
+    
+    [Preserve]
+    public enum StatConfigAggregationMethod
+    {
+        [EnumMember(Value = "TOTAL")] Total,
+        [EnumMember(Value = "MIN ")] Min,
+        [EnumMember(Value = "MAX")] Max,
+        [EnumMember(Value = "LAST ")] Last
     }
 
     [DataContract, Preserve]

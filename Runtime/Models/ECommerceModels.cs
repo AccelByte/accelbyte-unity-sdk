@@ -663,6 +663,11 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> localExt;
         [DataMember] public Dictionary<string, int> itemQty;
         [DataMember(Name = "flexible")] public bool Flexible;
+        [DataMember(Name = "listable")] public bool Listable;
+        [DataMember(Name = "purchasable")] public bool Purchasable;
+        [DataMember(Name = "sellable")] public bool Sellable;
+        [DataMember(Name = "sectionExclusive")] public bool SectionExclusive;
+        [DataMember(Name = "boundItemIds")] public string[] BoundItemIds;
     }
 
     [DataContract, Preserve]
@@ -999,6 +1004,7 @@ namespace AccelByte.Models
         [DataMember] public int price;
         [DataMember] public int discountedPrice;
         [DataMember] public string paymentProvider;
+        [DataMember(Name = "tax")] public double Tax;
         [DataMember] public int vat;
         [DataMember] public int salesTax;
         [DataMember] public int paymentProviderFee;

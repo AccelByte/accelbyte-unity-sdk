@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
@@ -38,13 +38,13 @@ namespace AccelByte.Api
         /// <param name="isPublic">Whether to save the binary as a public or private record. (Optional)</param>
         public void SaveUserBinaryRecord(string key
             , string fileType
-            , ResultCallback<UserBinaryRecord> callback
+            , ResultCallback<SaveBinaryRecordResponse> callback
             , bool isPublic = false)
         {
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.SaveUserBinaryRecord(key, fileType, isPublic, callback);
@@ -61,7 +61,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.GetCurrentUserBinaryRecord(key, callback);
@@ -80,7 +80,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.GetPublicUserBinaryRecord(key, userId, callback);
@@ -97,7 +97,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkGetCurrentUserBinaryRecords(keys, callback);
@@ -116,7 +116,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkGetPublicUserBinaryRecords(keys, userId, callback);
@@ -135,7 +135,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkGetPublicUserBinaryRecords(key, userIds, callback);
@@ -157,7 +157,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkQueryCurrentUserBinaryRecords(query, callback, offset, limit);
@@ -179,7 +179,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkQueryPublicUserBinaryRecords(userId, callback, offset, limit);
@@ -203,7 +203,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.UpdateUserBinaryRecordFile(key, contentType, fileLocation, callback);
@@ -223,7 +223,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.UpdateUserBinaryRecordMetadata(key, isPublic, callback);
@@ -240,7 +240,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.DeleteUserBinaryRecord(key, callback);
@@ -255,12 +255,12 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains BinaryInfo via callback when completed</param>
         public void RequestUserBinaryRecordPresignedUrl(string key
             , string fileType
-            , ResultCallback<BinaryInfo> callback)
+            , ResultCallback<RequestUserBinaryRecordPresignedUrlResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.RequestUserBinaryRecordPresignedUrl(key, fileType, callback);
@@ -277,7 +277,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.GetGameBinaryRecord(key, callback);
@@ -294,7 +294,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkGetGameBinaryRecords(keys, callback);
@@ -316,7 +316,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             binaryCloudSaveApi.BulkQueryGameBinaryRecords(query, callback, offset, limit);

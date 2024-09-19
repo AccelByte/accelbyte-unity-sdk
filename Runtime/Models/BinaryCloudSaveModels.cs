@@ -58,6 +58,31 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "file_type")] public string FileType;
     }
+    
+    [Preserve]
+    public class UploadBinaryOptionalParameters
+    {
+        public string ContentType;
+    }
+
+    [DataContract, Preserve]
+    public class UploadBinaryRecordResponse
+    {
+        [DataMember(Name = "content_type")] public string ContentType;
+        [DataMember(Name = "file_location")] public string FileLocation;
+        [DataMember(Name = "url")] public string Url;
+        [DataMember(Name = "version")] public int Version;
+    }
+    
+    [DataContract, Preserve]
+    public class SaveBinaryRecordResponse : UploadBinaryRecordResponse
+    {
+    }
+    
+    [DataContract, Preserve]
+    public class RequestUserBinaryRecordPresignedUrlResponse : UploadBinaryRecordResponse
+    {
+    }
 
     [DataContract, Preserve]
     public class BinaryInfo
@@ -79,6 +104,7 @@ namespace AccelByte.Models
         [DataMember(Name = "key")] public string Key;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "set_by")] public string SetBy;
+        [DataMember(Name = "tags")] public string[] Tags;
         [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
         [DataMember(Name = "user_id")] public string UserId;
     }
@@ -91,7 +117,9 @@ namespace AccelByte.Models
         [DataMember(Name = "key")] public string Key;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "set_by")] public string SetBy;
+        [DataMember(Name = "tags")] public string[] Tags;
         [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
+        [DataMember(Name = "ttl_config")] public TTLConfig TtlConfig;
     }
 
     [DataContract, Preserve]

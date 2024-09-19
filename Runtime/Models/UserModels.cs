@@ -70,24 +70,28 @@ namespace AccelByte.Models
     public class TokenData
     {
         [DataMember] public string access_token;
-        [DataMember] public TokenBans[] Bans;
         [DataMember] public string auth_trust_id;
-        [DataMember] public string refresh_token;
-        [DataMember] public int refresh_expires_in;
-        [DataMember] public int expires_in;
-        [DataMember] public string token_type;
-        [DataMember] public string user_id;
+        [DataMember(Name = "bans")] public TokenBans[] Bans;
         [DataMember] public string display_name;
+        [DataMember(Name = "device_id")] public string DeviceId;
+        [DataMember] public int expires_in;
+        [DataMember] public bool is_comply;
+        [DataMember(Name = "jflgs")] public float Jflgs;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "namespace_roles")] public NamespaceRoles[] NamespaceRoles;
-        [DataMember] public Permission[] Permissions;
-        [DataMember] public bool is_comply;
+        [DataMember(Name = "permissions")] public Permission[] Permissions;
         [DataMember] public string platform_id;
         [DataMember] public string platform_user_id;
-        [DataMember] public string[] Roles;
-        [DataMember] public string Scope;
-        [DataMember(Name = "device_id")] public string DeviceId;
+        [DataMember] public int refresh_expires_in;
+        [DataMember] public string refresh_token;
+        [DataMember(Name = "roles")] public string[] Roles;
+        [DataMember(Name = "scope")] public string Scope;
+        [DataMember(Name = "simultaneous_platform_id")] public string SimultaneousPlatformId;
+        [DataMember(Name = "simultaneous_platform_user_id")] public string SimultaneousPlatformUserId;
+        [DataMember] public string token_type;
         [DataMember(Name = "unique_display_name")] public string UniqueDisplayName;
+        [DataMember] public string user_id;
+        [DataMember(Name = "xuid")] public string Xuid;
     }
 
     [DataContract, Preserve]
@@ -160,6 +164,7 @@ namespace AccelByte.Models
         [DataMember(Name = "platformInfos")] public AccountUserPlatformInfo[] PlatformInfos;
         [DataMember] public string platformUserId;
         [DataMember] public string[] roles;
+        [DataMember(Name = "testAccount")] public bool TestAccount;
         [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userId;
         [DataMember] public string userName;
@@ -807,7 +812,7 @@ namespace AccelByte.Models
     public class GeneratedOneTimeCode
     {
         [DataMember] public string oneTimeLinkCode;
-        [DataMember] public string oneTimeLinkURL;
+        [DataMember(Name = "oneTimeLinkUrl")] public string oneTimeLinkURL;
         [DataMember] public int exp;
     }
 

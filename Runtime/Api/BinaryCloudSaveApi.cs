@@ -1,9 +1,9 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -42,22 +42,20 @@ namespace AccelByte.Api
         public void SaveUserBinaryRecord(string key
             , string fileType
             , bool isPublic
-            , ResultCallback<UserBinaryRecord> callback)
+            , ResultCallback<SaveBinaryRecordResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(key))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(key, fileType);
+            if (error!= null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(error);
                 return;
             }
-            if (string.IsNullOrEmpty(fileType))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " cannot be null!"));
-                return;
-            }
+
             if (!ValidateBinaryFileType(fileType))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " contains unsupported file type!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " contains unsupported file type!"));
                 return;
             }
 
@@ -81,8 +79,8 @@ namespace AccelByte.Api
             httpOperator.SendRequest(request
                 , response =>
                 {
-                    var result = response.TryParseJson<UserBinaryRecord>();
-                    callback.Try(result);
+                    var result = response.TryParseJson<SaveBinaryRecordResponse>();
+                    callback?.Try(result);
                 });
         }
 
@@ -92,7 +90,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
 
@@ -110,7 +108,7 @@ namespace AccelByte.Api
                 , response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -122,12 +120,12 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
                 return;
             }
 
@@ -145,7 +143,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -155,7 +153,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (keys == null || keys.Length == 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
                 return;
             }
 
@@ -177,7 +175,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -188,12 +186,12 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (keys == null || keys.Length == 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
                 return;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
                 return;
             }
 
@@ -216,7 +214,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -227,12 +225,12 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
             if (userIds == null || userIds.Length == 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userIds) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userIds) + " cannot be null!"));
                 return;
             }
 
@@ -255,7 +253,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -267,7 +265,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(query))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(query) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(query) + " cannot be null!"));
                 return;
             }
 
@@ -291,7 +289,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedUserBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -303,7 +301,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(userId) + " cannot be null!"));
                 return;
             }
 
@@ -327,7 +325,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedUserBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -339,17 +337,17 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
             if (string.IsNullOrEmpty(contentType))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(contentType) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(contentType) + " cannot be null!"));
                 return;
             }
             if (string.IsNullOrEmpty(fileLocation))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileLocation) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileLocation) + " cannot be null!"));
                 return;
             }
 
@@ -374,7 +372,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -385,7 +383,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
 
@@ -409,7 +407,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -419,7 +417,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
 
@@ -436,28 +434,28 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParse();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
         public void RequestUserBinaryRecordPresignedUrl(string key
             , string fileType
-            , ResultCallback<BinaryInfo> callback)
+            , ResultCallback<RequestUserBinaryRecordPresignedUrlResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
             if (string.IsNullOrEmpty(fileType))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " cannot be null!"));
                 return;
             }
             if (!ValidateBinaryFileType(fileType))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " contains unsupported file type!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(fileType) + " contains unsupported file type!"));
                 return;
             }
 
@@ -480,8 +478,8 @@ namespace AccelByte.Api
             httpOperator.SendRequest(request,
                 response =>
                 {
-                    var result = response.TryParseJson<BinaryInfo>();
-                    callback.Try(result);
+                    var result = response.TryParseJson<RequestUserBinaryRecordPresignedUrlResponse>();
+                    callback?.Try(result);
                 });
         }
 
@@ -491,7 +489,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(key) + " cannot be null!"));
                 return;
             }
 
@@ -508,7 +506,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<GameBinaryRecord>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -518,7 +516,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (keys == null || keys.Length == 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(keys) + " cannot be null!"));
                 return;
             }
 
@@ -540,7 +538,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<ListGameBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
 
@@ -552,7 +550,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(query))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(query) + " cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to execute " + GetType().Name + ". " + nameof(query) + " cannot be null!"));
                 return;
             }
 
@@ -576,7 +574,7 @@ namespace AccelByte.Api
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedGameBinaryRecords>();
-                    callback.Try(result);
+                    callback?.Try(result);
                 });
         }
     }

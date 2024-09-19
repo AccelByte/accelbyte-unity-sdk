@@ -209,6 +209,16 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "data")] public GoalProgressionInfo[] Data;
         [DataMember(Name = "meta")] public ChallengeMetaResponse Meta;
+        [DataMember(Name = "paging")] internal GoalProgressionPaging Paging;
+    }
+    
+    [DataContract, Preserve]
+    public class GoalProgressionPaging
+    {
+        [DataMember(Name = "first")] public string First;
+        [DataMember(Name = "last")] public string Last;
+        [DataMember(Name = "next")] public string Next;
+        [DataMember(Name = "previous")] public string Previous;
     }
 
     [DataContract, Preserve]

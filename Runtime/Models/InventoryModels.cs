@@ -115,7 +115,7 @@ namespace AccelByte.Models
         [DataMember(Name = "createdAt")] public DateTime createdAt;
         [DataMember(Name = "description")] public string Description;
         [DataMember(Name = "id")] public string Id;
-        [DataMember(Name = "initialmaxSlots")] public int InitialMaxSlots;
+        [DataMember(Name = "initialMaxSlots")] public int InitialMaxSlots;
         [DataMember(Name = "maxInstancesPerUser")] public int MaxInstancesPerUser;
         [DataMember(Name = "maxUpgradeSlots")] public int MaxUpgradeSlots;
         [DataMember(Name = "name")] public string Name;
@@ -207,6 +207,7 @@ namespace AccelByte.Models
         [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "userId")] public string UserId;
         [DataMember(Name = "inventoryId")] public string InventoryId;
+        [DataMember(Name = "itemInfo")] public Dictionary<string, object> ItemInfo;
         [DataMember(Name = "platformAvailable")] public bool IsPlatformAvailable;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "createdAt")] public DateTime CreatedAt;
@@ -498,11 +499,12 @@ namespace AccelByte.Models
         [DataMember(Name = "inventoryId")] public string InventoryId;
     }
 
+    [DataContract, Preserve]
     public class InventoryChainingOperationResponse
     {
         [DataMember(Name = "errorDetails")] public Error ErrorDetails;
         [DataMember(Name = "message")] public string Message;
-        [DataMember(Name = "Replayed")] public bool Replayed;
+        [DataMember(Name = "replayed")] public bool Replayed;
         [DataMember(Name = "requestId")] public string RequestId;
     }
 }

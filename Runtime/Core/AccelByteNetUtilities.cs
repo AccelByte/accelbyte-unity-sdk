@@ -87,6 +87,21 @@ namespace AccelByte.Core
             , byte[] data
             , ResultCallback callback)
         {
+            UploadBinaryTo(url, data, null, callback);
+        }
+        
+        /// <summary>
+        /// Upload binary data to given URL.
+        /// </summary>
+        /// <param name="url">URL to upload.</param>
+        /// <param name="data">Data to upload.</param>
+        /// <param name="optionalParameters">Optional parameters to upload binary data.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public static void UploadBinaryTo(string url
+            , byte[] data
+            , UploadBinaryOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
             if (string.IsNullOrEmpty(url))
             {
                 callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, url cannot be null!"));
@@ -98,7 +113,12 @@ namespace AccelByte.Core
                 return;
             }
 
-            coroutineRunner.Run(UploadToAsync(url, data, true, "application/octet-stream", callback));
+            string contentType = "application/octet-stream";
+            if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.ContentType))
+            {
+                contentType = optionalParameters.ContentType;
+            }
+            coroutineRunner.Run(UploadToAsync(url, data, isBinary: true, contentType: contentType, callback: callback));
         }
 
         private static IEnumerator UploadToAsync(string url
