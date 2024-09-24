@@ -33,30 +33,30 @@ namespace AccelByte.Models
     public class TurnServer
     {
         [DataMember(Name = "alias")] public string Alias;
-        [DataMember(Name = "cpu_usage")] public float CpuUsage;
+        [DataMember(Name = "cpu_usage")] public double CpuUsage;
         [DataMember(Name = "mem_usage")] public TurnServerMemoryUsage MemUsage;
-        [DataMember(Name = "net_usage")] public TurnServerNetUsage NetUsage;
+        [DataMember(Name = "netUsage")] public TurnServerNetUsage NetUsage;
         [DataMember] public string ip;
         [DataMember] public int port;
         [DataMember] public int qos_port;
         [DataMember] public string region;
         [DataMember] public TurnServerStatus status;
         [DataMember] public string last_update;
-        [DataMember] public int current_time;
+        [DataMember] public long current_time;
     }
 
     [DataContract, Preserve]
     public class TurnServerMemoryUsage
     {
-        [DataMember(Name = "total")] public int Total;
-        [DataMember(Name = "used")] public int Used;
+        [DataMember(Name = "total")] public ulong Total;
+        [DataMember(Name = "used")] public ulong Used;
     }
 
     [DataContract, Preserve]
     public class TurnServerNetUsage
     {
-        [DataMember(Name = "rx")] public int Rx;
-        [DataMember(Name = "tx")] public int Tx;
+        [DataMember(Name = "rx")] public ulong Rx;
+        [DataMember(Name = "tx")] public ulong Tx;
     }
 
     [DataContract, Preserve]

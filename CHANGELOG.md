@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.25.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.2%0D16.25.1) (2024-09-24)
+
+
+### Bug Fixes
+
+* fix some field types of TurnManager model ([f81eafd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f81eafd28766f299f85d8d6c0bad69790de20943))
+
 ### [16.25.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.1%0D16.25.0) (2024-09-19)
 
 
