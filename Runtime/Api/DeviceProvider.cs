@@ -22,7 +22,7 @@ namespace AccelByte.Api
 #if UNITY_SWITCH && !UNITY_EDITOR
         public static readonly string DefaultGeneratedIdCacheFileDir = "AccelByte/";
 #else
-        public static string DefaultGeneratedIdCacheFileDir = $"{Application.persistentDataPath}/AccelByte/";
+        public static string DefaultGeneratedIdCacheFileDir = $"{GameCommonInfo.PersistenPath}/AccelByte/";
 #endif
         public static string CacheFileName = "DeviceId";
 

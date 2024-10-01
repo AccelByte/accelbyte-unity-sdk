@@ -59,7 +59,33 @@ namespace AccelByte.Core
 
         public void ClearCookies(Uri uri)
         {
-            UnityWebRequest.ClearCookieCache(uri);
+            ClearCookiesSafeThread(uri);
+        }
+        
+        internal Models.AccelByteResult<Error> ClearCookiesSafeThread(Uri uri)
+        {
+            var retval = new Models.AccelByteResult<Error>();
+            try
+            {
+                if (heartBeat != null)
+                {
+                    heartBeat.Wait(new WaitAFrameCommand(cancellationToken: new System.Threading.CancellationTokenSource().Token, onDone: () =>
+                    {
+                        UnityWebRequest.ClearCookieCache(uri);  
+                        retval.Resolve();  
+                    }));
+                }
+                else
+                {
+                    UnityWebRequest.ClearCookieCache(uri);
+                    retval.Resolve();
+                }
+            }
+            catch (Exception ex)
+            {
+                retval.Reject(new Error(ErrorCode.ErrorFromException, ex.Message));
+            }
+            return retval;
         }
 
         private HttpSendResult ParseWebRequestResult(UnityWebRequest unityWebRequest)
@@ -94,6 +120,5 @@ namespace AccelByte.Core
 #endif
             return new HttpSendResult(callBackResponse, callBackError);
         }
-
     }
 }

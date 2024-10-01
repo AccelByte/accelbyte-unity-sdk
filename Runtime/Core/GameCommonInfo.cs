@@ -11,5 +11,8 @@ namespace AccelByte.Core
         public static string ProductName = Application.productName;
         public static string PlatformName = Application.platform.ToString();
         public static string DeviceType = SystemInfo.deviceType.ToString();
+#if !UNITY_SWITCH || UNITY_EDITOR
+        public static string PersistenPath = $"{Application.persistentDataPath}";
+#endif
     }
 }

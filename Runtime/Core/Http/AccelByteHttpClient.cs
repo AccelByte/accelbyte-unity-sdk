@@ -46,7 +46,7 @@ namespace AccelByte.Core
             SetLogger(logger);
             if(requestSender != null)
             {
-                this.sender = requestSender;
+                this.Sender = requestSender;
             }
             else
             {
@@ -57,7 +57,7 @@ namespace AccelByte.Core
                 CoreHeartBeat coreHeartBeat = new CoreHeartBeat();
                 defaultSender.SetLogger(logger);
                 defaultSender.SetHeartBeat(coreHeartBeat);
-                this.sender = defaultSender;
+                this.Sender = defaultSender;
             }
             this.SetRetryParameters();
         }
@@ -119,10 +119,7 @@ namespace AccelByte.Core
 
         public void ClearCookies()
         {
-            if (this.baseUri != null)
-            {
-                this.sender.ClearCookies(this.baseUri);
-            }
+            this.Sender.ClearCookies(this.baseUri);
         }
 
         public void SetBaseUri(Uri baseUri)
@@ -134,7 +131,7 @@ namespace AccelByte.Core
         {
             if(newRequestSender != null)
             {
-                this.sender = newRequestSender;
+                this.Sender = newRequestSender;
             }
         }
 
@@ -288,7 +285,7 @@ namespace AccelByte.Core
                     {
                         sendResult = result;
                     };
-                    sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
+                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
                     while (sendResult == null)
                     {
                         await AccelByteHttpHelper.HttpDelayOneFrame;
@@ -467,7 +464,7 @@ namespace AccelByte.Core
                     {
                         sendResult = result;
                     };
-                    sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
+                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
                     yield return new WaitUntil(() => sendResult != null);
                     httpResponse = sendResult.Value.CallbackResponse;
                     error = sendResult.Value.CallbackError;
@@ -669,7 +666,11 @@ namespace AccelByte.Core
             isRequestingNewAccessToken = isRequesting; 
         }
 
-        private IHttpRequestSender sender;
+        internal IHttpRequestSender Sender
+        {
+            get;
+            private set;
+        }
         private uint maxRetries;
         private uint totalTimeoutMs;
         private uint initialDelayMs;

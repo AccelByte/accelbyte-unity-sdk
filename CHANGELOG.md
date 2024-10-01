@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.25.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.3%0D16.25.2) (2024-10-01)
+
+
+### Bug Fixes
+
+* support http client clear cookies on multi-thread ([3c42024](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3c420244620f17d79e1f2c5093eb9e9ec010c26a))
+
 ### [16.25.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.2%0D16.25.1) (2024-09-24)
 
 
