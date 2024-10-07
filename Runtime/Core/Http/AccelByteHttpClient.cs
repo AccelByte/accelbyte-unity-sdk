@@ -33,7 +33,7 @@ namespace AccelByte.Core
         
         public event Action<IHttpRequest> NetworkErrorOccured;
 
-        public event Action<string, Action<string>> BearerAuthRejected;
+        public event Func<string, Action<string>, bool> BearerAuthRejected;
 
         public event Action<string> UnauthorizedOccured;
 
@@ -138,25 +138,30 @@ namespace AccelByte.Core
         public void OnBearerAuthRejected(Action<string> callback)
         {
             PauseBearerAuthRequest();
-            if (!IsRequestingNewAccessToken())
+            if (IsRequestingNewAccessToken())
             {
-                if (BearerAuthRejected == null)
+                return;
+            }
+            
+            if (BearerAuthRejected == null)
+            {
+                callback?.Invoke(null);
+                return;
+            }
+            
+            bool isRequestAccessTokenStart = BearerAuthRejected.Invoke(accessToken, result =>
+            {
+                SetRequestingNewAccessToken(false);
+                if (result != null)
                 {
-                    callback?.Invoke(null);
+                    ResumeBearerAuthRequest();
                 }
-                else
-                {
-                    SetRequestingNewAccessToken(true);
-                    BearerAuthRejected?.Invoke(accessToken, result =>
-                    {
-                        SetRequestingNewAccessToken(false);
-                        if (result != null)
-                        {
-                            ResumeBearerAuthRequest();
-                        }
-                        callback?.Invoke(result);
-                    });
-                }
+                callback?.Invoke(result);
+            });
+            
+            if (isRequestAccessTokenStart)
+            {
+                SetRequestingNewAccessToken(true);
             }
         }
 

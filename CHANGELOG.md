@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [16.25.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.4%0D16.25.3) (2024-10-07)
+
+
+### Bug Fixes
+
+* fix unathorized http request null exception ([565aed8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/565aed88cb8bcb5796ff61e53b4115e28727af3f))
+
 ### [16.25.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.3%0D16.25.2) (2024-10-01)
 
 

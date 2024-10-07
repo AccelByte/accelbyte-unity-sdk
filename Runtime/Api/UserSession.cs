@@ -158,14 +158,19 @@ namespace AccelByte.Api
             SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, nextRefreshInSeconds);
         }
 
-        private void BearerAuthRejected
+        private bool BearerAuthRejected
             ( string accessToken
             , Action<string> callback )
         {
+            if (tokenData == null || string.IsNullOrEmpty(tokenData.access_token) || string.IsNullOrEmpty(tokenData.refresh_token))
+            {
+                return false;
+            }
+            
             if (accessToken == tokenData?.access_token)
             {
                 SessionMaintainer?.Stop();
-                CallRefresh?.Invoke(tokenData.refresh_token, result =>
+                CallRefresh?.Invoke(tokenData?.refresh_token, result =>
                 {
                     string newAccessToken = null;
                     if (!result.IsError && result.Value != null)
@@ -176,6 +181,11 @@ namespace AccelByte.Api
 
                     callback?.Invoke(newAccessToken);
                 });
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
