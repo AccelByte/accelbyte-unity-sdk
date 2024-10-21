@@ -55,14 +55,14 @@ namespace AccelByte.Server
             }
 
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithBearerAuth(AuthToken)
                     .WithContentType(MediaType.ApplicationJson)
                     .Accepts(MediaType.ApplicationJson)
                     .WithBody(payload.ToUtf8Json())
                     .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<BinaryInfo>();
 
@@ -92,7 +92,7 @@ namespace AccelByte.Server
             }
 
             var builder = HttpRequestBuilder.CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithPathParam("key", key)
                     .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson);
@@ -100,7 +100,7 @@ namespace AccelByte.Server
             IHttpRequest request = builder.GetResult();
 
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -123,13 +123,13 @@ namespace AccelByte.Server
             }
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithPathParam("key", key)
                     .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson)
                     .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GameBinaryRecord>();
 
@@ -161,7 +161,7 @@ namespace AccelByte.Server
             }
 
             var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson)
                     .WithQueryParam("offset", offset.ToString())
@@ -179,7 +179,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PaginatedGameBinaryRecords>();
 
@@ -215,7 +215,7 @@ namespace AccelByte.Server
             };
 
             var builder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}/presigned")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithPathParam("key", key)
                     .WithBearerAuth(AuthToken)
                     .WithBody(body.ToUtf8Json())
@@ -224,7 +224,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<BinaryInfo>();
 
@@ -263,7 +263,7 @@ namespace AccelByte.Server
             };
 
             var request = HttpRequestBuilder.CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithPathParam("key", key)
                     .WithBearerAuth(AuthToken)
                     .WithContentType(MediaType.ApplicationJson)
@@ -271,7 +271,7 @@ namespace AccelByte.Server
                     .Accepts(MediaType.ApplicationJson)
                     .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GameBinaryRecord>();
 
@@ -304,7 +304,7 @@ namespace AccelByte.Server
             }
 
             var builder = HttpRequestBuilder.CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}/metadata")
-                    .WithPathParam("namespace", serverConfig.Namespace)
+                    .WithPathParam("namespace", ServerConfig.Namespace)
                     .WithPathParam("key", key)
                     .WithBearerAuth(AuthToken)
                     .WithContentType(MediaType.ApplicationJson)
@@ -329,7 +329,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GameBinaryRecord>();
 

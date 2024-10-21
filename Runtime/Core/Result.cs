@@ -569,10 +569,14 @@ namespace AccelByte.Core
         bool IsError { get; }
     }
 
-    public class Result<T, U>  
+    [System.Runtime.Serialization.DataContract, UnityEngine.Scripting.Preserve]
+    public class Result<T, U>
     {
-        public T Value { get; }
-        public U Error { get; }
+        [System.Runtime.Serialization.DataMember]
+        public readonly T Value;
+
+        [System.Runtime.Serialization.DataMember]
+        public readonly U Error;
         public bool IsError => this.Error != null; 
 
         public static Result<T, U> CreateOk() { return new Result<T, U>(); }
@@ -589,7 +593,10 @@ namespace AccelByte.Core
             return value != null ? new Result<T, U>(value) : new Result<T, U>(); 
         }
 
-        private Result() { }
+        private Result()
+        {
+            
+        }
 
         private Result(U error)
         {
@@ -602,32 +609,64 @@ namespace AccelByte.Core
         }
     }
 
+    [System.Runtime.Serialization.DataContract, UnityEngine.Scripting.Preserve]
     public class Result<T> : IResult
     {
-        public Error Error { get; }
-        public T Value { get; }
+        [System.Runtime.Serialization.DataMember]
+        public readonly T Value;
+
+        public Error Error
+        {
+            get
+            {
+                return error;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMember]
+        private Error error; 
 
         public bool IsError => this.Error != null;
 
-        public static Result<T> CreateOk(T value) { return new Result<T>(null, value); }
+        public static Result<T> CreateOk(T value)
+        {
+            return new Result<T>(null, value);
+        }
 
         public static Result<T> CreateError(ErrorCode errorCode, string errorMessage = null, object messageVariables = null)
         {
             return new Result<T>(new Error(errorCode, errorMessage, messageVariables), default);
         }
 
-        public static Result<T> CreateError(Error error) { return new Result<T>(error, default); }
+        public static Result<T> CreateError(Error error)
+        {
+            return new Result<T>(error, default);
+        }
+        
+        private Result()
+        {
+        }
 
         private Result(Error error, T value)
         {
-            this.Error = error;
+            this.error = error;
             this.Value = value;
         }
     }
 
+    [System.Runtime.Serialization.DataContract, UnityEngine.Scripting.Preserve]
     public class Result : IResult
     {
-        public Error Error { get; }
+        public Error Error
+        {
+            get
+            {
+                return error;
+            }
+        }
+
+        [System.Runtime.Serialization.DataMember]
+        private Error error; 
 
         public bool IsError => this.Error != null;
 
@@ -640,6 +679,14 @@ namespace AccelByte.Core
 
         public static Result CreateError(Error error) { return new Result(error); }
 
-        private Result(Error error) { this.Error = error; }
+        private Result()
+        {
+            error = null;
+        }
+        
+        private Result(Error error)
+        {
+            this.error = error;
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using Newtonsoft.Json;
+using System.Threading;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -26,12 +27,13 @@ namespace AccelByte.Api
 
         private List<TelemetryBody> eventList = new List<TelemetryBody>();
         
-        private bool isSchedulerRunning = false;
         private static readonly TimeSpan minimumTelemetryInterval = 
             new TimeSpan(0, 0, 5);
+        private CancellationTokenSource cancelationTokenSource = null;
 
         IAccelByteDataStorage cacheStorage;
         string cacheTableName;
+        private WaitTimeCommand telemetryLoopCommand;
 
         internal TimeSpan TelemetryInterval
         {
@@ -73,7 +75,11 @@ namespace AccelByte.Api
 
         ~GameTelemetry()
         {
-            isSchedulerRunning = false;
+            if (cancelationTokenSource != null)
+            {
+                cancelationTokenSource.Cancel();
+                cancelationTokenSource.Dispose();
+            }
         }
 
         /// <summary>
@@ -129,7 +135,6 @@ namespace AccelByte.Api
             if (SharedMemory != null && SharedMemory.TimeManager != null)
             {
                 telemetryBody.SetTimeReference(SharedMemory.TimeManager.TimelapseSinceSessionStart.Elapsed);
-                
             }
             
             if (immediateEvents.Contains(telemetryBody.EventName))
@@ -144,7 +149,7 @@ namespace AccelByte.Api
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
                 AppendEventToCache(telemetryBody);
 
-                if (!isSchedulerRunning)
+                if (cancelationTokenSource == null)
                 {
                     RunPeriodicTelemetry();
                 }
@@ -167,7 +172,7 @@ namespace AccelByte.Api
                 }
 
                 queue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(jobQueue);
-                jobQueue.Clear();
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
             }
 
             var queueBackup = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(queue);
@@ -233,25 +238,54 @@ namespace AccelByte.Api
         {
             lock(jobQueue)
             {
-                jobQueue.Clear();
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
             }
         }
 
-        private async void RunPeriodicTelemetry()
+        private void RunPeriodicTelemetry()
         {
-            if(isSchedulerRunning)
+            if(cancelationTokenSource != null)
             {
                 return;
             }
 
-            isSchedulerRunning = true;
-            while (isSchedulerRunning && session != null && session.IsValid())
-            {
-                SendTelemetryBatch(callback: null);
+            SendTelemetryBatch(callback: null);
+            
+            cancelationTokenSource = new CancellationTokenSource();
+            telemetryLoopCommand = new WaitTimeCommand(waitTime: telemetryInterval.TotalSeconds
+                , cancellationToken: cancelationTokenSource.Token
+                , onDone: TelemetryLoop);
+            SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
+        }
 
-                await System.Threading.Tasks.Task.Delay(telemetryInterval);
+        private void TelemetryLoop()
+        {
+            if (cancelationTokenSource == null || cancelationTokenSource.IsCancellationRequested)
+            {
+                return;
             }
-            isSchedulerRunning = false;
+            
+            if (session == null || !session.IsValid())
+            {
+                cancelationTokenSource.Dispose();
+                cancelationTokenSource = null;
+                return;
+            }
+
+            lock (jobQueue)
+            {
+                if (jobQueue == null || jobQueue.IsEmpty)
+                {
+                    cancelationTokenSource.Dispose();
+                    cancelationTokenSource = null;
+                    return;
+                }   
+            }
+
+            SendTelemetryBatch(callback: null);
+
+            telemetryLoopCommand.ResetTime();
+            SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
         }
 
         internal void LoadEventsFromCache(Action<List<TelemetryBody>> onLoadCacheDone)

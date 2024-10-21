@@ -6,6 +6,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server.Interface;
 using AccelByte.Utils;
+using System;
 
 namespace AccelByte.Server
 {
@@ -44,7 +45,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<DeleteUserInventoryItemResponse[]>();
 
@@ -80,7 +81,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UpdateUserInventoryItemResponse[]>();
 
@@ -116,7 +117,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserItem>();
 
@@ -149,7 +150,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<ServerIntegrationConfiguration>();
 
@@ -182,7 +183,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryConfiguration>();
 
@@ -215,7 +216,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryTag>();
 
@@ -248,7 +249,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryItemType>();
 
@@ -281,7 +282,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserInventory>();
 
@@ -314,7 +315,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 
@@ -347,7 +348,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 
@@ -379,7 +380,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 
@@ -413,7 +414,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 
@@ -448,7 +449,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryConfigurationsPagingResponse>();
 
@@ -482,7 +483,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<ServerIntegrationConfigurationsPagingResponse>();
 
@@ -515,7 +516,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryConfiguration>();
 
@@ -549,7 +550,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryTagsPagingResponse>();
 
@@ -583,7 +584,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<ItemTypesPagingResponse>();
 
@@ -619,7 +620,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserInventoriesPagingResponse>();
 
@@ -651,7 +652,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserInventory>();
 
@@ -664,6 +665,75 @@ namespace AccelByte.Server
             });
         }
 
+        public void GetUserInventoryAllItems(string inventoryId
+            , GetUserInventoryAllItemsOptionalParameters optionalParameters
+            , ResultCallback<UserItemsPagingResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/inventories/{inventoryId}/items")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("inventoryId", inventoryId);
+            
+            if (optionalParameters != null)
+            {
+                UserItemSortBy sortBy = optionalParameters.SortBy;
+                builder.WithQueryParam("sortBy", ConverterUtils.EnumToDescription(sortBy));
+                
+                if (optionalParameters.Limit > 0)
+                {
+                    builder.WithQueryParam("limit", optionalParameters.Limit.ToString());
+                }
+                
+                builder.WithQueryParam("offset", optionalParameters.Offset.ToString());
+
+                string collectedTags = null;
+                if (!string.IsNullOrEmpty(optionalParameters.Tags))
+                {
+                    collectedTags += optionalParameters.Tags;
+                }
+                
+                if (optionalParameters.TagQueryBuilder != null)
+                {
+                    collectedTags += optionalParameters.TagQueryBuilder.Build();
+                }
+
+                if (!string.IsNullOrEmpty(collectedTags))
+                {
+                    builder.WithQueryParam("tags", collectedTags);
+                }
+
+                if (!string.IsNullOrEmpty(optionalParameters.SourceItemId))
+                {
+                    builder.WithQueryParam("sourceItemId", optionalParameters.SourceItemId);
+                }
+            }
+
+            var httpRequest = builder.GetResult();
+
+            HttpOperator.SendRequest(httpRequest, response =>
+            {
+                var result = response.TryParseJson<UserItemsPagingResponse>();
+
+                if (result.IsError)
+                {
+                    callback?.TryError(result.Error);
+                    return;
+                }
+                callback?.Invoke(result);
+            });
+        }
+
+        [Obsolete("This interface is deprecated, and will be removed on AGS 3.81. Please use AccelByte.Server.ServerInventory.GetUserInventoryAllItems")]
         public void GetUserInventoryAllItems(string inventoryId, ResultCallback<UserItemsPagingResponse> callback, UserItemSortBy sortBy = UserItemSortBy.CreatedAt, int limit = 25, int offset = 0, string sourceItemId = "", TagQueryBuilder tagBuilder = null, int? quantity = null)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -690,7 +760,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserItemsPagingResponse>();
 
@@ -725,7 +795,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserItem>();
 
@@ -758,7 +828,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryChainingOperationResponse>();
 
@@ -792,7 +862,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserItem>();
 
@@ -828,7 +898,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserItem>();
 
@@ -861,7 +931,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 
@@ -896,7 +966,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<ServerIntegrationConfiguration>();
 
@@ -931,7 +1001,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<ServerIntegrationConfiguration>();
 
@@ -966,7 +1036,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<InventoryConfiguration>();
 
@@ -1000,7 +1070,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParseJson<UserInventory>();
 
@@ -1034,7 +1104,7 @@ namespace AccelByte.Server
 
             var httpRequest = builder.GetResult();
 
-            httpOperator.SendRequest(httpRequest, response =>
+            HttpOperator.SendRequest(httpRequest, response =>
             {
                 var result = response.TryParse();
 

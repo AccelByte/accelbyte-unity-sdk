@@ -7,7 +7,7 @@ using System;
 
 namespace AccelByte.Api
 {
-    [Obsolete("Please use ClientGameTelemetryApi api, will be removed on September release")]
+    [Obsolete("Please use ClientGameTelemetryApi api, will be removed on AGS 3.81")]
     public class AnalyticsApi : ClientGameTelemetryApi
     {
         internal AnalyticsApi(IHttpClient inHttpClient, 

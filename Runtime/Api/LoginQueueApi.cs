@@ -51,7 +51,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(ticketId)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<RefreshTicketResponse>();
                 callback.Try(result);
@@ -75,7 +75,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(ticketId)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);

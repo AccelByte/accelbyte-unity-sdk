@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -169,6 +169,16 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public DateTime createdAt;
         [DataMember] public string matchPool;
+    }
+
+    [DataContract, Preserve]
+    public class MatchmakingV2MatchmakingCanceledNotification
+    {
+        [DataMember(Name = "ticketId")] public string TicketId;
+        [DataMember(Name = "reason")] public string Reason;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "partyId")] public string PartyId;
+        [DataMember(Name = "userIds")] public string[] UserIds;
     }
 
     [DataContract, Preserve]

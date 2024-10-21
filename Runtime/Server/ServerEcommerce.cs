@@ -13,7 +13,7 @@ namespace AccelByte.Server
 {
     public class ServerEcommerce : WrapperBase
     {
-        private readonly ServerEcommerceApi api;
+        internal readonly ServerEcommerceApi Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
@@ -33,7 +33,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct Ecommerce manager; api is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct Ecommerce manager; coroutineRunner is null!");
 
-            api = inApi;
+            Api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
@@ -237,7 +237,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetUserEntitlementById(entitlementId, callback));
+                Api.GetUserEntitlementById(entitlementId, callback));
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GrantUserEntitlement(
+                Api.GrantUserEntitlement(
                     userId,
                     grantUserEntitlementsRequest,
                     cb =>
@@ -300,7 +300,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.CreditUserWallet(
+                Api.CreditUserWallet(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
@@ -340,7 +340,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.CreditUserWalletV2(
+                Api.CreditUserWalletV2(
                     userId,
                     currencyCode,
                     creditUserWalletRequest,
@@ -378,7 +378,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-               api.FulfillUserItem(
+               Api.FulfillUserItem(
                    userId,
                    fulfillmentRequest,
                    cb =>
@@ -407,7 +407,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetStoreList(callback));
+                Api.GetStoreList(callback));
         }
         
         /// <summary>
@@ -429,7 +429,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.QueryItemsByCriteria(criteria, callback));
+                Api.QueryItemsByCriteria(criteria, callback));
         }
         
         /// <summary>
@@ -457,7 +457,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.QueryItemsByCriteriaV2(criteria, callback));
+                Api.QueryItemsByCriteriaV2(criteria, callback));
         }
     }
 }

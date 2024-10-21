@@ -235,6 +235,7 @@ namespace AccelByte.Api
             return retval;
         }
 
+        [Obsolete("Deprecated, please use GetAnalyticService() to ensure user presence. This interface will be removed on AGS 3.81")]
         public static PresenceBroadcastEvent GetPresenceBroadcastEvent()
         {
             PresenceBroadcastEvent retval = AccelByteSDK.GetClientRegistry().GetApi().GetPresenceBroadcastEvent();

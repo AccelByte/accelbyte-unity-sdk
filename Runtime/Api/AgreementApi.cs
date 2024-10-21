@@ -207,7 +207,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);

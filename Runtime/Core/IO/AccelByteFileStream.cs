@@ -40,14 +40,14 @@ namespace AccelByte.Core
         {
             Action writeAction = () =>
             {
-                string pathDirectory = Path.GetDirectoryName(path);
-                if(!Directory.Exists(pathDirectory))
-                {
-                    Directory.CreateDirectory(pathDirectory);
-                }
-
                 try
                 {
+                    string pathDirectory = Path.GetDirectoryName(path);
+                    if(!Directory.Exists(pathDirectory))
+                    {
+                        Directory.CreateDirectory(pathDirectory);
+                    }
+                    
                     if (formatter != null)
                     {
                         using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
@@ -86,14 +86,14 @@ namespace AccelByte.Core
 
         public async void WriteFileAsync(string content, string path, System.Action<bool> onDone)
         {
-            string pathDirectory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(pathDirectory))
-            {
-                Directory.CreateDirectory(pathDirectory);
-            }
-
             try
             {
+                string pathDirectory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(pathDirectory))
+                {
+                    Directory.CreateDirectory(pathDirectory);
+                }
+                
                 using (var outputFile = new System.IO.StreamWriter(path))
                 {
                     await outputFile.WriteAsync(content);
@@ -220,6 +220,7 @@ namespace AccelByte.Core
             {
                 Directory.Delete(directory, true);
                 onDone?.Invoke(true);
+                return;
             }
             onDone?.Invoke(false);
         }

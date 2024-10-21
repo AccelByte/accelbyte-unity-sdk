@@ -31,7 +31,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetCurrentTime(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , @namespace: Namespace_
                 , baseUrl: BaseUrl
                 , callback);
@@ -41,7 +41,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetCountryGroups(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: true
@@ -53,7 +53,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetLanguages(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: true
@@ -65,7 +65,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetTimeZones(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: true
@@ -96,7 +96,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup[]>();
                 callback.Try(result);
@@ -121,7 +121,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup>();
                 callback.Try(result);
@@ -147,7 +147,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup>();
                 callback.Try(result);
@@ -171,7 +171,7 @@ namespace AccelByte.Server
 
             IHttpRequest request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);

@@ -11,7 +11,7 @@ namespace AccelByte.Server
 {
     public class ServerMatchmakingV2 : WrapperBase
     {
-        private readonly ServerMatchmakingV2Api _matchmakingV2Api;
+        internal ServerMatchmakingV2Api Api;
         private readonly ISession _session;
         private readonly CoroutineRunner _coroutineRunner;
 
@@ -23,7 +23,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct MatchmakingV2 manager; inApi is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct MatchmakingV2 manager; inCoroutineRunner is null!");
 
-            _matchmakingV2Api = inApi;
+            Api = inApi;
             _session = inSession;
             _coroutineRunner = inCoroutineRunner;
         }
@@ -49,7 +49,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _matchmakingV2Api.AcceptBackfillProposal(backfillProposal, stopBackfilling, cb =>
+                Api.AcceptBackfillProposal(backfillProposal, stopBackfilling, cb =>
                 {
                     SendPredefinedEvent(backfillProposal, RequestType.Accept);
                     HandleCallback(cb, callback);
@@ -76,7 +76,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _matchmakingV2Api.RejectBackfillProposal(backfillProposal, stopBackfilling, cb =>
+                Api.RejectBackfillProposal(backfillProposal, stopBackfilling, cb =>
                 {
                     SendPredefinedEvent(backfillProposal, RequestType.Reject);
                     HandleCallback(cb, callback);

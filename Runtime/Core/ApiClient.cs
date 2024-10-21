@@ -76,6 +76,12 @@ namespace AccelByte.Core
                 user.OnLoginSuccess = null;
                 user.OnLogout = null;
             }
+            
+            Api.Session sessionWrapper = GetSession(autoCreate);
+            if (sessionWrapper != null)
+            {
+                sessionWrapper.Reset();
+            }
 
             if (session != null)
             {
@@ -220,14 +226,23 @@ namespace AccelByte.Core
         public UGC GetUgc() { return GetApi<UGC, UGCApi>(); }
         public Reporting GetReporting() { return GetApi<Reporting, ReportingApi>(); }
         public SeasonPass GetSeasonPass() { return GetApi<SeasonPass, SeasonPassApi>(); }
-        public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
         public TurnManager GetTurnManager() { return GetApi<TurnManager, TurnManagerApi>(); }
         public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, ClientMiscellaneousApi>(); }
-        public Session GetSession() { return GetApi<Session, SessionApi>(); }
+
+        [Obsolete(
+            "This interface and its APIs are deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session instead.")]
+        public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
+
+        public Session GetSession(bool autoCreate = true)
+        {
+            Session retval = GetApi<Session, SessionApi>(autoCreate);
+            return retval;
+        }
         public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
         public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
         
-        [Obsolete("Duplicated Service. Please use GetAnalyticsService() to send telemetry data. Will be removed on September release")]
+        [Obsolete("Duplicated Service. Please use AccelByteSDK.GetClientRegistry().GetPresenceBroadcastEvent() to handle presence event. This interface will be removed on AGS 3.81")]
         public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, ClientGameTelemetryApi>(); }

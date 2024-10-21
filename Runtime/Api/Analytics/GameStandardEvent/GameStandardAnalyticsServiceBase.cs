@@ -13,7 +13,7 @@ namespace AccelByte.Api
 #if UNITY_SWITCH && !UNITY_EDITOR
         internal static readonly string DefaultCacheDirectory = "AccelByte/";
 #else
-        internal static readonly string DefaultCacheDirectory = $"{Application.persistentDataPath}/AccelByte/{Application.productName}/";
+        internal static readonly string DefaultCacheDirectory = $"{GameCommonInfo.PersistentPath}/AccelByte/{GameCommonInfo.ProductName}/";
 #endif
         internal GameStandardEventScheduler<TAnalyticsWrapper> Scheduler
         {

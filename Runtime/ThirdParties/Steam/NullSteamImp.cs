@@ -31,7 +31,7 @@ namespace AccelByte.ThirdParties.Steam
 
         public AccelByteResult<GetSteamTokenResult, Error> GetAccelByteSteamToken()
         {
-            return GetAccelByteSteamToken(serviceIdentity: ISteamImp.AccelByteServiceIdentity);
+            return GetAccelByteSteamToken(serviceIdentity: SteamWrapperInfo.AccelByteServiceIdentity);
         }
 
         public AccelByteResult<GetSteamTokenResult, Error> GetAccelByteSteamToken(string serviceIdentity)

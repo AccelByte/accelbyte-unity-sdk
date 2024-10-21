@@ -44,7 +44,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponse>();
                 if (!result.IsError)
@@ -81,7 +81,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalResponse>();
                 if (!result.IsError)
@@ -113,7 +113,7 @@ namespace AccelByte.Api
                 .WithQueryParam("limit", limit.ToString())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalProgressionResponse>();
                 if (!result.IsError)
@@ -150,7 +150,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserRewards>();
                 if (!result.IsError)
@@ -193,7 +193,7 @@ namespace AccelByte.Api
                 .WithQueryParam("limit", limit.ToString())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalProgressionResponse>();
                 if (!result.IsError)
@@ -217,7 +217,7 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Config.Namespace)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 if (!result.IsError)
@@ -244,7 +244,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserReward[]>();
                 if (!result.IsError)

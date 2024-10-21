@@ -1,10 +1,11 @@
-// Copyright (c) 2020 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 
 namespace AccelByte.Api
 {
@@ -28,30 +29,21 @@ namespace AccelByte.Api
 
         public IEnumerator GetAllQosServers( ResultCallback<QosServerList> callback )
         {
-            var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/public/qos")
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-            
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-            
-            var result = response.TryParseJson<QosServerList>();
-            callback?.Try(result);
+            RequestGetAllQosServers(callback);
+            yield break;
         }
         
         internal void RequestGetAllQosServers( ResultCallback<QosServerList> callback )
         {
+            Report.GetFunctionLog(GetType().Name);
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/qos")
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
             
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);
@@ -60,34 +52,34 @@ namespace AccelByte.Api
 
         public IEnumerator GetQosServers(ResultCallback<QosServerList> callback)
         {
-            var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
-                .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("status", "ACTIVE")
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+            GetQosServerOptionalParameters optionalParams = new GetQosServerOptionalParameters();
+            optionalParams.Status = QosStatus.Active;
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<QosServerList>();
-            callback?.Try(result);
+            RequestGetQosServers(optionalParams, callback);
+            yield break;
         }
 
-        internal void RequestGetQosServers(ResultCallback<QosServerList> callback)
+        internal void RequestGetQosServers(GetQosServerOptionalParameters optionalParams, ResultCallback<QosServerList> callback)
         {
-            var request = HttpRequestBuilder
+            Report.GetFunctionLog(GetType().Name);
+
+            var httpBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("status", "ACTIVE")
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            httpOperator.SendRequest(request, response =>
+            if (optionalParams != null)
+            {
+                if (optionalParams.Status != null)
+                {
+                    httpBuilder.WithQueryParam("status", ConverterUtils.EnumToDescription(optionalParams.Status));
+                }
+            }
+
+            var request = httpBuilder.GetResult();
+
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);

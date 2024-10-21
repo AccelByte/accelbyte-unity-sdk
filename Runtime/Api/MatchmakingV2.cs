@@ -3,10 +3,9 @@
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
 using AccelByte.Models;
-using JetBrains.Annotations;
 using System;
 using System.Collections;
-using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -35,12 +34,26 @@ namespace AccelByte.Api
         /// Creates a new request for matchmaking
         /// </summary>
         /// <param name="matchPoolName">Name of target match pool</param>
+        /// <param name="callback">
+        /// Returns a Result that contain MatchmakingV2CreateTicketResponse via callback when completed.
+        /// </param>
+        public void CreateMatchmakingTicket(string matchPoolName,
+            ResultCallback<MatchmakingV2CreateTicketResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            CreateMatchmakingTicket(matchPoolName, null, callback);
+        }
+        
+        /// <summary>
+        /// Creates a new request for matchmaking
+        /// </summary>
+        /// <param name="matchPoolName">Name of target match pool</param>
         /// <param name="optionalParams">Optional parameters in matchmaking ticket request.</param>
         /// <param name="callback">
         /// Returns a Result that contain MatchmakingV2CreateTicketResponse via callback when completed.
         /// </param>
         public void CreateMatchmakingTicket(string matchPoolName
-            , [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams,
+            , MatchmakingV2CreateTicketRequestOptionalParams optionalParams,
             ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -164,14 +177,25 @@ namespace AccelByte.Api
         /// Start polling for matchmaking ticket status when Enable Matchmaking Ticket Check is enabled on client config
         /// </summary>
         /// <param name="ticketId">String ID of ticket to poll status for.</param>
-        internal async void StartMatchmakingTicketPoll(string ticketId, string matchPoolName)
+        /// <param name="matchPoolName">Matchpool name used in matchmaking</param>
+        internal void StartMatchmakingTicketPoll(string ticketId, string matchPoolName)
+        {
+            coroutineRunner.Run(StartMatchmakingTicketPollAsync(ticketId, matchPoolName));
+        }
+
+        /// <summary>
+        /// Start polling for matchmaking ticket status when Enable Matchmaking Ticket Check is enabled on client config
+        /// </summary>
+        /// <param name="ticketId">String ID of ticket to poll status for.</param>
+        /// <param name="matchPoolName">Matchpool name used in matchmaking</param>
+        internal IEnumerator StartMatchmakingTicketPollAsync(string ticketId, string matchPoolName)
         {
             if (!matchmakingV2Api.Config.EnableMatchmakingTicketCheck)
             {
-                return;
-            }    
+                yield break;
+            }
 
-            await Task.Delay(matchmakingV2Api.Config.MatchmakingTicketCheckInitialDelay);
+            yield return new WaitForSeconds(matchmakingV2Api.Config.MatchmakingTicketCheckInitialDelay / 1000f);
 
             bool shouldContinuePolling = true;
             while (shouldContinuePolling)
@@ -216,7 +240,7 @@ namespace AccelByte.Api
 
                 if (shouldContinuePolling)
                 {
-                    await Task.Delay(matchmakingV2Api.Config.MatchmakingTicketCheckPollRate);
+                    yield return new WaitForSeconds(matchmakingV2Api.Config.MatchmakingTicketCheckPollRate / 1000f);
                 }
             }
         }
@@ -232,7 +256,7 @@ namespace AccelByte.Api
             return payload;
         }
 
-        IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result, string matchPoolName, [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams)
+        IAccelByteTelemetryPayload CreatePayload<T>(Result<T> result, string matchPoolName, MatchmakingV2CreateTicketRequestOptionalParams optionalParams)
         {
             IAccelByteTelemetryPayload payload = null;
             string localUserId = session.UserId;
@@ -253,7 +277,7 @@ namespace AccelByte.Api
             return payload;
         }
 
-        private void SendPredefinedEvent<T>(string matchPoolName, [CanBeNull] MatchmakingV2CreateTicketRequestOptionalParams optionalParams, Result<T> result, ResultCallback<T> callback)
+        private void SendPredefinedEvent<T>(string matchPoolName, MatchmakingV2CreateTicketRequestOptionalParams optionalParams, Result<T> result, ResultCallback<T> callback)
         {
             if (result.IsError)
             {

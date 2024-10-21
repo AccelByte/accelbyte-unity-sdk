@@ -94,6 +94,37 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Query other user's thirdparty subscription
+        /// </summary>
+        /// <param name="platformStoreId">A thirdparty platform id to be queried</param>
+        /// <param name="userId">user Id to be queried</param>
+        /// <param name="callback">Returns a Result that contains SubscriptionPagingSlicedResult via callback when completed</param>
+        public void QueryUserSubscription(PlatformStoreId platformStoreId, string userId, ResultCallback<SubscriptionPagingSlicedResult> callback)
+        {
+            QueryUserSubscription(platformStoreId, userId, null, callback);
+        }
+
+        /// <summary>
+        /// Query other user's thirdparty subscription
+        /// </summary>
+        /// <param name="platformStoreId">A thirdparty platform id to be queried</param>
+        /// <param name="userId">user Id to be queried</param>
+        /// <param name="optionalParameters">optional parameter for query</param>
+        /// <param name="callback">Returns a Result that contains SubscriptionPagingSlicedResult via callback when completed</param>
+        public void QueryUserSubscription(PlatformStoreId platformStoreId, string userId, QueryUserSubscriptionRequestOptionalParameters optionalParameters, ResultCallback<SubscriptionPagingSlicedResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.QueryUserSubscription(userId, platformStoreId, callback, optionalParameters);
+        }
+
+        /// <summary>
         /// Get user's entitlement by the entitlementId.
         /// </summary>
         /// <param name="entitlementId">The id of the entitlement</param>
@@ -447,6 +478,62 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get target user's entitlement history.
+        /// </summary>
+        /// <param name="userId">User Id of user to get entitlement history for.</param>
+        /// <param name="callback">Result callback containing user's entitlement history data</param>
+        public void GetUserEntitlementHistory(string userId
+            , ResultCallback<UserEntitlementHistoryResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId
+                , AccelByteIdValidator.HypensRule.NoRule
+                , AccelByteIdValidator.GetUserIdInvalidMessage(userId)
+                , callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetUserEntitlementHistory(userId, null, callback);
+        }
+
+        /// <summary>
+        /// Get target user's entitlement history.
+        /// </summary>
+        /// <param name="userId">User Id of user to get entitlement history for.</param>
+        /// <param name="optionalParams">Query parameters</param>
+        /// <param name="callback">Result callback containing user's entitlement history data</param>
+        public void GetUserEntitlementHistory(string userId
+            , GetUserEntitlementHistoryOptionalParams optionalParams
+            , ResultCallback<UserEntitlementHistoryResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(userId
+                , AccelByteIdValidator.HypensRule.NoRule
+                , AccelByteIdValidator.GetUserIdInvalidMessage(userId)
+                , callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetUserEntitlementHistory(userId, optionalParams, callback);
+        }
+
+        /// <summary>
         /// Create distribution receiver for current user
         /// </summary>
         /// <param name="extUserId">
@@ -615,13 +702,72 @@ namespace AccelByte.Api
                 return;
             }
             
-            api.SyncMobilePlatformPurchaseApple(productId
-                , transactionId
-                , receiptData
-                , optionalParameters 
-                , callback);
+            api.GetCurrentConfigFromServer(result =>
+            {
+                if (result.IsError)
+                {
+                    callback?.TryError(ErrorCode.InvalidArgument, result.Error.Message);
+                    return;
+                }
+
+                if (result.Value.Version == "V1")
+                {
+                    api.SyncMobilePlatformPurchaseApple(productId
+                        , transactionId
+                        , receiptData
+                        , optionalParameters
+                        , callback);
+                }
+                else if (result.Value.Version == "V2")
+                {
+                    api.SyncMobilePlatformPurchaseAppleV2(transactionId
+                        , callback);
+                }
+                else
+                {
+                    callback?.TryError(ErrorCode.InvalidResponse, $"Unrecognized config version {result.Value.Version}");
+                }
+            });
         }
-        
+
+        /// <summary>
+        /// Sync (Verify and fulfil) subscription item entitlement from Apple Store platform purchase.
+        /// </summary>
+        /// <param name="transactionId">purchased transaction id</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncMobilePlatformSubscriptionApple(string transactionId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetCurrentConfigFromServer(result => 
+            { 
+                if (result.IsError) 
+                { 
+                    callback?.TryError(ErrorCode.InvalidArgument, result.Error.Message); 
+                    return;
+                }
+                
+                if (result.Value.Version == "V1") 
+                { 
+                    callback?.TryError(ErrorCode.InvalidResponse, "Apple IAP config version mismatch detected: You need to change Apple integration configuration through Admin portal, please contact AccelByte support for the guideline");
+                }
+                else if (result.Value.Version == "V2") 
+                { 
+                    api.SyncMobilePlatformPurchaseAppleV2(transactionId, callback);
+                }
+                else 
+                { 
+                    callback?.TryError(ErrorCode.InvalidResponse, $"Unrecognized config version {result.Value.Version}");
+                }
+            });
+        }
+
         /// <summary>
         /// Sync (Verify and fulfil) item entitlement from Google Play platform purchase.
         /// </summary>
@@ -665,6 +811,7 @@ namespace AccelByte.Api
             , ResultCallback<GoogleReceiptResolveResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
@@ -677,6 +824,78 @@ namespace AccelByte.Api
                 , purchaseTime
                 , purchaseToken
                 , autoAck
+                , false
+                , optionalParameters
+                , callback);
+        }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item subscription from Google Play platform purchase.
+        /// </summary>
+        /// <param name="orderId">Google receipt's order id</param>
+        /// <param name="packageName">Google receipt's package name</param>
+        /// <param name="productId">Google receipt's product id</param>
+        /// <param name="purchaseTime">Google receipt's purchase time</param>
+        /// <param name="purchaseToken">Google receipt's purchase token</param>
+        /// <param name="autoAck">Auto acknowledge the purchase.
+        /// By setting it as false, Game client needs manualy acknowledge it, otherwise this transaction will be expired.
+        /// By setting it as true, AGS will automatically acknowledged it</param>
+        /// <param name="callback">Returns a Result that contain whether client should confirm pending purchase or not</param>
+        public void SyncMobilePlatformSubscriptionGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , ResultCallback<GoogleReceiptResolveResult> callback)
+        {
+            SyncMobilePlatformSubscriptionGoogle(orderId
+                , packageName
+                , productId
+                , purchaseTime
+                , purchaseToken
+                , autoAck
+                , null
+                , callback);
+        }
+
+        /// <summary>
+        /// Sync (Verify and fulfil) item subscription from Google Play platform purchase.
+        /// </summary>
+        /// <param name="orderId">Google receipt's order id</param>
+        /// <param name="packageName">Google receipt's package name</param>
+        /// <param name="productId">Google receipt's product id</param>
+        /// <param name="purchaseTime">Google receipt's purchase time</param>
+        /// <param name="purchaseToken">Google receipt's purchase token</param>
+        /// <param name="autoAck">Auto acknowledge the purchase.
+        /// By setting it as false, Game client needs manualy acknowledge it, otherwise this transaction will be expired.
+        /// By setting it as true, AGS will automatically acknowledged it</param>
+        /// <param name="optionalParameters">Optional parameters containing product region and language</param>
+        /// <param name="callback">Returns a Result that contain whether client should confirm pending purchase or not</param>
+        public void SyncMobilePlatformSubscriptionGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , PlatformSyncMobileGoogleOptionalParameters optionalParameters
+            , ResultCallback<GoogleReceiptResolveResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.SyncMobilePlatformPurchaseGoogle(orderId
+                , packageName
+                , productId
+                , purchaseTime
+                , purchaseToken
+                , autoAck
+                , true
                 , optionalParameters
                 , callback);
         }
@@ -755,6 +974,65 @@ namespace AccelByte.Api
                     userAppId,
                     callback
                     ));
+        }
+
+        /// <summary>
+        /// Sync steam inventory's items.
+        /// </summary>
+        /// <param name="userSteamId">Steam user id</param>
+        /// <param name="appId">Steam application id</param>
+        /// <param name="productId">Steam item def id</param>
+        /// <param name="price">Steam item price</param>
+        /// <param name="currencyCode">Steam item currency code</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncSteamInventory(string userSteamId
+            , string appId
+            , string productId
+            , double price
+            , string currencyCode
+            , ResultCallback callback)
+        {
+            SyncSteamInventory(userSteamId
+                , appId
+                , productId
+                , price
+                , currencyCode
+                , null
+                , callback);
+        }
+
+        /// <summary>
+        /// Sync steam inventory's items.
+        /// </summary>
+        /// <param name="userSteamId">Steam user id</param>
+        /// <param name="appId">Steam application id</param>
+        /// <param name="productId">Steam item def id</param>
+        /// <param name="price">Steam item price</param>
+        /// <param name="currencyCode">Steam item currency code</param>
+        /// <param name="optionalParameters">Optional parameters containing product region and language</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SyncSteamInventory(string userSteamId
+            , string appId
+            , string productId
+            , double price
+            , string currencyCode
+            , SyncSteamInventoryOptionalParameters optionalParameters = null
+            , ResultCallback callback = null)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.SyncSteamInventory(userSteamId
+                , appId
+                , productId
+                , price
+                , currencyCode
+                , optionalParameters
+                , callback);
         }
 
         /// <summary>

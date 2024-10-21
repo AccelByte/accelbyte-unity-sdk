@@ -20,6 +20,7 @@ namespace AccelByte.Models {
         private const int defaultStatsDMetricInterval = 60;
         [DataMember] public string Namespace;
         [DataMember] public string BaseUrl;
+        [DataMember] public string AgreementServerUrl;
         [DataMember] public string IamServerUrl;
         [DataMember] public string DSHubServerUrl;
         [DataMember] public string DSMControllerServerUrl;
@@ -92,7 +93,7 @@ namespace AccelByte.Models {
 
             if (!string.IsNullOrEmpty(DSHubServerUrl))
             {
-                if(DSHubServerUrl.EndsWith('/'))
+                if(DSHubServerUrl.EndsWith("/"))
                 {
                     DSHubServerUrl = DSHubServerUrl.Remove(DSHubServerUrl.Length - 1);
                 }
@@ -100,6 +101,8 @@ namespace AccelByte.Models {
                 this.DSHubServerWsUrl = DSHubServerUrl.Replace("https://", "wss://");
                 DSHubServerWsUrl += '/';
             }
+
+            this.AgreementServerUrl = this.ExpanServiceApiUrl(this.AgreementServerUrl, "/agreement", forceExpandServiceApiUrl);
 
             this.DSMControllerServerUrl = this.ExpanServiceApiUrl(this.DSMControllerServerUrl, "/dsmcontroller", forceExpandServiceApiUrl);
 
@@ -165,6 +168,8 @@ namespace AccelByte.Models {
             if (this.IamServerUrl == httpBaseUrl + "/iam") this.IamServerUrl = null;
 
             if (this.DSHubServerUrl == httpBaseUrl + "/dshub") this.DSMControllerServerUrl = null;
+
+            if (this.AgreementServerUrl == httpBaseUrl + "/agreement") this.AgreementServerUrl = null;
             
             if (this.DSMControllerServerUrl == httpBaseUrl + "/dsmcontroller") this.DSMControllerServerUrl = null;
 

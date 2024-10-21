@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 
 namespace AccelByte.Core
@@ -13,10 +14,16 @@ namespace AccelByte.Core
 
         private IDebugger logger;
         private CoreHeartBeat heartBeat;
+
+        private static HashSet<string> clearedCookiesUrl;
         
         public UnityHttpRequestSender(WebRequestScheduler httpTaskScheduler)
         {
             this.httpTaskScheduler = httpTaskScheduler;
+            if (clearedCookiesUrl == null)
+            {
+                clearedCookiesUrl = new HashSet<string>();
+            }
         }
 
         public void SetLogger(IDebugger logger)
@@ -65,26 +72,42 @@ namespace AccelByte.Core
         internal Models.AccelByteResult<Error> ClearCookiesSafeThread(Uri uri)
         {
             var retval = new Models.AccelByteResult<Error>();
-            try
+            string uriString = uri.ToString();
+
+            if (clearedCookiesUrl.Contains(uriString) || string.IsNullOrEmpty(uriString))
             {
-                if (heartBeat != null)
+                retval.Resolve();                
+            }
+            else
+            {
+                try
                 {
-                    heartBeat.Wait(new WaitAFrameCommand(cancellationToken: new System.Threading.CancellationTokenSource().Token, onDone: () =>
+                    if (heartBeat != null)
                     {
-                        UnityWebRequest.ClearCookieCache(uri);  
-                        retval.Resolve();  
-                    }));
+                        heartBeat.Wait(new WaitAFrameCommand(
+                            cancellationToken: new System.Threading.CancellationTokenSource().Token, onDone: () =>
+                            {
+                                if (!clearedCookiesUrl.Contains(uriString))
+                                {
+                                    clearedCookiesUrl.Add(uriString);
+                                    UnityWebRequest.ClearCookieCache(uri);
+                                }
+
+                                retval.Resolve();
+                            }));
+                    }
+                    else
+                    {
+                        UnityWebRequest.ClearCookieCache(uri);
+                        retval.Resolve();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    UnityWebRequest.ClearCookieCache(uri);
-                    retval.Resolve();
+                    retval.Reject(new Error(ErrorCode.ErrorFromException, ex.Message));
                 }
             }
-            catch (Exception ex)
-            {
-                retval.Reject(new Error(ErrorCode.ErrorFromException, ex.Message));
-            }
+
             return retval;
         }
 

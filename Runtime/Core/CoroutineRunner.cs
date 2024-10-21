@@ -11,7 +11,7 @@ namespace AccelByte.Core
 {
     public class CoroutineRunner
     {
-        private readonly MonoBehaviour monoBehaviour;
+        public readonly MonoBehaviour MonoBehaviour;
         private readonly Queue<Action> callbacks = new Queue<Action>();
         private readonly object syncToken = new object();
 
@@ -21,13 +21,13 @@ namespace AccelByte.Core
         {
             GameObject sdkGameObject = Utils.AccelByteGameObject.GetOrCreateGameObject();
 
-            this.monoBehaviour = sdkGameObject.GetComponent<DummyBehaviour>();
-            if(this.monoBehaviour == null)
+            this.MonoBehaviour = sdkGameObject.GetComponent<DummyBehaviour>();
+            if(this.MonoBehaviour == null)
             {
-                this.monoBehaviour = sdkGameObject.AddComponent<DummyBehaviour>();
+                this.MonoBehaviour = sdkGameObject.AddComponent<DummyBehaviour>();
             }
 			            
-            this.monoBehaviour.StartCoroutine(this.RunCallbacks());
+            this.MonoBehaviour.StartCoroutine(this.RunCallbacks());
         }
 
         ~CoroutineRunner() { 
@@ -36,10 +36,10 @@ namespace AccelByte.Core
 
         public Coroutine Run(IEnumerator coroutine)
         { 
-            return this.monoBehaviour != null ? this.monoBehaviour.StartCoroutine(coroutine) : null;
+            return this.MonoBehaviour != null ? this.MonoBehaviour.StartCoroutine(coroutine) : null;
         }
         
-        public void Stop(Coroutine coroutine) { this.monoBehaviour.StopCoroutine(coroutine); }
+        public void Stop(Coroutine coroutine) { this.MonoBehaviour.StopCoroutine(coroutine); }
 
         public void Run(Action callback)
         {

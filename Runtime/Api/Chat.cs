@@ -538,9 +538,54 @@ namespace AccelByte.Api
                 HandleCallback(cb, callback);
             }));
         }
-        
+
+        /// <summary>
+        /// Get chat configuration for current user.
+        /// </summary>
+        /// <param name="callback">Callback for retrieved chat configuration or error</param>
+        public void GetUserChatConfiguration(ResultCallback<GetUserChatConfigurationResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            websocketApi.GetUserChatConfiguration(callback);
+        }
+
+        /// <summary>
+        /// Set chat configuration for current user.
+        /// </summary>
+        /// <param name="isProfanityDisabled">Bool config for profanity filter</param>
+        /// <param name="callback">Callback for successful processing or error</param>
+        public void SetUserChatConfiguration(bool isProfanityDisabled, ResultCallback<SetUserChatConfigurationResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var config = new UserChatConfiguration()
+            {
+                ProfanityDisabled = isProfanityDisabled
+            };
+
+            var request = new SetUserChatConfigurationRequest()
+            {
+                Config = config
+            };
+
+            websocketApi.SetUserChatConfiguration(request, callback);
+        }
+
         #endregion
-        
+
         #region internal methods
         /// <summary>
         /// Establish a websocket connection via proxy url.

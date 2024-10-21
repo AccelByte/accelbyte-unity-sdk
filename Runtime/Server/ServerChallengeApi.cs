@@ -41,7 +41,7 @@ namespace AccelByte.Server
                 .WithBody(challengeBulkClaimRewardRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeBulkClaimRewardResponse[]>();
 
@@ -74,7 +74,7 @@ namespace AccelByte.Server
                 .WithBody(claimRewardRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserReward[]>();
 
@@ -104,7 +104,7 @@ namespace AccelByte.Server
                 .WithBody(createChallengeRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponseInfo>();
 
@@ -137,7 +137,7 @@ namespace AccelByte.Server
                 .WithBody(createChallengeGoalRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalResponseInfo>();
 
@@ -165,7 +165,7 @@ namespace AccelByte.Server
                 .WithPathParam("challengeCode", challengeCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
 
@@ -197,7 +197,7 @@ namespace AccelByte.Server
                 .WithPathParam("goalCode", goalCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
 
@@ -225,7 +225,7 @@ namespace AccelByte.Server
                 .WithPathParam("challengeCode", challengeCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
 
@@ -242,11 +242,11 @@ namespace AccelByte.Server
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
-                .WithPathParam("namespace", serverConfig.Namespace)
+                .WithPathParam("namespace", ServerConfig.Namespace)
                 .WithBody(requestBody.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
 
@@ -275,7 +275,7 @@ namespace AccelByte.Server
                 .WithPathParam("challengeCode", challengeCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponseInfo>();
 
@@ -307,7 +307,7 @@ namespace AccelByte.Server
                 .WithPathParam("goalCode", goalCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalResponseInfo>();
 
@@ -350,7 +350,7 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalResponse>();
 
@@ -391,7 +391,7 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengePeriodResponse>();
 
@@ -436,7 +436,7 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponse>();
 
@@ -484,7 +484,7 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserRewards>();
 
@@ -513,7 +513,7 @@ namespace AccelByte.Server
                 .WithPathParam("challengeCode", challengeCode)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponseInfo[]>();
 
@@ -546,7 +546,7 @@ namespace AccelByte.Server
                 .WithBody(updateChallengeRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponseInfo>();
 
@@ -581,7 +581,7 @@ namespace AccelByte.Server
                 .WithBody(updateChallengeGoalRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoalResponseInfo>();
 

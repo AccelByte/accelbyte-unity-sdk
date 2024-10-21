@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,74 +11,87 @@ namespace AccelByte.Core
     {
         internal Action<ResultCallback<TokenData>> OnAutoLogin;
         protected bool executeValidator;
+        bool? previousSessionValid = null;
+        private bool isInLogin;
 
         protected AutoLoginAnalyticsEventScheduler(IAccelByteAnalyticsWrapper analyticsWrapper) : base(analyticsWrapper)
         {
             executeValidator = false;
         }
 
-        protected async void RunAutoLoginValidator()
+        protected void RunAutoLoginValidator()
         {
-            bool currentSessionValid;
-            bool? previousSessionValid = null;
-
-            while (keepValidating)
+            if (!validatorCts.IsCancellationRequested && SharedMemory != null && SharedMemory?.CoreHeartBeat != null)
             {
-                if (executeValidator)
+                previousSessionValid = null;
+                
+                Action onUpdate = null;
+                onUpdate += () =>
                 {
-                    ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
-
-                    if (session == null || !session.IsValid())
+                    if (executeValidator)
                     {
-                        Result<TokenData> loginResult = null;
-                        if (OnAutoLogin != null)
-                        {
-                            OnAutoLogin.Invoke((callbackResult) =>
-                            {
-                                loginResult = callbackResult;
-                            });
+                        ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
 
-                            while (loginResult == null)
+                        if (session == null || !session.IsValid())
+                        {
+                            if (OnAutoLogin != null)
                             {
-                                await System.Threading.Tasks.Task.Delay(AccelByteHttpHelper.HttpDelayOneFrameTimeMs);
+                                isInLogin = true;
+                                OnAutoLogin.Invoke((callbackResult) =>
+                                {
+                                    isInLogin = false;
+                                });
                             }
                         }
                     }
-
-                    currentSessionValid = session != null ? session.IsValid() : false;
-                    if (previousSessionValid == null)
+                };
+                
+                onUpdate += () =>
+                {
+                    if (executeValidator)
                     {
-                        if (currentSessionValid)
+                        if (isInLogin)
                         {
-                            maintainer.Start();
+                            return;
                         }
-                    }
-                    else
-                    {
-                        if (currentSessionValid != previousSessionValid)
+                        
+                        ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
+                        bool currentSessionValid = session != null ? session.IsValid() : false;
+                        if (previousSessionValid == null)
                         {
                             if (currentSessionValid)
                             {
-                                if (!maintainer.IsHeartBeatJobRunning)
+                                maintainer.Start();
+                            }
+                        }
+                        else
+                        {
+                            if (currentSessionValid != previousSessionValid)
+                            {
+                                if (currentSessionValid)
                                 {
-                                    maintainer.Start();
+                                    if (!maintainer.IsHeartBeatJobRunning)
+                                    {
+                                        maintainer.Start();
+                                    }
+                                    else
+                                    {
+                                        maintainer.UnPause();
+                                    }
                                 }
                                 else
                                 {
-                                    maintainer.UnPause();
+                                    maintainer.Pause();
                                 }
                             }
-                            else
-                            {
-                                maintainer.Pause();
-                            }
                         }
+
+                        previousSessionValid = currentSessionValid;
                     }
-
-                    previousSessionValid = currentSessionValid;
-                }
-
-                await System.Threading.Tasks.Task.Delay(AccelByteHttpHelper.HttpDelayOneFrameTimeMs);
+                };
+                
+                onUpdate?.Invoke();
+                SharedMemory?.CoreHeartBeat.Wait(new IndefiniteLoopCommand(cancellationToken: validatorCts.Token, onUpdate: onUpdate));
             }
         }
     }

@@ -11,7 +11,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    [Obsolete("Please use ClientGameTelemetryApi api, will be removed on September release")]
+    [Obsolete("Please use ClientGameTelemetryApi api, will be removed on AGS 3.81")]
     public class GameTelemetryApi : ApiBase
     {
         /// <summary>
@@ -80,7 +80,7 @@ namespace AccelByte.Api
                     .Accepts(MediaType.ApplicationJson)
                     .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);

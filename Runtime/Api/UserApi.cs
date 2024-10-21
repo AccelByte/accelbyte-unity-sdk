@@ -54,7 +54,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response => 
+            HttpOperator.SendRequest(request, response => 
             {
                 var result = response.TryParseJson<RegisterUserResponse>();
                 callback.Try(result);
@@ -78,7 +78,7 @@ namespace AccelByte.Api
                  .WithBody(requestModel.ToUtf8Json())
                  .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<RegisterUserResponse>();
                 callback.Try(result);
@@ -95,7 +95,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -124,7 +124,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -148,7 +148,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -185,7 +185,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -221,7 +221,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -271,7 +271,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -301,7 +301,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -335,7 +335,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -364,7 +364,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -402,7 +402,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -440,7 +440,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationForm)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -486,7 +486,7 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -525,7 +525,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -552,7 +552,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -582,7 +582,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PagedPlatformLinks>();
                 callback.Try(result);
@@ -633,7 +633,7 @@ namespace AccelByte.Api
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PagedPublicUsersInfo>();
                 callback.Try(result);
@@ -662,7 +662,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PublicUserData>();
                 callback.Try(result);
@@ -700,7 +700,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -736,7 +736,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<BulkPlatformUserIdResponse>();
                 callback.Try(result);
@@ -772,7 +772,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<BulkPlatformUserIdResponse>();
                 callback?.Try(result);
@@ -787,7 +787,7 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v3/location/country")
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryInfo>();
                 callback.Try(result);
@@ -816,7 +816,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ListBulkUserInfoResponse>();
                 callback.Try(result);
@@ -849,7 +849,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<TokenData>();
                 callback.Try(result);
@@ -867,7 +867,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -896,7 +896,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -914,7 +914,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<SecretKey3rdPartyApp>();
                 callback.Try(result);
@@ -932,7 +932,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<TwoFACode>();
                 callback.Try(result);
@@ -950,7 +950,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -968,7 +968,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<TwoFACode>();
                 callback.Try(result);
@@ -986,7 +986,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<TwoFACode>();
                 callback.Try(result);
@@ -1005,7 +1005,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<Enable2FAFactors>();
                 callback.Try(result);
@@ -1035,7 +1035,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -1064,7 +1064,7 @@ namespace AccelByte.Api
                .Accepts(MediaType.ApplicationJson)
                .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<InputValidation>();
                 callback.Try(result);
@@ -1093,7 +1093,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback.Try(result);
@@ -1122,7 +1122,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GetPublisherUserResponse>();
                 callback.Try(result);
@@ -1151,7 +1151,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GetUserInformationResponse>();
                 callback.Try(result);
@@ -1174,7 +1174,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);
@@ -1204,7 +1204,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
                 callback.Try(result);
@@ -1260,7 +1260,7 @@ namespace AccelByte.Api
                  .Accepts(MediaType.ApplicationJson)
                  .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ConfigValueResponse<T>>();
                 if (result.IsError)
@@ -1294,7 +1294,7 @@ namespace AccelByte.Api
                 .WithBody(requestPayload.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<AccountUserPlatformInfosResponse>();
                 callback.Try(result);
@@ -1322,7 +1322,7 @@ namespace AccelByte.Api
                  .Accepts(MediaType.ApplicationJson)
                  .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 if (response.Code == (int)ErrorCode.NotFound)
                 {
@@ -1354,7 +1354,7 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Namespace_)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<Country[]>();
 

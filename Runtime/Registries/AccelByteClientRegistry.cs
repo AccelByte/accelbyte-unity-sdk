@@ -30,6 +30,7 @@ namespace AccelByte.Api
         private AccelByteMessagingSystem messagingSystem;
         private AccelByteNotificationSender notificationSender;
         private AccelByteNotificationBuffer notificationBuffer;
+        private IFileStream fileStream;
 
         IHttpClient httpClient;
 
@@ -91,7 +92,7 @@ namespace AccelByte.Api
             private set;
         }
 
-        internal AccelByteClientRegistry(SettingsEnvironment environment, Config config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager, CoreHeartBeat coreHeartBeat)
+        internal AccelByteClientRegistry(SettingsEnvironment environment, Config config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager, CoreHeartBeat coreHeartBeat, IFileStream fileStream)
         {
             clientApiInstances = new Dictionary<string, ApiClient>();
             loginUserClientApis = new List<ApiClient>();
@@ -99,6 +100,7 @@ namespace AccelByte.Api
             this.timeManager = timeManager;
             this.Logger = new AccelByteDebuggerV2();
             this.coreHeartBeat = coreHeartBeat;
+            this.fileStream = fileStream;
             
             Initialize(environment, config, oAuthConfig);
             
@@ -353,7 +355,7 @@ namespace AccelByte.Api
             IHttpClient httpClient = CreateHtppClient();
 
             string sessionCacheTableName = $"TokenCache/{environment}/TokenData";
-            IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.Implementation.FileStream);
+            IAccelByteDataStorage dataStorage = new Core.AccelByteDataStorageBinaryFile(this.fileStream);
             var session = new UserSession(
                     httpClient,
                     coroutineRunner,
@@ -400,14 +402,15 @@ namespace AccelByte.Api
                 LoadGameStandardAnalyticsCache(GameStandardCacheImp, gameStandardAnalyticsService, environment.ToString());
             }
 
-            string gameStandardCacheDirectory = GameStandardAnalyticsClientService.DefaultCacheDirectory;
             string gameStandardCacheFileName = GameStandardAnalyticsClientService.DefaultCacheFileName;
             string gameStandardCacheEncryptionKey = OAuthConfig.ClientId;
+            string gameStandardCacheTableName = $"GameStandardCache/{gameStandardCacheFileName}";
             if (GameStandardCacheImp == null)
             {
+                IAccelByteDataStorage gameStandardStorage = new AccelByteDataStorageBinaryFile(this.fileStream);
                 GameStandardCacheImp = new AccelByteGameStandardEventCacheImp(
-                    gameStandardCacheDirectory
-                    , gameStandardCacheFileName
+                    gameStandardCacheTableName
+                    , gameStandardStorage
                     , gameStandardCacheEncryptionKey
                 );
             }

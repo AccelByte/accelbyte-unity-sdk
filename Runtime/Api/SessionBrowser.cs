@@ -19,6 +19,9 @@ namespace AccelByte.Api
         private readonly CoroutineRunner coroutineRunner;
 
         [UnityEngine.Scripting.Preserve]
+        [Obsolete(
+            "This service and its interfaces are deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         internal SessionBrowser(SessionBrowserApi inApi, UserSession inSession, CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, "api parameter can not be null.");
@@ -35,6 +38,8 @@ namespace AccelByte.Api
         /// <param name="createRequest">Specification of the session</param>
         /// <param name="callback">Return the created session info</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void CreateGameSession(SessionBrowserCreateRequest createRequest, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -62,6 +67,8 @@ namespace AccelByte.Api
         /// <param name="updateRequest">The request to update the session</param>
         /// <param name="callback">Return the updated session info</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void UpdateGameSession(string sessionId, SessionBrowserUpdateSessionRequest updateRequest, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -87,6 +94,8 @@ namespace AccelByte.Api
         /// <param name="sessionId">Targeted session's ID</param>
         /// <param name="callback">Return the removed session info</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void RemoveGameSession(string sessionId, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -112,6 +121,8 @@ namespace AccelByte.Api
         /// <param name="filter">Specification to query sessions</param>
         /// <param name="callback">Return the query result</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void GetGameSessions(SessionBrowserQuerySessionFilter filter, ResultCallback<SessionBrowserGetResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -131,6 +142,8 @@ namespace AccelByte.Api
         /// <param name="userIds">List of user id</param>
         /// <param name="callback">Return the query result</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void GetGameSessionsByUserIds(string[] userIds, ResultCallback<SessionBrowserGetByUserIdsResult> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -151,6 +164,8 @@ namespace AccelByte.Api
         /// <param name="sessionId">Targeted session's ID</param>
         /// <param name="callback">Return the session info</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void GetGameSession(string sessionId, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -178,6 +193,8 @@ namespace AccelByte.Api
         /// <param name="asSpectator">Indicates as spectator</param>
         /// <param name="callback">Return the addition result</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void RegisterPlayer(string sessionId, string targetedUserId, bool asSpectator, ResultCallback<SessionBrowserAddPlayerResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -203,6 +220,8 @@ namespace AccelByte.Api
         /// <param name="sessionId">Targeted session's ID</param>
         /// <param name="callback">Return the removal result</param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void UnregisterPlayer(string sessionId, string targetedUserId, ResultCallback<SessionBrowserRemovePlayerResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -229,6 +248,8 @@ namespace AccelByte.Api
         /// <param name="offset">Starting position of a query</param>
         /// <param name="limit">The amount of data that will be returned from this query action</param>
         /// <param name="callback">Return an array of the recent player's data</param>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void GetRecentPlayer(string targetedUserId, uint offset, uint limit, ResultCallback<SessionBrowserRecentPlayerGetResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -255,6 +276,8 @@ namespace AccelByte.Api
         /// <param name="password"></param>
         /// <param name="callback">Return the specifed session info </param>
         /// <returns></returns>
+        [Obsolete("This interface is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2/Session service instead.")]
         public void JoinSession(string sessionId, string password, ResultCallback<SessionBrowserData> callback)
         {
             Report.GetFunctionLog(GetType().Name);

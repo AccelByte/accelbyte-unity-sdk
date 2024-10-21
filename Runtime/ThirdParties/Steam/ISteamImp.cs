@@ -6,6 +6,10 @@ namespace AccelByte.ThirdParties.Steam
 {
 	public interface ISteamImp : ISteamWrapper
     {
+    }
+    
+    internal static class SteamWrapperInfo
+    {
         internal const string AccelByteServiceIdentity = "accelbyteiam";
     }
 }

@@ -10,9 +10,9 @@ namespace AccelByte.Server
 {
     public class ServerUserAccount : WrapperBase
     {
+        internal readonly ISession Session;
         private readonly CoroutineRunner coroutineRunner;
-        private readonly ISession session;
-        private readonly ServerUserAccountApi api;
+        internal readonly ServerUserAccountApi Api;
 
         [UnityEngine.Scripting.Preserve]
         internal ServerUserAccount( ServerUserAccountApi inApi
@@ -22,8 +22,8 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, nameof(inApi) + " is null.");
             Assert.IsNotNull(inCoroutineRunner, nameof(inCoroutineRunner) + " is null.");
 
-            api = inApi;
-            session = inSession;
+            Api = inApi;
+            Session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
 
@@ -50,7 +50,7 @@ namespace AccelByte.Server
         public void GetUserData( string userAuthToken
             , ResultCallback<UserData> callback )
         {
-            coroutineRunner.Run(api.GetUserData(userAuthToken, callback));
+            coroutineRunner.Run(Api.GetUserData(userAuthToken, callback));
         }
 
         /// <summary>
@@ -70,14 +70,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!session.IsValid())
+            if (!Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                api.SearchUserOtherPlatformDisplayName(
+                Api.SearchUserOtherPlatformDisplayName(
                     platformDisplayName,
                     platformType,
                     callback,
@@ -97,14 +97,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!session.IsValid())
+            if (!Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                api.SearchUserOtherPlatformUserId(
+                Api.SearchUserOtherPlatformUserId(
                     platformUserId,
                     platformType,
                     callback));
@@ -135,7 +135,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
@@ -151,7 +151,7 @@ namespace AccelByte.Server
             };
 
             this.coroutineRunner.Run(
-                this.api.BanUser(
+                this.Api.BanUser(
                     userId,
                     banRequest,
                     callback));
@@ -182,14 +182,14 @@ namespace AccelByte.Server
                 return;
             }
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             this.coroutineRunner.Run(
-                this.api.ChangeUserBanStatus(
+                this.Api.ChangeUserBanStatus(
                     userId,
                     banId,
                     enabled,
@@ -213,14 +213,14 @@ namespace AccelByte.Server
                 return;
             }
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserBanInfo(
+                this.Api.GetUserBanInfo(
                     userId,
                     activeOnly,
                     callback));
@@ -243,7 +243,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
 
@@ -251,7 +251,7 @@ namespace AccelByte.Server
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserBannedList(
+                this.Api.GetUserBannedList(
                     activeOnly,
                     banType,
                     offset,
@@ -273,14 +273,14 @@ namespace AccelByte.Server
                 return;
             }
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             this.coroutineRunner.Run(
-                this.api.GetUserByUserId(userId, callback));
+                this.Api.GetUserByUserId(userId, callback));
         }
 
         /// <summary>
@@ -293,14 +293,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name);
 
-            if (!this.session.IsValid())
+            if (!this.Session.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             this.coroutineRunner.Run(
-                this.api.ListUserByUserId(listUserDataRequest, callback));
+                this.Api.ListUserByUserId(listUserDataRequest, callback));
         }
     }
 }

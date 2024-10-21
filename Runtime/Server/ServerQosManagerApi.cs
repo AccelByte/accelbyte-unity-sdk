@@ -1,10 +1,10 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System.Collections;
-using AccelByte.Api;
+
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 
 namespace AccelByte.Server
 {
@@ -28,13 +28,15 @@ namespace AccelByte.Server
         
         public void RequestGetAllQosServers(ResultCallback<QosServerList> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/qos")
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);
@@ -43,15 +45,33 @@ namespace AccelByte.Server
         
         public void RequestGetQosServers(ResultCallback<QosServerList> callback)
         {
-            var request = HttpRequestBuilder
+            GetQosServerOptionalParameters optionalParams = new GetQosServerOptionalParameters();
+            optionalParams.Status = QosStatus.Active;
+
+            RequestGetPublicQosServers(optionalParams, callback);
+        }
+
+        internal void RequestGetPublicQosServers(GetQosServerOptionalParameters optionalParams, ResultCallback<QosServerList> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var httpBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/qos")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("status", "ACTIVE")
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            httpOperator.SendRequest(request, response =>
+            if (optionalParams != null)
+            {
+                if (optionalParams.Status != null)
+                {
+                    httpBuilder.WithQueryParam("status", ConverterUtils.EnumToDescription(optionalParams.Status));
+                }
+            }
+
+            var request = httpBuilder.GetResult();
+
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);

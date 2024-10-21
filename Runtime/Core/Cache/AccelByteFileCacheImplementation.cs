@@ -9,7 +9,6 @@ namespace AccelByte.Core
 {
     internal class AccelByteFileCacheImplementation : IAccelByteCacheImplementation<string>
     {
-#if !UNITY_WEBGL
         readonly string cacheDirectory = string.Empty;
         const int readWriteAsyncWaitMs = 100;
 
@@ -158,56 +157,5 @@ namespace AccelByte.Core
             string retval = $"{cacheDirectory}/{key}";
             return retval;
         }
-#else
-        public AccelByteFileCacheImplementation(string cacheDirectory)
-        {
-
-        }
-
-        public bool Contains(string key)
-        {
-            return false;
-        }
-
-        public virtual bool Emplace(string key, string item)
-        {
-            return false;
-        }
-
-        public virtual void EmplaceAsync(string key, string item, System.Action<bool> callback = null)
-        {
-            callback?.Invoke(false);
-        }
-
-        public void Empty()
-        {
-            
-        }
-
-        public string Peek(string key)
-        {
-            return null;
-        }
-
-        public bool Remove(string key)
-        {
-            return false;
-        }
-
-        public virtual string Retrieve(string key)
-        {
-            return null;
-        }
-
-        public virtual void RetrieveAsync(string key, System.Action<string> callback)
-        {
-            callback?.Invoke(string.Empty);
-        }
-
-        public bool Update(string key, string item)
-        {
-            return false;
-        }
-#endif
     }
 }

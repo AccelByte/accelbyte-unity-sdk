@@ -22,7 +22,11 @@ namespace AccelByte.Core
 
         public IHttpRequestSender CreateHttpRequestSender()
         {
+#if !UNITY_WEBGL
             var httpSenderScheduler = new WebRequestSchedulerAsync();
+#else
+            var httpSenderScheduler = new WebRequestSchedulerCoroutine(new CoroutineRunner());
+#endif
             var sdkHttpSender = new UnityHttpRequestSender(httpSenderScheduler);
             sdkHttpSender.SetHeartBeat(coreHeartBeat);
             createdHttpRequestSenderRecord.Add(sdkHttpSender);

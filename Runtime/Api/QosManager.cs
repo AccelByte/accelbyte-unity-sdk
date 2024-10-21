@@ -2,17 +2,10 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -28,35 +21,64 @@ namespace AccelByte.Api
         private AccelByteMessagingSystem messagingSystem;
 
         [UnityEngine.Scripting.Preserve]
-        internal QosManager( QosManagerApi inApi
+        internal QosManager(QosManagerApi inApi
             , UserSession inSession
-            , CoroutineRunner inCoroutineRunner )
+            , CoroutineRunner inCoroutineRunner)
         {
             Assert.IsNotNull(inApi, nameof(inApi) + " is null.");
             Assert.IsNotNull(inCoroutineRunner, nameof(inCoroutineRunner) + " is null.");
-            
+
             api = inApi;
             coroutineRunner = inCoroutineRunner;
         }
-        
+
         /// <summary>
         /// Get all server latencies available
         /// </summary>
         /// <param name="callback">Returns a result via callback when completed</param>
-        public void GetAllServerLatencies( ResultCallback<Dictionary<string, int>> callback )
+        public void GetAllServerLatencies(ResultCallback<Dictionary<string, int>> callback)
         {
-            Result<QosServerList> getQosServersResult = null;
+            GetAllServerLatencies(null, callback);
+        }
 
-            api.RequestGetAllQosServers(result =>
+        /// <summary>
+        /// Get all server latencies available
+        /// </summary>
+        /// <param name="optionalParams">Optional parameter to modify the function</param> 
+        /// <param name="callback">Returns a result via callback when completed</param>
+        internal void GetAllServerLatencies(GetQosServerOptionalParameters optionalParams, ResultCallback<Dictionary<string, int>> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (api.Config.EnableAmsServerQos)
             {
-                getQosServersResult = result;
-                if (getQosServersResult.IsError)
+                GetQosServerOptionalParameters requestedOptionalParams = 
+                    optionalParams == null ? new GetQosServerOptionalParameters() : optionalParams;
+
+                GetServerLatenciesAsync(requestedOptionalParams, callback);
+            }
+            else
+            {
+                api.RequestGetAllQosServers(getQosServersResult =>
                 {
-                    callback?.TryError(getQosServersResult.Error.Code);
-                    return;
-                }
-                CalculateServerLatencies(getQosServersResult.Value.servers, callback);
-            });
+                    if (getQosServersResult.IsError)
+                    {
+                        callback?.TryError(getQosServersResult.Error.Code);
+                        return;
+                    }
+
+                    if (getQosServersResult.Value != null && getQosServersResult.Value.servers != null && getQosServersResult.Value.servers.Length > 0)
+                    {
+                        CalculateServerLatencies(getQosServersResult.Value.servers,
+                            optionalParams?.LatencyCalculator,
+                            callback);
+                    }
+                    else
+                    {
+                        callback?.TryOk(new Dictionary<string, int>());
+                    }
+                });
+            }
         }
 
         /// <summary>
@@ -65,22 +87,49 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a result via callback when completed</param>
         public void GetServerLatencies(ResultCallback<Dictionary<string, int>> callback)
         {
-            GetServerLatenciesAsync(callback);
+            GetServerLatencies(null, callback);
         }
 
-        internal virtual void GetServerLatenciesAsync(ResultCallback<Dictionary<string, int>> callback)
+        /// <summary>
+        /// Get server latencies for active QoS server in the namespace.
+        /// </summary>
+        /// <param name="optionalParams">Optional parameter to modify the function</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        internal void GetServerLatencies(GetQosServerOptionalParameters optionalParams, ResultCallback<Dictionary<string, int>> callback)
         {
-            Result<QosServerList> getQosServersResult = null;
+            Report.GetFunctionLog(GetType().Name);
 
-            api.RequestGetQosServers(result =>
+            GetServerLatenciesAsync(optionalParams, callback);
+        }
+
+        internal virtual void GetServerLatenciesAsync(GetQosServerOptionalParameters optionalParams, ResultCallback<Dictionary<string, int>> callback)
+        {
+            GetQosServerOptionalParameters requestedOptionalParams = optionalParams;
+
+            if (requestedOptionalParams == null)
             {
-                getQosServersResult = result;
+                requestedOptionalParams = new GetQosServerOptionalParameters();
+                requestedOptionalParams.Status = QosStatus.Active;
+            }
+
+            api.RequestGetQosServers(requestedOptionalParams, getQosServersResult =>
+            {
                 if (getQosServersResult.IsError)
                 {
                     callback?.TryError(getQosServersResult.Error.Code);
                     return;
                 }
-                CalculateServerLatencies(getQosServersResult.Value.servers, callback);
+
+                if (getQosServersResult.Value != null && getQosServersResult.Value.servers != null && getQosServersResult.Value.servers.Length > 0)
+                {
+                    CalculateServerLatencies(getQosServersResult.Value.servers,
+                        optionalParams?.LatencyCalculator,
+                        callback);
+                }
+                else
+                {
+                    callback?.TryOk(new Dictionary<string, int>());
+                }
             });
         }
 
@@ -111,8 +160,7 @@ namespace AccelByte.Api
         {
             if (listRegion.Count == 0)
             {
-                SharedMemory?.Logger?.LogWarning(
-                    $"No region servers found.");
+                SharedMemory?.Logger?.LogWarning($"No region servers found.");
                 return string.Empty;
             }
 
@@ -126,43 +174,34 @@ namespace AccelByte.Api
             }
             return closestRegion.Key;
         }
-        
-        private void CalculateServerLatencies(QosServer[] servers, ResultCallback<Dictionary<string, int>> callback)
+
+        private void CalculateServerLatencies(QosServer[] servers,
+            ILatencyCalculator latencyCalculator,
+            ResultCallback<Dictionary<string, int>> callback)
         {
-            var stopwatch = new Stopwatch();
-            var latencies = new Dictionary<string, int>();
+            int currentLatencyTaskCalculationDoneCount = 0;
+            int expectedLength = servers.Length;
 
-            foreach (QosServer server in servers)
+            Dictionary<string, int> retval = new Dictionary<string, int>();
+            ILatencyCalculator calculator =
+                latencyCalculator == null ? LatencyCalculatorFactory.CreateDefaultCalculator() : latencyCalculator;
+            
+            foreach (var server in servers)
             {
-                try
-                {
-                    using (var udpClient = new UdpClient(server.port))
+                calculator.CalculateLatency(server.ip, server.port)
+                    .OnSuccess(latency =>
                     {
-                        udpClient.Connect(server.ip, server.port);
-                        byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
-                        stopwatch.Restart();
-                    
-                        IAsyncResult asyncResult = udpClient.BeginSend(
-                            sendBytes, 
-                            sendBytes.Length, 
-                            null, 
-                            null);
-                        
-                        udpClient.EndSend(asyncResult);
-                        var remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                       
-                        asyncResult = udpClient.BeginReceive(null, null);
-                        udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
-                        latencies[server.region] = stopwatch.Elapsed.Milliseconds;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SharedMemory?.Logger?.LogWarning($"Encounter issue on calculating serevr latency. {ex.Message}");
-                }
+                        retval.Add(server.region, latency);
+                    })
+                    .OnComplete(() =>
+                    {
+                        currentLatencyTaskCalculationDoneCount++;
+                        if (currentLatencyTaskCalculationDoneCount == expectedLength)
+                        {
+                            callback?.TryOk(retval);
+                        }
+                    });
             }
-
-            callback?.TryOk(latencies);
         }
     }
 }

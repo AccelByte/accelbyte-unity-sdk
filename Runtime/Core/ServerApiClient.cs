@@ -157,6 +157,7 @@ namespace AccelByte.Core
             return dedicatedServer;
         }
         public DedicatedServerManager GetDedicatedServerManager() { return GetServerApi<DedicatedServerManager, DedicatedServerManagerApi>(); }
+        public IServerAgreement GetAgreement() { return GetServerApi<ServerAgreement, ServerAgreementApi>(); }
         public ServerEcommerce GetEcommerce() { return GetServerApi<ServerEcommerce, ServerEcommerceApi>(); }
         public ServerStatistic GetStatistic() { return GetServerApi<ServerStatistic, ServerStatisticApi>(); }
         public ServerUGC GetUGC() { return GetServerApi<ServerUGC, ServerUGCApi>(); }

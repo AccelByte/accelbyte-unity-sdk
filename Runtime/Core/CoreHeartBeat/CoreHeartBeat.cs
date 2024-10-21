@@ -19,7 +19,7 @@ namespace AccelByte.Core
             waitCommands = new List<IWaitCommand>();
             removedCommands = new List<IWaitCommand>();
             acceptCommand = true;
-            AccelByteSDKMain.OnGameUpdate += OnUpdate;
+            AccelByteSDKMain.AddGameUpdateListener(OnUpdate);
         }
 
         ~CoreHeartBeat()
@@ -30,7 +30,7 @@ namespace AccelByte.Core
         public void Reset()
         {
             acceptCommand = false;
-            AccelByteSDKMain.OnGameUpdate -= OnUpdate;
+            AccelByteSDKMain.RemoveGameUpdateListener(OnUpdate);
             lock (waitCommands)
             {
                 waitCommands.Clear();

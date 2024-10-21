@@ -11,6 +11,8 @@ namespace AccelByte.Core
             AccelByteDebug.LogVerbose("Create AccelByte Default FileStream");
 #if UNITY_SWITCH && !UNITY_EDITOR
             var retval = new NullFileStream();
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            var retval = new PlayerPrefsFileStream();
 #else
             var retval = new AccelByteFileStream();
 #endif

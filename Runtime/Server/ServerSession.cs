@@ -11,7 +11,7 @@ namespace AccelByte.Server
 {
     public class ServerSession : WrapperBase
     {
-        private readonly ServerSessionApi _sessionApi;
+        internal ServerSessionApi Api;
         private readonly ISession _session;
         private readonly CoroutineRunner _coroutineRunner;
 
@@ -23,7 +23,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct Session manager; inApi is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct Session manager; inCoroutineRunner is null!");
 
-            _sessionApi = inApi;
+            Api = inApi;
             _session = inSession;
             _coroutineRunner = inCoroutineRunner;
         }
@@ -78,7 +78,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _sessionApi.GetAllGameSessions(
+                Api.GetAllGameSessions(
                     callback
                     , statusV2
                     , sessionId
@@ -125,7 +125,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _sessionApi.GetGameSessionDetails(
+                Api.GetGameSessionDetails(
                     sessionId,
                     callback));
         }
@@ -154,7 +154,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _sessionApi.DeleteGameSession(
+                Api.DeleteGameSession(
                     sessionId,
                     callback));
         }
@@ -184,7 +184,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _sessionApi.UpdateGameSession(
+                Api.UpdateGameSession(
                     sessionId,
                     request,
                     callback));
@@ -215,7 +215,7 @@ namespace AccelByte.Server
             }
 
             _coroutineRunner.Run(
-                _sessionApi.SendDSSessionReady(
+                Api.SendDSSessionReady(
                     sessionId,
                     isDsSessionReady,
                     callback));
@@ -245,7 +245,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            _sessionApi.GetMemberActiveSession(userId, configurationName, callback);
+            Api.GetMemberActiveSession(userId, configurationName, callback);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            _sessionApi.ReconcileMaxActiveSession(userId, configurationName, callback);
+            Api.ReconcileMaxActiveSession(userId, configurationName, callback);
         }
     }
 }

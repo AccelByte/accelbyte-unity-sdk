@@ -85,6 +85,17 @@ namespace AccelByte.Api
             
             SendRequest(ChatMessageMethod.actionRefreshToken, request, result);
         }
+
+        public void GetUserChatConfiguration(ResultCallback<GetUserChatConfigurationResponse> callback)
+        {
+            object paramObject = null;
+            SendRequest(ChatMessageMethod.actionGetUserConfig, paramObject, callback);
+        }
+
+        public void SetUserChatConfiguration(SetUserChatConfigurationRequest request, ResultCallback<SetUserChatConfigurationResponse> callback)
+        {
+            SendRequest(ChatMessageMethod.actionSetUserConfig, request, callback);
+        }
         
         #region Chat topic
         public void CreatePersonalTopic(string otherUserId, ResultCallback<ChatActionTopicResponse> callback)

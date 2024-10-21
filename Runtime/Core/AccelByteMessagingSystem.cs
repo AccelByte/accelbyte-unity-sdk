@@ -18,6 +18,8 @@ namespace AccelByte.Core
 
         private Dictionary<AccelByteMessagingTopic, Action<string>> subscribersDelegateMap = 
             new Dictionary<AccelByteMessagingTopic, Action<string>>();
+        private Dictionary<AccelByteMessagingTopic, Action<AccelByteMessage>> subscribersDelegateMapV2 = 
+            new Dictionary<AccelByteMessagingTopic, Action<AccelByteMessage>>();
 
         private int totalSubscribers = 0;
         public int AllSubscribersCount => totalSubscribers;
@@ -59,6 +61,23 @@ namespace AccelByte.Core
             subscribersDelegateMap[topic] += callback;
             totalSubscribers++;
         }
+        
+        public void SubscribeToTopicV2(AccelByteMessagingTopic topic, Action<AccelByteMessage> callback)
+        {
+            if (topic == AccelByteMessagingTopic.None)
+            {
+                logger?.LogWarning("[MessagingSystem] Unable to subscribe, topic is empty.");
+                return;
+            }
+
+            if (!subscribersDelegateMapV2.ContainsKey(topic))
+            {
+                subscribersDelegateMapV2.Add(topic, default);
+            }
+
+            subscribersDelegateMapV2[topic] += callback;
+            totalSubscribers++;
+        }
 
         public void UnsubscribeToTopic(AccelByteMessagingTopic topic, Action<string> callback)
         {
@@ -74,10 +93,26 @@ namespace AccelByte.Core
                 totalSubscribers--;
             }
         }
+        
+        public void UnsubscribeToTopicV2(AccelByteMessagingTopic topic, Action<AccelByteMessage> callback)
+        {
+            if (topic == AccelByteMessagingTopic.None)
+            {
+                logger?.LogWarning("[MessagingSystem] Unable to unsubscribe, topic is empty.");
+                return;
+            }
+
+            if (subscribersDelegateMapV2.ContainsKey(topic))
+            {
+                subscribersDelegateMapV2[topic] -= callback;
+                totalSubscribers--;
+            }
+        }
 
         public void UnsubscribeAll()
         {
             subscribersDelegateMap.Clear();
+            subscribersDelegateMapV2.Clear();
             totalSubscribers = 0;
         }
 
@@ -94,10 +129,16 @@ namespace AccelByte.Core
                 {
                     subscribersDelegateMap[topic]?.Invoke(string.Empty);
                 }
+
+                if (subscribersDelegateMapV2.ContainsKey(topic))
+                {
+                    AccelByteMessage newMessage = new AccelByteMessage() { Topic = topic, Message = string.Empty };
+                    subscribersDelegateMapV2[topic]?.Invoke(newMessage);
+                }
                 return;
             }
 
-            MessagingSystemMessage message = new();
+            var message = new MessagingSystemMessage();
             message.Topic = topic;
 
             messages.Enqueue(message);
@@ -118,10 +159,15 @@ namespace AccelByte.Core
                 {
                     subscribersDelegateMap[topic]?.Invoke(payloadString);
                 }
+                if (subscribersDelegateMapV2.ContainsKey(topic))
+                {
+                    AccelByteMessage newMessage = new AccelByteMessage() { Topic = topic, Message = payloadString };
+                    subscribersDelegateMapV2[topic]?.Invoke(newMessage);
+                }
                 return;
             }
 
-            MessagingSystemMessage message = new();
+            var message = new MessagingSystemMessage();
             message.Topic = topic;
             message.Payload = payloadString;
 
@@ -132,14 +178,25 @@ namespace AccelByte.Core
         {
             while (messages.Count > 0)
             {
-                if (!messages.TryDequeue(out var message))
+                try
                 {
-                    continue;
-                }
+                    var message = messages.Dequeue();
 
-                if (subscribersDelegateMap.ContainsKey(message.Topic))
+                    if (subscribersDelegateMap.ContainsKey(message.Topic))
+                    {
+                        subscribersDelegateMap[message.Topic]?.Invoke(message.Payload);
+                    }
+
+                    if (subscribersDelegateMapV2.ContainsKey(message.Topic))
+                    {
+                        AccelByteMessage newMessage =
+                            new AccelByteMessage() { Topic = message.Topic, Message = message.Payload };
+                        subscribersDelegateMapV2[message.Topic]?.Invoke(newMessage);
+                    }
+                }
+                catch (System.Exception)
                 {
-                    subscribersDelegateMap[message.Topic]?.Invoke(message.Payload);
+                    
                 }
             }
         }

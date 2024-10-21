@@ -5,6 +5,7 @@
 using AccelByte.Core;
 using AccelByte.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -302,7 +303,13 @@ namespace AccelByte.Api
         /// <param name="message">message to be sent</param>
         public virtual async void Send(string message)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            var maintainerBehaviour = GetOrCreateMaintainerBehaviour();
+            maintainerBehaviour.StartCoroutine(
+                RetryBackoffUtils.RunCoroutine(WebsocketSend(message), logger: logger));
+#else
             await RetryBackoffUtils.Run<int>(() => WebsocketSend(message), logger: logger);
+#endif
         }
 
         private Task<int> WebsocketSend(string message)
@@ -361,6 +368,19 @@ namespace AccelByte.Api
             maintainer = null;
         }
 
+        private static DummyBehaviour GetOrCreateMaintainerBehaviour()
+        {
+            GameObject sdkGameObject = AccelByteGameObject.GetOrCreateGameObject();
+
+            var maintainerBehaviour = sdkGameObject.GetComponent<DummyBehaviour>();
+            if (maintainerBehaviour == null)
+            {
+                maintainerBehaviour = sdkGameObject.AddComponent<DummyBehaviour>();
+            }
+
+            return maintainerBehaviour;
+        }
+
         /// <summary>
         /// Retrying connection with exponential backoff if disconnected, ping if connected
         /// </summary>
@@ -394,7 +414,13 @@ namespace AccelByte.Api
                 this.maxReconnectRetries = maxReconnectRetries;
                 this.logger = logger;
                 currentRetryAttempt = 0;
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+                var maintainerBehaviour = GetOrCreateMaintainerBehaviour();
+                maintainerBehaviour.StartCoroutine(MaintainLoop());
+#else
                 MaintainLoop();
+#endif
             }
 
             ~WebstocketMaintainer()
@@ -409,8 +435,87 @@ namespace AccelByte.Api
                 isMaintaining = false;
             }
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+            IEnumerator MaintainLoop()
+            {
+                isMaintaining = true;
+                while (isMaintaining)
+                {
+                    switch (webSocket.ReadyState)
+                    {
+                        case WsState.New:
+                            break;
+                        case WsState.Open:
+                            webSocket.Ping();
+
+                            yield return new WaitForSeconds(pingDelay / 1000f);
+
+                            break;
+                        case WsState.Connecting:
+                            while (webSocket.ReadyState == WsState.Connecting)
+                            {
+                                yield return new WaitForSeconds(1);
+                            }
+
+                            break;
+                        case WsState.Closing:
+                            while (webSocket.ReadyState == WsState.Closing)
+                            {
+                                yield return new WaitForSeconds(1);
+                            }
+
+                            break;
+                        case WsState.Closed:
+                            System.Random rand = new System.Random();
+                            int nextDelay = backoffDelay;
+                            var firstClosedTime = DateTime.Now;
+                            var timeout = TimeSpan.FromSeconds(totalTimeout / 1000f);
+
+                            while (reconnectOnClose &&
+                                webSocket.ReadyState == WsState.Closed &&
+                                DateTime.Now - firstClosedTime < timeout)
+                            {
+#if DEBUG
+                                logger?.LogVerbose("[WS] Re-Connecting");
+#endif
+                                setupReconnectAction?.Invoke();
+
+                                reconnectAction?.Invoke();
+
+                                var randomizedDelay = Mathf.RoundToInt((float)(nextDelay + ((rand.NextDouble() * 0.5) - 0.5)));
+#if DEBUG
+                                logger?.LogVerbose("[WS] Next reconnection in: " + randomizedDelay);
+#endif
+                                yield return new WaitForSeconds(randomizedDelay / 1000f);
+
+                                nextDelay *= 2;
+
+                                if (nextDelay > maxDelay)
+                                {
+                                    nextDelay = maxDelay;
+                                }
+
+                                currentRetryAttempt++;
+#if DEBUG
+                                logger?.LogVerbose("[WS] Current retry attempt: " + currentRetryAttempt);
+#endif
+                            }
+
+                            if ((reconnectOnClose && webSocket.ReadyState == WsState.Closed) || currentRetryAttempt >= maxReconnectRetries)
+                            {
+                                onReconnectFailed?.Invoke();
+                                yield break;
+                            }
+
+                            break;
+                    }
+                }
+            }
+#else
             async void MaintainLoop()
             {
+                const int pollInterval = 1000;
+
                 isMaintaining = true;
                 while (isMaintaining)
                 {
@@ -427,14 +532,14 @@ namespace AccelByte.Api
                         case WsState.Connecting:
                             while (webSocket.ReadyState == WsState.Connecting)
                             {
-                                await Task.Delay(1000);
+                                await Task.Delay(pollInterval);
                             }
 
                             break;
                         case WsState.Closing:
                             while (webSocket.ReadyState == WsState.Closing)
                             {
-                                await Task.Delay(1000);
+                                await Task.Delay(pollInterval);
                             }
 
                             break;
@@ -484,6 +589,7 @@ namespace AccelByte.Api
                     }
                 }
             }
+#endif
         }
     }
 }

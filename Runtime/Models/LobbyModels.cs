@@ -166,6 +166,7 @@ namespace AccelByte.Models
         // MatchmakingV2
         OnMatchFound,
         OnMatchmakingStarted,
+        OnMatchmakingTicketCanceled,
         OnMatchmakingTicketExpired,
 
         // SessionV2Storage
@@ -261,7 +262,11 @@ namespace AccelByte.Models
 
         public override int GetHashCode()
         {
+#if UNITY_2021_3_OR_NEWER
             return HashCode.Combine(SequenceId, SequenceNumber);
+#else
+            return (SequenceId, SequenceNumber).GetHashCode();
+#endif
         }
 
         public override bool Equals(object obj)

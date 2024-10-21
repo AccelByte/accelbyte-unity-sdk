@@ -36,11 +36,7 @@ namespace AccelByte.Server
             clientId = inClientId;
             clientSecret = inClientSecret;
             httpClient = inHttpClient;
-#if UNITY_WEBGL && !UNITY_EDITOR
-            this.HttpOperator = httpOperator == null ? new HttpCoroutineOperator(httpClient, inCoroutineRunner) : httpOperator;
-#else
-            this.HttpOperator = httpOperator == null ? new HttpAsyncOperator(httpClient) : httpOperator;
-#endif
+            HttpOperator = httpOperator != null ? httpOperator : HttpOperator.CreateDefault(inHttpClient);
             CreateSessionMaintainer();
         }
 

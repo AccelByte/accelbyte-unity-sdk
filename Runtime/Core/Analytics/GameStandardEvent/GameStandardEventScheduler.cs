@@ -96,7 +96,7 @@ namespace AccelByte.Core
                 }
 
                 queue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(jobQueue);
-                jobQueue.Clear();
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
             }
 
             var queueBackup = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(queue);

@@ -1,6 +1,8 @@
 // Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
+using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -118,5 +120,100 @@ namespace AccelByte.Models
         [DataMember] public string policyId;
         [DataMember] public bool isMandatory;
         [DataMember] public bool isAccepted;
+        [DataMember(Name = "isHiddenPublic")] public bool IsHiddenPublic;
+    }
+
+    [DataContract, Preserve]
+    public class BasePolicy
+    {
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+        [DataMember(Name = "readableId")] public string ReadableId;
+        [DataMember(Name = "policyName")] public string PolicyName;
+        [DataMember(Name = "countryCode")] public string CountryCode;
+        [DataMember(Name = "countryGroupCode")] public string CountryGroupCode;
+        [DataMember(Name = "shouldNotifyOnUpdate")] public bool ShouldNotifyOnUpdate;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "isMandatory")] public bool IsMandatory;
+        [DataMember(Name = "isDefaultOpted")] public bool IsDefaultOpted;
+        [DataMember(Name = "isDefaultSelection")] public bool IsDefaultSelection;
+    }
+
+    [DataContract, Preserve]
+    public class GetBasePolicyResponse
+    {
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "policies")] public BasePolicy[] Policies;
+        [DataMember(Name = "basePolicyName")] public string BasePolicyName;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "isHidden")] public bool IsHidden;
+        [DataMember(Name = "isHiddenPublic")] public bool IsHiddenPublic;
+        [DataMember(Name = "affectedClientIds")] public string[] AffectedClientIds;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "policyTypeName")] public string PolicyTypeName;
+        [DataMember(Name = "policyTypeId")] public string PolicyTypeId;
+    }
+
+    [DataContract, Preserve]
+    public class BasePolicyOperationRequestBase
+    {
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "basePolicyName")] public string BasePolicyName;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "affectedCountries")] public string[] AffectedCountries;
+        [DataMember(Name = "isHidden")] public bool IsHidden;
+        [DataMember(Name = "isHiddenPublic")] public bool IsHiddenPublic;
+        [DataMember(Name = "affectedClientIds")] public string[] AffectedClientIds;
+        [DataMember(Name = "tags")] public string[] Tags;
+    }
+
+    [DataContract, Preserve]
+    public class CreateBasePolicyRequest : BasePolicyOperationRequestBase
+    {
+        [DataMember(Name = "typeId")] public string TypeId;
+    }
+
+    [DataContract, Preserve]
+    public class UpdateBasePolicyRequest : BasePolicyOperationRequestBase
+    {
+    }
+
+    [DataContract, Preserve]
+    public class BasePolicyOperationResponseBase
+    {
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "policyId")] public string PolicyId;
+        [DataMember(Name = "typeId")] public string TypeId;
+        [DataMember(Name = "globalPolicyName")] public string GlobalPolicyName;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "affectedCountries")] public string[] AffectedCountries;
+        [DataMember(Name = "affectedClientIds")] public string[] AffectedClientIds;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "isHidden")] public bool IsHidden;
+        [DataMember(Name = "isHiddenPublic")] public bool IsHiddenPublic;
+    }
+
+    [DataContract, Preserve]
+    public class CreateBasePolicyResponse : BasePolicyOperationResponseBase
+    {
+    }
+    
+    [DataContract, Preserve]
+    public class UpdateBasePolicyResponse : BasePolicyOperationResponseBase
+    {
+    }
+
+    [DataContract, Preserve]
+    internal class GetPolicyTypeIdResponse
+    {
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "policyTypeName")] public string PolicyTypeName;
     }
 }

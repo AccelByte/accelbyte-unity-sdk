@@ -298,13 +298,13 @@ namespace AccelByte.Server
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/memberactivesession/{userId}")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
-                .WithPathParam("namespace", serverConfig.Namespace)
+                .WithPathParam("namespace", ServerConfig.Namespace)
                 .WithPathParam("name", configurationName)
                 .WithPathParam("userId", userId);
 
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<SessionV2MemberActiveSession>();
                 if (!result.IsError)
@@ -326,7 +326,7 @@ namespace AccelByte.Server
                 .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/reconcile")
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithPathParam("namespace", serverConfig.Namespace)
+                .WithPathParam("namespace", ServerConfig.Namespace)
                 .WithPathParam("name", configurationName)
                 .Accepts(MediaType.ApplicationJson);
 
@@ -338,7 +338,7 @@ namespace AccelByte.Server
             builder.WithBody(body.ToUtf8Json());
             IHttpRequest request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback.Try(result);

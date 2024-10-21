@@ -32,7 +32,7 @@ namespace AccelByte.Api
 #if UNITY_SWITCH && !UNITY_EDITOR
         internal static readonly string DefaultPlatformCacheDirectory = "AccelByte/PlatformLoginCache/";
 #else
-        internal static readonly string DefaultPlatformCacheDirectory = Application.persistentDataPath + "/AccelByte/PlatformLoginCache/" + Application.productName;
+        internal static readonly string DefaultPlatformCacheDirectory = $"{GameCommonInfo.PersistentPath}/AccelByte/PlatformLoginCache/{GameCommonInfo.ProductName}";
 #endif
 
         internal Action<TokenData> OnLoginSuccess;
@@ -460,10 +460,12 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform type</param>
         /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         public void LoginWithOtherPlatform(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
-            , bool createHeadless = true)
+            , bool createHeadless = true
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -471,7 +473,8 @@ namespace AccelByte.Api
             LoginWithOtherPlatformId(platformId: platformId
                 , platformToken: platformToken
                 , callback: callback
-                , createHeadless: createHeadless);
+                , createHeadless: createHeadless
+                , loginWithMacAddress: loginWithMacAddress);
         }
 
         /// <summary>
@@ -482,19 +485,22 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform type</param>
         /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
+        /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatform(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
             , bool createHeadless
-            , string serviceLabel)
+            , string serviceLabel
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             Report.GetFunctionLog(GetType().Name);
 
             string platformId = platformType.ToString().ToLower();
 #pragma warning disable AB0001
-            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless, serviceLabel);
+            LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless, serviceLabel, loginWithMacAddress);
 #pragma warning restore AB0001
         }
 
@@ -563,20 +569,23 @@ namespace AccelByte.Api
         /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
-            , bool createHeadless = true)
+            , bool createHeadless = true
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
 #pragma warning disable AB0001
             LoginWithOtherPlatformId(platformId: platformId
                 , platformToken: platformToken
                 , callback: callback
                 , createHeadless: createHeadless
-                , serviceLabel: null);
+                , serviceLabel: null
+                , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
-
+        
         /// <summary>
         /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
         /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
@@ -587,12 +596,14 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatformId(string platformId
             , string platformToken
             , ResultCallback<TokenData, OAuthError> callback
             , bool createHeadless
-            , string serviceLabel)
+            , string serviceLabel
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -619,7 +630,7 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless, serviceLabel);
+                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, cb, createHeadless, serviceLabel, loginWithMacAddress);
                 }
                 , onAlreadyLogin
                 , onLoginFailed
@@ -3080,11 +3091,13 @@ namespace AccelByte.Api
         /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatformV4(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless = true)
+            , bool createHeadless = true
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -3093,10 +3106,11 @@ namespace AccelByte.Api
                 , platformToken: platformToken
                 , callback: callback
                 , createHeadless:createHeadless
-                , serviceLabel: null);
+                , serviceLabel: null
+                , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
-
+        
         /// <summary>
         /// Login with token from PS4/PS5 platforms. This will automatically register a user if the user
         /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
@@ -3111,12 +3125,14 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatformV4(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
             , bool createHeadless
-            , string serviceLabel)
+            , string serviceLabel
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             string platformId = platformType.ToString().ToLower();
 
@@ -3125,10 +3141,11 @@ namespace AccelByte.Api
                 , platformToken: platformToken
                 , callback: callback
                 , createHeadless: createHeadless
-                , serviceLabel: serviceLabel);
+                , serviceLabel: serviceLabel
+                , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
-
+        
         /// <summary>
         /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
         /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
@@ -3142,18 +3159,21 @@ namespace AccelByte.Api
         /// <param name="platformToken">Token for other platform type</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatformIdV4(string platformId
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless = true)
+            , bool createHeadless = true
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
 #pragma warning disable AB0001
             LoginWithOtherPlatformIdV4(platformId: platformId
                 , platformToken: platformToken
                 , callback: callback
                 , createHeadless: createHeadless
-                , serviceLabel: null);
+                , serviceLabel: null
+                , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
 
@@ -3171,12 +3191,14 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
+        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
         [AccelByte.Utils.Attributes.AccelBytePreview]
         public void LoginWithOtherPlatformIdV4(string platformId
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
             , bool createHeadless
-            , string serviceLabel)
+            , string serviceLabel
+            , LoginWithMacAddress loginWithMacAddress = null)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -3212,7 +3234,7 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, cb);
+                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, loginWithMacAddress, cb);
                 }
                 , onAlreadyLogin
                 , onLoginFailed

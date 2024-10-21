@@ -1,14 +1,15 @@
 {
     "name": "com.accelbyte.UnitySDK",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:04376767bc1f3b428aefa3d20743e819"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Newtonsoft.Json.dll",
-        "NativeWebSocket.dll"
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

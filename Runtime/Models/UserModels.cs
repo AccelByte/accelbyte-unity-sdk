@@ -958,6 +958,34 @@ namespace AccelByte.Models
         [DataMember(Name = "usernameDisabled")] public bool UserNameDisabled;
     }
 
+#region Strong Typed Variables
+    
+    public class LoginWithMacAddress
+    {
+        private bool isSendMacAddress;
+        
+        public LoginWithMacAddress(bool useMacAddress)
+        {
+            isSendMacAddress = useMacAddress;
+        }
+
+        public LoginWithMacAddress()
+        {
+            isSendMacAddress = true;
+        }
+        
+        internal bool IsLoginWithMacAddress()
+        {
+#if (!UNITY_PS4 && !UNITY_PS5 && !UNITY_GAMECORE_XBOXSERIES && !UNITY_GAMECORE_XBOXONE) || UNITY_EDITOR
+            return false;
+#else
+            return isSendMacAddress;
+#endif
+        }
+    }
+    
+#endregion
+    
     #region V4
 
     [DataContract, Preserve]

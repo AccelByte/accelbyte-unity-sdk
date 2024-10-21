@@ -76,7 +76,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request
+            HttpOperator.SendRequest(request
                 , response =>
                 {
                     var result = response.TryParseJson<SaveBinaryRecordResponse>();
@@ -104,7 +104,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request
+            HttpOperator.SendRequest(request
                 , response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
@@ -139,7 +139,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
@@ -171,7 +171,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
@@ -210,7 +210,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
@@ -249,7 +249,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<ListUserBinaryRecords>();
@@ -285,7 +285,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedUserBinaryRecords>();
@@ -321,7 +321,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedUserBinaryRecords>();
@@ -368,7 +368,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
@@ -403,7 +403,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<UserBinaryRecord>();
@@ -430,7 +430,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParse();
@@ -475,7 +475,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<RequestUserBinaryRecordPresignedUrlResponse>();
@@ -502,7 +502,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<GameBinaryRecord>();
@@ -534,7 +534,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<ListGameBinaryRecords>();
@@ -570,7 +570,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request,
+            HttpOperator.SendRequest(request,
                 response =>
                 {
                     var result = response.TryParseJson<PaginatedGameBinaryRecords>();

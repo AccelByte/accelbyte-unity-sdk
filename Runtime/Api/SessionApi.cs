@@ -167,7 +167,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
             
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<InviteUserToPartyResponse>();
                 callback?.Try(result);
@@ -530,9 +530,19 @@ namespace AccelByte.Api
         public IEnumerator GetGameSessionDetailsBySessionId(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            GetGameSessionDetailsBySessionIdInternal(sessionId, callback);
+            yield break;
+        }
+        
+        internal void GetGameSessionDetailsBySessionIdInternal(string sessionId
+            , ResultCallback<SessionV2GameSession> callback)
+        {
+            var error = Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, sessionId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}")
@@ -543,14 +553,11 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<SessionV2GameSession>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SessionV2GameSession>();
+                callback?.Try(result); 
+            });
         }
 
         public IEnumerator DeleteGameSession(string sessionId
@@ -662,7 +669,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<InviteUserToGameSessionResponse>();
                 callback?.Try(result);

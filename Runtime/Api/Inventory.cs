@@ -5,6 +5,7 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Api.Interface;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -152,12 +153,15 @@ namespace AccelByte.Api
         public void GetUserInventoryAllItems(
             string inventoryId
             , ResultCallback<UserItemsPagingResponse> callback
-            , UserItemSortBy sortBy = UserItemSortBy.CreatedAt
-            , int limit = 25
-            , int offset = 0
-            , string sourceItemId = ""
-            , TagQueryBuilder tagBuilder = null
-            , int? quantity = null
+        )
+        {
+            GetUserInventoryAllItems(inventoryId, null, callback);
+        }
+        
+        public void GetUserInventoryAllItems(
+            string inventoryId
+            , GetUserInventoryAllItemsOptionalParameters optionalParameters
+            , ResultCallback<UserItemsPagingResponse> callback
         )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -169,13 +173,31 @@ namespace AccelByte.Api
             }
 
             api.GetUserInventoryAllItems(inventoryId
-                , callback
-                , sortBy
-                , limit
-                , offset
-                , sourceItemId
-                , tagBuilder
-                , quantity);
+                , optionalParameters
+                , callback);
+        }
+        
+        public void GetUserInventoryAllItems(
+            string inventoryId
+            , ResultCallback<UserItemsPagingResponse> callback
+            , UserItemSortBy sortBy = UserItemSortBy.CreatedAt
+            , int limit = 25
+            , int offset = 0
+            , string sourceItemId = ""
+            , TagQueryBuilder tagBuilder = null
+            , int? quantity = null
+        )
+        {
+            GetUserInventoryAllItemsOptionalParameters optionalParameters = new GetUserInventoryAllItemsOptionalParameters()
+            {
+                SortBy = sortBy,
+                Limit = limit,
+                Offset = offset,
+                SourceItemId = sourceItemId,
+                TagQueryBuilder = tagBuilder
+            };
+            
+            GetUserInventoryAllItems(inventoryId, optionalParameters, callback);
         }
 
         public void GetUserInventoryItem(

@@ -24,8 +24,7 @@ namespace AccelByte.Server
         private TimeSpan telemetryInterval = TimeSpan.FromMinutes(1);
         private HashSet<string> immediateEvents = new HashSet<string>();
         private ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>> jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
-        private Coroutine telemetryCoroutine = null;
-        private bool isSchedulerRunning = false;
+        private System.Threading.CancellationTokenSource cancelationTokenSource = null;
         private static readonly TimeSpan minimumTelemetryInterval = new TimeSpan(0, 0, 5);
 
         internal TimeSpan TelemetryInterval
@@ -110,7 +109,7 @@ namespace AccelByte.Server
             else
             {
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
-                if (isSchedulerRunning == false)
+                if (cancelationTokenSource == null)
                 {
                     RunPeriodicTelemetry();
                 }
@@ -133,7 +132,7 @@ namespace AccelByte.Server
                 }
 
                 queue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(jobQueue);
-                jobQueue.Clear();
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
             }
 
             var queueBackup = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>(queue);
@@ -174,7 +173,7 @@ namespace AccelByte.Server
         {
             lock (jobQueue)
             {
-                jobQueue.Clear();
+                jobQueue = new ConcurrentQueue<Tuple<TelemetryBody, ResultCallback>>();
             }
         }
 
@@ -184,21 +183,46 @@ namespace AccelByte.Server
             serverAnalyticsService.SetSharedMemory(newSharedMemory);
         }
 
-        private async void RunPeriodicTelemetry()
+        private void RunPeriodicTelemetry()
         {
-            if (isSchedulerRunning)
+            if(cancelationTokenSource != null)
             {
                 return;
             }
 
-            isSchedulerRunning = true;
-            while (isSchedulerRunning && session != null && session.IsValid())
+            SendTelemetryBatch(callback: null);
+            
+            cancelationTokenSource = new System.Threading.CancellationTokenSource();
+            IndefiniteLoopCommand telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
+                , cancellationToken: cancelationTokenSource.Token
+                , onUpdate: TelemetryLoop);
+            SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
+        }
+        
+        private void TelemetryLoop()
+        {
+            if (cancelationTokenSource == null || cancelationTokenSource.IsCancellationRequested)
             {
-                SendTelemetryBatch(callback: null);
-
-                await System.Threading.Tasks.Task.Delay(telemetryInterval);
+                return;
             }
-            isSchedulerRunning = false;
+            
+            if (session == null || !session.IsValid())
+            {
+                return;
+            }
+
+            lock (jobQueue)
+            {
+                if (jobQueue == null || jobQueue.IsEmpty)
+                {
+                    cancelationTokenSource.Cancel();
+                    cancelationTokenSource.Dispose();
+                    cancelationTokenSource = null;
+                    return;
+                }   
+            }
+
+            SendTelemetryBatch(callback: null);
         }
 
         private void SendTelemetryRequest(List<TelemetryBody> telemetryBodies, ResultCallback callback)

@@ -16,12 +16,10 @@ namespace AccelByte.Core
         private IHttpClient httpClient;
         AccelByteAnalyticsSettings analyticsSettings;
         private ApiSharedMemory sharedMemory;
-        private OverrideConfigs overrideConfigs;
         private Server.ServerOauthLoginSession activeSession;
         
         internal ClientAnalyticsService(IHttpRequestSenderFactory httpRequestSenderFactory, CoreHeartBeat coreHeartBeat, AccelByteTimeManager timeManager, Config clientConfig, SettingsEnvironment environment)
         {
-            this.overrideConfigs = overrideConfigs;
             IHttpRequestSender requestSender = httpRequestSenderFactory.CreateHttpRequestSender();
             this.httpClient = new AccelByteHttpClient(requestSender);
 
@@ -205,7 +203,7 @@ namespace AccelByte.Core
 
         internal void DisposeScheduler()
         {
-            activeSession.Reset();
+            activeSession?.Reset();
             if (analyticsControllerEventScheduler != null)
             {
                 analyticsControllerEventScheduler.Dispose();

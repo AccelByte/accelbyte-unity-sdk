@@ -3,7 +3,6 @@
 // and restrictions contact your company contract manager.
 using System;
 using System.Collections;
-using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -157,7 +156,7 @@ namespace AccelByte.Server
             , ResultCallback callback )
         {
             string ip = "";
-            AccelByteNetUtilities.GetPublicIpWithIpify(httpOperator, getPublicIpResult =>
+            AccelByteNetUtilities.GetPublicIpWithIpify(HttpOperator, getPublicIpResult =>
             {
                 ip = getPublicIpResult.Value.ip;
             });
@@ -266,7 +265,7 @@ namespace AccelByte.Server
             callback?.Try(result);
         }
 
-        public async void ServerHeartBeat(ResultCallback callback)
+        public void ServerHeartBeat(ResultCallback callback)
         {
             if (AuthToken == null)
             {
@@ -291,10 +290,11 @@ namespace AccelByte.Server
                 .WithBody(heartBeatRequest.ToUtf8Json())
                 .GetResult();
 
-            HttpSendResult sendResult = await HttpClient.SendRequestAsync(request);
-            IHttpResponse response = sendResult.CallbackResponse;
-            var result = response.TryParse();
-            callback?.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         private void ParseArgsAndServerSetup()

@@ -8,7 +8,8 @@ using AccelByte.Api.Interface;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEngine.Assertions;
-using System.Threading.Tasks;
+using UnityEngine;
+using System.Collections;
 
 namespace AccelByte.Api
 {
@@ -17,7 +18,8 @@ namespace AccelByte.Api
         private readonly SessionApi sessionApi;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
-
+        private System.Threading.CancellationTokenSource cts;
+        
         [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
             , ISession inSession
@@ -28,6 +30,7 @@ namespace AccelByte.Api
             sessionApi = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
+            cts = new System.Threading.CancellationTokenSource();
         }
 
         internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
@@ -36,6 +39,16 @@ namespace AccelByte.Api
             base.SetSharedMemory(newSharedMemory);
 
             SharedMemory?.MessagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchFoundOnPoll, OnTicketPollMatchFound);
+        }
+
+        ~Session()
+        {
+            Reset();
+        }
+
+        internal void Reset()
+        {
+            cts.Cancel();
         }
 
         #region PartySession
@@ -755,106 +768,113 @@ namespace AccelByte.Api
                 sessionApi.PromoteUserToGameSessionLeader(sessionId, leaderId, callback));
         }
 
-        private async void OnTicketPollMatchFound(string sessionId)
+        private void OnTicketPollMatchFound(string sessionId)
+        {
+            coroutineRunner.Run(OnTicketPollMatchFoundAsync(sessionId));
+        }
+
+        private IEnumerator OnTicketPollMatchFoundAsync(string sessionId)
         {
             if (string.IsNullOrEmpty(sessionId))
             {
                 AccelByteDebug.LogError("Session ID from polled ticket is invalid");
-                return;
+                yield break;
             }
 
             bool isMatchFoundNotifSent = false;
             bool isDsStatusChangedNotifSent = false;
             bool shouldContinuePolling = true;
-            while (shouldContinuePolling)
+            while (shouldContinuePolling && !cts.IsCancellationRequested)
             {
-                coroutineRunner.Run(
-                    sessionApi.GetGameSessionDetailsBySessionId(sessionId, result =>
+                sessionApi.GetGameSessionDetailsBySessionIdInternal(sessionId, result =>
+                {
+                    if (result.IsError || cts.IsCancellationRequested)
                     {
-                        if (result.IsError)
+                        shouldContinuePolling = false;
+                        return;
+                    }
+
+                    if (result.Value.ticketIds == null)
+                    {
+                        return;
+                    }
+
+                    if (!isMatchFoundNotifSent)
+                    {
+                        var tickets = new MatchmakingV2Ticket[result.Value.ticketIds.Length];
+                        for (int i = 0; i < result.Value.ticketIds.Length; i++)
                         {
-                            shouldContinuePolling = false;
-                            return;
+                            tickets[i] = new MatchmakingV2Ticket() { ticketId = result.Value.ticketIds[i] };
                         }
 
-                        if (!isMatchFoundNotifSent)
+                        var matchFoundNotif = new MatchmakingV2MatchFoundNotification()
                         {
-                            var tickets = new MatchmakingV2Ticket[result.Value.ticketIds.Length];
-                            for (int i = 0; i < result.Value.ticketIds.Length; i++)
+                            id = result.Value.id,
+                            teams = result.Value.teams,
+                            matchPool = result.Value.matchPool,
+                            tickets = tickets,
+                            namespace_ = sessionApi.Config.Namespace,
+                            createdAt = System.DateTime.UtcNow
+                        };
+
+                        var matchFoundNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                            "OnMatchFound"
+                            , matchFoundNotif.ToJsonString()
+                            , isEncoded: true);
+                        SharedMemory.NotificationSender.SendLobbyNotification(matchFoundNotifMessage);
+
+                        isMatchFoundNotifSent = true;
+                    }
+
+                    if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.ENDED)
+                    {
+                        shouldContinuePolling = false;
+                        return;
+                    }
+
+                    if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE ||
+                        result.Value.dsInformation.StatusV2 == SessionV2DsStatus.FAILED_TO_REQUEST)
+                    {
+                        if (!isDsStatusChangedNotifSent)
+                        {
+                            var dsStatusChangedNotif = new SessionV2DsStatusUpdatedNotification()
                             {
-                                tickets[i] = new MatchmakingV2Ticket()
-                                {
-                                    ticketId = result.Value.ticketIds[i]
-                                };
-                            }
-                            var matchFoundNotif = new MatchmakingV2MatchFoundNotification()
-                            {
-                                id = result.Value.id,
-                                teams = result.Value.teams,
-                                matchPool = result.Value.matchPool,
-                                tickets = tickets,
-                                namespace_ = sessionApi.Config.Namespace,
-                                createdAt = System.DateTime.UtcNow
+                                session = result.Value, sessionId = result.Value.id, error = null
                             };
-
-                            var matchFoundNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
-                                "OnMatchFound"
-                                , matchFoundNotif.ToJsonString()
-                                , isEncoded: true);
-                            SharedMemory.NotificationSender.SendLobbyNotification(matchFoundNotifMessage);
-
-                            isMatchFoundNotifSent = true;
-                        }
-
-                        if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.ENDED)
-                        {
-                            shouldContinuePolling = false;
-                            return;
-                        }
-
-                        if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE ||
-                            result.Value.dsInformation.StatusV2 == SessionV2DsStatus.FAILED_TO_REQUEST)
-                        {
-                            if (!isDsStatusChangedNotifSent)
-                            {
-                                var dsStatusChangedNotif = new SessionV2DsStatusUpdatedNotification()
-                                {
-                                    session = result.Value,
-                                    sessionId = result.Value.id,
-                                    error = null
-                                };
-                                var dsStatusChangedNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                            var dsStatusChangedNotifMessage =
+                                AccelByteNotificationSenderUtility.ComposeMMv2Notification(
                                     "OnDSStatusChanged"
                                     , dsStatusChangedNotif.ToJsonString()
                                     , isEncoded: true);
 
-                                SharedMemory.NotificationSender.SendLobbyNotification(dsStatusChangedNotifMessage);
+                            SharedMemory.NotificationSender.SendLobbyNotification(dsStatusChangedNotifMessage);
 
-                                isDsStatusChangedNotifSent = true;
-                            }
+                            isDsStatusChangedNotifSent = true;
+                        }
 
-                            if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE)
+                        if (result.Value.dsInformation.StatusV2 == SessionV2DsStatus.AVAILABLE)
+                        {
+                            var sessionInviteNotif = new SessionV2GameInvitationNotification()
                             {
-                                var sessionInviteNotif = new SessionV2GameInvitationNotification()
-                                {
-                                    sessionId = result.Value.id
-                                };
+                                sessionId = result.Value.id
+                            };
 
-                                var sessionInviteNotifMessage = AccelByteNotificationSenderUtility.ComposeSessionNotification(
+                            var sessionInviteNotifMessage =
+                                AccelByteNotificationSenderUtility.ComposeSessionNotification(
                                     "OnSessionInvited"
                                     , sessionInviteNotif.ToJsonString()
                                     , isEncoded: true);
-                                SharedMemory.NotificationSender.SendLobbyNotification(sessionInviteNotifMessage);
-                            }
-
-                            shouldContinuePolling = false;
-                            return;
+                            SharedMemory.NotificationSender.SendLobbyNotification(sessionInviteNotifMessage);
                         }
-                    }));
+
+                        shouldContinuePolling = false;
+                        return;
+                    }
+                });
 
                 if (shouldContinuePolling)
                 {
-                    await Task.Delay(sessionApi.Config.MatchmakingTicketCheckPollRate);
+                    yield return new WaitForSeconds(sessionApi.Config.MatchmakingTicketCheckPollRate / 1000f);
                 }
             }
         }

@@ -21,13 +21,13 @@ namespace AccelByte.Api
         public void SendData(List<TelemetryBody> telemetryBodies
             , ResultCallback callback)
         {
-            AccelByteGameTelemetryApi.SendProtectedEventV1(telemetryBodies,httpOperator, BaseUrl, AuthToken, callback);
+            AccelByteGameTelemetryApi.SendProtectedEventV1(telemetryBodies,HttpOperator, BaseUrl, AuthToken, callback);
         }
 
         internal void FetchServerTime(ref AccelByteTimeManager timeManager)
         {
             Assert.IsNotNull(timeManager, "Time manager can't be null");
-            timeManager.FetchServerTime(httpOperator, Config.Namespace, Config.BasicServerUrl);
+            timeManager.FetchServerTime(HttpOperator, Config.Namespace, Config.BasicServerUrl);
         }
     }
 }

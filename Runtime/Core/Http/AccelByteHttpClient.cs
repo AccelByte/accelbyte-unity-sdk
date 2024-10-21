@@ -50,7 +50,11 @@ namespace AccelByte.Core
             }
             else
             {
+#if !UNITY_WEBGL
                 var defaultSenderScheduler = new WebRequestSchedulerAsync();
+#else
+                var defaultSenderScheduler = new WebRequestSchedulerCoroutine(new CoroutineRunner());
+#endif
                 UnityHttpRequestSender defaultSender = new UnityHttpRequestSender(defaultSenderScheduler);
                 defaultSenderScheduler.SetLogger(logger);
                 

@@ -28,7 +28,7 @@ namespace AccelByte.Core
         /// Comes from Config || ServerConfig, set @ SetBaseUrl() from constructor.
         /// - Eg, Config.BaseUrl || Config.CloudStorageServerUrl
         /// </summary>
-        protected readonly string BaseUrl;
+        internal readonly string BaseUrl;
 
         private ApiSharedMemory sharedMemory;
         
@@ -91,7 +91,7 @@ namespace AccelByte.Core
         /// Wrapper for Session.AuthorizationToken
         /// - Sometimes called AccessToken
         /// </summary>
-        protected string AuthToken => Session.AuthorizationToken;
+        internal string AuthToken => Session.AuthorizationToken;
         #endregion /High-Level Shortcuts
         
         internal virtual void SetSharedMemory(ApiSharedMemory newSharedMemory)

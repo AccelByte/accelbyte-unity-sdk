@@ -289,7 +289,7 @@ namespace AccelByte.Server
             {
                 maintainer.Stop();
             }
-            maintainer = new HeartBeatMaintainer(intervalMs);
+            maintainer = new HeartBeatMaintainer(intervalMs, SharedMemory?.CoreHeartBeat);
             maintainer.OnHeartBeatTrigger += () => api.ServerHeartBeat(heartBeatCallback);
             maintainer.Start();
         }
@@ -305,24 +305,30 @@ namespace AccelByte.Server
 
         private class HeartBeatMaintainer
         {
-            private int intervalInMs = 0;
+            private double intervalInSeconds = 0;
             internal Action OnHeartBeatTrigger;
 
             public bool IsHeartBeatEnabled
             {
-                get;
-                private set;
+                get
+                {
+                    return cts != null;
+                }
             }
 
-            public bool IsHeartBeatJobRunning
+            private CoreHeartBeat heartBeat;
+            private System.Threading.CancellationTokenSource cts;
+
+            public HeartBeatMaintainer(int heartBeatIntervalMs, CoreHeartBeat heartBeat)
             {
-                get;
-                private set;
+                UnityEngine.Assertions.Assert.IsNotNull(heartBeat);
+                this.heartBeat = heartBeat;
+                this.intervalInSeconds = heartBeatIntervalMs / 1000f;
             }
 
-            public HeartBeatMaintainer(int heartBeatIntervalMs, ServerSession session = null)
+            ~HeartBeatMaintainer()
             {
-                this.intervalInMs = heartBeatIntervalMs;
+                Stop();
             }
 
             public void Start()
@@ -332,19 +338,25 @@ namespace AccelByte.Server
 
             public void Stop()
             {
-                IsHeartBeatEnabled = false;
+                if (cts != null)
+                {
+                    cts.Cancel();
+                    cts.Dispose();
+                    cts = null;
+                }
             }
 
-            private async void RunPeriodicHeartBeat()
+            private void RunPeriodicHeartBeat()
             {
-                IsHeartBeatEnabled = true;
-                IsHeartBeatJobRunning = true;
-                while (IsHeartBeatEnabled)
+                Stop();
+                
+                cts = new System.Threading.CancellationTokenSource();
+                System.Action onloopUpdate = () =>
                 {
                     OnHeartBeatTrigger.Invoke();
-                    await System.Threading.Tasks.Task.Delay(this.intervalInMs);
-                }
-                IsHeartBeatJobRunning = false;
+                };
+                var loopCommand = new IndefiniteLoopCommand(intervalInSeconds, onUpdate: onloopUpdate, cts.Token);
+                heartBeat?.Wait(loopCommand);
             }
         }
 

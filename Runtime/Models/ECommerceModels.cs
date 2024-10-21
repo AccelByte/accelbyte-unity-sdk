@@ -1,6 +1,8 @@
 // Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
+using AccelByte.Core;
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
@@ -1114,6 +1116,96 @@ namespace AccelByte.Models
         [DataMember] public int count;
     }
 
+    [Preserve]
+    public class PlatformStoreId
+    {
+        private string currentPlatformStoreId;
+        private readonly Dictionary<PlatformType, string> platformTypeAndPlatformStoreNameMap = new Dictionary<PlatformType, string>()
+        {
+            {PlatformType.Steam, "STEAM"},
+            {PlatformType.EpicGames, "EPICGAMES"},
+            {PlatformType.PS4, "PLAYSTATION"},
+            {PlatformType.PS4Web, "PLAYSTATION"},
+            {PlatformType.PS5, "PLAYSTATION"},
+            {PlatformType.Google, "GOOGLE"},
+            {PlatformType.GooglePlayGames, "GOOGLE"},
+            {PlatformType.Android, "GOOGLE"},
+            {PlatformType.Live, "XBOX"},
+            {PlatformType.Apple, "APPLE"},
+            {PlatformType.iOS, "APPLE"},
+            {PlatformType.Oculus, "OCULUS"},
+            {PlatformType.Twitch, "TWITCH"}
+        };
+
+        public PlatformStoreId(string platformId)
+        {
+            currentPlatformStoreId = platformId;
+        }
+
+        public PlatformStoreId(PlatformType pType)
+        {
+            var successGetValue = platformTypeAndPlatformStoreNameMap.TryGetValue(pType, out currentPlatformStoreId);
+            if (!successGetValue)
+            {
+                AccelByteDebug.LogWarning($"subscription for {pType} doesn't exist");
+            }
+        }
+
+        internal string GetStorePlatformName()
+        {
+            return currentPlatformStoreId;
+        }
+    }
+
+    [Preserve]
+    public class QueryUserSubscriptionRequestOptionalParameters
+    {
+        /// <summary>
+        /// Optional param for set the result offset
+        /// </summary>
+        public int Offset = 0;
+        /// <summary>
+        /// Optional param for set the result limit
+        /// </summary>
+        public int Limit = 20;
+        /// <summary>
+        /// Optional param to show active subscription only
+        /// </summary>
+        public bool? ActiveOnly;
+        /// <summary>
+        /// Optional param to show only specific product Id
+        /// </summary>
+        public string ProductId;
+        /// <summary>
+        /// Optional param to show only specific group id
+        /// </summary>
+        public string GroupId;
+    }
+
+    [DataContract, Preserve]
+    public class ThirdPartyUserSubscriptionInfo
+    {
+        [DataMember (Name="id")] public string Id;
+        [DataMember (Name="namespace")] public string Namespace;
+        [DataMember (Name="platform")] public string Platform;
+        [DataMember (Name="active")] public bool Active;
+        [DataMember (Name="status")] public string Status;
+        [DataMember (Name="subscriptionGroupId")] public string SubscriptionGroupId;
+        [DataMember (Name="subscriptionProductId")] public string SubscriptionProductId;
+        [DataMember (Name="startAt")] public DateTime StartAt;
+        [DataMember (Name="expiredAt")] public DateTime ExpiredAt;
+        [DataMember (Name="lastTransactionId")] public string LastTransactionId;
+        [DataMember (Name="createdAt")] public DateTime CreatedAt;
+        [DataMember (Name="updatedAt")] public DateTime UpdatedAt;
+    }
+    
+    [DataContract, Preserve]
+    public class SubscriptionPagingSlicedResult
+    {
+        [DataMember(Name = "data")] public ThirdPartyUserSubscriptionInfo[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
+    }
+    
     [DataContract, Preserve]
     public class EntitlementInfo
     {
@@ -1146,6 +1238,60 @@ namespace AccelByte.Models
         [DataMember] public bool replayed;
         [DataMember] public EntitlementReward[] rewards;
         [DataMember] public LootBoxConfig lootBoxConfig;
+    }
+
+    [Preserve]
+    public class GetUserEntitlementHistoryOptionalParams
+    {
+        /// <summary>
+        /// Filter entitlement query based on Clazz.
+        /// </summary>
+        public EntitlementClazz EntitlementClazz = EntitlementClazz.NONE;
+
+        /// <summary>
+        /// Filter entitlement query based on start date.
+        /// </summary>
+        public DateTime? StartDate = null;
+
+        /// <summary>
+        /// Filter entitlement query based on end date.
+        /// </summary>
+        public DateTime? EndDate = null;
+
+        /// <summary>
+        /// Offset of the paginated list that has been sliced.
+        /// </summary>
+        public int Offset = 0;
+
+        /// <summary>
+        /// Limit of items to be displayed on each page.
+        /// </summary>
+        public int Limit = 20;
+    }
+
+    [DataContract, Preserve]
+    public class UserEntitlementHistory
+    {
+        [DataMember(Name = "entitlementId")] public string EntitlementId;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "action")] public string Action;
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "useCount")] public int UseCount;
+        [DataMember(Name = "useCountChange")] public int UseCountChange;
+        [DataMember(Name = "reason")] public string Reason;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+        [DataMember(Name = "origin")] public WalletTable Origin;
+        [DataMember(Name = "clazz")] public EntitlementClazz Clazz;
+        [DataMember(Name = "itemId")] public string ItemId;
+        [DataMember(Name = "sku")] public string Sku;
+    }
+
+    [DataContract, Preserve]
+    public class UserEntitlementHistoryResponse
+    {
+        [DataMember(Name = "data")] public UserEntitlementHistory[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 
     [DataContract, Preserve]
@@ -1296,6 +1442,49 @@ namespace AccelByte.Models
         [DataMember] public DateTime grantedAt;
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime updatedAt;
+    }
+
+    [DataContract, Preserve]
+    internal class SyncSteamInventoryRequest
+    {
+        [DataMember(Name = "steamId")] public string SteamId;
+        [DataMember(Name = "appId")] public string AppId;
+        [DataMember(Name = "region")] public string Region;
+        [DataMember(Name = "language")] public string Language;
+        [DataMember(Name = "productId")] public string ProductId;
+        [DataMember(Name = "price")] public double Price;
+        [DataMember(Name = "currencyCode")] public string CurrencyCode;
+
+        public SyncSteamInventoryRequest()
+        {
+
+        }
+
+        internal SyncSteamInventoryRequest(string steamId
+            , string appId
+            , string productId
+            , double price
+            , string currencyCode
+            , SyncSteamInventoryOptionalParameters optionalParameters)
+        {
+            SteamId = steamId;
+            AppId = appId;
+            ProductId = productId;
+            Price = price;
+            CurrencyCode = currencyCode;
+            Region = optionalParameters?.Region;
+            Language = optionalParameters?.Language;
+
+            if (Region == "")
+            {
+                Region = null;
+            }
+
+            if (Language == "")
+            {
+                Language = null;
+            }
+        }
     }
 
     [DataContract, Preserve]
@@ -1534,6 +1723,18 @@ namespace AccelByte.Models
     #region SyncPurchaseMobile
 
     [DataContract, Preserve]
+    public class CurrentAppleConfigVersion
+    {
+        [DataMember(Name = "version")] public string Version;
+    }
+    
+    [DataContract, Preserve]
+    public class PlatformSyncMobileAppleV2
+    {        
+        [DataMember(Name = "transactionId")] public string TransactionId;
+    }
+
+    [DataContract, Preserve]
     public class PlatformSyncMobileApple
     {
         [DataMember] public string productId;
@@ -1589,6 +1790,24 @@ namespace AccelByte.Models
     public class PlatformSyncMobileGoogleOptionalParameters
     {
         /// <summary>
+        /// Optional param for AutoConsume.
+        /// Automatically consume product after fulfill item.
+        /// </summary>
+        public bool? AutoConsume = null;
+        /// <summary>
+        /// Optional param for product region
+        /// </summary>
+        public string Region = null;
+        /// <summary>
+        /// Optional param for product language
+        /// </summary>
+        public string Language = null;
+    }
+
+    [Preserve]
+    public class SyncSteamInventoryOptionalParameters
+    {
+        /// <summary>
         /// Optional param for product region
         /// </summary>
         public string Region = null;
@@ -1609,13 +1828,24 @@ namespace AccelByte.Models
         [DataMember] public string region; //optional
         [DataMember] public string language; //optional
         [DataMember] public bool autoAck;  //should be true for sync DURABLE item entitlement
+        [DataMember(Name = "autoConsume"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? AutoConsume;
+        [DataMember(Name = "subscriptionPurchase"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public bool? SubscriptionPurchase;
         
         public PlatformSyncMobileGoogle()
         {
             
         }
 
-        internal PlatformSyncMobileGoogle(string orderId, string packageName, string productId, long purchaseTime, string purchaseToken, bool autoAck, PlatformSyncMobileGoogleOptionalParameters optionalParameters)
+        internal PlatformSyncMobileGoogle(string orderId
+            , string packageName
+            , string productId
+            , long purchaseTime
+            , string purchaseToken
+            , bool autoAck
+            , bool subscriptionPurchase
+            , PlatformSyncMobileGoogleOptionalParameters optionalParameters)
         {
             this.orderId = orderId;
             this.packageName = packageName;
@@ -1623,8 +1853,10 @@ namespace AccelByte.Models
             this.purchaseTime = purchaseTime;
             this.purchaseToken = purchaseToken;
             this.autoAck = autoAck;
+            this.SubscriptionPurchase = subscriptionPurchase;
             this.region = optionalParameters?.Region;
             this.language = optionalParameters?.Language;
+            this.AutoConsume = optionalParameters?.AutoConsume;
 
             if (region == "")
             {

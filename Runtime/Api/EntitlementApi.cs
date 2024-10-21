@@ -14,7 +14,6 @@ namespace AccelByte.Api
 {
     public class EntitlementApi : ApiBase
     {
-        protected HttpOperator httpOperator;
 
         /// <summary>
         /// </summary>
@@ -27,7 +26,6 @@ namespace AccelByte.Api
             , ISession session ) 
             : base( httpClient, config, config.PlatformServerUrl, session )
         {
-            this.httpOperator = httpOperator != null ? httpOperator : new HttpAsyncOperator(httpClient);
         }
 
         public IEnumerator QueryUserEntitlements(string userId
@@ -110,6 +108,60 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<EntitlementPagingSlicedResult>();
             callback.Try(result);
+        }
+
+        internal void QueryUserSubscription(string userId, PlatformStoreId platformStoreId, ResultCallback<SubscriptionPagingSlicedResult> callback, QueryUserSubscriptionRequestOptionalParameters optionalParameters)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, platformStoreId.GetStorePlatformName(), userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            HttpRequestBuilder builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/subscriptions/platforms/{platform}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("platform", platformStoreId.GetStorePlatformName().ToUpper())
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters != null)
+            {
+                if (optionalParameters.Limit >= 0)
+                {
+                    builder.WithQueryParam("limit", optionalParameters.Limit.ToString());
+                }
+                
+                builder.WithQueryParam("offset", optionalParameters.Offset.ToString());
+                
+                if (optionalParameters.ActiveOnly != null)
+                {
+                    builder.WithQueryParam("activeOnly", optionalParameters.ActiveOnly.ToString().ToLower());
+                }
+                
+                if (!string.IsNullOrEmpty(optionalParameters.ProductId))
+                {
+                    builder.WithQueryParam("productId", optionalParameters.ProductId);
+                }
+
+                if (!string.IsNullOrEmpty(optionalParameters.GroupId))
+                {
+                    builder.WithQueryParam("groupId", optionalParameters.GroupId);
+                }
+            }
+            
+            IHttpRequest request = builder.GetResult();
+            
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SubscriptionPagingSlicedResult>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetUserEntitlementById( string userId
@@ -324,6 +376,61 @@ namespace AccelByte.Api
             callback.Try(result);
         }
 
+        public void GetUserEntitlementHistory(string userId
+            , GetUserEntitlementHistoryOptionalParams optionalParams
+            , ResultCallback<UserEntitlementHistoryResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var httpBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/history")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId);
+
+            if (optionalParams != null)
+            {
+                if (optionalParams.EntitlementClazz != EntitlementClazz.NONE)
+                {
+                    httpBuilder.WithQueryParam("entitlementClazz", optionalParams.EntitlementClazz.ToString());
+                }
+                if (optionalParams.StartDate != null)
+                {
+                    httpBuilder.WithQueryParam("startDate"
+                        , ((DateTime)optionalParams.StartDate).ToString("yyyy-MM-ddThh:mm:ssZ"));
+                }
+                if (optionalParams.EndDate != null)
+                {
+                    httpBuilder.WithQueryParam("endDate"
+                        , ((DateTime)optionalParams.EndDate).ToString("yyyy-MM-ddThh:mm:ssZ"));
+                }
+                if (optionalParams.Offset > 0)
+                {
+                    httpBuilder.WithQueryParam("offset", optionalParams.Offset.ToString());
+                }
+                if (optionalParams.Limit > 0)
+                {
+                    httpBuilder.WithQueryParam("limit", optionalParams.Limit.ToString());
+                }
+            }
+
+            var request = httpBuilder.GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserEntitlementHistoryResponse>();
+                callback?.Try(result);
+            });
+        }
+
         public IEnumerator ConsumeUserEntitlement(string userId
             , string entitlementId
             , int useCount
@@ -528,9 +635,12 @@ namespace AccelByte.Api
             , long purchaseTime
             , string purchaseToken
             , bool autoAck
+            , bool subscriptionPurchase
             , PlatformSyncMobileGoogleOptionalParameters optionalParameters
             , ResultCallback<GoogleReceiptResolveResult> callback)
         {
+            Report.GetFunctionLog(GetType().Name);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(orderId
                 , packageName
                 , productId
@@ -550,6 +660,7 @@ namespace AccelByte.Api
                 , purchaseTime
                 , purchaseToken
                 , autoAck
+                , subscriptionPurchase
                 , optionalParameters);
 
             var request = HttpRequestBuilder
@@ -562,7 +673,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GoogleReceiptResolveResult>();
                 callback?.Try(result);
@@ -596,7 +707,38 @@ namespace AccelByte.Api
                 .WithBody(syncRequest.ToUtf8Json())
                 .GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+        
+        internal void SyncMobilePlatformPurchaseAppleV2(string transactionId
+            , ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(transactionId, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            PlatformSyncMobileAppleV2 syncRequest = new PlatformSyncMobileAppleV2()
+            {
+                TransactionId = transactionId
+            };
+                
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/iap/apple/receipt")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(syncRequest.ToUtf8Json())
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -691,6 +833,50 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
             callback.Try(result);
+        }
+
+        internal void SyncSteamInventory(string userSteamId
+            , string appId
+            , string productId
+            , double price
+            , string currencyCode
+            , SyncSteamInventoryOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userSteamId
+                , appId
+                , productId
+                , price
+                , currencyCode);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var syncRequest = new SyncSteamInventoryRequest(userSteamId
+                , appId
+                , productId
+                , price
+                , currencyCode
+                , optionalParameters);
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/steam/sync")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(syncRequest.ToUtf8Json())
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator SyncPSNDLC( string userId 
@@ -1161,9 +1347,32 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson);
             var request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response => 
+            HttpOperator.SendRequest(request, response => 
             {
                 var result = response.TryParseJson<DlcConfigRewardShortInfo>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetCurrentConfigFromServer(ResultCallback<CurrentAppleConfigVersion> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var builder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/namespaces/{namespace}/iap/apple/config/version")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson);
+            var request = builder.GetResult();
+
+            HttpOperator.SendRequest(request, response => 
+            {
+                var result = response.TryParseJson<CurrentAppleConfigVersion>();
                 callback?.Try(result);
             });
         }

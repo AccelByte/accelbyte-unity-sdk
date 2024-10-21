@@ -299,14 +299,15 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Namespace_);
 
+            DateTime unixEpoc = new DateTime(year: 1970, 1, 1);
             if (startTime != default)
             {
-                builder.WithQueryParam("startTime", ((long)startTime.Subtract(DateTime.UnixEpoch).TotalSeconds).ToString());
+                builder.WithQueryParam("startTime", ((long)startTime.Subtract(unixEpoc).TotalSeconds).ToString());
             }
 
             if (endTime != default)
             {
-                builder.WithQueryParam("endTime", ((long)endTime.Subtract(DateTime.UnixEpoch).TotalSeconds).ToString());
+                builder.WithQueryParam("endTime", ((long)endTime.Subtract(unixEpoc).TotalSeconds).ToString());
             }
 
             if (offset > 0)
@@ -321,7 +322,7 @@ namespace AccelByte.Api
 
             var request = builder.GetResult();
 
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<GetUserNotificationsResponse>();
                 

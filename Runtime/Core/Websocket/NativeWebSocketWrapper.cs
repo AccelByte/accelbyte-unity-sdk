@@ -72,7 +72,7 @@ namespace Core.Websocket
             Connect(url, protocols, customHeader, entitlementToken, callback);
         }
 
-        public async void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null, ResultCallback callback = null)
+        public void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null, ResultCallback callback = null)
         {
             try
             {
@@ -99,10 +99,12 @@ namespace Core.Websocket
                     OnClose?.Invoke((ushort)code);
                 };
 
-                AccelByteSDKMain.OnGameUpdate += _ =>
+                AccelByteSDKMain.AddGameUpdateListener(dt =>
                 {
+#if !UNITY_WEBGL || UNITY_EDITOR
                     webSocket.DispatchMessageQueue();
-                };
+#endif
+                });
             }
             catch (Exception e)
             {
@@ -152,7 +154,7 @@ namespace Core.Websocket
                             webSocket.OnClose += onConnectClosed;
                             webSocket.OnError += onConnectError;
 
-                            await webSocket.Connect();
+                            webSocket.Connect();
                         }
                         catch (Exception e)
                         {

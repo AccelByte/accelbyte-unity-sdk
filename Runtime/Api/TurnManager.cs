@@ -1,16 +1,11 @@
 // Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
-using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 using UnityEngine.Assertions;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Diagnostics;
 
 namespace AccelByte.Api
 {
@@ -40,31 +35,89 @@ namespace AccelByte.Api
         /// <param name="callback">Return list of turn server</param>
         public void GetTurnServers(ResultCallback<TurnServerList> callback)
         {
+            GetTurnServers(null, callback);
+        }
+
+        /// <summary>
+        /// Get List of TURN Server(s).
+        /// </summary>
+        /// <param name="optionalParam">Optional parameter to modify the function</param>
+        /// <param name="callback">Return list of turn server</param>
+        public void GetTurnServers(GetTurnServerOptionalParameters optionalParam, 
+            ResultCallback<TurnServerList> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetTurnServers(callback));
+            api.RequestGetTurnServers(getResult =>
+            {
+                if (getResult.IsError)
+                {
+                    callback?.TryError(getResult.Error.Code);
+                    return;
+                }
+
+                if (getResult.Value != null && getResult.Value.servers != null && getResult.Value.servers.Length > 0)
+                {
+                    int currentLatencyTaskCalculationDoneCount = 0;
+                    int expectedLength = getResult.Value.servers.Length;
+                    
+                    Action onCalculateLatencyDone = () =>
+                    {
+                        currentLatencyTaskCalculationDoneCount++;
+                        if (currentLatencyTaskCalculationDoneCount == expectedLength)
+                        {
+                            callback?.Try(getResult);
+                        }
+                    };
+                    
+                    foreach (var server in getResult.Value.servers)
+                    {
+                        server.LatencyCalculator = optionalParam?.LatencyCalculator == null ? new DefaultLatencyCalculator(SharedMemory?.CoreHeartBeat) : optionalParam?.LatencyCalculator;
+                        server.GetLatency(useCache: false).OnComplete(onCalculateLatencyDone);
+                    }
+                }
+                else
+                {
+                    callback?.Try(getResult);
+                }
+            });
         }
 
         /// <summary>
         /// Get the closest TURN server
         /// </summary>
         /// <param name="callback">callback to trigger with operation result</param>
+        [Obsolete("This method is deprecated and will be removed on 3.81 release. Please use " +
+            "GetTurnServers(ResultCallback<TurnServerList> callback) " + 
+            "and call GetClosestTurnServer() from callback's model.")]
         public void GetClosestTurnServer(ResultCallback<TurnServer> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            if (!session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
 
-            coroutineRunner.Run(GetClosestTurnServerAsync(callback));
+            GetTurnServers((getTurnServersResult) =>
+            {
+                if (getTurnServersResult.IsError)
+                {
+                    callback?.TryError(getTurnServersResult.Error.Code);
+                    return;
+                }
+
+                AccelByteResult<TurnServer, Error> closestTurnServerTask = getTurnServersResult.Value.GetClosestTurnServer();
+                closestTurnServerTask.OnSuccess(closestTurnServer =>
+                {
+                    callback?.TryOk(closestTurnServer); 
+                });
+                closestTurnServerTask.OnFailed(error =>
+                {
+                    callback?.TryError(error);
+                });
+            });
         }
 
         /// <summary>
@@ -80,13 +133,14 @@ namespace AccelByte.Api
             , ResultCallback<TurnServerCredential> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.GetTurnServerCredential(region, ip, port, callback));
+            api.RequestGetTurnServerCredential(region, ip, port, callback);
         }
 
         /// <summary>
@@ -100,71 +154,11 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.SendMetric(turnServerRegion, connectionType, callback));
-        }
-
-        private IEnumerator GetClosestTurnServerAsync(ResultCallback<TurnServer> callback)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            Result<TurnServerList> getResult = null;
-            yield return api.GetTurnServers(result => getResult = result);
-
-            if (getResult.IsError)
-            {
-                SharedMemory?.Logger?.LogWarning("TURN Manager error on getting closest TURN server");
-                callback.TryError(getResult.Error.Code);
-                yield break;
-            }
-
-            var stopwatch = new Stopwatch();
-            TurnServer currentClosestServer = null;
-            int fastestPingMiliseconds = 1000;
-            
-            foreach (TurnServer server in getResult.Value.servers)
-            {
-                using (var udpClient = new UdpClient())
-                {
-                    var turnServerEndpoint = new IPEndPoint(IPAddress.Parse(server.ip), server.qos_port);
-                    udpClient.Connect(turnServerEndpoint);
-                    byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
-                    stopwatch.Restart();
-
-                    IAsyncResult asyncResult = udpClient.BeginSend(
-                        sendBytes,
-                        sendBytes.Length,
-                        null,
-                        null);
-
-                    yield return new WaitUntil(() => asyncResult.IsCompleted);
-
-                    udpClient.EndSend(asyncResult);
-                    var remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                    asyncResult = udpClient.BeginReceive(null, null);
-
-                    yield return new WaitUntil(() => asyncResult.IsCompleted);
-
-                    udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
-                    if (fastestPingMiliseconds > stopwatch.Elapsed.Milliseconds)
-                    {
-                        fastestPingMiliseconds = stopwatch.Elapsed.Milliseconds;
-                        currentClosestServer = server;
-                    }
-                }
-            }
-
-            if (currentClosestServer == null)
-            {
-                callback.TryError(ErrorCode.InternalServerError);
-            }
-            else
-            {
-                callback.TryOk(currentClosestServer);
-            }
+            api.RequestSendMetric(turnServerRegion, connectionType, callback);
         }
 
         /// <summary>
@@ -180,7 +174,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.Disconnect(callback);
+            api.RequestDisconnect(callback);
         }
     }
 }

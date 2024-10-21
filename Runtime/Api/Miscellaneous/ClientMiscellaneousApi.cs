@@ -30,7 +30,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetCurrentTime(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , @namespace: Namespace_
                 , baseUrl: BaseUrl
                 , callback);
@@ -40,7 +40,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetCountryGroups(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: false
@@ -52,7 +52,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetLanguages(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: false
@@ -64,7 +64,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
             AccelByteMiscellaneousApi.GetTimeZones(
-                httpOperator: httpOperator
+                httpOperator: HttpOperator
                 , baseUrl: BaseUrl
                 , @namespace: Namespace_
                 , adminEndpoint: false

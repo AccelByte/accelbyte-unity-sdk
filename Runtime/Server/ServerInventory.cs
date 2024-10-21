@@ -5,6 +5,7 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server.Interface;
+using System;
 
 namespace AccelByte.Server
 {
@@ -274,7 +275,12 @@ namespace AccelByte.Server
             api.GetUserInventory(inventoryId, callback);
         }
 
-        public void GetUserInventoryAllItems(string inventoryId, ResultCallback<UserItemsPagingResponse> callback, UserItemSortBy sortBy = UserItemSortBy.CreatedAt, int limit = 25, int offset = 0, string sourceItemId = "", TagQueryBuilder tagBuilder = null, int? quantity = null)
+        public void GetUserInventoryAllItems(string inventoryId, ResultCallback<UserItemsPagingResponse> callback)
+        {
+            GetUserInventoryAllItems(inventoryId, null, callback);
+        }
+        
+        public void GetUserInventoryAllItems(string inventoryId, GetUserInventoryAllItemsOptionalParameters optionalParam, ResultCallback<UserItemsPagingResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -284,7 +290,21 @@ namespace AccelByte.Server
                 return;
             }
 
-            api.GetUserInventoryAllItems(inventoryId, callback, sortBy, limit, offset, sourceItemId, tagBuilder, quantity);
+            api.GetUserInventoryAllItems(inventoryId, optionalParam, callback);
+        }
+        
+        public void GetUserInventoryAllItems(string inventoryId, ResultCallback<UserItemsPagingResponse> callback, UserItemSortBy sortBy = UserItemSortBy.CreatedAt, int limit = 25, int offset = 0, string sourceItemId = "", TagQueryBuilder tagBuilder = null, int? quantity = null)
+        {
+            GetUserInventoryAllItemsOptionalParameters optionalParameters = new GetUserInventoryAllItemsOptionalParameters()
+            {
+                SortBy = sortBy,
+                Limit = limit,
+                Offset = offset,
+                SourceItemId = sourceItemId,
+                TagQueryBuilder = tagBuilder
+            };
+            
+            GetUserInventoryAllItems(inventoryId, optionalParameters, callback);
         }
 
         public void GetUserInventoryItem(string inventoryId, string slotId, string sourceItemId, ResultCallback<UserItem> callback)

@@ -5,11 +5,53 @@
 using System.Threading.Tasks;
 using System;
 using AccelByte.Core;
+using System.Collections;
+using UnityEngine;
 
 namespace AccelByte.Utils
 {
     public static class RetryBackoffUtils
     {
+        /// <summary>
+        /// Coroutine ver. This function is to let a Task Operation to perform retry backoff mechanism
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="operation"></param>
+        /// <param name="initialDelayInSeconds"></param>
+        /// <param name="maxDelayInSeconds"></param>
+        /// <param name="maxRetries"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        public static IEnumerator RunCoroutine<T>(Task<T> operation,
+            int initialDelayInSeconds = 1,
+            int maxDelayInSeconds = 2,
+            int maxRetries = 5,
+            IDebugger logger = null)
+        {
+            int retryCount = 0;
+            int currentDelay = initialDelayInSeconds;
+
+            while (retryCount < maxRetries)
+            {
+                yield return new WaitUntil(() => operation.IsCompleted);
+                T result = operation.Result;
+                if (IsOperationSuccess(result))
+                {
+                    yield break;
+                }
+
+                retryCount++;
+                if (retryCount < maxRetries)
+                {
+                    logger?.LogVerbose($"[{retryCount}/{maxRetries}] Websocket send failed, attempting to retry.");
+
+                    // Calculate the next delay using exponential backoff
+                    currentDelay = Math.Min(currentDelay * 2, maxDelayInSeconds);
+                    yield return new WaitForSeconds(currentDelay);
+                }
+            }
+        }
+
         /// <summary>
         /// This function is to let a Task Operation to perform retry backoff mechanism
         /// PLEASE BE AWARE 

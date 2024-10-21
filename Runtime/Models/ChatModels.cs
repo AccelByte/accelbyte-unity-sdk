@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -41,6 +41,7 @@ namespace AccelByte.Models
         actionDeleteTopicResponse,
         actionDisconnect,
         actionDisconnectResponse,
+        actionGetUserConfig,
         actionJoinTopic,
         actionJoinTopicResponse,
         actionQueryGroupTopic,
@@ -59,6 +60,7 @@ namespace AccelByte.Models
         actionRefreshTokenResponse,
         actionRemoveUserFromTopic,
         actionRemoveUserFromTopicResponse,
+        actionSetUserConfig,
         actionUnblockUser,
         actionUnblockUserResponse,
         actionUpdateTopic,
@@ -84,7 +86,7 @@ namespace AccelByte.Models
         personal,
         group
     }
-    
+
     [DataContract, Preserve]
     public class ChatWsMessage
     {
@@ -93,14 +95,14 @@ namespace AccelByte.Models
         [DataMember] public string id;
         [DataMember] public Error error;
     }
-    
+
     [DataContract, Preserve]
     public class ChatWsMessage<T> : ChatWsMessage
     {
         [DataMember, JsonProperty(PropertyName = "params", DefaultValueHandling = DefaultValueHandling.Populate)]
         public T params_;
     }
-    
+
     [DataContract, Preserve]
     public class ChatWsMessageResponse<T> : ChatWsMessage
     {
@@ -117,7 +119,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ChatActionTopicRequest
     {
-        [DataMember(Name="namespace")] public string Namespace;
+        [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string topicId;
         [DataMember] public string name;
         [DataMember] public string type;
@@ -131,7 +133,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ChatActionTopicResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
         [DataMember] public string topicId;
     }
@@ -146,7 +148,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SendChatResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
         [DataMember] public string topicId;
         [DataMember] public string chatId;
@@ -161,19 +163,19 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class QueryTopicRequest
     {
-        [DataMember(Name="namespace")] public string Namespace;
+        [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string keyword;
         [DataMember] public int offset;
         [DataMember] public int limit;
     }
-    
+
     public enum TopicType
     {
         NONE = 0,
         PERSONAL = 1,
         GROUP = 2
     };
-    
+
     [DataContract, Preserve]
     public class QueryTopicResponseData
     {
@@ -181,18 +183,18 @@ namespace AccelByte.Models
         [DataMember] public TopicType type;
         [DataMember] public string name;
         [DataMember] public string[] members;
-        
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime updatedAt;
     }
 
     [DataContract, Preserve]
     public class QueryTopicResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
-        
-        [DataMember] public QueryTopicResponseData[] data; 
+
+        [DataMember] public QueryTopicResponseData[] data;
     }
 
     [DataContract, Preserve]
@@ -200,14 +202,14 @@ namespace AccelByte.Models
     {
         [DataMember] public bool isChannel;
     }
-    
+
     [DataContract, Preserve]
     public class QueryTopicByIdResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
-        
-        [DataMember] public QueryTopicByIdResponseData[] data; 
+
+        [DataMember] public QueryTopicByIdResponseData[] data;
     }
 
     [DataContract, Preserve]
@@ -217,7 +219,7 @@ namespace AccelByte.Models
         [DataMember] public int limit;
         [DataMember] public DateTime lastChatCreatedAt;
     }
-    
+
     [DataContract, Preserve]
     public class QueryChatResponseData
     {
@@ -225,17 +227,17 @@ namespace AccelByte.Models
         [DataMember] public string message;
         [DataMember] public string topicId;
         [DataMember] public string from;
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime createdAt;
     }
 
     [DataContract, Preserve]
     public class QueryChatResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
-        
-        [DataMember] public QueryChatResponseData[] data; 
+
+        [DataMember] public QueryChatResponseData[] data;
     }
 
     [DataContract, Preserve]
@@ -247,7 +249,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class BlockUnblockResponse
     {
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime processed;
 
         [DataMember] public string userId;
@@ -338,12 +340,12 @@ namespace AccelByte.Models
         /// </summary>
         [DataMember(Name = "endCreatedAt"), JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime EndCreatedAt = default;
-        
+
         /// <summary>
         /// Category of system message
         /// </summary>
         [DataMember(Name = "category")] public string Category;
-        
+
         /// <summary>
         /// Query only unread messages
         /// </summary>
@@ -406,7 +408,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class GetSystemMessageStatsRequest
     {
-        
+
     }
 
     [DataContract, Preserve]
@@ -414,7 +416,7 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "oldestUnread"), JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime OldestUnread;
-        
+
         [DataMember(Name = "unread")] public Int32 Unread;
     }
 
@@ -424,7 +426,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string sessionId;
     }
-    
+
     [DataContract, Preserve]
     public class EventTopicUpdated
     {
@@ -450,11 +452,11 @@ namespace AccelByte.Models
         [DataMember] public string message;
         [DataMember] public string topicId;
         [DataMember] public string from;
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime createdAt;
     }
-    
-    
+
+
     public class EventBanUnban
     {
         [DataMember] public bool enable;
@@ -462,8 +464,8 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string namespace_;
         [DataMember] public string reason;
         [DataMember] public string ban;
-        
-        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))] 
+
+        [DataMember, JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime endDate;
     }
     #endregion
@@ -579,5 +581,30 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "topicId")]
         public string TopicId;
+    }
+
+    [DataContract, Preserve]
+    public class UserChatConfiguration
+    {
+        [DataMember(Name = "profanityDisabled")]  public bool ProfanityDisabled;
+    }
+
+    [DataContract, Preserve]
+    public class GetUserChatConfigurationResponse
+    {
+        [DataMember(Name = "config")] public UserChatConfiguration Config;
+        [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))] public DateTime Processed;
+    }
+
+    [DataContract, Preserve]
+    public class SetUserChatConfigurationRequest
+    {
+        [DataMember(Name = "config")] public UserChatConfiguration Config;
+    }
+
+    [DataContract, Preserve]
+    public class SetUserChatConfigurationResponse
+    {
+        [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))] public DateTime Processed;
     }
 }

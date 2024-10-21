@@ -17,6 +17,17 @@ namespace AccelByte.Core
         public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse> response);
 
         public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response);
+
+        public static HttpOperator CreateDefault(IHttpClient httpClient)
+        {
+            HttpOperator retval = null;
+#if !UNITY_WEBGL
+            retval = new HttpAsyncOperator(httpClient);
+#else
+            retval = new HttpCoroutineOperator(httpClient, new CoroutineRunner());
+#endif
+            return retval;
+        }
     }
 
     public class HttpAsyncOperator : HttpOperator

@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/17.0.0%0D16.25.4) (2024-10-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop support sort by quantity for get all items of inventory service
+
+### Features
+
+* add apple iap subscription interface ([4b8af65](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4b8af653e8645a8c0cbf13dc41cbf8c95ae30782))
+* add google iap subscription interface ([73dcb8c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73dcb8c5b1c8dd072b69ab2f5f5da7d7a05d8dfc))
+* add IAP query subscription interface ([f471a02](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f471a02348e62d27003e99d47ce08edc763502f1))
+* add message system v2 ([3412748](https://github.com/AccelByte/accelbyte-unity-sdk/commits/34127484585928b37c184265d7f9de078fd00300))
+* add optional param to include mac address ([7c75f5d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c75f5d5425a12b45cb919919785cbec582fe045))
+* add turn manager get latency ([b08459d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b08459d9ed14a6203c05f2af3c9a18488b8bbb19))
+* **entitlement:** add sync steam inventory ([471c73d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/471c73d0c66969db4026ce2a7a404e55e2431bcb))
+* exposed chat websocket endpoints to get and set user chat configuration ([0c214eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0c214eb9ee1b07d37179ce0197dbd831bd20349a))
+* exposed get user entitlement history endpoint ([64a8ad3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/64a8ad39726c49b3886b91cbd445438f2b3a0f6b))
+* implemented admin agreement endpoint interfaces, updated response model for QueryLegalEligibilities ([ba248a0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ba248a016ec1628a1cdba562f64ad50c35d366bd))
+* implemented matchmakingV2 canceled lobby notification ([610b8c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/610b8c496143d52ad3e4cf4a64bd610741c0e636))
+
+
+### Bug Fixes
+
+* add default latency calculator when calculating turn server's latency ([ea2bf7d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ea2bf7d165b6a01534b715a1722ee7ea976e5b51))
+* fixed issue on matchmaking session polling ([df03ed7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/df03ed7adc0572b85e39a6a54dd553fc3d00f228))
+* fixed issue when unity persistent path is null ([28c63b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28c63b82acd247478c9c7ab9c5389d17531ec0f7))
+* webgl platform improvements ([28333f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28333f4037191774a5216a24d74ce78ab2954743))
+
+
+### Refactors
+
+* drop support sort by quantity for get all items of inventory service ([fe665ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fe665efd0de86d38cb1735f555714791b712b60f))
+* expose some private api fields to internal ([0073c5a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0073c5adc48cf8fd9169131a896936a352f997df))
+* fixed game common info persistent path name ([55cbab7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55cbab74868dfb2a8abbb5fe33cbdf997fae1501))
+* refactor qosm to support call GetAllServerLatencies on AMS ([9f39498](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f39498507da09f3427539163336e53f25d9a58e))
+* remove deprecated param from inventory and server inventory ([6911482](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6911482958e483a5cec66425231175356542239e))
+
+
+### Documentations
+
+* pushed back presence event api and get country groups deprecation to AGS 3.81 ([194bdb6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/194bdb6bf0cca5a9e6dc16a3416b4e03c6d37951))
+
 ### [16.25.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.4%0D16.25.3) (2024-10-07)
 
 

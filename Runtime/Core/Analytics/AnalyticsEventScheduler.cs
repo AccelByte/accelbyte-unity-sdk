@@ -5,7 +5,6 @@
 using AccelByte.Models;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace AccelByte.Core
 {
@@ -17,7 +16,7 @@ namespace AccelByte.Core
         protected AccelByteHeartBeat maintainer;
 
         protected int eventIntervalInlMs;
-        protected bool keepValidating;
+        protected System.Threading.CancellationTokenSource validatorCts;
 
         protected abstract int defaultEventIntervalInMs
         {
@@ -43,7 +42,7 @@ namespace AccelByte.Core
         {
             get
             {
-                return keepValidating;
+                return validatorCts != null && !validatorCts.IsCancellationRequested;
             }
         }
 
@@ -72,9 +71,14 @@ namespace AccelByte.Core
         {
             eventIntervalInlMs = defaultEventIntervalInMs;
             this.analyticsWrapper = analyticsWrapper;
+            validatorCts = new System.Threading.CancellationTokenSource();
 
-            keepValidating = true;
             RunValidator();
+        }
+
+        ~AnalyticsEventScheduler()
+        {
+            Dispose();
         }
 
         /// <summary>
@@ -104,7 +108,12 @@ namespace AccelByte.Core
         protected virtual void Dispose(bool disposing)
         {
             StopEventScheduler();
-            keepValidating = false;
+            if (validatorCts != null)
+            {
+                validatorCts.Cancel();
+                validatorCts.Dispose();
+                validatorCts = null;
+            }
         }
         #endregion
 
@@ -116,6 +125,7 @@ namespace AccelByte.Core
         internal void SetSharedMemory(ref ApiSharedMemory sharedMemory)
         {
             this.SharedMemory = sharedMemory;
+            RunValidator();
         }
 
         internal void ClearTasks()
@@ -244,30 +254,31 @@ namespace AccelByte.Core
             OnTelemetryEventAdded?.Invoke(eventBody);
         }
 
-        protected async void RunCommonValidator()
+        protected void RunCommonValidator()
         {
-            bool currentSessionValid;
-            ISession session = null;
-
-            while (keepValidating)
+            if (!validatorCts.IsCancellationRequested && SharedMemory != null && SharedMemory.CoreHeartBeat != null)
             {
-                if (maintainer != null)
+                System.Action onLoopUpdate = () =>
                 {
-                    session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
-
-                    currentSessionValid = session != null ? session.IsValid() : false;
-
-                    if (currentSessionValid)
+                    if (maintainer != null)
                     {
-                        maintainer.Start();
-                    }
-                    else
-                    {
-                        maintainer.Pause();
-                    }
-                }
+                        ISession session = analyticsWrapper != null ? analyticsWrapper.GetSession() : null;
 
-                await System.Threading.Tasks.Task.Delay(AccelByteHttpHelper.HttpDelayOneFrameTimeMs);
+                        bool currentSessionValid = session != null ? session.IsValid() : false;
+
+                        if (currentSessionValid)
+                        {
+                            maintainer.Start();
+                        }
+                        else
+                        {
+                            maintainer.Pause();
+                        }
+                    }
+                };
+                
+                onLoopUpdate?.Invoke();
+                SharedMemory?.CoreHeartBeat.Wait(new IndefiniteLoopCommand(cancellationToken: validatorCts.Token, onUpdate: onLoopUpdate));
             }
         }
         #endregion

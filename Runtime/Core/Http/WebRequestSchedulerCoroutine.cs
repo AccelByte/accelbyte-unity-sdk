@@ -75,7 +75,7 @@ namespace AccelByte.Core
 
         internal virtual IEnumerator ExecuteWebRequest(UnityEngine.Networking.UnityWebRequest webRequest)
         {
-            yield return null;
+            yield return webRequest.SendWebRequest();;
         }
     }
 }

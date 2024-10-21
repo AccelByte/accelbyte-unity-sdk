@@ -15,9 +15,6 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.AppleExtension")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGooglePlayGames")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.GooglePlayGamesExtension")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.unittests")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.e2etests")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.gametest")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
 namespace AccelByte.Core
 {

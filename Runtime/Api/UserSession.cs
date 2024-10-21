@@ -368,7 +368,7 @@ namespace AccelByte.Api
 
             if(deleteCache && !string.IsNullOrEmpty(localTokenDataCacheKey))
             {
-                dataStorage.DeleteItem(localTokenDataCacheKey, null, TokenTableName);
+                DeleteCache(localTokenDataCacheKey);
             }
 
             if (!usePlayerPrefs) return;

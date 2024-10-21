@@ -14,7 +14,7 @@ namespace AccelByte.Core
 #if UNITY_SWITCH && !UNITY_EDITOR
         internal static readonly string RootPath = "AccelByte/";
 #else
-        internal static readonly string RootPath = $"{Application.persistentDataPath}/AccelByte/{Application.productName}";
+        internal static readonly string RootPath = $"{GameCommonInfo.PersistentPath}/AccelByte/{GameCommonInfo.ProductName}";
 #endif
 
         private readonly IFileStream accelByteFileStream;

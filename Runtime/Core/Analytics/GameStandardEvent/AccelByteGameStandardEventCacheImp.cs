@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -8,20 +8,30 @@ namespace AccelByte.Core
 {
 	public class AccelByteGameStandardEventCacheImp : AccelByteGameStandardEventCacheImpTemplate
     {
-        private string saveDirectory;
-        private string saveFile;
+        private string tableName;
         private bool saveAsync;
         private bool loadAsync;
-        internal AccelByteFileCacheImplementation FileCacheImp;
         protected MD5Crypto cryptoImp;
+        internal IAccelByteDataStorage DataStorage; 
 
         public AccelByteGameStandardEventCacheImp(string saveDirectory, string saveFile, string encryptionKey)
         {
-            this.saveDirectory = saveDirectory;
-            this.saveFile = saveFile;
+            this.tableName = $"{saveDirectory}/{saveFile}";
+            
+            DataStorage = new Core.AccelByteDataStorageBinaryFile(AccelByteSDK.Implementation.FileStream);
+            
             saveAsync = false;
             loadAsync = true;
-            FileCacheImp = GetFileCacheImp(saveDirectory);
+            UpdateKey(encryptionKey);
+        }
+        
+        internal AccelByteGameStandardEventCacheImp(string tableName, IAccelByteDataStorage dataStorage, string encryptionKey)
+        {
+            this.tableName = tableName;            
+            DataStorage = dataStorage;
+            
+            saveAsync = false;
+            loadAsync = true;
             UpdateKey(encryptionKey);
         }
 
@@ -55,8 +65,8 @@ namespace AccelByte.Core
 
         internal override void DeleteCache(string environment)
         {
-            string cacheFileName = environment + saveFile;
-            FileCacheImp.Remove(cacheFileName);
+            UnityEngine.Assertions.Assert.IsNotNull(DataStorage, "Data storage cache shouldn't null");
+            DataStorage.DeleteItem(environment, onDone: null, tableName: tableName);
         }
 
         protected override void DecryptCache(string content, Action<string> callback)
@@ -67,42 +77,21 @@ namespace AccelByte.Core
 
         protected override void CacheTelemetryEvents(string content, string environment, Action<bool> callback)
         {
-            string cacheFileName = environment + saveFile;
-            if (saveAsync)
-            {
-                FileCacheImp.EmplaceAsync(cacheFileName, content, callback);
-            }
-            else
-            {
-                bool result = FileCacheImp.Emplace(cacheFileName, content);
-                callback?.Invoke(result);
-            }
+            UnityEngine.Assertions.Assert.IsNotNull(DataStorage, "Data storage cache shouldn't null");
+            DataStorage.SaveItem(environment, content, callback, tableName);
         }
 
         protected override void LoadTelemetryEventsCache(string environment, Action<string> callback)
         {
-            string cacheFileName = environment + saveFile;
-
-            if (loadAsync)
+            UnityEngine.Assertions.Assert.IsNotNull(DataStorage, "Data storage cache shouldn't null");
+            DataStorage.GetItem<string>(environment, tableName: tableName, onDone: (success, content) =>
             {
-                callback += (content) =>
-                {
-                    if (!string.IsNullOrEmpty(content))
-                    {
-                        FileCacheImp.Remove(cacheFileName);
-                    }
-                };
-                FileCacheImp.RetrieveAsync(cacheFileName, callback);
-            }
-            else
-            {
-                string content = FileCacheImp.Retrieve(cacheFileName);
                 if (!string.IsNullOrEmpty(content))
                 {
-                    FileCacheImp.Remove(cacheFileName);
+                    DataStorage?.DeleteItem(key: environment, onDone: null, tableName);
                 }
                 callback?.Invoke(content);
-            }
+            });
         }
 
         internal virtual AccelByteFileCacheImplementation GetFileCacheImp(string cacheDirectory)

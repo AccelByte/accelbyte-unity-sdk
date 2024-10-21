@@ -140,8 +140,8 @@ namespace AccelByte.Core
             , string basicServerUrl)
         {
             Assert.IsNotNull(httpClient, "Assigned http client is null");
-            
-            var newOperator = new HttpAsyncOperator(httpClient);
+     
+            HttpOperator newOperator = HttpOperator.CreateDefault(httpClient);
             AccelByteResult<AccelByteServerTimeData, Error> retval = FetchServerTime(newOperator, @namespace, basicServerUrl);
             return retval;
         }

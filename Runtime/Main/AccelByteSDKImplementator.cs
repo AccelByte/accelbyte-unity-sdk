@@ -116,7 +116,7 @@ namespace AccelByte.Core
             const bool getServerConfig = false;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat);
+            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat, FileStream);
             
             return newClientRegistry;
         }
@@ -235,21 +235,27 @@ namespace AccelByte.Core
             {
                 if (fileStream == null)
                 {
-                    IFileStreamFactory fileStreamFactory = FileStreamFactory;
-                    if(fileStreamFactory == null)
-                    {
-                        fileStreamFactory = new AccelByteFileStreamFactory();
-                    }
-                    fileStream = fileStreamFactory.CreateFileStream();
-                    AccelByteSDKMain.OnGameUpdate += dt =>
-                    {
-                        fileStream.Pop();
-                    };
+                    fileStream = CreateFileStream();
                 }
                 return fileStream;
             }
         }
         public IFileStreamFactory FileStreamFactory;
+
+        internal IFileStream CreateFileStream()
+        {
+            IFileStreamFactory fileStreamFactory = FileStreamFactory;
+            if(fileStreamFactory == null)
+            {
+                fileStreamFactory = new AccelByteFileStreamFactory();
+            }
+            var createdFileStream = fileStreamFactory.CreateFileStream();
+            AccelByteSDKMain.OnGameUpdate += dt =>
+            {
+                createdFileStream.Pop();
+            };
+            return createdFileStream;
+        }
         #endregion
 
         private IHttpRequestSenderFactory sdkHttpSenderFactory;

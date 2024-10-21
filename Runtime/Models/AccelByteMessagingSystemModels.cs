@@ -25,4 +25,10 @@ namespace AccelByte.Models
         [DataMember(Name = "topic")] public AccelByteMessagingTopic Topic;
         [DataMember(Name = "payload")] public string Payload;
     }
+    
+    public struct AccelByteMessage
+    {
+        public AccelByteMessagingTopic Topic;
+        public string Message;
+    }
 }

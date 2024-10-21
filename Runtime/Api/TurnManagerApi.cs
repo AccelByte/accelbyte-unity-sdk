@@ -1,6 +1,7 @@
-// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
@@ -9,7 +10,7 @@ using System.Collections;
 namespace AccelByte.Api
 {
 
-    public class TurnManagerApi : AccelByte.Core.ApiBase
+    public class TurnManagerApi : ApiBase
     {
         [UnityEngine.Scripting.Preserve]
         public TurnManagerApi(IHttpClient inHttpClient, Config inConfig, ISession inSession)
@@ -19,7 +20,20 @@ namespace AccelByte.Api
 
         public IEnumerator GetTurnServers(ResultCallback<TurnServerList> callback)
         {
+            RequestGetTurnServers(callback);
+            yield break;
+        }
+
+        internal void RequestGetTurnServers(ResultCallback<TurnServerList> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/turn")
@@ -28,15 +42,11 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            HttpOperator.SendRequest(request, response =>
             {
-                response = rsp;
+                var result = response.TryParseJson<TurnServerList>();
+                callback?.Try(result);
             });
-
-            var result = response.TryParseJson<TurnServerList>();
-            callback.Try(result);
         }
 
         public IEnumerator GetTurnServerCredential(string region
@@ -44,22 +54,28 @@ namespace AccelByte.Api
             , int port
             , ResultCallback<TurnServerCredential> callback)
         {
+            RequestGetTurnServerCredential(region, ip, port,callback);
+            yield break;
+        }
+
+        internal void RequestGetTurnServerCredential(string region
+            , string ip
+            , int port
+            , ResultCallback<TurnServerCredential> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
-            if (string.IsNullOrEmpty(region))
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, region, ip);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "region parameter is null or empty!"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(ip))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "ip parameter is null or empty!"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             if (port < 1 || port > 65535)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "port is not between 1-65535!"));
-                yield break;
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "port is not between 1-65535!"));
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -72,44 +88,38 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            HttpOperator.SendRequest(request, response =>
             {
-                response = rsp;
+                var result = response.TryParseJson<TurnServerCredential>();
+                callback?.Try(result);
             });
-
-            var result = response.TryParseJson<TurnServerCredential>();
-            callback.Try(result);
         }
-        
+
         public IEnumerator SendMetric(string turnServerRegion, P2PConnectionType connectionType
             , ResultCallback callback)
         {
-            if (Namespace_ == null)
+            RequestSendMetric(turnServerRegion, connectionType, callback);
+            yield break;
+        }
+
+        internal void RequestSendMetric(string turnServerRegion, P2PConnectionType connectionType
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, turnServerRegion);
+            if (error != null)
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
-            
-            if (AuthToken == null)
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                yield break;
-            }
-            
-            if (string.IsNullOrEmpty(turnServerRegion))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "region is null or empty!"));
-                yield break;
-            }
-            
+
             if (connectionType == P2PConnectionType.None)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Connection type cannot be None"));
-                yield break;
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Connection type cannot be None"));
+                return;
             }
-            
+
             var data = new TurnServerMetricRequest()
             {
                 Region = turnServerRegion,
@@ -125,21 +135,23 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            HttpOperator.SendRequest(request, response =>
             {
-                response = rsp;
+                var result = response.TryParse();
+                callback?.Try(result);
             });
-
-            var result = response.TryParse();
-
-            callback.Try(result);
         }
 
         public void Disconnect(ResultCallback callback)
         {
-            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            RequestDisconnect(callback);
+        }
+
+        internal void RequestDisconnect(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -151,7 +163,7 @@ namespace AccelByte.Api
                 UserId = Session.UserId
             };
 
-            var httpBuilder = HttpRequestBuilder
+            var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/metrics/namespaces/{namespace}/disconnected")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
@@ -160,8 +172,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
             .GetResult();
 
-            IHttpRequest request = httpBuilder;
-            httpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);

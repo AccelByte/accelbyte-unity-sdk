@@ -150,6 +150,11 @@ namespace AccelByte.Api
         public event ResultCallback<MatchmakingV2MatchmakingStartedNotification> MatchmakingV2MatchmakingStarted;
 
         /// <summary>
+        /// MatchmakingV2 - Raised when matchmaking is canceled
+        /// </summary>
+        public event ResultCallback<MatchmakingV2MatchmakingCanceledNotification> MatchmakingV2MatchmakingCanceled;
+
+        /// <summary>
         /// MatchmakingV2 - Raised when matchmaking ticket expired
         /// </summary>
         public event ResultCallback<MatchmakingV2TicketExpiredNotification> MatchmakingV2TicketExpired;
@@ -202,16 +207,22 @@ namespace AccelByte.Api
         /// <summary>
         /// Raised when matchmaking process is completed.
         /// </summary>
+        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2 instead.")]
         public event ResultCallback<MatchmakingNotif> MatchmakingCompleted;
 
         /// <summary>
         /// Raised when user from within the same party confirmed he/she is ready for match
         /// </summary>
+        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2 instead.")]
         public event ResultCallback<ReadyForMatchConfirmation> ReadyForMatchConfirmed;
-        
+
         /// <summary>
         /// Raised when a user rejected the match
         /// </summary>
+        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2 instead.")]
         public event ResultCallback<ReadyForMatchConfirmation> MatchRejected;
 
         /// <summary>
@@ -219,6 +230,8 @@ namespace AccelByte.Api
         /// </summary>
         public event ResultCallback<DsNotif> DSUpdated;
 
+        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
+            "Please use/migrate to MatchmakingV2 instead.")]
         public event ResultCallback<RematchmakingNotification> RematchmakingNotif;
 
         /// <summary>
@@ -2285,6 +2298,12 @@ namespace AccelByte.Api
                     OnMatchmakingStartedHandle(matchmakingStartedNotification.ticketId);
                     websocketApi.DispatchNotification(matchmakingStartedNotification,
                         MatchmakingV2MatchmakingStarted);
+                    break;
+                case MultiplayerV2NotifType.OnMatchmakingTicketCanceled:
+                    var matchmakingCanceledNotification =
+                        JsonConvert.DeserializeObject<MatchmakingV2MatchmakingCanceledNotification>(jsonString);
+                    websocketApi.DispatchNotification(matchmakingCanceledNotification,
+                        MatchmakingV2MatchmakingCanceled);
                     break;
                 case MultiplayerV2NotifType.OnMatchmakingTicketExpired:
                     var ticketExpiredNotification =

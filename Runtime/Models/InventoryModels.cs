@@ -93,11 +93,14 @@ namespace AccelByte.Models
         UpdatedAtAsc,
         [System.ComponentModel.Description("updatedAt:desc")]
         UpdatedAtDesc,
-        [System.ComponentModel.Description("quantity")]
+        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
+        [System.ComponentModel.Description("createdAt")]
         Quantity,
-        [System.ComponentModel.Description("quantity:asc")]
+        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
+        [System.ComponentModel.Description("createdAt")]
         QuantityAsc,
-        [System.ComponentModel.Description("quantity:desc")]
+        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
+        [System.ComponentModel.Description("createdAt")]
         QuantityDesc
     }
 
@@ -212,6 +215,36 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "createdAt")] public DateTime CreatedAt;
         [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+    }
+    
+    [Preserve]
+    public class GetUserInventoryAllItemsOptionalParameters
+    {
+        /// <summary>
+        /// Optional parameter to get the result sortedBy 
+        /// </summary>
+        public UserItemSortBy SortBy = UserItemSortBy.CreatedAt;
+        /// <summary>
+        /// Optional parameter to define limit for the result length
+        /// </summary>
+        public int Limit = 25;
+        /// <summary>
+        /// Optional parameter to define offset for the result
+        /// </summary>
+        public int Offset = 0;
+        /// <summary>
+        /// Optional parameter to query based on a specific source item id
+        /// </summary>
+        public string SourceItemId;
+        /// <summary>
+        /// Optional parameter to query based on a tagBuilder
+        /// We provide query builder helper to ease build the query using AND, OR statement
+        /// </summary>
+        public TagQueryBuilder TagQueryBuilder;
+        /// <summary>
+        /// Optional parameter to query based on a tag
+        /// </summary>
+        public string Tags;
     }
 
     [DataContract, Preserve]
