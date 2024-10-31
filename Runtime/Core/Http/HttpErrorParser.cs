@@ -182,6 +182,23 @@ namespace AccelByte.Core
             }
         }
 
+        internal static bool IsInternalErrorRetriable(IHttpResponse response)
+        {
+            var error = ParseError(response);
+            if (error == null)
+            {
+                return false;
+            }
+
+            switch (error.Code)
+            {
+                case ErrorCode.SessionVersionMismatch:
+                    return true;
+            }
+
+            return false;
+        }
+
         private static Error ParseServiceError(IHttpResponse response)
         {
 #if ACCELBYTE_STRONG_RESPONSE_VALIDATION

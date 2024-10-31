@@ -84,6 +84,18 @@ namespace AccelByte.Models
         [DataMember(Name = "updatedAt")] public string UpdatedAt;
         [DataMember(Name = "createdAt")] public string CreatedAt;
     }
+    
+    [DataContract, Preserve]
+    public class RandomizedChallengeResponse
+    {
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "challengeCode")] public string ChallengeCode;
+        [DataMember(Name = "startTime")] public string StartTime;
+        [DataMember(Name = "endTime")] public string EndTime;        
+        [DataMember(Name = "updatedAt")] public string UpdatedAt;
+        [DataMember(Name = "createdAt")] public string CreatedAt;
+        [DataMember(Name = "goals")] public GoalResponseInfo[] Goals;
+    }
 
     [DataContract, Preserve]
     public class ChallengeResetConfig

@@ -188,7 +188,12 @@ namespace AccelByte.Models
             }
 
             ILatencyCalculator calculator = LatencyCalculator;
-            retval = calculator.CalculateLatency(ip, qos_port);
+            
+            string url = ip;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            url = LatencyCalculatorFactory.GetAwsPingEndpoint(region);
+#endif
+            retval = calculator.CalculateLatency(url, qos_port);
             retval.OnSuccess(newLatency =>
             {
                 cachedLatency = newLatency;
@@ -258,6 +263,7 @@ namespace AccelByte.Models
     [Preserve]
     public class GetTurnServerOptionalParameters
     {
+        public bool AutoCalculateLatency = true;
         internal ILatencyCalculator LatencyCalculator;
     }
 }

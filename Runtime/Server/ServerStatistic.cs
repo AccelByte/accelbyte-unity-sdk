@@ -11,7 +11,7 @@ namespace AccelByte.Server
 {
     public class ServerStatistic : WrapperBase
     {
-        private readonly ServerStatisticApi api;
+        internal readonly ServerStatisticApi Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
@@ -30,7 +30,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct Statistic manager; inApi is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct Statistic manager; inCoroutineRunner is null!");
 
-            api = inApi;
+            Api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
@@ -84,7 +84,7 @@ namespace AccelByte.Server
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Created);
 
             coroutineRunner.Run(
-                api.CreateUserStatItems(userId, statItems, callback));
+                Api.CreateUserStatItems(userId, statItems, callback));
         }
 
         private void SendPredefinedEvent(string userId, List<string> statCodes, PredefinedUserStatItemMode mode)
@@ -141,7 +141,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetUserStatItems(userId, null, null, callback, offset, limit, sortBy));
+                Api.GetUserStatItems(userId, null, null, callback, offset, limit, sortBy));
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetUserStatItems(userId, statCodes, tags, callback, offset, limit, sortBy));
+                Api.GetUserStatItems(userId, statCodes, tags, callback, offset, limit, sortBy));
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace AccelByte.Server
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
             coroutineRunner.Run(
-                api.IncrementUserStatItems(userId, increments, callback));
+                Api.IncrementUserStatItems(userId, increments, callback));
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.IncrementManyUsersStatItems(increments, callback));
+                Api.IncrementManyUsersStatItems(increments, callback));
         }
 
          /// <summary>
@@ -260,7 +260,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.ResetUserStatItems(userId, resets, callback));
+                Api.ResetUserStatItems(userId, resets, callback));
         }
 
         /// <summary>
@@ -280,7 +280,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.ResetManyUsersStatItems(resets, callback));
+                Api.ResetManyUsersStatItems(resets, callback));
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace AccelByte.Server
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
             coroutineRunner.Run(
-                api.UpdateUserStatItems(userId, additionalKey, updates, callback));
+                Api.UpdateUserStatItems(userId, additionalKey, updates, callback));
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.UpdateManyUsersStatItems(updates, callback));
+                Api.UpdateManyUsersStatItems(updates, callback));
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.BulkFetchUserStatItemValues(statCode, userIds, additionalKey, callback));
+                Api.BulkFetchUserStatItemValues(statCode, userIds, additionalKey, callback));
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.BulkFetchStatItemsValue(statCode, userIds, callback));
+                Api.BulkFetchStatItemsValue(statCode, userIds, callback));
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, callback));
+                Api.BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, callback));
         }
 
         /// <summary>
@@ -463,7 +463,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, callback));
+                Api.BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, callback));
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, callback));
+                Api.BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, callback));
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, callback));
+                Api.UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, callback));
         }
 
         /// <summary>
@@ -559,7 +559,7 @@ namespace AccelByte.Server
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Deleted);
             
             coroutineRunner.Run(
-                api.DeleteUserStatItems(userId, statCode, additionalKey, callback));
+                Api.DeleteUserStatItems(userId, statCode, additionalKey, callback));
         }
         
         /// <summary>
@@ -578,7 +578,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.GetGlobalStatItemsByStatCode(
+                Api.GetGlobalStatItemsByStatCode(
                     statCode, 
                     callback)
             );
@@ -608,7 +608,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            coroutineRunner.Run(api.GetListStatCycleConfigs(type, status, callback, offset, limit));
+            coroutineRunner.Run(Api.GetListStatCycleConfigs(type, status, callback, offset, limit));
         }
     }
 }

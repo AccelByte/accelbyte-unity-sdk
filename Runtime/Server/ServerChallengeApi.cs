@@ -493,7 +493,7 @@ namespace AccelByte.Server
         }
 
         public void RandomizeChallengeGoals(string challengeCode
-            , ResultCallback<ChallengeResponseInfo[]> callback)
+            , ResultCallback<RandomizedChallengeResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -515,7 +515,7 @@ namespace AccelByte.Server
 
             HttpOperator.SendRequest(request, response =>
             {
-                var result = response.TryParseJson<ChallengeResponseInfo[]>();
+                var result = response.TryParseJson<RandomizedChallengeResponse[]>();
 
                 callback?.Try(result);
             });

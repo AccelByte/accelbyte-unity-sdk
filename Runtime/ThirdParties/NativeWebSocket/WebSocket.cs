@@ -84,7 +84,7 @@ namespace NativeWebSocket
     public delegate void WebSocketOpenEventHandler();
     public delegate void WebSocketMessageEventHandler(byte[] data);
     public delegate void WebSocketErrorEventHandler(string errorMsg);
-    public delegate void WebSocketCloseEventHandler(WebSocketCloseCode closeCode);
+    public delegate void WebSocketCloseEventHandler(int closeCode);
 
     public enum WebSocketCloseCode
     {
@@ -356,7 +356,7 @@ namespace NativeWebSocket
     }
 
     public void DelegateOnCloseEvent (int closeCode) {
-      this.OnClose?.Invoke (WebSocketHelpers.ParseCloseCodeEnum (closeCode));
+      this.OnClose?.Invoke (closeCode);
     }
 
   }
@@ -476,7 +476,7 @@ namespace NativeWebSocket
             catch (Exception ex)
             {
                 OnError?.Invoke(ex.Message);
-                OnClose?.Invoke(WebSocketCloseCode.Abnormal);
+                OnClose?.Invoke((int)WebSocketCloseCode.Abnormal);
             }
             finally
             {
@@ -697,7 +697,7 @@ namespace NativeWebSocket
             finally
             {
                 await new WaitForUpdate();
-                OnClose?.Invoke(closeCode);
+                OnClose?.Invoke((int)closeCode);
             }
         }
 

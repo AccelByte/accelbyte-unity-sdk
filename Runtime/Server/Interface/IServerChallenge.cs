@@ -75,7 +75,7 @@ namespace AccelByte.Server.Interface
         /// <param name="challengeCode">String identifier of challenge to randomize goals for</param>
         /// <param name="callback">Result callback of challenge that has its goals randomized</param>
         public void RandomizeChallengeGoals(string challengeCode
-            , ResultCallback<ChallengeResponseInfo[]> callback);
+            , ResultCallback<RandomizedChallengeResponse[]> callback);
 
         /// <summary>
         /// Delete a specified TIED challenge along with its goals, schedules, and player progressions

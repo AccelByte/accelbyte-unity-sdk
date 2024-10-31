@@ -129,7 +129,12 @@ namespace AccelByte.Server
 
             foreach (var server in servers)
             {
-                    calculator.CalculateLatency(server.ip, server.port)
+                string url = server.ip;
+#if UNITY_WEBGL && !UNITY_EDITOR
+                url = LatencyCalculatorFactory.GetAwsPingEndpoint(server.region);
+#endif
+                
+                calculator.CalculateLatency(url, server.port)
                     .OnSuccess(latency =>
                     {
                         retval.Add(server.region, latency);

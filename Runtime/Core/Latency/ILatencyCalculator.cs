@@ -15,11 +15,13 @@ namespace AccelByte.Core
     {
         public static ILatencyCalculator CreateDefaultCalculator()
         {
-#if UNITY_WEBGL
-            return new DefaultWebGlLatencyCalculator();
-#else
-            return new DefaultLatencyCalculator(AccelByteSDK.Implementation.CoreHeartBeat);
-#endif
+            return new DefaultLatencyCalculator();
+        }
+
+        internal static string GetAwsPingEndpoint(string region)
+        {
+            string retval = $"https://ec2.{region}.amazonaws.com/ping?cache_buster={System.DateTime.UtcNow.Ticks}";
+            return retval;
         }
     }
 }

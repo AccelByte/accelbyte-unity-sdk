@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.0.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/17.0.1%0D17.0.0) (2024-10-31)
+
+
+### Bug Fixes
+
+* fix null GetTurnServers result on webgl platform ([5f4cdc1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5f4cdc1e646f95c65d137fae5705ba01b939ec0c))
+* fix server challenge response model ([099eb3d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/099eb3da47ab51cbd1d59f2c8610c1de26aaeb13))
+* fix webgl ping method ([d5dd386](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d5dd386eda652ef9aba2a01a8a009478449cdc22))
+
+
+### Refactors
+
+* bring back websocket changes ([84e1bda](https://github.com/AccelByte/accelbyte-unity-sdk/commits/84e1bda7e6cc029de9b75b727d9bbe6abc31ab7c))
+
 ## [17.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/17.0.0%0D16.25.4) (2024-10-21)
 
 

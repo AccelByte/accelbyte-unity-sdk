@@ -62,7 +62,13 @@ namespace AccelByte.Api
                     return;
                 }
 
-                if (getResult.Value != null && getResult.Value.servers != null && getResult.Value.servers.Length > 0)
+                bool autoCalculateLatency = true;
+                if (optionalParam != null)
+                {
+                    autoCalculateLatency = optionalParam.AutoCalculateLatency;
+                }
+                
+                if (autoCalculateLatency && getResult.Value != null && getResult.Value.servers != null && getResult.Value.servers.Length > 0)
                 {
                     int currentLatencyTaskCalculationDoneCount = 0;
                     int expectedLength = getResult.Value.servers.Length;
@@ -78,7 +84,9 @@ namespace AccelByte.Api
                     
                     foreach (var server in getResult.Value.servers)
                     {
-                        server.LatencyCalculator = optionalParam?.LatencyCalculator == null ? new DefaultLatencyCalculator(SharedMemory?.CoreHeartBeat) : optionalParam?.LatencyCalculator;
+                        ILatencyCalculator calculator =
+                            optionalParam?.LatencyCalculator == null ? LatencyCalculatorFactory.CreateDefaultCalculator() : optionalParam?.LatencyCalculator;
+                        server.LatencyCalculator = calculator;
                         server.GetLatency(useCache: false).OnComplete(onCalculateLatencyDone);
                     }
                 }

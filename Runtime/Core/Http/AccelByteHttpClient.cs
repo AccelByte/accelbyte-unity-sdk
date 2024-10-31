@@ -651,6 +651,10 @@ namespace AccelByte.Core
                 onServerError?.Invoke(httpRequest);
                 requireToRetry = true;
             }
+            else
+            {
+                requireToRetry = HttpErrorParser.IsInternalErrorRetriable(httpResponse);
+            }
             return requireToRetry;
         }
 

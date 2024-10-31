@@ -221,7 +221,7 @@ namespace AccelByte.Server
             api.GetUserRewards(userId, callback, challengeRewardStatus, challengeSortBy, offset, limit);
         }
 
-        public void RandomizeChallengeGoals(string challengeCode, ResultCallback<ChallengeResponseInfo[]> callback)
+        public void RandomizeChallengeGoals(string challengeCode, ResultCallback<RandomizedChallengeResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 

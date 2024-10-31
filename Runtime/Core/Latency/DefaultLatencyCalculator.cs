@@ -2,13 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Diagnostics;
-using System.Net.Sockets;
-using System.Net;
-using System.Text;
-using System;
 using AccelByte.Models;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace AccelByte.Core
@@ -22,21 +16,20 @@ namespace AccelByte.Core
             public AccelByteResult<int, Error> TaskResult;
         }
         
-        private CoreHeartBeat coreHeartBeat;
-        private float timeOutSeconds = 60;
+        private float timeOutSeconds;
+        private uint pingRetry;
 
         private static Dictionary<int, List<CalculateLatencyTask>> portQueue;
         
-        public DefaultLatencyCalculator(CoreHeartBeat coreHeartBeat, int timeOutSeconds = 60)
+        public DefaultLatencyCalculator(int timeOutSeconds = 10, uint pingRetry = 6)
         {
-            UnityEngine.Assertions.Assert.IsNotNull(coreHeartBeat);
             if (portQueue == null)
             {
                 portQueue = new Dictionary<int, List<CalculateLatencyTask>>();
             }
 
-            this.coreHeartBeat = coreHeartBeat;
             this.timeOutSeconds = timeOutSeconds;
+            this.pingRetry = pingRetry;
         }
         
         public AccelByteResult<int, Error> CalculateLatency(string url, int port)
@@ -74,8 +67,35 @@ namespace AccelByte.Core
                     nextTask = portQueue[port][0];
                     portQueue[port].RemoveAt(0);   
                 }
-                await CalculateLatency(nextTask.Url, nextTask.Port, nextTask.TaskResult);
 
+                var optionalParameters = new Utils.Networking.PingOptionalParameters();
+                optionalParameters.InTimeOutInMs = (uint)timeOutSeconds * 1000;
+                optionalParameters.MaxRetry = pingRetry;
+#if !UNITY_WEBGL || UNITY_EDITOR
+                AccelByteResult<int, Error> pingResult = AccelByte.Utils.Networking.UdpPing(nextTask.Url, (uint) nextTask.Port, optionalParameters);
+#else
+                AccelByteResult<int, Error> pingResult = AccelByte.Utils.Networking.HttpPing(nextTask.Url, optionalParameters);
+#endif
+                bool pingComplete = false;
+
+                pingResult.OnSuccess(ping =>
+                {
+                    nextTask.TaskResult.Resolve(ping);
+                });
+                pingResult.OnFailed(error =>
+                {
+                    nextTask.TaskResult.Reject(error);
+                });
+                pingResult.OnComplete(() =>
+                {
+                    pingComplete = true;
+                });
+                
+                while (!pingComplete)
+                {
+                    await System.Threading.Tasks.Task.Yield();
+                }
+                
                 lock (portQueue)
                 {
                     hasNextTask = portQueue[port].Count > 0;
@@ -86,59 +106,6 @@ namespace AccelByte.Core
                 }
             } 
             while (hasNextTask);
-        }
-        
-        private async System.Threading.Tasks.Task CalculateLatency(string url, int port, AccelByteResult<int, Error> result)
-        {
-            var stopwatch = new Stopwatch();
-            try
-            {
-                using (var udpClient = new UdpClient(port))
-                {
-                    udpClient.Connect(url, port);
-                    byte[] sendBytes = Encoding.ASCII.GetBytes("PING");
-                    stopwatch.Start();
-
-                    using (var cts = new System.Threading.CancellationTokenSource())
-                    {
-                        System.Threading.Tasks.Task<int> sendPingTask = null;
-                        coreHeartBeat.Wait(new WaitTimeCommand(timeOutSeconds, cancellationToken: cts.Token, onDone: () =>
-                        {
-                            udpClient.Close();
-                        }));
-
-                        IAsyncResult sendResult = udpClient.BeginSend(
-                            sendBytes,
-                            sendBytes.Length,
-                            null,
-                            null);
-
-                        sendPingTask = System.Threading.Tasks.Task.Factory.FromAsync(sendResult, udpClient.EndSend);
-                        await sendPingTask;
-                    
-                        var remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-
-                        IAsyncResult receiveResult = udpClient.BeginReceive(null, null);
-
-                        Func<IAsyncResult, byte[]> receiveEndMethod = (asyncResult) =>
-                        {
-                            return udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
-                        };
-                        await System.Threading.Tasks.Task.Factory.FromAsync(receiveResult, receiveEndMethod);
-
-                        cts.Cancel();
-                    }
-                    
-                    udpClient.Close();
-                    result.Resolve(stopwatch.Elapsed.Milliseconds);
-                }
-            }
-            catch (Exception ex)
-            {
-                string errorMessage = $"Encountered issue on calculating latency to \"{url}:{port}\".\n{ex.Message}";
-                result.Reject(new Error(ErrorCode.InternalServerError, errorMessage));
-            }
-            stopwatch.Stop();
         }
     }
 }
