@@ -1,22 +1,22 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
-### [17.0.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/17.0.1%0D17.0.0) (2024-10-31)
+### [17.0.1] (2024-10-31)
 
 
 ### Bug Fixes
 
-* fix null GetTurnServers result on webgl platform ([5f4cdc1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5f4cdc1e646f95c65d137fae5705ba01b939ec0c))
-* fix server challenge response model ([099eb3d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/099eb3da47ab51cbd1d59f2c8610c1de26aaeb13))
-* fix webgl ping method ([d5dd386](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d5dd386eda652ef9aba2a01a8a009478449cdc22))
+* fix null GetTurnServers result on webgl platform 
+* fix server challenge response model 
+* fix webgl ping method 
 
 
 ### Refactors
 
-* bring back websocket changes ([84e1bda](https://github.com/AccelByte/accelbyte-unity-sdk/commits/84e1bda7e6cc029de9b75b727d9bbe6abc31ab7c))
+* bring back websocket changes 
 
-## [17.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/17.0.0%0D16.25.4) (2024-10-21)
+## [17.0.0] (2024-10-21)
 
 
 ### ⚠ BREAKING CHANGES
@@ -25,763 +25,763 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* add apple iap subscription interface ([4b8af65](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4b8af653e8645a8c0cbf13dc41cbf8c95ae30782))
-* add google iap subscription interface ([73dcb8c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73dcb8c5b1c8dd072b69ab2f5f5da7d7a05d8dfc))
-* add IAP query subscription interface ([f471a02](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f471a02348e62d27003e99d47ce08edc763502f1))
-* add message system v2 ([3412748](https://github.com/AccelByte/accelbyte-unity-sdk/commits/34127484585928b37c184265d7f9de078fd00300))
-* add optional param to include mac address ([7c75f5d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c75f5d5425a12b45cb919919785cbec582fe045))
-* add turn manager get latency ([b08459d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b08459d9ed14a6203c05f2af3c9a18488b8bbb19))
-* **entitlement:** add sync steam inventory ([471c73d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/471c73d0c66969db4026ce2a7a404e55e2431bcb))
-* exposed chat websocket endpoints to get and set user chat configuration ([0c214eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0c214eb9ee1b07d37179ce0197dbd831bd20349a))
-* exposed get user entitlement history endpoint ([64a8ad3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/64a8ad39726c49b3886b91cbd445438f2b3a0f6b))
-* implemented admin agreement endpoint interfaces, updated response model for QueryLegalEligibilities ([ba248a0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ba248a016ec1628a1cdba562f64ad50c35d366bd))
-* implemented matchmakingV2 canceled lobby notification ([610b8c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/610b8c496143d52ad3e4cf4a64bd610741c0e636))
+* add apple iap subscription interface 
+* add google iap subscription interface 
+* add IAP query subscription interface 
+* add message system v2 
+* add optional param to include mac address 
+* add turn manager get latency 
+* **entitlement:** add sync steam inventory 
+* exposed chat websocket endpoints to get and set user chat configuration 
+* exposed get user entitlement history endpoint 
+* implemented admin agreement endpoint interfaces, updated response model for QueryLegalEligibilities 
+* implemented matchmakingV2 canceled lobby notification 
 
 
 ### Bug Fixes
 
-* add default latency calculator when calculating turn server's latency ([ea2bf7d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ea2bf7d165b6a01534b715a1722ee7ea976e5b51))
-* fixed issue on matchmaking session polling ([df03ed7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/df03ed7adc0572b85e39a6a54dd553fc3d00f228))
-* fixed issue when unity persistent path is null ([28c63b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28c63b82acd247478c9c7ab9c5389d17531ec0f7))
-* webgl platform improvements ([28333f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28333f4037191774a5216a24d74ce78ab2954743))
+* add default latency calculator when calculating turn server's latency 
+* fixed issue on matchmaking session polling 
+* fixed issue when unity persistent path is null 
+* webgl platform improvements 
 
 
 ### Refactors
 
-* drop support sort by quantity for get all items of inventory service ([fe665ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fe665efd0de86d38cb1735f555714791b712b60f))
-* expose some private api fields to internal ([0073c5a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0073c5adc48cf8fd9169131a896936a352f997df))
-* fixed game common info persistent path name ([55cbab7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55cbab74868dfb2a8abbb5fe33cbdf997fae1501))
-* refactor qosm to support call GetAllServerLatencies on AMS ([9f39498](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f39498507da09f3427539163336e53f25d9a58e))
-* remove deprecated param from inventory and server inventory ([6911482](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6911482958e483a5cec66425231175356542239e))
+* drop support sort by quantity for get all items of inventory service 
+* expose some private api fields to internal 
+* fixed game common info persistent path name 
+* refactor qosm to support call GetAllServerLatencies on AMS 
+* remove deprecated param from inventory and server inventory 
 
 
 ### Documentations
 
-* pushed back presence event api and get country groups deprecation to AGS 3.81 ([194bdb6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/194bdb6bf0cca5a9e6dc16a3416b4e03c6d37951))
+* pushed back presence event api and get country groups deprecation to AGS 3.81 
 
-### [16.25.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.4%0D16.25.3) (2024-10-07)
-
-
-### Bug Fixes
-
-* fix unathorized http request null exception ([565aed8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/565aed88cb8bcb5796ff61e53b4115e28727af3f))
-
-### [16.25.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.3%0D16.25.2) (2024-10-01)
+### [16.25.4] (2024-10-07)
 
 
 ### Bug Fixes
 
-* support http client clear cookies on multi-thread ([3c42024](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3c420244620f17d79e1f2c5093eb9e9ec010c26a))
+* fix unathorized http request null exception 
 
-### [16.25.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.2%0D16.25.1) (2024-09-24)
-
-
-### Bug Fixes
-
-* fix some field types of TurnManager model ([f81eafd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f81eafd28766f299f85d8d6c0bad69790de20943))
-
-### [16.25.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.1%0D16.25.0) (2024-09-19)
+### [16.25.3] (2024-10-01)
 
 
 ### Bug Fixes
 
-* add various http response fields ([0cfb1b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0cfb1b2b4eaaf44e0c089c52a73e811afea33b69))
-* added missing parameter to set upload binary content type ([226474e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/226474ee03e1a102e01d3ecfadab8309448f42fd))
-* **BinaryCloudSave:** incorrect request presigned url callback model ([689912b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/689912b6fa4804cd834d284ca434df06c323ed90))
-* **BinaryCloudSave:** invalid callback model ([12cb6c1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/12cb6c1b4433c83a9e85951653c06761cbaf3c7a))
+* support http client clear cookies on multi-thread 
+
+### [16.25.2] (2024-09-24)
+
+
+### Bug Fixes
+
+* fix some field types of TurnManager model 
+
+### [16.25.1] (2024-09-19)
+
+
+### Bug Fixes
+
+* add various http response fields 
+* added missing parameter to set upload binary content type 
+* **BinaryCloudSave:** incorrect request presigned url callback model 
+* **BinaryCloudSave:** invalid callback model 
 
 
 ### Refactors
 
-* change save binary and presigned url type ([f8e471d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f8e471d96208deb2a47a8232450d7d3160345092))
+* change save binary and presigned url type 
 
-## [16.25.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.25.0%0D16.24.0) (2024-09-18)
+## [16.25.0] (2024-09-18)
 
 
 ### Features
 
-* add change policy preferences in agreement ([6a92961](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6a92961ed5ad62a80bfea9ec8097e406bf42fdb8))
-* add disconnect endpoint ([ca69d82](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ca69d8222c8673b74f8680aeff30dde35dac068b))
-* add overload function for sync apple purchase ([ed64ba2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed64ba209736a52ad1c996fb832f2520277bf1bb))
-* added additional header to ds hub connection request ([fb702c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb702c46b8a02daebc68c4265381a8c62fb4ba27))
-* added option to have randomized device id on development build and editor ([ac68ec6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ac68ec6ed7584e90816daec949febe0ba606d17e))
-* **entitlement:** add overload function for google sync ([83be33e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/83be33edd559d32bb33083bfcd28c23b2d9ed011))
-* exposed endpoint to set and reset session timeout for ams ds ([539429a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/539429ab268a5fe8820fa60b730cf0c824de191d))
-* exposed new challenge service endpoints ([bc9e3a5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc9e3a5887627be5a6a37d5b2a0731a801873a4f))
-* Implemented fallback ticket polling and ws notif spoofing for matchmaking ([8b0da44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8b0da4466b7343a38732ac0dad036cac036c426a))
-* update turn manager model ([682e80e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/682e80e7081c2b6034077f50e62dc0117433f111))
+* add change policy preferences in agreement 
+* add disconnect endpoint 
+* add overload function for sync apple purchase 
+* added additional header to ds hub connection request 
+* added option to have randomized device id on development build and editor 
+* **entitlement:** add overload function for google sync 
+* exposed endpoint to set and reset session timeout for ams ds 
+* exposed new challenge service endpoints 
+* Implemented fallback ticket polling and ws notif spoofing for matchmaking 
+* update turn manager model 
 
 
 ### Bug Fixes
 
-* corrected sequenceId data type, changed buffer primary sort param from SentAt to SequenceId ([adfc488](https://github.com/AccelByte/accelbyte-unity-sdk/commits/adfc48810836589df67c2bbb43fabc38dd3fb8a1))
-* incorrect data type for GoogleReceiptResolveResult.NeedConsume ([bc4b221](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc4b2218f1ac3680944cfb50a5f1b57ec81b52e1))
-* preserve inventory api ([0fb1b3f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0fb1b3f599ffcf00abd50bce80f6deed4fd216f1))
-* set missing oauth api shared memory ([ad4c033](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ad4c03325f6858236f678132651edc3e9330e7ea))
+* corrected sequenceId data type, changed buffer primary sort param from SentAt to SequenceId 
+* incorrect data type for GoogleReceiptResolveResult.NeedConsume 
+* preserve inventory api 
+* set missing oauth api shared memory 
 
 
 ### Refactors
 
-* add defensive code for sync apple iap ([a9bc330](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a9bc33001157e20dc94d3d7ba1e8d0e9649a9a85))
-* refactor sdk heartbeat ([43d6a41](https://github.com/AccelByte/accelbyte-unity-sdk/commits/43d6a41f4b382a1a9da420e1d7dde8bc7a7fd5c3))
-* refactor sdk logging ([48cced6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/48cced6636c891f86e15145c38f0c1f62cf7196d))
-* refactor telemetry flightId payload field to camel case ([a256b82](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a256b82c845d2a5911d0ec418b483072bcb89727))
-* sdk refresh session improvement ([9f41571](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f41571af8639cf43cffb764f4fc94768fcc383e))
+* add defensive code for sync apple iap 
+* refactor sdk heartbeat 
+* refactor sdk logging 
+* refactor telemetry flightId payload field to camel case 
+* sdk refresh session improvement 
 
-## [16.24.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.24.0%0D16.23.1) (2024-08-12)
+## [16.24.0] (2024-08-12)
 
 
 ### Features
 
-* add AppleExtension as InternalsVisibleTo ([2451d23](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2451d2377b5b2d888e5f0510c0629c247d48d287))
-* add flight id and device type into telemetry data ([5377697](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5377697ba001a6c00a044072c4325074cd8e07c8))
-* add friend related error code ([fd7e2c0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fd7e2c0889fec897734b15ae62907977e00837c4))
-* add login with apple ([6cb3805](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6cb38053ed4802568576ed396b282ef6805fdf5c))
-* add optional service label param ([8dab5b5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8dab5b56f09f26bc08538761fabaa8eac5dee096))
-* add server misc service ([2aa2b21](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2aa2b21c3b1f7cc712aabc519abbb9e4b8d8fc59))
-* add StatisticCodePredicate and Code field for purchasing requirement ([45171c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/45171c58847785860ba19c485070ee9affaf76c5))
-* add support for GooglePlayGames authentication ([a33f131](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a33f1318fdbd699b30ecab3d6e746e75f88f0179))
-* add unity switch token expired time ([bce2407](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bce24071d8a29cd16b2777f0bc940583479416ed))
-* implement BulkGetUserByOtherPlatformUserIdsV4 ([1c8b1e9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1c8b1e9dfe331f75273f5ac13d6605d8d7e87a5f))
-* set telemetry client timestamp with server time reference ([b0ad854](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b0ad854b6128384f2e1bf8aa5de3b8849cbef9cf))
+* add AppleExtension as InternalsVisibleTo 
+* add flight id and device type into telemetry data 
+* add friend related error code 
+* add login with apple 
+* add optional service label param 
+* add server misc service 
+* add StatisticCodePredicate and Code field for purchasing requirement 
+* add support for GooglePlayGames authentication 
+* add unity switch token expired time 
+* implement BulkGetUserByOtherPlatformUserIdsV4 
+* set telemetry client timestamp with server time reference 
 
 
 ### Bug Fixes
 
-* fixed incorrect chat and server user account endpoints ([8ca8097](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8ca80975617426bd27967cebfdf875730a132484))
+* fixed incorrect chat and server user account endpoints 
 
 
 ### Refactors
 
-* refactor qos get latencies implementation ([0b6c597](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0b6c5977a626259508a19dca009f82fc36ea54c3))
+* refactor qos get latencies implementation 
 
-### [16.23.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.1%0D16.23.0) (2024-07-31)
+### [16.23.1] (2024-07-31)
 
 
 ### Bug Fixes
 
-* **QoS:** unable parse DNS address to get latency ([b2b720d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b2b720d832314da74ce3f8bd22393554610745e5))
+* **QoS:** unable parse DNS address to get latency 
 
-## [16.23.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.23.0%0D16.22.2) (2024-07-01)
+## [16.23.0] (2024-07-01)
 
 
 ### Features
 
-* implemented network maintainer ([fb9e5c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb9e5c40cb677b27fe16f288dc99e28c5d48acdf))
+* implemented network maintainer 
 
 
 ### Bug Fixes
 
-* add editor dedicated server macro to linux server bootstrap ([4efdece](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4efdecea56adaee936b362f25efefa8f166e7b3d))
-* add missing storeId param and fix false serverEcommerce endpoint ([32a60f5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/32a60f5b3ba576f186ec373d6a5bdb36906a7d21))
-* broken endpoint name in UserApi ([870a143](https://github.com/AccelByte/accelbyte-unity-sdk/commits/870a143a4b9f6e77180ead5b409ae6ac5028753d))
+* add editor dedicated server macro to linux server bootstrap 
+* add missing storeId param and fix false serverEcommerce endpoint 
+* broken endpoint name in UserApi 
 
-### [16.22.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.2%0D16.22.1) (2024-06-13)
+### [16.22.2] (2024-06-13)
 
 
 ### Bug Fixes
 
-* skip check null value for optional parameter in Entitlement ([e8dd1d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8dd1d78793e2cddcd40c07e1588ef027f8f711e))
+* skip check null value for optional parameter in Entitlement 
 
-### [16.22.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.1%0D16.22.0) (2024-05-28)
+### [16.22.1] (2024-05-28)
 
 
 ### Refactors
 
-* deprecate few nintendo switch interfaces ([790ac15](https://github.com/AccelByte/accelbyte-unity-sdk/commits/790ac15c1683bcbdf6c26c66c503ed97e2a0f6ca))
+* deprecate few nintendo switch interfaces 
 
-## [16.22.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.22.0%0D16.21.0) (2024-05-22)
+## [16.22.0] (2024-05-22)
 
 
 ### Features
 
-* add connect failed warning callback ([927fc5c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/927fc5c4c6f705e19dfcca3e9ebd64e2c4885fcb))
-* add get dlc mapping endpoint ([0ce64aa](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0ce64aafa639ae5abd210e64a7f005ea087040a5))
-* add more error codes ([aa0b91c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa0b91cfaad6ef0afa427b3369d8f5274d18c68a))
-* **BinaryCloudSave:** add server binary cloudsave interface ([7f4b77f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f4b77fcbb33eed730217964a4d4b5b0ef87a808))
-* **Order:** discount code redemption order preview order price with discount code API ([f648016](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f64801660beb01e32294dbfc69a4a554e4e94257))
-* server inventory service and api implementation ([e863966](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8639664df8a7b5cb89f04886faa1c66e6e7a407))
+* add connect failed warning callback 
+* add get dlc mapping endpoint 
+* add more error codes 
+* **BinaryCloudSave:** add server binary cloudsave interface 
+* **Order:** discount code redemption order preview order price with discount code API 
+* server inventory service and api implementation 
 
 
 ### Bug Fixes
 
-* broken revoke token endpoint ([8eb68a7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8eb68a750b3a2336d86fb3df071a55414890a4b4))
-* fix websocket implementation on webgl build ([4d40f7f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d40f7f0b0589c8c55c84091302e4d293912b147))
+* broken revoke token endpoint 
+* fix websocket implementation on webgl build 
 
-## [16.21.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.21.0%0D16.20.2) (2024-05-13)
-
-
-### Features
-
-* add dshub websocket url ([37b1cd6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/37b1cd6d52259263bdd11a90c3450b1446f0d18b))
-* add impacted user information ([b6e0c14](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b6e0c14be6863e5e3ffddc7a656dd46b1ff4b47b))
-
-### [16.20.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.2%0D16.20.1) (2024-05-08)
+## [16.21.0] (2024-05-13)
 
 
 ### Features
 
-* **session:** expose Session Endpoints to query active session ([6bf76c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6bf76c5f5efb2830e7b9c9a02dff46c6642864a1))
+* add dshub websocket url 
+* add impacted user information 
+
+### [16.20.2] (2024-05-08)
+
+
+### Features
+
+* **session:** expose Session Endpoints to query active session 
 
 
 ### Refactors
 
-* modify native websocket lib to return any ws close code ([25aeace](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25aeace7868d408bcb8781e943f362a37b5f072e))
+* modify native websocket lib to return any ws close code 
 
-### [16.20.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.1%0D16.20.0) (2024-04-30)
-
-
-### Features
-
-* added config for custom reconnect timeout for dshub and ams ([ba44528](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ba4452890fe16ec79ad3227017e684cde5fdb8ef))
-
-
-### Bug Fixes
-
-* added missing leading/trailing slashes to config urls ([52a1087](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52a1087890a537da15ae39058163b58267837569))
-* remove nunit assert ([e5b863e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e5b863e253d51bf0dfaae4f16f1dc9b27c4878e8))
-* **WebSocket:** missing close code on websocket retry ([3481c97](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3481c97a57dc97be0df108cdb02dfb0cb8f302c7))
-
-## [16.20.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.20.0%0D16.19.2) (2024-04-26)
+### [16.20.1] (2024-04-30)
 
 
 ### Features
 
-* implemented inventory service wrapper ([6711afc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6711afca2be812a08183a3bf12c255309128f634))
+* added config for custom reconnect timeout for dshub and ams 
 
 
 ### Bug Fixes
 
-* rename editor variable into namespace id ([7423f71](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7423f717229d8c7771345f77dec13acde29be665))
+* added missing leading/trailing slashes to config urls 
+* remove nunit assert 
+* **WebSocket:** missing close code on websocket retry 
+
+## [16.20.0] (2024-04-26)
+
+
+### Features
+
+* implemented inventory service wrapper 
+
+
+### Bug Fixes
+
+* rename editor variable into namespace id 
 
 
 ### Refactors
 
-* add null check on get refresh token info ([7c70fd0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c70fd0b5fcaf1028cf543397fcf8642ecb84c76))
+* add null check on get refresh token info 
 
-### [16.19.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.2%0D16.19.1) (2024-04-24)
-
-
-### Features
-
-* exposed get all server session endpoint for server session service ([ae8fc29](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ae8fc296e3eb2a74736f9b9509592b8a75bce055))
-
-### [16.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.1%0D16.19.0) (2024-04-08)
-
-## [16.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.19.0%0D16.18.0) (2024-04-05)
+### [16.19.2] (2024-04-24)
 
 
 ### Features
 
-* add a feature to immediately sending telemetry data in the queue ([9bf3920](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9bf3920bba0f23d235e2fb5cd549bfe27375a064))
-* add additional config types: Sandbox, Integration, QA ([056cbfe](https://github.com/AccelByte/accelbyte-unity-sdk/commits/056cbfe0304c6464e2bb35d78eeccadbe1bd7b93))
-* add get oauth config interface ([02f303a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/02f303ab92550d410d88ccd3afe5bd24394157eb))
-* add google play wrapper ([aa957fb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa957fb7d8c95e795929cfab8b40163eded560a7))
-* add switch save cache and handle game exit API ([104b7cd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/104b7cd1e73b37e877f89900511a418cca41e905))
-* implement challenge api ([cdc23a8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cdc23a805c01f92b37084558ce168b5a93fa7880))
-* **Item:** add autoCalcEstimatedPrice param to some item endpoint ([e7c5bc2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e7c5bc2c0b122d7056d1487c6d0e9f4bb6607956))
+* exposed get all server session endpoint for server session service 
 
-## [16.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.18.0%0D16.17.1) (2024-03-24)
+### [16.19.1] (2024-04-08)
+
+## [16.19.0] (2024-04-05)
 
 
 ### Features
 
-* add get config interfaces ([2795fe2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2795fe261ebc4448ef465937e6c80806543fa03e))
-* add implementation of nintendo switch platform ([60f3392](https://github.com/AccelByte/accelbyte-unity-sdk/commits/60f3392a33b597ff7cc61e8038d937395002aebe))
-* add server config editor ([3c5995a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3c5995a6c074008e4e90a3d53b843938566381f4))
-* **login:** add login queue API ([7363d14](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7363d14cdcc388089a69fa2e1af1e4feacbe3fd3))
+* add a feature to immediately sending telemetry data in the queue 
+* add additional config types: Sandbox, Integration, QA 
+* add get oauth config interface 
+* add google play wrapper 
+* add switch save cache and handle game exit API 
+* implement challenge api 
+* **Item:** add autoCalcEstimatedPrice param to some item endpoint 
+
+## [16.18.0] (2024-03-24)
+
+
+### Features
+
+* add get config interfaces 
+* add implementation of nintendo switch platform 
+* add server config editor 
+* **login:** add login queue API 
 
 
 ### Bug Fixes
 
-* fixed dshub error on empty websocket message topic ([4c77671](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4c77671ba422bd092e59a4ae755bdb5c24f044ab))
+* fixed dshub error on empty websocket message topic 
 
 
 ### Refactors
 
-* add new steam handler format ([c3207ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c3207ee699703b802ee762fbd6c48cc696c1516f))
+* add new steam handler format 
 
 
 ### Tests
 
-* set internal visible to e2e test ([eff30f2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eff30f24a123373601dcb9ddd2a12420d3b91d69))
+* set internal visible to e2e test 
 
-### [16.17.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.1%0D16.17.0) (2024-03-11)
+### [16.17.1] (2024-03-11)
 
 
 ### Bug Fixes
 
-* **utility:** missmatch data on download ([01d274b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/01d274b0a6bdc2f0f8565f6973a7e76ecd49a282))
+* **utility:** missmatch data on download 
 
-## [16.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.17.0%0D16.16.0) (2024-03-08)
+## [16.17.0] (2024-03-08)
 
 
 ### Features
 
-* add cloudsave endpoint ([dc771a9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dc771a9132efc9036675e0a7e2d1b989a034590e))
-* add default null filestream for switch platform. ([83db847](https://github.com/AccelByte/accelbyte-unity-sdk/commits/83db847b21d568cf77a93712d83e9499b1c6b78c))
-* **user:** assign uniqueDisplayName with displayName on Register ([db1dc88](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db1dc88c383caa56e8c1ad7804c597293a98e11d))
+* add cloudsave endpoint 
+* add default null filestream for switch platform. 
+* **user:** assign uniqueDisplayName with displayName on Register 
 
 
 ### Bug Fixes
 
-* fixed roslyn compiler warnings triggering on other attributes with the preview keyword ([47371cd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/47371cd8eaf4ed09ffcb29a1efdca7bf1429fc24))
-* remove additionalKey requirement from UpdateUserStatItemsValue ([f12c56a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f12c56a6f8b09d9007c3cb36ecc238d6c79f9177))
+* fixed roslyn compiler warnings triggering on other attributes with the preview keyword 
+* remove additionalKey requirement from UpdateUserStatItemsValue 
 
 
 ### Refactors
 
-* add server log settings, log only active after configuration loaded ([5acf0af](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5acf0af8605658e24cc308bb5fab0d4c6e818430))
-* change config injection command ([064f3d5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/064f3d5865cc2ad9ce0ceb63bcb5e1bc2f0e4947))
-* refactor config injection to avoid unnecessary warning ([42e36b4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42e36b4bda899f5a06092ec551c653c87fcbc380))
-* refactor SDK filesystem for switch support ([4eba29d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4eba29d2d50cd98803ff82281bf1f9de6ebad85e))
-* update game telemetry cache save & load ([b12ceb0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b12ceb0530cd00e39d666d90bff3369ff60ebb26))
+* add server log settings, log only active after configuration loaded 
+* change config injection command 
+* refactor config injection to avoid unnecessary warning 
+* refactor SDK filesystem for switch support 
+* update game telemetry cache save & load 
 
-## [16.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.16.0%0D16.15.0) (2024-02-21)
+## [16.16.0] (2024-02-21)
 
 
 ### Features
 
-* **account:** account profile revamp ([b361231](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b361231729bc9de1833e98a1b70df328dee3d0f7))
-* **User:** deprecate upgrade account username param ([94907c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/94907c41c014080065d9f341ccc829b3385fac78))
+* **account:** account profile revamp 
+* **User:** deprecate upgrade account username param 
 
 
 ### Bug Fixes
 
-* add preserve attributes on some models ([668e6c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/668e6c493919885beb375b9d56f71e07217256ca))
-* missing sanitation stage ([0f61f12](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0f61f12c00ff5891141dfcc71932f4de696f20de))
+* add preserve attributes on some models 
+* missing sanitation stage 
 
 
 ### Refactors
 
-* deprecate authentication platform link with username ([1d35f50](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1d35f5012e73dda06e566bfe4a14d75c371e5859))
+* deprecate authentication platform link with username 
 
-## [16.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.15.0%0D16.14.0) (2024-02-05)
+## [16.15.0] (2024-02-05)
 
 
 ### Features
 
-* add GetCountryGroupV3 ([21e104f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/21e104fb5010826ea62b01914fcba4a956fcaa4b))
+* add GetCountryGroupV3 
 
 
 ### Bug Fixes
 
-* prevent login error exception if an user hasn't complying legal agreement ([f5a8761](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f5a8761a12f5a9538d05e99b8a8e8284d64baa07))
+* prevent login error exception if an user hasn't complying legal agreement 
 
 
 ### Refactors
 
-* add 429 response code description ([13b5313](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13b5313d6bf35f1799188f5750224f3f57202326))
-* change custom_attribute type based on backend ([d8cd351](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d8cd351ff5bf122f77f882ac7f749efaf0686de9))
+* add 429 response code description 
+* change custom_attribute type based on backend 
 
-## [16.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.14.0%0D16.13.0) (2024-01-18)
+## [16.14.0] (2024-01-18)
 
 
 ### Features
 
-* add ams port in server config ([ecacee3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ecacee3ae62184de4f7239e6f76c1f8e562f4759))
-* add config injection v2 ([0863526](https://github.com/AccelByte/accelbyte-unity-sdk/commits/08635264f27b62b0c028323a8df63d39a3ca50c8))
-* add new client registry interface ([e975af9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e975af93de2a0ef68118c938b78702a06dcbd4a3))
-* add new server registry interface ([970a45d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/970a45d1794369043b7be5aaf83a418fe10a6a4f))
-* add override reload config option ([456e819](https://github.com/AccelByte/accelbyte-unity-sdk/commits/456e81906fa633eb43508b9fbddd03b3f4ca13b8))
-* added network conditioner to simulate dropped packets for websocket ([cc60e35](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cc60e358a576f9ea917b40b33f4839786a8e3747))
-* implemented sdk adjustments to accomodate new field on userdata, new user search overloads, and getting other user platform basic info ([cbd0181](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cbd0181f630c9264d63da80e0fd61580adbbcade))
-* **lobby:** add change user region ([4d31610](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d316109c5d3f492e0735115e070f7e4d36f949d))
-* **lobby:** automatically change region on lobby connected ([38e9581](https://github.com/AccelByte/accelbyte-unity-sdk/commits/38e9581e7355694c1a1956169191523ef2d9c2b2))
-* **UGC:** expose public staging content endpoint ([bf18df9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bf18df92c9d66fc101f4b8a1d95041a2569834fb))
+* add ams port in server config 
+* add config injection v2 
+* add new client registry interface 
+* add new server registry interface 
+* add override reload config option 
+* added network conditioner to simulate dropped packets for websocket 
+* implemented sdk adjustments to accomodate new field on userdata, new user search overloads, and getting other user platform basic info 
+* **lobby:** add change user region 
+* **lobby:** automatically change region on lobby connected 
+* **UGC:** expose public staging content endpoint 
 
 
 ### Bug Fixes
 
-* fix linux dedicated server error build ([13ea996](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13ea996f5aec15cdfa583a137b775aa724eafbe9))
-* readd namepsace on predefined event added ([12447b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/12447b85f70a8506589d2d3b7218082ef129b7bd))
+* fix linux dedicated server error build 
+* readd namepsace on predefined event added 
 
 
 ### Refactors
 
-* redirect all interface into api registry ([fb5c730](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb5c730d20a236db36c732ebe23923f496644e07))
-* refactored null param handlers for game client services, fixed errors with incorrect uri and headers ([ed79e37](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed79e374401820ead6cd7aa9716d1bc2dfd7f852))
-* update various service ([20637e0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/20637e065aa4cb8ddca882801ee371a6fca43d60))
+* redirect all interface into api registry 
+* refactored null param handlers for game client services, fixed errors with incorrect uri and headers 
+* update various service 
 
-## [16.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.13.0%0D16.12.1) (2023-12-14)
+## [16.13.0] (2023-12-14)
 
 
 ### Features
 
-* add byte converter utils ([f54008d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f54008d05645f1ec14e1f73f5691aa827b0f47b7))
-* Added missing predefined events, refactored predefined event namespace ([5230409](https://github.com/AccelByte/accelbyte-unity-sdk/commits/523040937a0200f85b7a8a4437bf36ba5616f89a))
-* adjust concurrent record endpoint behavior ([a687d16](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a687d16a59d40a9d416fc82d451dbd00a4cc503c))
-* expose public bulk get content by sharecode ([d6f722b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d6f722b6445246ec351fd889cf4fd12886313ebf))
-* Expose UGC ModifyContent and DeleteContent by shareCode ([f138270](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f138270800841e7874fc0721422e6b56b81bbf3f))
-* **MPv2:** add promote game session leader API ([873bed5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/873bed529493c683192a504877ea28bc7ffb88e0))
-* sync epic games inventory/IAP ([1dd4133](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1dd41337fb7e0c39dfa803a730de10ccc2f3322d))
+* add byte converter utils 
+* Added missing predefined events, refactored predefined event namespace 
+* adjust concurrent record endpoint behavior 
+* expose public bulk get content by sharecode 
+* Expose UGC ModifyContent and DeleteContent by shareCode 
+* **MPv2:** add promote game session leader API 
+* sync epic games inventory/IAP 
 
 
 ### Bug Fixes
 
-* change websocket-sharp to native-websocket ([59d4f5a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/59d4f5aefe148069baa8e9fafa5be2f1bf354e2a))
-* fix websocket send logic and add retry backoff mechanism ([f57df25](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f57df257fc2b20f029d909d84ea3ad49fb0b826e))
+* change websocket-sharp to native-websocket 
+* fix websocket send logic and add retry backoff mechanism 
 
-### [16.12.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.1%0D16.12.0) (2023-11-30)
+### [16.12.1] (2023-11-30)
 
 
 ### Bug Fixes
 
-* add missing override config in editor ([7830887](https://github.com/AccelByte/accelbyte-unity-sdk/commits/78308871f1218459d4092bbf058203c00d484a0a))
-* fix presence broadcast event is never initiated ([9f2b327](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f2b3270ae18ba1b8495fbe24deee36f6f2296aa))
-* fix unable to login with latest token ([5a33906](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5a339065407711c4f1b93cd57d56790716f80645))
+* add missing override config in editor 
+* fix presence broadcast event is never initiated 
+* fix unable to login with latest token 
 
 
 ### Refactors
 
-* remove flight id hypens ([25f32d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25f32d77703231a2d080b2b6afd438e4396367bd))
+* remove flight id hypens 
 
-## [16.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.12.0%0D16.11.0) (2023-11-28)
+## [16.12.0] (2023-11-28)
 
 
 ### Features
 
-* add sdk version and game version info on multiplayer connect ([45463a4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/45463a416587ed5dafc82f96a06fb7a17c3bc392))
-* Added api endpoint to serversession for sending ds session ready state ([9dd0bd6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9dd0bd60ea13352bb3b115bd06d7f400011d709e))
-* Added flag in client config to toggle using AMS QoS url ([11928b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/11928b273e37c5fbe27c9d209aef1a158c1ae424))
-* added new search hidden content parameters ([5cdb9f8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5cdb9f8ba18b2fad38a3368b96b63f086112a11e))
-* implemented statsD / server metrics ([392ba48](https://github.com/AccelByte/accelbyte-unity-sdk/commits/392ba48cce98a69fba12bfdae4ad5ed0f5f23196))
+* add sdk version and game version info on multiplayer connect 
+* Added api endpoint to serversession for sending ds session ready state 
+* Added flag in client config to toggle using AMS QoS url 
+* added new search hidden content parameters 
+* implemented statsD / server metrics 
 
 
 ### Bug Fixes
 
-* change websocket-sharp to native-websocket ([3d83b5e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3d83b5ef9b9129294dd500987beb535dfe292081))
-* fixed OnSDKStop race condition resulting in service clean up not triggering ([24c6fe2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/24c6fe24fad57e9e6289400e642ee64f850c2e8f))
-* move main run to first scene load before other scripts are run, api typo ([dbe9d28](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dbe9d28d7c752eb288498f33b8e21cd1749d04e5))
+* change websocket-sharp to native-websocket 
+* fixed OnSDKStop race condition resulting in service clean up not triggering 
+* move main run to first scene load before other scripts are run, api typo 
 
 
 ### Refactors
 
-* refactor session cache implementation ([8e3bb7b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8e3bb7bdf9705bddbd30ddcc3c082458c6b369f7))
-* store linux command line information to override config ([a8e6cc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8e6cc4bac7224a4011f799c5bed37d0f53cf31c))
+* refactor session cache implementation 
+* store linux command line information to override config 
 
-## [16.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.11.0%0D16.10.0) (2023-11-13)
+## [16.11.0] (2023-11-13)
 
 
 ### Features
 
-* Added custom roslyn analyzer for preview attribute warning emission ([2cf9cc6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cf9cc663fa56c0922e37583d0bb767bdd9e1bc2))
-* added game standard events analytics implementations ([fdfc560](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fdfc560bcae4b58af3927e31970a5c795ef651dd))
-* added public binary cloud save APIs ([44fed92](https://github.com/AccelByte/accelbyte-unity-sdk/commits/44fed92cfb9587294c2bf9cd563f7f25b4af3737))
-* **Cloudsave:** Expose Admin Game and Player Record endpoints ([48c1192](https://github.com/AccelByte/accelbyte-unity-sdk/commits/48c1192d61da8405d2666af1f240c80e5014aa26))
-* **ecommerce:** flexible bundle pricing ([a7e9566](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a7e956615dc306abe467ff271d6ba44b01c792b3))
-* integrated flight id to api calls ([6c4234b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6c4234bc2448c0bc4cd9e85d37352cefeea763a5))
-* Make the error description clearer for CheckUserAccountAvailability. ([77cb44a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/77cb44acbf53e2fd6d16781495656d35287e9e83))
-* remove game standard customizable event namespace ([a16c943](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a16c9437f299162dfc09f9df970d538e9ff5546b))
-* **UGC:** Add new V2 endpoints for UGC Service ([04999f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/04999f4a3b21de9f96f1bf2b9c3ce6fcd6449520))
+* Added custom roslyn analyzer for preview attribute warning emission 
+* added game standard events analytics implementations 
+* added public binary cloud save APIs 
+* **Cloudsave:** Expose Admin Game and Player Record endpoints 
+* **ecommerce:** flexible bundle pricing 
+* integrated flight id to api calls 
+* Make the error description clearer for CheckUserAccountAvailability. 
+* remove game standard customizable event namespace 
+* **UGC:** Add new V2 endpoints for UGC Service 
 
 
 ### Bug Fixes
 
-* add payment failed predefined event ([efdbcb6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/efdbcb6a304360dae2109060a1800ecf79e72ca6))
-* fix client session not update after environment updated ([d201225](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d201225613c21bb672223081c7d5f699b9876068))
-* fix empty device id on desktop platform ([8ab38d4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8ab38d46a80c16cbbe0a52cda0f72d253b306007))
-* fix file cache webgl implementation ([3b9ef4b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b9ef4b027c128827e8e1df79cfc66b3b7db6e14))
-* fix predefined event on monetization category ([fa5f8e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fa5f8e8c6aa2aa97f9f414f8a55e80ee6a2d28db))
+* add payment failed predefined event 
+* fix client session not update after environment updated 
+* fix empty device id on desktop platform 
+* fix file cache webgl implementation 
+* fix predefined event on monetization category 
 
 
 ### Refactors
 
-* transfer previous event name to payload param, implemented generic event name ([143c1ba](https://github.com/AccelByte/accelbyte-unity-sdk/commits/143c1ba14b3532402a81eb99e2fc486648afb8a1))
-* update game standard payload model ([0161695](https://github.com/AccelByte/accelbyte-unity-sdk/commits/01616950b2a0380dd6db11e9a35530cde7b98bb8))
+* transfer previous event name to payload param, implemented generic event name 
+* update game standard payload model 
 
-## [16.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.10.0%0D16.9.1) (2023-10-30)
+## [16.10.0] (2023-10-30)
 
 
 ### Features
 
-* add config injection for windows dev build and linux server platform ([b1fa066](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1fa0660518888ab97a266259140700c3eae184a))
-* added predefined events analytics implementations ([701c1ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/701c1ef10314121a05cc3b88a4dca5f0939ad46b))
-* Expose CheckUserAvailability ([8395a2a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8395a2a5723ca6fed5d40dc33c0f0d7c9d4dad3d))
-* **lobby:** add S2S friend sync API ([5862ea8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5862ea8f8c15b317794ebbc529bc7e692f050e94))
-* Make the error description clearer for CheckUserAccountAvailability. ([00c259f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/00c259fec36f81e05bb1cc28021872884f944d33))
-* update config injector interface ([847fffd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/847fffdea65f8ee21988a72c0308dfa19334c2e0))
+* add config injection for windows dev build and linux server platform 
+* added predefined events analytics implementations 
+* Expose CheckUserAvailability 
+* **lobby:** add S2S friend sync API 
+* Make the error description clearer for CheckUserAccountAvailability. 
+* update config injector interface 
 
 
 ### Bug Fixes
 
-* AccelbyteDebug config initialization and callbacks ([62d9fc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/62d9fc4a4f4a6d1334d6c7694fffe0c4ab5e3b9e))
-* change presence broadcast event namespace from publisher namespace to session namespace ([4a04d09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4a04d09ec39adb8a39fdd3f035027b54ba822131))
-* remove unused metafile ([3796d57](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3796d57990836f79eddcefcd5f91f6ee487bbeb1))
-* **ugc:** sync the variables for UGC response ([dad6d83](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dad6d830a2510f83540d1ad253bfed9a3e3e82db))
+* AccelbyteDebug config initialization and callbacks 
+* change presence broadcast event namespace from publisher namespace to session namespace 
+* remove unused metafile 
+* **ugc:** sync the variables for UGC response 
 
 
 ### Refactors
 
-* add leaderboard get rankings v3 ([903c30e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/903c30e16561d4b40f7a49efa7a3dc2b419614a0))
-* lobby event send platform info on sending connect request ([f5d20dc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f5d20dcf4f4bb37ea3f2735344efe09bbc63ea4e))
+* add leaderboard get rankings v3 
+* lobby event send platform info on sending connect request 
 
-### [16.9.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.1%0D16.9.0) (2023-10-16)
-
-
-### Refactors
-
-* fix webscheduler process keep looping after unity editor closed ([7f99487](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f99487c9f86a62e06247450ab5e963932826f27))
-
-## [16.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.9.0%0D16.8.0) (2023-10-12)
-
-
-### Features
-
-* **DSHub:** add session member changed notification handler ([edd7a9f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/edd7a9f85be10bddd2fab7a7d16c1138ba397a64))
-* **mpv2:** add persistent payload in SessionV2PublicConfiguration ([491bb98](https://github.com/AccelByte/accelbyte-unity-sdk/commits/491bb989d4ceca7b0bac0b6ff79112ae9f273e82))
-* oidc unlink features ([ebfb606](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebfb60636229235ac6acf32a9508c73204e6baf3))
-
-
-### Bug Fixes
-
-* add webrequest duplication prevention ([1dd846c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1dd846c9c9da2ab3c82873c20ea2f923522f7c3a))
-* **mpv2:** add missing notification handler for OnSessionEnded and refactor warning message for unrecognized topic ([137d412](https://github.com/AccelByte/accelbyte-unity-sdk/commits/137d4128dc904a87a5d79e0b89142bb0359153a1))
+### [16.9.1] (2023-10-16)
 
 
 ### Refactors
 
-* add id input validation ([62b91f4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/62b91f40998f4cece2996b5d7641de42fb2ace76))
+* fix webscheduler process keep looping after unity editor closed 
 
-## [16.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.8.0%0D16.7.0) (2023-09-25)
-
-
-### Features
-
-* add StatusV2 for session member and DS status ([6860469](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6860469f5600c8146e050ab0b388d7588429905e))
-* add turn manager send metric endpoint ([eedeb8e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eedeb8e593a258f3613ac792baa0081f99b3fbcc))
-* change client and server environment pointing into a same target ([5b2f67f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5b2f67f874bd6b22df414375a371dc1b7f8a67c8))
-* parity and add missing Oauth2Token params ([d9f9146](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9f9146ec2cab664f410dabcc3f83468ba14611d))
-
-## [16.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.7.0%0D16.6.5) (2023-09-11)
+## [16.9.0] (2023-10-12)
 
 
 ### Features
 
-* [JSC-1311] add game core and access model ([68664ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/68664ef191c3f61c24d87128761ee1cdad3c207e))
-* [JSC-1311] add ITelemetryEvent interface and constructor ([0416392](https://github.com/AccelByte/accelbyte-unity-sdk/commits/04163927d7ab4670c35c48ea12a86cb8611c1ae3))
-* [JSC-1311] add play and social models ([28f9e4d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28f9e4d1b474a5209739af6a810076b14c3b73aa))
-* [JSC-1311] add predefined event and config ([a90e33e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a90e33e5214a6030b66344e9e7d928ab0f281ea7))
-* [JSC-1311] add storage and monetization ([4f3e1c5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4f3e1c5ec2c574e2778d7578918debcc73d00f4d))
-* [JSC-1557] add presence broadcast event runtime config ([31c44c6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/31c44c666e89a6b7c7954a1cdeef435bcf4a60ca))
-* add auto send login telemetry ([a3868c6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3868c6c45b5bb100b001ff41d1950bab99031b8))
-* add server-side predefined event analytics ([e98b49d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e98b49d14fb3d20f8140156a925631e17312ca07))
-* Added version copy flow on engine initialization ([f6484e0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f6484e0f278c4ca3ab8294073b41a8c3b6b8a678))
-* apply sdk initialize and game launch event ([6778f18](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6778f188073b76871527e19ce371893da8e781cd))
-* **MPv2:** add API for session storage and lobby notification for storage changed ([d38bd24](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d38bd2461e93e66421609772e9a8a26c1f268ffd))
-* Refactored debug and default log classes to allow for scalable abstraction, multiple logger types running simultaneously ([ef1d8ec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ef1d8ecbc5fd2e351906a04452c4c16920145f49))
-* toggleable auto generate service url on saving configuration ([28bc9c1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/28bc9c18840e351536b979ee0f2649ba8c738621))
+* **DSHub:** add session member changed notification handler 
+* **mpv2:** add persistent payload in SessionV2PublicConfiguration 
+* oidc unlink features 
 
 
 ### Bug Fixes
 
-* add additional info in login method ([13adf0c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13adf0c8f6edbad409cc1f5a817d605e74b55483))
-* Added default logger to logging callbacks ([173ac35](https://github.com/AccelByte/accelbyte-unity-sdk/commits/173ac355dee2c0ba0b679d4da10b7ea38460a29f))
-* change presence broadcast event interval unit ([4c1e057](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4c1e0579105126f663f4c04da66dfa4c4c43e21f))
-* fix accelbyte plugin error ([86698a1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/86698a1d9774a325106bcc0470bec2433304833c))
-* fix enable and disable config ([e81b2d0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e81b2d0ab6893d0025780d2bfc6cd6662843ae1e))
-* fix presence broadcast event enabled logic ([f6a80b7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f6a80b7c20351ebd2c583a96d92cc94608dc080b))
-* **Statistic:** Adjust newest flow to expose which statistic is being updated ([64cb3c4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/64cb3c41f6adab39a28baa539ef41ca8afeb1bc7))
+* add webrequest duplication prevention 
+* **mpv2:** add missing notification handler for OnSessionEnded and refactor warning message for unrecognized topic 
 
 
 ### Refactors
 
-* add accelbyte telemetry event layer ([7350304](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73503040e218edcab33459b830d66ac1cf559bc7))
-* add analytics api and wrapper ([47b066b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/47b066b55f2c4343a8acd71f16f32d8d9dc303a0))
-* create new analytic event base ([bf79265](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bf79265095be59a0f3b03b47b91803a8ef36cfb1))
-* implement user login event ([24fe95a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/24fe95a22e3ffb884d27a856fa7057743aac9d9a))
-* move and modify predefined event controller ([6de6ace](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6de6ace552dba95fb2ca26b44a163f8ede693c2e))
-* refactor client after adding analytics wrapper and api ([6be910f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6be910fc16c4ef45360b50946d68c88057c61818))
-* refactor game state event ([2cd53cc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cd53cccaac9ec7850930cbbbbc9b5bbb662e2bd))
-* refactor server after adding analytics wrapper and api ([79651e5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/79651e5fc05681456ad26ba2c942b138c133f2a3))
-* rename predefine event controller into predefine event scheduler ([56f65bd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/56f65bdc17ee026c877ac66572d1845e41115c9a))
+* add id input validation 
 
-### [16.6.5](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.5%0D16.6.4) (2023-09-07)
+## [16.8.0] (2023-09-25)
 
 
 ### Features
 
-* add client analytics interval config ([cf1988d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cf1988d27aba85beb659a9a7a2a8ac0ddf1b23fd))
+* add StatusV2 for session member and DS status 
+* add turn manager send metric endpoint 
+* change client and server environment pointing into a same target 
+* parity and add missing Oauth2Token params 
 
-
-### Bug Fixes
-
-* reset sdk static object on game start ([737f2d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/737f2d7e2c916a4204f01dd90a30318c97c2960f))
-
-### [16.6.4](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.4%0D16.6.3) (2023-09-06)
-
-
-### Features
-
-* add customizable event namespace to client analytics ([543a4f1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/543a4f12eaae673220387e5cdde7ddc388c81e01))
-
-
-### Bug Fixes
-
-* change Nunit import into UnityEngine ([d4698b0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d4698b05fb51b1f23975705b7ee1ac28fbb5a2be))
-
-### [16.6.3](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.3%0D16.6.2) (2023-09-06)
-
-
-### Bug Fixes
-
-* fix windows package and linux editor unable to find steam oAuth config ([fb9f60e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb9f60ea287d455fc0e1d15e413e02f8ff41e36e))
-
-### [16.6.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.2%0D16.6.1) (2023-09-04)
-
-
-### Bug Fixes
-
-* fix error on analytics dispose failure on unity close ([4f46e26](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4f46e261eca851437670c036b4057f8a28127ebd))
-
-### [16.6.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.1%0D16.6.0) (2023-09-04)
+## [16.7.0] (2023-09-11)
 
 
 ### Features
 
-* add analytic config editor ([1ccfb15](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1ccfb1532034b8e8ab57718db594e3bded0b0c48))
-* add client telemetry feature ([25a6655](https://github.com/AccelByte/accelbyte-unity-sdk/commits/25a6655d6b9c465f538750a486b78eb664c2372a))
-* add GetTokenWithClientCredentials oauth api ([49e124a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/49e124a3eb4a64c24fdefb4cd145a9e318135af7))
-* analytics core ([bd45420](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bd454206df4c9963162e21c2b9803449c37cf15e))
-* change client and server environment pointing into a same target ([73772fb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73772fbaa83586d066caa7a9974bdc1e1dae19c6))
+* [JSC-1311] add game core and access model 
+* [JSC-1311] add ITelemetryEvent interface and constructor 
+* [JSC-1311] add play and social models 
+* [JSC-1311] add predefined event and config 
+* [JSC-1311] add storage and monetization 
+* [JSC-1557] add presence broadcast event runtime config 
+* add auto send login telemetry 
+* add server-side predefined event analytics 
+* Added version copy flow on engine initialization 
+* apply sdk initialize and game launch event 
+* **MPv2:** add API for session storage and lobby notification for storage changed 
+* Refactored debug and default log classes to allow for scalable abstraction, multiple logger types running simultaneously 
+* toggleable auto generate service url on saving configuration 
+
+
+### Bug Fixes
+
+* add additional info in login method 
+* Added default logger to logging callbacks 
+* change presence broadcast event interval unit 
+* fix accelbyte plugin error 
+* fix enable and disable config 
+* fix presence broadcast event enabled logic 
+* **Statistic:** Adjust newest flow to expose which statistic is being updated 
 
 
 ### Refactors
 
-* refactor for testability ([bb4e99b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bb4e99b0e9baf1b207ccde87777896c425e26b11))
+* add accelbyte telemetry event layer 
+* add analytics api and wrapper 
+* create new analytic event base 
+* implement user login event 
+* move and modify predefined event controller 
+* refactor client after adding analytics wrapper and api 
+* refactor game state event 
+* refactor server after adding analytics wrapper and api 
+* rename predefine event controller into predefine event scheduler 
 
-## [16.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.6.0%0D16.5.0) (2023-08-28)
+### [16.6.5] (2023-09-07)
 
 
 ### Features
 
-* **MPv2:** add data model for create match ticket error ([7f47229](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7f472293b58e0ea89731f65b8ad3c8b470b1bf1d))
-* **UGC:** add a new sort by value and devide liked content endpoint ([9291557](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9291557a1104d7c22e6f13f5e31ebab348bfd581))
+* add client analytics interval config 
 
 
 ### Bug Fixes
 
-* add error callback when the auth token is empty ([d264cd8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d264cd8534ac099413816cb8742d3a7fec25a998))
-* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([6e3ceab](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e3ceab8c03ad3779782e33095ba8d1a625eaaae))
+* reset sdk static object on game start 
+
+### [16.6.4] (2023-09-06)
+
+
+### Features
+
+* add customizable event namespace to client analytics 
+
+
+### Bug Fixes
+
+* change Nunit import into UnityEngine 
+
+### [16.6.3] (2023-09-06)
+
+
+### Bug Fixes
+
+* fix windows package and linux editor unable to find steam oAuth config 
+
+### [16.6.2] (2023-09-04)
+
+
+### Bug Fixes
+
+* fix error on analytics dispose failure on unity close 
+
+### [16.6.1] (2023-09-04)
+
+
+### Features
+
+* add analytic config editor 
+* add client telemetry feature 
+* add GetTokenWithClientCredentials oauth api 
+* analytics core 
+* change client and server environment pointing into a same target 
 
 
 ### Refactors
 
-* add playstation 4 main ([55977a9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55977a973af01de3a16486b9becd8bdbd6f8f854))
-* add playstation 5 main ([9f584d6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9f584d6103c27cf7b83d31ab0b4079b1b8a44a2e))
-* add steam wrapper abstraction ([c84bb64](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c84bb642f105908e3e77806d87cb66efa3433172))
-* add xbox game core main ([664b684](https://github.com/AccelByte/accelbyte-unity-sdk/commits/664b68432808a7aaed597e3d4ffb331b06a303e2))
-* refactor platform infoware ([51a77cc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/51a77cc28b692e215532d82921645923d5ec6ab2))
+* refactor for testability 
 
-## [16.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.5.0%0D16.4.1) (2023-08-14)
+## [16.6.0] (2023-08-28)
 
 
 ### Features
 
-* [JSC-1519] add client timestamp as datamember ([fb937f3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb937f3d710256406cfe73bd3808f7b1399e4683))
-* **lobby:** implement lobby API outgoing and incoming friend request with timestamp ([f2fee80](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f2fee80bebd54fa7612978e4f8ff1cd7d390625c))
-* **MPv1:** add region in MatchmakingNotif data model ([d926758](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d926758bf9b92286065b30424ed5a1b9da3dece4))
-* **sessionV2:** add API for joining game session and party by code ([0633843](https://github.com/AccelByte/accelbyte-unity-sdk/commits/063384314e8172f9d6d5fbb0518184dda4f6f80a))
+* **MPv2:** add data model for create match ticket error 
+* **UGC:** add a new sort by value and devide liked content endpoint 
 
 
 ### Bug Fixes
 
-* [none] set presence broadcast enabled after plugin is running ([a8eedf2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8eedf2cdf759e908ea566a0aea32de7e0a75312))
-* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([b5b040e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b5b040e37ea2e007f5db9f4a4aae2d7a7b1a1af8))
-
-### [16.4.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.1%0D16.4.0) (2023-08-03)
-
-
-### Bug Fixes
-
-* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. ([3e4528a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3e4528a5bbb0bc363579856bb5815b553159d971))
-
-## [16.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.4.0%0D16.3.1) (2023-07-31)
-
-
-### Features
-
-* Expose Oculus IAP Sync Endpoint ([e4f7608](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e4f76087aef5e4e8283409542ef399b07017e678))
-* **MPv2:** add api to query active matchmaking ticket ([cb73a0a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb73a0a7071add559a0e408a3504a2713d88a221))
-* **sessionV2:** add API for joining game session and party by code ([c72309e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c72309e8090f37a01ad503aad48579e02a20661b))
-
-
-### Bug Fixes
-
-* add missing field on user models ([0e80013](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0e800130e3be6d0c6968b178c8d10e36234c0a0d))
-* adjust typo in IAPOrderStatus enum ([db513b5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db513b5e830f8528dac023f5579b2d4618399f6d))
-* complete user service url error information ([ecaf71f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ecaf71fd4aad9dffc4f0948aeccb2f79e062916c))
-* **UGC:** Expose the target user id so player didn't folloow themselves ([4ad284b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4ad284b126149b09fb1b936f860dc823cad782d4))
-
-### [16.3.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.1%0D16.3.0) (2023-07-25)
-
-
-### Bug Fixes
-
-* use connect async to avoid blocking game thread ([3d81829](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3d81829c66c11fd2bbecc25661c076da90a755c9))
-
-## [16.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.3.0%0D16.2.1) (2023-07-17)
-
-
-### Features
-
-* exposed sync consumable entitlement ([52c8206](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52c8206270fc5506945c4dc9db888bc5c93d371e))
-* exposing missing psn sync entitlement multiple service ([507ae71](https://github.com/AccelByte/accelbyte-unity-sdk/commits/507ae71fc95b43affbe7eb7260d02a399f6d9c9a))
-
-
-### Bug Fixes
-
-* adjust typo in IAPOrderStatus enum ([d1336c9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d1336c91383b332049ea5d62bfac688139476f08))
+* add error callback when the auth token is empty 
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. 
 
 
 ### Refactors
 
-* set AccelByteSDKMain to public ([dcecf1d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dcecf1d4733e6a405bdedf8d29b1180166fbe451))
+* add playstation 4 main 
+* add playstation 5 main 
+* add steam wrapper abstraction 
+* add xbox game core main 
+* refactor platform infoware 
 
-### [16.2.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.1%0D16.2.0) (2023-07-17)
-
-
-### Refactors
-
-* set AccelByteSDKMain to public ([d38cf3d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d38cf3ddbfc51c3ab64a2eb2c9abb0edc16af49b))
-
-## [16.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.2.0%0D16.1.0) (2023-07-03)
+## [16.5.0] (2023-08-14)
 
 
 ### Features
 
-* [JSC-1199] add presence broadcast event UI and mechanism ([e45e805](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e45e805c1cb2b5abbd05d094ceaf22f7860414c9))
-* added missing metafile for gdpr api ([369801a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/369801ace3f643af3042b2d4396075b78e74083d))
-* **chat:** add group chat moderator api ([fb8fcf0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb8fcf003bc9246c0f11d9465ba6f87314443d73))
-* Provide methods for end users to request account deletion for own headless accounts in game ([98b0109](https://github.com/AccelByte/accelbyte-unity-sdk/commits/98b01094dd2bd084c852dbc122e981237154e6cf))
+* [JSC-1519] add client timestamp as datamember 
+* **lobby:** implement lobby API outgoing and incoming friend request with timestamp 
+* **MPv1:** add region in MatchmakingNotif data model 
+* **sessionV2:** add API for joining game session and party by code 
 
 
 ### Bug Fixes
 
-* [JSC-1278] remove unwanted warning while adding unity sdk through git ([c474325](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c47432500a4af43dfa514fc89c7b345362dab123))
+* [none] set presence broadcast enabled after plugin is running 
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. 
 
-## [16.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.1.0%0D16.0.0) (2023-06-19)
+### [16.4.1] (2023-08-03)
+
+
+### Bug Fixes
+
+* itemIds param on BulkGetLocaleItems was modified to be a string joined separated with comma when used as a query param in an HTTP call. 
+
+## [16.4.0] (2023-07-31)
 
 
 ### Features
 
-* [JSC-1125] Get device Id for Xbox ([7867c26](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7867c262bce9f2b95741ab2c5518f2e2394a3204))
-* add new config member for P2P and assign reasonable default value ([b622e09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b622e096310f5f5efadd11939424b2c3fd4283de))
-* custom game thread signaller support ([e8ace94](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e8ace94628e9318025ff5ce09163c2d6ece4014d))
-* leaderboard v3 endpoints ([7b911ad](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7b911ad49989ebf0c4a53edcbb53e166771014b1))
-* new statistic endpoint ([f29d963](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f29d963b43b873b0c86ba77519e62f572c9aa711))
+* Expose Oculus IAP Sync Endpoint 
+* **MPv2:** add api to query active matchmaking ticket 
+* **sessionV2:** add API for joining game session and party by code 
+
+
+### Bug Fixes
+
+* add missing field on user models 
+* adjust typo in IAPOrderStatus enum 
+* complete user service url error information 
+* **UGC:** Expose the target user id so player didn't folloow themselves 
+
+### [16.3.1] (2023-07-25)
+
+
+### Bug Fixes
+
+* use connect async to avoid blocking game thread 
+
+## [16.3.0] (2023-07-17)
+
+
+### Features
+
+* exposed sync consumable entitlement 
+* exposing missing psn sync entitlement multiple service 
+
+
+### Bug Fixes
+
+* adjust typo in IAPOrderStatus enum 
 
 
 ### Refactors
 
-* **AMS:** change ServerWatchdog to ServerAMS ([3a167db](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3a167dba7f4babfbc461e96fa8aa461314b80a31))
+* set AccelByteSDKMain to public 
+
+### [16.2.1] (2023-07-17)
+
+
+### Refactors
+
+* set AccelByteSDKMain to public 
+
+## [16.2.0] (2023-07-03)
+
+
+### Features
+
+* [JSC-1199] add presence broadcast event UI and mechanism 
+* added missing metafile for gdpr api 
+* **chat:** add group chat moderator api 
+* Provide methods for end users to request account deletion for own headless accounts in game 
+
+
+### Bug Fixes
+
+* [JSC-1278] remove unwanted warning while adding unity sdk through git 
+
+## [16.1.0] (2023-06-19)
+
+
+### Features
+
+* [JSC-1125] Get device Id for Xbox 
+* add new config member for P2P and assign reasonable default value 
+* custom game thread signaller support 
+* leaderboard v3 endpoints 
+* new statistic endpoint 
+
+
+### Refactors
+
+* **AMS:** change ServerWatchdog to ServerAMS 
 
 
 ### Documentations
 
-* redirect readme to doc portal ([37d08b8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/37d08b80532ec6f680973714fefa2d27d717d385))
+* redirect readme to doc portal 
 
-## [16.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/16.0.0%0D15.19.2) (2023-06-05)
+## [16.0.0] (2023-06-05)
 
 
 ### ⚠ BREAKING CHANGES
@@ -790,522 +790,522 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* preserve user API ([76b8d02](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76b8d02368b5da4ec9278ab85c86e54785cb8ebc))
-* **UGC:** change the content update boolean to false by default ([fb448d0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb448d0f907f173cc101f6a866b45da524d525d5))
+* preserve user API 
+* **UGC:** change the content update boolean to false by default 
 
 
 ### Refactors
 
-* cache generated device id ([65e117e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/65e117e05d51fcbc1183b74e61d87682a29e896c))
-* change attribute data type from Dictionary<string, string> to Dictionary<string, object> ([03fd0f1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/03fd0f187c987cb1823922bd391b4fa9f432e1ea))
+* cache generated device id 
+* change attribute data type from Dictionary<string, string> to Dictionary<string, object> 
 
-### [15.19.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.2%0D15.19.1) (2023-05-26)
-
-
-### Features
-
-* **DS:** add DSM heartbeat API ([dd0bba3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dd0bba3e6b6ce3eaaf91c185d86cd8bc4d2eaa71))
-
-### [15.19.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.1%0D15.19.0) (2023-05-24)
-
-
-### Bug Fixes
-
-* preserve SDK models and API ([8c63e9f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8c63e9fb9181cce6e4f2b42e40c43a6d5f54c910))
-
-## [15.19.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.19.0%0D15.18.2) (2023-05-22)
+### [15.19.2] (2023-05-26)
 
 
 ### Features
 
-* Supporting Expiry Dates for Item Types ([ddfc6dd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ddfc6ddffebd5bcbebe89b639d93fdf2c0ce00c6))
+* **DS:** add DSM heartbeat API 
+
+### [15.19.1] (2023-05-24)
 
 
 ### Bug Fixes
 
-* [ASP-4655] add null IHttpResponse condition ([cb69bcf](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb69bcf3ae7a68b920d027a178955cd4613ad32e))
+* preserve SDK models and API 
 
-### [15.18.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.2%0D15.18.1) (2023-05-17)
-
-
-### Bug Fixes
-
-* add unityWebRequest dispose for better cleanup ([a58f902](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a58f902a821b4137bd85d43a6ba71870c29185e7))
-* exclude webgl in set platform login cache ([dfe486a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dfe486a7b81f40739521ee499f4c49fa77d25bed))
-
-### [15.18.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.1%0D15.18.0) (2023-05-12)
-
-
-### Bug Fixes
-
-* fix webgl websocket missing implementation ([31c1f44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/31c1f442f8064449e967dd58a9d9be664c6ab7b0))
-
-## [15.18.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.18.0%0D15.17.0) (2023-05-08)
+## [15.19.0] (2023-05-22)
 
 
 ### Features
 
-* add custom attribute property ([bc230d6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc230d6989648e2acbb5f4c72360f18f3c4d4733))
-* add statistic cycle endpoint along with the models ([a5058b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a5058b26e6b3c074078743208638709db164aabf))
-* Section ID needs to be passed and stored when create order for items that are ‘Section Exclusive’. ([1a10c76](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1a10c76a983a9fc10802a0f91d95e8952496ce87))
+* Supporting Expiry Dates for Item Types 
 
 
 ### Bug Fixes
 
-* add config null check on setting editor ([340ba9a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/340ba9ad3bca87ce93c6adc1f3d2e02ba8a76c43))
-* add multiple constructor in user and oauth api, set all api to public ([b1ef66b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1ef66b1c0a99df65919047cc9277e29d20f4acc))
-* fix config setting unable to redirect to default config ([98b7327](https://github.com/AccelByte/accelbyte-unity-sdk/commits/98b732735ffd2f2043065034adadbfc42fb8f418))
-* fix multiregistry issue ([fc2a18c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fc2a18cd467aa397b3f8dbbf14b5184060400daf))
-* remove url config warning when the value is empty ([7203a2f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7203a2fcac99e5399c3d275e77265171dd25c6a3))
+* [ASP-4655] add null IHttpResponse condition 
+
+### [15.18.2] (2023-05-17)
+
+
+### Bug Fixes
+
+* add unityWebRequest dispose for better cleanup 
+* exclude webgl in set platform login cache 
+
+### [15.18.1] (2023-05-12)
+
+
+### Bug Fixes
+
+* fix webgl websocket missing implementation 
+
+## [15.18.0] (2023-05-08)
+
+
+### Features
+
+* add custom attribute property 
+* add statistic cycle endpoint along with the models 
+* Section ID needs to be passed and stored when create order for items that are ‘Section Exclusive’. 
+
+
+### Bug Fixes
+
+* add config null check on setting editor 
+* add multiple constructor in user and oauth api, set all api to public 
+* fix config setting unable to redirect to default config 
+* fix multiregistry issue 
+* remove url config warning when the value is empty 
 
 
 ### Refactors
 
-* add request task only at game main thread ([4d35de4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4d35de497741e0d2595655fde56b9389ba6ce2ad))
-* remove xbox 360 from config ([842090e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/842090e58a2d856bdef1d6162c2fcb601add8966))
+* add request task only at game main thread 
+* remove xbox 360 from config 
 
-## [15.17.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.17.0%0D15.16.2) (2023-04-26)
+## [15.17.0] (2023-04-26)
 
 
 ### Features
 
-* Add itemName and currencyCode to response of RedeemCampaignCode API ([29a56e3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/29a56e304c6166dda693a56fa0852fcb947165a6))
-* add send verification to email ([3b19774](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b1977488816b2baa39bcd08eeb250b9bbb9b8e7))
-* **cloudsave:** add get bulk user record keys and records ([9e8beb4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9e8beb4a61744084d08e3a07cb184e53b5f4d2a7))
-* ecommerce enable item sellback store ([dbc3498](https://github.com/AccelByte/accelbyte-unity-sdk/commits/dbc3498ab629dded438df39c465814ef675f79c7))
-* **mmv2:** implement get metrics and add queueTime field in create ticket response ([f34b37a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f34b37a6415142ab115c9cd651436c0e69c50e0c))
-* server api cloudsave get gamerecord ([c91da29](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c91da290d29b63fdc607e7cee19c8ecc1c315d0b))
-* **UGC:** new get channels, fix sort by and order by ([9460753](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9460753bd2980034f7ef074d9f0cf1a9e864ca87))
+* Add itemName and currencyCode to response of RedeemCampaignCode API 
+* add send verification to email 
+* **cloudsave:** add get bulk user record keys and records 
+* ecommerce enable item sellback store 
+* **mmv2:** implement get metrics and add queueTime field in create ticket response 
+* server api cloudsave get gamerecord 
+* **UGC:** new get channels, fix sort by and order by 
 
 
 ### Refactors
 
-* add webrequest scheduler ([5d0296a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5d0296ad7743d35359a480707f3c8b03b2bb05d5))
-* change logger abstraction ([9071cfe](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9071cfe766a0f44db99407773bec130bb151ceb7))
-* refactor user and oauth api structure ([4850aea](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4850aea1e2ad6e2c8a1412380a67d60a78120545))
-* remove sdk warnings ([829557b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/829557b354a040f821af1cb4620181a3aa1dc2b0))
-* revert back user api function names, remove coroutine usage within user interface ([89db768](https://github.com/AccelByte/accelbyte-unity-sdk/commits/89db7689c15cc267a9f558d43945545464dcc9cf))
-* user api using c# async await ([efdd54a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/efdd54ad1b3db997152e4146fdfa839260b24591))
+* add webrequest scheduler 
+* change logger abstraction 
+* refactor user and oauth api structure 
+* remove sdk warnings 
+* revert back user api function names, remove coroutine usage within user interface 
+* user api using c# async await 
 
-### [15.16.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.2%0D15.16.1) (2023-04-19)
+### [15.16.2] (2023-04-19)
 
 
 ### Bug Fixes
 
-* [ASP-4200] Android null device id ([77726e6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/77726e6882a4df44cded4105c88369b747cda706))
-* add static marshal linking in linux sigterm listener ([7c8cc97](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c8cc9732806ad38286fc1b7fe8a25c73deea3be))
-* fix config setting unable to redirect to default config ([789673d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/789673d1e34ecb0143b067f2aaf8e59908aa1a1f))
+* [ASP-4200] Android null device id 
+* add static marshal linking in linux sigterm listener 
+* fix config setting unable to redirect to default config 
 
 
 ### Refactors
 
-* add API http client getter ([8b35b18](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8b35b1882a58c7a6243cedbf76574d33536d484e))
-* remove client secret as requirement ([a017120](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a017120476248d561cf7168f092137b37de52bad))
+* add API http client getter 
+* remove client secret as requirement 
 
-### [15.16.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.1%0D15.16.0) (2023-04-18)
+### [15.16.1] (2023-04-18)
 
 
 ### Features
 
-* server api cloudsave get gamerecord ([0e00b44](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0e00b448a54475d10f6455dbcdbc9d652a6a3cea))
+* server api cloudsave get gamerecord 
 
 
 ### Bug Fixes
 
-* sigterm library exposed to all platforms ([aa742c2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa742c2d6868dd7c56c53d97a6dcdf72cb66923a))
+* sigterm library exposed to all platforms 
 
-## [15.16.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.16.0%0D15.15.0) (2023-04-10)
+## [15.16.0] (2023-04-10)
 
 
 ### Features
 
-* **lobby:** ErrorNotif with associated Request will trigger Respond instead ([10ba8cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/10ba8cb21d05e5afdb57a1e609e1d4cba5245c2f))
-* platform relogin ([438ad96](https://github.com/AccelByte/accelbyte-unity-sdk/commits/438ad966679d8a2e8993865aa1496430be64fdd1))
+* **lobby:** ErrorNotif with associated Request will trigger Respond instead 
+* platform relogin 
 
 
 ### Bug Fixes
 
-* [JSC-1125] fix missing device ID on PSN ([3b240b9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3b240b9fb64741e66c4b0db310437d87e560671e))
-* fix base url sanitize when url is null ([b1bcd43](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b1bcd436f5fd28e411dd8dbba2eb6f7d03e93c4a))
-* fix linux server error ([e025de1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e025de1c40ee4409f0942dc72e327e0c3673f81c))
-* **turnManager:** change UdpClient instantiation so it doesn't bind to a port ([fa9c990](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fa9c990b861b186608ee1b2e296a504aa5a05796))
-* upload crypto medatada ([13480d7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13480d7abf433f9e48549a9ff0a6ce3f0c2a20a2))
+* [JSC-1125] fix missing device ID on PSN 
+* fix base url sanitize when url is null 
+* fix linux server error 
+* **turnManager:** change UdpClient instantiation so it doesn't bind to a port 
+* upload crypto medatada 
 
 
 ### Refactors
 
-* add file cache implementation ([20ed219](https://github.com/AccelByte/accelbyte-unity-sdk/commits/20ed2192ddcf1f76aeb55dd46d1ce9bcb624bbaf))
+* add file cache implementation 
 
-## [15.15.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.15.0%0D15.14.0) (2023-03-27)
+## [15.15.0] (2023-03-27)
 
 
 ### Features
 
-* added sigterm listener to linux server ([3a1a4eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3a1a4ebd079c81bc32f6e1a086c012ce6b921b4c))
-* admin get bulk user by user id ([8948d7e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8948d7e730deaf27d3edf2dd60040929dbe6f282))
-* **chat:** add notif handler and api (query, update, delete, stats) for system messages ([345a9f0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/345a9f04282fb8dcc7a901d2b14767d621091afa))
-* create connection to Watchdog in SDK Linux Server main ([a626930](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a626930b58dccf6f5d3bc245b2241635d9fe9093))
-* expose Account Linking and Proggresion ([cf26820](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cf26820502ad53be259a58267a8151c137b89b23))
-* mark deprecated since will give security hole issue for other player/user use GetUserProfilePublicInfo instead. function now just only have error message ([a84aa24](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a84aa248f1d74286af9e64ec4de2c8fe6efa04d4))
+* added sigterm listener to linux server 
+* admin get bulk user by user id 
+* **chat:** add notif handler and api (query, update, delete, stats) for system messages 
+* create connection to Watchdog in SDK Linux Server main 
+* expose Account Linking and Proggresion 
+* mark deprecated since will give security hole issue for other player/user use GetUserProfilePublicInfo instead. function now just only have error message 
 
 
 ### Refactors
 
-* add log when SDK start ([ebf9149](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebf9149152c87a3ed0a2eaf8211204beaa7e535e))
+* add log when SDK start 
 
-## [15.14.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.14.0%0D15.13.0) (2023-03-13)
+## [15.14.0] (2023-03-13)
 
 
 ### Features
 
-* **DS:** add watchdog api ([c804b17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c804b17de765414c3864cd7c813e12a22d0cd810))
+* **DS:** add watchdog api 
 
 
 ### Documentations
 
-* remove documentation of directly creating config files ([69bcbf6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/69bcbf661218e55f82d4936af1f2dcfc6748bc51))
+* remove documentation of directly creating config files 
 
 
 ### Refactors
 
-* add http send request with async method ([0bad98a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0bad98aef6bd733449d92d951ac43ae3817d93f9))
-* change heartbeat with async ([5233d70](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5233d70dd5ec4f6a36568fc13c5527b6625048cd))
-* change websocket maintainer with async method ([9489bec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9489bec8d8ef198b2f6cb8626b44b4b811c2c7a8))
-* create async method of heartbeat, websocket, http request ([b9246e6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b9246e6c1c64394722b49b2aaa739cf33b2c2416))
-* seperate device identifier and device unique id ([9b9fcd7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9b9fcd7adad5ce32ce9d4046a50a2cf97df22869))
-* set config editor default environment to default ([26bf0eb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/26bf0ebbd4e8424aefe1def47568759c4bc856bd))
+* add http send request with async method 
+* change heartbeat with async 
+* change websocket maintainer with async method 
+* create async method of heartbeat, websocket, http request 
+* seperate device identifier and device unique id 
+* set config editor default environment to default 
 
-## [15.13.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.13.0%0D15.12.0) (2023-02-28)
+## [15.13.0] (2023-02-28)
 
 
 ### Features
 
-* adding global achievements endpoints ([7c5b4cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c5b4cbbb71c34e00386add24a5aafa064303bbc))
+* adding global achievements endpoints 
 
 
 ### Bug Fixes
 
-* fix unsupported code in lower version csharp ([e2bded8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e2bded84704e83e80f7d8a31056abb0ac1ccbf3a))
+* fix unsupported code in lower version csharp 
 
 
 ### Refactors
 
-* set app id as non mandatory config field ([535d54d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/535d54de92346e9f3994fc576a8d860302f3eeac))
+* set app id as non mandatory config field 
 
-## [15.12.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.12.0%0D15.11.2) (2023-02-13)
+## [15.12.0] (2023-02-13)
 
 
 ### Features
 
-* [JSC-1032] add compatibility matrix check ([4932ee2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4932ee229680a1cc7dfad649d410374d4555bcf3))
-* add ugc custom attributes ([208ac2d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/208ac2d37bb8868f0188df84b033ecc0522f7207))
-* cache config ([14b5985](https://github.com/AccelByte/accelbyte-unity-sdk/commits/14b59855fbd4123573d9be0a58a8cebaccae4e8d))
-* get game token by publisher token ([65901c8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/65901c820d605841489752b9ca353b3d3b974911))
-* http cache ([3fd4194](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3fd4194cce327fd757ff72ac95c88ba67d196117))
-* http cache ([ce6c25c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ce6c25c1d18ac5046955ca23c7dd8bff4b45dbab))
-* **lobby:** add reject match ([ed03ffa](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ed03ffafc9c0a5a9afacf52ba1da56a2696bf393))
-* LRU Memory implementation ([eec8b01](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eec8b01f94f671aa43ae95a6329cf3f13ee33e3a))
-* new v2 group api ([cb27b6a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cb27b6a9d7ba185561eb651e4b3710bc32f08434))
-* new v2 group api ([19f4675](https://github.com/AccelByte/accelbyte-unity-sdk/commits/19f4675d0789f3972ea1eca16966ab464292c86c))
-* Remove some Stadia enumeration variable, because Google is shutting down Stadia. ([92b3de4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/92b3de4bb33340d7c38f2336bf0c395bf727ef27))
-* **turnmanager:** add api to get turn server credential ([a37e87b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a37e87b241b225c46cf28925d09aad84c616a16d))
-* user ban error response ([18f0eca](https://github.com/AccelByte/accelbyte-unity-sdk/commits/18f0ecafcc45c1a049078438bc372f2832318194))
-* user ban error response ([c359f21](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c359f21dd2ec2f1d3269169f3ce3b5e4df015982))
+* [JSC-1032] add compatibility matrix check 
+* add ugc custom attributes 
+* cache config 
+* get game token by publisher token 
+* http cache 
+* http cache 
+* **lobby:** add reject match 
+* LRU Memory implementation 
+* new v2 group api 
+* new v2 group api 
+* Remove some Stadia enumeration variable, because Google is shutting down Stadia. 
+* **turnmanager:** add api to get turn server credential 
+* user ban error response 
+* user ban error response 
 
 
 ### Bug Fixes
 
-* change default current_player and current_internal_player to 0 ([9e89460](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9e894603c5ec8e47ba8fa75c1b8a455e2f26de19))
-* fix unsupported code in lower version csharp ([b3685b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b3685b258c9315b335c9166d2ea70115062cfd95))
-* generate sdk version metadata file ([3eba075](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3eba0752ede8471033473a701b30cdbe6c02b628))
-* revert default config directory to resource root ([a095a76](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a095a76796640bd67805d7c157f1569362920399))
-* set server flag on save OAuth file ([9858bf9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9858bf97a8850a068663f4fb405407b611e1be35))
+* change default current_player and current_internal_player to 0 
+* fix unsupported code in lower version csharp 
+* generate sdk version metadata file 
+* revert default config directory to resource root 
+* set server flag on save OAuth file 
 
 
 ### Refactors
 
-* add changeable http sender ([197896e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/197896e609e6cb45815b53abe5a846ff52c15b7c))
+* add changeable http sender 
 
-### [15.11.2](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.2%0D15.11.1) (2023-02-01)
-
-
-### Bug Fixes
-
-* missing NUnit package causes compile error ([7186b5b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7186b5b9772329529cc523315545b0a3135aa53d))
-
-### [15.11.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.1%0D15.11.0) (2023-01-31)
+### [15.11.2] (2023-02-01)
 
 
 ### Bug Fixes
 
-* **chat:** change class initialization to support c[#8](https://accelbyte.atlassian.net/browse/8) and below ([cfec4ea](https://github.com/AccelByte/accelbyte-unity-sdk/commits/cfec4ea77bd1e3ed52df0eb2d529d20f7dedf775))
-* define AccelByteNetUtilities explicitly public ([b63d37d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b63d37dcb04e067df806e57d4cf77e9af7349004))
+* missing NUnit package causes compile error 
 
-## [15.11.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.11.0%0D15.10.1) (2023-01-30)
+### [15.11.1] (2023-01-31)
+
+
+### Bug Fixes
+
+* **chat:** change class initialization to support c[#8] and below 
+* define AccelByteNetUtilities explicitly public 
+
+## [15.11.0] (2023-01-30)
 
 
 ### Features
 
-* **chat:** add chat apis ([123684c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/123684c1aa3f1bf247c02b6a26dfeb8bbf3c19d5))
-* **turnmanager:** add api to get turn server credential ([5fa327e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5fa327e0e1efbc40babe16ffa2e1e0b3fffa1f35))
+* **chat:** add chat apis 
+* **turnmanager:** add api to get turn server credential 
 
 
 ### Bug Fixes
 
-* set server flag on save OAuth file ([55440e1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/55440e198457af6e08954ea53b5bbad322032777))
+* set server flag on save OAuth file 
 
-### [15.9.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.9.1%0D15.10.0) (2023-01-18)
+### [15.9.1] (2023-01-18)
 
 
 ### Features
 
-* add required text on config input field ([6e89b48](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e89b4874458377ea29a35aceca18d58bd440f79))
-* implement new endpoint bulk get user and game records ([41c65e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/41c65e87bc7f0246e2d8ea54dc1257084bec2639))
+* add required text on config input field 
+* implement new endpoint bulk get user and game records 
 
 
 ### Bug Fixes
 
-* add missing param title to reporting api ([926fd4e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/926fd4ec15f1a86200595dee2205d45a50961f46))
-* add safe guard and refactor with debugable code of http error parser ([76cde28](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76cde28bea30af0a0616c8ac72ff6dd67f8c5eab))
-* fix websocket not running coroutine in their events ([7e90ec9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7e90ec95e85c124212dce509e0717ba213ec0aac))
-* missing Unity meta files ([ebe2c2d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ebe2c2d678e6637ea08594706d706f7fd5861d6e))
-* unsupported C# implementation in Unity 2019 ([5b7168e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5b7168ea903e0a45519df834f007ac9e7af4d880))
+* add missing param title to reporting api 
+* add safe guard and refactor with debugable code of http error parser 
+* fix websocket not running coroutine in their events 
+* missing Unity meta files 
+* unsupported C# implementation in Unity 2019 
 
 
 ### Refactors
 
-* refactor accelbyte setting into non singleton structure ([bc9bec5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bc9bec5b5ab5fe3bf3e26de6101625cff142885f))
-* repositioned config editor order and add foldout category ([e89dbdd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e89dbddebfc86574c24ba9531362acf989a6a3d8))
+* refactor accelbyte setting into non singleton structure 
+* repositioned config editor order and add foldout category 
 
-### [15.10.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.1%0D15.10.0) (2023-01-18)
+### [15.10.1] (2023-01-18)
 
 
 ### Bug Fixes
 
-* missing Unity meta files ([f61bc31](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f61bc314fa49c7c3d9888895986c794e2911ef53))
-* unsupported C# implementation in Unity 2019 ([7ffb40f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7ffb40f4123d8780fb14c55329fa665ab345c9c0))
+* missing Unity meta files 
+* unsupported C# implementation in Unity 2019 
 
-## [15.10.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.10.0%0D15.9.0) (2023-01-16)
+## [15.10.0] (2023-01-16)
 
 
 ### Features
 
-* [JSC-916] add device ID generator ([4ae2160](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4ae216021ad2e842cac3074543912739d7396302))
-* ability to set logger ([ea3ebc9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ea3ebc911d6e052dfc560abc2375c9f0c8b5fe96))
-* get global statistic item by stat code ([a3b2bcc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3b2bcc867bd30692908743978679ef1ba69160f))
+* [JSC-916] add device ID generator 
+* ability to set logger 
+* get global statistic item by stat code 
 
 
 ### Bug Fixes
 
-* [JSC-1020] replace websocket-sharp.dll properly ([42e0d9e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42e0d9e96db3319c31209ddfce9835d74296838d))
+* [JSC-1020] replace websocket-sharp.dll properly 
 
 
 ### Refactors
 
-* rename websockket-sharp to accelbyte.websocket.sharp ([c2daec4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c2daec4b6d3a7df9b448aaf9a9b93420445899b1))
+* rename websockket-sharp to accelbyte.websocket.sharp 
 
-## [15.9.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.9.0%0D15.8.1) (2023-01-03)
-
-
-### Features
-
-* Displays & sections (Rotating Shop Items) ([1e4955c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1e4955c1de8a75d85df20eb0df216cdcea97eb04))
-* **lobby:** Add away availability in lobby presence ([eb0ecb7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/eb0ecb7fbcfcd1b280f7ea8b173b6947e493d111))
-* new get achievement public tag endpoint ([0401fb1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0401fb1cec37be216bdfe67f266bc098004ca0d9))
-* renamed api class for rotating item feature ([7295ea8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7295ea8cbdc2239ed5a9fe08ec441d00f0382729))
-* **Session:** add ENDED and UNKNOWN DS status ([0a6db06](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0a6db064b491a237ba05282e592ca12e0d71a4da))
-
-
-### Bug Fixes
-
-* GetItemsByCriteria parse Error ([f02ec4d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f02ec4d578e72c6e21e16f1e51c1099e59888252))
-
-### [15.8.1](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.1%0D15.8.0) (2022-12-23)
-
-
-### Bug Fixes
-
-* unsupported implicit instantiation when using .NET Framework ([6af58e5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6af58e519b430bd62402e3405aabf08a64fff51f))
-
-## [15.8.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.8.0%0D15.7.0) (2022-12-19)
+## [15.9.0] (2023-01-03)
 
 
 ### Features
 
-* Account linking with one-time code ([c63999b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c63999bcfa5e0ff4362d733ba1fb193fbf6702b3))
-* add Snapchat & Discord to PlatformType Model ([a830e0b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a830e0b56f38db04ddea00a791108d92c29c2e21))
-* **doxygen:** add check envar before generate docs ([a8598c9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a8598c91bddc332f0f61b91a1b59946141335144))
-* **doxygen:** generate doxygen document when compilation triggerred ([2a1a10d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2a1a10dbfe944af7725244e4638d581396e23b5a))
+* Displays & sections (Rotating Shop Items) 
+* **lobby:** Add away availability in lobby presence 
+* new get achievement public tag endpoint 
+* renamed api class for rotating item feature 
+* **Session:** add ENDED and UNKNOWN DS status 
 
 
 ### Bug Fixes
 
-* fix sdk setting editor error and add scrollbar ([13e051f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/13e051f4c6310ba6600ccc19d6dd1480d2bc39ea))
-* GetItemsByCriteria parse Error ([6a4c619](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6a4c61949c2f7eef850f9e2e1d92acf842ff6f8a))
-* handle lobby received ban and unban ([54c2c7d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/54c2c7d2c2809407c8b91fe137cafb1a9c8b085a))
-* set dummy coroutine dont destroy called by gameobject ([aa498ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aa498ef6bf155aed9ddc8fce88db359de6241eab))
+* GetItemsByCriteria parse Error 
 
-## [15.7.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.7.0%0D15.6.0) (2022-12-05)
+### [15.8.1] (2022-12-23)
+
+
+### Bug Fixes
+
+* unsupported implicit instantiation when using .NET Framework 
+
+## [15.8.0] (2022-12-19)
 
 
 ### Features
 
-* add .editorconfig ([9cd051a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9cd051a7ac04446b6937e0804a292a9939bef4b0))
-* add heartbeat service ([d9beaae](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9beaaef04d8cb5e39ada42b07b5b9dae998aa68))
-* Exposing Get Item By Criteria in DS ([7c05cde](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7c05cde150729c5a0da8fd5bd4940357e42c3a88))
-* PSN sync endpoint to be able to receive multiple service labels ([e44a7bd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e44a7bd60e5a2ab1cd8abeada8aa9559dc32405f))
-* sanitize base url on load ([6ddcfd5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6ddcfd5662c21609a1d9641a7776ad0b67774777))
-* tag query builder class for endpoint with search function with tags. ([9a1bb73](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9a1bb73a8903b7a182c35b8d02af6ef84c7ddca4))
+* Account linking with one-time code 
+* add Snapchat & Discord to PlatformType Model 
+* **doxygen:** add check envar before generate docs 
+* **doxygen:** generate doxygen document when compilation triggerred 
 
 
 ### Bug Fixes
 
-* disable HeartBeat in DS ([c452982](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c4529822f4110266e454342b348ec34e90ec3bd1))
-* http request namespace defined from parameter ([f1a4ca4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f1a4ca4ced6ddf216f469c8dab99b4990f9bda02))
-* misleading readme.md ([db98846](https://github.com/AccelByte/accelbyte-unity-sdk/commits/db9884699d09f2e53288727b20f011633fbc316c))
+* fix sdk setting editor error and add scrollbar 
+* GetItemsByCriteria parse Error 
+* handle lobby received ban and unban 
+* set dummy coroutine dont destroy called by gameobject 
+
+## [15.7.0] (2022-12-05)
+
+
+### Features
+
+* add .editorconfig 
+* add heartbeat service 
+* Exposing Get Item By Criteria in DS 
+* PSN sync endpoint to be able to receive multiple service labels 
+* sanitize base url on load 
+* tag query builder class for endpoint with search function with tags. 
+
+
+### Bug Fixes
+
+* disable HeartBeat in DS 
+* http request namespace defined from parameter 
+* misleading readme.md 
 
 
 ### Refactors
 
-* set oAuth return the result ([3ffe332](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3ffe3322985e688d2cb66421c7ceba14ab0912db))
+* set oAuth return the result 
 
-## [15.6.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.6.0%0D15.5.0) (2022-11-21)
+## [15.6.0] (2022-11-21)
 
 
 ### Features
 
-* add new item type ecommerce lootbox ([52e0d61](https://github.com/AccelByte/accelbyte-unity-sdk/commits/52e0d615f2ffc9cac546ffefe7368a4380a6638a))
-* **DSM:** add public getter for server name ([73d92cb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/73d92cb181211929b741cb41b975157b4f6d2a55))
-* expose get store list for ds ([ff5ab53](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ff5ab531f9a667fbbf0911d41e700bc19338fb4e))
-* **misc:** add get back calculated server time ([aec6579](https://github.com/AccelByte/accelbyte-unity-sdk/commits/aec6579c32160325efce5bdf17df6828039b1a32))
-* **refresh token:** change refresh token playerprefs save method with binary file save ([e441db6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e441db6c294880934f68cc62c2d1660977ab2998))
-* **serverApiClient:** cache instantiated wrapper ([36255e4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/36255e4b79c4b856a169a9fdaef3a7ec420b0ead))
-* **session:** add Disconnected and terminated member status enum ([8932068](https://github.com/AccelByte/accelbyte-unity-sdk/commits/89320688e22c695710594fbef69cd0ce1ae1583b))
+* add new item type ecommerce lootbox 
+* **DSM:** add public getter for server name 
+* expose get store list for ds 
+* **misc:** add get back calculated server time 
+* **refresh token:** change refresh token playerprefs save method with binary file save 
+* **serverApiClient:** cache instantiated wrapper 
+* **session:** add Disconnected and terminated member status enum 
 
 
 ### Bug Fixes
 
-* add empty DsHubNotificationTopic enum ([1437730](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1437730a304ad5d05f93f9bc7bed50dbe81d609e))
-* cache server name when register local server ([e85ece2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e85ece2dd1136d2a62af717ae9b350530ac3ce4e))
-* fix bearer unathorized loop stuck ([d3ab66a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d3ab66a5f18ce4161429c22926e5ea13ddd0d460))
-* update access token failed authentication flow ([a7f0256](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a7f0256e68bb781e723b987780f16ac591b973a6))
-* Update SessionV2DsInformation and SessionV2MemberStatus ([7e50e1e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7e50e1e8dfd929d8515187646944e6f7ea811463))
+* add empty DsHubNotificationTopic enum 
+* cache server name when register local server 
+* fix bearer unathorized loop stuck 
+* update access token failed authentication flow 
+* Update SessionV2DsInformation and SessionV2MemberStatus 
 
 
 ### Tests
 
-* add severity, time, and stacktraces to logger ([5029393](https://github.com/AccelByte/accelbyte-unity-sdk/commits/50293939b275d36dd632e9ccf3944cfe36977f77))
+* add severity, time, and stacktraces to logger 
 
-## [15.5.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.5.0%0D15.4.0) (2022-11-07)
-
-
-### Features
-
-* fixed subscription test that always fail ([499244f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/499244f9f4b78e24cd01e18e4cb7888a602e5c62))
-* OPTIONBOX on EAccelByteEntitlementClass ([4b3c67a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4b3c67a883811f7367a41bf6e8fc9d43ed8768a5))
-* username field in the BaseUserInfo function ([9cf8eb5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9cf8eb5ccfb7c34a9d61b08a3e41fe90b75565ad))
-
-## [15.4.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.4.0%0D15.3.0) (2022-10-24)
+## [15.5.0] (2022-11-07)
 
 
 ### Features
 
-* Bulk get user season progression API ([fb970e8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb970e83dcfb39d83f26be259ef4366e32d06b04))
-* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([066de9a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/066de9acd87bc9b4000411e9c990981cff436323))
-* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([ceedce0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ceedce00870b360671e8c8aa1146126627730c36))
-* Expose update channel public endpoint ([1bf155b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1bf155bd5453fc661c630364e871c89cfd72bb5d))
-* IAM Phase 3 Statement & Substitute Implementation ([9b680ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9b680ee72b6e80e014212cf4995488874dffedee))
-* IAM Phase 4 Statement & Substitute Implementation ([1ddf21f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1ddf21f72cea41d617a207db3092497c95d00c89))
-* UnitTest/Sample Code SyncSteamDLC ([10a8470](https://github.com/AccelByte/accelbyte-unity-sdk/commits/10a847040e33fbacd72d845e30248557d0bf2dbc))
+* fixed subscription test that always fail 
+* OPTIONBOX on EAccelByteEntitlementClass 
+* username field in the BaseUserInfo function 
+
+## [15.4.0] (2022-10-24)
+
+
+### Features
+
+* Bulk get user season progression API 
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify 
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify 
+* Expose update channel public endpoint 
+* IAM Phase 3 Statement & Substitute Implementation 
+* IAM Phase 4 Statement & Substitute Implementation 
+* UnitTest/Sample Code SyncSteamDLC 
 
 
 ### Bug Fixes
 
-* adopt the changes from lobby session refactoring ([881fd6d](https://github.com/AccelByte/accelbyte-unity-sdk/commits/881fd6d4ff1eaf84255bafb194b9c01d3aa173c2))
-* client sdk config type misplaced ([228295c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/228295c60b2fab59b160358dbb9809172612d190))
-* comment out matchmaking code to avoid build test crashes ([c69679e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c69679e723574202ddd2d5c7db775c4f10bb1445))
-* comment out protobuf messaage notification handling ([4889e85](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4889e858643f51f448bbe06ffed457a682104c2e))
-* fix wrong purchase condition model in item api BREAKING CHANGES: updated item info model ([a94338c](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a94338c0152e19da5e3f1900b20c42f24d226829))
-* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends ([71e9044](https://github.com/AccelByte/accelbyte-unity-sdk/commits/71e90447f5d670d98bc4b039bb3f0703fbd0ce0d))
-* missing dependency after rebase ([02d8eec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/02d8eeccb0e558799b86977f87fcf258d2d1fca3))
-* missing request model for promote member to party leader ([b2765d0](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b2765d07a73e770708df9e1c7d54cef29a484ec0))
-* mistaken refactor of session model and server config ([7509b78](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7509b78a24cf0d49c8ede65928eb2d47029f133c))
-* rename typo, confusing namespace, remove UpdateGameSession ([6e511ba](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6e511ba56997b46972a63f75cf51c82f23207b32))
-* session info replace session member and ds status changed notif ([9d8dda4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9d8dda4ba2fc79f51f9e21e210eea06189bae05b))
-* SessionV2DsInformation can has null requestedAt ([49f2000](https://github.com/AccelByte/accelbyte-unity-sdk/commits/49f2000b0510ac8cc6ebb7af95828f95669408ca))
-* typo in Lobby.cs of session v2 notification ([e1a5249](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e1a524939b56a4b0e89286ae6bf547f9ba38c310))
-* typo in ServerMatchmakingApi.cs ([3870417](https://github.com/AccelByte/accelbyte-unity-sdk/commits/38704173545e296c9c2c83ea89455b3bbcab1892))
+* adopt the changes from lobby session refactoring 
+* client sdk config type misplaced 
+* comment out matchmaking code to avoid build test crashes 
+* comment out protobuf messaage notification handling 
+* fix wrong purchase condition model in item api BREAKING CHANGES: updated item info model 
+* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends 
+* missing dependency after rebase 
+* missing request model for promote member to party leader 
+* mistaken refactor of session model and server config 
+* rename typo, confusing namespace, remove UpdateGameSession 
+* session info replace session member and ds status changed notif 
+* SessionV2DsInformation can has null requestedAt 
+* typo in Lobby.cs of session v2 notification 
+* typo in ServerMatchmakingApi.cs 
 
 
 ### Tests
 
-* Refactor and improved party test coverage and quality ([4750084](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4750084ce098e1a1d614d315e4810ff36f8ac58f))
+* Refactor and improved party test coverage and quality 
 
 
 ### Refactors
 
-* handle session notifications as json instead of protobuf ([f1cba09](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f1cba09db43fbf959b744e3b0b3c352cdaccf0cb))
-* **lobby:** move websocket api call into a new class ([8dfcf60](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8dfcf60c495d0ae1b5679a69e3ab38af68dedfcc))
-* MMv2 RejectBackfillProposal use backfill proposal notification directly ([7db3057](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7db3057e530537a5d63c420666d8410218a85c56))
-* remove protobuf library and generated class ([93ed4b7](https://github.com/AccelByte/accelbyte-unity-sdk/commits/93ed4b704659569a83ef25f47c804d7438f698d3))
+* handle session notifications as json instead of protobuf 
+* **lobby:** move websocket api call into a new class 
+* MMv2 RejectBackfillProposal use backfill proposal notification directly 
+* remove protobuf library and generated class 
 
-## [15.3.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.3.0%0D15.2.0) (2022-10-10)
-
-
-### Features
-
-*  Bruteforce protection upon game login ([f24e935](https://github.com/AccelByte/accelbyte-unity-sdk/commits/f24e9354684ff2ad9c609128ea98bf2b3ef537e2))
-* adjustment for improve entitlement track log ([8a98deb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/8a98debbf8dda2d38cabdb195a597a3f4af03951))
-* banning by device id (PSN, XBOX) ([0dd98fc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0dd98fc0b9d72ca36a0659154d9f99b05e559aab))
-* expose Get and Update PrivateCustomAttributes ([7adc696](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7adc696c413a9737cfbc5646c5666fdf563b407f))
-* **HTTP:** adding SDK version to the resource and add HTTP headers metadata [sdk version, game client version, namespace] ([fb041ee](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fb041ee42190450100068f6664f96729c0c7625a))
-* **lobby:** add send party notif ([a1f36ed](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a1f36eded46e54ec02ffde8d4bef30071e5ea1f2))
-* **lobby:** support for role based matchmaking ([835704f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/835704f68e556c8e8272ada52baf7625a5481492))
-* **lobby:** support rejected status on role based matchmaking ([2f30c17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2f30c1732ad7a87f53499aedfbd7bbacb3d291df))
-* Temporarily cache telemetry data into the local disk storage ([7676ad8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/7676ad85e33bf8ea8139ce2b4525a0d91df7210e))
-
-
-### Bug Fixes
-
-* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends ([d546342](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d546342b3ad5cb68c923e22d10a34bd0c5aa2f74))
-* support get wallet info old workflow ([e59db17](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e59db17b72b7e4d53823ef4e76f55df4d70f7752))
-
-## [15.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.2.0%0D15.1.0) (2022-09-27)
+## [15.3.0] (2022-10-10)
 
 
 ### Features
 
-* AccelByteUnitySdk Plug-in's GetWalletInfoByCurrencyCode returns a partial response ([bd3c2ce](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bd3c2ce0d55401eaf4c967f796f5d2c7c29a74e6))
-* Improve Store Category search results to display all items from its sub-categories ([29271da](https://github.com/AccelByte/accelbyte-unity-sdk/commits/29271dae27872f380376f57ab07fe2004c5e067f))
-* providing mac address & platform name methods to fulfill client requirement ([5697687](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5697687894b955522c7ee3f75fa3df2d6c7dd7b5))
-* support old walletapi  walkflow and multiple platform ([2cca8ef](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2cca8ef02baa73711291327550c608f0d7ff126b))
+*  Bruteforce protection upon game login 
+* adjustment for improve entitlement track log 
+* banning by device id (PSN, XBOX) 
+* expose Get and Update PrivateCustomAttributes 
+* **HTTP:** adding SDK version to the resource and add HTTP headers metadata [sdk version, game client version, namespace] 
+* **lobby:** add send party notif 
+* **lobby:** support for role based matchmaking 
+* **lobby:** support rejected status on role based matchmaking 
+* Temporarily cache telemetry data into the local disk storage 
 
 
 ### Bug Fixes
 
-* Fixed missing Dispose call when creating and assigning UnityWebRequest ([714c8cf](https://github.com/AccelByte/accelbyte-unity-sdk/commits/714c8cfc6fca799e1a771882e9476835aba8b599))
-* Fixed missing Dispose call when creating and assigning UnityWebRequest on the possible issue ([2db0dab](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2db0dab8a1b35b3fcb44fa2ad85f9c1f0f15c36c))
-* player is unable to logout ([4314b02](https://github.com/AccelByte/accelbyte-unity-sdk/commits/4314b02bf7f1146bd0d71dcae6e3b1f5ef890e87))
-* Set OnDispose = true on uploadHandler and downloadHandler ([a3b8da8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a3b8da8bdd30752db64f510a277d2f631bd3616f))
-* support get wallet info old workflow ([42d2428](https://github.com/AccelByte/accelbyte-unity-sdk/commits/42d24285eee1db6268557307787a4f44813a97d7))
+* **lobby:** fix presence message still uri escaped on FriendsStatusChanged and ListOnlineFriends 
+* support get wallet info old workflow 
 
-## [15.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.1.0%0D15.0.0) (2022-09-12)
+## [15.2.0] (2022-09-27)
 
 
 ### Features
 
-* ApiClient API Getter to ease the transition from singleton ([76e1487](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76e14874ca8073d90e3026018e6385eb921b199f))
-* change access modifier from internal to public ([d9a53a3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/d9a53a34db541dcfd4cae7c4e881ffdb30b4ab3c))
-* IAM Phase 4 Statement & Substitute Implementation ([af2c4d8](https://github.com/AccelByte/accelbyte-unity-sdk/commits/af2c4d8b746505b82020f972f44d383de436c3d0))
-* SDK Implementation for UGC service Test ([b3f816b](https://github.com/AccelByte/accelbyte-unity-sdk/commits/b3f816bf5cf41b720b705308ef0268bfc5069a3b))
+* AccelByteUnitySdk Plug-in's GetWalletInfoByCurrencyCode returns a partial response 
+* Improve Store Category search results to display all items from its sub-categories 
+* providing mac address & platform name methods to fulfill client requirement 
+* support old walletapi  walkflow and multiple platform 
 
 
 ### Bug Fixes
 
-* compile error on Unity 2019 ([c1af4b6](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c1af4b67a05200ad5b14652439db41b3b4d31eaa))
-* use proper LoginWithUsernameV3 in User.cs ([a127a33](https://github.com/AccelByte/accelbyte-unity-sdk/commits/a127a33292abff8d17f9625861a6e50babbe73da))
+* Fixed missing Dispose call when creating and assigning UnityWebRequest 
+* Fixed missing Dispose call when creating and assigning UnityWebRequest on the possible issue 
+* player is unable to logout 
+* Set OnDispose = true on uploadHandler and downloadHandler 
+* support get wallet info old workflow 
 
-## [15.0.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/15.0.0%0D14.2.0) (2022-08-29)
+## [15.1.0] (2022-09-12)
+
+
+### Features
+
+* ApiClient API Getter to ease the transition from singleton 
+* change access modifier from internal to public 
+* IAM Phase 4 Statement & Substitute Implementation 
+* SDK Implementation for UGC service Test 
+
+
+### Bug Fixes
+
+* compile error on Unity 2019 
+* use proper LoginWithUsernameV3 in User.cs 
+
+## [15.0.0] (2022-08-29)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1314,70 +1314,70 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* adjust function and simplify logic ([0a3c130](https://github.com/AccelByte/accelbyte-unity-sdk/commits/0a3c13052d3b18fd7d57b0bfab02e0c21f06b5f6))
-* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify ([ffde0f5](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ffde0f58b2f64e0aee0bb1aa55b2cd7b18b065e9))
-* fix merging conflict ([6f7574f](https://github.com/AccelByte/accelbyte-unity-sdk/commits/6f7574fa551dc21a0fa277bf14e903aa6aedfc99))
-* IAM Phase 3 Statement & Substitute Implementation ([bde86d4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/bde86d470847af4449009313d939c495f157573f))
-* **qos:** add GetAllServerLatencies function ([940af73](https://github.com/AccelByte/accelbyte-unity-sdk/commits/940af737d41190085cb89c7492dbce202c701281))
-* SDK Implementation for UGC service - get follower count & update Follow status ([c8b5c41](https://github.com/AccelByte/accelbyte-unity-sdk/commits/c8b5c41d36832c0f945374040aa0ed69dadf8a3d))
-* SDK Implementation for UGC service - Get list content ([290f5b2](https://github.com/AccelByte/accelbyte-unity-sdk/commits/290f5b2e04a7eb9b54fc0ab39a4479d8899d8357))
-* SDK Implementation for UGC service - like a content ([740ebc4](https://github.com/AccelByte/accelbyte-unity-sdk/commits/740ebc441ade46f224aefacbb4ab4b15db3280ca))
-* SDK Implementation for UGC service - Query by Tags ([e30c5f9](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e30c5f9bf55b9f9d89c1ffaa51277747e2920ce5))
+* adjust function and simplify logic 
+* deprecated endpoint /iam/oauth/token, added new end point /iam/v3/oauth/verify 
+* fix merging conflict 
+* IAM Phase 3 Statement & Substitute Implementation 
+* **qos:** add GetAllServerLatencies function 
+* SDK Implementation for UGC service - get follower count & update Follow status 
+* SDK Implementation for UGC service - Get list content 
+* SDK Implementation for UGC service - like a content 
+* SDK Implementation for UGC service - Query by Tags 
 
 
 ### Bug Fixes
 
-* Cannot remember "device_token" if comes from request header. rename header device_token to device-token ([2af20b1](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2af20b1a9066acfd27a817b919154e9992cd1430))
-* use proper LoginWithUsernameV3 in User.cs ([5df2273](https://github.com/AccelByte/accelbyte-unity-sdk/commits/5df22734702ef30eb14138c11573690a54fa3592))
+* Cannot remember "device_token" if comes from request header. rename header device_token to device-token 
+* use proper LoginWithUsernameV3 in User.cs 
 
 
 ### feature
 
-* refactor LoginSession ([76b7e3a](https://github.com/AccelByte/accelbyte-unity-sdk/commits/76b7e3a92447825783adf6bf813ade2f5f2c48b9))
+* refactor LoginSession 
 
 
 ### Refactors
 
-* **lobby:** move websocket api call into a new class ([e763547](https://github.com/AccelByte/accelbyte-unity-sdk/commits/e7635479cad6853edc38947cbabff7f9dc79490d))
+* **lobby:** move websocket api call into a new class 
 
-## [14.2.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/14.2.0%0D14.1.0) (2022-08-15)
-
-
-### Features
-
-* expose store Id and list public store ([1acf4ec](https://github.com/AccelByte/accelbyte-unity-sdk/commits/1acf4ec49d0d6e121a4a99baafa078779e77c185))
-* exposing v2 statistics endpoint ([2a5b935](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2a5b93519c30f4bc24fb832d193a6c1b8d7a95d1))
-* searching entitlement by feature ([75f2b6e](https://github.com/AccelByte/accelbyte-unity-sdk/commits/75f2b6e74f681a0f2d280fa0f0aac179385ba91d))
-* **sessionbrowser:** add get game sessions by user ids ([9949260](https://github.com/AccelByte/accelbyte-unity-sdk/commits/99492609f5afcb4cd3d8e704e5b5dccc53119c9c))
-
-## [14.1.0](https://github.com/AccelByte/accelbyte-unity-sdk/branches/compare/14.1.0%0D14.0.1) (2022-08-01)
+## [14.2.0] (2022-08-15)
 
 
 ### Features
 
-* **basic:** added category param in generate upload url for user content ([2e3ac30](https://github.com/AccelByte/accelbyte-unity-sdk/commits/2e3ac300a24760d4c7f023e6300a53b6a4d131cb))
-* **iam:** EA Origin Authentication Integration ([ee83f59](https://github.com/AccelByte/accelbyte-unity-sdk/commits/ee83f599d5bef8a84d190cb2e1b4a5960b525fea))
-* Lobby function signature change to follow the rest of WrapperBase class ([394f8d3](https://github.com/AccelByte/accelbyte-unity-sdk/commits/394f8d3a430843c419314d52a69755163350f129))
-* Purchasing Requirements ([9517cdc](https://github.com/AccelByte/accelbyte-unity-sdk/commits/9517cdca58ab1415fe614d7ecd10a46fd144cee1))
-* unity new item type optionbox ([fa324dd](https://github.com/AccelByte/accelbyte-unity-sdk/commits/fa324ddb73e18c90db5c557de455147362b711cc))
+* expose store Id and list public store 
+* exposing v2 statistics endpoint 
+* searching entitlement by feature 
+* **sessionbrowser:** add get game sessions by user ids 
+
+## [14.1.0] (2022-08-01)
+
+
+### Features
+
+* **basic:** added category param in generate upload url for user content 
+* **iam:** EA Origin Authentication Integration 
+* Lobby function signature change to follow the rest of WrapperBase class 
+* Purchasing Requirements 
+* unity new item type optionbox 
 
 
 ### Bug Fixes
 
-* **apiclient:** older version of Unity doesn't support  TryAdd function ([3d44eeb](https://github.com/AccelByte/accelbyte-unity-sdk/commits/3d44eebd2ce726e4ff6fc63711047917eec8b51d))
+* **apiclient:** older version of Unity doesn't support  TryAdd function 
 
-## [13.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/13.1.0%0D13.0.0) (2022-06-20)
+## [13.1.0] (2022-06-20)
 
 
 ### Features
 
-* **iam:** Support netflix platform ID for login through Unity SDK ([80f8ac8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/80f8ac826c8a0a9446bce7510de6ceaeead3e69f))
-* **lobby:** implement add friend by public id ([671f1f7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/671f1f7cecc5c4871d729a2a0e392aa5a6e03be3))
-* **lobby:** implement set party size limit ([7d0884e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7d0884e90937f4748046288223b8d9cd7e5ee38f))
-* **seasonpass:** Granted Season Pass EXP Tracking ([c9b7e89](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c9b7e89275126e30b52ee9490067fd5334a74a8d))
-* **seasonpass:** make new params (source & tags) as optional. ([bd53296](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bd53296032eef6e9d4f07da82a5273450af6ad3b))
+* **iam:** Support netflix platform ID for login through Unity SDK 
+* **lobby:** implement add friend by public id 
+* **lobby:** implement set party size limit 
+* **seasonpass:** Granted Season Pass EXP Tracking 
+* **seasonpass:** make new params (source & tags) as optional. 
 
-## [13.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/13.0.0%0D12.0.1) (2022-06-06)
+## [13.0.0] (2022-06-06)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1386,22 +1386,22 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **basic:** Implement Public Code/Friend Code in SDK ([dfe6a47](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/dfe6a4725a37cfe8f85c9a400433872b57b5c5d4))
-* **iam:**  Include platformUserIds field when bulk gets users' basic info ([60f99e6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/60f99e6b2173829b1cde0887fe95bcda2808c95e))
-* **iam:** account linking handling ([81cb8c2](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/81cb8c2fae96ee609aa4ff9f3fd6c9b066899555))
-* **iam:** Adjusting Search User to the updated Public Search User V3 API, Adding Params Limit and Offset ([41ee254](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/41ee2547e1242949ebf46b20a4d5868bd12bb0bf))
+* **basic:** Implement Public Code/Friend Code in SDK 
+* **iam:**  Include platformUserIds field when bulk gets users' basic info 
+* **iam:** account linking handling 
+* **iam:** Adjusting Search User to the updated Public Search User V3 API, Adding Params Limit and Offset 
 
 
 ### Bug Fixes
 
-* **test:** add delay after create game mode for lobby to refresh game mode cache from matchmaking ([f1d6b31](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f1d6b31dad0367d2f45d8927cdcca34a5aef307d))
+* **test:** add delay after create game mode for lobby to refresh game mode cache from matchmaking 
 
 
 ### Tests
 
-* **matchmaking:** fix cancel matchmaking using wrong value for game mode parameter ([9a0b13e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9a0b13ec84486dff2e851f7aaf5aa74aeca0a1ac))
+* **matchmaking:** fix cancel matchmaking using wrong value for game mode parameter 
 
-### [12.0.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/12.0.1%0D12.0.0) (2022-05-23)
+### [12.0.1] (2022-05-23)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1410,10 +1410,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **AccelbytePlugin:** change the platform list from RuntimePlatform to PlatformType ([0d1bbec](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0d1bbec6304307c8e614f7ee39b65dfdb109e4e0))
-* **config:** separate oauth config from config ([c44df5d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c44df5d856892f4c07ebdbbe4aace8f703270ed3))
+* **AccelbytePlugin:** change the platform list from RuntimePlatform to PlatformType 
+* **config:** separate oauth config from config 
 
-## [12.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/12.0.0%0D11.0.0) (2022-05-23)
+## [12.0.0] (2022-05-23)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1424,15 +1424,15 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **iam:** Expose the Admin Ban User endpoint ([e6c4404](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e6c44048e28cb813917e88aff6cb790954d13dfe))
-* **iam:** Expose the Admin Ban User endpoint ([cd55afd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/cd55afd1eb624b395c8e7dbed18e3bb3bc5c8713))
-* **multiReg:** Implement multiReg (multiPlugins) ([65271a7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/65271a7be3a25cb6faf82e5cca101d4593346a12))
-* **Plugins:** add multiple environment credential switch ([fb68bb7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fb68bb778040a0984d2700ee54ba0afb8c79cbf3))
+* **iam:** Expose the Admin Ban User endpoint 
+* **iam:** Expose the Admin Ban User endpoint 
+* **multiReg:** Implement multiReg (multiPlugins) 
+* **Plugins:** add multiple environment credential switch 
 
 
-* Merge branch 'feature/OS-6354-Expose-Admin-Ban-User-endpoint' of bitbucket.org:accelbyte/justice-unity-sdk into feature/OS-6354-Expose-Admin-Ban-User-endpoint ([7052f5f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7052f5fcbba353eeabf5275f68f2c026439d6ea1))
+* Merge branch 'feature/OS-6354-Expose-Admin-Ban-User-endpoint' of bitbucket.org:accelbyte/justice-unity-sdk into feature/OS-6354-Expose-Admin-Ban-User-endpoint 
 
-## [11.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/11.0.0%0D10.0.0) (2022-05-09)
+## [11.0.0] (2022-05-09)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1443,29 +1443,29 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **ecommerce:** Update Unit Test Code for New Behavior Cross Platform Wallet ([39141bb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/39141bbdcfe981d3b5b4cc39c8ee08b6175e494c))
-* **jsonconverter:** add json serializer settings for enum string, array object and dictionary ([8473923](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/84739237f120a12cd3148545765a4f14a744f315))
-* **lobby:** add custom attribute in register server & DSNotif ([6948396](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6948396a4e9929e5f99b63f3bcbc7d191ca452dc))
-* **lobby:** add reconnect on connection close code 4000 ([2757d29](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2757d29f84fca04bb2af31e06ce4882107612404))
+* **ecommerce:** Update Unit Test Code for New Behavior Cross Platform Wallet 
+* **jsonconverter:** add json serializer settings for enum string, array object and dictionary 
+* **lobby:** add custom attribute in register server & DSNotif 
+* **lobby:** add reconnect on connection close code 4000 
 
 
 ### Bug Fixes
 
-* clean up UTF8 Json resolver remnants ([5963290](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5963290dc2894fe4454ff09af461b8afa7cc9e6b))
-* **converter:** add attribute decoration to be able to convert enums into the string values ([8e81602](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8e816023343b5ecb9e0e1d2b9b6eb9e7bb9ede05))
-* **editor:** Fix save settings to the config file ([53599d4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/53599d492e38d64b2e11430436e03d2b989a5187))
-* **lobby:** fixed empty session when reconnecting ([ba5562c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ba5562c9f829a6fc3fca2fc176c43fdddaa78428))
+* clean up UTF8 Json resolver remnants 
+* **converter:** add attribute decoration to be able to convert enums into the string values 
+* **editor:** Fix save settings to the config file 
+* **lobby:** fixed empty session when reconnecting 
 
 
-* Due to limited permission of Game Record needs to be adjust some unit tests to make it passes. ([3ce9612](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3ce9612f17b34599e5a035057896f1c91f80039f))
-* Due to limited permission of Game Record needs to be adjust some unit tests to make it passes. ([111d07d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/111d07d60af7353472093d2c305d2077219ac6e5))
+* Due to limited permission of Game Record needs to be adjust some unit tests to make it passes. 
+* Due to limited permission of Game Record needs to be adjust some unit tests to make it passes. 
 
 
 ### Tests
 
-* **Agreement:** Make sure test setup fetch correct base policies that have expected contry code ([d30c47a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d30c47a3dd67578771cad6c7487d9e8fda2ff4cf))
+* **Agreement:** Make sure test setup fetch correct base policies that have expected contry code 
 
-## [10.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/10.0.0%0D9.2.0) (2022-04-25)
+## [10.0.0] (2022-04-25)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1474,43 +1474,43 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* metadata change field name ([9f1b9f0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9f1b9f0aedc304e2309e2ef05be8d6fb80b375ad))
+* metadata change field name 
 
 
 ### Bug Fixes
 
-* Fixed missing Dispose call when using UnityWebRequest ([1050a3b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1050a3b42dbc6df629499caff56a3d85280f10b6))
+* Fixed missing Dispose call when using UnityWebRequest 
 
 
 ### Tests
 
-* change hardcoded namespace to using namespace from config ([8082d8d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8082d8d3e4b384a9a16c5872316f64ffcd16cfe0))
-* **subscription:** add stage env public key ([b47c9e0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b47c9e05c3e0d88604eda1aa0ec7a294c202bce3))
+* change hardcoded namespace to using namespace from config 
+* **subscription:** add stage env public key 
 
 
-* Merge branch 'master' into feature/OS-6138-Change-Metadata-RecordRequest-Field ([2d24e54](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2d24e5402397f61c24b2edcad0430b4136fccd99))
+* Merge branch 'master' into feature/OS-6138-Change-Metadata-RecordRequest-Field 
 
-## [9.2.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/9.2.0%0D9.1.0) (2022-04-11)
-
-
-### Features
-
-* **2FA:** Handle in-game login when 2FA enabled ([3d523a7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3d523a73aa3e3009e185b6e8e49cf64170df9987))
-* **2FA:** Implement IAM Input validation to our SDK ([c20bfee](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c20bfee3bc42e9b2d93ff22a0083bab798cc65a0))
-* Bring back old login flow with old callback delegate. ([67ce7e9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/67ce7e935f7e23a0151ff09998854c4c8070d3e9))
-* cookie in 2FA in game login ([ad0f088](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ad0f088ed72452939ae881490b3ec511a22c3135))
-* **lobby:** combine signaling message and notif model ([b8babbb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b8babbb3f0d5744cfb748d26b133255ebca04a91))
-
-## [9.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/9.1.0%0D9.0.0) (2022-03-28)
+## [9.2.0] (2022-04-11)
 
 
 ### Features
 
-* **cloudsave:** support server validation by using additional META field ([59efcee](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/59efcee5d04bafc2b245de20410eef6f8787c7a8))
-* **lobby:** add send signaling message and notification handler ([1cdf367](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1cdf367fce0075d107cb036541616d2b60ee9ace))
-* unity google IAP ([9798629](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/97986295f074bd7cec3913a6ebfd5ce3298d3ddb))
+* **2FA:** Handle in-game login when 2FA enabled 
+* **2FA:** Implement IAM Input validation to our SDK 
+* Bring back old login flow with old callback delegate. 
+* cookie in 2FA in game login 
+* **lobby:** combine signaling message and notif model 
 
-## [9.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/9.0.0%0D8.7.0) (2022-03-14)
+## [9.1.0] (2022-03-28)
+
+
+### Features
+
+* **cloudsave:** support server validation by using additional META field 
+* **lobby:** add send signaling message and notification handler 
+* unity google IAP 
+
+## [9.0.0] (2022-03-14)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1519,118 +1519,118 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **user:** upgrade and verify headless account ([4a7dbe4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4a7dbe4b1902eb4c2354105e2bd295ffa05e002c))
+* **user:** upgrade and verify headless account 
 
 
 ### Tests
 
-* **matchmaking:** refactor matchmaking test to create game mode in setup step. ([643ce10](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/643ce106bb1a7d9f6a51bbdd6468d3f802a33f39))
+* **matchmaking:** refactor matchmaking test to create game mode in setup step. 
 
-## [8.7.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.7.0%0D8.6.0) (2022-03-01)
+## [8.7.0] (2022-03-01)
 
 
 ### Features
 
-* **entitlement:** Sync item entitlement with Twitch Drop item ([57fdcc8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/57fdcc85abaa27e7b7cb1f1d4b5c4bf641ec9e23))
+* **entitlement:** Sync item entitlement with Twitch Drop item 
 
 
 ### Tests
 
-* **test:** make test stable in dev IaC env ([60a381e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/60a381e4903880fbd56b41458b19c823ff643452))
+* **test:** make test stable in dev IaC env 
 
 
 ### Refactors
 
-* **lobby:** Separate websocket management logic from lobby class. ([a0bce24](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a0bce245b39d71ec4c9c7151747b51de92c68a15))
+* **lobby:** Separate websocket management logic from lobby class. 
 
-## [8.6.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.6.0%0D8.5.0) (2022-02-14)
-
-
-### Features
-
-* **entitlement:** bringback sync DLC item ([91987f7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/91987f736676e356857a536c40bc2b97ff5530d3))
-* **user:** Login with password grant V3 ([68772f8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/68772f81a7f04c172ec43148b7035e82bf8162ea))
-
-## [8.5.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.5.0%0D8.4.1) (2022-01-31)
+## [8.6.0] (2022-02-14)
 
 
 ### Features
 
-* **lobby:** add more fields in MatchmakingNotif ([a6aafb5](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a6aafb50e0a7359ab6d5e8f63e5322591ee1fb64))
-* **lobby:** add userID in lobby invite & kick response ([a189f06](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a189f0653e2bbc9e12fb493f843bf80bc1456a7f))
+* **entitlement:** bringback sync DLC item 
+* **user:** Login with password grant V3 
 
-### [8.4.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.4.1%0D8.4.0) (2022-01-17)
+## [8.5.0] (2022-01-31)
+
+
+### Features
+
+* **lobby:** add more fields in MatchmakingNotif 
+* **lobby:** add userID in lobby invite & kick response 
+
+### [8.4.1] (2022-01-17)
 
 
 ### Bug Fixes
 
-* **session:** fix session doesn't maintain access token after relogging ([392e89f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/392e89f21d7a84ce62c3f8a065e321b825a5a0ff))
-* **utf8json:** update Utf8JsonGenerated ([2d1c34f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2d1c34f5dce1996c95ec0816dbd2e7c820137ea0))
+* **session:** fix session doesn't maintain access token after relogging 
+* **utf8json:** update Utf8JsonGenerated 
 
 
 ### Tests
 
-* **lobby:** add proper cleanup for RefreshToken test. ([e7fa401](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e7fa401b65f705dd184d17cd21bfa994a816a7e6))
-* **lobby:** fix wrong error codes in unit test check ([dc5b45a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/dc5b45a03438b0e3d9f7092f66cc6c399bdbc809))
+* **lobby:** add proper cleanup for RefreshToken test. 
+* **lobby:** fix wrong error codes in unit test check 
 
-## [8.4.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.4.0%0D8.3.0) (2022-01-04)
+## [8.4.0] (2022-01-04)
 
 
 ### Features
 
-* **lobby:** add startmatchmaking with optional struct as parameter. ([2337aba](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2337abaa46367b2a4a0df62ba77c01140c1667ad))
+* **lobby:** add startmatchmaking with optional struct as parameter. 
 
 
 ### Tests
 
-* **matchmaking:** add timeout duration for rematchmaking_ReturnOk case. ([2d314d2](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2d314d2c68d09def0d352226082b5e5a6885f0cb))
+* **matchmaking:** add timeout duration for rematchmaking_ReturnOk case. 
 
-## [8.3.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.3.0%0D8.2.0) (2021-12-20)
-
-
-### Features
-
-* **ServerUser:** API to provide DS searchUserOtherPlatform ([c84b6d0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c84b6d0d8165a5f3324a10d977406469ed3882df))
-* **SyncGoogleandApple:** sync purchased item from mobile platform ([1ce5732](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1ce5732d9ccdbeacda70810c4564896bba6fab42))
-
-## [8.2.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.2.0%0D8.1.0) (2021-12-06)
+## [8.3.0] (2021-12-20)
 
 
 ### Features
 
-* **lobby:** add RefreshToken command, and sdk auto call RefreshToken when Token is refreshed. ([b0325d0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b0325d0e35543ab85d002284c6b63aa09b637a38))
-* **user:** get bulk userInfo ([2958ede](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2958ede14acd91879796e326a596eff0dce238e6))
+* **ServerUser:** API to provide DS searchUserOtherPlatform 
+* **SyncGoogleandApple:** sync purchased item from mobile platform 
+
+## [8.2.0] (2021-12-06)
+
+
+### Features
+
+* **lobby:** add RefreshToken command, and sdk auto call RefreshToken when Token is refreshed. 
+* **user:** get bulk userInfo 
 
 
 ### Bug Fixes
 
-* **UGC:** fix adjustment for backend behavior changes ([bf536d3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bf536d3e96b4a097f268781575b09b88c0777b76))
+* **UGC:** fix adjustment for backend behavior changes 
 
-## [8.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.1.0%0D8.0.0) (2021-11-22)
+## [8.1.0] (2021-11-22)
 
 
 ### Features
 
-* **accelbyteplugin:** add new internal function to register utf8json resolver. test included ([802995d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/802995dc6786ad88c8b5902cf87bab3f50e47d88))
-* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) ([b2d4a53](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b2d4a53f89af227601ddb15163a1e0ecfc895773))
-* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) ([aac220f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/aac220ff4d70e43107c6a393b830c3a22e62c7a7))
-* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) ([0bc96db](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0bc96dbba6305fb04103525d9d5db1cdb1972b5f))
-* Added ability to get valid Countries, TimeZones and Languages in the SDK through the Miscellaneous Class ([4666829](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4666829a045e62a4e2209ea72e8270834b665dd5))
-* Added ability to get valid Countries, TimeZones and Languages in the SDK through the Miscellaneous Class ([547323d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/547323d209b049c5105ccfbd586a978fbef20b72))
-* Added GetPublicUserProfile to a client accessible function ([6032810](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/603281033caab73bbb4e4abf3988fed02429cc96))
-* Added GetPublicUserProfile to a client accessible function ([b1cb686](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b1cb686e60b61baa15c4e42e1ac6612ef271a3b3))
-* Added GetPublicUserProfile to a client accessible function ([41be517](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/41be5178b1c23b2ecc2a4ef1b39d480d6ae9b698))
-* **DSM:** Add support for DSMC Multi Allocation Server Registration. ([b26ad98](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b26ad98fe831eb4d8128cbc9e6726c7b972c41c5))
-* **ecommerce:** Add Store Media Item Type ([ed3f176](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ed3f17687d09351d5897722f04a557f97e432af5))
-* **GetCurrentUserProgression:** add GetCurrentUserProgression ([2421494](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2421494aa075e9be7cc2b1ce460bdbe2be603482))
-* **ihttpclient:** add post request without body parameter and make sure that then content type is json media type ([60668f7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/60668f7349d470c5712369bfcb13a7e34c207f57))
+* **accelbyteplugin:** add new internal function to register utf8json resolver. test included 
+* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) 
+* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) 
+* Added a function to download the UserAvatar of a given UserID UserProfiles.GetUserAvatar(userID,callback) 
+* Added ability to get valid Countries, TimeZones and Languages in the SDK through the Miscellaneous Class 
+* Added ability to get valid Countries, TimeZones and Languages in the SDK through the Miscellaneous Class 
+* Added GetPublicUserProfile to a client accessible function 
+* Added GetPublicUserProfile to a client accessible function 
+* Added GetPublicUserProfile to a client accessible function 
+* **DSM:** Add support for DSMC Multi Allocation Server Registration. 
+* **ecommerce:** Add Store Media Item Type 
+* **GetCurrentUserProgression:** add GetCurrentUserProgression 
+* **ihttpclient:** add post request without body parameter and make sure that then content type is json media type 
 
 
 ### Refactors
 
-* **DSM): Revert "feat(DSM:** Add support for DSMC Multi Allocation Server Registration." ([43b00a0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/43b00a03a727705ffe9aac2b4fafa195a8b2989b))
+* **DSM): Revert "feat(DSM:** Add support for DSMC Multi Allocation Server Registration." 
 
-## [8.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/8.0.0%0D7.1.1) (2021-11-08)
+## [8.0.0] (2021-11-08)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1639,55 +1639,55 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **AccelBytePlugin:** changes required for multicredential ([8547780](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8547780bff7e89433a5da1bcf363f3a9754392a5))
-* **ban:** add change ban status, get ban list, and update error code ([9c94372](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9c94372eb3c60a4f3011ca63c58544ab8b7fc7ca))
-* **reward:** Adding GetRewardByRewardCode, GetRewardByRewardId, and QueryRewards . also setup for the integration tests. ([631f6f6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/631f6f6f2b366e0ac6d993bb9cbb58ffdf11986f))
-* **session:** add is comply ([0a13c57](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0a13c57692658f5814c4456e0af1adcc1800eadd))
-* **shadowban:** Add auto refresh token when bearer auth rejected, and try reconnect when in lobby ([543f9f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/543f9f955554acbb878b21a565c82cb0ed46eb6c))
+* **AccelBytePlugin:** changes required for multicredential 
+* **ban:** add change ban status, get ban list, and update error code 
+* **reward:** Adding GetRewardByRewardCode, GetRewardByRewardId, and QueryRewards . also setup for the integration tests. 
+* **session:** add is comply 
+* **shadowban:** Add auto refresh token when bearer auth rejected, and try reconnect when in lobby 
 
 
 ### Bug Fixes
 
-* **AccelByteHttpClient:** remove ClientSecret is empty checker ([03826d1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/03826d1bd2b675d48f5ada235130d5c8fbbf8b60))
-* **AccelBytePlugin:** remove CheckPlugin preprocessor so that every platform could manually initialize plugin if the plugin has not been initialized ([c5d7513](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c5d751344ec929703cc4474c07080914c1aba486))
-* **login:** fix null reference when login with incorrect email ([da2ad38](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/da2ad381d275e6546bc47ad6ccf2360209fdbb05))
+* **AccelByteHttpClient:** remove ClientSecret is empty checker 
+* **AccelBytePlugin:** remove CheckPlugin preprocessor so that every platform could manually initialize plugin if the plugin has not been initialized 
+* **login:** fix null reference when login with incorrect email 
 
 
 ### Refactors
 
-* **LobbyServer:** remove GetActiveParties method. ([e891cb3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e891cb3582cecfd62296074e111b8dfbad9fa7ed))
+* **LobbyServer:** remove GetActiveParties method. 
 
-### [7.1.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.1%0D7.1.0) (2021-10-27)
+### [7.1.1] (2021-10-27)
 
 
 ### Refactors
 
-* **DSM:** Removed apify dependencies ([69608fa](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/69608fac4e169ef378bea9a67dfeffeed2267250))
+* **DSM:** Removed apify dependencies 
 
-## [7.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.1.0%0D7.0.0) (2021-09-27)
+## [7.1.0] (2021-09-27)
 
 
 ### Features
 
-* **httperrorparser:** handle empty response body bytes ([838050b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/838050b28ff3a960e398a2e5903da1d0c5e3715c))
+* **httperrorparser:** handle empty response body bytes 
 
 
 ### Bug Fixes
 
-* **ecommerce:** fix ecommerce setup teardown dependencies ([d3d48bb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d3d48bb245d57358daf220a8b5109c302a764e0a))
-* **jenkins:** slack notification + add modules.groovy ([2f57192](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2f5719249d972caa01b06540f39a0193070c8130))
-* **jenkins:** workaround for unity test stuck at clean up mono ([bfc63f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bfc63f9e0a84bc302d6618fbe3b9173ba244a382))
-* **lobby:** make Dictionary<string,int> and <string,string> parseable with ws parser. ([f7133bc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f7133bcdc354e8a6cd0e24cad437ff7fba0df7b5))
-* **test:** do not shutdown unity run tests on first test failure ([6dfaf2f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6dfaf2fd25a15e6eeff97ace93cd46a760dbbe8d))
+* **ecommerce:** fix ecommerce setup teardown dependencies 
+* **jenkins:** slack notification + add modules.groovy 
+* **jenkins:** workaround for unity test stuck at clean up mono 
+* **lobby:** make Dictionary<string,int> and <string,string> parseable with ws parser. 
+* **test:** do not shutdown unity run tests on first test failure 
 
 
 ### Tests
 
-* **TestHelper:** add Wait* test unit ([af1435e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/af1435ed81c8f4fe45079e014908eda3b8ec9523))
-* **TestHelper:** change Wait* methods timeout to 1 minute ([ee6204d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ee6204d0baeaf0bdb1eab09cea3dbbc7abaa25f0))
-* **TestHelper:** remove WaitWhile & WaitEqual ([8cf0d0f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8cf0d0f122689cad27dadc75e0f74c1f494cbfd1))
+* **TestHelper:** add Wait* test unit 
+* **TestHelper:** change Wait* methods timeout to 1 minute 
+* **TestHelper:** remove WaitWhile & WaitEqual 
 
-## [7.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/7.0.0%0D6.0.0) (2021-09-13)
+## [7.0.0] (2021-09-13)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1696,22 +1696,22 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **GameClient:** add extensible client API ([e189f43](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e189f438f3cb9a76e852d0cdd5f5c5e0b190040a))
-* **reporting:** Add unity reporting SDK ([a0524f9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a0524f94d4eb6e19dc776ccfb32a30292fe4c8fd))
-* **SeasonPass:** initial support for Season Pass service ([35be892](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/35be8921ed1857c1a14eb14ff6b06b1ae5348adf))
-* **User:** Reimplement Logout api ([d171c13](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d171c13919f24b4477616c5097f82aca08b164f9))
+* **GameClient:** add extensible client API 
+* **reporting:** Add unity reporting SDK 
+* **SeasonPass:** initial support for Season Pass service 
+* **User:** Reimplement Logout api 
 
 
 ### Bug Fixes
 
-* **User:** Change the name of CountryInfo members of UserModel into using camelCase. ([0107e59](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0107e59c1a6e63fe66c98936da3713c1945562d4))
+* **User:** Change the name of CountryInfo members of UserModel into using camelCase. 
 
 
 ### Reverts
 
-* **accelbyteplugin:** revert accidentally deleted http api configure and getter ([13bebc4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/13bebc469162e13ebb1a36708ab075585a37e4bc))
+* **accelbyteplugin:** revert accidentally deleted http api configure and getter 
 
-## [6.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/6.0.0%0D5.0.0) (2021-08-30)
+## [6.0.0] (2021-08-30)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1720,39 +1720,39 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **accelbyteplugin:** provide basic api url to miscelaneus ([a0737ed](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a0737edca56c10b82ec2cf144a5ba31dddfdb1a2))
-* **ECommerceModel:** new model for fulfilluserItem api  ([b9a7c27](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b9a7c272517837b5c4b3c73a7061c566a2f1ef39))
-* **ECommerceModels:** add itemid property ([ce716a9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ce716a95f43827998e07ecd785647fedaa967cc3))
-* **fulfillment:** add new fulfillmentapi, add new fulfillment ([9ae1c2d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9ae1c2dbbe1098b169b6d2124c19b5e1a1c82aad))
-* **HttpRequestBuilder:** Refactor how http api works to simplify http request creation and make it more testable ([3af039a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3af039a744b4a0c7ef9058a8d4d22cf4148bd27e))
-* **miscellaneous:** miscellaneous api,http request and model ([d71ecd5](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d71ecd5abcfad75d0c8dd57c9c58041c68047161))
-* **model:** add var in the leaderboard model ([5a122e1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5a122e138c2e3f334a409399a6d6f73d314cde5f))
-* **OrderWalletEntitlementTest:** add fulfilluseritem test for invalid item id and negative amount number ([23576f0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/23576f022f3dccd4808bdc3e379506ef843eeeff))
-* **ServerEcommerceApi:** new fulfill user item method ([8a76ca0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8a76ca0e6cbe7b1f08d0028ac35c1f88782e6b7d))
-* **ServerEcommerce:** fulfill user item ([1f3c6cd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1f3c6cd515c0fdcc274476f7bef933a3ebda48a7))
+* **accelbyteplugin:** provide basic api url to miscelaneus 
+* **ECommerceModel:** new model for fulfilluserItem api  
+* **ECommerceModels:** add itemid property 
+* **fulfillment:** add new fulfillmentapi, add new fulfillment 
+* **HttpRequestBuilder:** Refactor how http api works to simplify http request creation and make it more testable 
+* **miscellaneous:** miscellaneous api,http request and model 
+* **model:** add var in the leaderboard model 
+* **OrderWalletEntitlementTest:** add fulfilluseritem test for invalid item id and negative amount number 
+* **ServerEcommerceApi:** new fulfill user item method 
+* **ServerEcommerce:** fulfill user item 
 
 
 ### Bug Fixes
 
-* **Achievement:** Fix the Achievement Api's Public Achievement and Multi Language Achievement model difference with the Backend response. Fix the Test Helper's Achievement Request and Achievement Response model difference with the Backend response. ([745b4a7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/745b4a7e2ec70ec0be33431bb034b37055ba36a2))
-* **Subscription:** Adjusting from single draft store change ([69b2a98](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/69b2a988ab0d3509dd5aebbdeca406ec4d815b05))
-* **testhelper:** revert unintended config change ([de74844](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/de74844fdf54982bd0051390732a1f27c19217e5))
+* **Achievement:** Fix the Achievement Api's Public Achievement and Multi Language Achievement model difference with the Backend response. Fix the Test Helper's Achievement Request and Achievement Response model difference with the Backend response. 
+* **Subscription:** Adjusting from single draft store change 
+* **testhelper:** revert unintended config change 
 
 
 ### Refactors
 
-* **accelbyteplugin:** use base url instead of platform url for fulfillment api ([e0d219c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e0d219c73480ede82485f7874b17b5cc71b149f8))
-* **fulfillmentapi:** user PlatformUrl instead of BaseUrl ([36069c0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/36069c0ad4242752738b9bcffdc1bd25b743162b))
+* **accelbyteplugin:** use base url instead of platform url for fulfillment api 
+* **fulfillmentapi:** user PlatformUrl instead of BaseUrl 
 
 
 ### Tests
 
-* **fulfillmentTest:** add test for fulfillment api ([09fdc55](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/09fdc55daa1fc7604bc001adee6833f26ec8d5da))
-* **fulfillmentTest:** complete test ([f562834](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f56283480adae8dd346f40735d1ee92ad74283a4))
-* **miscellaneous:** add miscellaneous test ([9fcbd75](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9fcbd7557aee1a12ab2646f43a52842e630e223b))
-* **OrderWalletEntitlementTest:** add server fulfill in-game item success test ([ab78e41](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ab78e41da0a191fe4257e114c7933487b9419118))
+* **fulfillmentTest:** add test for fulfillment api 
+* **fulfillmentTest:** complete test 
+* **miscellaneous:** add miscellaneous test 
+* **OrderWalletEntitlementTest:** add server fulfill in-game item success test 
 
-## [5.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/5.0.0%0D4.1.0) (2021-08-16)
+## [5.0.0] (2021-08-16)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1761,36 +1761,36 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **UGC:** add UGC into Unity SDK ([26d2ab0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/26d2ab0088da06063cc60a5c37e60ecd2cde49f5))
+* **UGC:** add UGC into Unity SDK 
 
 
 ### Bug Fixes
 
-* **Achievement:** Fix the User Achievement response model ([8a2fcdb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8a2fcdb16c9a1fe28bb18abfda295f6b77ac25c3))
-* **LoginSession:** Fix the LoginWithAuthorizationCode() using v1 endpoint ([2192b48](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2192b48c1d6587c3737b02fb7cdacd4c9a693484))
+* **Achievement:** Fix the User Achievement response model 
+* **LoginSession:** Fix the LoginWithAuthorizationCode() using v1 endpoint 
 
-## [4.1.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/4.1.0%0D4.0.0) (2021-08-02)
+## [4.1.0] (2021-08-02)
 
 
 ### Features
 
-* **lobby:** add get & getAll session attribute ws command ([b3aae1f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b3aae1fdef6c25a10afb5f1a5c7c2cedcee3f327))
-* **server lobby:** add get, getAll and set user session attribute ([b8feece](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b8feece56da58c4a33d4d521c11409bc5d054158))
+* **lobby:** add get & getAll session attribute ws command 
+* **server lobby:** add get, getAll and set user session attribute 
 
 
 ### Bug Fixes
 
-* **utf8json:** update utf8json ([728e000](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/728e00012f100caaa63d18d39f3bd744d15ca6ee))
+* **utf8json:** update utf8json 
 
 
 ### Tests
 
-* **jenkins:** add quotes to block secrets and passwords ([9f8c9bc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/9f8c9bc47681d9da3cf804de9ff9bfd993da40a7))
-* **joinable:** increase timeout because of mm delay logic changes ([14958c4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/14958c424c3f620f96d715aba4ceeacf599d50f6))
-* **lobby:** fixed some lobby tests ([8d65e6d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8d65e6daea7a759a9951e7223be9405e5687ecf6))
-* **server lobby:** rename UnityTearDown function to CleanupLobbyConnections ([524fee3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/524fee3b4b33b74cb439d38a66b18fd6fcc79c77))
+* **jenkins:** add quotes to block secrets and passwords 
+* **joinable:** increase timeout because of mm delay logic changes 
+* **lobby:** fixed some lobby tests 
+* **server lobby:** rename UnityTearDown function to CleanupLobbyConnections 
 
-## [4.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/4.0.0%0D3.0.0) (2021-06-23)
+## [4.0.0] (2021-06-23)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1799,9 +1799,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **Remove APIGW:** Remove APIGW support from Unity SDK ([e1a8ccd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e1a8ccd9d35082a806d5d7cb0455060e1d4565cb))
+* **Remove APIGW:** Remove APIGW support from Unity SDK 
 
-## [3.0.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/3.0.0%0D2.32.0) (2021-06-09)
+## [3.0.0] (2021-06-09)
 
 
 ### ⚠ BREAKING CHANGES
@@ -1810,298 +1810,298 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **User:** remove sensitive user information ([1f47176](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1f47176ce5c45470765ee7cb7a8bc34bae3b729d))
+* **User:** remove sensitive user information 
 
 
 ### Tests
 
-* **leaderboard:** rewrite leadearboard test to be more readable ([33547da](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/33547da673437335efff5e3e630f1d5439689865))
+* **leaderboard:** rewrite leadearboard test to be more readable 
 
-## [2.32.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.32.0%0D2.31.0) (2021-05-25)
-
-
-### Features
-
-* **dsm:** add RegisterLocalServer with public ip address & moved GetPublicIp to AccelByteNetUtilites ([539566f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/539566ff2b910f8f2d4ee0b455cbc154013cfee4)), closes [#263](https://accelbyte.atlassian.net/browse/263)
-
-## [2.31.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.31.0%0D2.30.0) (2021-04-28)
+## [2.32.0] (2021-05-25)
 
 
 ### Features
 
-* **lobby:** add custom ports field in DSNotif ([eb5b329](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/eb5b329815326b1da50c55189c62c0be91c0cebd)), closes [#258](https://accelbyte.atlassian.net/browse/258)
+* **dsm:** add RegisterLocalServer with public ip address & moved GetPublicIp to AccelByteNetUtilites , closes [#263]
 
-## [2.30.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.30.0%0D2.29.0) (2021-04-14)
-
-
-### Features
-
-* **server:** remove agones ([2aec3b6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2aec3b6e60a1d43b2bb585a721b35974a94c99a0))
-
-## [2.29.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.29.0%0D2.28.3) (2021-03-17)
+## [2.31.0] (2021-04-28)
 
 
 ### Features
 
-* **config:** make config url optional ([3c716e0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/3c716e062e0cd27a05d178ad7e4e262ede6894ec))
-* **config:** make config url optional ([6e5bc2e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6e5bc2e3e909904b87dc95d3a81dd90e644d66cf))
-* **config:** remove protocol remover ([47eaf86](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/47eaf86eb5f525c9c465d0f692b92e9a66874893))
-* **config:** revert field place ([5caa94a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5caa94a2a5084ea69ca0aeba1919afee51fb11b0))
-* **jsonParser:** add resolver settings to exclude null value ([7cab47a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7cab47acf11b48bf48af23a87798f8b223d2de4b))
-* **jsonParser:** add resolver settings to exclude null value ([33293cb](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/33293cbdd3898ddde64680713a3aefbb6b49da5d))
+* **lobby:** add custom ports field in DSNotif , closes [#258]
+
+## [2.30.0] (2021-04-14)
+
+
+### Features
+
+* **server:** remove agones 
+
+## [2.29.0] (2021-03-17)
+
+
+### Features
+
+* **config:** make config url optional 
+* **config:** make config url optional 
+* **config:** remove protocol remover 
+* **config:** revert field place 
+* **jsonParser:** add resolver settings to exclude null value 
+* **jsonParser:** add resolver settings to exclude null value 
 
 
 ### Bug Fixes
 
-* **config:** fix client lobby url ([7ebaaac](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7ebaaac9b5075f0b12945be23b4620cc54e0bb7d))
-* **config:** fix config JSON ([b8ccf72](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b8ccf7206f331b286fed338db223783ac6a6a7ca))
-* **config:** fix statistic url ([4184744](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4184744aa5dc920da30ffd774c1fe179f9ae356f))
-* **config:** incorrect url ([396e3c4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/396e3c4d1290f6409dd24290bef3fa7d089e9475))
-* **user:** fix UnlinkOtherPlatform got 406 ([b0e451e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b0e451ecd8090289c1602173f9191f9b67f7875c))
-* **user:** fix UnlinkOtherPlatform got 406 ([97bfd42](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/97bfd4261bf44bb3d1d0452cba96b04631479fd8))
+* **config:** fix client lobby url 
+* **config:** fix config JSON 
+* **config:** fix statistic url 
+* **config:** incorrect url 
+* **user:** fix UnlinkOtherPlatform got 406 
+* **user:** fix UnlinkOtherPlatform got 406 
 
-### [2.28.3](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.3%0D2.28.2) (2021-03-03)
-
-
-### Bug Fixes
-
-* **dsm:** refactor parse function ([68a1add](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/68a1addaa19d0c73497f7877d2dc89710dd3c1b4))
-* **dsm:** replace Provider enum with string ([848fdde](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/848fdde60164e5379cf95f6ac4a84a8ba922ee11))
-* **dsm:** replace Provider enum with string ([602a2e7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/602a2e78764b12a966f3c2c42f459ef593694a8c))
-* **dsm:** set variable from parse result ([366a078](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/366a078354917ff36e048bfd44df6e1b814f418a))
-
-### [2.28.2](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.2%0D2.28.1) (2021-02-17)
-
-### [2.28.1](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.1%0D2.28.0) (2021-02-03)
+### [2.28.3] (2021-03-03)
 
 
 ### Bug Fixes
 
-* **lobby:** increase timeout and rename function ([44a21e3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/44a21e3c875366affed3499c46a43830a97e30de))
-* **plugin:** fix error AccelByteSettings.Save() called in game build. ([c08f8a9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c08f8a9591cd506ea957ffe783a83c5229d5d554)), closes [#240](https://accelbyte.atlassian.net/browse/240)
+* **dsm:** refactor parse function 
+* **dsm:** replace Provider enum with string 
+* **dsm:** replace Provider enum with string 
+* **dsm:** set variable from parse result 
 
-## [2.28.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.28.0%0D2.27.0) (2021-01-20)
+### [2.28.2] (2021-02-17)
 
-
-### Features
-
-* **Automation Metric:** SDET-1300 Integrate SDK Test Result to Automation Metrics ([731e761](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/731e7617cdeb34d968f3c0808a240a1bae476c48)), closes [#235](https://accelbyte.atlassian.net/browse/235)
-* **lobby:** add matchmaking with extra attribute parameter ([f8e3c9b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f8e3c9b30267f11df4388663d226c2acc537606e)), closes [#236](https://accelbyte.atlassian.net/browse/236)
-* **server:** add GetPartyDataByUserId in server ([739a76d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/739a76d53525079a06601355d1810b8dbcb102e2)), closes [#238](https://accelbyte.atlassian.net/browse/238)
+### [2.28.1] (2021-02-03)
 
 
 ### Bug Fixes
 
-* **age:** update age to comply new requisite ([f084a73](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f084a7366df578ac6c85603510cb25c3fa8aa025))
-* **config:** check required field on init ([ad9be26](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/ad9be2607c7e80404328e1964ff90e45cae7a829))
+* **lobby:** increase timeout and rename function 
+* **plugin:** fix error AccelByteSettings.Save() called in game build. , closes [#240]
 
-## [2.27.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.27.0%0D2.26.0) (2021-01-06)
+## [2.28.0] (2021-01-20)
 
 
 ### Features
 
-* **lobby:** add client update party storage. ([7e143a2](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7e143a24c84610563a89e8a9a11baf222e2ff119))
-* **lobby:** add client update partyStorage. ([8e1323b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/8e1323b40dd6bb1a8edccbc66675beee21dfb05a))
-* **server:** implement joinable session ([e2577b4](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e2577b47c8e9f2a6e69d2582eef397435d6dfcd8))
-* **server:** implement joinable session ([926ceb8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/926ceb8d4da0e0ab28aec91539eef40b983b302f))
+* **Automation Metric:** SDET-1300 Integrate SDK Test Result to Automation Metrics , closes [#235]
+* **lobby:** add matchmaking with extra attribute parameter , closes [#236]
+* **server:** add GetPartyDataByUserId in server , closes [#238]
 
 
 ### Bug Fixes
 
-* **config:** assign default value when ClientSecret is null ([a63843f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a63843fed55b7d472a2fe3e65a482c47551d2b47))
-* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field ([31a47b1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/31a47b10b437acadad61f968d73dd32ff3ef814b))
-* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field ([bc440a1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bc440a16f58a979d41b83505102812bd53d7aff0))
+* **age:** update age to comply new requisite 
+* **config:** check required field on init 
 
-## [2.26.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.26.0%0D2.25.0) (2020-12-23)
-
-
-### Features
-
-* **lobby:** add matchmaking with temporary party ([71e23f7](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/71e23f7aa54de1a5f0a0337d5bef58085bc4486a))
-* **lobby:** add matchmaking with temporary party ([28e804d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/28e804d61cb3cb5ec1311009d9ec08e2e4f78fee))
-* **log:** make toggle config to enable/disable debug log in editor ([954a715](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/954a715dbd0ae882043ebe49c0269e770eac58ae))
-* **userLogin:** add EpicGames enum ([852aa9c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/852aa9c76faf00c3db2be5c4f3377c9913c2018c))
-
-## [2.25.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.25.0%0D2.24.0) (2020-12-10)
+## [2.27.0] (2021-01-06)
 
 
 ### Features
 
-* **lobby:** bulk presence count ([04320e8](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/04320e8f3de3eb7f022b3dfbac5fedc2cb60a662))
-* **lobby:** support parse lobby message object value ([b974900](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b9749005649db5784c42de57772e6f2a3fd147a9))
+* **lobby:** add client update party storage. 
+* **lobby:** add client update partyStorage. 
+* **server:** implement joinable session 
+* **server:** implement joinable session 
 
 
 ### Bug Fixes
 
-* login with launcher, calls error callback when the game is not launched from launcher instead of throw assertion ([cdc8c31](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/cdc8c31f0481cdb87acacacd53603879e044f5cc))
+* **config:** assign default value when ClientSecret is null 
+* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field 
+* **dsm:** register server shouldn't query QoS but take region from launch params and add provider field 
 
-## [2.24.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.24.0%0D2.23.0) (2020-11-25)
+## [2.26.0] (2020-12-23)
 
 
 ### Features
 
-* **cloudsave:** replace record concurrently ([c5b788c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c5b788cb77572dd5b8456776b443512c067340a9))
-* **group:** bringback group api from VE ([1084f09](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1084f09a709afedbac303e0fe21abea113681ded))
-* **profanityFilter:** add new WS command setSessionAttribute in lobby, add profanity filter test ([7fbdbf9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7fbdbf9a4e39ca67157d372292eea0144bf36102))
+* **lobby:** add matchmaking with temporary party 
+* **lobby:** add matchmaking with temporary party 
+* **log:** make toggle config to enable/disable debug log in editor 
+* **userLogin:** add EpicGames enum 
+
+## [2.25.0] (2020-12-10)
+
+
+### Features
+
+* **lobby:** bulk presence count 
+* **lobby:** support parse lobby message object value 
+
+
+### Bug Fixes
+
+* login with launcher, calls error callback when the game is not launched from launcher instead of throw assertion 
+
+## [2.24.0] (2020-11-25)
+
+
+### Features
+
+* **cloudsave:** replace record concurrently 
+* **group:** bringback group api from VE 
+* **profanityFilter:** add new WS command setSessionAttribute in lobby, add profanity filter test 
 
 
 ### Refactors
 
-* **agreement:** add bulk accept legal to support ismandatory in apigateway ([c453047](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c4530477cc33a70eb2e482e5d07c4d7e43fba3b8))
-* **userId:** get user id by calling refresh data ([e9071af](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e9071af26be6b60d8cbe2f8ce686bd1659ed3b62))
+* **agreement:** add bulk accept legal to support ismandatory in apigateway 
+* **userId:** get user id by calling refresh data 
 
-## [2.23.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.23.0%0D2.22.0) (2020-11-11)
-
-
-### Features
-
-* **Lobby:** bulk user presence ([57a6b2a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/57a6b2a558b5d1363ea31ecee41a40e4aaf67b87))
-* **user:** stadia login and account link ([800a558](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/800a558c1a10c9af30a122879bdef6f2fff5ec49))
-
-## [2.22.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.22.0%0D2.21.0) (2020-10-28)
+## [2.23.0] (2020-11-11)
 
 
 ### Features
 
-* **leaderboard:** get leaderboard list ([384495f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/384495f666fa22dde2be1e8f8367b9cec42a6714))
+* **Lobby:** bulk user presence 
+* **user:** stadia login and account link 
+
+## [2.22.0] (2020-10-28)
+
+
+### Features
+
+* **leaderboard:** get leaderboard list 
 
 
 ### Bug Fixes
 
-* **dsm:** temporary disabling dsm-related test ([99485e6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/99485e668558e876e6e11e65fee6bc1558048faa))
+* **dsm:** temporary disabling dsm-related test 
 
 
 ### Tests
 
-* **Daily Test:** SDET-1166 Run SDK Automation Test Daily and Send report to slack channel ([acb8033](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/acb80338e38dd0961af50f5d6240a8835d83d1ec))
+* **Daily Test:** SDET-1166 Run SDK Automation Test Daily and Send report to slack channel 
 
-## [2.21.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.21.0%0D2.20.0) (2020-10-14)
-
-
-### Features
-
-* **lobby:** block and unblock player functions ([1be94dc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/1be94dc8d1b4e278f64d38a1fb4c8a6ac5cfd3cb))
-* **lobby:** reject party invitation ([c4c9bae](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c4c9bae3ec9eb09f9283ad6b60aaec9b2df0f313))
-
-## [2.20.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.20.0%0D2.19.0) (2020-10-01)
+## [2.21.0] (2020-10-14)
 
 
 ### Features
 
-* add cloudsave API to Server SDK ([739b2c9](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/739b2c97d6d2e88c82a4d9588a2d94b935a599e4))
-* **leaderboard:** add additionalKey and additionalData for character leaderboard ([7a25033](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7a25033b70dc74c8560c82682a488739c01e4ac2))
-* **lobby:** party update notif & its REST APIs ([defdd4b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/defdd4b81b983e39386c613ab1ddd330a5bde3cc))
-* **serverLobby:** change WritePartyStorage signature to prevent overwrite ([fae5501](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fae550184a89ff28bbde5b65a869c8be362063be))
+* **lobby:** block and unblock player functions 
+* **lobby:** reject party invitation 
+
+## [2.20.0] (2020-10-01)
+
+
+### Features
+
+* add cloudsave API to Server SDK 
+* **leaderboard:** add additionalKey and additionalData for character leaderboard 
+* **lobby:** party update notif & its REST APIs 
+* **serverLobby:** change WritePartyStorage signature to prevent overwrite 
 
 
 ### Bug Fixes
 
-* **plugin:** hotifx add CheckPlugin() on GetConfig() and set the order of bool setter in the CheckPlugin ([f496158](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/f49615833140a45f324280015f1e2c1bc818663e))
-* **plugin:** plugin failure on Unity Editor disable domain/scene reload ([d18bb42](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/d18bb426b4e334728ebb83ae3b03e7c1cd195d3f))
+* **plugin:** hotifx add CheckPlugin() on GetConfig() and set the order of bool setter in the CheckPlugin 
+* **plugin:** plugin failure on Unity Editor disable domain/scene reload 
 
 
 ### Tests
 
-* **sub:** fixed sub test by changing user ([59eb188](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/59eb18818c74c85db59da9f292e2c2fe431d47d0))
+* **sub:** fixed sub test by changing user 
 
 
 ### Refactors
 
-* **search:** add filter param in search users ([72bd941](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/72bd941945f8a40f73739bee37ef2d24caf9073f))
+* **search:** add filter param in search users 
 
-## [2.19.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.19.0%0D2.18.0) (2020-09-16)
+## [2.19.0] (2020-09-16)
 
 
 ### Features
 
-* **lobby:** add global chat implementation ([e9fe2fc](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e9fe2fc331fcb57ecf5a8946335ab9041f16df96))
-* **statistic:** add additionalKey and additionalData to update statItem endpoint ([0e86053](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0e860539fb41c165b2b95d95974bf2eadcde25c7))
-* **statistic:** add reset and update statistic ([c09c301](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c09c30132205d14c32cffeb7873dfa88284f8942))
-* **subscription:** check subscription in SKD changed flow to not check sub endpoints. ([bb84530](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bb845304b40af4be7bcf67b74d108639be7dc5bf))
-* **Subscription:** update using the new flow & API endpoint ([95af021](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/95af02132b8122b4ef65957b2e3e05bb6b84ce12))
-* **subscriptionTest:** integration test ([b3475b0](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b3475b0c75feca18ff4495427ea8f1d5bc7ef344))
-* **user:** register and upgrade with username param ([38d3ddd](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/38d3ddde989545e8bc1f71adb19e4009bc0b7ea7))
+* **lobby:** add global chat implementation 
+* **statistic:** add additionalKey and additionalData to update statItem endpoint 
+* **statistic:** add reset and update statistic 
+* **subscription:** check subscription in SKD changed flow to not check sub endpoints. 
+* **Subscription:** update using the new flow & API endpoint 
+* **subscriptionTest:** integration test 
+* **user:** register and upgrade with username param 
 
 
 ### Bug Fixes
 
-* **subscription:** added flag when final result is found before the end to make it more consistent ([5b7bb0d](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5b7bb0d7f3ad84e081b1b7457250d8a57b0f0ab2))
-* **subscription:** changed API endpoint so it can check publisher namespace using game namespace token ([2c97d5c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2c97d5ce5f75a610e3209002af7d995904eb23f8))
-* **Subscription:** added Publisher Namespace and Changed label "Store App ID" to "App Id" in accelbytePlatrofmSettingEditor ([6f83873](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/6f838734a6091052da05b2121463a8f9792fa0ac))
-* **Subscription:** added publisher namespace in AccelbyteSettings ([b29392f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/b29392f76fb11823aab9b46e4d83b0d0060124b4))
-* **Subscription:** changed accessing config from AccelbyteSettings to AccelbytePlugin.Config ([0a60df3](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/0a60df3c0230cf313637f856d00abd984ee5cd7a))
-* **Subscription:** changed sub test name to SubscriptionTest ([fb69c30](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fb69c30b07af2f0b4aa732e778f57196f8a47bf7))
-* **Subscription:** some endpoints need to be accessed with publisher namespace (get entitlements by appId, sku and getItems by appid) ([7677110](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/7677110e43deaf4e37216de3e1825f02ccb28217))
+* **subscription:** added flag when final result is found before the end to make it more consistent 
+* **subscription:** changed API endpoint so it can check publisher namespace using game namespace token 
+* **Subscription:** added Publisher Namespace and Changed label "Store App ID" to "App Id" in accelbytePlatrofmSettingEditor 
+* **Subscription:** added publisher namespace in AccelbyteSettings 
+* **Subscription:** changed accessing config from AccelbyteSettings to AccelbytePlugin.Config 
+* **Subscription:** changed sub test name to SubscriptionTest 
+* **Subscription:** some endpoints need to be accessed with publisher namespace (get entitlements by appId, sku and getItems by appid) 
 
 
 ### Code Style Fixes
 
-* **Subscription:** added newline before callback parameter to keep style inline with other functions. ([4c697da](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4c697da9312a9ea50b19bea8c90ea59921523948))
+* **Subscription:** added newline before callback parameter to keep style inline with other functions. 
 
 
 ### Tests
 
-* **subcription:** changed appId to static to comply to Jenkins Test ([375153f](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/375153fadd6d2a950259d2177bf21dedca07eefb))
+* **subcription:** changed appId to static to comply to Jenkins Test 
 
-## [2.18.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.18.0%0D2.17.0) (2020-09-02)
-
-
-### Features
-
-* **Lobby:** add partyAttributes for matchmaking ([68a1603](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/68a16039a78ba947fe07f9dc70e51e51a9a09efd))
-* **User:** add ForcedLinkOtherPlatform function ([08ebe3a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/08ebe3a8f1c9af9c8219c8a56bc30e7c6910fac2))
-* **User:** fix refreshed token not distributed correctly to other services ([009e1b6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/009e1b6a341725eb1a1232c11c78ee0a53721595))
-
-## [2.17.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.17.0%0D2.16.0) (2020-08-19)
+## [2.18.0] (2020-09-02)
 
 
 ### Features
 
-* **Achievement:** bring this API back from customer Versus Evil Unity SDK repository. ([fcd5ed6](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fcd5ed6371c0bd80452e3b58d6178e23c8ad2403))
+* **Lobby:** add partyAttributes for matchmaking 
+* **User:** add ForcedLinkOtherPlatform function 
+* **User:** fix refreshed token not distributed correctly to other services 
+
+## [2.17.0] (2020-08-19)
+
+
+### Features
+
+* **Achievement:** bring this API back from customer Versus Evil Unity SDK repository. 
 
 
 ### Bug Fixes
 
-* **test:** additional incremental Achievement test ([2809e5a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/2809e5a624c6e814b662d194e4c3c0182bfc3138))
+* **test:** additional incremental Achievement test 
 
-## [2.16.0](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.16.0%0D2.15.3) (2020-08-05)
+## [2.16.0] (2020-08-05)
 
 
 ### Features
 
-* **editor:** AccelBytePlugin static class need to be forcefully initialize on Unity Editor entering the play mode ([afa43bf](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/afa43bfa70b8376511b36c34b6d2973a1db3cfa1))
-* **gameTelemetry:** APIs are added for both client & server ([fc03e03](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/fc03e036cd79f51a270aec7c52bf1581ca253151))
+* **editor:** AccelBytePlugin static class need to be forcefully initialize on Unity Editor entering the play mode 
+* **gameTelemetry:** APIs are added for both client & server 
 
 
 ### Bug Fixes
 
-* **cloudstorage:** Fix UpdateSlotMetadata function ([bdf465a](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/bdf465ac5b0dc714b0875648113f1c0799ed9b1a))
-* **dsm:** only select healthy DSM url ([5cf6118](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/5cf6118b12cedee60510f95aa5a42b069e74f16e))
-* **statistic:** Fix statistic error codes. ([035ff92](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/035ff92b60f44ad8df74934bf7110b17bd264aab))
+* **cloudstorage:** Fix UpdateSlotMetadata function 
+* **dsm:** only select healthy DSM url 
+* **statistic:** Fix statistic error codes. 
 
 
 ### CI
 
-* **jenkins:** archive test log file ([e42fbb1](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/e42fbb117495c2faa5fcf6fa99f27746afbb7302))
-* **jenkins:** temporary social service env flag ([a746962](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/a746962bfc07c6a2088b6c4020cb6addcf57b7a5))
+* **jenkins:** archive test log file 
+* **jenkins:** temporary social service env flag 
 
 
 ### Tests
 
-* add leaderboard log result ([abbb461](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/abbb4614cb8d0c1d3b46d29a9a6d59185873f809))
-* log the test name at beginning test run ([160246b](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/160246b3ad4fc811d8acd8f5657cdeb3ebe56adf))
+* add leaderboard log result 
+* log the test name at beginning test run 
 
 
 ### Refactors
 
-* **Agremeent:** add missing function from bring back ([c7c5d7e](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/c7c5d7eb8fa4fd34132f1daa024fe71f44427154))
+* **Agremeent:** add missing function from bring back 
 
-### [2.15.3](https://bitbucket.org/accelbyte/justice-unity-sdk/branches/compare/2.15.3%0D2.15.2) (2020-07-08)
+### [2.15.3] (2020-07-08)
 
 
 ### Bug Fixes
 
-* **serverDSM:** agones heartbeat delegate return should not be null ([4026c5c](https://bitbucket.org/accelbyte/justice-unity-sdk/commits/4026c5c1718440f677f651c89ba2c300483ea76f))
+* **serverDSM:** agones heartbeat delegate return should not be null 
 
 ## 2.15.2 (2020-07-01)
 ### Changed
