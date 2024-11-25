@@ -32,8 +32,10 @@ namespace AccelByte.Core
 
         public string FlightId
         {
-            internal set;
-            get;
+            get
+            {
+                return AccelByteSDKMain.FlightId;
+            }
         }
 
         public string Version
@@ -48,9 +50,6 @@ namespace AccelByte.Core
         {
             Environment = new AccelByteEnvironment();
             Environment.OnEnvironmentChanged += ChangeInterfaceEnvironment;
-            
-            string newId = System.Guid.NewGuid().ToString();
-            FlightId = newId.Replace("-", string.Empty);
         }
 
         public AccelByteClientRegistry GetClientRegistry()

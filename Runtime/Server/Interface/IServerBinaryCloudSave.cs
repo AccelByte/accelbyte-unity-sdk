@@ -106,5 +106,13 @@ namespace AccelByte.Server.Interface
             , ICollection<string> tags
             , TTLConfig ttlConfig
             , ResultCallback<GameBinaryRecord> callback);
+
+        /// <summary>
+        /// Delete the TTLConfig for a specific game binary record by its key.
+        /// </summary>
+        /// <param name="key">Key of the binary record</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void DeleteGameBinaryRecordTTLConfig(string key,
+            ResultCallback callback);
     }
 }

@@ -794,12 +794,7 @@ namespace AccelByte.Api
                         return;
                     }
 
-                    if (result.Value.ticketIds == null)
-                    {
-                        return;
-                    }
-
-                    if (!isMatchFoundNotifSent)
+                    if (!isMatchFoundNotifSent && result.Value.ticketIds != null)
                     {
                         var tickets = new MatchmakingV2Ticket[result.Value.ticketIds.Length];
                         for (int i = 0; i < result.Value.ticketIds.Length; i++)

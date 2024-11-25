@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace AccelByte.Utils
 {
@@ -48,6 +49,13 @@ namespace AccelByte.Utils
             var field = value.GetType().GetField(value.ToString());
             var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
             return attribute == null ? value.ToString() : attribute.Description;
+        }
+
+        internal static string EnumToEnumMemberValue(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = (EnumMemberAttribute)Attribute.GetCustomAttribute(field, typeof(EnumMemberAttribute));
+            return attribute == null ? value.ToString() : attribute.Value;
         }
     }
 }

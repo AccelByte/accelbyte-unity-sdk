@@ -30,7 +30,7 @@ namespace AccelByte.Server
             , TTLConfig ttlConfig
             , ResultCallback<BinaryInfo> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , Namespace_
@@ -76,10 +76,36 @@ namespace AccelByte.Server
             });
         }
 
+        public void DeleteGameBinaryRecordTTLConfig(string key, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/binaries/{key}/ttl")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
         public void DeleteGameBinaryRecord(string key
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , Namespace_
@@ -110,7 +136,7 @@ namespace AccelByte.Server
         public void GetGameBinaryRecord(string key
             , ResultCallback<GameBinaryRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , Namespace_
@@ -149,7 +175,7 @@ namespace AccelByte.Server
             , int limit
             , ResultCallback<PaginatedGameBinaryRecords> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
                 , AuthToken);
@@ -197,7 +223,7 @@ namespace AccelByte.Server
             , FileType fileType
             , ResultCallback<BinaryInfo> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , Namespace_
@@ -243,7 +269,7 @@ namespace AccelByte.Server
             , string fileLocation
             , ResultCallback<GameBinaryRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , fileLocation
@@ -291,7 +317,7 @@ namespace AccelByte.Server
             , TTLConfig ttlConfig
             , ResultCallback<GameBinaryRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(key
                 , Namespace_

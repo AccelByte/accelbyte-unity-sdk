@@ -10,7 +10,7 @@ namespace AccelByte.Core
 {
     internal class WebRequestTask
     {
-        private readonly int timeoutMs;
+        public readonly int TimeoutMs;
         public IHttpRequest HttpRequest
         {
             get;
@@ -49,7 +49,7 @@ namespace AccelByte.Core
         {
             HttpRequest = httpRequest;
             DelayMs = delayMs;
-            this.timeoutMs = timeoutMs;
+            this.TimeoutMs = timeoutMs;
             CreatedTimeStamp = DateTime.UtcNow;
             SetState(WebRequestState.Waiting);
         }
@@ -68,7 +68,6 @@ namespace AccelByte.Core
         public UnityWebRequest CreateWebRequest()
         {
             UnityWebRequest unityWebRequest = HttpRequest.GetUnityWebRequest();
-            unityWebRequest.timeout = timeoutMs / 1000;
             return unityWebRequest;
         }
     }

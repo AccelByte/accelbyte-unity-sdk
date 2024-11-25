@@ -276,6 +276,22 @@ namespace AccelByte.Models
         [DataMember] public string username;
         [DataMember] public string avatarUrl;
     }
+    
+    [Preserve]
+    public class LoginPlatformType
+    {
+        internal readonly string PlatformId;
+
+        public LoginPlatformType(PlatformType typeEnum)
+        {
+            PlatformId = typeEnum.ToString().ToLower();
+        }
+        
+        public LoginPlatformType(string platformId)
+        {
+            PlatformId = platformId;
+        }
+    }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PlatformType
@@ -302,7 +318,7 @@ namespace AccelByte.Models
         Snapchat,
         PS4Web,
         GooglePlayGames,
-    } 
+    }
 
     [DataContract, Preserve]
     public class PlatformLink
@@ -329,17 +345,52 @@ namespace AccelByte.Models
     public class BulkPlatformUserIdRequest
     {
         [DataMember] public string[] platformUserIDs;
+        [DataMember(Name = "pidType"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)] public string PidType = null;
     }
 
     public class BulkPlatformUserIdParameter
     {
         public string PlatformId;
+        public bool? RawPuid;
     }
 
     [DataContract, Preserve]
     public class PlatformUserIdMap
     {
         [DataMember] public string userId;
+    }
+
+    [DataContract, Preserve]
+    public class BulkGetUserByOtherPlatformUserIdsOptionalParameters
+    {
+        /// <summary>
+        /// When enabled, return un-encrypted platform user id.
+        /// </summary>
+        public bool? RawPuid = null;
+        /// <summary>
+        /// The type of the platform user ids.
+        /// </summary>
+        public PidType PidType = null;
+    }
+
+    public class PidType
+    {
+        private string pid;
+        
+        public PidType(BulkGetUserPlatformUserIdType typeEnum)
+        {
+            pid = Utils.ConverterUtils.EnumToDescription(typeEnum);
+        }
+
+        public string ConvertToString()
+        {
+            return pid;
+        }
+    }
+    
+    public enum BulkGetUserPlatformUserIdType
+    {
+        [Description("OCULUS_APP_USER_ID")] OculusAppUserId
     }
 
     [DataContract, Preserve]
@@ -983,15 +1034,15 @@ namespace AccelByte.Models
 #endif
         }
     }
-    
-#endregion
-    
-    #region V4
 
+    #endregion
+
+    #region V4
     [DataContract, Preserve]
     public class LoginQueueTicket
     {
         [DataMember(Name = "estimatedWaitingTimeInSeconds")] public int EstimatedWaitingTimeInSeconds;
+        [DataMember(Name = "playerPollingTimeInSeconds")] public int PlayerPollingTimeInSeconds;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "position")] public int Position;
         [DataMember(Name = "reconnectExpiredAt")] public int ReconnectExpiredAt;
@@ -1019,5 +1070,92 @@ namespace AccelByte.Models
         [DataMember(Name = "href")] public string Href;
     };
 
+    [Preserve]
+    public class LoginV4OptionalParameters
+    {
+        /// <summary>
+        /// Cancelation token that can be used to cancel the queue process
+        /// </summary>
+        public System.Threading.CancellationToken? CancellationToken;
+
+        /// <summary>
+        /// Set the the login queue timeout
+        /// </summary>
+        public LoginV4Timeout LoginTimeout = new LoginV4Timeout(120 * 1000);
+
+        /// <summary>
+        /// Returns the queue refreshed token update periodically
+        /// </summary>
+        public Action<LoginQueueTicket> OnQueueUpdatedEvent;
+
+        /// <summary>
+        /// Return when cancellation queue ticket is triggered
+        /// </summary>
+        public Action OnCancelledEvent;
+    }
+
+    public class LoginV4Timeout
+    {
+        private const uint minTime = 30000; 
+        public readonly uint TimeoutMs;
+
+        public LoginV4Timeout(uint timeoutMs)
+        {
+            var selectedTimeoutTime = System.Math.Max(timeoutMs, minTime);
+            TimeoutMs = selectedTimeoutTime;
+        }
+    }
+
+    [Preserve]
+    public class LoginWithEmailV4OptionalParameters : LoginV4OptionalParameters
+    {
+        /// <summary>
+        /// Set it to true to extend the refresh token expiration time
+        /// </summary>
+        public bool RememberMe = false;
+    }
+
+    [Preserve]
+    public class LoginWithDeviceIdV4OptionalParameters : LoginV4OptionalParameters { }
+
+    [Preserve]
+    public class LoginWithOtherPlatformV4OptionalParameters : LoginV4OptionalParameters
+    {
+        /// <summary>
+        /// If directly create new account when not linked yet
+        /// </summary>
+        public bool CreateHeadless = true;
+
+        /// <summary>
+        /// (Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5
+        /// </summary>
+        public string ServiceLabel = null;
+
+        /// <summary>
+        /// Include mac Address information for PSN and Xbox ban reporting
+        /// </summary>
+        public LoginWithMacAddress LoginWithMacAddress = null;
+    }
+
+    [Preserve]
+    public class LoginWithRefreshTokenV4OptionalParameters : LoginV4OptionalParameters { }
+
+    [Preserve]
+    public class CreateHeadlessAccountAndResponseTokenV4OptionalParameters : LoginV4OptionalParameters { }
+
+    [Preserve]
+    public class AuthenticationWithPlatformLinkAndLoginV4OptionalParameters : LoginV4OptionalParameters { }
+
+    [Preserve]
+    public class GenerateGameTokenV4OptionalParameters : LoginV4OptionalParameters { }
+
+    [Preserve]
+    public class Verify2FACodeV4OptionalParameters : LoginV4OptionalParameters
+    {
+        /// <summary>
+        /// Record device token when true
+        /// </summary>
+        public bool RememberDevice = false;
+    }
     #endregion
 };

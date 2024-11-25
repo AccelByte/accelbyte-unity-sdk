@@ -272,6 +272,7 @@ namespace AccelByte.Models
         [DataMember(Name = "challengeCode")] public string ChallengeCode;
         [DataMember(Name = "createdAt")] public string CreatedAt;
         [DataMember(Name = "goalCode")] public string GoalCode;
+        [DataMember(Name = "goalProgressionId")] public string GoalProgressionId;
         [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "itemId")] public string ItemId;
         [DataMember(Name = "itemName")] public string ItemName;

@@ -470,7 +470,7 @@ namespace AccelByte.Server
 
             if (challengeRewardStatus != ChallengeRewardStatus.None)
             {
-                requestBuilder.WithQueryParam("status", challengeRewardStatus.ToString());
+                requestBuilder.WithQueryParam("status", ConverterUtils.EnumToDescription(challengeRewardStatus));
             }
             requestBuilder.WithQueryParam("sortBy", ConverterUtils.EnumToDescription(challengeSortBy));
             if (offset >= 0)

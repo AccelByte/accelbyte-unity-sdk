@@ -890,27 +890,32 @@ namespace AccelByte.Models
         [DataMember] public string value;
     }
 
+    [DataContract, Preserve]
     public class GetSessionAttributeRequest
     {
         [DataMember] public string key;
     }
 
+    [DataContract, Preserve]
     public class GetSessionAttributeResponse
     {
         [DataMember] public string value;
     }
 
+    [DataContract, Preserve]
     public class ServerGetSessionAttributeResponse
     {
         [DataMember] public string key;
         [DataMember] public string value;
     }
 
+    [DataContract, Preserve]
     public class GetSessionAttributeAllResponse
     {
         [DataMember] public Dictionary<string, string> attributes;
     }
 
+    [DataContract, Preserve]
     public class ServerSetSessionAttributeRequest
     {
         [DataMember] public Dictionary<string, string> attributes;

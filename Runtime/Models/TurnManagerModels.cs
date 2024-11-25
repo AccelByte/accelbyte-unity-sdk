@@ -191,7 +191,7 @@ namespace AccelByte.Models
             
             string url = ip;
 #if UNITY_WEBGL && !UNITY_EDITOR
-            url = LatencyCalculatorFactory.GetAwsPingEndpoint(region);
+            url = AccelByte.Utils.Networking.GetTestServerUrlByRegion(region);
 #endif
             retval = calculator.CalculateLatency(url, qos_port);
             retval.OnSuccess(newLatency =>

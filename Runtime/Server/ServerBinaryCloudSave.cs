@@ -35,7 +35,7 @@ namespace AccelByte.Server
             , TTLConfig ttlConfig
             , ResultCallback<BinaryInfo> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -53,7 +53,7 @@ namespace AccelByte.Server
         public void DeleteGameBinaryRecord(string key
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -64,14 +64,27 @@ namespace AccelByte.Server
             api.DeleteGameBinaryRecord(key, callback);
         }
 
-        public void GetGameBinaryRecord(string key
-            , ResultCallback<GameBinaryRecord> callback)
+        public void DeleteGameBinaryRecordTTLConfig(string key, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.DeleteGameBinaryRecordTTLConfig(key, callback);
+        }
+
+        public void GetGameBinaryRecord(string key
+            , ResultCallback<GameBinaryRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -84,7 +97,7 @@ namespace AccelByte.Server
             , int limit
             , ResultCallback<PaginatedGameBinaryRecords> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -99,7 +112,7 @@ namespace AccelByte.Server
             , FileType fileType
             , ResultCallback<BinaryInfo> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -115,7 +128,7 @@ namespace AccelByte.Server
             , string fileLocation
             , ResultCallback<GameBinaryRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -132,7 +145,7 @@ namespace AccelByte.Server
             , TTLConfig config
             , ResultCallback<GameBinaryRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {

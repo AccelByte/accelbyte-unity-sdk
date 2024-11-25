@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -9,7 +9,7 @@ namespace AccelByte.Server
 {
     public class ServerAchievement : WrapperBase
     {
-        private readonly ServerAchievementApi api;
+        internal readonly ServerAchievementApi Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
@@ -21,7 +21,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct server achievement; api is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct server achievement; coroutineRunner is null!");
 
-            api = inApi;
+            Api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
@@ -71,7 +71,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.UnlockAchievement(userId, session.AuthorizationToken, achievementCode, callback));
+                Api.UnlockAchievement(userId, session.AuthorizationToken, achievementCode, callback));
         }
     }
 }

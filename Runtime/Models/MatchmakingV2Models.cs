@@ -61,6 +61,9 @@ namespace AccelByte.Models
     {
         [DataMember] public string sessionId;
         [DataMember] public bool matchFound;
+        [DataMember(Name = "isActive")] public bool IsActive;
+        [DataMember(Name = "matchPool")] public string MatchPool;
+        [DataMember(Name = "proposedProposal")] public MatchmakingV2ProposedProposal ProposedProposal;
     }
 
     [DataContract, Preserve]
@@ -106,6 +109,8 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ServerMatchmakingV2BackfillRequest
     {
+        [DataMember(Name = "acceptedTicketIds"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string[] AcceptedTicketIds;
         [DataMember] public string proposalId;
         [DataMember(Name = "stop")] public bool isStoppingBackfill;
     }
@@ -118,18 +123,29 @@ namespace AccelByte.Models
         [DataMember] public string matchPool;
         [DataMember] public string matchSessionId;
         [DataMember] public SessionV2TeamData[] proposedTeams;
-        [DataMember] public MatchmakingV2Ticket[] addedTickets;
+        [DataMember(Name = "addedTickets")] public ServerMatchmakingV2Ticket[] BackfillProposalTickets;
+
+        [Obsolete("This field is deprecated, and please use BackfillProposalTickets for more detailed ticket information. This field will be removed on AGS 3.82")]
+        public MatchmakingV2Ticket[] addedTickets
+        {
+            get
+            {
+                return BackfillProposalTickets;
+            }
+        }
     }
-    
+
     [DataContract, Preserve]
-    public class ServerMatchmakingV2Ticket
+    public class ServerMatchmakingV2Ticket : MatchmakingV2Ticket
     {
-        [DataMember] public string ticketId;
         [DataMember] public string matchPool;
         [DataMember] public DateTime createdAt;
         [DataMember] public ServerMatchmakingV2Players[] players;
         [DataMember] public ServerMatchmakingV2TicketAttributes ticketAttributes;
         [DataMember] public Dictionary<string, int> latencies;
+        [DataMember(Name = "Namespace")] public string Namespace;
+        [DataMember(Name = "PartySessionID")] public string PartySessionId;
+        [DataMember(Name = "CreatedAt")] public DateTime CreatedAt;
     }
     
     [DataContract, Preserve]
@@ -142,6 +158,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ServerMatchmakingV2Players
     {
+        [DataMember(Name = "partyId")] public string PartyId;
         [DataMember] public string playerId;
         [DataMember] public Dictionary<string, object> attributes;
     }

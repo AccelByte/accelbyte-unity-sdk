@@ -29,6 +29,49 @@ namespace AccelByte.Server
         }
 
         /// <summary>
+        /// Accept entire backfill proposal
+        /// </summary>
+        /// <param name="backfillProposal">Backfill proposal received from notification</param>
+        /// <param name="callback">
+        /// Returns a Result via callback when completed.
+        /// </param>
+        public void AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal
+            , ResultCallback<AcceptBackfillProposalResponse> callback)
+        {
+            AcceptBackfillProposal(backfillProposal, null, callback);
+        }
+
+        /// <summary>
+        /// Accept backfill proposal
+        /// </summary>
+        /// <param name="backfillProposal">Backfill proposal received from notification</param>
+        /// <param name="optionalParam">Accept backfill proposal optional params.
+        /// To accept partial backfill proposal, fill the ticket ids on the AcceptedTicketIds. 
+        /// <param name="callback">
+        /// Returns a Result via callback when completed.
+        /// </param>
+        public void AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal
+            , AcceptBackfillProposalOptionalParams optionalParam
+            , ResultCallback<AcceptBackfillProposalResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!_session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.AcceptBackfillProposal(backfillProposal
+                , optionalParam
+                , result =>
+                {
+                    SendPredefinedEvent(backfillProposal, RequestType.Accept);
+                    callback?.Try(result);
+                });
+        }
+
+        /// <summary>
         /// Accept backfill proposal
         /// </summary>
         /// <param name="backfillProposal">Backfill proposal received from notification</param>
@@ -36,24 +79,26 @@ namespace AccelByte.Server
         /// <param name="callback">
         /// Returns a Result via callback when completed.
         /// </param>
+        [Obsolete("This interface is deprecated, and will be removed on AGS 3.82. Please use AcceptBackfillProposal(backfillProposal, acceptedTicketIds, stopBackfilling, callback)")]
         public void AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal,
             bool stopBackfilling,
             ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
-
-            if (!_session.IsValid())
+            var optionalParams = new AcceptBackfillProposalOptionalParams()
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
+                StopBackfilling = stopBackfilling
+            };
 
-            _coroutineRunner.Run(
-                Api.AcceptBackfillProposal(backfillProposal, stopBackfilling, cb =>
+            AcceptBackfillProposal(backfillProposal, optionalParams, result =>
+            {
+                if (result.IsError)
                 {
-                    SendPredefinedEvent(backfillProposal, RequestType.Accept);
-                    HandleCallback(cb, callback);
-                }));
+                    callback?.TryError(result.Error);
+                    return;
+                }
+
+                callback?.TryOk();
+            });
         }
 
         /// <summary>
@@ -94,6 +139,11 @@ namespace AccelByte.Server
 
         private IAccelByteTelemetryPayload CreatePayload(MatchmakingV2BackfillProposalNotification backfillNotif, RequestType requestType)
         {
+            if (backfillNotif == null)
+            {
+                return null;
+            }
+
             if (string.IsNullOrEmpty(podName))
             {
                 podName = AccelByteSDK.GetServerRegistry().GetApi().GetDedicatedServerManager().ServerName;

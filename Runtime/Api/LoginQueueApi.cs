@@ -5,8 +5,6 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace AccelByte.Api
 {

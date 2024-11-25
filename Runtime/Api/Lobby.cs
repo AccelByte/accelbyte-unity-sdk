@@ -1969,7 +1969,7 @@ namespace AccelByte.Api
 
         private void HandleOnMessage(string message, bool isSkipConditioner = false)
         {
-            Report.GetWebSocketResponse(message);
+            Report.GetWebSocketResponse(message, SharedMemory?.Logger);
 
             long messageId;
             MessageType messageType;

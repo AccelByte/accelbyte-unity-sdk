@@ -69,7 +69,54 @@ namespace AccelByte.Models
         [DataMember] public DateTime created_at;
         [DataMember] public DateTime updated_at;
         [DataMember] public string set_by;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "ttl_config")] public TTLConfig TTLConfig;
+    }
 
+    [DataContract, Preserve]
+    public class SaveRecordMetaDataBase
+    {
+        [DataMember(Name = "ttl_config")] public TTLConfig TTLConfig;
+        [DataMember(Name = "tags")] public string[] Tags;
+    }
+
+    [DataContract, Preserve]
+    public class SaveAdminRecordMetaData : SaveRecordMetaDataBase
+    {
+    }
+
+    [DataContract, Preserve]
+    public class SaveGameRecordMetaData : SaveRecordMetaDataBase
+    {
+        [DataMember(Name = "set_by")] public RecordSetBy SetBy;
+    }
+
+    [Preserve]
+    public class MetadataOptionalParamsBase
+    {
+        /// <summary>
+        /// Indicates the TTL configuration for the game record.
+        /// </summary>
+        public TTLConfig TTLConfig = null;
+
+        /// <summary>
+        /// Indicates the tagging for the game record.
+        /// </summary>
+        public string[] Tags = null;
+    }
+
+    [Preserve]
+    public class AdminRecordMetadataOptionalParams : MetadataOptionalParamsBase
+    {
+    }
+
+    [Preserve]
+    public class GameRecordMetadataOptionalParams : MetadataOptionalParamsBase
+    {
+        /// <summary>
+        /// Indicates which party that can modify the game record (Default: CLIENT).
+        /// </summary>
+        public RecordSetBy SetBy = RecordSetBy.CLIENT;
     }
 
     [DataContract, Preserve]
@@ -126,11 +173,25 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class AdminGameRecord
     {
-        [DataMember] public string Key;
+        [DataMember(Name = "key")] public string Key;
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "created_at")] public DateTime CreatedAt;
         [DataMember(Name = "updated_at")] public DateTime UpdatedAt;
-        [DataMember] public Dictionary<string, object> Value;
+        [DataMember(Name = "value")] public Dictionary<string, object> Value;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "ttl_config")] public TTLConfig TTLConfig;
+    }
+
+    [DataContract, Preserve]
+    public class BulkQueryAdminGameRecordRequest
+    {
+        [DataMember(Name = "keys")] public string[] Keys;
+    }
+
+    [DataContract, Preserve]
+    public class BulkAdminGameRecordResponse
+    {
+        [DataMember(Name = "data")] public AdminGameRecord[] Data; 
     }
 
     [DataContract, Preserve]

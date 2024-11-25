@@ -357,6 +357,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class AcceptBackfillProposalResponse : SessionV2GameSession
+    {
+    }
+    
+    [DataContract, Preserve]
+    public class AcceptBackfillProposalOptionalParams
+    {
+        [DataMember(Name = "acceptedTicketIds")] public string[] AcceptedTicketIds;
+        [DataMember(Name = "stop")] public bool? StopBackfilling;
+    }
+
+    [DataContract, Preserve]
     public class SessionV2GameSessionPagingResponse
     {
         [DataMember(Name = "data")] public SessionV2GameSession[] Data;

@@ -230,6 +230,7 @@ namespace AccelByte.Models
         [DataMember] public string UserId;
     }
 
+    [DataContract, Preserve]
     public class FetchUserStatistic
     {
         [DataMember] public StatItemValue[] UserStatistic;
@@ -255,12 +256,14 @@ namespace AccelByte.Models
         [DataMember] public string UserId;
     }
 
+    [DataContract, Preserve]
     public class UserStatItem
     {
         [DataMember] public string statCode;
         [DataMember] public object additionalData;
     }
 
+    [DataContract, Preserve]
     public class UpdateUserStatItemWithStatCode
     {
         [DataMember] public string statCode;
@@ -269,6 +272,7 @@ namespace AccelByte.Models
         [DataMember] public object additionalData;
     }
 
+    [DataContract, Preserve]
     public class PublicUpdateUserStatItem
     {
         [DataMember] public StatisticUpdateStrategy updateStrategy;
@@ -276,6 +280,7 @@ namespace AccelByte.Models
         [DataMember] public object additionalData;
     }
 
+    [DataContract, Preserve]
     public class UpdateUserStatItemValueResponse
     {
         [DataMember] public float currentValue;

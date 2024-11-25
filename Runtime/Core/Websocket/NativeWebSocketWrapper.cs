@@ -11,6 +11,7 @@ namespace Core.Websocket
     internal class NativeWebSocketWrapper : IWebSocket
     {
         private NativeWebSocket.WebSocket webSocket;
+        internal NativeWebSocket.WebSocket WebSocketOverride;
 
         public event OnOpenHandler OnOpen;
         public event OnMessageHandler OnMessage;
@@ -77,6 +78,11 @@ namespace Core.Websocket
             try
             {
                 webSocket = string.IsNullOrEmpty(protocols) ? new NativeWebSocket.WebSocket(url, customHeaders) : new NativeWebSocket.WebSocket(url, protocols, customHeaders);
+
+                if (WebSocketOverride != null)
+                {
+                    webSocket = WebSocketOverride;
+                }
 
                 webSocket.OnOpen += () =>
                 {

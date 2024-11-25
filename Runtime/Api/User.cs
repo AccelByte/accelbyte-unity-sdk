@@ -23,7 +23,7 @@ namespace AccelByte.Api
     /// with UserSession:ISession (which contains UserId, AuthorizationToken, etc). 
     /// </remarks> 
     /// </summary>
-    public class User : WrapperBase
+    public partial class User : WrapperBase
     {
         //Constants
         internal const string AuthorizationCodeEnvironmentVariable = "JUSTICE_AUTHORIZATION_CODE";
@@ -2061,7 +2061,7 @@ namespace AccelByte.Api
             };
             api.GetUserByOtherPlatformUserId(requestModel, callback);
         }
-
+        
         /// <summary>
         /// Get other user data by other platform userId(s) (such as SteamID, for example)
         /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
@@ -2071,6 +2071,24 @@ namespace AccelByte.Api
         /// <param name="callback">Return a Result that contains UserData when completed.</param>
         public void BulkGetUserByOtherPlatformUserIds( PlatformType platformType
             , string[] otherPlatformUserId
+            , ResultCallback<BulkPlatformUserIdResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            BulkGetUserByOtherPlatformUserIds(platformType, otherPlatformUserId, optionalParameters: null, callback);
+        }
+
+        /// <summary>
+        /// Get other user data by other platform userId(s) (such as SteamID, for example)
+        /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
+        /// </summary>
+        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
+        /// <param name="otherPlatformUserId">Platform UserId that needed to get user data</param>
+        /// <param name="optionalParameters">Additional parameters of the interface</param>
+        /// <param name="callback">Return a Result that contains UserData when completed.</param>
+        public void BulkGetUserByOtherPlatformUserIds( PlatformType platformType
+            , string[] otherPlatformUserId
+            , BulkGetUserByOtherPlatformUserIdsOptionalParameters optionalParameters
             , ResultCallback<BulkPlatformUserIdResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
@@ -2098,10 +2116,16 @@ namespace AccelByte.Api
                 PlatformId = platformType.ToString().ToLower()
             };
 
+            if (optionalParameters != null)
+            {
+                requestModel.PidType = optionalParameters.PidType != null ? optionalParameters.PidType.ConvertToString() : null;
+                requestParameter.RawPuid = optionalParameters.RawPuid;
+            }
+
             if (otherPlatformUserId.Length > MaxNumOfBulkGetUserByOtherPlatformUserId)
             {
-                UnityEngine.Debug.LogWarning($"otherPlatformUserId exceeded limit ({MaxNumOfBulkGetUserByOtherPlatformUserId}). Sending more than {MaxNumOfBulkGetUserByOtherPlatformUserId} userIds will be DEPRECATED");
-                api.BulkGetUserByOtherPlatformUserIds(requestModel, requestParameter, callback);
+                callback?.TryError(new Error(ErrorCode.BadRequest, $"Unable to send more than {MaxNumOfBulkGetUserByOtherPlatformUserId} user ids."));
+                return;
             }
             else
             {
@@ -2967,7 +2991,10 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         /// <param name="callback">Returns Result via callback when completed</param>
         /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithEmailV4(string email, string password, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "LoginWithEmailV4(string email, string password, LoginWithEmailV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithEmailV4(string email
             , string password
             , ResultCallback<TokenDataV4, OAuthError> callback
@@ -3034,7 +3061,10 @@ namespace AccelByte.Api
         /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithDeviceIdV4(ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "LoginWithDeviceIdV4(LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -3092,7 +3122,9 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithOtherPlatformV4(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
@@ -3110,7 +3142,7 @@ namespace AccelByte.Api
                 , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
-        
+
         /// <summary>
         /// Login with token from PS4/PS5 platforms. This will automatically register a user if the user
         /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
@@ -3126,7 +3158,9 @@ namespace AccelByte.Api
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
         /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithOtherPlatformV4(PlatformType platformType
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
@@ -3145,7 +3179,7 @@ namespace AccelByte.Api
                 , loginWithMacAddress: loginWithMacAddress);
 #pragma warning restore AB0001
         }
-        
+
         /// <summary>
         /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
         /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
@@ -3160,7 +3194,9 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithOtherPlatformIdV4(string platformId
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
@@ -3192,7 +3228,9 @@ namespace AccelByte.Api
         /// <param name="createHeadless">If directly create new account when not linked yet</param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
         /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithOtherPlatformIdV4(string platformId
             , string platformToken
             , ResultCallback<TokenDataV4, OAuthError> callback
@@ -3250,7 +3288,10 @@ namespace AccelByte.Api
         /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
         /// </summary>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithLastRefreshTokenV4(ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "LoginWithLastRefreshTokenV4(LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithLastRefreshTokenV4(ResultCallback<TokenDataV4, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -3266,7 +3307,10 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="refreshToken">The latest user's refresh token</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithRefreshTokenV4(string refreshToken, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "LoginWithRefreshTokenV4(string refreshToken, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithRefreshTokenV4(string refreshToken
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
@@ -3291,7 +3335,10 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="cacheKey">Login unique cache name</param>
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "LoginWithCachedRefreshTokenV4(string cacheKey, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "LoginWithCachedRefreshTokenV4(string cacheKey, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void LoginWithCachedRefreshTokenV4(string cacheKey
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
@@ -3394,7 +3441,10 @@ namespace AccelByte.Api
         /// <param name="linkingToken">Token for platfrom type</param>
         /// <param name="extendExp">Extend expiration date of refresh token</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "CreateHeadlessAccountAndResponseTokenV4(string linkingToken, bool extendExp, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "CreateHeadlessAccountAndResponseTokenV4(string linkingToken, bool extendExp, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
             , bool extendExp
             , ResultCallback<TokenDataV4, OAuthError> callback)
@@ -3448,7 +3498,10 @@ namespace AccelByte.Api
         /// <param name="password">Password to login</param>
         ///  <param name="linkingToken">Token for platfrom type</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "AuthenticationWithPlatformLinkAndLoginV4(string email, string password, string linkingToken, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "AuthenticationWithPlatformLinkAndLoginV4(string email, string password, string linkingToken, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void AuthenticationWithPlatformLinkAndLoginV4(string email
             , string password
             , string linkingToken
@@ -3510,7 +3563,10 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="code">code from request game token</param>
         /// <param name="callback">Return Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "GenerateGameTokenV4(string code, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "GenerateGameTokenV4(string code, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void GenerateGameTokenV4(string code
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
@@ -3573,7 +3629,10 @@ namespace AccelByte.Api
         /// <param name="code">Verification code</param>
         /// <param name="callback">Returns a result via callback when completed</param>
         /// <param name="rememberDevice">Will record device token when true</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
+            "Verify2FACodeV4(string mfaToken, TwoFAFactorType factor, string code, ResultCallback<TokenData, OAuthError> loginCallback) or " +
+            "Verify2FACodeV4(string mfaToken, TwoFAFactorType factor, string code, Verify2FACodeV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
+            "function instead.")]
         public void Verify2FACodeV4(string mfaToken
             , TwoFAFactorType factor
             , string code
@@ -3636,7 +3695,9 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="loginTicket">LoginTicket Login Ticket to claim the access token
         /// <param name="callback">Returns a result via callback when completed.
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82 " +
+            "and the access token will be automatically claimed in the ResultCallback<TokenData, OAuthError> loginCallback " +
+            "once the queue position is 0.")]
         public void ClaimAccessToken(TokenDataV4 loginTicket
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
@@ -3677,7 +3738,8 @@ namespace AccelByte.Api
         /// <param name="loginTicket">Login queue ticket</param>
         /// <param name="namespace_">user namespace</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("Since login queue process simplified since AGS 3.79, This function will be removed on AGS 3.82. " +
+            "Please follow this documentation how to call the simplified login queue: https://docs.accelbyte.io/gaming-services/services/utilities/login-queue")]
         public void RefreshLoginQueueTicket(TokenDataV4 loginTicket
             , ResultCallback<RefreshTicketResponse> callback)
         {
@@ -3693,7 +3755,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="loginTicket">Login queue ticket</param>
         /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
+        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("Since login queue process simplified since AGS 3.79, This function will be removed on AGS 3.82. " +
+            "Please follow this documentation how to cancel the simplified login queue: https://docs.accelbyte.io/gaming-services/services/utilities/login-queue")]
         public void CancelLoginQueueTicket(TokenDataV4 loginTicket, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -3701,6 +3764,11 @@ namespace AccelByte.Api
             var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
 
             loginQueueApi.CancelTicket(loginTicket.Queue.Ticket, ticketNamespace, callback);
+
+            if (queuePoller != null) 
+            {
+                queuePoller.StopPoll();
+            }
         }
         
         #endregion

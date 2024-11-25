@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -103,7 +103,7 @@ namespace AccelByte.Server
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
@@ -114,16 +114,16 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.SaveUserRecord(
+            api.SaveUserRecord(
                 userId,
                 key,
                 recordRequest,
                 callback,
-                isPublic: false));
+                isPublic: false);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace AccelByte.Server
             , bool isPublic
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
             Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
 
@@ -154,18 +154,17 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.SaveUserRecord(
-                    userId,
-                    key,
-                    recordRequest,
-                    setBy,
-                    isPublic,
-                    callback));
+            api.SaveUserRecord(
+                userId,
+                key,
+                recordRequest,
+                setBy,
+                isPublic,
+                callback);
         }
 
         /// <summary>
@@ -180,7 +179,7 @@ namespace AccelByte.Server
             , string key
             , ResultCallback<UserRecord> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
@@ -190,12 +189,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserRecord(userId, key, false, callback));
+            api.GetUserRecord(userId, key, false, callback);
         }
 
         /// <summary>
@@ -211,7 +209,7 @@ namespace AccelByte.Server
             , Dictionary<string, object> recordRequest
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
@@ -222,16 +220,16 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.ReplaceUserRecord(
+            api.ReplaceUserRecord(
                 userId,
                 key,
                 recordRequest,
                 callback,
-                isPublic:false));
+                isPublic:false);
         }
 
         /// <summary>
@@ -251,7 +249,7 @@ namespace AccelByte.Server
             , bool isPublic
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
             Assert.IsNotNull(key, "Can't replace user record! RecordRequest parameter is null!");
 
@@ -262,19 +260,19 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
 
-            coroutineRunner.Run(
-                api.ReplaceUserRecord(
-                    userId,
-                    key,
-                    recordRequest,
-                    setBy,
-                    isPublic,
-                    callback));
+            
+            api.ReplaceUserRecord(
+                userId,
+                key,
+                recordRequest,
+                setBy,
+                isPublic,
+                callback);
         }
 
         /// <summary>
@@ -287,7 +285,7 @@ namespace AccelByte.Server
             , string key
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
@@ -297,14 +295,14 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.DeleteUserRecord(
+            api.DeleteUserRecord(
                 userId,
                 key, 
-                callback));
+                callback);
         }
 
 
@@ -316,33 +314,74 @@ namespace AccelByte.Server
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+            "Please use SaveGameRecord(key, recordRequest, optionalParams, callback).")]
         public void SaveGameRecord( string key
             , Dictionary<string, object> recordRequest
             , RecordSetBy setBy
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GameRecordMetadataOptionalParams optionalParams = new GameRecordMetadataOptionalParams()
+            {
+                SetBy = setBy
+            };
+
+            SaveGameRecord(
+                key
+                , recordRequest
+                , optionalParams
+                , result =>
+                {
+                    if (result.IsError)
+                    {
+                        callback?.TryError(result.Error);
+                        return;
+                    }
+
+                    callback?.TryOk();
+                });
+        }
+
+        /// <summary>
+        /// Save a game record.If the record doesn't exist, it will create and
+        /// save the record, if already exists, it will append to the existing one.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record to be formatted as JSON</param>
+        /// <param name="optionalParams">Optional params to set metadata (Can be null)</param>
+        /// <param name="callback">Returns a GameRecord result via callback when completed</param>
+        public void SaveGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , GameRecordMetadataOptionalParams optionalParams
+            , ResultCallback<GameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
+            }
+
+            if (optionalParams == null)
+            {
+                optionalParams = new GameRecordMetadataOptionalParams();
             }
 
             SendPredefinedEvent(
                 PredefinedGameRecordMode.Updated,
                 key,
                 Utils.JsonUtils.SerializeWithStringEnum(PredefinedGameRecordStrategy.Append),
-                setBy.GetString(),
+                optionalParams.SetBy.GetString(),
                 recordRequest);
 
-            coroutineRunner.Run(api.SaveGameRecord(
+            api.SaveGameRecord(
                 key,
                 recordRequest,
-                setBy,
-                callback));
+                optionalParams,
+                callback);
         }
 
         /// <summary>
@@ -353,18 +392,17 @@ namespace AccelByte.Server
         public void DeleteGameRecord( string key
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             SendPredefinedEvent(PredefinedGameRecordMode.Deleted, key);
 
-            coroutineRunner.Run(api.DeleteGameRecord(key, callback));
+            api.DeleteGameRecord(key, callback);
         }
 
         /// <summary>
@@ -375,33 +413,74 @@ namespace AccelByte.Server
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+            "Please use ReplaceGameRecord(key, recordRequest, optionalParams, callback).")]
         public void ReplaceGameRecord( string key
             , Dictionary<string, object> recordRequest
             , RecordSetBy setBy
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! RecordRequest parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GameRecordMetadataOptionalParams optionalParams = new GameRecordMetadataOptionalParams()
+            {
+                SetBy = setBy
+            };
+
+            ReplaceGameRecord(
+                key, 
+                recordRequest,
+                optionalParams,
+                result =>
+                {
+                    if (result.IsError)
+                    {
+                        callback?.TryError(result.Error);
+                        return;
+                    }
+
+                    callback?.TryOk();
+                });
+        }
+
+        /// <summary>
+        /// Replace a game record. If the record doesn't exist, it will create and
+        /// save the record, if already exists, it will append to the existing one.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record to be formatted as JSON</param>
+        /// <param name="optionalParams">Optional params to set metadata (Can be null)</param>
+        /// <param name="callback">Returns a GameRecord result via callback when completed</param>
+        public void ReplaceGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , GameRecordMetadataOptionalParams optionalParams
+            , ResultCallback<GameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
+            if (optionalParams == null)
+            {
+                optionalParams = new GameRecordMetadataOptionalParams();
+            }
+
             SendPredefinedEvent(
-                PredefinedGameRecordMode.Updated, 
-                key, 
-                Utils.JsonUtils.SerializeWithStringEnum(PredefinedGameRecordStrategy.Replace), 
-                setBy.GetString(), 
+                PredefinedGameRecordMode.Updated,
+                key,
+                Utils.JsonUtils.SerializeWithStringEnum(PredefinedGameRecordStrategy.Replace),
+                optionalParams.SetBy.GetString(),
                 recordRequest);
 
-            coroutineRunner.Run(api.ReplaceGameRecord(
-                key, 
+            api.ReplaceGameRecord(
+                key,
                 recordRequest,
-                setBy, 
-                callback));
+                optionalParams,
+                callback);
         }
 
         /// <summary>
@@ -420,11 +499,11 @@ namespace AccelByte.Server
             Assert.IsFalse(string.IsNullOrEmpty(key), "Key should not be null.");
             Assert.IsNotNull(recordRequest, "RecordRequest should not be null.");
 
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -435,8 +514,7 @@ namespace AccelByte.Server
                 value = recordRequest,
             };
 
-            coroutineRunner.Run(api.ReplaceGameRecord(
-                key, request, callback));
+            api.ReplaceGameRecord(key, request, callback);
         }
 
         /// <summary>
@@ -453,18 +531,15 @@ namespace AccelByte.Server
             , int offset = 0
             , int limit  = 20 )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(offset.ToString(), "Can't get query user record! offset parameter is null!");
-            Assert.IsNotNull(limit.ToString(), "Can't get query user record! limit parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.RetrieveGameRecordsKey(callback, query, offset, limit));
+            api.RetrieveGameRecordsKey(callback, query, offset, limit);
         }
 
         /// <summary>
@@ -474,15 +549,15 @@ namespace AccelByte.Server
         /// <param name="callback"></param>
         public void GetGameRecords(string key, ResultCallback<GameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.GetGameRecords(key, callback));
+            api.GetGameRecords(key, callback);
         }
 
         /// <summary>
@@ -491,19 +566,39 @@ namespace AccelByte.Server
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+            "Please use CreateAdminGameRecord(key, recordRequest, optionalParams, callback).")]
         public void CreateAdminGameRecord(string key
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParams = new AdminRecordMetadataOptionalParams();
+            CreateAdminGameRecord(key, recordRequest, optionalParams, callback);
+        }
+
+        /// <summary>
+        /// Create new admin game record or append the existing admin game record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="optionalParams">Optional params to set metadata (Can be null)</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void CreateAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , AdminRecordMetadataOptionalParams optionalParams
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.CreateAdminGameRecord(key, recordRequest, callback));
+            api.CreateAdminGameRecord(key, recordRequest, optionalParams, callback);
         }
 
         /// <summary>
@@ -514,15 +609,34 @@ namespace AccelByte.Server
         public void QueryAdminGameRecordsByKey(string key
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.QueryAdminGameRecordsByKey(key, callback));
+            api.QueryAdminGameRecordsByKey(key, callback);
+        }
+
+        /// <summary>
+        /// Get an array of records by their keys in namespace-level.
+        /// </summary>
+        /// <param name="keys">Array of keys of record to get. Maximum value of 20.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        public void BulkQueryAdminGameRecordsByKey(string[] keys
+            , ResultCallback<BulkAdminGameRecordResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.BulkQueryAdminGameRecordsByKey(keys, callback);
         }
 
         /// <summary>
@@ -535,15 +649,15 @@ namespace AccelByte.Server
             , int limit = 20
             , int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.QueryAdminGameRecordKeys(callback, offset, limit));
+            api.QueryAdminGameRecordKeys(callback, limit, offset);
         }
 
         /// <summary>
@@ -552,19 +666,39 @@ namespace AccelByte.Server
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+            "Please use ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback).")]
         public void ReplaceAdminGameRecord(string key
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParams = new AdminRecordMetadataOptionalParams();
+            ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback);
+        }
+
+        /// <summary>
+        /// Create new admin game record or replace the existing admin game record.
+        /// </summary>
+        /// <param name="key">Key of record</param>
+        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
+        /// <param name="optionalParams">Optional params to set metadata (Can be null)</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ReplaceAdminGameRecord(string key
+            , Dictionary<string, object> recordRequest
+            , AdminRecordMetadataOptionalParams optionalParams
+            , ResultCallback<AdminGameRecord> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.ReplaceAdminGameRecord(key, recordRequest, callback));
+            api.ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback);
         }
 
         /// <summary>
@@ -575,15 +709,15 @@ namespace AccelByte.Server
         public void DeleteAdminGameRecord(string key
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.DeleteAdminGameRecord(key, callback));
+            api.DeleteAdminGameRecord(key, callback);
         }
 
         /// <summary>
@@ -598,7 +732,7 @@ namespace AccelByte.Server
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -607,11 +741,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.CreateAdminUserRecord(key, userId, recordRequest, callback));
+            api.CreateAdminUserRecord(key, userId, recordRequest, callback);
         }
 
         /// <summary>
@@ -624,7 +758,7 @@ namespace AccelByte.Server
             , string userId
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -633,11 +767,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.QueryAdminUserRecordsByKey(key, userId, callback));
+            api.QueryAdminUserRecordsByKey(key, userId, callback);
         }
 
         /// <summary>
@@ -652,7 +786,7 @@ namespace AccelByte.Server
             , int limit = 20
             , int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -661,11 +795,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.QueryAdminUserRecordKeys(userId, callback, limit, offset));
+            api.QueryAdminUserRecordKeys(userId, callback, limit, offset);
         }
 
         /// <summary>
@@ -680,7 +814,7 @@ namespace AccelByte.Server
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -689,18 +823,18 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.ReplaceAdminUserRecord(key, userId, recordRequest, callback));
+            api.ReplaceAdminUserRecord(key, userId, recordRequest, callback);
         }
 
         public void DeleteAdminUserRecord(string key
             , string userId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -709,11 +843,47 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.DeleteAdminUserRecord(key, userId, callback));
+            api.DeleteAdminUserRecord(key, userId, callback);
+        }
+
+        /// <summary>
+        /// Delete the TTLConfig for a specific Admin Game Record by its key.
+        /// </summary>
+        /// <param name="key">Key of the admin game record.</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void DeleteAdminGameRecordTTLConfig(string key, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.DeleteAdminGameRecordTTLConfig(key, callback);
+        }
+
+        /// <summary>
+        /// Delete the TTLConfig for a specific Game Record by its key.
+        /// </summary>
+        /// <param name="key">Key of the game record.</param>
+        /// <param name="callback">Returns a result via callback when completed.</param>
+        public void DeleteGameRecordTTLConfig(string key, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.DeleteGameRecordTTLConfig(key, callback);
         }
     }
 }

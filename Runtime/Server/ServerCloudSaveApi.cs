@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -26,11 +27,47 @@ namespace AccelByte.Server
         }
 
         #region Private Methods 
-        private Dictionary<string, object> AddMetaDataJsonGameRecord
-            ( RecordSetBy setBy
-            , Dictionary<string, object> RequestToInject )
+
+        const string metaDataFieldKey = "__META";
+
+        private Dictionary<string, object> AddMetaDataJsonAdminRecord
+            (AdminRecordMetadataOptionalParams optionalParams
+            , Dictionary<string, object> requestToInject)
         {
-            RequestToInject["__META"] = new { set_by = setBy.GetString() };
+            if (requestToInject.ContainsKey(metaDataFieldKey))
+            {
+                AccelByteDebug.LogWarning(
+                    $"{metaDataFieldKey} field for AdminGameRecord request overriden. " +
+                    $"Please use optionalParams instead to populate metadata");
+            }
+
+            requestToInject[metaDataFieldKey] = new SaveAdminRecordMetaData
+            {
+                TTLConfig = optionalParams.TTLConfig,
+                Tags = optionalParams.Tags
+            };
+
+            return requestToInject;
+        }
+
+        private Dictionary<string, object> AddMetaDataJsonGameRecord
+            (GameRecordMetadataOptionalParams optionalParams
+            , Dictionary<string, object> RequestToInject)
+        {
+            if (RequestToInject.ContainsKey(metaDataFieldKey))
+            {
+                AccelByteDebug.LogWarning(
+                    $"{metaDataFieldKey} field for GameRecord request overriden. " +
+                    $"Please use optionalParams instead to populate metadata");
+            }
+
+            RequestToInject[metaDataFieldKey] = new SaveGameRecordMetaData
+            {
+                SetBy = optionalParams.SetBy,
+                TTLConfig = optionalParams.TTLConfig,
+                Tags = optionalParams.Tags
+            };
+
             return RequestToInject;
         }
 
@@ -38,7 +75,7 @@ namespace AccelByte.Server
             , bool isPublic
             , Dictionary<string, object> RequestToInject )
         {
-            RequestToInject["__META"] = new
+            RequestToInject[metaDataFieldKey] = new
             {
                 set_by = setBy.GetString(), 
                 is_public = isPublic,
@@ -47,22 +84,35 @@ namespace AccelByte.Server
             return RequestToInject;
         }
         #endregion /Private Methods
-        
-        public IEnumerator SaveGameRecord( string key
+
+        public void SaveGameRecord(
+            string key
             , Dictionary<string, object> recordRequest
-            , RecordSetBy setBy
-            , ResultCallback callback )
+            , GameRecordMetadataOptionalParams optionalParams
+            , ResultCallback<GameRecord> callback)
         {
-            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
-            yield return SaveGameRecord(key, recordRequest, callback);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            recordRequest = AddMetaDataJsonGameRecord(optionalParams, recordRequest);
+
+            SaveGameRecord(key, recordRequest, callback);
         }
-  
-        public IEnumerator SaveGameRecord( string key
+
+        public void SaveGameRecord( string key
             , Dictionary<string, object> recordRequest
-            , ResultCallback callback )
+            , ResultCallback<GameRecord> callback )
         {
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/records/{key}")
@@ -74,16 +124,14 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GameRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator SaveUserRecord( string userId
+        public void SaveUserRecord( string userId
             , string key
             , Dictionary<string, object> recordRequest
             , RecordSetBy setBy
@@ -91,7 +139,7 @@ namespace AccelByte.Server
             , ResultCallback callback )
         {
             recordRequest = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
-            yield return SaveUserRecord(
+            SaveUserRecord(
                 userId,
                 key,
                 recordRequest,
@@ -99,15 +147,17 @@ namespace AccelByte.Server
                 isPublic: false);
         } 
         
-        public IEnumerator GetUserRecord( string userId
+        public void GetUserRecord( string userId
             , string key
             , bool isPublic
             , ResultCallback<UserRecord> callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't get user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user record! AuthToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't get user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             string url = "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -122,24 +172,25 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<UserRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator ReplaceUserRecord( string userId
+        public void ReplaceUserRecord( string userId
             , string key
             , Dictionary<string, object> recordRequest
             , ResultCallback callback
             , bool isPublic )
         {
-            Assert.IsNotNull(userId, "Can't replace user record! userId parameter is null!");
-            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't replace user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             string url = "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -156,30 +207,40 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
-        
-        public IEnumerator ReplaceGameRecord( string key
+
+        public void ReplaceGameRecord(string key
             , Dictionary<string, object> recordRequest
-            , RecordSetBy setBy
-            , ResultCallback callback )
+            , GameRecordMetadataOptionalParams optionalParams
+            , ResultCallback<GameRecord> callback)
         {
-            recordRequest = AddMetaDataJsonGameRecord(setBy, recordRequest);
-            yield return ReplaceGameRecord(key, recordRequest, callback);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            recordRequest = AddMetaDataJsonGameRecord(optionalParams, recordRequest);
+
+            ReplaceGameRecord(key, recordRequest, callback);
         }
-        
-        public IEnumerator ReplaceGameRecord( string key
+
+        public void ReplaceGameRecord( string key
             , Dictionary<string, object> recordRequest
-            , ResultCallback callback )
+            , ResultCallback<GameRecord> callback )
         {
-            Assert.IsNotNull(key, "Can't replace user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't replace user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             string url = "/v1/admin/namespaces/{namespace}/records/{key}"; 
 
@@ -193,22 +254,24 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GameRecord>();
+                callback?.Try(result);
+            });
         }
         
-        public IEnumerator ReplaceGameRecord( string key
+        public void ReplaceGameRecord( string key
             , ConcurrentReplaceRequest data
             , ResultCallback callback
             , Action callbackOnConflictedData = null )
         {
-            Assert.IsNotNull(key, nameof(key) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null"); 
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key, data);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/concurrent/records/{key}")
@@ -220,29 +283,35 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+                bool hasErr =
+                    result.IsError &&
+                    result.Error.Code == ErrorCode.GameRecordPreconditionFailed &&
+                    callbackOnConflictedData != null;
 
-            var result = response.TryParse();
-
-            bool hasErr = 
-                result.IsError && 
-                result.Error.Code == ErrorCode.GameRecordPreconditionFailed && 
-                callbackOnConflictedData != null;
-            
-            if (hasErr)
-                callbackOnConflictedData?.Invoke();
-            else
-                callback.Try(result);
+                if (hasErr)
+                {
+                    callbackOnConflictedData?.Invoke();
+                }
+                else
+                {
+                    callback?.Try(result);
+                }
+            });
         }
 
-        public IEnumerator DeleteGameRecord( string key
+        public void DeleteGameRecord( string key
             , ResultCallback callback )
         {
-            Assert.IsNotNull(AuthToken, "Can't delete user record! AuthToken parameter is null!");
-            Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/records/{key}")
@@ -252,26 +321,26 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         #region User Record 
-        public IEnumerator SaveUserRecord( string userId
+        public void SaveUserRecord( string userId
             , string key
             , Dictionary<string, object> recordRequest
             , ResultCallback callback
             , bool isPublic )
         {
-            Assert.IsNotNull(userId, "Can't save user record! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't save user record! AuthToken parameter is null!");
-            Assert.IsNotNull(key, "Can't save user record! Key parameter is null!");
-            Assert.IsNotNull(recordRequest, "Can't save user record! recordRequest parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, userId, key, recordRequest);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             string url = "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}";
             if (isPublic)
@@ -288,16 +357,14 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator ReplaceUserRecord( string userId
+        public void ReplaceUserRecord( string userId
             , string key
             , Dictionary<string, object> recordRequest
             , RecordSetBy setBy
@@ -305,7 +372,7 @@ namespace AccelByte.Server
             , ResultCallback callback )
         {
             recordRequest = AddMetaDataJsonUserRecord(setBy, setPublic, recordRequest);
-            yield return ReplaceUserRecord(
+            ReplaceUserRecord(
                 userId,
                 key,
                 recordRequest,
@@ -313,14 +380,16 @@ namespace AccelByte.Server
                 false);
         }
 
-        public IEnumerator DeleteUserRecord( string userId
+        public void DeleteUserRecord( string userId
             , string key
             , ResultCallback callback )
         {
-            Assert.IsNotNull(Namespace_, "Can't delete user record! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't delete user record! userId parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't delete user record! AuthToken parameter is null!");
-            Assert.IsNotNull(key, "Can't delete user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, userId, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/records/{key}")
@@ -331,52 +400,48 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator RetrieveGameRecordsKey(
+        public void RetrieveGameRecordsKey(
             ResultCallback<GameRecordList> callback
             ,string query
             ,int offset
             ,int limit )
         {
-            Assert.IsNotNull(Namespace_, "Can't get user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user record! AccessToken parameter is null!");
-
             string url = "/v1/admin/namespaces/{namespace}/records";
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + url)
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("query", query)
+                .WithQueryParam("query", query != "{}" ? query : "")
                 .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
                 .WithQueryParam("limit", (limit >= 0) ? limit.ToString() : "")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<GameRecordList>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GameRecordList>();
+                callback?.Try(result);
+            });
         }
 
         #endregion
 
-        public IEnumerator GetGameRecords(string key, ResultCallback<GameRecord> callback)
+        public void GetGameRecords(string key, ResultCallback<GameRecord> callback)
         {
-            Assert.IsNotNull(Namespace_, "Can't get user record! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't get user record! AccessToken parameter is null!");
-            Assert.IsNotNull(key, "Can't get user record! Key parameter is null!");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             string url = "/v1/admin/namespaces/{namespace}/records/{key}";
 
@@ -388,36 +453,28 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<GameRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GameRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator CreateAdminGameRecord(string key
+        public void CreateAdminGameRecord(string key
             , Dictionary<string, object> recordRequest
+            , AdminRecordMetadataOptionalParams optionalParams
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
+
+            recordRequest = AddMetaDataJsonAdminRecord(optionalParams, recordRequest);
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
@@ -429,37 +486,23 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminGameRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminGameRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator QueryAdminGameRecordsByKey(string key
+        public void QueryAdminGameRecordsByKey(string key
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -471,33 +514,64 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminGameRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminGameRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator QueryAdminGameRecordKeys(ResultCallback<GameRecordList> callback
+        public void BulkQueryAdminGameRecordsByKey(string[] keys,
+            ResultCallback<BulkAdminGameRecordResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, keys);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            if (keys.Length > 20)
+            {
+                error = new Error(ErrorCode.InvalidRequest, message: "Number of keys cannot be greater than 20.");
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBody = new BulkQueryAdminGameRecordRequest()
+            {
+                Keys = keys
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/bulk")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(requestBody.ToUtf8Json())
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<BulkAdminGameRecordResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        public void QueryAdminGameRecordKeys(ResultCallback<GameRecordList> callback
             , int limit
             , int offset)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -510,39 +584,28 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<GameRecordList>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GameRecordList>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator ReplaceAdminGameRecord(string key
+        public void ReplaceAdminGameRecord(string key
             , Dictionary<string, object> recordRequest
+            , AdminRecordMetadataOptionalParams optionalParams
             , ResultCallback<AdminGameRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
+
+            recordRequest = AddMetaDataJsonAdminRecord(optionalParams, recordRequest);
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}")
@@ -554,37 +617,23 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminGameRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminGameRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator DeleteAdminGameRecord(string key
+        public void DeleteAdminGameRecord(string key
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -596,44 +645,25 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParse();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator CreateAdminUserRecord(string key
+        public void CreateAdminUserRecord(string key
             , string userId
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userId))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -647,43 +677,24 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminUserRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminUserRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator QueryAdminUserRecordsByKey(string key
+        public void QueryAdminUserRecordsByKey(string key
             , string userId
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userId))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -696,39 +707,25 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminUserRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminUserRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator QueryAdminUserRecordKeys(string userId
+        public void QueryAdminUserRecordKeys(string userId
             , ResultCallback<PaginatedGetAdminUserRecordKeys> callback
             , int limit = 20
             , int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userId))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -742,44 +739,25 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<PaginatedGetAdminUserRecordKeys>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PaginatedGetAdminUserRecordKeys>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator ReplaceAdminUserRecord(string key
+        public void ReplaceAdminUserRecord(string key
             , string userId
             , Dictionary<string, object> recordRequest
             , ResultCallback<AdminUserRecord> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userId))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -793,43 +771,24 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<AdminUserRecord>();
-            callback.Try(result);
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<AdminUserRecord>();
+                callback?.Try(result);
+            });
         }
 
-        public IEnumerator DeleteAdminUserRecord(string key
+        public void DeleteAdminUserRecord(string key
             , string userId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, userId);
+            if (error != null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(key))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(userId))
-            {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -842,16 +801,63 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
 
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
+        public void DeleteAdminGameRecordTTLConfig(string key, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            var result = response.TryParse();
-            callback.Try(result);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/adminrecords/{key}/ttl")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
+        public void DeleteGameRecordTTLConfig(string key, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/records/{key}/ttl")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("key", key)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
     }
 }

@@ -247,18 +247,12 @@ namespace AccelByte.Core
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, ClientGameTelemetryApi>(); }
         public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }
-        [Obsolete("This API renamed into GetVersionService and will be removed on 3.79 release")]
-        public Api.ServiceVersion GetServiceVersion() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
         public Api.ServiceVersion GetVersionService() { return GetApi<Api.ServiceVersion, Api.ServiceVersionApi>(); }
-        [Obsolete("This API renamed into GetHeartBeatService and will be removed on 3.79 release")]
-        public HeartBeat GetHeartBeat() { return GetApi<HeartBeat, HeartBeatApi>(); }
         public HeartBeat GetHeartBeatService(bool autoCreate = true)
         {
             HeartBeat retval = GetApi<HeartBeat, HeartBeatApi>(autoCreate);
             return retval;
         }
-        [Obsolete("This API renamed into GetStoreDisplayService and will be removed on 3.79 release")]
-        public StoreDisplay GetStoreDisplay() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         public StoreDisplay GetStoreDisplayService() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
         #endregion
 

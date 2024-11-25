@@ -35,33 +35,29 @@ namespace AccelByte.Core
         internal void SetHeartBeat(CoreHeartBeat coreHeartBeat)
         {
             heartBeat = coreHeartBeat;
+            httpTaskScheduler?.SetHeartBeat(coreHeartBeat);
         }
 
         public void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs = 0)
         {
-            if (heartBeat != null)
+            WebRequestTask newTask = new WebRequestTask(request, timeoutMs, delayTimeMs)
             {
-                Action onNextFrame = () =>
+                OnComplete = (sentWebRequest) =>
                 {
-                    WebRequestTask newTask = new WebRequestTask(request, timeoutMs, delayTimeMs)
-                    {
-                        OnComplete = (sentWebRequest) =>
-                        {
-                            HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
-                            callback?.Invoke(responseResult);
-                        }
-                    };
-                    httpTaskScheduler.AddTask(newTask);
-                };
-                var cancelTokenSource = new System.Threading.CancellationTokenSource();
-                WaitAFrameCommand waitCommand = new WaitAFrameCommand(onNextFrame, cancelTokenSource.Token);
-                heartBeat.Wait(waitCommand);
-            }
+                    HttpSendResult responseResult = ParseWebRequestResult(sentWebRequest);
+                    callback?.Invoke(responseResult);
+                }
+            };
+            heartBeat.Wait(new WaitAFrameCommand(cancellationToken: new System.Threading.CancellationTokenSource().Token, onDone:
+                () =>
+                {
+                    httpTaskScheduler.ExecuteWebTask(newTask);
+                }));
         }
 
         public void ClearTasks()
         {
-            this.httpTaskScheduler.CleanTask();
+            this.httpTaskScheduler.Stop();
         }
 
         public void ClearCookies(Uri uri)

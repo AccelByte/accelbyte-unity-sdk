@@ -17,12 +17,6 @@ namespace AccelByte.Core
         {
             return new DefaultLatencyCalculator();
         }
-
-        internal static string GetAwsPingEndpoint(string region)
-        {
-            string retval = $"https://ec2.{region}.amazonaws.com/ping?cache_buster={System.DateTime.UtcNow.Ticks}";
-            return retval;
-        }
     }
 }
 

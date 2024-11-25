@@ -373,7 +373,8 @@ namespace NativeWebSocket
         private Uri uri;
         private Dictionary<string, string> headers;
         private List<string> subprotocols;
-        private ClientWebSocket m_Socket = new ClientWebSocket();
+        private System.Net.WebSockets.WebSocket m_Socket = new ClientWebSocket();
+        internal System.Net.WebSockets.WebSocket SocketOverride;
 
         private CancellationTokenSource m_TokenSource;
         private CancellationToken m_CancellationToken;
@@ -457,20 +458,29 @@ namespace NativeWebSocket
                 m_TokenSource = new CancellationTokenSource();
                 m_CancellationToken = m_TokenSource.Token;
 
-                m_Socket = new ClientWebSocket();
-
-                foreach (var header in headers)
+                if (SocketOverride == null)
                 {
-                    m_Socket.Options.SetRequestHeader(header.Key, header.Value);
+                    m_Socket = new ClientWebSocket();
+                    var socket = m_Socket as ClientWebSocket;
+
+                    foreach (var header in headers)
+                    {
+                        socket.Options.SetRequestHeader(header.Key, header.Value);
+                    }
+
+                    foreach (string subprotocol in subprotocols)
+                    {
+                        socket.Options.AddSubProtocol(subprotocol);
+                    }
+
+                    await socket.ConnectAsync(uri, m_CancellationToken);
+                }
+                else
+                {
+                    m_Socket = SocketOverride;
                 }
 
-                foreach (string subprotocol in subprotocols) {
-                    m_Socket.Options.AddSubProtocol(subprotocol);
-                }
-
-                await m_Socket.ConnectAsync(uri, m_CancellationToken);
                 OnOpen?.Invoke();
-
                 await Receive();
             }
             catch (Exception ex)
@@ -640,7 +650,7 @@ namespace NativeWebSocket
 
         public async Task Receive()
         {
-            WebSocketCloseCode closeCode = WebSocketCloseCode.Abnormal;
+            int closeCode = (int)WebSocketCloseCode.Abnormal;
             await new WaitForBackgroundThread();
 
             ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[8192]);
@@ -684,7 +694,7 @@ namespace NativeWebSocket
                         else if (result.MessageType == WebSocketMessageType.Close)
                         {
                             await Close();
-                            closeCode = WebSocketHelpers.ParseCloseCodeEnum((int)result.CloseStatus);
+                            closeCode = (int)result.CloseStatus;
                             break;
                         }
                     }
@@ -697,7 +707,7 @@ namespace NativeWebSocket
             finally
             {
                 await new WaitForUpdate();
-                OnClose?.Invoke((int)closeCode);
+                OnClose?.Invoke(closeCode);
             }
         }
 
@@ -844,5 +854,4 @@ namespace NativeWebSocket
         }
 
     }
-
 }

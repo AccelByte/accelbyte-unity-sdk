@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.1.0] (2024-11-25)
+
+
+### Features
+
+* add login v4 and cancel queue process 
+* add partial accept backfill proposal 
+* add qosm new interface to fetch server list 
+* added optional parameters on User.BulkGetUserByOtherPlatformUserIds 
+* added ttl config to relevant admin game record interfaces, mark older function for deprecation 
+* remove support to fetch 100 or more users on Api.User.BulkGetUserByOtherPlatformUserIds 
+* sunset accelbyte plugin and multi registry interfaces 
+* sunset api client's deprecated interfaces 
+
+
+### Bug Fixes
+
+* fix missing ctor exception on some of lobby's response and request models 
+* fix missing preserver attribute in statistic models 
+* fix webgl ping method 
+
+
+### Refactors
+
+* differentiate ping method optional parameters 
+* improve sdk http executor 
+* refactor native websocket and wrapper to be overridable for testing 
+* response validation improvements 
+
 ### [17.0.1] (2024-10-31)
 
 

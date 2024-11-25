@@ -13,10 +13,30 @@ namespace AccelByte.Utils
 {
     public static class Networking
     {
-        public class PingOptionalParameters
+        public abstract class PingOptionalParameters
         {
             public uint InTimeOutInMs = 10 * 1000;
             public uint MaxRetry = 6;
+        }
+
+        public class UdpPingOptionalParameters : PingOptionalParameters
+        {
+            
+        }
+
+        public class HttpPingOptionalParameters : PingOptionalParameters
+        {
+            
+        }
+        
+        /// <summary>
+        /// Generate test server address by region name
+        /// </summary>
+        /// <param name="region"></param>
+        public static string GetTestServerUrlByRegion(string region)
+        {
+            string retval = $"https://ec2.{region}.amazonaws.com/ping";
+            return retval;
         }
         
         /// <summary>
@@ -24,6 +44,7 @@ namespace AccelByte.Utils
         /// </summary>
         /// <param name="url">url to ping</param>
         /// <param name="inTimeOutInMs">timeout limit</param>
+        [System.Obsolete("This ping method is deprecated. Please use UdpPing or HttpPing method. This method will be removed on AGS 3.82.")]
         public static AccelByteResult<int, Error> Ping(string url, uint inTimeOutInMs = 60 * 1000)
         {
             AccelByteResult<int, Error> pingResult = new AccelByteResult<int, Error>();
@@ -37,13 +58,13 @@ namespace AccelByte.Utils
         /// <param name="url">Url to ping</param>
         /// <param name="port">Assign the port number to ping</param>
         /// <param name="optionalParameters">Ping optional parameters</param>
-        public static AccelByteResult<int, Error> UdpPing(string url, uint port, PingOptionalParameters optionalParameters = null)
+        public static AccelByteResult<int, Error> UdpPing(string url, uint port, UdpPingOptionalParameters optionalParameters = null)
         {
             AccelByteResult<int, Error> pingResult = new AccelByteResult<int, Error>();
 #if !UNITY_WEBGL || UNITY_EDITOR
             if (optionalParameters == null)
             {
-                optionalParameters = new PingOptionalParameters();
+                optionalParameters = new UdpPingOptionalParameters();
             }
             UdpPingImp(url, (int) port, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry);
 #else
@@ -57,12 +78,12 @@ namespace AccelByte.Utils
         /// </summary>
         /// <param name="url">Url to ping</param>
         /// <param name="optionalParameters">Ping optional parameters</param>
-        public static AccelByteResult<int, Error> HttpPing(string url, PingOptionalParameters optionalParameters = null)
+        public static AccelByteResult<int, Error> HttpPing(string url, HttpPingOptionalParameters optionalParameters = null)
         {
             AccelByteResult<int, Error> pingResult = new AccelByteResult<int, Error>();
             if (optionalParameters == null)
             {
-                optionalParameters = new PingOptionalParameters();
+                optionalParameters = new HttpPingOptionalParameters();
             }
             HttpPingImp(url, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry);
             return pingResult;

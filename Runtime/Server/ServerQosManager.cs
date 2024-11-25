@@ -25,6 +25,52 @@ namespace AccelByte.Server
             api = inApi;
             coroutineRunner = inCoroutineRunner;
         }
+        
+        /// <summary>
+        /// Fetch QoS server list
+        /// </summary>
+        public void FetchQosServers(ResultCallback<QosServerList> callback)
+        {
+            FetchQosServers(fetchOptionalParams: null, callback);
+        }
+
+        /// <summary>
+        /// Fetch QoS server list
+        /// </summary>
+        public void FetchQosServers(FetchQosServerOptionalParameters fetchOptionalParams, ResultCallback<QosServerList> callback)
+        {
+            var apiOptionalParameter = new GetQosServerOptionalParameters();
+            if (fetchOptionalParams == null)
+            {
+                fetchOptionalParams = new FetchQosServerOptionalParameters();
+                fetchOptionalParams.Status = QosStatus.Active;
+            }
+
+            apiOptionalParameter.LatencyCalculator = fetchOptionalParams.LatencyCalculator;
+            apiOptionalParameter.Status = fetchOptionalParams.Status;
+            
+            api.RequestGetPublicQosServers(apiOptionalParameter, getQosServersResult =>
+            {
+                if (getQosServersResult.IsError)
+                {
+                    callback?.TryError(getQosServersResult.Error.Code);
+                    return;
+                }
+
+                if (getQosServersResult.Value != null && getQosServersResult.Value.servers != null && getQosServersResult.Value.servers.Length > 0)
+                {
+                    foreach (QosServer qosServer in getQosServersResult.Value.servers)
+                    {
+                        if (fetchOptionalParams != null && fetchOptionalParams.LatencyCalculator != null)
+                        {
+                            qosServer.LatencyCalculator = fetchOptionalParams.LatencyCalculator;
+                        }
+                    }
+                }
+                
+                callback?.Try(getQosServersResult);
+            });
+        }
 
         /// <summary>
         /// Get all server latencies available
@@ -54,9 +100,22 @@ namespace AccelByte.Server
 
                 if (getQosServersResult.Value != null && getQosServersResult.Value.servers != null && getQosServersResult.Value.servers.Length > 0)
                 {
-                    CalculateServerLatencies(getQosServersResult.Value.servers,
-                        optionalParams?.LatencyCalculator,
-                        callback);
+                    if (optionalParams != null && optionalParams.LatencyCalculator != null)
+                    {
+                        foreach (QosServer qosServer in getQosServersResult.Value.servers)
+                        {
+                            qosServer.LatencyCalculator = optionalParams.LatencyCalculator;
+                        }
+                    }
+                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = getQosServersResult.Value.GenerateLatenciesMap(useCache: false);
+                    generateLatencyResult.OnSuccess(map =>
+                    {
+                        callback?.TryOk(map);
+                    });
+                    generateLatencyResult.OnFailed(error =>
+                    {
+                        callback?.TryError(error);
+                    });
                 }
                 else
                 {
@@ -82,72 +141,43 @@ namespace AccelByte.Server
         internal void GetServerLatencies(GetQosServerOptionalParameters optionalParams, ResultCallback<Dictionary<string, int>> callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            GetServerLatenciesAsync(optionalParams, callback);
-        }
-
-        private void GetServerLatenciesAsync(GetQosServerOptionalParameters optionalParams, ResultCallback<Dictionary<string, int>> callback)
-        {
-            GetQosServerOptionalParameters requestedOptionalParams = optionalParams;
-
-            if (requestedOptionalParams == null)
+            
+            FetchQosServerOptionalParameters fetchOptionalParams = null;
+            if (optionalParams != null)
             {
-                requestedOptionalParams = new GetQosServerOptionalParameters();
-                requestedOptionalParams.Status = QosStatus.Active;
+                fetchOptionalParams = optionalParams.ConvertToFetchParameters();
             }
 
-            api.RequestGetPublicQosServers(requestedOptionalParams, getQosServersResult =>
+            if (fetchOptionalParams == null)
             {
-                if (getQosServersResult.IsError)
+                fetchOptionalParams = new FetchQosServerOptionalParameters();
+            }
+
+            FetchQosServers(fetchOptionalParams, fetchQosServerResult =>
+            {
+                if (fetchQosServerResult.IsError)
                 {
-                    callback?.TryError(getQosServersResult.Error.Code);
+                    callback?.TryError(fetchQosServerResult.Error.Code);
                     return;
                 }
-
-                if (getQosServersResult.Value != null && getQosServersResult.Value.servers != null && getQosServersResult.Value.servers.Length > 0)
+                
+                if (fetchQosServerResult.Value != null && fetchQosServerResult.Value.servers != null && fetchQosServerResult.Value.servers.Length > 0)
                 {
-                    CalculateServerLatencies(getQosServersResult.Value.servers,
-                        optionalParams?.LatencyCalculator,
-                        callback);
+                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = fetchQosServerResult.Value.GenerateLatenciesMap(useCache: false);
+                    generateLatencyResult.OnSuccess(map =>
+                    {
+                        callback?.TryOk(map);
+                    });
+                    generateLatencyResult.OnFailed(error =>
+                    {
+                        callback?.TryError(error);
+                    });
                 }
                 else
                 {
                     callback?.TryOk(new Dictionary<string, int>());
                 }
             });
-        }
-
-        private void CalculateServerLatencies(QosServer[] servers,
-            ILatencyCalculator latencyCalculator,
-            ResultCallback<Dictionary<string, int>> callback)
-        {
-            int currentLatencyTaskCalculationDoneCount = 0;
-            int expectedLength = servers.Length;
-
-            Dictionary<string, int> retval = new Dictionary<string, int>();
-            ILatencyCalculator calculator =
-                latencyCalculator == null ? LatencyCalculatorFactory.CreateDefaultCalculator() : latencyCalculator;
-
-            foreach (var server in servers)
-            {
-                string url = server.ip;
-#if UNITY_WEBGL && !UNITY_EDITOR
-                url = LatencyCalculatorFactory.GetAwsPingEndpoint(server.region);
-#endif
-                
-                calculator.CalculateLatency(url, server.port)
-                    .OnSuccess(latency =>
-                    {
-                        retval.Add(server.region, latency);
-                    })
-                    .OnComplete(() => 
-                    {
-                        currentLatencyTaskCalculationDoneCount++;
-                        if (currentLatencyTaskCalculationDoneCount == expectedLength)
-                        {
-                            callback?.TryOk(retval);
-                        }
-                    });
-            }
         }
     }
 }

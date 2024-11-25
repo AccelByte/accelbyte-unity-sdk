@@ -46,7 +46,7 @@ namespace AccelByte.Core
         {
             get
             {
-                return Implementation.FlightId;
+                return AccelByteSDKMain.FlightId;
             }
         }
 

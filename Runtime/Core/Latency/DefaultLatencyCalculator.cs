@@ -68,12 +68,15 @@ namespace AccelByte.Core
                     portQueue[port].RemoveAt(0);   
                 }
 
-                var optionalParameters = new Utils.Networking.PingOptionalParameters();
+#if !UNITY_WEBGL || UNITY_EDITOR
+                var optionalParameters = new Utils.Networking.UdpPingOptionalParameters();
                 optionalParameters.InTimeOutInMs = (uint)timeOutSeconds * 1000;
                 optionalParameters.MaxRetry = pingRetry;
-#if !UNITY_WEBGL || UNITY_EDITOR
                 AccelByteResult<int, Error> pingResult = AccelByte.Utils.Networking.UdpPing(nextTask.Url, (uint) nextTask.Port, optionalParameters);
 #else
+                var optionalParameters = new Utils.Networking.HttpPingOptionalParameters();
+                optionalParameters.InTimeOutInMs = (uint)timeOutSeconds * 1000;
+                optionalParameters.MaxRetry = pingRetry;
                 AccelByteResult<int, Error> pingResult = AccelByte.Utils.Networking.HttpPing(nextTask.Url, optionalParameters);
 #endif
                 bool pingComplete = false;

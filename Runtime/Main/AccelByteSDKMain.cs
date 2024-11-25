@@ -60,6 +60,8 @@ namespace AccelByte.Core
 
         internal static System.Action OnSDKStopped;
 
+        internal static string FlightId;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         private static void StartAccelByteSDK()
         {
@@ -69,6 +71,9 @@ namespace AccelByte.Core
             {
                 Main = new PlatformMain();
             }
+            
+            string newId = System.Guid.NewGuid().ToString();
+            FlightId = newId.Replace("-", string.Empty);
 
             onGameUpdate = null;
 

@@ -6,21 +6,24 @@ using System.Collections.Generic;
 
 namespace AccelByte.Core
 {
-    internal abstract class WebRequestScheduler
+    internal class WebRequestScheduler
     {
         protected List<WebRequestTask> requestTask;
-
-        internal abstract void StartScheduler();
-        internal abstract void StopScheduler();
 
         private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
 
         protected IDebugger logger;
+        protected CoreHeartBeat heartBeat;
+        private bool stopRequested;
         
-        ~WebRequestScheduler()
+        public WebRequestScheduler()
         {
-            StopScheduler();
-            CleanTask();
+            stopRequested = false;
+        }
+
+        public void Stop()
+        {
+            stopRequested = true;
         }
 
         public void SetLogger(IDebugger newLogger)
@@ -28,67 +31,55 @@ namespace AccelByte.Core
             this.logger = newLogger;
         }
 
-        internal void AddTask(WebRequestTask newTask)
+        public void SetHeartBeat(CoreHeartBeat heartBeat)
         {
-            if(requestTask == null)
-            {
-                requestTask = new List<WebRequestTask>();
-            }
-
-            lock (requestTask)
-            {
-                requestTask.Add(newTask);
-                requestTask.Sort(orderComparer);
-            }
-
-            StartScheduler();
+            UnityEngine.Assertions.Assert.IsNotNull(heartBeat);
+            this.heartBeat = heartBeat;
         }
 
-        internal WebRequestTask FetchTask()
+        internal async void ExecuteWebTask(WebRequestTask task)
         {
-            if(requestTask == null)
+            if (stopRequested)
             {
-                return null;
+                return;
             }
-
-            WebRequestTask retval = null;
-            lock (requestTask)
+            
+            if (task.DelayMs > 0)
             {
-                while(requestTask.Count > 0)
+                bool waitDone = false;
+                heartBeat.Wait(new WaitTimeCommand(task.DelayMs / 1000, 
+                    cancellationToken: new System.Threading.CancellationTokenSource().Token,
+                    onDone: () =>
                 {
-                    if(requestTask[0].State == WebRequestState.Waiting)
-                    {
-                        break;
-                    }
-                    if (requestTask[0].State == WebRequestState.OnProcess)
-                    {
-                        // If a is task already running, skip fetching
-                        return null;
-                    }
-                    else if(requestTask[0].State == WebRequestState.Complete)
-                    {
-                        requestTask.RemoveAt(0);
-                    }
-                }
-
-                if (requestTask.Count > 0)
+                    waitDone = true;
+                }));
+                while (!waitDone)
                 {
-                    retval = requestTask[0];
-                    requestTask.RemoveAt(0);
-                    retval.SetState(WebRequestState.OnProcess);
+                    await System.Threading.Tasks.Task.Yield();
                 }
             }
 
-            return retval;
-        }
-
-        internal void CleanTask()
-        {
-            if (requestTask != null)
+            using (UnityEngine.Networking.UnityWebRequest webRequest = task.CreateWebRequest())
             {
-                lock (requestTask)
+                using (var webRequestCancelTokenSource = new System.Threading.CancellationTokenSource())
                 {
-                    requestTask.Clear();
+                    double timeoutSeconds = task.TimeoutMs / 1000;
+                    bool isTimeout = false;
+                    heartBeat.Wait(new WaitTimeCommand(waitTime: timeoutSeconds, cancellationToken: webRequestCancelTokenSource.Token, onDone: () =>
+                    {
+                        logger?.LogWarning($"{webRequest.method} {webRequest.uri} reached timeout");
+                        webRequest?.Abort();
+                        isTimeout = true;
+                    }));
+                    Report.GetHttpRequest(task.HttpRequest, webRequest, logger);
+                    var asyncOp = webRequest.SendWebRequest();
+                    while (!asyncOp.isDone && !isTimeout)
+                    {
+                        await System.Threading.Tasks.Task.Yield();
+                    }
+                    Report.GetHttpResponse(webRequest, logger);
+                    webRequestCancelTokenSource.Cancel();
+                    task.SetComplete(webRequest);
                 }
             }
         }

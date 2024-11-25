@@ -16,7 +16,8 @@ namespace AccelByte.Models
         BACKFILL_PROPOSAL,
         [EnumMember(Value = "SESSION_ENDED_NOTIF")] SessionEnded,
         [EnumMember(Value = "SESSION_MEMBER_CHANGED")] SessionMemberChanged,
-        [EnumMember(Value = "DSHUB_CONNECTED")] DsHubConnected
+        [EnumMember(Value = "DSHUB_CONNECTED")] DsHubConnected,
+        [EnumMember(Value = "BACKFILL_TICKET_EXPIRE")] BackfillTicketExpire
     }
     
     [DataContract, Preserve]
