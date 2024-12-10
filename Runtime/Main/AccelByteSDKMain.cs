@@ -16,6 +16,8 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGooglePlayGames")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.AccelByte.GooglePlayGamesExtension")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("AccelByte.Networking")]
+
 namespace AccelByte.Core
 {
 #if !UNITY_EDITOR && UNITY_STANDALONE_WIN

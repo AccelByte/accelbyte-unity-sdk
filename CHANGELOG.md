@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.2.0] (2024-12-10)
+
+
+### Features
+
+* add cancel party invitation 
+* added lobby PartyCreatedNotification 
+* added new session interfaces store, get, delete player attributes 
+* removed deprecated telemetry scripts 
+
+
+### Documentations
+
+* update readme 
+
 ## [17.1.0] (2024-11-25)
 
 

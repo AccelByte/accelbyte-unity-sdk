@@ -44,7 +44,8 @@ namespace AccelByte.Models
         KICKED,
         TIMEOUT,
         DISCONNECTED,
-        TERMINATED
+        TERMINATED,
+        CANCELLED
     };
     
     [JsonConverter(typeof(StringEnumConverter))]
@@ -234,7 +235,7 @@ namespace AccelByte.Models
         [DataMember] public string joinerId;
         [DataMember] public string leaderId;
         [DataMember] public SessionV2ImpactedUserIds ImpactedUserIds;
-    }    
+    } 
     
     [DataContract, Preserve]
     public class SessionV2PartyInvitationRejectedNotification
@@ -242,7 +243,15 @@ namespace AccelByte.Models
         [DataMember] public SessionV2MemberData[] members;
         [DataMember] public string partyId;
         [DataMember] public string rejectedId;
-    }    
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2PartyInvitationCancelledNotification
+    {
+        [DataMember] public SessionV2MemberData[] members;
+        [DataMember] public string partyId;
+        [DataMember] public string[] cancelledUserIDs;
+    }
     
     [DataContract, Preserve]
     public class SessionV2PartyUserKickedNotification
@@ -264,6 +273,16 @@ namespace AccelByte.Models
         [DataMember] public string leaderId;
         [DataMember] public string configurationName;
         [DataMember] public string createdBy;
+    }
+    
+    [DataContract, Preserve]
+    public class PartyCreatedNotification
+    {
+        [DataMember] public string CreatedBy;
+        [DataMember] public uint inactiveTimeout;
+        [DataMember] public string PartyID;
+        [DataMember] public bool TextChat;
+        [DataMember] public string Code;
     }
 
     #endregion
@@ -508,7 +527,7 @@ namespace AccelByte.Models
     public class SessionV2GameInvitationNotification
     {
         [DataMember] public string sessionId;
-    }    
+    } 
     
     [DataContract, Preserve]
     public class SessionV2GameJoinedNotification
@@ -577,5 +596,86 @@ namespace AccelByte.Models
     
     #endregion
 
+    #endregion
+
+    #region Player
+    [Preserve, DataContract]
+    public class PlayerAttributesRequestBody
+    {
+        /// <summary>
+        /// Flag to enable crossplay to player session
+        /// </summary>
+        [DataMember(Name = "crossplayEnabled")] public bool CrossPlayEnabled;
+        /// <summary>
+        /// User Current Platform
+        /// </summary>
+        [DataMember(Name = "currentPlatform")] public string CurrentPlatform;
+        /// <summary>
+        /// Store other data for user private attribute.
+        /// </summary>
+        [DataMember(Name = "data")] public JObject Data;
+        /// <summary>
+        /// List of the player's 3rd party platform account information
+        /// </summary>
+        [DataMember(Name = "platforms")] public UserPlatformInfo[] Platforms;
+        /// <summary>
+        /// User role for matchmaking role base support.
+        /// </summary>
+        [DataMember(Name = "roles")] public string[] Roles;
+        /// <summary>
+        /// User Simultaneous Platform
+        /// </summary>
+        [DataMember(Name = "simultaneousPlatform")] public string SimultaneousPlatform;
+    }
+    
+    [Preserve, DataContract]
+    public class PlayerAttributesResponseBody
+    {
+        /// <summary>
+        /// Flag to enable crossplay to player session
+        /// </summary>
+        [DataMember(Name = "crossplayEnabled")] public bool CrossPlayEnabled;
+        /// <summary>
+        /// User Current Platform
+        /// </summary>
+        [DataMember(Name = "currentPlatform")] public string CurrentPlatform;
+        /// <summary>
+        /// Store other data for user private attribute.
+        /// </summary>
+        [DataMember(Name = "data")] public JObject Data;
+        /// <summary>
+        /// List of the player's 3rd party platform account information
+        /// </summary>
+        [DataMember(Name = "platforms")] public UserPlatformInfo[] Platforms;
+        /// <summary>
+        /// User role for matchmaking role base support.
+        /// </summary>
+        [DataMember(Name = "roles")] public string[] Roles;
+        /// <summary>
+        /// User Simultaneous Platform
+        /// </summary>
+        [DataMember(Name = "userID")] public string UserId;
+    }
+    
+    [Preserve, DataContract]
+    public class UserPlatformInfo
+    {
+        [DataMember(Name = "name")] public readonly string Name;
+        [DataMember(Name = "userID")] public readonly string UserId;
+
+        public UserPlatformInfo(PlayerAttributeUserPlatformType platformType, string userId)
+        {
+            this.Name = Utils.ConverterUtils.EnumToDescription(platformType);
+            this.UserId = userId;
+        }
+    }
+    
+    [Preserve, DataContract]
+    public enum PlayerAttributeUserPlatformType
+    {
+        [System.ComponentModel.Description("STEAM")] Steam,
+        [System.ComponentModel.Description("XBOX")] Xbox,
+        [System.ComponentModel.Description("PSN")] Psn
+    }
     #endregion
 }

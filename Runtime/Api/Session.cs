@@ -51,7 +51,7 @@ namespace AccelByte.Api
             cts.Cancel();
         }
 
-        #region PartySession
+#region PartySession
         public void GetPartyDetails(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -63,7 +63,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -113,7 +113,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -173,13 +173,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(leaderId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Leader id cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Leader id cannot be null or empty"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -208,7 +208,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -236,7 +236,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -264,7 +264,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -291,7 +291,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
@@ -317,7 +317,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
                 
@@ -340,7 +340,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -357,7 +357,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -384,7 +384,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -404,17 +404,42 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
                 sessionApi.RevokePartyCode(sessionId, callback));
         }
+        
+        public void CancelPartyInvitation(string partyId
+            , string userId
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+            
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+            
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
 
-        #endregion
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
 
-        #region GameSession
+            sessionApi.CancelPartyInvitation(partyId, userId, callback);
+        }
+
+#endregion
+
+#region GameSession
 
         public void CreateGameSession(SessionV2GameSessionCreateRequest request
             , ResultCallback<SessionV2GameSession> callback)
@@ -425,7 +450,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -453,7 +478,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -471,7 +496,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -493,7 +518,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -515,7 +540,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -538,7 +563,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -598,7 +623,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -627,7 +652,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -656,7 +681,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -673,7 +698,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -693,7 +718,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -720,7 +745,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -740,7 +765,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -760,7 +785,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -874,9 +899,9 @@ namespace AccelByte.Api
             }
         }
 
-        #endregion
+#endregion
 
-        #region SessionStorage
+#region SessionStorage
 
         public void UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
@@ -889,7 +914,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -908,17 +933,16 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
                 sessionApi.UpdateMemberStorage(session.UserId, sessionId, data, callback));
         }
+#endregion
 
-        #endregion
-
-        #region PredefinedEvents
+#region PredefinedEvents
         private enum PredefinedAnalyticsMode
         {
             GameSessionCreate,
@@ -1071,6 +1095,56 @@ namespace AccelByte.Api
             callback?.TryOk();
         }
 
-        #endregion
+#endregion
+        
+#region Player
+        /// <summary>
+        /// Get player attributes.
+        /// </summary>
+        public void GetPlayerAttributes(ResultCallback<PlayerAttributesResponseBody> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.GetPlayerAttributes(callback);
+        }
+
+        /// <summary>
+        /// Set the behavior of player online session.
+        /// </summary>
+        public void StorePlayerAttributes(PlayerAttributesRequestBody requestBody, ResultCallback<PlayerAttributesResponseBody> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.StorePlayerAttributes(requestBody, callback);
+        }
+
+        /// <summary>
+        /// Reset player attributes
+        /// </summary>
+        public void ResetPlayerAttributes(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.RemovePlayerAttributes(callback);
+        }
+#endregion
     }
 }

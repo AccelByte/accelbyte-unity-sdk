@@ -407,6 +407,7 @@ namespace AccelByte.Core
         CodeRedeemptionNotStarted = 37177,
         CodeRedeemptionAlreadyEnded = 37178,
         MaxRedeemCountPerCodePerCampaignExceeded = 37179,
+        AchievementTooManyRequests = 40153,
         SeasonPassDefaultLanguageRequiredException = 49121,
         SeasonPassInvalidTimeRangeException = 49122,
         SeasonPassTierItemNotFoundException = 49141,

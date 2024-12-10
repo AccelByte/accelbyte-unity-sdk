@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using Newtonsoft.Json.Linq;
 using UnityEngine.Assertions;
 
@@ -51,7 +52,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateParty(string partyId, SessionV2PartySessionUpdateRequest data
@@ -79,7 +80,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator PatchUpdateParty(string partyId, SessionV2PartySessionUpdateRequest data
@@ -107,7 +108,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator InviteUserToParty(string partyId, string userId
@@ -140,7 +141,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         internal void InviteUserToParty(string partyId, string userId, ResultCallback<InviteUserToPartyResponse> callback)
@@ -204,7 +205,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator JoinParty(string partyId, ResultCallback<SessionV2PartySession> callback)
@@ -229,7 +230,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator LeaveParty(string partyId, ResultCallback callback)
@@ -254,7 +255,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectPartyInvitation(string partyId, ResultCallback callback)
@@ -279,7 +280,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator KickUserFromParty(string partyId, string userId,
@@ -307,7 +308,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySessionKickResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateParty(SessionV2PartySessionCreateRequest data
@@ -333,7 +334,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserParties(ResultCallback<PaginatedResponse<SessionV2PartySession>> callback)
@@ -356,7 +357,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedResponse<SessionV2PartySession>>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator JoinPartyByCode(string code
@@ -386,7 +387,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GenerateNewPartyCode(string partyId
@@ -414,7 +415,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2PartySession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RevokePartyCode(string partyId
@@ -442,7 +443,33 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
+        }
+
+        internal void CancelPartyInvitation(string partyId, string userId, ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId, userId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+            
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/{userId}/cancel")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("partyId", partyId)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         #endregion
@@ -472,7 +499,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryGameSession(Dictionary<string, object> data
@@ -498,7 +525,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedResponse<SessionV2GameSession>>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameSessionDetailsByPodName(string podName
@@ -524,7 +551,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameSessionDetailsBySessionId(string sessionId
@@ -583,7 +610,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator PatchGameSession(string sessionId,
@@ -612,7 +639,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator InviteUserToGameSession(string sessionId, string userId
@@ -642,7 +669,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         internal void InviteUserToGameSession(string sessionId, string userId, ResultCallback<InviteUserToGameSessionResponse> callback)
@@ -699,7 +726,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator LeaveGameSession(string sessionId
@@ -725,7 +752,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectGameSessionInvitation(string sessionId
@@ -751,7 +778,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserGameSessions(SessionV2StatusFilter? statusFilter,
@@ -783,7 +810,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedResponse<SessionV2GameSession>>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator JoinGameSessionByCode(string code
@@ -813,7 +840,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GenerateNewGameSessionCode(string sessionId
@@ -841,7 +868,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RevokeGameSessionCode(string sessionId
@@ -869,7 +896,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator PromoteUserToGameSessionLeader(string sessionId, string leaderId
@@ -877,22 +904,22 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(leaderId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(leaderId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(leaderId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -920,28 +947,27 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         #endregion
 
-        #region SessionStorage
-
+#region SessionStorage
         public IEnumerator UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -964,24 +990,24 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<JObject>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateMemberStorage(string userId, string sessionId, JObject data, ResultCallback<JObject> callback)
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1005,9 +1031,84 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<JObject>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
-        #endregion
+#endregion
+        
+#region Player
+        internal void GetPlayerAttributes(ResultCallback<PlayerAttributesResponseBody> callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+        
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/attributes")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+                    
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PlayerAttributesResponseBody>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void StorePlayerAttributes(PlayerAttributesRequestBody requestBody, ResultCallback<PlayerAttributesResponseBody> callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, requestBody);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/attributes")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithBody(requestBody.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PlayerAttributesResponseBody>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void RemovePlayerAttributes(ResultCallback callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/attributes")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+#endregion
     }
 }

@@ -150,6 +150,7 @@ namespace AccelByte.Models
         OnPartyRejected,
         OnPartyKicked,
         OnPartyUpdated,
+        OnPartyCancelled,
 
         // SessionV2 - Game
         OnSessionInvited,
@@ -171,6 +172,7 @@ namespace AccelByte.Models
 
         // SessionV2Storage
         OnSessionStorageChanged,
+        OnPartyCreated
     }
     
     [DataContract, Preserve]

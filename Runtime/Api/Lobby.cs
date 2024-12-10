@@ -89,6 +89,11 @@ namespace AccelByte.Api
         public event ResultCallback<SessionV2PartyInvitationRejectedNotification> SessionV2UserRejectedPartyInvitation;
 
         /// <summary>
+        /// SessionV2 - Raised when a leader is canceling an invitation
+        /// </summary>
+        public event ResultCallback<SessionV2PartyInvitationCancelledNotification> SessionV2PartyInvitationCancelled;
+
+        /// <summary>
         /// SessionV2 - Raised when a user is kicked from party
         /// </summary>
         public event ResultCallback<SessionV2PartyUserKickedNotification> SessionV2UserKickedFromParty;
@@ -168,6 +173,11 @@ namespace AccelByte.Api
         /// Raised when party chat message received.
         /// </summary>
         public event ResultCallback<ChatMessage> PartyChatReceived;
+        
+        /// <summary>
+        /// Triggered when party successfully created
+        /// </summary>
+        public event ResultCallback<PartyCreatedNotification> PartyCreatedNotification;
 
         /// <summary>
         /// Raised when a notification (usually from the system or admin) is received.
@@ -2227,6 +2237,12 @@ namespace AccelByte.Api
                     websocketApi.DispatchNotification(partySession,
                         SessionV2PartyUpdated);
                     break;
+                case MultiplayerV2NotifType.OnPartyCancelled:
+                    var cancelledPartySession = 
+                        JsonConvert.DeserializeObject<SessionV2PartyInvitationCancelledNotification>(jsonString);
+                    websocketApi.DispatchNotification(cancelledPartySession,
+                        SessionV2PartyInvitationCancelled);
+                    break;
                 case MultiplayerV2NotifType.OnSessionInvited:
                     var gameSessionNotificationUserInvited =
                         JsonConvert.DeserializeObject<SessionV2GameInvitationNotification>(jsonString);
@@ -2318,6 +2334,12 @@ namespace AccelByte.Api
                     var sessionStorageChangedNotification =
                         JsonConvert.DeserializeObject<SessionStorageChangedNotification>(jsonString);
                     websocketApi.DispatchNotification(sessionStorageChangedNotification, SessionV2StorageChanged);
+                    break;
+                case MultiplayerV2NotifType.OnPartyCreated:
+                    var partyCreatedNotification = 
+                        JsonConvert.DeserializeObject<PartyCreatedNotification>(jsonString);
+                    websocketApi.DispatchNotification(partyCreatedNotification,
+                        PartyCreatedNotification);
                     break;
                 default:
                     SharedMemory?.Logger?.LogWarning($"MultiplayerV2 notification type {notificationType} not supported");
