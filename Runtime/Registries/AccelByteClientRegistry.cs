@@ -30,6 +30,7 @@ namespace AccelByte.Api
         private AccelByteMessagingSystem messagingSystem;
         private AccelByteNotificationSender notificationSender;
         private AccelByteNotificationBuffer notificationBuffer;
+        private AccelBytePastSessionRecordManager pastSessionRecordManager;
         private IFileStream fileStream;
 
         IHttpClient httpClient;
@@ -92,7 +93,16 @@ namespace AccelByte.Api
             private set;
         }
 
-        internal AccelByteClientRegistry(SettingsEnvironment environment, Config config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager, CoreHeartBeat coreHeartBeat, IFileStream fileStream)
+        private Utils.AccelByteServiceTracker serviceTracker;
+
+        internal AccelByteClientRegistry(SettingsEnvironment environment
+            , Config config
+            , OAuthConfig oAuthConfig
+            , IHttpRequestSenderFactory requestSenderFactory
+            , AccelByteTimeManager timeManager
+            , CoreHeartBeat coreHeartBeat
+            , IFileStream fileStream
+            , Utils.AccelByteServiceTracker serviceTracker)
         {
             clientApiInstances = new Dictionary<string, ApiClient>();
             loginUserClientApis = new List<ApiClient>();
@@ -101,6 +111,7 @@ namespace AccelByte.Api
             this.Logger = new AccelByteDebuggerV2();
             this.coreHeartBeat = coreHeartBeat;
             this.fileStream = fileStream;
+            this.serviceTracker = serviceTracker;
             
             Initialize(environment, config, oAuthConfig);
             
@@ -142,6 +153,11 @@ namespace AccelByte.Api
             return notificationSender;
         }
 
+        public AccelBytePastSessionRecordManager GetPastSessionRecordManager()
+        {
+            return pastSessionRecordManager;
+        }
+
         public PresenceBroadcastEventScheduler GetPresenceBroadcastEvent()
         {
             return presenceEventScheduler;
@@ -174,6 +190,7 @@ namespace AccelByte.Api
             {
                 Logger = newLogger;
                 sharedMemory.Logger = newLogger;
+                SetupCurrentLogger(Config);
             }
         }
 
@@ -185,12 +202,7 @@ namespace AccelByte.Api
 
             if (config != null)
             {
-                Logger?.SetEnableLogging(config.EnableDebugLog);
-                if (Enum.TryParse(config.DebugLogFilter, out AccelByteLogType logTypeEnum))
-                {
-                    Logger?.SetFilterLogType(logTypeEnum);
-                }
-                AccelByteDebug.Initialize(config.EnableDebugLog, config.DebugLogFilter);
+                SetupCurrentLogger(config);
             }
 
             sharedMemory = new ApiSharedMemory();
@@ -198,10 +210,12 @@ namespace AccelByte.Api
             sharedMemory.CoreHeartBeat = this.coreHeartBeat;
             sharedMemory.DeviceIdGeneratorConfig =
                 new DeviceIdGeneratorConfig(config != null ? config.RandomizeDeviceId : false);
+            sharedMemory.ServiceTracker = serviceTracker;
             
             InitializeNetworkConditioner();
             InitializeMessagingSystem();
             InitializeNotificationSender();
+            InitializePartySessionStorageLocalUserManager();
             InitializeAnalytics(config);
 
             System.Net.ServicePointManager.ServerCertificateValidationCallback += OnCertificateValidated;
@@ -211,6 +225,7 @@ namespace AccelByte.Api
             sharedMemory.NetworkConditioner = networkConditioner;
             sharedMemory.MessagingSystem = messagingSystem;
             sharedMemory.NotificationSender = notificationSender;
+            sharedMemory.PastSessionRecordManager = pastSessionRecordManager;
             sharedMemory.TimeManager = this.TimeManager;
             sharedMemory.TimeManager?.SetLogger(Logger);
 
@@ -557,6 +572,11 @@ namespace AccelByte.Api
             notificationSender = new AccelByteNotificationSender(ref messagingSystem);
         }
 
+        private void InitializePartySessionStorageLocalUserManager()
+        {
+            pastSessionRecordManager = new AccelBytePastSessionRecordManager();
+        }
+
         private void InitializeNotificationBuffer()
         {
             notificationBuffer = new AccelByteNotificationBuffer(Logger);
@@ -591,6 +611,17 @@ namespace AccelByte.Api
             {
                 TimeManager.FetchServerTime(httpClient, config.Namespace, config.BasicServerUrl);
             }
+        }
+
+        private void SetupCurrentLogger(Config config)
+        {
+            Logger?.SetEnableLogging(config.EnableDebugLog);
+            Logger?.SetEnableEnhancedLogging(config.EnhancedServiceLogging);
+            if (Enum.TryParse(config.DebugLogFilter, out AccelByteLogType logTypeEnum))
+            {
+                Logger?.SetFilterLogType(logTypeEnum);
+            }
+            AccelByteDebug.Initialize(config.EnableDebugLog, config.DebugLogFilter);
         }
     }
 }

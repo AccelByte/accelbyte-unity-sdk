@@ -274,5 +274,26 @@ namespace AccelByte.Server
 
             Api.ReconcileMaxActiveSession(userId, configurationName, callback);
         }
+
+        internal void GetPartySessionStorage(string partyId
+            , ResultCallback<GetPartySessionStorageResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId)
+                , callback))
+            {
+                return;
+            }
+
+            if (!_session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.GetPartySessionStorage(partyId, callback);
+        }
     }
 }

@@ -40,14 +40,13 @@ namespace AccelByte.Core {
         void Connect(string url, string protocols, string sessionId, string entitlementToken = null, ResultCallback callback = null);
         void Close(WsCloseCode code = WsCloseCode.Normal, string reason = null);
         void Send(string message);
-        void SetLogger(IDebugger logger);
         void SetProxy(string url, string username, string password);
-
         void Ping();
         WsState ReadyState { get; }
         event OnOpenHandler OnOpen;
         event OnMessageHandler OnMessage;
         event OnErrorHandler OnError;
         event OnCloseHandler OnClose;
+        internal void SetSharedMemory(ApiSharedMemory sharedMemory);
     }
 }

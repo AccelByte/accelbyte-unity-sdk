@@ -144,6 +144,7 @@ namespace AccelByte.Models
     public enum MultiplayerV2NotifType
     {
         // SessionV2 - Party
+        OnPartyCreated,
         OnPartyInvited,
         OnPartyJoined,
         OnPartyMembersChanged,
@@ -172,7 +173,6 @@ namespace AccelByte.Models
 
         // SessionV2Storage
         OnSessionStorageChanged,
-        OnPartyCreated
     }
     
     [DataContract, Preserve]

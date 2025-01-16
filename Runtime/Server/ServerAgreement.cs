@@ -5,6 +5,7 @@
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server.Interface;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Scripting;
 
@@ -13,6 +14,7 @@ namespace AccelByte.Server
     /// <summary>
     /// Provides APIs to access Agreement service.
     /// </summary>
+    [Obsolete("This class will be removed on AGS 3.84, please manage your legal document on Admin Portal")]
     public class ServerAgreement : WrapperBase, IServerAgreement
     {
         private readonly ServerAgreementApi api;

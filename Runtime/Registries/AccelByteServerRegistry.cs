@@ -67,8 +67,17 @@ namespace AccelByte.Server
             get;
             private set;
         }
+        
+        private Utils.AccelByteServiceTracker serviceTracker;
 
-        internal AccelByteServerRegistry(SettingsEnvironment environment, ServerConfig config, OAuthConfig oAuthConfig, IHttpRequestSenderFactory requestSenderFactory, AccelByteTimeManager timeManager, CoreHeartBeat coreHeartBeat)
+        internal AccelByteServerRegistry(
+            SettingsEnvironment environment
+            , ServerConfig config
+            , OAuthConfig oAuthConfig
+            , IHttpRequestSenderFactory requestSenderFactory
+            , AccelByteTimeManager timeManager
+            , CoreHeartBeat coreHeartBeat
+            , Utils.AccelByteServiceTracker serviceTracker)
         {
             serverApiClientInstances = new Dictionary<string, ServerApiClient>();
             loginUserClientApis = new List<ServerApiClient>();
@@ -76,6 +85,7 @@ namespace AccelByte.Server
             this.timeManager = timeManager;
             this.Logger = new AccelByteDebuggerV2();
             this.coreHeartBeat = coreHeartBeat;
+            this.serviceTracker = serviceTracker;
             
             Initialize(environment, config, oAuthConfig);
             UpdateServerTime(ref this.timeManager, CreateHtppClient(), ref Config);
@@ -127,6 +137,7 @@ namespace AccelByte.Server
             {
                 Logger = newLogger;
                 sharedMemory.Logger = newLogger;
+                SetupCurrentLogger(Config);
             }
         }
 
@@ -138,17 +149,13 @@ namespace AccelByte.Server
 
             if (config != null)
             {
-                Logger?.SetEnableLogging(config.EnableDebugLog);
-                if (Enum.TryParse(config.DebugLogFilter, out AccelByteLogType logTypeEnum))
-                {
-                    Logger?.SetFilterLogType(logTypeEnum);
-                }
-                AccelByteDebug.Initialize(config.EnableDebugLog, config.DebugLogFilter);
+                SetupCurrentLogger(config);
             }
 
             sharedMemory = new ApiSharedMemory();
             sharedMemory.Logger = Logger;
             sharedMemory.CoreHeartBeat = coreHeartBeat;
+            sharedMemory.ServiceTracker = serviceTracker;
 
             InitializeAnalytics(config);
 
@@ -382,6 +389,17 @@ namespace AccelByte.Server
             {
                 TimeManager.FetchServerTime(httpClient, config.Namespace, config.BasicServerUrl);
             }
+        }
+
+        private void SetupCurrentLogger(ServerConfig config)
+        {
+            Logger?.SetEnableLogging(config.EnableDebugLog);
+            Logger?.SetEnableEnhancedLogging(config.EnhancedServiceLogging);
+            if (Enum.TryParse(config.DebugLogFilter, out AccelByteLogType logTypeEnum))
+            {
+                Logger?.SetFilterLogType(logTypeEnum);
+            }
+            AccelByteDebug.Initialize(config.EnableDebugLog, config.DebugLogFilter);
         }
     }
 }

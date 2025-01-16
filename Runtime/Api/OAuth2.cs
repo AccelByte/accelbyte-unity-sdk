@@ -772,22 +772,94 @@ public class OAuth2 : ApiBase
         , PlatformType platformId
         , ResultCallback<GeneratedOneTimeCode> callback)
     {
+        GenerateOneTimeCode(AccessToken, platformId, null, callback);
+    }
+    
+    public void GenerateOneTimeCode(string accessToken
+        , PlatformType platformId
+        , GenerateOneTimeCodeOptionalParameters optionalParameters
+        , ResultCallback<GeneratedOneTimeCode> callback)
+    {
         Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(AccessToken, "Can't verify token! token parameter is null!");
 
-        var request = HttpRequestBuilder
+        var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken);
+        if (error != null)
+        {
+            callback?.TryError(error);
+            return;
+        }
+
+        var builder = HttpRequestBuilder
             .CreatePost(BaseUrl + "/v3/link/code/request")
-            .WithBearerAuth(AccessToken)
+            .WithBearerAuth(accessToken)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("platformId", platformId.ToString().ToLower())
-            .GetResult();
+            .WithFormParam("platformId", platformId.ToString().ToLower());
+
+        if (!string.IsNullOrEmpty(optionalParameters?.RedirectUri))
+        {
+            builder.WithFormParam("redirectUri", optionalParameters.RedirectUri);
+        }
+
+        if (!string.IsNullOrEmpty(optionalParameters?.State))
+        {
+            builder.WithFormParam("state", optionalParameters.State);
+        }
+
+        var request = builder.GetResult();
 
         HttpOperator.SendRequest(request, response =>
         {
             var result = response.TryParseJson<GeneratedOneTimeCode>();
 
             callback.Try(result);
+        });
+    }
+
+    internal void RequestTokenByOneTimeLinkCode(string oneTimeCode
+        , RequestTokenByOneTimeLinkCodeOptionalParameters optionalParams
+        , ResultCallback<TokenData> callback)
+    {
+        Report.GetFunctionLog(GetType().Name);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(oneTimeCode);
+        if (error != null)
+        {
+            callback?.TryError(error);
+            return;
+        }
+
+        var builder = HttpRequestBuilder
+            .CreatePost(BaseUrl + "/v3/link/token/exchange")
+            .WithBearerAuth(AuthToken)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("oneTimeLinkCode", oneTimeCode)
+            .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId);
+
+        if (optionalParams != null)
+        {
+            if (optionalParams.IsTransient != null)
+            {
+                builder.WithFormParam("isTransient", optionalParams.IsTransient.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(optionalParams.AdditionalData))
+            {
+                builder.WithFormParam("additionalData", optionalParams.AdditionalData);
+            }
+        }
+
+        var request = builder.GetResult();
+
+        HttpOperator.SendRequest(request, response =>
+        {
+            var result = response.TryParseJson<TokenData>();
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+            }
+            callback?.Try(result);
         });
     }
 

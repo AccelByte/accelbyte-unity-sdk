@@ -162,6 +162,7 @@ namespace AccelByte.Editor
             EditorCommon.CreateTextInput((newValue) => editedServerConfig.BaseUrl = newValue, editedServerConfig.BaseUrl, "Base Url", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerConfig.RedirectUri = newValue, editedServerConfig.RedirectUri, "Redirect Uri", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerConfig.Namespace = newValue, editedServerConfig.Namespace, "Namespace Id", required: true);
+            EditorCommon.CreateTextInput((newValue) => editedServerConfig.PublisherNamespace = newValue, editedServerConfig.PublisherNamespace, "Publisher Namespace Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerOAuthConfig.ClientId = newValue, editedServerOAuthConfig.ClientId, "Client Id", required: true);
             EditorCommon.CreateTextInput((newValue) => editedServerOAuthConfig.ClientSecret = newValue, editedServerOAuthConfig.ClientSecret, "Client Secret");
 
@@ -183,6 +184,8 @@ namespace AccelByte.Editor
 
                 EditorGUILayout.LabelField("");
                 EditorGUILayout.EndHorizontal();
+                
+                EditorCommon.CreateToggleInput((newValue) => editedServerConfig.EnhancedServiceLogging = newValue, editedServerConfig.EnhancedServiceLogging, "Enhanced Service Logging", indentLevel: 1);
             }
             #endregion
 
@@ -217,6 +220,9 @@ namespace AccelByte.Editor
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.QosManagerServerUrl = newValue, editedServerConfig.QosManagerServerUrl, "QoS Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.GameTelemetryServerUrl = newValue, editedServerConfig.GameTelemetryServerUrl, "Game Telemetry Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.AchievementServerUrl = newValue, editedServerConfig.AchievementServerUrl, "Achievement Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedServerConfig.ChallengeServerUrl = newValue, editedServerConfig.ChallengeServerUrl, "Challenge Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedServerConfig.InventoryServerUrl = newValue, editedServerConfig.InventoryServerUrl, "Inventory Server Url", false, generateServiceUrl, indentLevel: 1);
+                EditorCommon.CreateTextInput((newValue) => editedServerConfig.ProfanityFilterServerUrl = newValue, editedServerConfig.ProfanityFilterServerUrl, "Profanity Filter Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.LobbyServerUrl = newValue, editedServerConfig.LobbyServerUrl, "Lobby Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.SessionServerUrl = newValue, editedServerConfig.SessionServerUrl, "Session Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedServerConfig.CloudSaveServerUrl = newValue, editedServerConfig.CloudSaveServerUrl, "CloudSave Server Url", false, generateServiceUrl, indentLevel: 1);

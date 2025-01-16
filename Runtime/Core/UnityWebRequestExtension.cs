@@ -1,4 +1,4 @@
-// Copyright (c) 2019 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,11 +11,12 @@ namespace AccelByte.Core
 {
     public static class UnityWebRequestExtension
     {
-        public static UnityWebRequest GetUnityWebRequest(this IHttpRequest request)
+        public static AccelByteWebRequest GetUnityWebRequest(this IHttpRequest request)
         {
             var uri = new Uri(request.Url);
-            var unityWebRequest = new UnityWebRequest(uri, request.Method);
+            var unityWebRequest = new AccelByteWebRequest(uri, request.Method);
 
+            unityWebRequest.RequestId = request.Id;
             if (request.Headers.TryGetValue("Authorization", out string value))
             {
                 unityWebRequest.SetRequestHeader("Authorization", value);

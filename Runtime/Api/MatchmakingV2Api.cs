@@ -48,9 +48,22 @@ namespace AccelByte.Api
 
             if (optionalParams != null)
             {
-                if (optionalParams.attributes != null) requestBody.attributes = optionalParams.attributes;
-                if (optionalParams.latencies != null) requestBody.latencies = optionalParams.latencies;
-                if (!string.IsNullOrEmpty(optionalParams.sessionId)) requestBody.sessionId = optionalParams.sessionId;
+                if (optionalParams.attributes != null)
+                {
+                    requestBody.attributes = optionalParams.attributes;
+                }
+                if (optionalParams.latencies != null)
+                {
+                    requestBody.latencies = optionalParams.latencies;
+                }
+                if (!string.IsNullOrEmpty(optionalParams.sessionId))
+                {
+                    requestBody.sessionId = optionalParams.sessionId;
+                }
+                if (optionalParams.ExcludedGameSessionIds != null)
+                {
+                    requestBody.ExcludedSessions = optionalParams.ExcludedGameSessionIds;
+                }
             }
 
             var request = HttpRequestBuilder
@@ -62,14 +75,13 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<MatchmakingV2CreateTicketResponse>();
+                callback?.Try(result);
+            });
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<MatchmakingV2CreateTicketResponse>();
-
-            callback.Try(result);
+            yield break;
         }
 
         public IEnumerator GetMatchmakingTicket(string ticketId

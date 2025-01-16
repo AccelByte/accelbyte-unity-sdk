@@ -3,8 +3,11 @@
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
 using AccelByte.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -12,11 +15,20 @@ namespace AccelByte.Api
 {
     public class MatchmakingV2 : WrapperBase
     {
-        private readonly MatchmakingV2Api matchmakingV2Api;
+        internal MatchmakingV2Api Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
-        
+        private Dictionary<string, PartySessionStorageReservedData> partyMemberSessionIds;
+        internal readonly PartySessionStorageApi PartySessionStorageApi;
+        private string partySessionId;
+
         internal Action<Result<MatchmakingV2MatchTicketStatus>> MatchmakingTicketPolled;
+
+        public bool PartyMemberPastSessionRecordSyncEnabled
+        {
+            get;
+            set;
+        }
 
         [UnityEngine.Scripting.Preserve]
         internal MatchmakingV2(MatchmakingV2Api inApi
@@ -25,9 +37,27 @@ namespace AccelByte.Api
         {
             Assert.IsNotNull(inCoroutineRunner);
 
-            matchmakingV2Api = inApi;
+            Api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
+            PartySessionStorageApi = new PartySessionStorageApi(inApi.HttpClient,
+                inApi.Config,
+                session);
+        }
+
+        internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
+        {
+            SharedMemory?.MessagingSystem?.UnsubscribeToTopicV2(AccelByteMessagingTopic.OnJoinedPartyNotification, OnJoinedPartyEventHandler);
+            SharedMemory?.MessagingSystem?.UnsubscribeToTopicV2(AccelByteMessagingTopic.OnCreatedPartyNotification, OnCreatedPartyEventHandler);
+            SharedMemory?.MessagingSystem?.UnsubscribeToTopicV2(AccelByteMessagingTopic.OnLeftPartyNotification, OnLeftPartyEventHandler);
+            SharedMemory?.MessagingSystem?.UnsubscribeToTopicV2(AccelByteMessagingTopic.OnJoinedGameSessionNotification, OnJoinedGameSessionEventHandler);
+
+            base.SetSharedMemory(newSharedMemory);
+
+            SharedMemory?.MessagingSystem?.SubscribeToTopicV2(AccelByteMessagingTopic.OnJoinedPartyNotification, OnJoinedPartyEventHandler);
+            SharedMemory?.MessagingSystem?.SubscribeToTopicV2(AccelByteMessagingTopic.OnCreatedPartyNotification, OnCreatedPartyEventHandler);
+            SharedMemory?.MessagingSystem?.SubscribeToTopicV2(AccelByteMessagingTopic.OnLeftPartyNotification, OnLeftPartyEventHandler);
+            SharedMemory?.MessagingSystem?.SubscribeToTopicV2(AccelByteMessagingTopic.OnJoinedGameSessionNotification, OnJoinedGameSessionEventHandler);
         }
 
         /// <summary>
@@ -60,20 +90,28 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                matchmakingV2Api.CreateMatchmakingTicket(matchPoolName, optionalParams, cb => 
+            if (GetPartySessionStorageRequired(optionalParams))
+            {
+                GetPartySessionStorage(optionalParams.sessionId, cb =>
                 {
-                    if(!cb.IsError)
+                    if (!cb.IsError)
                     {
-                        SharedMemory.MessagingSystem.SendMessage(AccelByteMessagingTopic.MatchmakingStarted, cb.Value.matchTicketId);
-                        StartMatchmakingTicketPoll(cb.Value.matchTicketId, matchPoolName);
+                        foreach (var memberSessionId in cb.Value.Reserved)
+                        {
+                            SharedMemory?.PastSessionRecordManager?.InsertPastSessionId(memberSessionId.Key, memberSessionId.Value.PastSessionIds); ;
+                        }
+                        partyMemberSessionIds = cb.Value.Reserved;
                     }
-                    SendPredefinedEvent(matchPoolName, optionalParams, cb, callback);
-                }));
+                    CreateMatchmakingTicketHandler(matchPoolName, optionalParams, callback);
+                });
+                return;
+            }
+
+            CreateMatchmakingTicketHandler(matchPoolName, optionalParams, callback);
         }
         
         /// <summary>
@@ -95,12 +133,12 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.GetMatchmakingTicket(ticketId, callback));
+                Api.GetMatchmakingTicket(ticketId, callback));
         }
         
         /// <summary>
@@ -121,12 +159,12 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.DeleteMatchmakingTicket(ticketId, cb =>
+                Api.DeleteMatchmakingTicket(ticketId, cb =>
                 {
                     SendPredefinedEvent(ticketId, cb, callback);
                 }));
@@ -143,12 +181,12 @@ namespace AccelByte.Api
             
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.GetMatchmakingMetrics(matchPool, callback));
+                Api.GetMatchmakingMetrics(matchPool, callback));
         }
 
         /// <summary>
@@ -165,12 +203,12 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
-                matchmakingV2Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
+                Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
         }
 
         /// <summary>
@@ -190,18 +228,18 @@ namespace AccelByte.Api
         /// <param name="matchPoolName">Matchpool name used in matchmaking</param>
         internal IEnumerator StartMatchmakingTicketPollAsync(string ticketId, string matchPoolName)
         {
-            if (!matchmakingV2Api.Config.EnableMatchmakingTicketCheck)
+            if (!Api.Config.EnableMatchmakingTicketCheck)
             {
                 yield break;
             }
 
-            yield return new WaitForSeconds(matchmakingV2Api.Config.MatchmakingTicketCheckInitialDelay / 1000f);
+            yield return new WaitForSeconds(Api.Config.MatchmakingTicketCheckInitialDelay / 1000f);
 
             bool shouldContinuePolling = true;
             while (shouldContinuePolling)
             {
                 coroutineRunner.Run(
-                    matchmakingV2Api.GetMatchmakingTicket(ticketId, result =>
+                    Api.GetMatchmakingTicket(ticketId, result =>
                     {
                         MatchmakingTicketPolled?.Invoke(result);
 
@@ -213,7 +251,7 @@ namespace AccelByte.Api
                                 {
                                     ticketId = ticketId,
                                     matchPool = matchPoolName,
-                                    namespace_ = matchmakingV2Api.Config.Namespace,
+                                    namespace_ = Api.Config.Namespace,
                                     createdAt = DateTime.UtcNow
                                 };
                                 var expiredNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
@@ -240,10 +278,184 @@ namespace AccelByte.Api
 
                 if (shouldContinuePolling)
                 {
-                    yield return new WaitForSeconds(matchmakingV2Api.Config.MatchmakingTicketCheckPollRate / 1000f);
+                    yield return new WaitForSeconds(Api.Config.MatchmakingTicketCheckPollRate / 1000f);
                 }
             }
         }
+
+        private bool GetPartySessionStorageRequired(MatchmakingV2CreateTicketRequestOptionalParams optionalParams)
+        {
+            if (optionalParams == null)
+            {
+                return false;
+            }
+
+            return !string.IsNullOrEmpty(optionalParams.sessionId) 
+                && (optionalParams.ExclusionType == MatchmakingV2ExclusionType.NPastSession
+                || optionalParams.ExclusionType == MatchmakingV2ExclusionType.AllMemberCachedSession);
+        }
+
+        private void CreateMatchmakingTicketHandler(string matchPoolName
+            , MatchmakingV2CreateTicketRequestOptionalParams optionalParams
+            , ResultCallback<MatchmakingV2CreateTicketResponse> callback)
+        {
+            if (optionalParams != null)
+            {
+                optionalParams.ExcludedGameSessionIds = PopulatePastMemberSessionId(optionalParams);
+            }
+
+
+            coroutineRunner.Run(Api.CreateMatchmakingTicket(matchPoolName, optionalParams, cb =>
+            {
+                if (!cb.IsError)
+                {
+                    StartMatchmakingTicketPoll(cb.Value.matchTicketId, matchPoolName);
+                    SharedMemory.MessagingSystem.SendMessage(AccelByteMessagingTopic.MatchmakingStarted, cb.Value.matchTicketId);
+                }
+                SendPredefinedEvent(matchPoolName, optionalParams, cb, callback);
+            }));
+        }
+
+        private string[] PopulatePastMemberSessionId(MatchmakingV2CreateTicketRequestOptionalParams optionalParams)
+        {
+
+            if (optionalParams == null 
+                || optionalParams.ExclusionType == MatchmakingV2ExclusionType.None)
+            {
+                return null;
+            }
+
+            if (optionalParams.ExclusionType == MatchmakingV2ExclusionType.ExplicitList)
+            {
+                return optionalParams.ExcludedGameSessionIds;
+            }
+
+            if (partyMemberSessionIds == null)
+            {
+                return null;
+            }
+
+            var populatedPastMemberSessionId = new List<string>();
+
+            foreach (var pastMemberSessionId in partyMemberSessionIds.Values)
+            {
+                if (optionalParams.ExclusionType == MatchmakingV2ExclusionType.NPastSession)
+                {
+                    populatedPastMemberSessionId.AddRange(pastMemberSessionId.PastSessionIds.TakeLast(optionalParams.ExcludedPastSessionCount));
+                }
+                else
+                {
+                    populatedPastMemberSessionId.AddRange(pastMemberSessionId.PastSessionIds);
+                }
+            }
+            return populatedPastMemberSessionId.ToArray();
+        }
+
+        #region PartySessionStorage
+        internal void GetPartySessionStorage(string partyId
+            , ResultCallback<GetPartySessionStorageResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(partyId
+                , Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId)
+                , callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            PartySessionStorageApi.GetPartySessionStorage(partyId, callback);
+        }
+
+        internal void StorePersonalDataToReservedPartySessionStorage(string partyId
+            , PartySessionStorageReservedData body
+            , ResultCallback<PartySessionStorageReservedData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!ValidateAccelByteId(partyId
+                , Utils.AccelByteIdValidator.HypensRule.NoRule
+                , Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId)
+                , callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            PartySessionStorageApi.StorePersonalDataToReservedPartySessionStorage(partyId, body, callback);
+        }
+
+        private void UpdatePartySessionStorageWithPastSessionInfo(string partyId)
+        {
+            if (partyId == null || !PartyMemberPastSessionRecordSyncEnabled)
+            {
+                return;
+            }
+
+            partySessionId = partyId;
+
+            var pastSessionIds = SharedMemory?.PastSessionRecordManager?
+                .GetPastSessionIds(session.UserId);
+
+            if (pastSessionIds?.Count() > 0)
+            {
+                var payload = new PartySessionStorageReservedData(pastSessionIds);
+                PartySessionStorageApi.StorePersonalDataToReservedPartySessionStorage(partyId
+                    , payload
+                    , null);
+            }
+        }
+
+        private void OnJoinedPartyEventHandler(AccelByteMessage notif)
+        {
+            var partyNotificationUserJoined =
+                JsonConvert.DeserializeObject<SessionV2PartyJoinedNotification>(notif.Message);
+
+            if (partyNotificationUserJoined.members.Any(member => member.id == session.UserId))
+            {
+                UpdatePartySessionStorageWithPastSessionInfo(partyNotificationUserJoined.partyId);
+            }
+        }
+
+        private void OnCreatedPartyEventHandler(AccelByteMessage notif)
+        {
+            var partyNotificationUserJoined =
+                JsonConvert.DeserializeObject<PartyCreatedNotification>(notif.Message);
+            
+            if (partyNotificationUserJoined.CreatedBy == session.UserId)
+            {
+                UpdatePartySessionStorageWithPastSessionInfo(partyNotificationUserJoined.PartyID);
+            }
+        }
+
+        private void OnLeftPartyEventHandler(AccelByteMessage notif)
+        {
+            if (notif.Message == session.UserId)
+            {
+                partySessionId = null;
+            }
+        }
+
+        private void OnJoinedGameSessionEventHandler(AccelByteMessage notif)
+        {
+            if (notif.Message == session.UserId)
+            {
+                UpdatePartySessionStorageWithPastSessionInfo(partySessionId);
+            }
+        }
+        #endregion
 
         #region PredefinedEvents
 
@@ -281,14 +493,14 @@ namespace AccelByte.Api
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
             PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
-                callback.Try(result);
+                callback?.Try(result);
                 return;
             }
 
@@ -296,21 +508,21 @@ namespace AccelByte.Api
             var matchmakingEvent = new AccelByteTelemetryEvent(payload);
 
             predefinedEventScheduler.SendEvent(matchmakingEvent, null);
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         private void SendPredefinedEvent(string matchTicketId, Result result, ResultCallback callback)
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
             PredefinedEventScheduler predefinedEventScheduler = SharedMemory.PredefinedEventScheduler;
             if (predefinedEventScheduler == null)
             {
-                callback.Try(result);
+                callback?.Try(result);
                 return;
             }
 
@@ -318,7 +530,7 @@ namespace AccelByte.Api
             var matchmakingEvent = new AccelByteTelemetryEvent(payload);
 
             predefinedEventScheduler.SendEvent(matchmakingEvent, null);
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         #endregion

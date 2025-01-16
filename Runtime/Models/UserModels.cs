@@ -991,6 +991,25 @@ namespace AccelByte.Models
         [DataMember(Name = "data")] public AccountUserPlatformData[] Data;
     }
 
+    /// <summary>
+    /// Holds fields to be validated against input validation and profanity filter (if enabled). Unused fields can be left null
+    /// </summary>
+    [DataContract, Preserve]
+    public class ValidateInputRequest
+    {
+        [DataMember(Name = "displayName")] public string DisplayName = null;
+        [DataMember(Name = "password")] public string Password = null;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName = null;
+        [DataMember(Name = "username")] public string Username = null;
+    }
+
+    [DataContract, Preserve]
+    public class ValidateInputResponse
+    {
+        [DataMember(Name = "message")] public string Message; 
+        [DataMember(Name = "valid")] public bool IsValid; 
+    }
+
     [DataContract, Preserve]
     internal class ConfigValueResponse<T>
     {
@@ -1069,6 +1088,36 @@ namespace AccelByte.Models
         [DataMember(Name = "action")] public string Action;
         [DataMember(Name = "href")] public string Href;
     };
+
+    [Preserve]
+    public class GenerateOneTimeCodeOptionalParameters
+    {
+        /// <summary>
+        /// A Redirect Uri that will be called as DeepLinking uri
+        /// It have to be registered through IAM Client settings on Admin Portal
+        /// </summary>
+        public string RedirectUri;
+        
+        /// <summary>
+        /// A string that will be given back to the game client
+        /// It can be used for a security validation
+        /// </summary>
+        public string State;
+    }
+
+    [Preserve]
+    public class RequestTokenByOneTimeLinkCodeOptionalParameters
+    {
+        /// <summary>
+        /// A flag to produce transient token
+        /// </summary>
+        public bool? IsTransient = false;
+        
+        /// <summary>
+        /// Additional info, it will be passed to login success event.
+        /// </summary>
+        public string AdditionalData;
+    }
 
     [Preserve]
     public class LoginV4OptionalParameters

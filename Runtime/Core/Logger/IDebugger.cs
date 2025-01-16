@@ -9,8 +9,11 @@ namespace AccelByte.Core
 {
     public interface IDebugger
     {
+        void SetEnableEnhancedLogging(bool enable);
+        bool IsEnhancedLoggingEnabled();
         void SetEnableLogging(bool enable);
         void SetFilterLogType(AccelByteLogType type);
+        void LogEnhancedService(object message);
         void LogVerbose(object message, bool forceLog = false);
         public void LogVerbose(object message, Object context, bool forceLog = false);
         public void Log(object message, bool forceLog = false);

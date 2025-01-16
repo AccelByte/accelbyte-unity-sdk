@@ -46,10 +46,22 @@ namespace AccelByte.Core
             }
         }
 
+        internal readonly Utils.AccelByteServiceTracker ServiceTracker;
+        
+        internal System.Action<IHttpClient> OnHttpClientCreated;
+
         public AccelByteSDKImplementator()
         {
             Environment = new AccelByteEnvironment();
             Environment.OnEnvironmentChanged += ChangeInterfaceEnvironment;
+            
+            ServiceTracker = new Utils.AccelByteServiceTracker();
+            var serviceLogger = new Utils.AccelByteServiceLogger();
+            
+            ServiceTracker.OnNewRequestSentEvent += serviceLogger.LogServiceActivity;
+            ServiceTracker.OnNewResponseReceivedEvent += serviceLogger.LogServiceActivity;
+            ServiceTracker.OnSendingWebsocketRequestEvent += serviceLogger.LogServiceActivity;
+            ServiceTracker.OnReceivingWebsocketNotificationEvent += serviceLogger.LogServiceActivity;
         }
 
         public AccelByteClientRegistry GetClientRegistry()
@@ -115,7 +127,15 @@ namespace AccelByte.Core
             const bool getServerConfig = false;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newClientRegistry = new AccelByteClientRegistry(environment, settings.SDKConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat, FileStream);
+            var newClientRegistry = new AccelByteClientRegistry(
+                environment, 
+                settings.SDKConfig, 
+                settings.OAuthConfig, 
+                httpRequestSenderFactory, 
+                TimeManager, 
+                CoreHeartBeat, 
+                FileStream, 
+                ServiceTracker);
             
             return newClientRegistry;
         }
@@ -125,7 +145,7 @@ namespace AccelByte.Core
             const bool getServerConfig = true;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newServerRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat);
+            var newServerRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat, ServiceTracker);
             
             return newServerRegistry;
         }
@@ -265,7 +285,9 @@ namespace AccelByte.Core
             {
                 if (sdkHttpSenderFactory == null)
                 {
-                    sdkHttpSenderFactory = new AccelByteSDKHttpRequestFactory(CoreHeartBeat);
+                    var defaultHttpSender = new AccelByteSDKHttpRequestFactory(CoreHeartBeat);
+                    defaultHttpSender.OnWebRequestSchedulerCreated = ServiceTracker.OnNewWebRequestSchedulerCreated;
+                    sdkHttpSenderFactory = defaultHttpSender;
                 }
                 return sdkHttpSenderFactory;
             }

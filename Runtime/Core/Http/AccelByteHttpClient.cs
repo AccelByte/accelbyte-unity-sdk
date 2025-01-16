@@ -180,6 +180,7 @@ namespace AccelByte.Core
 
         public async Task<HttpSendResult> SendRequestAsync(IHttpRequest requestInput)
         {
+            string requestUniqueIdentifier = Guid.NewGuid().ToString();
             var rand = new Random();
             uint retryDelayMs = this.initialDelayMs;
             var stopwatch = new Stopwatch();
@@ -290,6 +291,7 @@ namespace AccelByte.Core
                     {
                         sendResult = result;
                     };
+                    request.Id = $"{requestUniqueIdentifier}-{retryTimes}";
                     Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
                     while (sendResult == null)
                     {
@@ -354,6 +356,7 @@ namespace AccelByte.Core
 
         public IEnumerator SendRequest(IHttpRequest requestInput, Action<IHttpResponse, Error> callback)
         {
+            string requestUniqueIdentifier = Guid.NewGuid().ToString();
             var rand = new Random();
             uint retryDelayMs = this.initialDelayMs;
             var stopwatch = new Stopwatch();
@@ -469,6 +472,7 @@ namespace AccelByte.Core
                     {
                         sendResult = result;
                     };
+                    request.Id = $"{requestUniqueIdentifier}-{retryTimes}";
                     Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
                     yield return new WaitUntil(() => sendResult != null);
                     httpResponse = sendResult.Value.CallbackResponse;

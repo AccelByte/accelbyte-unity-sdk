@@ -15,6 +15,7 @@ namespace AccelByte.Core
         public AccelByteMessagingSystem MessagingSystem;
         public AccelByteNotificationSender NotificationSender;
         public AccelByteTimeManager TimeManager;
+        public AccelBytePastSessionRecordManager PastSessionRecordManager;
         public Models.DeviceIdGeneratorConfig DeviceIdGeneratorConfig;
         public IDebugger Logger;
         public CoreHeartBeat CoreHeartBeat;
@@ -35,5 +36,6 @@ namespace AccelByte.Core
             }
         }
         Utils.AccelByteIdValidator accelByteIdValidator;
+        public AccelByte.Utils.AccelByteServiceTracker ServiceTracker;
     }
 }

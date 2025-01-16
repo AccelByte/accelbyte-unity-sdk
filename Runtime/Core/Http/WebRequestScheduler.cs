@@ -2,12 +2,15 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using System;
 using System.Collections.Generic;
 
 namespace AccelByte.Core
 {
     internal class WebRequestScheduler
     {
+        public System.Action<AccelByteWebRequest, IDictionary<string ,string>, byte[], IDebugger> PreHttpRequest;
+        public System.Action<AccelByteWebRequest, IDebugger> PostHttpRequest;
         protected List<WebRequestTask> requestTask;
 
         private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
@@ -59,7 +62,7 @@ namespace AccelByte.Core
                 }
             }
 
-            using (UnityEngine.Networking.UnityWebRequest webRequest = task.CreateWebRequest())
+            using (AccelByteWebRequest webRequest = task.CreateWebRequest())
             {
                 using (var webRequestCancelTokenSource = new System.Threading.CancellationTokenSource())
                 {
@@ -71,13 +74,18 @@ namespace AccelByte.Core
                         webRequest?.Abort();
                         isTimeout = true;
                     }));
-                    Report.GetHttpRequest(task.HttpRequest, webRequest, logger);
+                    
+                    webRequest.SentTimestamp = DateTime.UtcNow;
+                    PreHttpRequest?.Invoke(webRequest, task.HttpRequest.Headers, task.HttpRequest.BodyBytes, logger);
+                    
                     var asyncOp = webRequest.SendWebRequest();
                     while (!asyncOp.isDone && !isTimeout)
                     {
                         await System.Threading.Tasks.Task.Yield();
                     }
-                    Report.GetHttpResponse(webRequest, logger);
+                    webRequest.ResponseTimestamp = DateTime.UtcNow;
+                    PostHttpRequest?.Invoke(webRequest, logger);
+                    
                     webRequestCancelTokenSource.Cancel();
                     task.SetComplete(webRequest);
                 }

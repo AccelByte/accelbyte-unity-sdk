@@ -19,6 +19,15 @@ namespace AccelByte.Models
         OnTicketExpired,
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MatchmakingV2ExclusionType
+    {
+        None,
+        NPastSession,
+        ExplicitList,
+        AllMemberCachedSession,
+    }
+
     [DataContract, Preserve]
     public class MatchmakingV2CreateTicketRequest
     {
@@ -26,6 +35,8 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public Dictionary<string, int> latencies;
         [DataMember] public string sessionId;
+        [DataMember(Name = "excludedSessions"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string[] ExcludedSessions;
     }
 
     [DataContract, Preserve]
@@ -33,7 +44,25 @@ namespace AccelByte.Models
     {
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public Dictionary<string, int> latencies;
+        // <summary>
+        // If matchmaking is performed by the party leader, fill this with the party session ID.
+        // It will make all users in the party to be included in matchmaking and later will be notified when the match is found.
+        // </summary>
         [DataMember] public string sessionId;
+        /// <summary>
+        /// Indicates how to exclude past session id when creating a match ticket.
+        /// </summary>
+        [DataMember] public MatchmakingV2ExclusionType ExclusionType;
+        /// <summary>
+        /// Must be filled when ExclusionType is NPastSession.
+        /// Indicating how many past session that will be excluded when creating a match ticket.
+        /// </summary>
+        [DataMember] public int ExcludedPastSessionCount;
+        /// <summary>
+        /// Must be filled when start matchmaking with ExclusionType is ExplicitList.
+        /// Indicating past session id that will be excluded when creating a match ticket.
+        /// </summary>
+        [DataMember] public string[] ExcludedGameSessionIds;
     }
 
     [DataContract, Preserve]

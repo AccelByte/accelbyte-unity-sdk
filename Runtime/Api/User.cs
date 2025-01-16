@@ -116,7 +116,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithUserName(username, password, callback, rememberMe);
         }
 
@@ -133,7 +133,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithUserName(username, password, callback, rememberMe);
         }
 
@@ -150,7 +150,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool rememberMe = false )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithUserNameV3(username, password, callback, rememberMe);
         }
         
@@ -166,7 +166,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberMe = false )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithUserNameV3(username, password, callback, rememberMe);
         }
         
@@ -446,7 +446,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool createHeadless = true )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             string platformId = platformType.ToString().ToLower();
             LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
@@ -467,7 +467,7 @@ namespace AccelByte.Api
             , bool createHeadless = true
             , LoginWithMacAddress loginWithMacAddress = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             string platformId = platformType.ToString().ToLower();
             LoginWithOtherPlatformId(platformId: platformId
@@ -496,7 +496,7 @@ namespace AccelByte.Api
             , string serviceLabel
             , LoginWithMacAddress loginWithMacAddress = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             string platformId = platformType.ToString().ToLower();
 #pragma warning disable AB0001
@@ -529,7 +529,7 @@ namespace AccelByte.Api
             , ResultCallback callback
             , bool createHeadless = true)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<Error> onAlreadyLogin = (error) =>
             {
@@ -605,7 +605,7 @@ namespace AccelByte.Api
             , string serviceLabel
             , LoginWithMacAddress loginWithMacAddress = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -645,7 +645,7 @@ namespace AccelByte.Api
         [Obsolete]
         public void LoginWithLauncher( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             string authCode = Environment.GetEnvironmentVariable(AuthorizationCodeEnvironmentVariable);
 
             if (string.IsNullOrEmpty(authCode))
@@ -695,7 +695,7 @@ namespace AccelByte.Api
 
         internal void LoginWithLauncher(string authCode, ResultCallback<TokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             if (string.IsNullOrEmpty(authCode))
             {
                 OAuthError error = new OAuthError()
@@ -744,7 +744,7 @@ namespace AccelByte.Api
         [Obsolete]
         public void LoginWithDeviceId( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<Error> onAlreadyLogin = (error) =>
             {
@@ -782,7 +782,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void LoginWithDeviceId( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -820,7 +820,7 @@ namespace AccelByte.Api
         [Obsolete]
         public void LoginWithLatestRefreshToken( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
         }
 
@@ -830,7 +830,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void LoginWithLatestRefreshToken( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithCachedRefreshToken(UserSession.LastLoginUserCacheKey, callback);
         }
 
@@ -843,7 +843,7 @@ namespace AccelByte.Api
         public void LoginWithLatestRefreshToken( string refreshToken
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -863,7 +863,7 @@ namespace AccelByte.Api
         public void LoginWithLatestRefreshToken( string refreshToken
             , ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -878,7 +878,7 @@ namespace AccelByte.Api
         [Obsolete]
         private void LoginWithCachedRefreshToken(string cacheKey, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
             {
@@ -906,7 +906,7 @@ namespace AccelByte.Api
         public void LoginWithCachedRefreshToken(string cacheKey
             , ResultCallback<TokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             TriggerLoginWithCachedRefreshToken(cacheKey, callback);
         }
@@ -1026,7 +1026,7 @@ namespace AccelByte.Api
         [Obsolete]
         public void RefreshSession( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             oAuth2.RefreshSession(userSession.refreshToken, callback);
         }
 
@@ -1036,7 +1036,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
         public void RefreshSession( ResultCallback<TokenData, OAuthError> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             oAuth2.RefreshSession(userSession.refreshToken, callback);
         }
 
@@ -1047,7 +1047,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns Result via callback when completed</param>
         public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             oAuth2.RefreshSession(refreshToken, callback);
         }
 
@@ -1056,7 +1056,7 @@ namespace AccelByte.Api
         /// </summary>
         public void Logout( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1099,7 +1099,7 @@ namespace AccelByte.Api
             , DateTime dateOfBirth
             , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             var registerUserRequest = new RegisterUserRequest
             {
                 authType = AuthenticationType.EMAILPASSWD,
@@ -1131,7 +1131,7 @@ namespace AccelByte.Api
             , string uniqueDisplayName
             , ResultCallback<RegisterUserResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var registerUserRequest = new RegisterUserRequest
             {
@@ -1167,7 +1167,7 @@ namespace AccelByte.Api
             , string uniqueDisplayName
             , ResultCallback<RegisterUserResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var registerUserRequest = new RegisterUserRequestv2
             {
@@ -1202,7 +1202,7 @@ namespace AccelByte.Api
             , DateTime dateOfBirth
             , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             var registerUserRequest = new RegisterUserRequestv2
             {
                 authType = AuthenticationType.EMAILPASSWD,
@@ -1226,7 +1226,7 @@ namespace AccelByte.Api
         public void RegisterAndAcceptPolicies(RegisterUserRequestv2 request
             , ResultCallback<RegisterUserResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             //authType other than EMAILPASSWD is not supported
             request.authType = AuthenticationType.EMAILPASSWD;
@@ -1246,7 +1246,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
         public void GetData(ResultCallback<UserData> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (userDataCache != null)
             {
@@ -1264,7 +1264,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains UserData via callback</param>
         public void GetDataWithLinkedPlatform(ResultCallback<UserData> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (userDataCache != null && userDataCache.PlatformInfos != null)
             {
@@ -1288,7 +1288,7 @@ namespace AccelByte.Api
             , ResultCallback<AccountUserPlatformInfosResponse> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1319,7 +1319,7 @@ namespace AccelByte.Api
         /// <param name="isIncludeAllPlatforms">Set to true to also get other platform data. Default: false</param>
         public void RefreshData(ResultCallback<UserData> callback, bool isIncludeAllPlatforms = false)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             userDataCache = null;
 
             api.GetData(
@@ -1346,7 +1346,7 @@ namespace AccelByte.Api
         public void Update( UpdateUserRequest updateRequest
             , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             api.Update(updateRequest, updateResult => {
                 if (!updateResult.IsError)
@@ -1366,7 +1366,7 @@ namespace AccelByte.Api
         public void UpdateEmail( UpdateEmailRequest updateEmailRequest
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             api.UpdateEmail(updateEmailRequest, callback);
         }
 
@@ -1383,7 +1383,7 @@ namespace AccelByte.Api
             , ResultCallback<UserData> callback
             , bool needVerificationCode = false)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             var requestModel = new UpgradeRequest
             {
                 EmailAddress = userName,
@@ -1424,7 +1424,7 @@ namespace AccelByte.Api
             , string password
             , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var requestModel = new UpgradeV2Request
             {
@@ -1455,7 +1455,7 @@ namespace AccelByte.Api
             , string password
             , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var requestModel = new UpgradeV2Request
             {
@@ -1483,7 +1483,7 @@ namespace AccelByte.Api
         public void UpgradeAndVerifyHeadlessAccount( UpgradeAndVerifyHeadlessRequest upgradeAndVerifyHeadlessRequest
             , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             api.UpgradeAndVerifyHeadlessAccount(upgradeAndVerifyHeadlessRequest, callback);
         }
 
@@ -1496,7 +1496,7 @@ namespace AccelByte.Api
         public void SendUpgradeVerificationCode( string emailAddress
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var requestModel = new SendVerificationCodeRequest
             {
@@ -1513,7 +1513,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendVerificationCode( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             SendVerificationCode(VerificationContext.UserAccountRegistration, callback);
         }
 
@@ -1524,7 +1524,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendVerificationCode(VerificationContext verificationContext, ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             GetData(userDataResult =>
             {
@@ -1556,7 +1556,7 @@ namespace AccelByte.Api
         public void Verify( string verificationCode
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             const string contactType = "email";
             var requestModel = new VerifyRequest
@@ -1575,7 +1575,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void SendResetPasswordCode(string userName, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!EmailUtils.IsValidEmailAddress(userName))
             {
@@ -1601,7 +1601,7 @@ namespace AccelByte.Api
             , string newPassword
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!EmailUtils.IsValidEmailAddress(userName))
             {
@@ -1627,7 +1627,7 @@ namespace AccelByte.Api
             , string platformTicket
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1657,7 +1657,7 @@ namespace AccelByte.Api
             , string platformTicket
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1687,7 +1687,7 @@ namespace AccelByte.Api
             , string platformUserId
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1728,7 +1728,7 @@ namespace AccelByte.Api
             , string platformUserId
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1768,7 +1768,7 @@ namespace AccelByte.Api
         public void UnlinkOtherPlatform( PlatformType platformType
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1797,7 +1797,7 @@ namespace AccelByte.Api
         public void UnlinkOtherPlatformId(string platformId
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1830,7 +1830,7 @@ namespace AccelByte.Api
         public void UnlinkAllOtherPlatform( PlatformType platformType
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1858,7 +1858,7 @@ namespace AccelByte.Api
         public void UnlinkAllOtherPlatformId( string PlatformId
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1880,7 +1880,7 @@ namespace AccelByte.Api
         /// completed.</param>
         public void GetPlatformLinks( ResultCallback<PagedPlatformLinks> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1913,7 +1913,7 @@ namespace AccelByte.Api
             , string platformId = null
             , SearchPlatformType platformBy = SearchPlatformType.None)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -1971,7 +1971,7 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 100)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var platformId = platformType.ToString().ToLower();
             SearchUsers(query, SearchType.ALL, callback, offset, limit, platformId, platformBy);
@@ -1995,7 +1995,7 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 100)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(platformId);
             if (error != null)
@@ -2015,7 +2015,7 @@ namespace AccelByte.Api
         public void GetUserByUserId( string userId
             , ResultCallback<PublicUserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if(!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -2046,7 +2046,7 @@ namespace AccelByte.Api
             , string otherPlatformUserId
             , ResultCallback<UserData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2073,7 +2073,7 @@ namespace AccelByte.Api
             , string[] otherPlatformUserId
             , ResultCallback<BulkPlatformUserIdResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             BulkGetUserByOtherPlatformUserIds(platformType, otherPlatformUserId, optionalParameters: null, callback);
         }
@@ -2091,7 +2091,7 @@ namespace AccelByte.Api
             , BulkGetUserByOtherPlatformUserIdsOptionalParameters optionalParameters
             , ResultCallback<BulkPlatformUserIdResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2139,7 +2139,7 @@ namespace AccelByte.Api
         /// <param name="callback"> Returns a Result that contains country information via callback when completed</param>
         public void GetCountryFromIP( ResultCallback<CountryInfo> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             api.GetCountryFromIP(callback);
         }
 
@@ -2149,7 +2149,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains an Array of <see cref="Country"/> via callback when completed</param>
         public void GetCountryGroupV3(ResultCallback<Country[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             api.GetCountryGroupV3(callback);
         }
@@ -2160,7 +2160,7 @@ namespace AccelByte.Api
         /// <param name="callback"> Returns the boolean result whether the user is subscribed and eligible to play the game via callback when the operation is completed</param>
         public void GetUserEligibleToPlay(ResultCallback<bool> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             ResultCallback<ItemInfo> onGotItemInfo = itemInfoResult =>
             {
@@ -2201,7 +2201,7 @@ namespace AccelByte.Api
         public void BulkGetUserInfo( string[] userIds
             , ResultCallback<ListBulkUserInfoResponse> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2230,7 +2230,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenData, OAuthError> callback
             , bool rememberDevice = false )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (userSession.IsValid())
             {
@@ -2252,7 +2252,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void VerifyToken(ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2274,7 +2274,7 @@ namespace AccelByte.Api
             , TwoFAFactorType factor
             , ResultCallback<TokenData> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2296,7 +2296,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a result via callback when completed</param>
         public void Disable2FAAuthenticator( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2317,7 +2317,7 @@ namespace AccelByte.Api
         public void Enable2FAAuthenticator( string code
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2341,7 +2341,7 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a result via callback when completed</param>
         public void GenerateSecretKeyFor3rdPartyAuthenticateApp( ResultCallback<SecretKey3rdPartyApp> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2359,7 +2359,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void GenerateBackUpCode( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2377,7 +2377,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void Disable2FABackupCodes( ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2396,7 +2396,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void Enable2FABackupCodes( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2415,7 +2415,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void GetBackUpCode( ResultCallback<TwoFACode> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2433,7 +2433,7 @@ namespace AccelByte.Api
         /// <param name="callback"></param>
         public void GetUserEnabledFactors( ResultCallback<Enable2FAFactors> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2453,7 +2453,7 @@ namespace AccelByte.Api
         public void Make2FAFactorDefault( TwoFAFactorType factor
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2479,7 +2479,7 @@ namespace AccelByte.Api
             , ResultCallback<InputValidation> callback
             , bool defaultOnEmpty = true )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2504,7 +2504,7 @@ namespace AccelByte.Api
         public void UpdateUser(UpdateUserRequest updateUserRequest
             , ResultCallback<UserData> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2526,7 +2526,7 @@ namespace AccelByte.Api
             , bool extendExp
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<Error> onAlreadyLogin = (error) =>
             {
@@ -2564,7 +2564,7 @@ namespace AccelByte.Api
             , bool extendExp
             , ResultCallback<TokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -2606,7 +2606,7 @@ namespace AccelByte.Api
             , string linkingToken
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
@@ -2651,7 +2651,7 @@ namespace AccelByte.Api
             , string linkingToken
             , ResultCallback<TokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
@@ -2692,7 +2692,7 @@ namespace AccelByte.Api
         public void GetUserAvatar(string userId
             , ResultCallback<Texture2D> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2728,7 +2728,7 @@ namespace AccelByte.Api
         public void GetPublisherUser(string userId
             , ResultCallback<GetPublisherUserResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -2756,7 +2756,7 @@ namespace AccelByte.Api
         public void GetUserInformation(string userId
             , ResultCallback<GetUserInformationResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -2784,14 +2784,58 @@ namespace AccelByte.Api
         public void GenerateOneTimeCode(PlatformType platformId
             , ResultCallback<GeneratedOneTimeCode> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            GenerateOneTimeCode(platformId, null, callback);
+        }
+        
+        /// <summary>
+        /// Generate one time linking code
+        /// </summary>
+        /// <param name="platformId">The platform ID</param>
+        /// <param name="optionalParameters">Optional parameter to be sent</param>
+        /// <param name="callback">Result via callback when completed</param>
+        public void GenerateOneTimeCode(PlatformType platformId
+            , GenerateOneTimeCodeOptionalParameters optionalParameters
+            , ResultCallback<GeneratedOneTimeCode> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             if (!userSession.IsValid())
             {
-                const string errorMessage = "User is not log in.";
-                callback.TryError(new Error(ErrorCode.InvalidRequest, errorMessage));
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-            oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, callback);
+            oAuth2.GenerateOneTimeCode(Session.AuthorizationToken, platformId, optionalParameters, callback);
+        }
+        
+        /// <summary>
+        /// Generate user's token by one time link code.
+        /// It requires a code which can be generated from GenerateOneTimeCode function.
+        /// </summary>
+        /// <param name="oneTimeLinkingCode">Generated code from GenerateOneTimeCode</param>
+        /// <param name="callback">Result via callback when completed</param>
+        public void RequestTokenByOneTimeLinkCode(string oneTimeLinkingCode
+            , ResultCallback<TokenData> callback)
+        {
+            RequestTokenByOneTimeLinkCode(oneTimeLinkingCode, null, callback);
+        }
+        
+        /// <summary>
+        /// Generate user's token by one time link code.
+        /// It requires a code which can be generated from GenerateOneTimeCode function.
+        /// </summary>
+        /// <param name="oneTimeLinkingCode">Generated code from GenerateOneTimeCode</param>
+        /// <param name="optionalParameters">Optional parameter to be sent</param>
+        /// <param name="callback">Result via callback when completed</param>
+        public void RequestTokenByOneTimeLinkCode(string oneTimeLinkingCode
+            , RequestTokenByOneTimeLinkCodeOptionalParameters optionalParameters
+            , ResultCallback<TokenData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            if (!userSession.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            oAuth2.RequestTokenByOneTimeLinkCode(oneTimeLinkingCode, optionalParameters, callback);
         }
 
         /// <summary>
@@ -2802,7 +2846,7 @@ namespace AccelByte.Api
         public void GenerateCodeForPublisherTokenExchange(string publisherClientId
             , ResultCallback<CodeForTokenExchangeResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             if (!userSession.IsValid())
             {
                 callback.TryError(ErrorCode.IsNotLoggedIn);
@@ -2828,7 +2872,7 @@ namespace AccelByte.Api
         public void GenerateGameToken(string code
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             if (userSession.IsValid())
             {
                 callback?.TryError(ErrorCode.InvalidRequest,
@@ -2853,7 +2897,7 @@ namespace AccelByte.Api
         public void LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest linkHeadlessAccountRequest
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2871,7 +2915,7 @@ namespace AccelByte.Api
         public void GetConflictResultWhenLinkHeadlessAccountToFullAccount(string oneTimeLinkCode
             , ResultCallback<ConflictLinkHeadlessAccountResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2895,7 +2939,7 @@ namespace AccelByte.Api
         public void CheckUserAccountAvailability(string displayName
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2917,7 +2961,7 @@ namespace AccelByte.Api
         public void CheckUserAccountAvailability(string valueToCheck, AccountAvailabilityField field
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2935,7 +2979,7 @@ namespace AccelByte.Api
         /// <param name="callback">Return Result via callback when completed</param> 
         public void GetConfigUniqueDisplayNameEnabled(ResultCallback<bool> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             api.GetConfigUniqueDisplayNameEnabled(callback);
         }
@@ -2946,7 +2990,7 @@ namespace AccelByte.Api
         /// <param name="callback">Return Result via callback when completed</param> 
         public void GetConfigUserNameDisabled(ResultCallback<bool> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             api.GetConfigUserNameDisabled(callback);
         }
@@ -2963,7 +3007,7 @@ namespace AccelByte.Api
         public void RetrieveUserThirdPartyPlatformToken(PlatformType platformType 
             , ResultCallback<ThirdPartyPlatformTokenData, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!userSession.IsValid())
             {
@@ -2976,6 +3020,18 @@ namespace AccelByte.Api
             string userId = userSession.UserId;
             coroutineRunner.Run(
                 oAuth2.RetrieveUserThirdPartyPlatformToken(userId, platformType, callback));
+        }
+
+        /// <summary>
+        /// Validate user inputs by checking against existing input validation and profanity filter service (if enabled).
+        /// </summary>
+        /// <param name="request">Request body, unused fields can be null</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void ValidateUserInput(ValidateInputRequest request, ResultCallback<ValidateInputResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            api.ValidateUserInput(request, callback);
         }
 
         #region V4
@@ -3000,7 +3056,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenDataV4, OAuthError> callback
             , bool rememberMe = false)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!EmailUtils.IsValidEmailAddress(email))
             {
@@ -3067,7 +3123,7 @@ namespace AccelByte.Api
             "function instead.")]
         public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -3131,7 +3187,7 @@ namespace AccelByte.Api
             , bool createHeadless = true
             , LoginWithMacAddress loginWithMacAddress = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
 #pragma warning disable AB0001
             LoginWithOtherPlatformV4(platformType: platformType
@@ -3238,7 +3294,7 @@ namespace AccelByte.Api
             , string serviceLabel
             , LoginWithMacAddress loginWithMacAddress = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -3294,7 +3350,7 @@ namespace AccelByte.Api
             "function instead.")]
         public void LoginWithLastRefreshTokenV4(ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, callback);
         }
 
@@ -3314,7 +3370,7 @@ namespace AccelByte.Api
         public void LoginWithRefreshTokenV4(string refreshToken
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -3342,7 +3398,7 @@ namespace AccelByte.Api
         public void LoginWithCachedRefreshTokenV4(string cacheKey
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             TriggerLoginWithCachedRefreshTokenV4(cacheKey, callback);
         }
@@ -3449,7 +3505,7 @@ namespace AccelByte.Api
             , bool extendExp
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
@@ -3507,7 +3563,7 @@ namespace AccelByte.Api
             , string linkingToken
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (string.IsNullOrEmpty(linkingToken))
             {
@@ -3570,7 +3626,7 @@ namespace AccelByte.Api
         public void GenerateGameTokenV4(string code
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (string.IsNullOrEmpty(code))
             {
@@ -3639,7 +3695,7 @@ namespace AccelByte.Api
             , ResultCallback<TokenDataV4, OAuthError> callback
             , bool rememberDevice = false)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (userSession.IsValid())
             {
@@ -3701,7 +3757,7 @@ namespace AccelByte.Api
         public void ClaimAccessToken(TokenDataV4 loginTicket
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             Session.LoadAuthTrustId((isSuccess, authTrustId) =>
             {
@@ -3743,7 +3799,7 @@ namespace AccelByte.Api
         public void RefreshLoginQueueTicket(TokenDataV4 loginTicket
             , ResultCallback<RefreshTicketResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
 
@@ -3759,7 +3815,7 @@ namespace AccelByte.Api
             "Please follow this documentation how to cancel the simplified login queue: https://docs.accelbyte.io/gaming-services/services/utilities/login-queue")]
         public void CancelLoginQueueTicket(TokenDataV4 loginTicket, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
 

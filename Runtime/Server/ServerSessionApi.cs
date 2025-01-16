@@ -87,7 +87,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<SessionV2GameSessionPagingResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameSessionDetails(string sessionId
@@ -95,21 +95,21 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
@@ -133,7 +133,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteGameSession(string sessionId
@@ -141,21 +141,21 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
@@ -179,7 +179,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGameSession(string sessionId,
@@ -188,28 +188,28 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
 
             if (data == null)
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null"));
                 yield break;
             }
@@ -234,7 +234,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<SessionV2GameSession>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SendDSSessionReady(string sessionId,
@@ -243,21 +243,21 @@ namespace AccelByte.Server
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(sessionId))
             {
-                callback.TryError(
+                callback?.TryError(
                     new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
                 yield break;
             }
@@ -287,7 +287,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public void GetMemberActiveSession(string userId
@@ -313,7 +313,7 @@ namespace AccelByte.Server
                 }
                 else
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 };
             });
         }
@@ -341,7 +341,25 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
-                callback.Try(result);
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetPartySessionStorage(string partyId
+            , ResultCallback<GetPartySessionStorageResult> callback)
+        {
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/parties/{partyId}/storage")
+                .WithBearerAuth(AuthToken)
+                .WithPathParam("namespace", ServerConfig.Namespace)
+                .WithPathParam("partyId", partyId)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetPartySessionStorageResult>();
+                callback?.Try(result);
             });
         }
     }

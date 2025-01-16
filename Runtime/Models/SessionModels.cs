@@ -199,7 +199,8 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public int inactiveTimeout;
         [DataMember] public int inviteTimeout;
-        [DataMember] public SessionV2Joinability joinability;
+        [DataMember, JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public SessionV2Joinability joinability;
         [DataMember] public int maxPlayers;
         [DataMember] public int minPlayers;
         [DataMember] public SessionConfigurationTemplateType type;
@@ -213,7 +214,7 @@ namespace AccelByte.Models
     }
     
     #region Notification
-    
+
     [DataContract, Preserve]
     public class SessionV2PartyInvitationNotification
     {
@@ -235,7 +236,7 @@ namespace AccelByte.Models
         [DataMember] public string joinerId;
         [DataMember] public string leaderId;
         [DataMember] public SessionV2ImpactedUserIds ImpactedUserIds;
-    } 
+    }    
     
     [DataContract, Preserve]
     public class SessionV2PartyInvitationRejectedNotification
@@ -252,7 +253,7 @@ namespace AccelByte.Models
         [DataMember] public string partyId;
         [DataMember] public string[] cancelledUserIDs;
     }
-    
+
     [DataContract, Preserve]
     public class SessionV2PartyUserKickedNotification
     {
@@ -274,7 +275,7 @@ namespace AccelByte.Models
         [DataMember] public string configurationName;
         [DataMember] public string createdBy;
     }
-    
+
     [DataContract, Preserve]
     public class PartyCreatedNotification
     {
@@ -527,7 +528,7 @@ namespace AccelByte.Models
     public class SessionV2GameInvitationNotification
     {
         [DataMember] public string sessionId;
-    } 
+    }    
     
     [DataContract, Preserve]
     public class SessionV2GameJoinedNotification
@@ -593,12 +594,14 @@ namespace AccelByte.Models
         [DataMember] public string SessionID;
         [DataMember] public bool TextChat;
     }
-    
+
     #endregion
 
     #endregion
+
 
     #region Player
+
     [Preserve, DataContract]
     public class PlayerAttributesRequestBody
     {
@@ -627,7 +630,7 @@ namespace AccelByte.Models
         /// </summary>
         [DataMember(Name = "simultaneousPlatform")] public string SimultaneousPlatform;
     }
-    
+
     [Preserve, DataContract]
     public class PlayerAttributesResponseBody
     {
@@ -656,7 +659,7 @@ namespace AccelByte.Models
         /// </summary>
         [DataMember(Name = "userID")] public string UserId;
     }
-    
+
     [Preserve, DataContract]
     public class UserPlatformInfo
     {
@@ -669,7 +672,7 @@ namespace AccelByte.Models
             this.UserId = userId;
         }
     }
-    
+
     [Preserve, DataContract]
     public enum PlayerAttributeUserPlatformType
     {
@@ -677,5 +680,6 @@ namespace AccelByte.Models
         [System.ComponentModel.Description("XBOX")] Xbox,
         [System.ComponentModel.Description("PSN")] Psn
     }
+
     #endregion
 }

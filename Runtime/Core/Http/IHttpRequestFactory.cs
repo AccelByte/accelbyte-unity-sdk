@@ -12,6 +12,7 @@ namespace AccelByte.Core
 
     internal class AccelByteSDKHttpRequestFactory : IHttpRequestSenderFactory
     {
+        public System.Action<WebRequestScheduler> OnWebRequestSchedulerCreated;
         private CoreHeartBeat coreHeartBeat;
         private readonly System.Collections.Generic.List<IHttpRequestSender> createdHttpRequestSenderRecord;
         public AccelByteSDKHttpRequestFactory(CoreHeartBeat coreHeartBeat)
@@ -26,6 +27,8 @@ namespace AccelByte.Core
             var sdkHttpSender = new UnityHttpRequestSender(httpSenderScheduler);
             sdkHttpSender.SetHeartBeat(coreHeartBeat);
             createdHttpRequestSenderRecord.Add(sdkHttpSender);
+            OnWebRequestSchedulerCreated?.Invoke(httpSenderScheduler);
+            
             return sdkHttpSender;
         }
 

@@ -12,12 +12,6 @@ namespace AccelByte.Core
             get;
         }
 
-        [Obsolete("SDK will assign time stamps on telemetry Send(). Field will be removed on 3.80 release.")]
-        System.DateTime CreatedTimestamp
-        {
-            get;
-        }
-
         string EventName
         {
             get;

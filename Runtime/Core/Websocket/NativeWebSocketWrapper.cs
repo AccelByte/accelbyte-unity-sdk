@@ -18,12 +18,7 @@ namespace Core.Websocket
         public event OnErrorHandler OnError;
         public event OnCloseHandler OnClose;
 
-        private IDebugger logger;
-
-        public void SetLogger(IDebugger logger)
-        {
-            this.logger = logger;
-        }
+        private ApiSharedMemory sharedMemory;
 
         ~NativeWebSocketWrapper()
         {
@@ -92,6 +87,8 @@ namespace Core.Websocket
                 webSocket.OnMessage += data =>
                 {
                     string dataStr = System.Text.Encoding.UTF8.GetString(data);
+                    
+                    sharedMemory?.ServiceTracker?.OnReceivingWebsocketNotification(dataStr, sharedMemory?.Logger);
                     OnMessage?.Invoke(dataStr);
                 };
 
@@ -122,11 +119,11 @@ namespace Core.Websocket
             switch (webSocket.State)
             {
                 case NativeWebSocket.WebSocketState.Open:
-                        logger?.Log($"Websocket connection to {url} already opened");
+                        sharedMemory?.Logger?.Log($"Websocket connection to {url} already opened");
                         callback?.TryOk();
                         return;
                 case NativeWebSocket.WebSocketState.Connecting:
-                        logger?.LogVerbose($"Websocket connection to {url} is connecting");
+                        sharedMemory?.Logger?.LogVerbose($"Websocket connection to {url} is connecting");
                         callback?.TryOk();
                         break;
                 case NativeWebSocket.WebSocketState.Closing:
@@ -183,11 +180,13 @@ namespace Core.Websocket
         {
             // Check state
             if (webSocket.State != NativeWebSocket.WebSocketState.Open)
+            {
                 throw new WebSocketInvalidStateException("Websocket is not open.");
+            }
 
             try
             {
-                Report.GetWebSocketRequest(message);
+                sharedMemory?.ServiceTracker?.OnSendingWebsocketRequest(message, sharedMemory?.Logger);
                 webSocket.SendText(message);
             }
             catch (Exception e)
@@ -217,6 +216,11 @@ namespace Core.Websocket
             {
                 throw new WebSocketUnexpectedException("Failed to close the connection.", e);
             }
+        }
+
+        void IWebSocket.SetSharedMemory(ApiSharedMemory sharedMemory)
+        {
+            this.sharedMemory = sharedMemory;
         }
     }
 }

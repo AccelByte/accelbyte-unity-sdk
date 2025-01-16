@@ -19,6 +19,7 @@ namespace AccelByte.Models {
         private const int defaultStatsDPort = 8125;
         private const int defaultStatsDMetricInterval = 60;
         [DataMember] public string Namespace;
+        [DataMember] public string PublisherNamespace;
         [DataMember] public string BaseUrl;
         [DataMember] public string AgreementServerUrl;
         [DataMember] public string IamServerUrl;
@@ -35,6 +36,7 @@ namespace AccelByte.Models {
         [DataMember] public string CloudSaveServerUrl;
         [DataMember] public string ChallengeServerUrl;
         [DataMember] public string InventoryServerUrl;
+        [DataMember] public string ProfanityFilterServerUrl;
         [DataMember] public string RedirectUri;
         [DataMember] public string MatchmakingServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
@@ -52,6 +54,7 @@ namespace AccelByte.Models {
         [DataMember] public int StatsDMetricInterval;
         [DataMember] public string DsId;
         [DataMember] public bool EnableDebugLog = true;
+        [DataMember] public bool EnhancedServiceLogging = false;
         [DataMember] public string DebugLogFilter = "Verbose";
         [DataMember] public int DSHubReconnectTotalTimeout = 60000;
         [DataMember] public int AMSReconnectTotalTimeout = 60000;
@@ -128,6 +131,8 @@ namespace AccelByte.Models {
             
             this.InventoryServerUrl = this.ExpanServiceApiUrl(this.InventoryServerUrl, "/inventory", forceExpandServiceApiUrl);
 
+            this.ProfanityFilterServerUrl = this.ExpanServiceApiUrl(this.ProfanityFilterServerUrl, "/profanity-filter", forceExpandServiceApiUrl);
+
             this.MatchmakingServerUrl = this.ExpanServiceApiUrl(this.MatchmakingServerUrl, "/matchmaking", forceExpandServiceApiUrl);
             
             this.MatchmakingV2ServerUrl = this.ExpanServiceApiUrl(this.MatchmakingV2ServerUrl, "/match2", forceExpandServiceApiUrl);
@@ -194,6 +199,8 @@ namespace AccelByte.Models {
             if (this.ChallengeServerUrl == httpBaseUrl + "/challenge") this.ChallengeServerUrl = null;
 
             if (this.InventoryServerUrl == httpBaseUrl + "/inventory") this.InventoryServerUrl = null;
+
+            if (this.ProfanityFilterServerUrl == httpBaseUrl + "/profanity-filter") this.ProfanityFilterServerUrl = null;
 
             if (this.MatchmakingServerUrl == httpBaseUrl + "/matchmaking") this.MatchmakingServerUrl = null;
             

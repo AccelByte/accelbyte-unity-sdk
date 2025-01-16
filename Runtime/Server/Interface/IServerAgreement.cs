@@ -4,9 +4,11 @@
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 
 namespace AccelByte.Server.Interface
 {
+    [Obsolete("This interface will be removed on AGS 3.84, please manage your legal document on Admin Portal")]
     public interface IServerAgreement
     {
         /// <summary>

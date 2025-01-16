@@ -303,6 +303,8 @@ namespace AccelByte.Editor
 
                 EditorGUILayout.LabelField("");
                 EditorGUILayout.EndHorizontal();
+                
+                EditorCommon.CreateToggleInput((newValue) => editedSdkConfig.EnhancedServiceLogging = newValue, editedSdkConfig.EnhancedServiceLogging, "Enhanced Service Logging", indentLevel: 1);
             }
 
             if(EditorCommon.CreateFoldout("Service Url Configs", foldoutConfigStatus))

@@ -14,6 +14,7 @@ namespace AccelByte.Models
         [DataMember] public string Namespace;
         [DataMember] public bool? UsePlayerPrefs;
         [DataMember] public bool? EnableDebugLog;
+        [DataMember] public bool? EnhancedServiceLogging;
         [DataMember] public string DebugLogFilter;
         [DataMember] public bool? RandomizeDeviceId;
         [DataMember] public string BaseUrl;
@@ -53,6 +54,7 @@ namespace AccelByte.Models
         [DataMember] public string ChatServerUrl;
         [DataMember] public string GdprServerUrl;
         [DataMember] public string LoginQueueServerUrl;
+        [DataMember] public string ProfanityFilterServerUrl;
         [DataMember] public string RedirectUri;
         [DataMember] public string AppId;
         [DataMember] public string PublisherNamespace;

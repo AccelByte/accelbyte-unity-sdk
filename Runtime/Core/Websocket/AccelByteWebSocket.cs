@@ -5,7 +5,6 @@
 using AccelByte.Core;
 using AccelByte.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -25,7 +24,7 @@ namespace AccelByte.Api
         internal int BackoffDelay = 1000;
         internal int MaxDelay = 30000;
 
-        protected IWebSocket webSocket;
+        internal IWebSocket WebSocketImp;
         protected string webSocketUrl;
         protected string authorizationToken;
         
@@ -93,7 +92,7 @@ namespace AccelByte.Api
 
         private void OnTokenReceived(string token)
         {
-             this.webSocket.Connect(this.webSocketUrl, this.authorizationToken, ReconnectCustomHeaders, token);
+             this.WebSocketImp.Connect(this.webSocketUrl, this.authorizationToken, ReconnectCustomHeaders, token);
         }
 
         /// <summary>
@@ -103,7 +102,7 @@ namespace AccelByte.Api
         {
             get
             {
-                return webSocket.ReadyState;
+                return WebSocketImp.ReadyState;
             }
         }
 
@@ -129,20 +128,20 @@ namespace AccelByte.Api
             }
         }
 
-        public AccelByteWebSocket(IWebSocket webSocket, int connectionTimeoutMs = 60000)
+        public AccelByteWebSocket(IWebSocket webSocketImp, int connectionTimeoutMs = 60000)
         {
-            if(webSocket == null)
+            if(webSocketImp == null)
             {
                 throw new System.InvalidOperationException("Assigning null websocket");
             }
             this.closeCodeCurrent = WsCloseCode.NotSet;
 
-            this.webSocket = webSocket;
+            this.WebSocketImp = webSocketImp;
 
-            this.webSocket.OnOpen += OnOpenReceived;
-            this.webSocket.OnMessage += OnMessageReceived;
-            this.webSocket.OnError += OnErrorReceived;
-            this.webSocket.OnClose += OnCloseReceived;
+            this.WebSocketImp.OnOpen += OnOpenReceived;
+            this.WebSocketImp.OnMessage += OnMessageReceived;
+            this.WebSocketImp.OnError += OnErrorReceived;
+            this.WebSocketImp.OnClose += OnCloseReceived;
 
             TotalTimeout = connectionTimeoutMs;
 
@@ -245,7 +244,7 @@ namespace AccelByte.Api
             };
 
             logger?.LogVerbose($"Connecting websocket to {url}");
-            webSocket.Connect(url: url, 
+            WebSocketImp.Connect(url: url, 
                 protocols: this.authorizationToken, 
                 customHeaders: customHeaders, 
                 entitlementToken: string.Empty,
@@ -273,7 +272,7 @@ namespace AccelByte.Api
 
             if (this.IsConnected || this.IsConnecting)
             {
-                this.webSocket.Close();
+                this.WebSocketImp.Close();
             }
         }
 
@@ -317,7 +316,7 @@ namespace AccelByte.Api
             int errorCode = 0;
             try
             {
-                webSocket.Send(message);
+                WebSocketImp.Send(message);
             }
             catch (Exception e)
             {
@@ -341,7 +340,7 @@ namespace AccelByte.Api
 
                 if (this.tokenGenerator == null)
                 {
-                    webSocket.Connect(webSocketUrl, authorizationToken, ReconnectCustomHeaders);
+                    WebSocketImp.Connect(webSocketUrl, authorizationToken, ReconnectCustomHeaders);
                 }
                 else
                 {
@@ -354,7 +353,7 @@ namespace AccelByte.Api
                 OnRetryAttemptFailed?.Invoke(this, EventArgs.Empty);
             };
 
-            maintainer = new WebstocketMaintainer(ref webSocket, ref PingDelay, ref BackoffDelay, ref MaxDelay, ref TotalTimeout, reconnectOnClose, logger, OnPreReconnectAction, reconnectAction, onReconnectFailed);
+            maintainer = new WebstocketMaintainer(ref WebSocketImp, ref PingDelay, ref BackoffDelay, ref MaxDelay, ref TotalTimeout, reconnectOnClose, logger, OnPreReconnectAction, reconnectAction, onReconnectFailed);
         }
 
         private void StopMaintainConnection()
@@ -436,7 +435,7 @@ namespace AccelByte.Api
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            IEnumerator MaintainLoop()
+            System.Collections.IEnumerator MaintainLoop()
             {
                 isMaintaining = true;
                 while (isMaintaining)

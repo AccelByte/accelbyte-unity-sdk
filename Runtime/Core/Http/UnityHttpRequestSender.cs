@@ -107,36 +107,21 @@ namespace AccelByte.Core
             return retval;
         }
 
-        private HttpSendResult ParseWebRequestResult(UnityWebRequest unityWebRequest)
+        private HttpSendResult ParseWebRequestResult(AccelByteWebRequest unityWebRequest)
         {
             IHttpResponse callBackResponse = null;
             Error callBackError = null;
-#if UNITY_2020_3_OR_NEWER
             switch (unityWebRequest.result)
             {
                 case UnityWebRequest.Result.Success:
                 case UnityWebRequest.Result.ProtocolError:
                 case UnityWebRequest.Result.DataProcessingError:
                     callBackResponse = unityWebRequest.GetHttpResponse();
-                    callBackError = null;
                     break;
                 case UnityWebRequest.Result.ConnectionError:
-                    callBackResponse = null;
                     callBackError = new Error(ErrorCode.NetworkError);
                     break;
             }
-#else
-            if (unityWebRequest.isNetworkError)
-            {
-                callBackResponse = null;
-                callBackError = new Error(ErrorCode.NetworkError);
-            }
-            else
-            {
-                callBackResponse = unityWebRequest.GetHttpResponse();
-                callBackError = null;
-            }
-#endif
             return new HttpSendResult(callBackResponse, callBackError);
         }
     }

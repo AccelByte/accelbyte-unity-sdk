@@ -17,7 +17,7 @@ namespace AccelByte.Core
             private set;
         }
 
-        public System.Action<UnityWebRequest> OnComplete;
+        public System.Action<AccelByteWebRequest> OnComplete;
 
         public uint DelayMs
         {
@@ -54,7 +54,7 @@ namespace AccelByte.Core
             SetState(WebRequestState.Waiting);
         }
 
-        public void SetComplete(UnityWebRequest webRequestResult)
+        public void SetComplete(AccelByteWebRequest webRequestResult)
         {
             SetState(WebRequestState.Complete);
             OnComplete?.Invoke(webRequestResult);
@@ -65,9 +65,9 @@ namespace AccelByte.Core
             State = newState;
         }
 
-        public UnityWebRequest CreateWebRequest()
+        public AccelByteWebRequest CreateWebRequest()
         {
-            UnityWebRequest unityWebRequest = HttpRequest.GetUnityWebRequest();
+            AccelByteWebRequest unityWebRequest = HttpRequest.GetUnityWebRequest();
             return unityWebRequest;
         }
     }

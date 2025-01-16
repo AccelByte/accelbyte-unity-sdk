@@ -177,6 +177,7 @@ namespace AccelByte.Core
         public ServerMatchmakingV2 GetMatchmakingV2() { return GetServerApi<ServerMatchmakingV2, ServerMatchmakingV2Api>(); }
         public ServerAnalyticsService GetAnalyticsService() { return GetServerApi<ServerAnalyticsService, ServerGameTelemetryApi>(); }
         public IServerMiscellaneousWrapper GetMiscellaneous() { return GetServerApi<ServerMiscellaneous, ServerMiscellaneousApi>(); }
+        public IServerProfanityFilter GetProfanityFilter() { return GetServerApi<ServerProfanityFilter, ServerProfanityFilterApi>(); }
         public ServiceVersion GetVersionService() { return GetServerApi<ServiceVersion, ServiceVersionApi>(); }
 
         public AccelByteStatsDMetricExporterApi GetStatsMetricExporterService()

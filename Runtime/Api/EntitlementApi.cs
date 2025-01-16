@@ -744,32 +744,6 @@ namespace AccelByte.Api
                 callback?.Try(result);
             });
         }
-        
-        [Obsolete("This interface will be removed on 3.80 release. Please access using Api.GetEntitlement().SyncMobilePlatformPurchaseApple")]
-        public IEnumerator SyncMobilePlatformPurchaseApple( string userId
-            , PlatformSyncMobileApple syncRequest
-            , ResultCallback callback )
-        {
-            Assert.IsNotNull(Namespace_, "Can't update distribution receiver! Namespace_ from parent  is null!");
-            Assert.IsNotNull(userId, "Can't update distribution receiver! UserId parameter is null!");
-
-            var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/iap/apple/receipt")
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userId)
-                .WithBearerAuth(AuthToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(syncRequest.ToUtf8Json())
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
-        }
 
         public IEnumerator SyncXBoxDLC( string userId
             , XBoxDLCSync XBoxDLCSync

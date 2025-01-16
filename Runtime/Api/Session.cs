@@ -19,7 +19,7 @@ namespace AccelByte.Api
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
         private System.Threading.CancellationTokenSource cts;
-        
+
         [UnityEngine.Scripting.Preserve]
         internal Session(SessionApi inApi
             , ISession inSession
@@ -247,6 +247,7 @@ namespace AccelByte.Api
                     {
                         if (cb != null && !cb.IsError)
                         {
+                            SharedMemory?.MessagingSystem?.SendMessage(AccelByteMessagingTopic.OnLeftPartyNotification, session.UserId);
                             SendPredefinedEvent(PredefinedAnalyticsMode.PartySessionLeft, session.UserId, partyId);
                         }
                         HandleCallback(cb, callback);
@@ -411,18 +412,18 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.RevokePartyCode(sessionId, callback));
         }
-        
+
         public void CancelPartyInvitation(string partyId
             , string userId
             , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
-            
+
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
                 return;
             }
-            
+
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -461,6 +462,9 @@ namespace AccelByte.Api
                     {
                         if (!cb.IsError && cb.Value != null)
                         {
+                            SharedMemory?.PastSessionRecordManager?
+                                .InsertPastSessionId(session.UserId, cb.Value.id);
+                            SharedMemory?.MessagingSystem?.SendMessage(AccelByteMessagingTopic.OnJoinedGameSessionNotification, session.UserId);
                             SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionCreate);
                         }
                         HandleCallback(cb, callback);
@@ -634,6 +638,9 @@ namespace AccelByte.Api
                     {
                         if (!cb.IsError && cb.Value != null)
                         {
+                            SharedMemory.PastSessionRecordManager?
+                                .InsertPastSessionId(session.UserId, cb.Value.id);
+                            SharedMemory?.MessagingSystem?.SendMessage(AccelByteMessagingTopic.OnJoinedGameSessionNotification, session.UserId);
                             SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionJoin);
                         }
                         HandleCallback(cb, callback);
@@ -641,7 +648,7 @@ namespace AccelByte.Api
         }
 
         public void LeaveGameSession(string sessionId
-            , ResultCallback<SessionV2GameSession> callback)
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -661,9 +668,9 @@ namespace AccelByte.Api
                     sessionId,
                     cb =>
                     {
-                        if (!cb.IsError && cb.Value != null)
+                        if (cb != null && !cb.IsError)
                         {
-                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionLeft);
+                            SendPredefinedEvent(PredefinedAnalyticsMode.GameSessionLeft, session.UserId, sessionId);
                         }
                         HandleCallback(cb, callback);
                     }));
@@ -727,6 +734,8 @@ namespace AccelByte.Api
                 {
                     if (!cb.IsError && cb.Value != null)
                     {
+                        SharedMemory?.PastSessionRecordManager?
+                            .InsertPastSessionId(session.UserId, cb.Value.id);
                         SendPredefinedEvent(cb, PredefinedAnalyticsMode.GameSessionJoin);
                     }
                     HandleCallback(cb, callback);
@@ -940,6 +949,7 @@ namespace AccelByte.Api
             coroutineRunner.Run(
                 sessionApi.UpdateMemberStorage(session.UserId, sessionId, data, callback));
         }
+
 #endregion
 
 #region PredefinedEvents
@@ -972,11 +982,6 @@ namespace AccelByte.Api
                 case PredefinedAnalyticsMode.GameSessionJoin:
                     var sessionJoinResult = apiCallResult as Result<SessionV2GameSession>;
                     payload = new PredefinedGameSessionV2JoinedPayload(userId, sessionJoinResult.Value.id);
-                    return payload;
-
-                case PredefinedAnalyticsMode.GameSessionLeft:
-                    var sessionLeftResult = apiCallResult as Result<SessionV2GameSession>;
-                    payload = new PredefinedGameSessionV2LeftPayload(userId, sessionLeftResult.Value.id);
                     return payload;
 
                 case PredefinedAnalyticsMode.PartySessionCreate:
@@ -1020,6 +1025,10 @@ namespace AccelByte.Api
 
                 case PredefinedAnalyticsMode.PartySessionLeft:
                     payload = new PredefinedPartySessionV2LeftPayload(userId, sessionId);
+                    return payload;
+
+                case PredefinedAnalyticsMode.GameSessionLeft:
+                    payload = new PredefinedGameSessionV2LeftPayload(userId, sessionId);
                     return payload;
 
                 default:
@@ -1096,7 +1105,7 @@ namespace AccelByte.Api
         }
 
 #endregion
-        
+
 #region Player
         /// <summary>
         /// Get player attributes.

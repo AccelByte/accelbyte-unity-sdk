@@ -28,6 +28,7 @@ namespace AccelByte.Models
         [DataMember] public string Namespace = "";
         [DataMember] public bool UsePlayerPrefs = false;
         [DataMember] public bool EnableDebugLog = true;
+        [DataMember] public bool EnhancedServiceLogging = false;
         [DataMember] public string DebugLogFilter = "Verbose";
         [DataMember] public bool RandomizeDeviceId = false;
         [DataMember] public string BaseUrl = "";

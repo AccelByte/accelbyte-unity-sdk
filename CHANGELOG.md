@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.3.0] (2025-01-16)
+
+
+### Features
+
+* add caching mechanism when joining party 
+* add excluded session optional param when creating matchmaking ticket 
+* add internal interface for session party storage 
+* add optional param for generate one time code 
+* add request token by one time code function 
+* add service tracker log 
+* added server Profanity Filter service, and validation endpoints to User service 
+* sunset telemetry event created timestamp and google apple entitlement sync interfaces 
+
 ## [17.2.0] (2024-12-10)
 
 

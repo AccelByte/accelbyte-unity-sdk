@@ -371,6 +371,7 @@ namespace AccelByte.Api
             backoffDelay = inBackoffDelay;
             websocketApi.OverrideWebsocket(inWebSocket, inPingDelay, inMaxDelay, inTotalTimeout);
             websocketApi.SetLogger(SharedMemory?.Logger);
+            inWebSocket?.SetSharedMemory(SharedMemory);
         }
 
         /// <summary>
@@ -1979,8 +1980,6 @@ namespace AccelByte.Api
 
         private void HandleOnMessage(string message, bool isSkipConditioner = false)
         {
-            Report.GetWebSocketResponse(message, SharedMemory?.Logger);
-
             long messageId;
             MessageType messageType;
             ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
@@ -2213,6 +2212,7 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<SessionV2PartyJoinedNotification>(jsonString);
                     websocketApi.DispatchNotification(partyNotificationUserJoined,
                         SessionV2UserJoinedParty);
+                    messagingSystem?.SendMessage(AccelByteMessagingTopic.OnJoinedPartyNotification, jsonString);
                     break;
                 case MultiplayerV2NotifType.OnPartyMembersChanged:
                     var partyNotificationMembersChanged =
@@ -2340,6 +2340,7 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<PartyCreatedNotification>(jsonString);
                     websocketApi.DispatchNotification(partyCreatedNotification,
                         PartyCreatedNotification);
+                    messagingSystem?.SendMessage(AccelByteMessagingTopic.OnCreatedPartyNotification, jsonString);
                     break;
                 default:
                     SharedMemory?.Logger?.LogWarning($"MultiplayerV2 notification type {notificationType} not supported");
@@ -2351,14 +2352,17 @@ namespace AccelByte.Api
         {
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
             
             base.SetSharedMemory(newSharedMemory);
 
             messagingSystem = newSharedMemory.MessagingSystem;
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
             notificationBuffer?.SetLogger(SharedMemory?.Logger);
             websocketApi?.SetLogger(SharedMemory?.Logger);
+            websocketApi?.WebSocket?.WebSocketImp?.SetSharedMemory(newSharedMemory);
         }
 
         private void OnReceivedQosLatenciesUpdatedHandle(string payload)

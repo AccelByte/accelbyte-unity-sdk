@@ -102,7 +102,7 @@ namespace AccelByte.Utils
             {
                 tryCount++;
                 stopwatch.Reset();
-                using (UnityWebRequest webRequest = UnityWebRequest.Head(completeUrl))
+                using (UnityWebRequest webRequest = UnityWebRequest.Get(completeUrl))
                 {
                     try
                     {

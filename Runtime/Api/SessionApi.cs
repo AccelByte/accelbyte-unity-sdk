@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -8,7 +8,6 @@ using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
 using Newtonsoft.Json.Linq;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -32,9 +31,15 @@ namespace AccelByte.Api
         public IEnumerator GetPartyDetails(string partyId
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}")
@@ -58,10 +63,16 @@ namespace AccelByte.Api
         public IEnumerator UpdateParty(string partyId, SessionV2PartySessionUpdateRequest data
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
-            Assert.IsNotNull(data, "SessionV2PartySessionUpdateRequest cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}")
@@ -86,10 +97,16 @@ namespace AccelByte.Api
         public IEnumerator PatchUpdateParty(string partyId, SessionV2PartySessionUpdateRequest data
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
-            Assert.IsNotNull(data, "SessionV2PartySessionUpdateRequest cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePatch(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}")
@@ -114,11 +131,17 @@ namespace AccelByte.Api
         public IEnumerator InviteUserToParty(string partyId, string userId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , userId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
+
             var data = new SessionV2SessionInviteRequest
             {
                 userId = userId
@@ -178,11 +201,16 @@ namespace AccelByte.Api
         public IEnumerator PromoteUserToPartyLeader(string partyId, string leaderId
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
-            Assert.IsNotNull(leaderId, nameof(leaderId) + " cannot be null");
-            
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , leaderId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
             var data = new SessionV2PartySessionPromoteLeaderRequest()
             {
                 leaderId = leaderId
@@ -210,9 +238,15 @@ namespace AccelByte.Api
 
         public IEnumerator JoinParty(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/me/join")
@@ -235,9 +269,15 @@ namespace AccelByte.Api
 
         public IEnumerator LeaveParty(string partyId, ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/me/leave")
@@ -260,9 +300,15 @@ namespace AccelByte.Api
 
         public IEnumerator RejectPartyInvitation(string partyId, ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/me/reject")
@@ -286,10 +332,16 @@ namespace AccelByte.Api
         public IEnumerator KickUserFromParty(string partyId, string userId,
             ResultCallback<SessionV2PartySessionKickResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , userId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/{userId}/kick")
@@ -314,9 +366,15 @@ namespace AccelByte.Api
         public IEnumerator CreateParty(SessionV2PartySessionCreateRequest data
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, "SessionV2PartySessionCreateRequest cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/party")
@@ -339,8 +397,13 @@ namespace AccelByte.Api
 
         public IEnumerator GetUserParties(ResultCallback<PaginatedResponse<SessionV2PartySession>> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/parties")
@@ -363,9 +426,15 @@ namespace AccelByte.Api
         public IEnumerator JoinPartyByCode(string code
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(code, nameof(code) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(code
+                 , AuthToken
+                 , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             SessionV2JoinByCodeRequest body = new SessionV2JoinByCodeRequest { Code = code };
 
@@ -393,9 +462,15 @@ namespace AccelByte.Api
         public IEnumerator GenerateNewPartyCode(string partyId
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/code")
@@ -421,9 +496,15 @@ namespace AccelByte.Api
         public IEnumerator RevokePartyCode(string partyId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(partyId, nameof(partyId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/code")
@@ -454,7 +535,7 @@ namespace AccelByte.Api
                 callback?.TryError(error);
                 return;
             }
-            
+
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/{userId}/cancel")
                 .WithPathParam("namespace", Namespace_)
@@ -464,7 +545,6 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
@@ -479,9 +559,15 @@ namespace AccelByte.Api
         public IEnumerator CreateGameSession(SessionV2GameSessionCreateRequest data
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, "SessionV2GameSessionCreateRequest cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesession")
@@ -505,9 +591,15 @@ namespace AccelByte.Api
         public IEnumerator QueryGameSession(Dictionary<string, object> data
             , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, "GameSession attribute filters cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions")
@@ -531,9 +623,15 @@ namespace AccelByte.Api
         public IEnumerator GetGameSessionDetailsByPodName(string podName
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(podName, nameof(podName) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(podName
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/servers/{podName}")
@@ -590,9 +688,15 @@ namespace AccelByte.Api
         public IEnumerator DeleteGameSession(string sessionId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}")
@@ -617,10 +721,16 @@ namespace AccelByte.Api
             SessionV2GameSessionUpdateRequest data
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
-            Assert.IsNotNull(data, "SessionV2GameSessionUpdateRequest cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , data
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePatch(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}")
@@ -645,10 +755,16 @@ namespace AccelByte.Api
         public IEnumerator InviteUserToGameSession(string sessionId, string userId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , userId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var data = new SessionV2SessionInviteRequest { userId = userId };
 
@@ -706,9 +822,15 @@ namespace AccelByte.Api
         public IEnumerator JoinGameSession(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/join")
@@ -730,11 +852,17 @@ namespace AccelByte.Api
         }
 
         public IEnumerator LeaveGameSession(string sessionId
-            , ResultCallback<SessionV2GameSession> callback)
+            , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/leave")
@@ -750,7 +878,7 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request,
                 rsp => response = rsp);
 
-            var result = response.TryParseJson<SessionV2GameSession>();
+            var result = response.TryParse();
 
             callback?.Try(result);
         }
@@ -758,9 +886,15 @@ namespace AccelByte.Api
         public IEnumerator RejectGameSessionInvitation(string sessionId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/reject")
@@ -785,8 +919,13 @@ namespace AccelByte.Api
             SessionV2AttributeOrderBy? orderBy, bool? sortDesc,
             ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var queryDict = new Dictionary<string, string>();
 
@@ -816,9 +955,15 @@ namespace AccelByte.Api
         public IEnumerator JoinGameSessionByCode(string code
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(code, nameof(code) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(code
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             SessionV2JoinByCodeRequest body = new SessionV2JoinByCodeRequest { Code = code };
 
@@ -846,9 +991,15 @@ namespace AccelByte.Api
         public IEnumerator GenerateNewGameSessionCode(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/code")
@@ -874,9 +1025,15 @@ namespace AccelByte.Api
         public IEnumerator RevokeGameSessionCode(string sessionId
             , ResultCallback callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(sessionId, nameof(sessionId) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/code")
@@ -902,24 +1059,14 @@ namespace AccelByte.Api
         public IEnumerator PromoteUserToGameSessionLeader(string sessionId, string leaderId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , leaderId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
             {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(leaderId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(leaderId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -952,22 +1099,17 @@ namespace AccelByte.Api
 
         #endregion
 
-#region SessionStorage
+        #region SessionStorage
+
         public IEnumerator UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
             {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -995,19 +1137,13 @@ namespace AccelByte.Api
 
         public IEnumerator UpdateMemberStorage(string userId, string sessionId, JObject data, ResultCallback<JObject> callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
             {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1034,8 +1170,8 @@ namespace AccelByte.Api
             callback?.Try(result);
         }
 
-#endregion
-        
+        #endregion
+
 #region Player
         internal void GetPlayerAttributes(ResultCallback<PlayerAttributesResponseBody> callback)
         {
@@ -1045,7 +1181,7 @@ namespace AccelByte.Api
                 callback?.TryError(error);
                 return;
             }
-        
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/attributes")
                 .WithPathParam("namespace", Namespace_)
@@ -1053,7 +1189,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-                    
+
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PlayerAttributesResponseBody>();
@@ -1078,7 +1214,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            
+
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<PlayerAttributesResponseBody>();
@@ -1102,7 +1238,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            
+
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();

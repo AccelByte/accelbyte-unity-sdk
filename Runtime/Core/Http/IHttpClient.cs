@@ -17,6 +17,7 @@ namespace AccelByte.Core {
 
     public interface IHttpRequest
     {
+        string Id { get; set; }
         string Method { get; }
         string Url { get; set; }
         HttpAuth AuthType { get; }

@@ -466,6 +466,7 @@ namespace AccelByte.Core
 
         private class HttpRequestPrototype : IHttpRequest
         {
+            public string Id { get; set; }
             public string Method { get; set; }
             public string Url { get; set; }
             

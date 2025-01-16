@@ -37,7 +37,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -57,7 +57,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PublicPolicy[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetLegalPoliciesByCountry(string countryCode
@@ -72,7 +72,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(countryCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -91,7 +91,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PublicPolicy[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkAcceptPolicyVersions( AcceptAgreementRequest[] acceptAgreementRequests
@@ -99,7 +99,16 @@ namespace AccelByte.Api
         {
             string functionName = "BulkAcceptPolicyVersions";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                acceptAgreementRequests
+                , Namespace_
+                , AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/agreements/policies")
@@ -115,7 +124,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<AcceptAgreementResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AcceptPolicyVersion( string localizedPolicyVersionId
@@ -123,7 +132,16 @@ namespace AccelByte.Api
         {
             string functionName = "AcceptPolicyVersion";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! AccessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(localizedPolicyVersionId
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/agreements/localized-policy-versions/{localizedPolicyVersionId}")
@@ -139,15 +157,20 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryLegalEligibilities( ResultCallback<RetrieveUserEligibilitiesResponse[]> callback )
         {
             string functionName = "CheckLegalEligibilities";
             Report.GetFunctionLog(GetType().Name, functionName);
-            Assert.IsNotNull(Namespace_, "Can't " + functionName + "! namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't " + functionName + "! accessToken parameter is null!");
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/eligibilities/namespaces/{namespace}")
@@ -163,7 +186,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<RetrieveUserEligibilitiesResponse[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetLegalDocument( string url

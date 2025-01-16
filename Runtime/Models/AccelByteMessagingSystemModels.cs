@@ -16,7 +16,12 @@ namespace AccelByte.Models
         NotificationBufferSent,
         MatchmakingStarted,
         MatchFoundOnPoll,
-        MatchFoundOnGetSessionDetails
+        MatchFoundOnGetSessionDetails,
+        OnCreatedPartyNotification,
+        OnJoinedPartyNotification,
+        OnLeftPartyNotification,
+        OnJoinedGameSessionNotification,
+        OnLeftGameSessionNotification,
     }
 
     [DataContract, Preserve]

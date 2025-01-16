@@ -241,10 +241,10 @@ namespace AccelByte.Api.Interface
         /// </summary>
         /// <param name="sessionId">Targeted game session's sessionId</param>
         /// <param name="callback">
-        /// Returns a result of SessionV2GameSession via callback when completed.
+        /// Returns a result via callback when completed.
         /// </param>
         public void LeaveGameSession(string sessionId
-            , ResultCallback<SessionV2GameSession> callback);
+            , ResultCallback callback);
 
         /// <summary>
         /// Reject a game session invitation.

@@ -14,12 +14,18 @@ namespace AccelByte.Core
         private List<AccelByteILogger> loggers = new List<AccelByteILogger>();
 
         internal AccelByteLogType currentSeverity;
-        
+
         private Action<AccelByteLogType, object, Object> onLog;
 
         private Action<Exception, Object> onException;
 
         internal AccelByteILogger DefaultLogger
+        {
+            get;
+            private set;
+        }
+
+        internal bool EnhancedLogEnabled
         {
             get;
             private set;
@@ -35,7 +41,7 @@ namespace AccelByte.Core
         {
             DefaultLogger = new AccelByteLogHandler();
             AddLogWriter(DefaultLogger);
-            
+
             LogEnabled = false;
         }
 
@@ -43,9 +49,21 @@ namespace AccelByte.Core
         {
             DefaultLogger = new AccelByteLogHandler();
             AddLogWriter(DefaultLogger);
-            
+
             SetEnableLogging(enableLog);
             SetFilterLogType(logFilter);
+        }
+
+        public bool IsEnhancedLoggingEnabled()
+        {
+            return EnhancedLogEnabled;
+        }
+
+    public void SetEnableEnhancedLogging(bool enable)
+        {
+#if DEVELOPMENT_BUILD || UNITY_EDITOR 
+            EnhancedLogEnabled = enable;
+#endif
         }
 
         public void SetEnableLogging(bool enable)
@@ -56,6 +74,15 @@ namespace AccelByte.Core
         public void SetFilterLogType(AccelByteLogType type)
         {
             currentSeverity = type;
+        }
+        
+        public void LogEnhancedService(object message)
+        {
+            if (!EnhancedLogEnabled)
+            {
+                return;
+            }
+            onLog?.Invoke(AccelByteLogType.Verbose, message, null);
         }
 
         public void LogVerbose(object message, bool forceLog = false)
