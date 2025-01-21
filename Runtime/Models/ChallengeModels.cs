@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -237,9 +237,13 @@ namespace AccelByte.Models
     public class ChallengeRequirementProgressionResponse
     {
         [DataMember(Name = "completedAt")] public string CompletedAt;
-        [DataMember(Name = "currrentValue")] public double CurrentValue;
+        [DataMember(Name = "currentValue")] public double CurrentValue;
         [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "targetValue")] public double TargetValue;
+        [DataMember(Name = "matcher")] public string Matcher;
+        [DataMember(Name = "parameterName")] public string ParameterName;
+        [DataMember(Name = "parameterType")] public string ParameterType;
+        [DataMember(Name = "statCycleId")] public string StatCycleId;
     }
 
     [DataContract, Preserve]

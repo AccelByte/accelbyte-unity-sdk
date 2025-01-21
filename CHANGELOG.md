@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.4.0] (2025-01-21)
+
+
+### Features
+
+* add missing field on challenge model 
+
+
+### Bug Fixes
+
+* fix challenge model typo 
+
 ## [17.3.0] (2025-01-16)
 
 
