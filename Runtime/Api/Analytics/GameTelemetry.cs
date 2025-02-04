@@ -289,7 +289,7 @@ namespace AccelByte.Api
         private void InitializeTelemetryLoop()
         {
             cancelationTokenSource = new System.Threading.CancellationTokenSource();
-            IndefiniteLoopCommand telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
+            telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
                 , cancellationToken: cancelationTokenSource.Token
                 , onUpdate: TelemetryLoop);
             SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
