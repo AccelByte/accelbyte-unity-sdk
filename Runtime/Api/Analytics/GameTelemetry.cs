@@ -288,10 +288,10 @@ namespace AccelByte.Api
 
         private void InitializeTelemetryLoop()
         {
-            cancelationTokenSource = new System.Threading.CancellationTokenSource();
-            telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
+            cancelationTokenSource = new CancellationTokenSource();
+            telemetryLoopCommand = new WaitTimeCommand(waitTime: telemetryInterval.TotalSeconds
                 , cancellationToken: cancelationTokenSource.Token
-                , onUpdate: TelemetryLoop);
+                , onDone: TelemetryLoop);
             SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
         }
 
@@ -333,11 +333,23 @@ namespace AccelByte.Api
                 return;
             }
 
+            if (!useCache)
+            {
+                onLoadCacheDone?.Invoke(null);
+                return;
+            }
+
             LoadEventsFromCache(session.UserId, onLoadCacheDone);
         }
 
         internal void LoadEventsFromCache(string key, Action<List<TelemetryBody>> onLoadCacheDone)
         {
+            if (!useCache)
+            {
+                onLoadCacheDone?.Invoke(null);
+                return;
+            }
+            
             cacheStorage.GetItem(
                 key
                 , tableName: cacheTableName
@@ -370,12 +382,23 @@ namespace AccelByte.Api
                 onSaveCacheDone?.Invoke(false);
                 return;
             }
+            if (!useCache)
+            {
+                onSaveCacheDone?.Invoke(false);
+                return;
+            }
 
             AppendEventToCache(session.UserId, telemetryBody, onSaveCacheDone);
         }
 
         internal void AppendEventToCache(string key, TelemetryBody telemetryBody, Action<bool> onSaveCacheDone = null)
         {
+            if (!useCache)
+            {
+                onSaveCacheDone?.Invoke(false);
+                return;
+            }
+            
             eventList.Add(telemetryBody);
             var telemetryEventsJson = System.Text.Encoding.UTF8.GetString(eventList.ToUtf8Json());
             cacheStorage.SaveItem(key, telemetryEventsJson, onSaveCacheDone, tableName: cacheTableName);
@@ -389,6 +412,10 @@ namespace AccelByte.Api
         private void RemoveEventsFromCache()
         {
             if (session != null && !session.IsValid())
+            {
+                return;
+            }
+            if (!useCache)
             {
                 return;
             }
