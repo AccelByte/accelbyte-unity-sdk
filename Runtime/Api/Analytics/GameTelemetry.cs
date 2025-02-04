@@ -123,13 +123,19 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Enable or disable the usage of the file storage cache.
+        /// The cache stores all events in JSON before being sent in case
+        /// of crash or errors and attempts to re-send them when it can.
+        /// The cache is enabled by default.
         /// </summary>
+        /// <param name="shouldUseCache">Enables or disables the usage of the cache.</param>
         public void SetUseCache(bool shouldUseCache)
         {
             useCache = shouldUseCache;
 
             if (!useCache)
             {
+                eventList.Clear();
                 DeleteCache();
             }
         }
@@ -327,13 +333,12 @@ namespace AccelByte.Api
 
         internal void LoadEventsFromCache(Action<List<TelemetryBody>> onLoadCacheDone)
         {
-            if (!session.IsValid())
+            if (!useCache)
             {
                 onLoadCacheDone?.Invoke(null);
                 return;
             }
-
-            if (!useCache)
+            if (!session.IsValid())
             {
                 onLoadCacheDone?.Invoke(null);
                 return;
@@ -377,12 +382,12 @@ namespace AccelByte.Api
 
         internal void AppendEventToCache(TelemetryBody telemetryBody, Action<bool> onSaveCacheDone = null)
         {
-            if (!session.IsValid())
+            if (!useCache)
             {
                 onSaveCacheDone?.Invoke(false);
                 return;
             }
-            if (!useCache)
+            if (!session.IsValid())
             {
                 onSaveCacheDone?.Invoke(false);
                 return;
@@ -411,11 +416,11 @@ namespace AccelByte.Api
 
         private void RemoveEventsFromCache()
         {
-            if (session != null && !session.IsValid())
+            if (!useCache)
             {
                 return;
             }
-            if (!useCache)
+            if (session != null && !session.IsValid())
             {
                 return;
             }
