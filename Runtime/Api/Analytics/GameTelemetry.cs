@@ -102,10 +102,13 @@ namespace AccelByte.Api
                     $"Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
                 telemetryInterval = minimumTelemetryInterval;
             }
-            
-            cancelationTokenSource?.Cancel();
-            cancelationTokenSource?.Dispse();
-            InitializeTelemetryLoop();
+
+            if (cancelationTokenSource != null)
+            {
+                cancelationTokenSource.Cancel();
+                cancelationTokenSource.Dispose();
+                InitializeTelemetryLoop();
+            }
         }
 
         /// <summary>
