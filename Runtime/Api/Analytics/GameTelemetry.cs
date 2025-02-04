@@ -33,6 +33,7 @@ namespace AccelByte.Api
 
         IAccelByteDataStorage cacheStorage;
         string cacheTableName;
+        private bool useCache;
         private WaitTimeCommand telemetryLoopCommand;
 
         internal TimeSpan TelemetryInterval
@@ -54,6 +55,7 @@ namespace AccelByte.Api
             
             session = inSession;
 
+            useCache = true;
             cacheStorage = session.DataStorage;
             cacheTableName = $"GameTelemetryCache/{AccelByteSDK.Environment.Current}.cache";
 
@@ -100,6 +102,10 @@ namespace AccelByte.Api
                     $"Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
                 telemetryInterval = minimumTelemetryInterval;
             }
+            
+            cancelationTokenSource?.Cancel();
+            cancelationTokenSource?.Dispse();
+            InitializeTelemetryLoop();
         }
 
         /// <summary>
@@ -111,6 +117,18 @@ namespace AccelByte.Api
         public void SetBatchFrequency(int intervalSeconds)
         {
             SetBatchFrequency(TimeSpan.FromSeconds(intervalSeconds));
+        }
+
+        /// <summary>
+        /// </summary>
+        public void SetUseCache(bool shouldUseCache)
+        {
+            useCache = shouldUseCache;
+
+            if (!useCache)
+            {
+                DeleteCache();
+            }
         }
 
         /// <summary>
@@ -147,7 +165,11 @@ namespace AccelByte.Api
             else
             {
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
-                AppendEventToCache(telemetryBody);
+
+                if (useCache)
+                {
+                    AppendEventToCache(telemetryBody);
+                }
 
                 if (cancelationTokenSource == null)
                 {
@@ -203,7 +225,10 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    RemoveEventsFromCache();
+                    if (useCache)
+                    {
+                        RemoveEventsFromCache();
+                    }
                 }
 
                 foreach (var telemetryCallback in telemetryCallbacks)
@@ -222,6 +247,11 @@ namespace AccelByte.Api
 
         private void SendCachedTelemetry()
         {
+            if (!useCache)
+            {
+                return;
+            }
+            
             LoadEventsFromCache(telemetryBodies =>
             {
                 SendTelemetryRequest(telemetryBodies, cb =>
@@ -250,11 +280,15 @@ namespace AccelByte.Api
             }
 
             SendTelemetryBatch(callback: null);
-            
-            cancelationTokenSource = new CancellationTokenSource();
-            telemetryLoopCommand = new WaitTimeCommand(waitTime: telemetryInterval.TotalSeconds
+            InitializeTelemetryLoop();
+        }
+
+        private void InitializeTelemetryLoop()
+        {
+            cancelationTokenSource = new System.Threading.CancellationTokenSource();
+            IndefiniteLoopCommand telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
                 , cancellationToken: cancelationTokenSource.Token
-                , onDone: TelemetryLoop);
+                , onUpdate: TelemetryLoop);
             SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
         }
 

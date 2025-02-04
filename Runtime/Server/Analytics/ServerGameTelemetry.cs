@@ -65,10 +65,6 @@ namespace AccelByte.Server
                 SharedMemory?.Logger?.LogWarning($"Telemetry schedule interval is too small! Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
                 telemetryInterval = minimumTelemetryInterval;
             }
-            
-            cancelationTokenSource?.Cancel();
-            cancelationTokenSource?.Dispse();
-            InitializeTelemetryLoop();
         }
 
         /// <summary>
