@@ -191,7 +191,6 @@ namespace AccelByte.Server
             }
 
             SendTelemetryBatch(callback: null);
-            
             cancelationTokenSource = new System.Threading.CancellationTokenSource();
             IndefiniteLoopCommand telemetryLoopCommand = new IndefiniteLoopCommand(interval: telemetryInterval.TotalSeconds
                 , cancellationToken: cancelationTokenSource.Token
