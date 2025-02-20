@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -560,6 +560,7 @@ namespace AccelByte.Api
             , ResultCallback<SessionV2GameSession> callback)
         {
             var error = ApiHelperUtils.CheckForNullOrEmpty(data
+                , data?.configurationName
                 , AuthToken
                 , Namespace_);
 
@@ -815,6 +816,30 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<InviteUserToGameSessionResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        public void KickUserFromGameSession(string sessionId, string userId, ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId, userId, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/members/{memberId}/kick")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithPathParam("memberId", userId)
+                .WithBearerAuth(AuthToken)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
                 callback?.Try(result);
             });
         }

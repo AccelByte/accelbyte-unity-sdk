@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc.All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc.All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -345,59 +345,6 @@ namespace AccelByte.Api
                     builder.WithQueryParam("sourceItemId", optionalParameters.SourceItemId);
                 }
             }
-
-            var request = builder.GetResult();
-
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<UserItemsPagingResponse>();
-
-                if (result.IsError)
-                {
-                    callback?.TryError(result.Error);
-                    return;
-                }
-
-                callback?.TryOk(result.Value);
-            });
-        }
-
-        [Obsolete("This interface is deprecated, and will be removed on AGS 3.81. Please use AccelByte.Api.Inventory.GetUserInventoryAllItems")]
-        public void GetUserInventoryAllItems(string inventoryId
-            , ResultCallback<UserItemsPagingResponse> callback
-            , UserItemSortBy sortBy = UserItemSortBy.CreatedAt
-            , int limit = 25
-            , int offset = 0
-            , string sourceItemId = ""
-            , TagQueryBuilder tagBuilder = null
-            , int? quantity = null)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId);
-            if (error != null)
-            {
-                callback.TryError(error);
-                return;
-            }
-
-            var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/" +
-                "inventories/{inventoryId}/items")
-                .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson)
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("inventoryId", inventoryId)
-                .WithQueryParam("sortBy", ConverterUtils.EnumToDescription(sortBy))
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("offset", offset.ToString());
-
-            if (tagBuilder != null)
-            {
-                builder.WithQueryParam("tags", tagBuilder.Build());
-            }
-
-            builder.WithQueryParam("sourceItemId", sourceItemId)
-                .WithQueryParam("qtyGte", quantity.ToString());
 
             var request = builder.GetResult();
 

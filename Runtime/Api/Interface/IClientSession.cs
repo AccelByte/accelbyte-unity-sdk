@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -225,6 +225,14 @@ namespace AccelByte.Api.Interface
         /// </param>
         public void InviteUserToGameSession(string sessionId, string userId
             , ResultCallback callback);
+
+        /// <summary>
+        /// Kick a user from the game session. Only the leader can kick a member.
+        /// </summary>
+        /// <param name="sessionId">Targeted game session's sessionId</param>
+        /// <param name="userId">Targeted user's userId</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void KickUserFromGameSession(string sessionId, string userId, ResultCallback callback);
 
         /// <summary>
         /// Join a game session.

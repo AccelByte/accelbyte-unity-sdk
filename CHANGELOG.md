@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.5.0] (2025-02-20)
+
+
+### Features
+
+* add get challenge's schedule endpoint 
+* add optional parameters tags and keyword when requesting challanges list 
+* add retry mechanism for lobby connect 
+* add TeamID field to session team data 
+* added get public user info endpoint 
+* added migration qos.GetServerLatencies to qos.GetAllActiveServerLatencies 
+* added new game standard events 
+* expose kick user from game session endpoints to session wrapper services 
+* implemented lockable queue for synchronous lobby event handling 
+* remove inventory query item interface, remove turn manager get closest turn server interface, remove duplicated presence event api 
+
+
+### Refactors
+
+* change api base parent BaseUrl, AuthToken, Namespace_ to protected internal 
+* improve UGC and Wallet validation checks 
+
 ## [17.4.0] (2025-01-21)
 
 

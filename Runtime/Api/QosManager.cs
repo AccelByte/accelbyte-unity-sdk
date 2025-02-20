@@ -148,9 +148,21 @@ namespace AccelByte.Api
         /// Get server latencies for active QoS server in the namespace.
         /// </summary>
         /// <param name="callback">Returns a result via callback when completed</param>
+        [System.Obsolete("Deprecated, please use GetAllActiveServerLatencies instead. This interface will be removed in 2025.4.AGS versions.")]
         public void GetServerLatencies(ResultCallback<Dictionary<string, int>> callback)
         {
             GetServerLatencies(null, callback);
+        }
+
+        /// <summary>
+        /// Get server latencies for active QoS server in the namespace.
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetAllActiveServerLatencies(ResultCallback<Dictionary<string, int>> callback)
+        {
+            var optionalParams = new GetQosServerOptionalParameters();
+            optionalParams.Status = QosStatus.Active;
+            GetServerLatencies(optionalParams, callback);
         }
 
         /// <summary>

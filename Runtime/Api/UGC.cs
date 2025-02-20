@@ -66,7 +66,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -146,7 +146,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -185,7 +185,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -234,7 +234,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -278,7 +278,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -303,7 +303,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -323,7 +323,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -348,7 +348,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -373,7 +373,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -395,7 +395,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -417,7 +417,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -437,7 +437,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -468,7 +468,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -492,7 +492,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -517,7 +517,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -537,7 +537,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             coroutineRunner.Run(
@@ -563,7 +563,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             coroutineRunner.Run(
@@ -589,7 +589,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -621,7 +621,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -641,7 +641,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -677,7 +677,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -706,7 +706,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -739,7 +739,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -774,7 +774,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -797,7 +797,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -820,7 +820,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -849,7 +849,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -872,7 +872,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -893,7 +893,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -918,7 +918,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -947,7 +947,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -974,7 +974,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1015,7 +1015,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1042,7 +1042,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1062,7 +1062,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1097,7 +1097,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1123,7 +1123,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1143,7 +1143,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1163,7 +1163,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1188,7 +1188,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1215,7 +1215,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1247,7 +1247,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1281,7 +1281,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1315,7 +1315,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1351,7 +1351,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1382,7 +1382,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1411,7 +1411,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1440,7 +1440,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1472,7 +1472,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1492,7 +1492,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1521,7 +1521,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1554,7 +1554,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1589,7 +1589,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1616,7 +1616,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1651,7 +1651,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1683,7 +1683,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1717,7 +1717,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             coroutineRunner.Run(
@@ -1748,7 +1748,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             coroutineRunner.Run(

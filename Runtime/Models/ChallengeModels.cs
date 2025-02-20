@@ -1,4 +1,4 @@
-// Copyright (c) 2025 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -74,6 +74,7 @@ namespace AccelByte.Models
         [DataMember(Name = "resetConfig")] public ChallengeResetConfig ResetConfig;
         [DataMember(Name = "repeatAfter")] public int RepeatAfter;
         [DataMember(Name = "randomizedPerRotation")] public bool RandomizedPerRotation;
+        [DataMember(Name = "tags")] public string[] Tags;
     }
 
     [DataContract, Preserve]
@@ -117,6 +118,35 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class GetChallengesOptionalParamenters
+    {
+        /// <summary>
+        /// Filter challenges by code
+        /// </summary>
+        public string Keyword;
+        /// <summary>
+        /// Filter challenges by tags.
+        /// </summary>
+        public string[] Tags;
+        /// <summary>
+        /// Maximum number of items to retrieve.
+        /// </summary>
+        public int? Limit;
+        /// <summary>
+        /// Number of item to skip.
+        /// </summary>
+        public int? Offset;
+        /// <summary>
+        /// Sort list by attributes.
+        /// </summary>
+        public ChallengeSortBy? SortBy;
+        /// <summary>
+        /// Challenge status
+        /// </summary>
+        public ChallengeStatus? Status;
+    }
+
+    [DataContract, Preserve]
     public class ChallengeResponse
     {
         [DataMember(Name = "data")] public ChallengeResponseInfo[] Data;
@@ -140,18 +170,32 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "requirementGroups")] public ChallengeRequirement[] RequirementGroups;
         [DataMember(Name = "rewards")] public ChallengeReward[] Rewards;
+        [Obsolete("This field will be removed on AGS 2025.4. Please use AccelByte.Api.Challenge.ListSchedules or AccelByte.Api.Challenge.ListScheduleByGoal to get schedule information")]
         [DataMember(Name = "schedule")] public ChallengeGoalSchedule Schedule;
         [DataMember(Name = "tags")] public string[] Tags;
         [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }
 
     [DataContract, Preserve]
+    public class ChallengeGoalMeta
+    {
+        [DataMember(Name = "code")] public string Code;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "name")] public string Name;
+        [DataMember(Name = "requirementGroups")] public ChallengeRequirement[] RequirementGroups;
+        [DataMember(Name = "rewards")] public ChallengeReward[] Rewards;
+        [DataMember(Name = "tags")] public string[] Tags;
+    }
+
+    [DataContract, Preserve]
     public class GoalProgressionInfo : GoalResponseBase
     {
+        [DataMember(Name = "goal")] public ChallengeGoalMeta Goal;
         [DataMember(Name = "goalCode")] public string GoalCode;
         [DataMember(Name = "goalProgressionId")] public string GoalProgressionId;
         [DataMember(Name = "requirementProgressions")] public ChallengeRequirementProgressionResponse[] RequirementProgressions;
         [DataMember(Name = "status")] public string Status;
+        [DataMember(Name = "toClaimRewards")] public ChallengeClaimableUserReward[] ToClaimRewards;
     }
 
     [DataContract, Preserve]
@@ -214,6 +258,14 @@ namespace AccelByte.Models
         [DataMember(Name = "itemName")] public string ItemName;
         [DataMember(Name = "qty")] public float Quantity;
         [DataMember(Name = "type")] public string Type;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeClaimableUserReward : ChallengeReward
+    {
+        [DataMember(Name = "goalProgressionId")] public string GoalProgressionId;
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "status")] public ChallengeRewardStatus Status;
     }
 
     [DataContract, Preserve]
@@ -321,5 +373,65 @@ namespace AccelByte.Models
     public class ChallengeEvaluatePlayerProgressionRequest
     {
         [DataMember(Name = "userIds")] public string[] UserIds;
+    }
+    
+    [DataContract, Preserve]
+    public class ChallengeScheduleByGoalResponse
+    {
+        [DataMember(Name = "endTime")] public DateTime EndTime;
+        [DataMember(Name = "startTime")] public DateTime StartTime;
+    }
+    
+    [DataContract, Preserve]
+    public class ChallengeListScheduleByGoalOptionalParameters
+    {
+        public int? Limit;
+        public int? Offset;
+    }
+    
+    [DataContract, Preserve]
+    public class ChallengeListScheduleByGoalResponse
+    {
+        [DataMember(Name = "data")] public ChallengeScheduleByGoalResponse[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeGoalInSchedulesResponse
+    {
+        [DataMember(Name = "challengeCode")] public string ChallengeCode;
+        [DataMember(Name = "code")] public string Code;
+        [DataMember(Name = "createdAt")] public DateTime CreatedAt;
+        [DataMember(Name = "description")] public string Description;
+        [DataMember(Name = "isActive")] public bool IsActive;
+        [DataMember(Name = "name")] public string Name;
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "requirementGroups")] public ChallengeRequirement[] RequirementGroups;
+        [DataMember(Name = "rewards")] public ChallengeReward[] Rewards;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "updatedAt")] public DateTime UpdatedAt;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeScheduleResponse
+    {
+        [DataMember(Name = "endTime")] public DateTime EndTime;
+        [DataMember(Name = "goals")] public ChallengeGoalInSchedulesResponse[] Goals;
+        [DataMember(Name = "startTime")] public DateTime StartTime;
+    }
+
+    [DataContract, Preserve]
+    public class ChallengeListSchedulesOptionalParameters
+    {
+        public DateTime? DateTime;
+        public int? Limit;
+        public int? Offset;
+    }
+    
+    [DataContract, Preserve]
+    public class ChallengeListSchedulesResponse
+    {
+        [DataMember(Name = "data")] public ChallengeScheduleResponse[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 }

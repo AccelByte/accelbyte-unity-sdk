@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -2012,6 +2012,8 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userId"> user id that needed to get user data</param>
         /// <param name="callback"> Return a Result that contains UserData when completed. </param>
+
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserPublicInfo instead")]
         public void GetUserByUserId( string userId
             , ResultCallback<PublicUserData> callback )
         {
@@ -2036,12 +2038,38 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Get public user info by user id
+        /// </summary>
+        /// <param name="userId"> user id that needed to get user data</param>
+        /// <param name="callback"> Return a Result that contains usre public info when completed. </param>
+        public void GetUserPublicInfo(string userId
+            , ResultCallback<GetUserPublicInfoResponse> callback )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if(!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!userSession.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetUserPublicInfo(userId, callback);
+        }
+
+        /// <summary>
         /// Get other user data by other platform userId (such as SteamID, for example)
         /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
         /// </summary>
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="otherPlatformUserId">Platform UserId that needed to get user data</param>
         /// <param name="callback">Return a Result that contains UserData when completed.</param>
+
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserByOtherPlatformUserIdV4 instead")]
         public void GetUserByOtherPlatformUserId( PlatformType platformType
             , string otherPlatformUserId
             , ResultCallback<UserData> callback )
@@ -2060,6 +2088,36 @@ namespace AccelByte.Api
                 PlatformUserId = otherPlatformUserId
             };
             api.GetUserByOtherPlatformUserId(requestModel, callback);
+        }
+
+        /// <summary>
+        /// Get other user data by other platform userId.
+        /// </summary>
+        /// <param name="platformType">User platform's type that needed to get user data (Google, Steam, Facebook, etc).</param>
+        /// <param name="platformUserId">
+        /// Platform UserId that needed to get user data. 
+        /// For Nintendo Platform, NSA ID need to be appended with Environment ID using colon as separator. e.g kmzwa8awaa:dd1.
+        /// </param>
+        /// <param name="callback">Return a Result that contains UserData when completed.</param>
+        public void GetUserByOtherPlatformUserIdV4(GetUserPlatformType platformType
+            , string platformUserId
+            , ResultCallback<UserData> callback )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!userSession.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            if (platformType == null || !platformType.IsValid())
+            {
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, $"Invalid platformType"));
+                return;
+            }
+
+            api.GetUserByOtherPlatformUserIdV4(platformType.PlatformId, platformUserId, callback);
         }
         
         /// <summary>
@@ -2198,6 +2256,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="userIds">List UserId(s) to get.</param>
         /// <param name="callback">Returns a result via callback when completed</param>
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserOtherPlatformBasicPublicInfo instead")]
         public void BulkGetUserInfo( string[] userIds
             , ResultCallback<ListBulkUserInfoResponse> callback )
         {

@@ -1,10 +1,12 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace AccelByte.Server
 {
@@ -399,11 +401,26 @@ namespace AccelByte.Server
             });
         }
 
+        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
         public void GetChallenges(ResultCallback<ChallengeResponse> callback
             , ChallengeStatus status = ChallengeStatus.None
             , ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc
             , int offset = 0
             , int limit = 20)
+        {
+            var optionalParams = new GetChallengesOptionalParamenters()
+            {
+                Limit = limit,
+                Offset = offset,
+                SortBy = sortBy,
+                Status = status
+            };
+
+            GetChallenges(optionalParams, callback);
+        }
+
+        public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
+            , ResultCallback<ChallengeResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -415,26 +432,38 @@ namespace AccelByte.Server
                 return;
             }
 
-            var requestBuilder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/challenges")
+            var queries = new Dictionary<string, string>();
+            if (optionalParameters?.SortBy != null)
+            {
+                queries["sortBy"] = ConverterUtils.EnumToDescription(optionalParameters.SortBy);
+            }
+            if (optionalParameters?.Status != null && optionalParameters?.Status.Value != ChallengeStatus.None)
+            {
+                queries["status"] = ConverterUtils.EnumToDescription(optionalParameters.Status);
+            }
+            if (optionalParameters?.Tags != null)
+            {
+                queries["tags"] = string.Join(',', optionalParameters.Tags);
+            }
+            if (!string.IsNullOrEmpty(optionalParameters?.Keyword))
+            {
+                queries["keyword"] = optionalParameters.Keyword;
+            }
+            if (optionalParameters?.Offset != null)
+            {
+                queries["offset"] = optionalParameters.Offset.Value.ToString();
+            }
+            if (optionalParameters?.Limit != null && optionalParameters?.Limit > 0)
+            {
+                queries["limit"] = optionalParameters.Limit.Value.ToString();
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/challenges")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
-                .WithPathParam("namespace", Namespace_);
-
-            if (status != ChallengeStatus.None)
-            {
-                requestBuilder.WithQueryParam("status", status.ToString());
-            }
-            requestBuilder.WithQueryParam("sortBy", ConverterUtils.EnumToDescription(sortBy));
-            if (offset >= 0)
-            {
-                requestBuilder.WithQueryParam("offset", offset.ToString());
-            }
-            if (limit >= 0)
-            {
-                requestBuilder.WithQueryParam("limit", limit.ToString());
-            }
-
-            var request = requestBuilder.GetResult();
+                .WithPathParam("namespace", Namespace_)
+                .WithQueries(queries)
+                .GetResult();
 
             HttpOperator.SendRequest(request, response =>
             {

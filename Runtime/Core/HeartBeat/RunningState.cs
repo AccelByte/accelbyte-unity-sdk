@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -10,12 +10,14 @@ namespace AccelByte.Core
     {
         private Action triggerAction;
         private bool isRunning;
+        private bool isImmediateTrigger;
         Utils.AccelByteTimer timer;
 
-        public RunningState(int delayTimeInMs, Action triggerAction)
+        public RunningState(int delayTimeInMs, Action triggerAction, bool isImmediateTrigger = true)
         {
             float delayTimeInS = Utils.TimeUtils.MillisecondsToSeconds(delayTimeInMs);
             this.triggerAction = triggerAction;
+            this.isImmediateTrigger = isImmediateTrigger;
             Action onTimerDone = () =>
             {
                 if (isRunning)
@@ -29,7 +31,10 @@ namespace AccelByte.Core
 
         public void Run()
         {
-            triggerAction?.Invoke();
+            if (isImmediateTrigger)
+            {
+                triggerAction?.Invoke();
+            }
             timer.Start();
             isRunning = true;
         }

@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -92,16 +92,7 @@ namespace AccelByte.Models
         [System.ComponentModel.Description("updatedAt:asc")]
         UpdatedAtAsc,
         [System.ComponentModel.Description("updatedAt:desc")]
-        UpdatedAtDesc,
-        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
-        [System.ComponentModel.Description("createdAt")]
-        Quantity,
-        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
-        [System.ComponentModel.Description("createdAt")]
-        QuantityAsc,
-        [Obsolete("This sort type is no longer supported, and will set the type to CreatedAt. This option will be removed on AGS 3.81")]
-        [System.ComponentModel.Description("createdAt")]
-        QuantityDesc
+        UpdatedAtDesc
     }
 
     [DataContract, Preserve]

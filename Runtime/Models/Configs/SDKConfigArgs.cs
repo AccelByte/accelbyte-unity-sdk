@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -36,7 +36,6 @@ namespace AccelByte.Models
         [DataMember] public string UGCServerUrl;
         [DataMember] public string ReportingServerUrl;
         [DataMember] public string SeasonPassServerUrl;
-        [DataMember] public string SessionBrowserServerUrl;
         [DataMember] public string SessionServerUrl;
         [DataMember] public string MatchmakingV2ServerUrl;
         [DataMember] public bool? UseTurnManager;

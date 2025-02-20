@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -359,11 +359,11 @@ namespace AccelByte.Api
 
             if (errorCode != ErrorCode.None)
             {
-                coroutineRunner.Run( ()=>handler(Result<T>.CreateError(errorCode)));
+                handler?.Invoke(Result<T>.CreateError(errorCode));
             }
             else
             {
-                coroutineRunner.Run( ()=>handler(Result<T>.CreateOk(payload)));
+                handler?.Invoke(Result<T>.CreateOk(payload));
             }
         }
         
@@ -380,9 +380,7 @@ namespace AccelByte.Api
         public void DispatchNotification<T>(T notification, ResultCallback<T> handler)
             where T : class, new()
         {
-            if (handler == null) return;
-
-            coroutineRunner.Run(() => handler(Result<T>.CreateOk(notification)));
+            handler?.Invoke(Result<T>.CreateOk(notification));
         }
 
         public void HandleResponse(long messageId, string message, ErrorCode errorCode)

@@ -38,7 +38,7 @@ namespace AccelByte.Core
         
         #region High-Level Shortcuts
         /// <summary>Config.Namespace wrapper</summary>
-        protected string Namespace_ => Config.Namespace;
+        protected internal string Namespace_ => Config.Namespace;
         #endregion /High-Level Shortcuts
     }
 }

@@ -96,7 +96,7 @@ namespace AccelByte.Server
                 });
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchContentsSpesificToChannel(string channelId
@@ -105,8 +105,16 @@ namespace AccelByte.Server
             , string userId)
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't search content! Namespace parameter is null!");
-            Assert.IsNotNull(channelId, "Can't search content! channelId parameter is null!");
+            
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , channelId
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                  .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/channels/{channelId}/contents/search")
@@ -137,7 +145,7 @@ namespace AccelByte.Server
                 });
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator ModifyContentByShareCode( string userId
@@ -150,27 +158,27 @@ namespace AccelByte.Server
             
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(shareCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -201,7 +209,7 @@ namespace AccelByte.Server
                 });
 
             var result = response.TryParseJson<UGCResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator DeleteContentByShareCode( string userId
@@ -213,27 +221,27 @@ namespace AccelByte.Server
             
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(shareCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -256,7 +264,7 @@ namespace AccelByte.Server
                 });
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }        
 }

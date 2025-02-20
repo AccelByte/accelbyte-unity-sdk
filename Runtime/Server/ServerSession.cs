@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Api;
@@ -69,11 +69,11 @@ namespace AccelByte.Server
             , int limit = 20
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace AccelByte.Server
         public void GetGameSessionDetails(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -120,7 +120,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace AccelByte.Server
         public void DeleteGameSession(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -149,7 +149,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -170,7 +170,7 @@ namespace AccelByte.Server
         public void UpdateGameSession(string sessionId, SessionV2GameSessionUpdateRequest request
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -179,7 +179,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -188,6 +188,35 @@ namespace AccelByte.Server
                     sessionId,
                     request,
                     callback));
+        }
+
+        /// <summary>
+        /// Kick a user from the game session.
+        /// </summary>
+        /// <param name="sessionId">Targeted game session's sessionId</param>
+        /// <param name="userId">Targeted user's userId</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void KickUserFromGameSession(string sessionId, string userId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!_session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.KickUserFromGameSession(sessionId, userId, callback);
         }
 
         /// <summary>
@@ -200,7 +229,7 @@ namespace AccelByte.Server
         public void SendDSSessionReady(string sessionId, bool isDsSessionReady
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule
                 , Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
@@ -210,7 +239,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -231,7 +260,7 @@ namespace AccelByte.Server
             , string configurationName
             , ResultCallback<SessionV2MemberActiveSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule
                 , Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
@@ -241,7 +270,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -258,7 +287,7 @@ namespace AccelByte.Server
             , string configurationName
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoRule
                 , Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
@@ -268,7 +297,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -278,7 +307,7 @@ namespace AccelByte.Server
         internal void GetPartySessionStorage(string partyId
             , ResultCallback<GetPartySessionStorageResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule
                 , Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId)
@@ -289,7 +318,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 

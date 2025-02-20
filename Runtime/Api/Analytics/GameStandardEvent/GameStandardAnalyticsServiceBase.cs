@@ -90,15 +90,14 @@ namespace AccelByte.Api
             Scheduler.Dispose();
         }
 
-        internal virtual void SendEvent(GameStandardEventPayload payload)
+        internal virtual void SendEvent(GameStandardEventPayload payload, ResultCallback callback = null)
         {
             var telemetryEvent = new AccelByteTelemetryEvent(payload);
-            SendEvent(telemetryEvent);
+            SendEvent(telemetryEvent, callback);
         }
 
-        internal void SendEvent(AccelByteTelemetryEvent telemetryEvent)
+        internal void SendEvent(AccelByteTelemetryEvent telemetryEvent, ResultCallback callback = null)
         {
-            ResultCallback callback = null;
             Scheduler.SendEvent(telemetryEvent, callback);
 
             if (!Scheduler.IsEventJobEnabled)

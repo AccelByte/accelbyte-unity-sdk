@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
+using System.Collections.Generic;
+using AccelByte.Api;
 using AccelByte.Core;
 using AccelByte.Models;
 using UnityEngine.Assertions;
@@ -301,6 +303,63 @@ namespace AccelByte.Server
 
             this.coroutineRunner.Run(
                 this.Api.ListUserByUserId(listUserDataRequest, callback));
+        }
+
+        /// <summary>
+        /// Search user by the list of email addresses
+        /// </summary>
+        /// <param name="emailAddresses">List of user email address to search</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetBulkUserByEmailAddress(IEnumerable<string> emailAddresses
+            , ResultCallback<GetBulkUserByEmailAddressResponse> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!this.Session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.GetBulkUserByEmailAddress(emailAddresses, callback);
+        }
+
+        /// <summary>
+        /// Retrieves platform accounts linked to user.
+        /// </summary>
+        /// <param name="userId">User id to get the linked platform accounts</param>
+        /// <param name="optionalParameters">Optional params to get linked platform accounts</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetLinkedPlatformAccounts(string userId
+            , GetLinkedPlatformAccountsOptionalParams optionalParameters
+            , ResultCallback<PagedPlatformLinks> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
+            if (!ValidateAccelByteId(userId
+                , Utils.AccelByteIdValidator.HypensRule.NoHypens
+                , Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!this.Session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.GetLinkedPlatformAccounts(userId, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Retrieves platform accounts linked to user.
+        /// </summary>
+        /// <param name="userId">User id to get the linked platform accounts</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        public void GetLinkedPlatformAccounts(string userId, ResultCallback<PagedPlatformLinks> callback)
+        {
+            GetLinkedPlatformAccounts(userId, null , callback);
         }
     }
 }

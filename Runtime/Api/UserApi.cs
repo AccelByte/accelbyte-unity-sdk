@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System;
 
 namespace AccelByte.Api
 {
@@ -640,6 +641,7 @@ namespace AccelByte.Api
             });
         }
 
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserPublicInfo instead")]
         public void GetUserByUserId(GetUserByUserIdRequest requestModel, ResultCallback<PublicUserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
@@ -669,6 +671,34 @@ namespace AccelByte.Api
             });
         }
 
+        public void GetUserPublicInfo(string userId, ResultCallback<GetUserPublicInfoResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v4/public/namespaces/{namespace}/users/{userId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetUserPublicInfoResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserByOtherPlatformUserIdV4 instead")]
         public void GetUserByOtherPlatformUserId(GetUserByOtherPlatformUserIdRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
@@ -697,6 +727,37 @@ namespace AccelByte.Api
                 .WithPathParam("platformUserId", requestModel.PlatformUserId)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetUserByOtherPlatformUserIdV4(string platformId, string platformUserId, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(platformId
+                , platformUserId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v4/public/namespaces/{namespace}/platforms/{platformId}/users/{platformUserId}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("platformId", platformId)
+                .WithPathParam("platformUserId", platformUserId)
+                .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
@@ -763,6 +824,8 @@ namespace AccelByte.Api
             });
         }
 
+
+        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserOtherPlatformBasicPublicInfo instead")]
         public void BulkGetUserInfo(ListBulkUserInfoRequest requestModel, ResultCallback<ListBulkUserInfoResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);

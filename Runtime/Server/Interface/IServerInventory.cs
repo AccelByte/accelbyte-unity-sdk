@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -69,30 +69,6 @@ namespace AccelByte.Server.Interface
             string userId
             , ServerValidateUserInventoryCapacityRequest request
             , ResultCallback callback
-        );
-
-        
-        /// <summary>
-        /// List all user's Item in an inventory
-        /// </summary>
-        /// <param name="inventoryId">Selected inventory Id</param>
-        /// <param name="callback">Returns a Result that contains UserItemsPagingResponse via callback when completed</param>
-        /// <param name="sortBy">Optional parameter to get the result sortedBy</param>
-        /// <param name="limit">Optional parameter to define limit for the result length</param>
-        /// <param name="offset">Optional parameter to define offset for the result</param>
-        /// <param name="sourceItemId">Optional parameter to query based on a specific source item id</param>
-        /// <param name="tagBuilder">Optional parameter to query based on a tagBuilder</param>
-        /// <param name="quantity">Optional parameter to query based on specific quantity</param>
-        [Obsolete("Quantity parameter is no longer supported. Please use GetUserInventoryAllItems(inventoryId, optionalParameters, callback). This interface will be removed on AGS 3.81")]
-        public void GetUserInventoryAllItems(
-            string inventoryId
-            , ResultCallback<UserItemsPagingResponse> callback
-            , UserItemSortBy sortBy = UserItemSortBy.CreatedAt
-            , int limit = 25
-            , int offset = 0
-            , string sourceItemId = ""
-            , TagQueryBuilder tagBuilder = null
-            , int? quantity = null
         );
 
         /// <summary>

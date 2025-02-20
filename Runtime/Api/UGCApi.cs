@@ -173,7 +173,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -200,7 +200,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateContent( string userId
@@ -230,7 +230,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -266,7 +266,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -294,7 +294,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ModifyContent( string userId
@@ -316,7 +316,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -367,7 +367,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -397,7 +397,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -426,7 +426,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchContentsSpesificToChannel(string channelId
@@ -443,7 +443,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -473,7 +473,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteContent( string userId
@@ -492,7 +492,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -512,7 +512,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentByContentId( string userId
@@ -529,7 +529,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -547,7 +547,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCContentResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentByShareCode( string shareCode
@@ -562,7 +562,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -580,7 +580,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCContentResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentPreview( string userId
@@ -597,7 +597,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -616,7 +616,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCPreview>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentPreview( string userId
@@ -633,7 +633,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -641,7 +641,7 @@ namespace AccelByte.Api
             {
                 if (result.IsError)
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                     return;
                 }
 
@@ -655,7 +655,7 @@ namespace AccelByte.Api
                     Error error = new Error(ErrorCode.ErrorFromException, $"Failed to convert preview value.\nError: {ex.Message}");
                     return;
                 }
-                callback.TryOk(bytes);
+                callback?.TryOk(bytes);
             });
         }
 
@@ -671,7 +671,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -690,7 +690,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCTagsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetTypes( ResultCallback<UGCTypesPagingResponse> callback
@@ -705,7 +705,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -724,7 +724,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCTypesPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateChannel( string userId
@@ -741,7 +741,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -761,7 +761,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCChannelResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetChannels( string userId
@@ -779,7 +779,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -800,7 +800,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCChannelPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteChannel( string userId
@@ -817,7 +817,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -836,7 +836,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateLikeStatusToContent(UpdateLikeStatusToContentRequest requestModel
@@ -853,7 +853,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -873,7 +873,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCUpdateLikeStatusToContentResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         public IEnumerator GetListFollowers(string userId
             , ResultCallback<UGCGetListFollowersPagingResponse> callback
@@ -889,7 +889,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -910,7 +910,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateFollowStatus(UpdateFollowStatusRequest requestModel
@@ -927,7 +927,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -947,7 +947,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCUpdateFollowStatusToUserResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetBulkContentId(GetBulkContentIdRequest requestModel
@@ -960,7 +960,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -978,7 +978,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCModelsContentsResponse[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetUserContents(string userId
@@ -995,7 +995,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1016,7 +1016,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator UploadScreenshotContent(string contentId
@@ -1034,7 +1034,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1055,7 +1055,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<ScreenshotsResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetContentFollowed(ResultCallback<UGCContentsPagingResponse> callback
@@ -1070,7 +1070,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1090,7 +1090,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetFollowedCreators(ResultCallback<UGCGetListFollowersPagingResponse> callback
@@ -1105,7 +1105,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1125,7 +1125,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetListFollowing(string userId
@@ -1142,7 +1142,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1163,7 +1163,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCGetListFollowersPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetLikedContents( GetLikedContentRequest getLikedContentRequest
@@ -1177,7 +1177,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1203,7 +1203,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetLikedContents( GetAllLikedContentRequest getLikedContentRequest
@@ -1217,7 +1217,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1252,7 +1252,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCContentsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetCreatorStats(string userId
@@ -1267,7 +1267,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1286,7 +1286,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCGetCreatorStatsResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetUserGroups(string userId
@@ -1303,7 +1303,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1324,7 +1324,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCGetUserGroupsPagingResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateChannel(UpdateChannelRequest requestModel
@@ -1344,7 +1344,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1365,7 +1365,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UGCChannelResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchContentsSpecificToChannelV2(string channelId
@@ -1378,17 +1378,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1413,7 +1413,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchContentsV2(UGCGetContentFilterRequestV2 filterRequest
@@ -1431,7 +1431,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1459,7 +1459,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentBulkByIdsV2(string[] contentIds
@@ -1474,17 +1474,17 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
             if (contentIds.Length <= 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot be null or empty"));
                 yield break;
             }
             if (contentIds.Length > maxBulkContentIds)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot exceed " + maxBulkContentIds));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentIds) + " cannot exceed " + maxBulkContentIds));
                 yield break;
             }
 
@@ -1506,7 +1506,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsContentsResponseV2[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentByShareCodeV2(string shareCode
@@ -1516,17 +1516,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(shareCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1548,7 +1548,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsContentsResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetContentByContentIdV2(string contentId
@@ -1558,17 +1558,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1590,7 +1590,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsContentsResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateContentV2(string userId
@@ -1602,27 +1602,27 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (createRequest == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(createRequest) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(createRequest) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1652,7 +1652,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsCreateUGCResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteContentV2(string userId
@@ -1664,27 +1664,27 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1708,7 +1708,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ModifyContentV2(string userId
@@ -1721,27 +1721,27 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1766,7 +1766,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsModifyUGCResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GenerateUploadContentURLV2(string userId
@@ -1779,32 +1779,32 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(uploadRequest.FileExtension))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1835,7 +1835,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsUploadContentURLResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateContentFileLocationV2(string userId
@@ -1849,37 +1849,37 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(fileExtension))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(fileExtension) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(fileExtension) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(s3Key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(s3Key) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(s3Key) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1910,7 +1910,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UpdateContentFileLocationResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserContentsV2(string userId
@@ -1923,17 +1923,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -1958,7 +1958,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCSearchContentsPagingResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateContentScreenshotV2(string userId
@@ -1970,22 +1970,22 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2009,7 +2009,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<ScreenshotsUpdatesV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UploadContentScreenshotV2(string userId
@@ -2021,27 +2021,27 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
             if (screenshotsRequest == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotsRequest) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotsRequest) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2065,7 +2065,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<ScreenshotsResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteContentScreenshotV2(string userId
@@ -2077,27 +2077,27 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(screenshotId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(screenshotId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2121,7 +2121,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AddDownloadContentCountV2(string contentId
@@ -2131,17 +2131,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2163,7 +2163,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsAddDownloadContentCountResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListContentDownloaderV2(string contentId
@@ -2177,17 +2177,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2213,7 +2213,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsPaginatedContentDownloaderResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListContentLikerV2(string contentId
@@ -2226,17 +2226,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(contentId) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2261,7 +2261,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsPaginatedContentLikerResponseV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateLikeStatusToContentV2(string contentId
@@ -2272,17 +2272,17 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(contentId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2308,7 +2308,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCUpdateLikeStatusToContentResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator ModifyContentByShareCode(string userId
@@ -2321,27 +2321,27 @@ namespace AccelByte.Api
             
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(shareCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2372,7 +2372,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator DeleteContentByShareCode(string userId
@@ -2384,27 +2384,27 @@ namespace AccelByte.Api
             
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(channelId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(channelId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(shareCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCode) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -2427,7 +2427,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator BulkGetContentByShareCode(string[] shareCodes
@@ -2442,17 +2442,17 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
             if (shareCodes.Length <= 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
                 yield break;
             }
             if (shareCodes.Length > maxBulkShareCodes)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
                 yield break;
             }
 
@@ -2474,7 +2474,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsContentsResponse[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator BulkGetContentByShareCodeV2(string[] shareCodes
@@ -2489,17 +2489,17 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
             if (shareCodes.Length <= 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot be null or empty"));
                 yield break;
             }
             if (shareCodes.Length > maxBulkShareCodes)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(shareCodes) + " cannot exceed " + maxBulkShareCodes));
                 yield break;
             }
 
@@ -2521,7 +2521,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsContentsResponseV2[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
 #region StagingContent
@@ -2534,7 +2534,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, contentId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -2557,7 +2557,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelStagingContent>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListStagingContent(string userId
@@ -2572,7 +2572,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -2598,7 +2598,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelsPaginatedStagingContentResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ModifyStagingContentByContentId(string userId
@@ -2618,7 +2618,7 @@ namespace AccelByte.Api
 
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -2648,7 +2648,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UGCModelStagingContent>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteStagingContentByContentId(string userId
@@ -2660,7 +2660,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, contentId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -2683,7 +2683,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 #endregion
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -50,7 +50,6 @@ namespace AccelByte.Models
         [DataMember] public string UGCServerUrl = "";
         [DataMember] public string ReportingServerUrl = "";
         [DataMember] public string SeasonPassServerUrl = "";
-        [DataMember] public string SessionBrowserServerUrl = "";
         [DataMember] public string SessionServerUrl = "";
         [DataMember] public string MatchmakingV2ServerUrl = "";
         [DataMember] public bool UseTurnManager = true;
@@ -126,7 +125,6 @@ namespace AccelByte.Models
                    this.GroupServerUrl == anotherConfig.GroupServerUrl &&
                    this.UGCServerUrl == anotherConfig.UGCServerUrl &&
                    this.SeasonPassServerUrl == anotherConfig.SeasonPassServerUrl &&
-                   this.SessionBrowserServerUrl == anotherConfig.SessionBrowserServerUrl &&
                    this.SessionServerUrl == anotherConfig.SessionServerUrl &&
                    this.MatchmakingV2ServerUrl == anotherConfig.MatchmakingV2ServerUrl &&
                    this.TurnManagerServerUrl == anotherConfig.TurnManagerServerUrl &&
@@ -235,10 +233,6 @@ namespace AccelByte.Models
             if (SeasonPassServerUrl == null)
             {
                 SeasonPassServerUrl = "";
-            }
-            if (SessionBrowserServerUrl == null)
-            {
-                SessionBrowserServerUrl = "";
             }
             if (SessionServerUrl == null)
             {
@@ -375,8 +369,6 @@ namespace AccelByte.Models
 
                 this.SeasonPassServerUrl = ExpandServiceApiUrl(this.SeasonPassServerUrl, "/seasonpass", forceExpandServiceApiUrl);
 
-                this.SessionBrowserServerUrl = ExpandServiceApiUrl(this.SessionBrowserServerUrl, "/sessionbrowser", forceExpandServiceApiUrl);
-
                 this.SessionServerUrl = ExpandServiceApiUrl(this.SessionServerUrl, "/session", forceExpandServiceApiUrl);
 
                 this.MatchmakingV2ServerUrl = ExpandServiceApiUrl(this.MatchmakingV2ServerUrl, "/match2", forceExpandServiceApiUrl);
@@ -452,8 +444,6 @@ namespace AccelByte.Models
                 if (this.ReportingServerUrl == httpsBaseUrl + "/reporting") this.ReportingServerUrl = null;
 
                 if (this.SeasonPassServerUrl == httpsBaseUrl + "/seasonpass") this.SeasonPassServerUrl = null;
-
-                if (this.SessionBrowserServerUrl == httpsBaseUrl + "/sessionbrowser") this.SessionBrowserServerUrl = null;
 
                 if (this.SessionServerUrl == httpsBaseUrl + "/session") this.SessionServerUrl = null;
 

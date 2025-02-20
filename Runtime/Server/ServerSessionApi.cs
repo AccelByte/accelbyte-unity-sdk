@@ -3,11 +3,10 @@
 // and restrictions contact your company contract manager.
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Server
 {
@@ -93,24 +92,13 @@ namespace AccelByte.Server
         public IEnumerator GetGameSessionDetails(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
 
-            if (string.IsNullOrEmpty(AuthToken))
+            if (error != null)
             {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -139,24 +127,13 @@ namespace AccelByte.Server
         public IEnumerator DeleteGameSession(string sessionId
             , ResultCallback callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
 
-            if (string.IsNullOrEmpty(AuthToken))
+            if (error != null)
             {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -186,31 +163,14 @@ namespace AccelByte.Server
             SessionV2GameSessionUpdateRequest data
             , ResultCallback<SessionV2GameSession> callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , data
+                , AuthToken
+                , Namespace_);
 
-            if (string.IsNullOrEmpty(AuthToken))
+            if (error != null)
             {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
-                yield break;
-            }
-
-            if (data == null)
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -237,28 +197,41 @@ namespace AccelByte.Server
             callback?.Try(result);
         }
 
+        public void KickUserFromGameSession(string sessionId, string userId, ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId, userId, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateDelete(BaseUrl + "/v1/admin/namespaces/{namespace}/gamesessions/{sessionId}/members/{memberId}/kick")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithPathParam("memberId", userId)
+                .WithBearerAuth(AuthToken)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
         public IEnumerator SendDSSessionReady(string sessionId,
             bool isDsSessionReady,
             ResultCallback callback)
         {
-            if (string.IsNullOrEmpty(Namespace_))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
-                yield break;
-            }
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
+                , AuthToken
+                , Namespace_);
 
-            if (string.IsNullOrEmpty(AuthToken))
+            if (error != null)
             {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
-                yield break;
-            }
-
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                callback?.TryError(
-                    new Error(ErrorCode.InvalidRequest, nameof(sessionId) + " cannot be null or empty"));
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -294,6 +267,17 @@ namespace AccelByte.Server
             , string configurationName
             , ResultCallback<SessionV2MemberActiveSession> callback)
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId
+                , configurationName
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/memberactivesession/{userId}")
                 .WithBearerAuth(AuthToken)
@@ -307,14 +291,7 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<SessionV2MemberActiveSession>();
-                if (!result.IsError)
-                {
-                    callback?.Invoke(result);
-                }
-                else
-                {
-                    callback?.TryError(result.Error);
-                };
+                callback?.Try(result);
             });
         }
 
@@ -322,6 +299,17 @@ namespace AccelByte.Server
             , string configurationName
             , ResultCallback callback)
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId
+                , configurationName
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var builder = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/configurations/{name}/reconcile")
                 .WithBearerAuth(AuthToken)
@@ -348,6 +336,16 @@ namespace AccelByte.Server
         internal void GetPartySessionStorage(string partyId
             , ResultCallback<GetPartySessionStorageResult> callback)
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
+                , AuthToken
+                , Namespace_);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/parties/{partyId}/storage")
                 .WithBearerAuth(AuthToken)

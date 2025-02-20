@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -329,7 +329,6 @@ namespace AccelByte.Editor
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.GameTelemetryServerUrl = newValue, editedSdkConfig.GameTelemetryServerUrl, "Game Telemetry Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.GroupServerUrl = newValue, editedSdkConfig.GroupServerUrl, "Group Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.SeasonPassServerUrl = newValue, editedSdkConfig.SeasonPassServerUrl, "Season Pass Server Url", false, generateServiceUrl, indentLevel: 1);
-                EditorCommon.CreateTextInput((newValue) => editedSdkConfig.SessionBrowserServerUrl = newValue, editedSdkConfig.SessionBrowserServerUrl, "Session BrowserServer Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.SessionServerUrl = newValue, editedSdkConfig.SessionServerUrl, "Session Server Url", false, generateServiceUrl, indentLevel: 1);
                 EditorCommon.CreateTextInput((newValue) => editedSdkConfig.MatchmakingV2ServerUrl = newValue, editedSdkConfig.MatchmakingV2ServerUrl, "MatchmakingV2 Server Url", false, generateServiceUrl, indentLevel: 1);
             }

@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections;
+using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System.Linq;
 
 namespace AccelByte.Server
 {
@@ -299,6 +301,92 @@ namespace AccelByte.Server
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
             var result = response.TryParseJson<ListUserDataResponse>();
             callback?.Try(result);
+        }
+
+        internal void GetBulkUserByEmailAddress(IEnumerable<string> emailAddresses
+            , ResultCallback<GetBulkUserByEmailAddressResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , emailAddresses);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            emailAddresses = emailAddresses.Where(email => !string.IsNullOrEmpty(email)).ToArray();
+
+            if (emailAddresses.Count() < 1)
+            {
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Email addresses cannot be empty"));
+                return;
+            }
+
+            var body = new GetBulkUserByEmailAddressRequest()
+            {
+                ListEmailAddressRequest = emailAddresses.ToArray()
+            };
+
+            var request = HttpRequestBuilder
+               .CreatePost(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/search/bulk")
+               .WithPathParam("namespace", Namespace_)
+               .WithBearerAuth(AuthToken)
+               .WithContentType(MediaType.ApplicationJson)
+               .Accepts(MediaType.ApplicationJson)
+               .WithBody(body.ToUtf8Json())
+               .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<GetBulkUserByEmailAddressResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetLinkedPlatformAccounts(string userId
+            , GetLinkedPlatformAccountsOptionalParams optionalParameters
+            , ResultCallback<PagedPlatformLinks> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , AuthToken
+                , userId);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var queries = new Dictionary<string, string>();
+            if (optionalParameters?.PlatformId != null && optionalParameters?.PlatformId != PlatformType.None)
+            {
+                queries.Add("platformId", optionalParameters.PlatformId.ToString().ToLower());
+            }
+            if (!string.IsNullOrEmpty(optionalParameters?.TargetNamespace))
+            {
+                queries.Add("targetNamespace", optionalParameters.TargetNamespace);
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/platforms")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithQueries(queries)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<PagedPlatformLinks>();
+                callback?.Try(result);
+            });
         }
     }
 }

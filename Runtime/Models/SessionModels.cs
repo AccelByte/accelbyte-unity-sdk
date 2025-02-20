@@ -483,6 +483,8 @@ namespace AccelByte.Models
     public class SessionV2TeamData
     {
         [DataMember] public string[] userIds;
+        [DataMember(Name = "TeamID"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string TeamId;
     }
 
     [DataContract, Preserve]

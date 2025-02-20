@@ -1,4 +1,4 @@
-// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -94,37 +94,6 @@ namespace AccelByte.Api
                 {
                     callback?.Try(getResult);
                 }
-            });
-        }
-
-        /// <summary>
-        /// Get the closest TURN server
-        /// </summary>
-        /// <param name="callback">callback to trigger with operation result</param>
-        [Obsolete("This method is deprecated and will be removed on 3.81 release. Please use " +
-            "GetTurnServers(ResultCallback<TurnServerList> callback) " + 
-            "and call GetClosestTurnServer() from callback's model.")]
-        public void GetClosestTurnServer(ResultCallback<TurnServer> callback)
-        {
-            Report.GetFunctionLog(GetType().Name);
-
-            GetTurnServers((getTurnServersResult) =>
-            {
-                if (getTurnServersResult.IsError)
-                {
-                    callback?.TryError(getTurnServersResult.Error.Code);
-                    return;
-                }
-
-                AccelByteResult<TurnServer, Error> closestTurnServerTask = getTurnServersResult.Value.GetClosestTurnServer();
-                closestTurnServerTask.OnSuccess(closestTurnServer =>
-                {
-                    callback?.TryOk(closestTurnServer); 
-                });
-                closestTurnServerTask.OnFailed(error =>
-                {
-                    callback?.TryError(error);
-                });
             });
         }
 

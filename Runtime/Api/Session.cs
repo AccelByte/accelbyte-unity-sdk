@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -54,7 +54,7 @@ namespace AccelByte.Api
 #region PartySession
         public void GetPartyDetails(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -76,7 +76,7 @@ namespace AccelByte.Api
         public void UpdateParty(string partyId, SessionV2PartySessionUpdateRequest request,
             ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -102,7 +102,7 @@ namespace AccelByte.Api
         public void PatchUpdateParty(string partyId, SessionV2PartySessionUpdateRequest request,
             ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -127,7 +127,7 @@ namespace AccelByte.Api
         public void InviteUserToParty(string partyId, string userId,
             ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -164,7 +164,7 @@ namespace AccelByte.Api
         public void PromoteUserToPartyLeader(string partyId, string leaderId,
             ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -199,7 +199,7 @@ namespace AccelByte.Api
 
         public void JoinParty(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -227,7 +227,7 @@ namespace AccelByte.Api
 
         public void LeaveParty(string partyId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -256,7 +256,7 @@ namespace AccelByte.Api
 
         public void RejectPartyInvitation(string partyId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -278,7 +278,7 @@ namespace AccelByte.Api
         public void KickUserFromParty(string partyId, string userId,
             ResultCallback<SessionV2PartySessionKickResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -313,7 +313,7 @@ namespace AccelByte.Api
         public void CreateParty(SessionV2PartySessionCreateRequest request,
             ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(request, "SessionV2PartySessionCreateRequest cannot be null.");
 
             if (!session.IsValid())
@@ -337,7 +337,7 @@ namespace AccelByte.Api
 
         public void GetUserParties(ResultCallback<PaginatedResponse<SessionV2PartySession>> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -353,7 +353,7 @@ namespace AccelByte.Api
         public void JoinPartyByCode(string code
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(code, "code cannot be null");
 
             if (!session.IsValid())
@@ -376,7 +376,7 @@ namespace AccelByte.Api
         public void GenerateNewPartyCode(string partyId
             , ResultCallback<SessionV2PartySession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -396,7 +396,7 @@ namespace AccelByte.Api
         public void RevokePartyCode(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -417,7 +417,7 @@ namespace AccelByte.Api
             , string userId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
@@ -445,9 +445,7 @@ namespace AccelByte.Api
         public void CreateGameSession(SessionV2GameSessionCreateRequest request
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(request, "SessionV2GameSessionCreateRequest cannot be null");
-            Assert.IsNotNull(request.configurationName, "configurationName cannot be null");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -474,7 +472,7 @@ namespace AccelByte.Api
         public void QueryGameSession(Dictionary<string, object> request
             , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             if (request == null)
             {
                 request = new Dictionary<string, object>();
@@ -495,7 +493,7 @@ namespace AccelByte.Api
         public void GetGameSessionDetailsByPodName(string podName
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(podName, "podName cannot be null");
 
             if (!session.IsValid())
@@ -513,7 +511,7 @@ namespace AccelByte.Api
         public void GetGameSessionDetailsBySessionId(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -535,7 +533,7 @@ namespace AccelByte.Api
         public void DeleteGameSession(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -557,7 +555,7 @@ namespace AccelByte.Api
         public void PatchGameSession(string sessionId, SessionV2GameSessionUpdateRequest request
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(request, "SessionV2GameSessionUpdateRequest cannot be null");
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
@@ -581,7 +579,7 @@ namespace AccelByte.Api
         public void InviteUserToGameSession(string sessionId, string userId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -615,10 +613,33 @@ namespace AccelByte.Api
                 inviteUserCallback);
         }
 
+        public void KickUserFromGameSession(string sessionId, string userId, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.KickUserFromGameSession(sessionId, userId, callback);
+        }
+
         public void JoinGameSession(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -650,7 +671,7 @@ namespace AccelByte.Api
         public void LeaveGameSession(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -679,7 +700,7 @@ namespace AccelByte.Api
         public void RejectGameSessionInvitation(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -701,7 +722,7 @@ namespace AccelByte.Api
         public void GetUserGameSessions(SessionV2StatusFilter? statusFilter, SessionV2AttributeOrderBy? orderBy,
             bool? sortDesc, ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -720,7 +741,7 @@ namespace AccelByte.Api
         public void JoinGameSessionByCode(string code
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             Assert.IsNotNull(code, "code cannot be null");
 
             if (!session.IsValid())
@@ -745,7 +766,7 @@ namespace AccelByte.Api
         public void GenerateNewGameSessionCode(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -765,7 +786,7 @@ namespace AccelByte.Api
         public void RevokeGameSessionCode(string sessionId
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -785,7 +806,7 @@ namespace AccelByte.Api
         public void PromoteUserToGameSessionLeader(string sessionId, string leaderId,
             ResultCallback<SessionV2GameSession> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -914,7 +935,7 @@ namespace AccelByte.Api
 
         public void UpdateLeaderStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -933,7 +954,7 @@ namespace AccelByte.Api
 
         public void UpdateMemberStorage(string sessionId, JObject data, ResultCallback<JObject> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {
@@ -1112,7 +1133,7 @@ namespace AccelByte.Api
         /// </summary>
         public void GetPlayerAttributes(ResultCallback<PlayerAttributesResponseBody> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -1128,7 +1149,7 @@ namespace AccelByte.Api
         /// </summary>
         public void StorePlayerAttributes(PlayerAttributesRequestBody requestBody, ResultCallback<PlayerAttributesResponseBody> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -1144,7 +1165,7 @@ namespace AccelByte.Api
         /// </summary>
         public void ResetPlayerAttributes(ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {

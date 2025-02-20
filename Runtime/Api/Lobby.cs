@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -215,34 +215,9 @@ namespace AccelByte.Api
         public event ResultCallback<Acquaintance> FriendRequestRejected;
 
         /// <summary>
-        /// Raised when matchmaking process is completed.
-        /// </summary>
-        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
-            "Please use/migrate to MatchmakingV2 instead.")]
-        public event ResultCallback<MatchmakingNotif> MatchmakingCompleted;
-
-        /// <summary>
-        /// Raised when user from within the same party confirmed he/she is ready for match
-        /// </summary>
-        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
-            "Please use/migrate to MatchmakingV2 instead.")]
-        public event ResultCallback<ReadyForMatchConfirmation> ReadyForMatchConfirmed;
-
-        /// <summary>
-        /// Raised when a user rejected the match
-        /// </summary>
-        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
-            "Please use/migrate to MatchmakingV2 instead.")]
-        public event ResultCallback<ReadyForMatchConfirmation> MatchRejected;
-
-        /// <summary>
         /// Raised when DS process is updated.
         /// </summary>
         public event ResultCallback<DsNotif> DSUpdated;
-
-        [Obsolete("This event is deprecated for newer environments (AGS 3.78 onwards). " +
-            "Please use/migrate to MatchmakingV2 instead.")]
-        public event ResultCallback<RematchmakingNotification> RematchmakingNotif;
 
         /// <summary>
         /// Raised when there's an update in the party's storage.
@@ -305,6 +280,15 @@ namespace AccelByte.Api
         private AccelByteMessagingSystem messagingSystem;
         private AccelByteNotificationBuffer notificationBuffer;
 
+        private NotificationQueue notificationQueue;
+        private AccelByteHeartBeat ticker;
+        private const int tickerInterval = 20;
+
+        private AccelByteHeartBeat connectRetryTicker;
+        private const int maxRetryAttempts = 3;
+        private const int retryInterval = 20 * 1000;
+        private int retryAttempts = 0;
+
         private int backoffDelay;
         
         private bool reconnectsOnBans;
@@ -351,6 +335,13 @@ namespace AccelByte.Api
 
             notificationBuffer = new AccelByteNotificationBuffer(inApi?.SharedMemory?.Logger);
 
+            connectRetryTicker = new AccelByteHeartBeat(retryInterval, SharedMemory?.Logger);
+
+            notificationQueue = new NotificationQueue();
+            notificationQueue.RefreshQueue();
+            ticker = new AccelByteHeartBeat(tickerInterval);
+            ticker.OnHeartbeatTrigger += Tick;
+
             OverrideWebsocket(webSocket);
         }
 
@@ -386,7 +377,15 @@ namespace AccelByte.Api
         public void Connect()
         {
             Report.GetFunctionLog(GetType().Name);
+
+            connectRetryTicker.OnHeartbeatTrigger = null;
+            ClearRetryConnectDelegate();
+
             websocketApi.Connect();
+
+            retryAttempts = 0;
+            connectRetryTicker.OnHeartbeatTrigger += RetryConnect;
+            connectRetryTicker.Start(isImmediateTrigger: false);
         }
 
         /// <summary>
@@ -1816,8 +1815,10 @@ namespace AccelByte.Api
 
         private void HandleOnOpen()
         {
-            // debug ws connection
+            ClearRetryConnectDelegate();
+
 #if DEBUG
+            // debug ws connection
             SharedMemory?.Logger?.LogVerbose("[WS] Connection open");
 #endif
             Connected?.Invoke();
@@ -1873,6 +1874,8 @@ namespace AccelByte.Api
                 reconnectsOnBans = false;
                 coroutineRunner.Run(ReconnectOnBan());
             }
+
+            ticker.Stop();
         }
 
         private IEnumerator ReconnectOnBan()
@@ -1982,7 +1985,7 @@ namespace AccelByte.Api
         {
             long messageId;
             MessageType messageType;
-            ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
+            websocketSerializer.ReadHeader(message, out messageType, out messageId);
 
             string lobbyNotification = messageType.ToString();
             if (!isSkipConditioner
@@ -1993,142 +1996,10 @@ namespace AccelByte.Api
                 return;
             }
 
-            websocketSerializer.ReadPayload(message, out Notification userNotif);
-
-            if (TryBufferNotification(userNotif.ToJsonString()))
+            notificationQueue.Enqueue(message);
+            if (!ticker.IsHeartBeatJobRunning)
             {
-                return;
-            }
-
-            switch (messageType)
-            {
-                case MessageType.messageSessionNotif:
-                    websocketSerializer.ReadPayload(message, out Notification sessionNotification);
-                    if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
-                            out MultiplayerV2NotifType sessionV2NotificationType))
-                    {
-                        SharedMemory?.Logger?.LogWarning(
-                            $"SessionV2 notification topic not recognized: {sessionNotification.topic}");
-                        return;
-                    }
-                    HandleMultiplayerV2Notification(message, sessionV2NotificationType);
-                    break;
-                case MessageType.partyGetInvitedNotif:
-                    websocketApi.HandleNotification(message, InvitedToParty);
-                    break;
-                case MessageType.partyJoinNotif:
-                    websocketApi.HandleNotification(message, JoinedParty);
-                    break;
-                case MessageType.partyKickNotif:
-                    websocketApi.HandleNotification(message, KickedFromParty);
-                    break;
-                case MessageType.partyLeaveNotif:
-                    websocketApi.HandleNotification(message, LeaveFromParty);
-                    break;
-                case MessageType.personalChatNotif:
-                    websocketApi.HandleNotification(message, PersonalChatReceived);
-                    break;
-                case MessageType.partyChatNotif:
-                    websocketApi.HandleNotification(message, PartyChatReceived);
-                    break;
-                case MessageType.messageNotif:
-                    websocketSerializer.ReadPayload(message, out Notification notification);
-                    if (Enum.TryParse<MultiplayerV2NotifType>(notification.topic, true,
-                            out MultiplayerV2NotifType matchmakingV2NotificationType))
-                    {
-                        HandleMultiplayerV2Notification(message, matchmakingV2NotificationType);
-                    }
-                    else
-                    {
-                        websocketApi.HandleNotification(message, OnNotification);
-                    }
-                    break;
-                case MessageType.userStatusNotif:
-                    websocketApi.HandleUserStatusNotif(message, FriendsStatusChanged);
-                    break;
-                case MessageType.matchmakingNotif:
-                    websocketApi.HandleNotification(message, MatchmakingCompleted);
-                    break;
-                case MessageType.dsNotif:
-                    websocketApi.HandleNotification(message, DSUpdated);
-                    break;
-                case MessageType.acceptFriendsNotif:
-                    websocketApi.HandleNotification(message, FriendRequestAccepted);
-                    break;
-                case MessageType.requestFriendsNotif:
-                    websocketApi.HandleNotification(message, OnIncomingFriendRequest);
-                    break;
-                case MessageType.unfriendNotif:
-                    websocketApi.HandleNotification(message, OnUnfriend);
-                    break;
-                case MessageType.cancelFriendsNotif:
-                    websocketApi.HandleNotification(message, FriendRequestCanceled);
-                    break;
-                case MessageType.rejectFriendsNotif:
-                    websocketApi.HandleNotification(message, FriendRequestRejected);
-                    break;
-                case MessageType.setReadyConsentNotif:
-                    websocketApi.HandleNotification(message, ReadyForMatchConfirmed);
-                    break;
-                case MessageType.rematchmakingNotif:
-                    websocketApi.HandleNotification(message, RematchmakingNotif);
-                    break;
-                case MessageType.channelChatNotif:
-                    websocketApi.HandleNotification(message, ChannelChatReceived);
-                    break;
-                case MessageType.connectNotif:
-                    websocketSerializer.ReadPayload(message, out LobbySessionId lobbySessionId);
-                    websocketApi.AddReconnectCustomHeader(AccelByteWebSocket.LobbySessionIdHeaderName, lobbySessionId.lobbySessionID);
-                    break;
-                case MessageType.disconnectNotif:
-                    websocketApi.HandleNotification(message, Disconnecting);
-                    break;
-                case MessageType.partyDataUpdateNotif:
-                    websocketApi.HandleNotification(message, PartyDataUpdateNotif);
-                    break;
-                case MessageType.partyNotif:
-                    websocketApi.HandleNotification(message, PartyNotif);
-                    break;
-                case MessageType.partyRejectNotif:
-                    websocketApi.HandleNotification(message, RejectedPartyInvitation);
-                    break;
-                case MessageType.blockPlayerNotif:
-                    websocketApi.HandleNotification(message, PlayerBlockedNotif);
-                    break;
-                case MessageType.unblockPlayerNotif:
-                    websocketApi.HandleNotification(message, PlayerUnblockedNotif);
-                    break;
-                case MessageType.userBannedNotification:
-                    websocketApi.HandleNotification(message, UserBannedNotification);
-                    HandleBanNotification();
-                    break;
-                case MessageType.userUnbannedNotification:
-                    websocketApi.HandleNotification(message, UserUnbannedNotification);
-                    HandleUnbanNotification();
-                    break;
-                case MessageType.signalingP2PNotif:
-                    websocketApi.HandleNotification(message, this.SignalingP2PNotification);
-                    break;
-                case MessageType.setRejectConsentNotif:
-                    websocketApi.HandleNotification(message, MatchRejected);
-                    break;
-                case MessageType.errorNotif:
-                    websocketSerializer.ReadPayload(message, out ErrorNotif notif);
-                    if (string.IsNullOrEmpty(notif.requestType))
-                    {
-                        if (ErrorNotification != null)
-                        {
-                            ErrorNotification(Result.CreateError((ErrorCode)notif.code, notif.message));
-                        }
-                    }
-                    else
-                    {
-                        websocketApi.HandleResponse(long.Parse(notif.id), message, (ErrorCode)notif.code);
-                    }
-                    break;
-                default:
-                    websocketApi.HandleResponse(messageId, message, errorCode);
-                    break;
+                ticker.Start();
             }
         }
 
@@ -2348,6 +2219,154 @@ namespace AccelByte.Api
             }
         }
 
+        private void Tick()
+        {
+            if (notificationQueue.IsLocked || notificationQueue.IsEmpty())
+            {
+                return;
+            }
+
+            string message;
+            if (!notificationQueue.Dequeue(out message))
+            {
+                return;
+            }
+
+            long messageId;
+            MessageType messageType;
+            ErrorCode errorCode = websocketSerializer.ReadHeader(message, out messageType, out messageId);
+
+            websocketSerializer.ReadPayload(message, out Notification userNotif);
+
+            if (TryBufferNotification(userNotif.ToJsonString()))
+            {
+                return;
+            }
+
+            notificationQueue.LockQueue();
+
+            switch (messageType)
+            {
+                case MessageType.messageSessionNotif:
+                    websocketSerializer.ReadPayload(message, out Notification sessionNotification);
+                    if (!Enum.TryParse<MultiplayerV2NotifType>(sessionNotification.topic, true,
+                            out MultiplayerV2NotifType sessionV2NotificationType))
+                    {
+                        SharedMemory?.Logger?.LogWarning(
+                            $"SessionV2 notification topic not recognized: {sessionNotification.topic}");
+                        break;
+                    }
+                    HandleMultiplayerV2Notification(message, sessionV2NotificationType);
+                    break;
+                case MessageType.partyGetInvitedNotif:
+                    websocketApi.HandleNotification(message, InvitedToParty);
+                    break;
+                case MessageType.partyJoinNotif:
+                    websocketApi.HandleNotification(message, JoinedParty);
+                    break;
+                case MessageType.partyKickNotif:
+                    websocketApi.HandleNotification(message, KickedFromParty);
+                    break;
+                case MessageType.partyLeaveNotif:
+                    websocketApi.HandleNotification(message, LeaveFromParty);
+                    break;
+                case MessageType.personalChatNotif:
+                    websocketApi.HandleNotification(message, PersonalChatReceived);
+                    break;
+                case MessageType.partyChatNotif:
+                    websocketApi.HandleNotification(message, PartyChatReceived);
+                    break;
+                case MessageType.messageNotif:
+                    websocketSerializer.ReadPayload(message, out Notification notification);
+                    if (Enum.TryParse<MultiplayerV2NotifType>(notification.topic, true,
+                            out MultiplayerV2NotifType matchmakingV2NotificationType))
+                    {
+                        HandleMultiplayerV2Notification(message, matchmakingV2NotificationType);
+                    }
+                    else
+                    {
+                        websocketApi.HandleNotification(message, OnNotification);
+                    }
+                    break;
+                case MessageType.userStatusNotif:
+                    websocketApi.HandleUserStatusNotif(message, FriendsStatusChanged);
+                    break;
+                case MessageType.dsNotif:
+                    websocketApi.HandleNotification(message, DSUpdated);
+                    break;
+                case MessageType.acceptFriendsNotif:
+                    websocketApi.HandleNotification(message, FriendRequestAccepted);
+                    break;
+                case MessageType.requestFriendsNotif:
+                    websocketApi.HandleNotification(message, OnIncomingFriendRequest);
+                    break;
+                case MessageType.unfriendNotif:
+                    websocketApi.HandleNotification(message, OnUnfriend);
+                    break;
+                case MessageType.cancelFriendsNotif:
+                    websocketApi.HandleNotification(message, FriendRequestCanceled);
+                    break;
+                case MessageType.rejectFriendsNotif:
+                    websocketApi.HandleNotification(message, FriendRequestRejected);
+                    break;
+                case MessageType.channelChatNotif:
+                    websocketApi.HandleNotification(message, ChannelChatReceived);
+                    break;
+                case MessageType.connectNotif:
+                    websocketSerializer.ReadPayload(message, out LobbySessionId lobbySessionId);
+                    websocketApi.AddReconnectCustomHeader(AccelByteWebSocket.LobbySessionIdHeaderName, lobbySessionId.lobbySessionID);
+                    break;
+                case MessageType.disconnectNotif:
+                    websocketApi.HandleNotification(message, Disconnecting);
+                    break;
+                case MessageType.partyDataUpdateNotif:
+                    websocketApi.HandleNotification(message, PartyDataUpdateNotif);
+                    break;
+                case MessageType.partyNotif:
+                    websocketApi.HandleNotification(message, PartyNotif);
+                    break;
+                case MessageType.partyRejectNotif:
+                    websocketApi.HandleNotification(message, RejectedPartyInvitation);
+                    break;
+                case MessageType.blockPlayerNotif:
+                    websocketApi.HandleNotification(message, PlayerBlockedNotif);
+                    break;
+                case MessageType.unblockPlayerNotif:
+                    websocketApi.HandleNotification(message, PlayerUnblockedNotif);
+                    break;
+                case MessageType.userBannedNotification:
+                    websocketApi.HandleNotification(message, UserBannedNotification);
+                    HandleBanNotification();
+                    break;
+                case MessageType.userUnbannedNotification:
+                    websocketApi.HandleNotification(message, UserUnbannedNotification);
+                    HandleUnbanNotification();
+                    break;
+                case MessageType.signalingP2PNotif:
+                    websocketApi.HandleNotification(message, this.SignalingP2PNotification);
+                    break;
+                case MessageType.errorNotif:
+                    websocketSerializer.ReadPayload(message, out ErrorNotif notif);
+                    if (string.IsNullOrEmpty(notif.requestType))
+                    {
+                        if (ErrorNotification != null)
+                        {
+                            ErrorNotification(Result.CreateError((ErrorCode)notif.code, notif.message));
+                        }
+                    }
+                    else
+                    {
+                        websocketApi.HandleResponse(long.Parse(notif.id), message, (ErrorCode)notif.code);
+                    }
+                    break;
+                default:
+                    websocketApi.HandleResponse(messageId, message, errorCode);
+                    break;
+            }
+
+            notificationQueue.UnlockQueue();
+        }
+
         internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
         {
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
@@ -2361,8 +2380,41 @@ namespace AccelByte.Api
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
             notificationBuffer?.SetLogger(SharedMemory?.Logger);
+            
             websocketApi?.SetLogger(SharedMemory?.Logger);
             websocketApi?.WebSocket?.WebSocketImp?.SetSharedMemory(newSharedMemory);
+        }
+
+        private void RetryConnect()
+        {
+            if (websocketApi.WebSocket.IsConnected)
+            {
+                ClearRetryConnectDelegate();
+                return;
+            }
+
+            if (websocketApi.WebSocket.IsConnecting)
+            {
+                return;
+            }
+
+            if (retryAttempts >= maxRetryAttempts)
+            {
+                SharedMemory?.Logger?.LogWarning("Failed to connect to lobby websocket service");
+                ClearRetryConnectDelegate();
+                retryAttempts = 0;
+                return;
+            }
+
+            retryAttempts++;
+            SharedMemory?.Logger?.LogWarning($"Lobby retrying to connect ({retryAttempts}/{maxRetryAttempts})");
+            websocketApi.Connect();
+        }
+
+        private void ClearRetryConnectDelegate()
+        {
+            connectRetryTicker.OnHeartbeatTrigger = null;
+            connectRetryTicker.Stop();
         }
 
         private void OnReceivedQosLatenciesUpdatedHandle(string payload)

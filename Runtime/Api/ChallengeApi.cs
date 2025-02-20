@@ -1,10 +1,12 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace AccelByte.Api
 {
@@ -13,6 +15,8 @@ namespace AccelByte.Api
     /// </summary>
     internal class ChallengeApi : ApiBase
     {
+        private const string dateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
+
         [UnityEngine.Scripting.Preserve]
         internal ChallengeApi(IHttpClient httpClient
             , Config config
@@ -27,34 +31,60 @@ namespace AccelByte.Api
             , int limit
             , ResultCallback<ChallengeResponse> callback)
         {
+            var optionalParams = new GetChallengesOptionalParamenters()
+            {
+                Limit = limit,
+                Offset = offset,
+                SortBy = sortBy,
+                Status = status
+            };
+
+            GetChallenges(optionalParams, callback);
+        }
+
+        internal void GetChallenges(GetChallengesOptionalParamenters optionalParameters
+            , ResultCallback<ChallengeResponse> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
-            var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/challenges")
+            var queries = new Dictionary<string, string>();
+            if (optionalParameters?.SortBy != null)
+            {
+                queries["sortBy"] = ConverterUtils.EnumToDescription(optionalParameters.SortBy);
+            }
+            if (optionalParameters?.Status != null && optionalParameters?.Status.Value != ChallengeStatus.None)
+            {
+                queries["status"] = ConverterUtils.EnumToDescription(optionalParameters.Status);
+            }
+            if (optionalParameters?.Tags != null)
+            {
+                queries["tags"] = string.Join(',', optionalParameters.Tags);
+            }
+            if (!string.IsNullOrEmpty(optionalParameters?.Keyword))
+            {
+                queries["keyword"] = optionalParameters.Keyword;
+            }
+            if (optionalParameters?.Offset != null)
+            {
+                queries["offset"] = optionalParameters.Offset.Value.ToString();
+            }
+            if (optionalParameters?.Limit != null && optionalParameters?.Limit > 0)
+            {
+                queries["limit"] = optionalParameters.Limit.Value.ToString();
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/challenges")
                     .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson)
                     .WithPathParam("namespace", Config.Namespace)
-                    .WithQueryParam("sortBy", ConverterUtils.EnumToDescription(sortBy))
-                    .WithQueryParam("offset", offset.ToString())
-                    .WithQueryParam("limit", limit.ToString());
-
-            if(status != ChallengeStatus.None)
-            {
-                builder.WithQueryParam("status", ConverterUtils.EnumToDescription(status));
-            }
-
-            IHttpRequest request = builder.GetResult();
+                    .WithQueries(queries)
+                    .GetResult();
 
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponse>();
-                if (!result.IsError)
-                {
-                    callback?.TryOk(result.Value);
-                }
-                else
-                {
-                    callback?.TryError(result.Error);
-                };
+
+                callback?.Try(result);
             });
         }
 
@@ -255,6 +285,97 @@ namespace AccelByte.Api
                 {
                     callback.TryError(result.Error);
                 };
+            });
+        }
+
+        internal void ListScheduleByGoal(string challengeCode
+            , string goalCode
+            , ChallengeListScheduleByGoalOptionalParameters optionalParams
+            , ResultCallback<ChallengeListScheduleByGoalResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode
+                , goalCode
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var queries = new Dictionary<string, string>();
+
+            if (optionalParams?.Offset != null)
+            {
+                queries.Add("offset", optionalParams?.Offset.Value.ToString());
+            }
+            if (optionalParams?.Limit != null)
+            {
+                queries.Add("limit", optionalParams?.Limit.Value.ToString());
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/challenges/{challengeCode}/goals/{code}/schedules")
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Config.Namespace)
+                .WithPathParam("challengeCode", challengeCode)
+                .WithPathParam("code", goalCode)
+                .WithQueries(queries)
+                .WithBearerAuth(AuthToken)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<ChallengeListScheduleByGoalResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void ListSchedules(string challengeCode
+            , ChallengeListSchedulesOptionalParameters optionalParams
+            , ResultCallback<ChallengeListSchedulesResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode
+                , Namespace_
+                , AuthToken);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var queries = new Dictionary<string, string>();
+
+            if (optionalParams?.DateTime != null)
+            {
+                queries.Add("dateTime", optionalParams?.DateTime.Value.ToString(dateTimeFormat, DateTimeFormatInfo.InvariantInfo));
+            }
+            if (optionalParams?.Offset != null)
+            {
+                queries.Add("offset", optionalParams?.Offset.Value.ToString());
+            }
+            if (optionalParams?.Limit != null)
+            {
+                queries.Add("limit", optionalParams?.Limit.Value.ToString());
+            }
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/challenges/{challengeCode}/schedules")
+                .Accepts(MediaType.ApplicationJson)
+                .WithPathParam("namespace", Config.Namespace)
+                .WithPathParam("challengeCode", challengeCode)
+                .WithQueries(queries)
+                .WithBearerAuth(AuthToken)
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<ChallengeListSchedulesResponse>();
+                callback?.Try(result);
             });
         }
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -73,17 +73,6 @@ namespace AccelByte.Api
                 Result<Time> result = Result<Time>.CreateOk(Value);
                 callback.Try(result);
             }
-        }
-
-        /// <summary>
-        /// Get all valid country codes for User Registration
-        /// </summary>
-        /// <param name="callback">Returns a Result that contains an Array of <see cref="Country"/> via callback when completed</param>
-        [Obsolete ("Please use Api.User.GetCountryGroupV3. This API will be removed on AGS 3.81")]
-        public void GetCountryGroups( ResultCallback<Country[]> callback )
-        {
-            Report.GetFunctionLog(GetType().Name);
-            api.GetCountryGroups(callback);
         }
 
         /// <summary>

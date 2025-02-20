@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -229,11 +229,6 @@ namespace AccelByte.Core
         public TurnManager GetTurnManager() { return GetApi<TurnManager, TurnManagerApi>(); }
         public Miscellaneous GetMiscellaneous() { return GetApi<Miscellaneous, ClientMiscellaneousApi>(); }
 
-        [Obsolete(
-            "This interface and its APIs are deprecated for newer environments (AGS 3.78 onwards). " +
-            "Please use/migrate to MatchmakingV2/Session instead.")]
-        public SessionBrowser GetSessionBrowser() { return GetApi<SessionBrowser, SessionBrowserApi>(); }
-
         public Session GetSession(bool autoCreate = true)
         {
             Session retval = GetApi<Session, SessionApi>(autoCreate);
@@ -241,9 +236,6 @@ namespace AccelByte.Core
         }
         public MatchmakingV2 GetMatchmakingV2() { return GetApi<MatchmakingV2, MatchmakingV2Api>(); }
         public Chat GetChat() { return GetApi<Chat, ChatApi>(); }
-        
-        [Obsolete("Duplicated Service. Please use AccelByteSDK.GetClientRegistry().GetPresenceBroadcastEvent() to handle presence event. This interface will be removed on AGS 3.81")]
-        public PresenceBroadcastEvent GetPresenceBroadcastEvent() { return GetApi<PresenceBroadcastEvent, PresenceBroadcastEventApi>(); }
         public Gdpr GetGdpr() { return GetApi<Gdpr, GdprApi>(); }
         public AnalyticsService GetAnalyticsService() { return GetApi<AnalyticsService, ClientGameTelemetryApi>(); }
         public BinaryCloudSave GetBinaryCloudSave() { return GetApi<BinaryCloudSave, BinaryCloudSaveApi>(); }

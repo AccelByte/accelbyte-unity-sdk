@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using Newtonsoft.Json;
@@ -158,8 +158,8 @@ namespace AccelByte.Models
         [DataMember] public Permission[] permissions;
         [DataMember] public string phoneNumber;
         [DataMember] public bool phoneVerified;
-        [DataMember] public bool platformAvatarUrl;
-        [DataMember] public bool platformDisplayName;
+        [DataMember] public string platformAvatarUrl;
+        [DataMember] public string platformDisplayName;
         [DataMember] public string platformId;
         [DataMember(Name = "platformInfos")] public AccountUserPlatformInfo[] PlatformInfos;
         [DataMember] public string platformUserId;
@@ -294,8 +294,57 @@ namespace AccelByte.Models
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum PlatformGroup
+    {
+        None,
+        SteamNetwork,
+        Psn,
+        Xbox,
+        OculusGroup,
+        Google
+    }
+
+    [Preserve]
+    public class GetUserPlatformType
+    {
+        internal readonly string PlatformId;
+
+        internal bool IsValid()
+        {
+            return !string.IsNullOrEmpty(PlatformId);
+        }
+
+        public GetUserPlatformType(PlatformType typeEnum)
+        {
+            PlatformId = typeEnum.ToString().ToLower();
+        }
+
+        public GetUserPlatformType(PlatformGroup typeEnum)
+        {
+            PlatformId = typeEnum.ToString().ToLower();
+        }
+        
+        public GetUserPlatformType(string platformId)
+        {
+            bool ignoreCase = true;
+            if (Enum.TryParse(platformId, ignoreCase, out PlatformType _))
+            {
+                PlatformId = platformId.ToLower();
+                return;
+            }
+
+            if (Enum.TryParse(platformId, ignoreCase, out PlatformGroup _))
+            {
+                PlatformId = platformId.ToLower();
+                return;
+            }
+        }
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PlatformType
     {
+        None,
         Steam,
         EpicGames,
         PS4,
@@ -323,6 +372,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class PlatformLink
     {
+        [DataMember(Name = "accountGroup")] public string AccountGroup;
         [DataMember] public string displayName;
         [DataMember] public string emailAddress;
         [DataMember] public string linkedAt;
@@ -330,8 +380,8 @@ namespace AccelByte.Models
         [DataMember] public string originNamespace;
         [DataMember] public string platformId;
         [DataMember] public string platformUserId;
-        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string userId;
+        [DataMember(Name = "xuid")] public string Xuid;
     }
 
     [DataContract, Preserve]
@@ -896,6 +946,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class GetBulkUserByEmailAddressRequest
+    {
+        [DataMember(Name = "listEmailAddressRequest")] public string[] ListEmailAddressRequest;
+    }
+
+    [DataContract, Preserve]
+    public class GetBulkUserByEmailAddressResponse
+    {
+        [DataMember(Name = "data")] public UserData[] Data;
+    }
+
+    [DataContract, Preserve]
     public class LinkHeadlessAccountRequest
     {
         [DataMember] public string[] ChosenNamespaces;
@@ -1073,6 +1135,21 @@ namespace AccelByte.Models
     public class TokenDataV4 : TokenData
     {
         [DataMember] public LoginQueueTicket Queue;
+    }
+
+    [DataContract, Preserve]
+    public class GetUserPublicInfoResponse
+    {
+        [DataMember(Name = "displayName")] public string DisplayName;
+        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
+        [DataMember(Name = "userId")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class GetLinkedPlatformAccountsOptionalParams
+    {
+        public PlatformType PlatformId;
+        public string TargetNamespace;
     }
 
     [DataContract, Preserve]

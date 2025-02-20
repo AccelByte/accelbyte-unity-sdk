@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -31,8 +31,6 @@ namespace AccelByte.Core
                 return persistentPath;
             }
         }
-        [System.Obsolete("Please use PersistentPath instead, will be removed on AGS 3.81")]
-        public static string PersistenPath = PersistentPath;
 #endif
     }
 }

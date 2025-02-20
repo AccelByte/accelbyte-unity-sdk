@@ -1,10 +1,11 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server.Interface;
+using System;
 
 namespace AccelByte.Server
 {
@@ -195,6 +196,7 @@ namespace AccelByte.Server
             api.GetChallengePeriods(challengeCode, callback, offset, limit);
         }
 
+        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
         public void GetChallenges(ResultCallback<ChallengeResponse> callback, ChallengeStatus status = ChallengeStatus.None, ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc, int offset = 0, int limit = 20)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -206,6 +208,33 @@ namespace AccelByte.Server
             }
 
             api.GetChallenges(callback, status, sortBy, offset, limit);
+        }
+
+        public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
+            , ResultCallback<ChallengeResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetChallenges(optionalParameters, callback);
+        }
+
+        public void GetChallenges(ResultCallback<ChallengeResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.GetChallenges(null, callback);
         }
 
         public void GetUserRewards(string userId, ResultCallback<UserRewards> callback, ChallengeRewardStatus challengeRewardStatus = ChallengeRewardStatus.None, ChallengeSortBy challengeSortBy = ChallengeSortBy.UpdatedAtDesc, int offset = 0, int limit = 20)

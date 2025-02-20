@@ -1,4 +1,4 @@
-// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -80,14 +80,15 @@ namespace AccelByte.Core
             OnHeartbeatTrigger = null;
         }
 
-        public void Start()
+        public void Start(bool isImmediateTrigger = true)
         {
             if (!(state is RunningState))
             {
                 TransitionTo(new RunningState(intervalInMs, () =>
-                {
-                    OnHeartbeatTrigger?.Invoke();
-                }));
+                    {
+                        OnHeartbeatTrigger?.Invoke();
+                    }
+                    , isImmediateTrigger));
             }
         }
 

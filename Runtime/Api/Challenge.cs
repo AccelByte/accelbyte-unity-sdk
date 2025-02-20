@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -6,6 +6,7 @@ using AccelByte.Api.Interface;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
+using System;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -29,11 +30,26 @@ namespace AccelByte.Api
             session = inSession;
         }
 
+        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
         public void GetChallenges(ResultCallback<ChallengeResponse> callback
             , ChallengeStatus status = ChallengeStatus.None
             , ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc
             , int offset = 0
             , int limit = 20)
+        {
+            var optionalParams = new GetChallengesOptionalParamenters()
+            {
+                Limit = limit,
+                Offset = offset,
+                SortBy = sortBy,
+                Status = status
+            };
+
+            GetChallenges(optionalParams, callback);
+        }
+
+        public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
+            , ResultCallback<ChallengeResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -43,7 +59,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.GetChallenges(sortBy, status, offset, limit, callback);
+            api.GetChallenges(optionalParameters, callback);
+        }
+
+        public void GetChallenges(ResultCallback<ChallengeResponse> callback)
+        {
+            GetChallenges(null, callback);
         }
 
         public void GetScheduledChallengeGoals(string challengeCode
@@ -176,6 +197,50 @@ namespace AccelByte.Api
             }
 
             api.EvaluateChallengeProgress(callback);
+        }
+
+        public void ListScheduleByGoal(string challengeCode
+            , string goalCode
+            , ResultCallback<ChallengeListScheduleByGoalResponse> callback)
+        {
+            ListScheduleByGoal(challengeCode, goalCode, null, callback);
+        }
+
+        public void ListScheduleByGoal(string challengeCode
+            , string goalCode
+            , ChallengeListScheduleByGoalOptionalParameters optionalParams
+            , ResultCallback<ChallengeListScheduleByGoalResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.ListScheduleByGoal(challengeCode, goalCode, optionalParams , callback);
+        }
+
+        public void ListSchedules(string challengeCode
+            , ResultCallback<ChallengeListSchedulesResponse> callback)
+        {
+            ListSchedules(challengeCode, null, callback);
+        }
+
+        public void ListSchedules(string challengeCode
+            , ChallengeListSchedulesOptionalParameters optionalParams
+            , ResultCallback<ChallengeListSchedulesResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            api.ListSchedules(challengeCode, optionalParams, callback);
         }
     }
 }

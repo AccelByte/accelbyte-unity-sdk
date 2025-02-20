@@ -1,9 +1,10 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
+using System;
 
 namespace AccelByte.Api.Interface
 {
@@ -17,11 +18,26 @@ namespace AccelByte.Api.Interface
         /// <param name="sortBy">Determines the returned sort order of the challenges</param>
         /// <param name="offset">Number of challenges to skip when returning the challenge list, defaults to 0</param>
         /// <param name="limit">Number of challenges that should be included in the challenge list, defaults to 20</param>
+        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
         public void GetChallenges(ResultCallback<ChallengeResponse> callback
             , ChallengeStatus status = ChallengeStatus.None
             , ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc
             , int offset = 0
             , int limit = 20);
+
+        /// <summary>
+        /// Send a request to get challenges.
+        /// </summary>
+        /// <param name="optionalParameters">Optional parameter to get challenges list</param>
+        /// <param name="callback">Api Result Callback</param>
+        public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
+            , ResultCallback<ChallengeResponse> callback);
+
+        /// <summary>
+        /// Send a request to get all challenges.
+        /// </summary>
+        /// <param name="callback">Api Result Callback</param>
+        public void GetChallenges(ResultCallback<ChallengeResponse> callback);
 
         /// <summary>
         /// Send a request to get all scheduled goals for a specific challenge
@@ -95,5 +111,47 @@ namespace AccelByte.Api.Interface
         /// </summary>
         /// <param name="callback">ResultCallback if operation is successful or not</param>
         public void EvaluateChallengeProgress(ResultCallback callback);
+
+        /// <summary>
+        /// List schedules of given challenge for specific user.
+        /// </summary>
+        /// <param name="challengeCode">Challenge code</param>
+        /// <param name="optionalParams">Optional parameter to list challenge schedules.
+        /// To query schedules prior to specific date time, use dateTime parameter.
+        /// </param>
+        /// <param name="callback">Api Result Callback</param>
+        public void ListSchedules(string challengeCode
+            , ChallengeListSchedulesOptionalParameters optionalParams
+            , ResultCallback<ChallengeListSchedulesResponse> callback);
+
+        /// <summary>
+        /// List schedules of given challenge for specific user.
+        /// </summary>
+        /// <param name="challengeCode">Challenge code</param>
+        /// <param name="callback">Api Result Callback</param>
+        public void ListSchedules(string challengeCode
+            , ResultCallback<ChallengeListSchedulesResponse> callback);
+
+        /// <summary>
+        /// List schedules of given goal in a challenge for specific user.
+        /// </summary>
+        /// <param name="challengeCode">Challenge code</param>
+        /// <param name="goalCode">Goal code</param>
+        /// <param name="optionalParams">Optional parameter to list challenge schedules</param>
+        /// <param name="callback">Api Result Callback</param>
+        public void ListScheduleByGoal(string challengeCode
+            , string goalCode
+            , ChallengeListScheduleByGoalOptionalParameters optionalParams
+            , ResultCallback<ChallengeListScheduleByGoalResponse> callback);
+
+        /// <summary>
+        /// List schedules of given goal in a challenge for specific user.
+        /// </summary>
+        /// <param name="challengeCode">Challenge code</param>
+        /// <param name="goalCode">Goal code</param>
+        /// <param name="callback">Api Result Callback</param>
+        public void ListScheduleByGoal(string challengeCode
+            , string goalCode
+            , ResultCallback<ChallengeListScheduleByGoalResponse> callback);
     }
 }

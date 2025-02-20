@@ -32,13 +32,18 @@ namespace AccelByte.Api
             , ResultCallback<WalletInfo> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get wallet info by currency code! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get wallet info by currency code! UserId parameter is null!");
-            Assert.IsNotNull(
-                AuthToken,
-                "Can't get wallet info by currency code! accessToken parameter is null!");
-
-            Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code! CurrencyCode parameter is null!");
+            
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , currencyCode
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/me/wallets/{currencyCode}")
@@ -71,7 +76,7 @@ namespace AccelByte.Api
                 walletInfo.balance = result.Value.balance;
                 walletInfo.status = result.Value.status;
             }
-            callback.TryOk(walletInfo);
+            callback?.TryOk(walletInfo);
         }
         
         public IEnumerator GetWalletInfoByCurrencyCodeV2( string userId
@@ -79,13 +84,18 @@ namespace AccelByte.Api
             , ResultCallback<WalletInfoResponse> callback )
         {
             Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't get wallet info by currency code! Namespace parameter is null!");
-            Assert.IsNotNull(userId, "Can't get wallet info by currency code! UserId parameter is null!");
-            Assert.IsNotNull(
-                AuthToken,
-                "Can't get wallet info by currency code! accessToken parameter is null!");
-
-            Assert.IsNotNull(currencyCode, "Can't get wallet info by currency code! CurrencyCode parameter is null!");
+            
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+                , userId
+                , currencyCode
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/namespaces/{namespace}/users/me/wallets/{currencyCode}")
@@ -103,7 +113,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<WalletInfoResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }
