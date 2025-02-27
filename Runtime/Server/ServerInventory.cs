@@ -333,7 +333,36 @@ namespace AccelByte.Server
             api.RunChainingOperation(request, callback);
         }
 
-        public void SaveUserInventoryItem(string userId, ServerSaveUserInventoryItemRequest request, ResultCallback<UserItem> callback)
+        public void SaveUserInventoryItem(
+            string userId
+            , string inventoryConfigurationCode
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , ResultCallback<UserItem> callback
+        )
+        {
+            SaveUserInventoryItem(userId: userId
+                , inventoryConfigurationCode: inventoryConfigurationCode
+                , source: source
+                , sourceItemId: sourceItemId
+                , type: type
+                , quantity: quantity
+                , optionalParameters: null
+                , callback: callback);
+        }
+
+        public void SaveUserInventoryItem(
+            string userId
+            , string inventoryConfigurationCode
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , SaveUserInventoryItemOptionalParameters optionalParameters
+            , ResultCallback<UserItem> callback
+        )
         {
             Report.GetFunctionLog(GetType().Name);
 
@@ -343,7 +372,14 @@ namespace AccelByte.Server
                 return;
             }
 
-            api.SaveUserInventoryItem(userId, request, callback);
+            api.SaveUserInventoryItem(userId: userId
+                , inventoryConfigurationCode: inventoryConfigurationCode
+                , source: source
+                , sourceItemId: sourceItemId
+                , type: type
+                , quantity: quantity
+                , optionalParameters: optionalParameters
+                , callback: callback);
         }
 
         public void SaveUserInventoryItemToInventory(string userId, string inventoryId, ServerSaveUserInventoryItemRequest request, ResultCallback<UserItem> callback)

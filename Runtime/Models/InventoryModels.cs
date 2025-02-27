@@ -448,6 +448,21 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    internal class ServerSaveUserInventoryItemToUserPayload
+    {
+        [DataMember(Name = "inventoryConfigurationCode")] public string InventoryConfigurationCode;
+        [DataMember(Name = "source")] public string Source;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
+        [DataMember(Name = "type")] public string Type;
+        [DataMember(Name = "qty")] public int Quantity;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "slotUsed")] public int SlotUsed;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "serverCustomAttributes")] public Dictionary<string, object> ServerCustomAttributes;
+    }
+
+    [DataContract, Preserve]
     public class ServerInventoryConfigurationRequestBase
     {
         [DataMember(Name = "name")] public string Name;
@@ -530,5 +545,30 @@ namespace AccelByte.Models
         [DataMember(Name = "message")] public string Message;
         [DataMember(Name = "replayed")] public bool Replayed;
         [DataMember(Name = "requestId")] public string RequestId;
+    }
+
+    [Preserve]
+    public class SaveUserInventoryItemOptionalParameters
+    {
+        /// <summary>
+        /// Optional parameter to specify item with tags
+        /// </summary>
+        public string[] Tags;
+        /// <summary>
+        /// Optional parameter to define the slot Id 
+        /// </summary>
+        public string SlotId;
+        /// <summary>
+        /// Optional parameter to define number of slot used
+        /// </summary>
+        public int SlotUsed;
+        /// <summary>
+        /// Optional parameter to set its custom attributes
+        /// </summary>
+        public Dictionary<string, object> CustomAttributes;
+        /// <summary>
+        /// Optional parameter to set its custom attribute on server side
+        /// </summary>
+        public Dictionary<string, object> ServerCustomAttributes;
     }
 }

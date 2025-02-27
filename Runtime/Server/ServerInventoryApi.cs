@@ -801,15 +801,59 @@ namespace AccelByte.Server
             });
         }
 
-        public void SaveUserInventoryItem(string userId, ServerSaveUserInventoryItemRequest request, ResultCallback<UserItem> callback)
+        public void SaveUserInventoryItem(string userId
+            , string inventoryConfigurationCode
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , SaveUserInventoryItemOptionalParameters optionalParameters
+            , ResultCallback<UserItem> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, userId, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, userId, inventoryConfigurationCode, source, sourceItemId, type);
             if (error != null)
             {
                 callback?.TryError(error);
                 return;
+            }
+            
+            var request = new ServerSaveUserInventoryItemToUserPayload
+            {
+                InventoryConfigurationCode = inventoryConfigurationCode,
+                Source = source,
+                SourceItemId = sourceItemId,
+                Type = type,
+                Quantity = (int)quantity
+            };
+
+            if (optionalParameters != null)
+            {
+                if (optionalParameters.Tags != null)
+                {
+                    request.Tags = optionalParameters.Tags;
+                }
+
+                if (!string.IsNullOrEmpty(optionalParameters.SlotId))
+                {
+                    request.SlotId = optionalParameters.SlotId;
+                }
+
+                if (optionalParameters.SlotUsed > 0)
+                {
+                    request.SlotUsed = optionalParameters.SlotUsed;
+                }
+
+                if (optionalParameters.CustomAttributes != null)
+                {
+                    request.CustomAttributes = optionalParameters.CustomAttributes;
+                }
+
+                if (optionalParameters.ServerCustomAttributes != null)
+                {
+                    request.ServerCustomAttributes = optionalParameters.ServerCustomAttributes;
+                }
             }
 
             var builder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/items")

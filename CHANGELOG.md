@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+### [17.5.1] (2025-02-27)
+
+
+### Bug Fixes
+
+* add missing field in server inventory 
+
 ## [17.5.0] (2025-02-20)
 
 

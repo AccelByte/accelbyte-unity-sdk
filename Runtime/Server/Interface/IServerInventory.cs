@@ -34,6 +34,15 @@ namespace AccelByte.Server.Interface
             , ResultCallback<ServerIntegrationConfiguration> callback
         );
 
+        /// <summary>
+        /// Retrieve list of user inventories
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="sortBy">Optional parameter to set inventory list order</param>
+        /// <param name="limit">Optional parameter to define limit for the result length</param>
+        /// <param name="offset">Optional parameter to define offset for the result</param>
+        /// <param name="inventoryConfigurationCode"> Optional parameter to query based on inventory configuration code</param>
+        /// <param name="userId">Optional parameter to query based on a specific userId</param>
         public void GetUserInventories(
             ResultCallback<UserInventoriesPagingResponse> callback
             , UserInventorySortBy sortBy = UserInventorySortBy.CreatedAt
@@ -43,6 +52,11 @@ namespace AccelByte.Server.Interface
             , string userId = ""
         );
 
+        /// <summary>
+        /// Grant inventory to the player
+        /// </summary>
+        /// <param name="request">Detailed data to be processed</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void CreateUserInventory(
             ServerCreateInventoryRequest request
             , ResultCallback<UserInventory> callback
@@ -53,12 +67,24 @@ namespace AccelByte.Server.Interface
             , ResultCallback<UserInventory> callback
         );
 
+        /// <summary>
+        /// Update user inventory slot limit
+        /// </summary>
+        /// <param name="inventoryId">Inventory Id to be processed</param>
+        /// <param name="request">Detailed data to be processed</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void UpdateUserInventory(
             string inventoryId
             , ServerUpdateInventoryRequest request
             , ResultCallback<UserInventory> callback
         );
 
+        /// <summary>
+        /// Delete user inventory based on inventory id
+        /// </summary>
+        /// <param name="inventoryId">Inventory Id to be processed</param>
+        /// <param name="request">Detailed data to be processed</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void DeleteUserInventory(
             string inventoryId
             , ServerDeleteInventoryRequest request
@@ -72,15 +98,15 @@ namespace AccelByte.Server.Interface
         );
 
         /// <summary>
-        /// Listing all items in an inventory.
+        /// Retrieve a list of user inventories
         /// </summary>
         /// <param name="inventoryId">Selected inventory Id</param>
-        /// <param name="callback">Returns a Result that contains UserItemsPagingResponse via callback when completed</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
         public void GetUserInventoryAllItems(string inventoryId
             , ResultCallback<UserItemsPagingResponse> callback);
 
         /// <summary>
-        /// Listing all items in an inventory.
+        /// Retrieve a list of user inventories
         /// </summary>
         /// <param name="inventoryId">Selected inventory Id</param>
         /// <param name="optionalParameters">Optional parameter to get specific result</param>
@@ -89,6 +115,13 @@ namespace AccelByte.Server.Interface
             , GetUserInventoryAllItemsOptionalParameters optionalParameters
             , ResultCallback<UserItemsPagingResponse> callback);
 
+        /// <summary>
+        /// Listing all items in an inventory.
+        /// </summary>
+        /// <param name="inventoryId">Selected inventory Id</param>
+        /// <param name="slotId">slot id to be fetch</param>
+        /// <param name="sourceItemId">item id to fetch</param>
+        /// <param name="callback">Returns a Result that contains UserItem via callback when completed</param>
         public void GetUserInventoryItem(
             string inventoryId
             , string slotId
@@ -96,6 +129,13 @@ namespace AccelByte.Server.Interface
             , ResultCallback<UserItem> callback
         );
 
+        /// <summary>
+        /// Make a user consume item
+        /// </summary>
+        /// <param name="inventoryId">InventoryId to be process</param>
+        /// <param name="userId">User id to be processed</param>
+        /// <param name="request">Detailed data to be processed</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void ConsumeUserInventoryItem(
             string inventoryId
             , string userId
@@ -103,6 +143,13 @@ namespace AccelByte.Server.Interface
             , ResultCallback<UserItem> callback
         );
 
+        /// <summary>
+        /// Update item attributes and tags for a specidic user
+        /// </summary>
+        /// <param name="inventoryId">InventoryId to be process</param>
+        /// <param name="userId">User id to be processed</param>
+        /// <param name="request">Detailed data to be processed</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void BulkUpdateUserInventoryItems(
             string inventoryId
             , string userId
@@ -110,6 +157,13 @@ namespace AccelByte.Server.Interface
             , ResultCallback<UpdateUserInventoryItemResponse[]> callback
         );
 
+        /// <summary>
+        /// Add item to player inventory using inventoryId
+        /// </summary>
+        /// <param name="inventoryId">InventoryId to be process</param>
+        /// <param name="userId">user to be process</param>
+        /// <param name="request">request body contains the item detail</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void SaveUserInventoryItemToInventory(
             string inventoryId
             , string userId
@@ -117,6 +171,13 @@ namespace AccelByte.Server.Interface
             , ResultCallback<UserItem> callback
         );
 
+        /// <summary>
+        /// Remove items from player's inventory
+        /// </summary>
+        /// <param name="inventoryId">InventoryId to be process</param>
+        /// <param name="userId">user to be process</param>
+        /// <param name="request">request body contains the item detail</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void BulkDeleteUserInventoryItems(
             string inventoryId
             , string userId
@@ -124,9 +185,45 @@ namespace AccelByte.Server.Interface
             , ResultCallback<DeleteUserInventoryItemResponse[]> callback
         );
 
+        /// <summary>
+        /// Add item to player inventory using inventoryConfigurationCode
+        /// </summary>
+        /// <param name="userId">user to be process</param>
+        /// <param name="inventoryConfigurationCode">inventory config code to be processed</param>
+        /// <param name="source">item source to be processed</param>
+        /// <param name="sourceItemId">item source id to be processed</param>
+        /// <param name="type">item type to be processed</param>
+        /// <param name="quantity">item quantity to be processed</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
         public void SaveUserInventoryItem(
             string userId
-            , ServerSaveUserInventoryItemRequest request
+            , string inventoryConfigurationCode
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , ResultCallback<UserItem> callback
+        );
+
+        /// <summary>
+        /// Add item to player inventory using inventoryConfigurationCode
+        /// </summary>
+        /// <param name="userId">user to be process</param>
+        /// <param name="inventoryConfigurationCode">inventory config code to be processed</param>
+        /// <param name="source">item source to be processed</param>
+        /// <param name="sourceItemId">item source id to be processed</param>
+        /// <param name="type">item type to be processed</param>
+        /// <param name="quantity">item quantity to be processed</param>
+        /// <param name="optionalParameters">optional parameters to be processed</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void SaveUserInventoryItem(
+            string userId
+            , string inventoryConfigurationCode
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , SaveUserInventoryItemOptionalParameters optionalParameters
             , ResultCallback<UserItem> callback
         );
 
