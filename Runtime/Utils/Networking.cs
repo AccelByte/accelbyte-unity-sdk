@@ -40,19 +40,6 @@ namespace AccelByte.Utils
         }
         
         /// <summary>
-        /// Ping a specific url
-        /// </summary>
-        /// <param name="url">url to ping</param>
-        /// <param name="inTimeOutInMs">timeout limit</param>
-        [System.Obsolete("This ping method is deprecated. Please use UdpPing or HttpPing method. This method will be removed on AGS 3.82.")]
-        public static AccelByteResult<int, Error> Ping(string url, uint inTimeOutInMs = 60 * 1000)
-        {
-            AccelByteResult<int, Error> pingResult = new AccelByteResult<int, Error>();
-            HttpPingImp(url, pingResult, inTimeOutInMs, maxRetry: 1);
-            return pingResult;
-        }
-        
-        /// <summary>
         /// Ping a specific url with UDP client. This feature isn't supported on Web Platform.
         /// </summary>
         /// <param name="url">Url to ping</param>

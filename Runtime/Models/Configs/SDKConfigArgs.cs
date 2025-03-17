@@ -68,6 +68,8 @@ namespace AccelByte.Models
         [DataMember] public bool? EnablePreDefinedEvent;
         [DataMember] public bool? EnableClientAnalyticsEvent;
         [DataMember] public float? ClientAnalyticsEventInterval;
+        [DataMember] public bool? GameTelemetryCacheEnabled;
+        [DataMember] public bool? EnableGameTelemetryStartupAutoSend;
         [DataMember] public bool? EnableAmsServerQos;
         [DataMember] public string DSHubServerUrl;
         [DataMember] public string DSMControllerServerUrl;

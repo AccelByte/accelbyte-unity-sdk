@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -11,7 +11,7 @@ namespace AccelByte.Server
 {
     public class ServerUGC : WrapperBase
     {
-        private readonly ServerUGCApi api;
+        internal readonly ServerUGCApi Api;
         private readonly ISession session;
         private readonly CoroutineRunner coroutineRunner;
 
@@ -23,7 +23,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(inApi, "Cannot construct UGC manager; inApi is null!");
             Assert.IsNotNull(inCoroutineRunner, "Cannot construct UGC manager; inCoroutineRunner is null!");
 
-            api = inApi;
+            Api = inApi;
             session = inSession;
             coroutineRunner = inCoroutineRunner;
         }
@@ -60,7 +60,7 @@ namespace AccelByte.Server
                 return;
             }
             coroutineRunner.Run(
-                api.SearchContent(searchContentRequest, callback, userId));
+                Api.SearchContent(searchContentRequest, callback, userId));
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace AccelByte.Server
                 return;
             }
             coroutineRunner.Run(
-                api.SearchContentsSpesificToChannel(channelId, searchContentRequest, callback, userId));
+                Api.SearchContentsSpesificToChannel(channelId, searchContentRequest, callback, userId));
         }
         
         /// <summary>
@@ -125,7 +125,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.ModifyContentByShareCode(userId, channelId, shareCode, modifyRequest, callback));
+                Api.ModifyContentByShareCode(userId, channelId, shareCode, modifyRequest, callback));
         }
         
         /// <summary>
@@ -159,7 +159,7 @@ namespace AccelByte.Server
             }
 
             coroutineRunner.Run(
-                api.DeleteContentByShareCode(userId, channelId, shareCode, callback));
+                Api.DeleteContentByShareCode(userId, channelId, shareCode, callback));
         }
     }
 }

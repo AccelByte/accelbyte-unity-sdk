@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -65,11 +65,11 @@ namespace AccelByte.Api
             , bool isGlobal = false
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -101,11 +101,11 @@ namespace AccelByte.Api
         public void GetAchievement(string achievementCode
             , ResultCallback<MultiLanguageAchievement> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -137,11 +137,11 @@ namespace AccelByte.Api
             , TagQueryBuilder tagBuilder = null
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -173,11 +173,11 @@ namespace AccelByte.Api
         public void UnlockAchievement( string achievementCode
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -190,6 +190,25 @@ namespace AccelByte.Api
                     }
                     HandleCallback(cb, callback);
                 }));
+        }
+
+        /// <summary>
+        /// Unlock multiple achievements via achievementCode for the current user.
+        /// </summary>
+        /// <param name="achievementCodes">Array of achievement codes to be unlocked.</param>
+        /// <param name="callback">Returns a Result via callback that contains an array of BulkUnlockAchievementResponse when completed.</param>
+        public void BulkUnlockAchievement(string[] achievementCodes
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.BulkUnlockAchievement(achievementCodes, callback);
         }
 
         /// <summary>
@@ -211,11 +230,11 @@ namespace AccelByte.Api
             , TagQueryBuilder tagBuilder = null
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -254,11 +273,11 @@ namespace AccelByte.Api
             , int limit = 20
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -293,11 +312,11 @@ namespace AccelByte.Api
             , int limit = 20
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -327,11 +346,11 @@ namespace AccelByte.Api
             , ResultCallback callback
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -364,11 +383,11 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
@@ -488,22 +507,22 @@ namespace AccelByte.Api
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         private void HandleCallback(Result result, ResultCallback callback)
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         #endregion

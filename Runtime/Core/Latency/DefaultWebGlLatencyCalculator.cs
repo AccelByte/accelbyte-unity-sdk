@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Models;
+using AccelByte.Utils;
 
 namespace AccelByte.Core
 {
@@ -18,7 +19,10 @@ namespace AccelByte.Core
         
         private void StartPing(string url, AccelByteResult<int, Error> resultCallback)
         {
-            var pingResult = Utils.Networking.Ping(url, (uint)timeOutSeconds * 1000);
+            var pingResult = Utils.Networking.HttpPing(url, new Networking.HttpPingOptionalParameters()
+            {
+                InTimeOutInMs = (uint)timeOutSeconds * 1000
+            });
             pingResult.OnSuccess(latencyResult => 
                 { 
                     resultCallback.Resolve(latencyResult); 

@@ -177,6 +177,8 @@ namespace AccelByte.Core
 
             switch (error.Code)
             {
+                case ErrorCode.HttpTooManyRequests:
+                case ErrorCode.RetryWith:
                 case ErrorCode.SessionVersionMismatch:
                 case ErrorCode.AchievementTooManyRequests:
                     return true;

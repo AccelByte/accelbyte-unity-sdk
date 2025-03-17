@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -10,6 +10,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
+    [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use Api.CloudSave instead")]
     public class GameProfiles : WrapperBase
     {
         private readonly GameProfilesApi api;

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Runtime.Serialization;
@@ -32,7 +32,7 @@ namespace AccelByte.Models
         [DataMember] public Paging paging;
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PaginationType
     {
         FIRST,

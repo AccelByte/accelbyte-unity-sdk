@@ -12,6 +12,7 @@ namespace AccelByte.Models
     {
         [DataMember] public string ClientId;
         [DataMember] public string ClientSecret;
+        [DataMember] public string GoogleWebClientId;
 
         /// <summary>
         ///  Copy member values
@@ -24,6 +25,7 @@ namespace AccelByte.Models
         public bool Compare(OAuthConfig anotherConfig)
         {
             return this.ClientId == anotherConfig.ClientId &&
+                   this.GoogleWebClientId == anotherConfig.GoogleWebClientId &&
                    this.ClientSecret == anotherConfig.ClientSecret;
         }
 
@@ -39,6 +41,10 @@ namespace AccelByte.Models
             if (this.ClientSecret == null)
             {
                 this.ClientSecret = "";
+            }
+            if (this.GoogleWebClientId == null)
+            {
+                this.GoogleWebClientId = "";
             }
         }
 

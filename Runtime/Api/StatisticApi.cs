@@ -179,7 +179,7 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback ) 
         {
-            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken, resets);
             if (error != null)
             {
                 callback.TryError(error);
@@ -250,9 +250,6 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , userId
-                , statCodes
-                , tags
-                , additionalKey
                 , accessToken
             );
             if (error != null)
@@ -265,17 +262,29 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithQueryParam("additionalKey", additionalKey)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
-            foreach (var statCode in statCodes)
+
+            if (!string.IsNullOrEmpty(additionalKey))
             {
-                builder.WithQueryParam("statCodes", statCode);
+                builder.WithQueryParam("additionalKey", additionalKey);
             }
-            foreach (var tag in tags)
+
+            if (statCodes != null && statCodes.Length > 0)
             {
-                builder.WithQueryParam("tags", tag);
+                foreach (var statCode in statCodes)
+                {
+                    builder.WithQueryParam("statCodes", statCode);
+                }
+            }
+
+            if (tags != null && tags.Length > 0)
+            {
+                foreach (var tag in tags)
+                {
+                    builder.WithQueryParam("tags", tag);
+                }
             }
             var request = builder.GetResult();
 
@@ -576,15 +585,21 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
-            
-            foreach (string statCode in statCodes)
+
+            if (statCodes != null)
             {
-                requestBuilder.WithQueryParam("statCodes", statCode);
+                foreach (string statCode in statCodes)
+                {
+                    requestBuilder.WithQueryParam("statCodes", statCode);
+                }
             }
 
-            foreach (string tag in tags)
+            if (tags != null)
             {
-                requestBuilder.WithQueryParam("tags", tag);
+                foreach (string tag in tags)
+                {
+                    requestBuilder.WithQueryParam("tags", tag);
+                }
             }
 
             IHttpRequest request = requestBuilder.GetResult();
@@ -608,19 +623,29 @@ namespace AccelByte.Api
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statitems/value/bulk")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("additionalKey", additionalKey)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            foreach (string statCode in statCodes)
+            if (!string.IsNullOrEmpty(additionalKey))
             {
-                requestBuilder.WithQueryParam("statCodes", statCode);
+                requestBuilder.WithQueryParam("additionalKey", additionalKey);
             }
 
-            foreach (string tag in tags)
+            if (statCodes != null)
             {
-                requestBuilder.WithQueryParam("tags", tag);
+                foreach (string statCode in statCodes)
+                {
+                    requestBuilder.WithQueryParam("statCodes", statCode);
+                }
+            }
+
+            if (tags != null)
+            {
+                foreach (string tag in tags)
+                {
+                    requestBuilder.WithQueryParam("tags", tag);
+                }
             }
 
             IHttpRequest request = requestBuilder.GetResult();
@@ -643,6 +668,13 @@ namespace AccelByte.Api
             ResultCallback<PagedStatCycleItem> callback
         )
         {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken, cycleId);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
+
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statCycles/{cycleId}/statCycleitems")
                 .WithPathParam("namespace", Namespace_)

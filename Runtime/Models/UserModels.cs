@@ -12,13 +12,13 @@ using UnityEngine.Scripting;
 namespace AccelByte.Models
 {
     #region enum
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum AuthenticationType { EMAILPASSWD, PHONEPASSWD }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SearchType { ALL, DISPLAYNAME, USERNAME, THIRDPARTYPLATFORM, UNIQUEDISPLAYNAME }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum TwoFAFactorType
     {
         [Description("authenticator")]
@@ -27,10 +27,10 @@ namespace AccelByte.Models
         BACKUPCODE
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SearchPlatformType { None, PlatformDisplayName }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum AccountAvailabilityField
     {
         [EnumMember(Value = "displayName")] DisplayName,
@@ -223,6 +223,17 @@ namespace AccelByte.Models
         [DataMember] public string policyVersionId;
     }
 
+    /// <summary>
+    /// Optional parameters for Register and RegisterV4 endpoints. Can be null.
+    /// </summary>
+    public class RegisterUserOptionalParameters
+    {
+        /// <summary>
+        /// Verification code sent to email. Use only when Mandatory Email Verification is enabled on the namespace.
+        /// </summary>
+        public string Code;
+    }
+
     [DataContract, Preserve]
     public class RegisterUserRequest
     {
@@ -234,6 +245,7 @@ namespace AccelByte.Models
         [DataMember] public string password;
         [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public List<PolicyAcceptance> acceptedPolicies;
+        [DataMember(Name = "code"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)] public string Code;
     }
     
     [DataContract, Preserve]
@@ -248,6 +260,7 @@ namespace AccelByte.Models
         [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
         [DataMember] public List<PolicyAcceptance> acceptedPolicies;
+        [DataMember(Name = "code"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)] public string Code;
     }
 
     [DataContract, Preserve]
@@ -293,7 +306,7 @@ namespace AccelByte.Models
         }
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PlatformGroup
     {
         None,
@@ -341,7 +354,7 @@ namespace AccelByte.Models
         }
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PlatformType
     {
         None,
@@ -625,13 +638,13 @@ namespace AccelByte.Models
     /// <summary>
     /// Type of Ban that available
     /// </summary>
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum BanType { LOGIN, CHAT_SEND, CHAT_ALL, ORDER_AND_PAYMENT, STATISTICS, LEADERBOARD, MATCHMAKING, UGC_CREATE_UPDATE }
 
     /// <summary>
     /// Type of Ban reason that available
     /// </summary>
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum BanReason { VIOLENCE, HARASSMENT, HATEFUL_CONDUCT, OFFENSIVE_USERNAME, IMPERSONATION, 
         MALICIOUS_CONTENT, SEXUALLY_SUGGESTIVE, SEXUAL_VIOLENCE, EXTREME_VIOLENCE, UNDERAGE_USER, CHEATING, TOS_VIOLATION }
 
@@ -1051,6 +1064,25 @@ namespace AccelByte.Models
     public class AccountUserPlatformInfosResponse
     {
         [DataMember(Name = "data")] public AccountUserPlatformData[] Data;
+    }
+
+    [DataContract, Preserve]
+    public class SendVerificationCodeToNewUserRequest
+    {
+        [DataMember(Name = "emailAddress")] public string EmailAddress;
+        [DataMember(Name = "languageTag")
+            , JsonProperty(NullValueHandling = NullValueHandling.Ignore)] public string LanguageTag;
+    }
+
+    /// <summary>
+    /// Request verification code to email address optional parameters. Can be null.
+    /// </summary>
+    public class SendVerificationCodeToNewUserOptionalParameters
+    {
+        /// <summary>
+        /// Language of email to be sent if configured.
+        /// </summary>
+        public string LanguageTag = null;
     }
 
     /// <summary>

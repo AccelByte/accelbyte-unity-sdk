@@ -42,9 +42,16 @@ namespace AccelByte.Api
         public void Register(RegisterUserRequest requestModel, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            if (requestModel == null)
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , requestModel
+                , requestModel.authType
+                , requestModel.country
+                , requestModel.emailAddress
+                , requestModel.password);
+            if (error != null)
             {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Register failed. registerUserRequest is null!"));
+                callback?.TryError(error);
                 return;
             }
 
@@ -66,7 +73,13 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, requestModel);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+                , requestModel
+                , requestModel.authType
+                , requestModel.emailAddress
+                , requestModel.username
+                , requestModel.password
+                , requestModel.country);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -82,6 +95,39 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<RegisterUserResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        public void SendVerificationCodeToNewUser(string emailAddress
+            , SendVerificationCodeToNewUserOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, emailAddress);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBody = new SendVerificationCodeToNewUserRequest()
+            {
+                EmailAddress = emailAddress,
+                LanguageTag = optionalParameters?.LanguageTag
+            };
+
+            var request =
+                HttpRequestBuilder.CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/code/request")
+                    .WithPathParam("namespace", Namespace_)
+                    .WithContentType(MediaType.ApplicationJson)
+                    .WithBody(requestBody.ToUtf8Json())
+                    .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
                 callback?.Try(result);
             });
         }

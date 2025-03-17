@@ -23,6 +23,8 @@ namespace AccelByte.Models
         private const int defaultPresenceBroadcastEvetntIntervalInSecond = 600;
         private const int defaultPresenceBroadcastEventGameState = 0;
         private const bool defaultPredefinedEvent = false;
+        private const bool defaultGameTelemetryCacheEnabled = true;
+        private const bool defaultGameTelemetryAutoSend = true;
         private const int defaultClientAnalyticsEventIntervalInSecond = 10;
 
         [DataMember] public string Namespace = "";
@@ -81,6 +83,8 @@ namespace AccelByte.Models
         [DataMember] public bool EnablePreDefinedEvent = defaultPredefinedEvent;
         [DataMember] public bool EnableClientAnalyticsEvent = false;
         [DataMember] public float ClientAnalyticsEventInterval = defaultClientAnalyticsEventIntervalInSecond;
+        [DataMember] public bool GameTelemetryCacheEnabled = defaultGameTelemetryCacheEnabled;
+        [DataMember] public bool EnableGameTelemetryStartupAutoSend = defaultGameTelemetryAutoSend;
         [DataMember] public bool EnableAmsServerQos = false;
         [DataMember] public bool EnableMatchmakingTicketCheck = true;
         [DataMember] public int MatchmakingTicketCheckPollRate = 5000;
@@ -148,6 +152,8 @@ namespace AccelByte.Models
                    this.PeerMonitorTimeoutMs == anotherConfig.PeerMonitorTimeoutMs &&
                    this.HostCheckTimeoutInSeconds == anotherConfig.HostCheckTimeoutInSeconds &&
                    this.EnablePresenceBroadcastEvent == anotherConfig.EnablePresenceBroadcastEvent &&
+                   this.GameTelemetryCacheEnabled == anotherConfig.GameTelemetryCacheEnabled &&
+                   this.EnableGameTelemetryStartupAutoSend == anotherConfig.EnableGameTelemetryStartupAutoSend &&
                    this.PresenceBroadcastEventInterval == anotherConfig.PresenceBroadcastEventInterval &&
                    this.PresenceBroadcastEventGameState == anotherConfig.PresenceBroadcastEventGameState &&
                    this.PresenceBroadcastEventGameStateDescription == anotherConfig.PresenceBroadcastEventGameStateDescription &&

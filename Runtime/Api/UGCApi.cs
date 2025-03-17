@@ -1488,10 +1488,15 @@ namespace AccelByte.Api
                 yield break;
             }
 
+            var requestBody = new UGCGetContentBulkByIdsV2Request()
+            {
+                ContentIds = contentIds
+            };
+
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/contents/bulk")
                 .WithPathParam("namespace", Namespace_)
-                .WithBody(new { contentIds = contentIds }.ToUtf8Json())
+                .WithBody(requestBody.ToUtf8Json())
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
@@ -2286,14 +2291,16 @@ namespace AccelByte.Api
                 yield break;
             }
 
+            var requestBody = new UGCUpdateLikeStatusToContentV2Request()
+            {
+                LikeStatus = likeStatus
+            };
+
             var request = HttpRequestBuilder
                  .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/contents/{contentId}/like")
                  .WithPathParam("namespace", Namespace_)
                  .WithPathParam("contentId", contentId)
-                 .WithBody(new
-                 {
-                     likeStatus = likeStatus
-                 }.ToUtf8Json())
+                 .WithBody(requestBody.ToUtf8Json())
                  .WithContentType(MediaType.ApplicationJson)
                  .WithBearerAuth(AuthToken)
                  .Accepts(MediaType.ApplicationJson)
@@ -2456,10 +2463,15 @@ namespace AccelByte.Api
                 yield break;
             }
 
+            var requestBody = new UGCGetContentByShareCodeRequest()
+            {
+                ShareCodes = shareCodes
+            };
+
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/contents/sharecodes/bulk")
                 .WithPathParam("namespace", Namespace_)
-                .WithBody(new { shareCodes = shareCodes }.ToUtf8Json())
+                .WithBody(requestBody.ToUtf8Json())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)
@@ -2503,10 +2515,15 @@ namespace AccelByte.Api
                 yield break;
             }
 
+            var requestBody = new UGCGetContentByShareCodeRequest()
+            {
+                ShareCodes = shareCodes
+            };
+
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v2/public/namespaces/{namespace}/contents/sharecodes/bulk")
                 .WithPathParam("namespace", Namespace_)
-                .WithBody(new { shareCodes = shareCodes }.ToUtf8Json())
+                .WithBody(requestBody.ToUtf8Json())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationJson)

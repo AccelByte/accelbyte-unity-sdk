@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections.Generic;
@@ -9,21 +9,21 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticSetBy
     {
         CLIENT,
         SERVER
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticStatus
     {
         INIT,
         TIED
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticUpdateStrategy
     {
         OVERRIDE,
@@ -32,7 +32,7 @@ namespace AccelByte.Models
         MAX
     }
     
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticCycleType
     {
         None,
@@ -48,7 +48,7 @@ namespace AccelByte.Models
         Seasonal
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticCycleStatus
     {
         None,
@@ -60,7 +60,7 @@ namespace AccelByte.Models
         Stopped
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum StatisticSortBy
     {
         None,
@@ -349,5 +349,51 @@ namespace AccelByte.Models
     {
         [DataMember] public StatCycleItem[] Data;
         [DataMember] public Paging Paging;
+    }
+
+    public class OptionalParamBase
+    {
+        /// <summary>
+        /// Offset of the list that has been sliced based on Limit parameter (optional, default = 0)
+        /// </summary>
+        public int Offset = 0;
+
+        /// <summary>
+        /// The limit of item on page (optional, default = 20)
+        /// </summary>
+        public int Limit = 20;
+        
+        /// <summary>
+        /// Array of statistic codes for statistic cycle items to be retrieved
+        /// </summary>
+        public string[] StatCodes;
+    }
+
+    [Preserve]
+    public class GetUserStatItemsOptionalParam : OptionalParamBase
+    {
+        /// <summary>
+        /// List of tags that will be included in the result
+        /// </summary>
+        public string[] Tags;
+
+        /// <summary>
+        /// The sorting method of item on page (optional, default = updated at and ascending) 
+        /// </summary>
+        public StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc;
+    }
+
+    [Preserve]
+    public class GetMyStatCycleItemsOptionalParam : OptionalParamBase
+    {
+    }
+
+    [Preserve]
+    public class GetMyStatItemsOptionalParam : OptionalParamBase
+    {        
+        /// <summary>
+        /// List of tags that will be included in the result
+        /// </summary>
+        public string[] Tags;
     }
 }

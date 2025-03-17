@@ -211,7 +211,9 @@ namespace AccelByte.Core
         public Reward GetReward() { return GetApi<Reward, RewardApi>(); }
         public Wallet GetWallet() { return GetApi<Wallet, WalletApi>(); }
         public Lobby GetLobby() { return GetApi<Lobby, LobbyApi>(); }
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use GetBinaryCloudSave() instead")]
         public CloudStorage GetCloudStorage() { return GetApi<CloudStorage, CloudStorageApi>(); }
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use GetCloudSave() instead")]
         public GameProfiles GetGameProfiles() { return GetApi<GameProfiles, GameProfilesApi>(); }
         public Entitlement GetEntitlement() { return GetApi<Entitlement, EntitlementApi>(); }
         public Fulfillment GetFulfillment() { return GetApi<Fulfillment, FulfillmentApi>(); }

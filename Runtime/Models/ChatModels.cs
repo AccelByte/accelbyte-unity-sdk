@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -12,7 +12,7 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ChatMessageMethod
     {
         empty,
@@ -79,7 +79,7 @@ namespace AccelByte.Models
         eventUserUnmuted
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ChatTopicType
     {
         empty,
@@ -128,6 +128,18 @@ namespace AccelByte.Models
         [DataMember] public int shardLimit;
         [DataMember] public string[] members;
         [DataMember] public string[] admins;
+    }
+
+    [DataContract, Preserve]
+    public class ChatActionJoinTopicRequest
+    {
+        [DataMember] public string topicId;
+    }
+    
+    [DataContract, Preserve]
+    public class ChatActionDeleteTopicRequest
+    {
+        [DataMember] public string topicId;
     }
 
     [DataContract, Preserve]
@@ -606,5 +618,14 @@ namespace AccelByte.Models
     public class SetUserChatConfigurationResponse
     {
         [DataMember(Name = "processed"), JsonConverter(typeof(UnixDateTimeConverter))] public DateTime Processed;
+    }
+
+    [DataContract, Preserve]
+    public class CreateGroupTopicOptionalParameter
+    {
+        /// <summary>
+        /// Flag if the group topic joinable
+        /// </summary>
+        public bool IsJoinable = false;
     }
 }

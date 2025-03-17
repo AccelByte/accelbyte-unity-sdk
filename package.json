@@ -1,7 +1,7 @@
 {
   "name": "com.accelbyte.unitysdk",
   "displayName": "AccelByte Unity SDK",
-  "version": "17.5.1",
+  "version": "17.6.0",
   "unity": "2020.3",
   "description": "Official AccelByte's backend service SDK for Unity game engine",
   "keywords": [
@@ -15,8 +15,8 @@
     "name": "AccelByte Inc",
     "url": "https://accelbyte.io/"
   },
-  "changelogUrl": "https://github.com/AccelByte/accelbyte-unity-sdk/releases",
-  "documentationUrl": "https://docs.accelbyte.io/gsg/sdk-guides/unity-sdk-getting-started.html",
+  "changelogUrl": "https://docs.accelbyte.io/gaming-services/knowledge-base/release-notes",
+  "documentationUrl": "https://docs.accelbyte.io/gaming-services/getting-started/setup-game-sdk/unity-sdk",
   "hideInEditor": false,
   "category": "editor extensions",
   "homepage": "https://accelbyte.io/",

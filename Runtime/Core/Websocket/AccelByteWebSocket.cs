@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -64,6 +64,11 @@ namespace AccelByte.Api
         /// Raised when websocket failed an attempt to reconnect.
         /// </summary>
         public event EventHandler OnRetryAttemptFailed;
+
+        /// <summary>
+        /// Raised when websocket tries to reconnect;
+        /// </summary>
+        public event Action Reconnecting;
 
         private void OnOpenReceived()
         {
@@ -336,6 +341,7 @@ namespace AccelByte.Api
             const bool reconnectOnClose = true;
             System.Action reconnectAction = () =>
             {
+                Reconnecting?.Invoke();
                 ReconnectCustomHeaders = ApplyAdditionalData(ReconnectCustomHeaders);
 
                 if (this.tokenGenerator == null)

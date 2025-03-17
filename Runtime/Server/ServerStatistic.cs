@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -51,7 +52,7 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Create stat items of a user. Before a user can have any data in a stat item, he/she needs to have that stat item created.
+        /// Create stat items of a user.
         /// </summary>
         /// <param name="userId">UserId of a user</param>
         /// <param name="statItems">List of statCodes to be created for a user</param>
@@ -148,6 +149,63 @@ namespace AccelByte.Server
         /// Get stat items of a user, filter by statCodes and tags
         /// </summary>
         /// <param name="userId">UserId of a user</param>
+        /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        public void GetUserStatItems(string userId, ResultCallback<PagedStatItems> callback)
+        {
+            GetUserStatItems(userId:userId, callback: callback, optionalParam: null);
+        }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="optionalParam">Optional parameters to be sent</param>
+        /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        public void GetUserStatItems(string userId, GetUserStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
+        {
+            ICollection<string> inStatCode = null;
+            ICollection<string> inTags = null;
+            int offset;
+            int limit;
+            StatisticSortBy sortBy;
+
+            if (optionalParam != null)
+            {
+                if (optionalParam.StatCodes != null)
+                {
+                    inStatCode = optionalParam.StatCodes;
+                }
+                if (optionalParam.Tags != null)
+                {
+                    inTags = optionalParam.Tags;
+                }
+
+                offset = optionalParam.Offset > 0 ? optionalParam.Offset : 0;
+                limit = optionalParam.Limit > 0 ? optionalParam.Limit : 0;
+
+                sortBy = optionalParam.sortBy;
+            }
+            else
+            {
+                var optParam = new GetUserStatItemsOptionalParam();
+                offset = optParam.Offset;
+                limit = optParam.Limit;
+                sortBy = optParam.sortBy;
+            }
+
+            GetUserStatItems(userId: userId
+                , statCodes: inStatCode
+                , tags: inTags
+                , callback: callback
+                , offset: offset
+                , limit: limit
+                , sortBy: sortBy);
+        }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
         /// <param name="statCodes">List of statCodes that will be included in the result</param>
         /// <param name="tags">List of tags that will be included in the result</param>
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
@@ -236,7 +294,7 @@ namespace AccelByte.Server
                 Api.IncrementManyUsersStatItems(increments, callback));
         }
 
-         /// <summary>
+        /// <summary>
         /// Reset stat items for a user
         /// </summary>
         /// <param name="userId">UserId of a user</param>

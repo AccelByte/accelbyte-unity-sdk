@@ -1,10 +1,10 @@
 // Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System;
-using System.Collections.Generic;
 using AccelByte.Api;
 using AccelByte.Models;
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -395,6 +395,21 @@ namespace AccelByte.Editor
                 {
                     editedSdkConfig.ClientAnalyticsEventInterval = minimalInterval;
                 }
+            }
+
+            if (EditorCommon.CreateFoldout("Game Telemetry Configs", foldoutConfigStatus))
+            {
+                EditorCommon.CreateToggleInput((newValue) => editedSdkConfig.GameTelemetryCacheEnabled = newValue,
+                    editedSdkConfig.GameTelemetryCacheEnabled, "Enable Game Telemetry event cache", indentLevel: 1);
+                EditorCommon.CreateToggleInput(
+                        (newValue) => editedSdkConfig.EnableGameTelemetryStartupAutoSend = newValue,
+                        editedSdkConfig.EnableGameTelemetryStartupAutoSend, "Enable Game Telemetry start up auto-send",
+                        indentLevel: 1);
+            }
+
+            if (EditorCommon.CreateFoldout("Google Configs", foldoutConfigStatus))
+            {
+                EditorCommon.CreateTextInput((newValue) => editedClientOAuthConfig.GoogleWebClientId = newValue, editedClientOAuthConfig.GoogleWebClientId, "Web Client Id");
             }
 
             EditorGUILayout.EndScrollView();

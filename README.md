@@ -15,7 +15,7 @@ From Unity Package Manager, add package from git URL: "https://github.com/AccelB
 1. Linux
 1. Mac
 1. [iOS](https://github.com/AccelByte/accelbyte-unity-sdk-apple)
-1. [Android](https://github.com/AccelByte/accelbyte-unity-sdk-google-play)
+1. [Android (Google)](https://github.com/AccelByte/accelbyte-unity-sdk-google)
 1. Playstation 4
 1. Playstation 5
 1. Xbox GDK

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -13,7 +13,7 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionConfigurationTemplateType
     {
         NONE,
@@ -21,7 +21,7 @@ namespace AccelByte.Models
         DS
     };
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2Joinability
     {
         None,
@@ -31,7 +31,7 @@ namespace AccelByte.Models
         OPEN
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2MemberStatus
     {
         EMPTY,
@@ -48,7 +48,7 @@ namespace AccelByte.Models
         CANCELLED
     };
     
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2NotifType
     {
         // Party Session
@@ -292,7 +292,7 @@ namespace AccelByte.Models
 
     #region GameSession
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2StatusFilter
     {
         EMPTY,
@@ -301,7 +301,7 @@ namespace AccelByte.Models
         CONNECTED,
     };
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2DsStatus
     {
         None,
@@ -315,14 +315,14 @@ namespace AccelByte.Models
         UNKNOWN
     };
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2AttributeOrderBy
     {
         createdAt,
         updatedAt
     };
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionV2AttributeOrder
     {
         Asc,

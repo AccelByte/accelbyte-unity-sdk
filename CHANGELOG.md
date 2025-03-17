@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.6.0] (2025-03-17)
+
+
+### Features
+
+*  add user wrapper endpoint to trigger verification email, additional field to register user requests 
+* add reconnecting event delegate for lobby websocket 
+* add topic related chat function 
+* added google sign in implementation and deprecated google play v1 extension 
+* change optional value from statistic wrapper 
+* decomissioned Network.Ping 
+* decommission loginV4 with TokenDataV4 interface 
+* decommission matchmaking backfill proposal with no response model 
+* exposed bulk unlock achievement endpoints 
+
+
+### Bug Fixes
+
+* refactored ugc api with anonymous type for request body for compatibility with mobile 
+
+
+### Refactors
+
+* added serializeable attribute for all enum 
+* pushed back server cloud save migration 
+* rename telemetry cache enabled config name 
+
+
+### Documentations
+
+* update google android readme link 
+* update page link 
+
 ### [17.5.1] (2025-02-27)
 
 

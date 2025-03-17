@@ -22,12 +22,12 @@ namespace AccelByte.Api
 
         public void BulkDeleteInventoryItems(
             string inventoryId
-            , DeleteUserInventoryItemRequest[] deletedItemsRequest
+            , BulkDeleteUserInventoryItemsPayload[] payload
             , ResultCallback<DeleteUserInventoryItemResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, deletedItemsRequest);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, payload);
             if (error != null)
             {
                 callback.TryError(error);
@@ -41,7 +41,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("inventoryId", inventoryId)
-                .WithBody(deletedItemsRequest.ToUtf8Json());
+                .WithBody(payload.ToUtf8Json());
 
             var request = builder.GetResult();
 
@@ -61,12 +61,12 @@ namespace AccelByte.Api
 
         public void BulkUpdateInventoryItems(
             string inventoryId
-            , UpdateUserInventoryItemRequest[] updatedItemsRequest
+            , BulkUpdateInventoryItemsPayload[] payload
             , ResultCallback<UpdateUserInventoryItemResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, updatedItemsRequest);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, payload);
             if (error != null)
             {
                 callback.TryError(error);
@@ -80,7 +80,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("inventoryId", inventoryId)
-                .WithBody(updatedItemsRequest.ToUtf8Json());
+                .WithBody(payload.ToUtf8Json());
 
             var request = builder.GetResult();
 
@@ -402,17 +402,20 @@ namespace AccelByte.Api
         }
 
         public void MoveItemsBetweenInventories(string targetInventoryId
-            , MoveUserItemsBetweenInventoriesRequest moveItemsRequest
+            , string sourceInventoryId
+            , MoveUserItemsBetweenInventoriesPayload[] payload
             , ResultCallback<MoveUserItemsBetweenInventoriesResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, targetInventoryId, moveItemsRequest);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, targetInventoryId, payload);
             if (error != null)
             {
                 callback.TryError(error);
                 return;
             }
+
+            var requestBody = new MoveUserItemsBetweenInventoriesRequest(payload, sourceInventoryId);
 
             var builder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/" +
                 "inventories/{inventoryId}/items/movement")
@@ -421,7 +424,7 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("inventoryId", targetInventoryId)
-                .WithBody(moveItemsRequest.ToUtf8Json());
+                .WithBody(requestBody.ToUtf8Json());
 
             var request = builder.GetResult();
 

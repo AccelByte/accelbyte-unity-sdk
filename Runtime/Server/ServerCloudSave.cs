@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -24,7 +24,7 @@ namespace AccelByte.Server
             Deleted
         }
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
         private enum PredefinedGameRecordStrategy
         {
             [EnumMember(Value = "APPEND")]
@@ -314,7 +314,7 @@ namespace AccelByte.Server
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
             "Please use SaveGameRecord(key, recordRequest, optionalParams, callback).")]
         public void SaveGameRecord( string key
             , Dictionary<string, object> recordRequest
@@ -413,7 +413,7 @@ namespace AccelByte.Server
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="setBy">Record set by.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
             "Please use ReplaceGameRecord(key, recordRequest, optionalParams, callback).")]
         public void ReplaceGameRecord( string key
             , Dictionary<string, object> recordRequest
@@ -566,7 +566,7 @@ namespace AccelByte.Server
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
             "Please use CreateAdminGameRecord(key, recordRequest, optionalParams, callback).")]
         public void CreateAdminGameRecord(string key
             , Dictionary<string, object> recordRequest
@@ -666,7 +666,7 @@ namespace AccelByte.Server
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on AGS 3.82. " +
+        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
             "Please use ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback).")]
         public void ReplaceAdminGameRecord(string key
             , Dictionary<string, object> recordRequest

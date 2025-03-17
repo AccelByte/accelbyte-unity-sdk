@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -11,7 +11,7 @@ using AccelByte.Core;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum MatchmakingV2NotifType
     {
         OnMatchFound,
@@ -19,7 +19,7 @@ namespace AccelByte.Models
         OnTicketExpired,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum MatchmakingV2ExclusionType
     {
         None,
@@ -153,15 +153,6 @@ namespace AccelByte.Models
         [DataMember] public string matchSessionId;
         [DataMember] public SessionV2TeamData[] proposedTeams;
         [DataMember(Name = "addedTickets")] public ServerMatchmakingV2Ticket[] BackfillProposalTickets;
-
-        [Obsolete("This field is deprecated, and please use BackfillProposalTickets for more detailed ticket information. This field will be removed on AGS 3.82")]
-        public MatchmakingV2Ticket[] addedTickets
-        {
-            get
-            {
-                return BackfillProposalTickets;
-            }
-        }
     }
 
     [DataContract, Preserve]

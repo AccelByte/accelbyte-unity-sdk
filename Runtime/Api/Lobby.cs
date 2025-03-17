@@ -39,6 +39,11 @@ namespace AccelByte.Api
         public event Action<WsCloseCode> Disconnected;
 
         /// <summary>
+        /// Raised when lobby is attempting to reconnect
+        /// </summary>
+        public event Action Reconnecting;
+
+        /// <summary>
         /// Raised when a user is invited to party
         /// </summary>
         public event ResultCallback<PartyInvitation> InvitedToParty;
@@ -332,6 +337,7 @@ namespace AccelByte.Api
                 HandleOnMessage(message, false);
             };
             websocketApi.OnClose += HandleOnClose;
+            websocketApi.WebSocket.Reconnecting += Reconnecting;
 
             notificationBuffer = new AccelByteNotificationBuffer(inApi?.SharedMemory?.Logger);
 
@@ -2408,6 +2414,8 @@ namespace AccelByte.Api
 
             retryAttempts++;
             SharedMemory?.Logger?.LogWarning($"Lobby retrying to connect ({retryAttempts}/{maxRetryAttempts})");
+
+            Reconnecting?.Invoke();
             websocketApi.Connect();
         }
 

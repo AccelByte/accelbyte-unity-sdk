@@ -1116,6 +1116,40 @@ namespace AccelByte.Api
         /// <summary>
         /// Register a user by giving username, password, and displayName 
         /// </summary>
+        /// <param name="emailAddress">Email address of the user</param>
+        /// <param name="password">Password to login</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Usernam</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains UserData via callback</param>
+        public void Register(string emailAddress
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , RegisterUserOptionalParameters optionalParameters
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var registerUserRequest = new RegisterUserRequest
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                emailAddress = emailAddress,
+                password = password,
+                displayName = displayName,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                Code = optionalParameters?.Code
+            };
+
+            api.Register(registerUserRequest, callback);
+        }
+
+        /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
         /// <param name="emailAddress">Email address of the user, can be used as login username</param>
         /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
@@ -1142,6 +1176,43 @@ namespace AccelByte.Api
                 emailAddress = emailAddress,
                 password = password,
                 UniqueDisplayName = uniqueDisplayName
+            };
+
+            api.Register(registerUserRequest, callback);
+        }
+
+        /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US.</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="uniqueDisplayName">This is required when uniqueDisplayNameEnabled/UNIQUE_DISPLAY_NAME_ENABLED is true.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void Register(string emailAddress
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , string uniqueDisplayName
+            , RegisterUserOptionalParameters optionalParameters
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var registerUserRequest = new RegisterUserRequest
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                displayName = displayName,
+                emailAddress = emailAddress,
+                password = password,
+                UniqueDisplayName = uniqueDisplayName,
+                Code = optionalParameters?.Code
             };
 
             api.Register(registerUserRequest, callback);
@@ -1193,6 +1264,46 @@ namespace AccelByte.Api
         /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
         /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
         /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="uniqueDisplayName">This is required when uniqueDisplayNameEnabled/UNIQUE_DISPLAY_NAME_ENABLED is true.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void RegisterV2(string emailAddress
+            , string username
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , string uniqueDisplayName
+            , RegisterUserOptionalParameters optionalParameters
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var registerUserRequest = new RegisterUserRequestv2
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                displayName = displayName,
+                emailAddress = emailAddress,
+                password = password,
+                UniqueDisplayName = uniqueDisplayName,
+                username = username,
+                Code = optionalParameters?.Code
+            };
+
+            api.RegisterV2(registerUserRequest, callback);
+        }
+
+        /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
         /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
         public void Registerv2( string emailAddress
             , string username
@@ -1219,6 +1330,43 @@ namespace AccelByte.Api
         }
 
         /// <summary>
+        /// Register a user by giving username, password, and displayName 
+        /// </summary>
+        /// <param name="emailAddress">Email address of the user, can be used as login username</param>
+        /// <param name="username">The username can be used as login username, case insensitive, alphanumeric with allowed symbols underscore (_) and dot (.)</param>
+        /// <param name="password">Password to login, 8 to 32 characters, satisfy at least 3 out of 4 conditions(uppercase, lowercase letters, numbers and special characters) and should not have more than 2 equal characters in a row.</param>
+        /// <param name="displayName">Any string can be used as display name, make it more flexible than Username</param>
+        /// <param name="country">User's country, ISO3166-1 alpha-2 two letter, e.g. US. Use GetCountryV3() to fetch the latest Country list</param>
+        /// <param name="dateOfBirth">User's date of birth, valid values are between 1905-01-01 until current date.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains RegisterUserResponse via callback</param>
+        public void Registerv2(string emailAddress
+            , string username
+            , string password
+            , string displayName
+            , string country
+            , DateTime dateOfBirth
+            , RegisterUserOptionalParameters optionalParameters
+            , ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            var registerUserRequest = new RegisterUserRequestv2
+            {
+                authType = AuthenticationType.EMAILPASSWD,
+                emailAddress = emailAddress,
+                username = username,
+                password = password,
+                displayName = displayName,
+                UniqueDisplayName = displayName,
+                country = country,
+                dateOfBirth = dateOfBirth.ToString("yyyy-MM-dd"),
+                Code = optionalParameters?.Code
+            };
+
+            api.RegisterV2(registerUserRequest, callback);
+        }
+
+        /// <summary>
         /// Register a user while optionally accepting legal policies, password, and displayName 
         /// </summary>
         /// <param name="request">To accept policies, fill acceptedPolicies field</param>
@@ -1239,7 +1387,24 @@ namespace AccelByte.Api
 
             api.RegisterV2(request, callback);
         }
-        
+
+        /// <summary>
+        /// Request for verification code to be sent via provided email address.
+        /// <para>This is used to generate and send the code for a user that is going to register 
+        /// to be used for email verification when mandatoryEmailVerificationEnabled is configured on the namespace.</para>
+        /// </summary>
+        /// <param name="emailAddress">Email address to send verification code to.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback when operation finishes.</param>
+        public void SendVerificationCodeToNewUser(string emailAddress
+            , SendVerificationCodeToNewUserOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            api.SendVerificationCodeToNewUser(emailAddress, optionalParameters, callback);
+        }
+
         /// <summary>
         /// Get current logged in user data. It will return cached user data if it has been called before
         /// </summary>
@@ -3095,373 +3260,6 @@ namespace AccelByte.Api
 
         #region V4
 
-        /// <summary>
-        /// Login to AccelByte account with email and password.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="email">Email address</param>
-        /// <param name="password">Password to login</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        /// <param name="rememberMe">Set it to true to extend the refresh token expiration time</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithEmailV4(string email, string password, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "LoginWithEmailV4(string email, string password, LoginWithEmailV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithEmailV4(string email
-            , string password
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool rememberMe = false)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (!EmailUtils.IsValidEmailAddress(email))
-            {
-                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
-            }
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveAuthTrustId(isSuccess =>
-                    {
-                        Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
-                        {
-                            OnLoginSuccess?.Invoke(tokenData);
-                            SendLoginSuccessPredefinedEvent(tokenData);
-                        });
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = email;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(
-                cb =>
-                {
-                    Session.LoadAuthTrustId((isSuccess, authTrustId) =>
-                    {
-                        oAuth2.LoginWithEmailV4(email, password, rememberMe, cb, authTrustId);
-                    });
-                }
-                , onAlreadyLogin
-                , onLoginFailed
-                , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Login with device id. A user registered with this method is called a headless account because it doesn't
-        /// have username yet.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithDeviceIdV4(ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "LoginWithDeviceIdV4(LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(tokenData.platform_user_id, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = string.Empty;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(
-                cb =>
-                {
-                    oAuth2.LoginWithDeviceIdV4(cb);
-                }
-                , onAlreadyLogin
-                , onLoginFailed
-                , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Login with token from non AccelByte platforms. This will automatically register a user if the user
-        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
-        /// is called a headless account because it doesn't have username yet.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="platformType">Other platform type</param>
-        /// <param name="platformToken">Token for other platform type</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        /// <param name="createHeadless">If directly create new account when not linked yet</param>
-        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithOtherPlatformV4(PlatformType platformType
-            , string platformToken
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless = true
-            , LoginWithMacAddress loginWithMacAddress = null)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-#pragma warning disable AB0001
-            LoginWithOtherPlatformV4(platformType: platformType
-                , platformToken: platformToken
-                , callback: callback
-                , createHeadless:createHeadless
-                , serviceLabel: null
-                , loginWithMacAddress: loginWithMacAddress);
-#pragma warning restore AB0001
-        }
-
-        /// <summary>
-        /// Login with token from PS4/PS5 platforms. This will automatically register a user if the user
-        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
-        /// is called a headless account because it doesn't have username yet.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="platformType">Other platform type</param>
-        /// <param name="platformToken">Token for other platform type</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        /// <param name="createHeadless">If directly create new account when not linked yet</param>
-        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
-        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithOtherPlatformV4(PlatformType platformType
-            , string platformToken
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless
-            , string serviceLabel
-            , LoginWithMacAddress loginWithMacAddress = null)
-        {
-            string platformId = platformType.ToString().ToLower();
-
-#pragma warning disable AB0001
-            LoginWithOtherPlatformIdV4(platformId: platformId
-                , platformToken: platformToken
-                , callback: callback
-                , createHeadless: createHeadless
-                , serviceLabel: serviceLabel
-                , loginWithMacAddress: loginWithMacAddress);
-#pragma warning restore AB0001
-        }
-
-        /// <summary>
-        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
-        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
-        /// is called a headless account because it doesn't have username yet.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
-        /// <param name="platformToken">Token for other platform type</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        /// <param name="createHeadless">If directly create new account when not linked yet</param>
-        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithOtherPlatformIdV4(string platformId
-            , string platformToken
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless = true
-            , LoginWithMacAddress loginWithMacAddress = null)
-        {
-#pragma warning disable AB0001
-            LoginWithOtherPlatformIdV4(platformId: platformId
-                , platformToken: platformToken
-                , callback: callback
-                , createHeadless: createHeadless
-                , serviceLabel: null
-                , loginWithMacAddress: loginWithMacAddress);
-#pragma warning restore AB0001
-        }
-
-        /// <summary>
-        /// Login with token from non AccelByte platforms, especially to support OIDC (with 2FA enable)
-        /// identified by its platform type and platform token doesn't exist yet. A user registered with this method
-        /// is called a headless account because it doesn't have username yet.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="platformId">Specify platform type, string type of this field makes support OpenID Connect (OIDC)</param>
-        /// <param name="platformToken">Token for other platform type</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        /// <param name="createHeadless">If directly create new account when not linked yet</param>
-        /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
-        /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithOtherPlatformV4(LoginPlatformType loginPlatformType, string platformToken, LoginWithOtherPlatformOptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithOtherPlatformIdV4(string platformId
-            , string platformToken
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless
-            , string serviceLabel
-            , LoginWithMacAddress loginWithMacAddress = null)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = platformId;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(
-                cb =>
-                {
-                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, loginWithMacAddress, cb);
-                }
-                , onAlreadyLogin
-                , onLoginFailed
-                , onProcessCompleted
-            );
-        }
-
-        /// <summary>
-        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithLastRefreshTokenV4(ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "LoginWithLastRefreshTokenV4(LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithLastRefreshTokenV4(ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, callback);
-        }
-
-        /// <summary>
-        /// Login with the latest refresh token stored on the device. Will returning an error if the token already expired.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="refreshToken">The latest user's refresh token</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithRefreshTokenV4(string refreshToken, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "LoginWithRefreshTokenV4(string refreshToken, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithRefreshTokenV4(string refreshToken
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (!string.IsNullOrEmpty(refreshToken))
-            {
-                LoginWithRefreshTokenV4(refreshToken, UserSession.LastLoginUserCacheKey, callback);
-            }
-            else
-            {
-                LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, callback);
-            }
-        }
-
-        /// <summary>
-        /// Login with refresh token from local cache file.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="cacheKey">Login unique cache name</param>
-        /// <param name="callback">Returns Result with OAuth Error via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "LoginWithCachedRefreshTokenV4(string cacheKey, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "LoginWithCachedRefreshTokenV4(string cacheKey, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void LoginWithCachedRefreshTokenV4(string cacheKey
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            TriggerLoginWithCachedRefreshTokenV4(cacheKey, callback);
-        }
-
         protected virtual void TriggerLoginWithCachedRefreshTokenV4(string cacheKey
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
@@ -3545,348 +3343,6 @@ namespace AccelByte.Api
             , onLoginFailed
             , onProcessCompleted);
         }
-
-        /// <summary>
-        /// Create Headless Account for Account Linking.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="linkingToken">Token for platfrom type</param>
-        /// <param name="extendExp">Extend expiration date of refresh token</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "CreateHeadlessAccountAndResponseTokenV4(string linkingToken, bool extendExp, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "CreateHeadlessAccountAndResponseTokenV4(string linkingToken, bool extendExp, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
-            , bool extendExp
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = linkingToken;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(cb =>
-            {
-                oAuth2.CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, cb);
-            }
-            , onAlreadyLogin
-            , onLoginFailed
-            , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Authentication With PlatformLink for Account Linking.
-        /// The callback will consist of login queue ticket and token data.
-        /// If token data is empty, game client is expected to poll the login ticket status
-        /// until they receive a response that their position is zero and then claim the ticket.
-        /// Ticket status can be get using LogInQueue API, and for claiming the token please call ClaimAccessToken method.
-        /// </summary>
-        /// <param name="email">Email address to login</param>
-        /// <param name="password">Password to login</param>
-        ///  <param name="linkingToken">Token for platfrom type</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "AuthenticationWithPlatformLinkAndLoginV4(string email, string password, string linkingToken, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "AuthenticationWithPlatformLinkAndLoginV4(string email, string password, string linkingToken, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void AuthenticationWithPlatformLinkAndLoginV4(string email
-            , string password
-            , string linkingToken
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (string.IsNullOrEmpty(linkingToken))
-            {
-                OAuthError error = new OAuthError()
-                {
-                    error = ErrorCode.InvalidArgument.ToString(),
-                    error_description = "The application was not executed from launcher"
-                };
-                callback?.TryError(error);
-                return;
-            }
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = linkingToken;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(cb =>
-            {
-                oAuth2.AuthenticationWithPlatformLinkV4(email, password, linkingToken, cb);
-            }
-            , onAlreadyLogin
-            , onLoginFailed
-            , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Generate publisher user's game token. Required a code from request game token
-        /// </summary>
-        /// <param name="code">code from request game token</param>
-        /// <param name="callback">Return Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "GenerateGameTokenV4(string code, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "GenerateGameTokenV4(string code, LoginV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void GenerateGameTokenV4(string code
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (string.IsNullOrEmpty(code))
-            {
-                OAuthError error = new OAuthError()
-                {
-                    error = ErrorCode.InvalidArgument.ToString(),
-                    error_description = "The application was not executed from launcher"
-                };
-                callback?.TryError(error);
-                return;
-            }
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = code;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(cb =>
-            {
-                oAuth2.GenerateGameTokenV4(code, cb);
-            }
-            , onAlreadyLogin
-            , onLoginFailed
-            , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Verify 2FA Code 
-        /// </summary>
-        /// <param name="mfaToken">Multi-factor authentication Token</param>
-        /// <param name="factor">The factor will return factor based on what factors is enabled</param>
-        /// <param name="code">Verification code</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        /// <param name="rememberDevice">Will record device token when true</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82. Please use " +
-            "Verify2FACodeV4(string mfaToken, TwoFAFactorType factor, string code, ResultCallback<TokenData, OAuthError> loginCallback) or " +
-            "Verify2FACodeV4(string mfaToken, TwoFAFactorType factor, string code, Verify2FACodeV4OptionalParameters optionalParams, ResultCallback<TokenData, OAuthError> loginCallback) " +
-            "function instead.")]
-        public void Verify2FACodeV4(string mfaToken
-            , TwoFAFactorType factor
-            , string code
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool rememberDevice = false)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (userSession.IsValid())
-            {
-                OAuthError error = new OAuthError()
-                {
-                    error = ErrorCode.InvalidRequest.ToString(),
-                    error_description = "User is already logged in."
-                };
-                callback.TryError(error);
-                return;
-            }
-
-            Action<OAuthError> onAlreadyLogin = (error) =>
-            {
-                callback.TryError(error);
-            };
-
-            Action<OAuthError> onLoginFailed = (error) =>
-            {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
-            };
-
-            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
-            {
-                if (tokenData.Queue == null)
-                {
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(tokenData);
-                        SendLoginSuccessPredefinedEvent(tokenData);
-                    });
-                }
-                else
-                {
-                    tokenData.Queue.Identifier = code;
-                }
-                callback.TryOk(tokenData);
-            };
-
-            Login(cb =>
-            {
-                oAuth2.Verify2FACodeV4(mfaToken, factor, code, rememberDevice, cb);
-            }
-            , onAlreadyLogin
-            , onLoginFailed
-            , onProcessCompleted);
-        }
-
-        /// <summary>
-        /// Claim Access Token using Login Ticket.
-        /// </summary>
-        /// <param name="loginTicket">LoginTicket Login Ticket to claim the access token
-        /// <param name="callback">Returns a result via callback when completed.
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("This function will be removed by AGS 3.82 " +
-            "and the access token will be automatically claimed in the ResultCallback<TokenData, OAuthError> loginCallback " +
-            "once the queue position is 0.")]
-        public void ClaimAccessToken(TokenDataV4 loginTicket
-            , ResultCallback<TokenDataV4, OAuthError> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            Session.LoadAuthTrustId((isSuccess, authTrustId) =>
-            {
-                oAuth2.GetTokenWithLoginTicket(loginTicket: loginTicket.Queue.Ticket, authTrustId: authTrustId, callback: result =>
-                {
-                    if(result.IsError)
-                    {
-                        callback.TryError(result.Error);
-                        return;
-                    }
-
-                    if (loginTicket.Queue.Identifier == string.Empty)
-                    {
-                        loginTicket.Queue.Identifier = result.Value.user_id;
-                    }
-
-                    const bool saveTokenAsLatestUser = true;
-                    Session.SaveRefreshToken(loginTicket.Queue.Identifier, saveTokenAsLatestUser, (saveSuccess) =>
-                    {
-                        OnLoginSuccess?.Invoke(result.Value);
-                        SendLoginSuccessPredefinedEvent(result.Value);
-                    });
-
-                    callback.TryOk(result.Value);
-                });
-            });
-        }
-
-        #region LoginQueueApi
-
-        /// <summary>
-        /// Refresh ticket.
-        /// </summary>
-        /// <param name="loginTicket">Login queue ticket</param>
-        /// <param name="namespace_">user namespace</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("Since login queue process simplified since AGS 3.79, This function will be removed on AGS 3.82. " +
-            "Please follow this documentation how to call the simplified login queue: https://docs.accelbyte.io/gaming-services/services/utilities/login-queue")]
-        public void RefreshLoginQueueTicket(TokenDataV4 loginTicket
-            , ResultCallback<RefreshTicketResponse> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
-
-            loginQueueApi.RefreshTicket(loginTicket.Queue.Ticket, ticketNamespace, callback);
-        }
-
-        /// <summary>
-        /// Cancel ticket.
-        /// </summary>
-        /// <param name="loginTicket">Login queue ticket</param>
-        /// <param name="callback">Returns Result via callback when completed</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview, Obsolete("Since login queue process simplified since AGS 3.79, This function will be removed on AGS 3.82. " +
-            "Please follow this documentation how to cancel the simplified login queue: https://docs.accelbyte.io/gaming-services/services/utilities/login-queue")]
-        public void CancelLoginQueueTicket(TokenDataV4 loginTicket, ResultCallback callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            var ticketNamespace = loginTicket.Queue.Namespace ?? api.Config.Namespace;
-
-            loginQueueApi.CancelTicket(loginTicket.Queue.Ticket, ticketNamespace, callback);
-
-            if (queuePoller != null) 
-            {
-                queuePoller.StopPoll();
-            }
-        }
-        
-        #endregion
 
         #endregion
 

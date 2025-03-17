@@ -585,7 +585,7 @@ namespace AccelByte.Models
         }
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum FlowType
     {
         [EnumMember(Value = "sink")]

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,7 +14,7 @@ namespace AccelByte.Models
 {
     #region Enum
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ItemType
     {
         NONE,
@@ -31,7 +31,7 @@ namespace AccelByte.Models
         EXTENSION
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ItemStatus
     {
         NONE,
@@ -39,7 +39,7 @@ namespace AccelByte.Models
         INACTIVE
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum CurrencyType
     {
         NONE,
@@ -47,7 +47,7 @@ namespace AccelByte.Models
         VIRTUAL
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementClazz
     {
         NONE,
@@ -60,7 +60,7 @@ namespace AccelByte.Models
         LOOTBOX
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementStatus
     {
         NONE,
@@ -70,7 +70,7 @@ namespace AccelByte.Models
         REVOKED
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementAppType
     {
         NONE,
@@ -80,7 +80,7 @@ namespace AccelByte.Models
         DEMO
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementType
     {
         NONE,
@@ -88,7 +88,7 @@ namespace AccelByte.Models
         CONSUMABLE
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum OrderStatus
     {
         NONE,
@@ -105,7 +105,7 @@ namespace AccelByte.Models
         DELETED
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ItemSource
     {
         NONE,
@@ -118,7 +118,7 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementSource
     {
         NONE,
@@ -133,7 +133,7 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum CreditUserWalletSource
     {
         PURCHASE,
@@ -146,14 +146,14 @@ namespace AccelByte.Models
         OTHER
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SeasonType
     {
         PASS = 0,
         TIER
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum RewardSortBy
     {
         NAMESPACE,
@@ -164,7 +164,7 @@ namespace AccelByte.Models
         REWARDCODE_DESC
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum WalletTable
     {
         Playstation = 0,
@@ -179,7 +179,7 @@ namespace AccelByte.Models
         Other
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum Cycle
     {
         WEEKLY,
@@ -188,7 +188,7 @@ namespace AccelByte.Models
         YEARLY
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PredicateType
     {
         EntitlementPredicate,
@@ -197,7 +197,7 @@ namespace AccelByte.Models
         StatisticCodePredicate
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum RewardType
     {
         REWARD,
@@ -205,7 +205,7 @@ namespace AccelByte.Models
         PROBABILITY_GROUP
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SubscribedBy
     {
         None,
@@ -213,7 +213,7 @@ namespace AccelByte.Models
         Platform
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SubscriptionStatus
     {
         None,
@@ -223,7 +223,7 @@ namespace AccelByte.Models
         Expired
     }
     
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum IAPOrderStatus
     {
         Verified,
@@ -231,7 +231,7 @@ namespace AccelByte.Models
         Failed
     }     
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementItemIdentityType
     {
         None = 0,
@@ -241,7 +241,7 @@ namespace AccelByte.Models
         ItemSku, 
     }     
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum EntitlementIAPOrderStatus
     {
         None = 0,
@@ -253,7 +253,7 @@ namespace AccelByte.Models
         Failed
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PaymentProvider
     {
         None = 0,
@@ -867,7 +867,7 @@ namespace AccelByte.Models
 
     #region Orders
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum OrderDeductionType
     {
         None,
@@ -875,7 +875,7 @@ namespace AccelByte.Models
         DiscountCode,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum OrderDiscountType
     {
         None,
@@ -885,7 +885,7 @@ namespace AccelByte.Models
         Percentage,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum OrderRestrictType
     {
         [EnumMember(Value = "NONE")]

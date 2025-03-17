@@ -72,36 +72,6 @@ namespace AccelByte.Server
         }
 
         /// <summary>
-        /// Accept backfill proposal
-        /// </summary>
-        /// <param name="backfillProposal">Backfill proposal received from notification</param>
-        /// <param name="stopBackfilling">Should server stop backfilling</param>
-        /// <param name="callback">
-        /// Returns a Result via callback when completed.
-        /// </param>
-        [Obsolete("This interface is deprecated, and will be removed on AGS 3.82. Please use AcceptBackfillProposal(backfillProposal, acceptedTicketIds, stopBackfilling, callback)")]
-        public void AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal,
-            bool stopBackfilling,
-            ResultCallback callback)
-        {
-            var optionalParams = new AcceptBackfillProposalOptionalParams()
-            {
-                StopBackfilling = stopBackfilling
-            };
-
-            AcceptBackfillProposal(backfillProposal, optionalParams, result =>
-            {
-                if (result.IsError)
-                {
-                    callback?.TryError(result.Error);
-                    return;
-                }
-
-                callback?.TryOk();
-            });
-        }
-
-        /// <summary>
         /// Reject backfill proposal
         /// </summary>
         /// <param name="backfillProposal">Backfill proposal received from notification</param>

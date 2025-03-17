@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -14,7 +14,7 @@ namespace AccelByte.Models
 {
     #region General
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum MessageType
     {
         unknown,
@@ -140,7 +140,7 @@ namespace AccelByte.Models
         errorNotif
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum MultiplayerV2NotifType
     {
         // SessionV2 - Party
@@ -646,7 +646,7 @@ namespace AccelByte.Models
 
     #region Friends
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     [DataContract, Preserve]
     public enum RelationshipStatusCode
     {
@@ -732,7 +732,7 @@ namespace AccelByte.Models
 
     #region Presence
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum UserStatus
     {
         Offline,
@@ -870,13 +870,13 @@ namespace AccelByte.Models
 
     #region Session Attribute
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SessionAttributeName
     {
         profanity_filtering_level
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ProfanityFilterLevel
     {
         all,

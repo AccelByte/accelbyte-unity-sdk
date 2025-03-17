@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum FileType
     {
         [Description("jpeg")]
@@ -32,7 +32,7 @@ namespace AccelByte.Models
         WEBP
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum UploadCategory
     {
         [Description("Default")]

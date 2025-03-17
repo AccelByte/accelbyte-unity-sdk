@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
@@ -245,7 +245,7 @@ namespace AccelByte.Api
 
                         if (result.IsError)
                         {
-                            if (result.Error.Code == ErrorCode.NotFound)
+                            if (result.Error.Code == ErrorCode.MatchmakingTicketNotFound || result.Error.Code == ErrorCode.NotFound)
                             {
                                 var expiredNotif = new MatchmakingV2TicketExpiredNotification()
                                 {

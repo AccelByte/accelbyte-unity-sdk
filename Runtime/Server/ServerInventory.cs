@@ -1,11 +1,10 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Server.Interface;
-using System;
 
 namespace AccelByte.Server
 {
@@ -30,7 +29,7 @@ namespace AccelByte.Server
 
         public void BulkDeleteUserInventoryItems(string inventoryId, string userId, DeleteUserInventoryItemRequest[] request, ResultCallback<DeleteUserInventoryItemResponse[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -38,12 +37,28 @@ namespace AccelByte.Server
                 return;
             }
 
-            api.BulkDeleteUserInventoryItems(inventoryId, userId, request, callback);
+            if (request == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var payload = new BulkDeleteUserInventoryItemsPayload[request.Length];
+            for (int i = 0; i < payload.Length; i++)
+            {
+                payload[i] = new BulkDeleteUserInventoryItemsPayload(request[i].SourceItemId);
+                payload[i].SlotId = request[i].SlotId;
+            }
+
+            BulkDeleteUserInventoryItems(inventoryId, userId, payload, callback);
         }
 
-        public void BulkUpdateUserInventoryItems(string inventoryId, string userId, ServerUpdateUserInventoryItemRequest[] request, ResultCallback<UpdateUserInventoryItemResponse[]> callback)
+        public void BulkDeleteUserInventoryItems(string inventoryId
+            , string userId
+            , BulkDeleteUserInventoryItemsPayload[] payload
+            , ResultCallback<DeleteUserInventoryItemResponse[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -51,25 +66,117 @@ namespace AccelByte.Server
                 return;
             }
 
-            api.BulkUpdateUserInventoryItems(inventoryId, userId, request, callback);
+            api.BulkDeleteUserInventoryItems(inventoryId, userId, payload, callback);
+        }
+
+        public void BulkUpdateUserInventoryItems(string inventoryId
+            , string userId
+            , ServerUpdateUserInventoryItemRequest[] request
+            , ResultCallback<UpdateUserInventoryItemResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            if (request == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var payload = new ServerUpdateUserInventoryItemPayload[request.Length];
+            for (int i = 0; i < payload.Length; i++)
+            {
+                payload[i] = new ServerUpdateUserInventoryItemPayload(request[i].SourceItemId);
+                payload[i].ServerCustomAttributes = request[i].ServerCustomAttributes;
+                payload[i].SlotId = request[i].SlotId;
+                payload[i].CustomAttributes = request[i].CustomAttributes;
+                payload[i].Tags = request[i].Tags;
+                payload[i].Type = request[i].Type;
+            }
+
+            BulkUpdateUserInventoryItems(inventoryId, userId, payload, callback);
+        }
+
+        public void BulkUpdateUserInventoryItems(string inventoryId
+            , string userId
+            , ServerUpdateUserInventoryItemPayload[] payload
+            , ResultCallback<UpdateUserInventoryItemResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.BulkUpdateUserInventoryItems(inventoryId, userId, payload, callback);
         }
 
         public void ConsumeUserInventoryItem(string inventoryId, string userId, ConsumeUserItemsRequest request, ResultCallback<UserItem> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            if (request == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var optionalparams = new ConsumeUserInventoryItemOptionalParameters()
+            {
+                Options = request.Options,
+                SlotId = request.SlotId
+            };
+
+            ConsumeUserInventoryItem(inventoryId
+                , userId
+                , (uint)request.Quantity
+                , request.SourceItemId
+                , optionalparams
+                , callback);
+        }
+
+        public void ConsumeUserInventoryItem(string inventoryId
+            , string userId
+            , uint qty
+            , string sourceItemId
+            , ConsumeUserInventoryItemOptionalParameters optionalParameters
+            , ResultCallback<UserItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ConsumeUserItemsRequest()
+            {
+                Quantity = (int)qty,
+                SourceItemId = sourceItemId,
+                SlotId = optionalParameters?.SlotId,
+                Options = optionalParameters?.Options
+            };
 
             api.ConsumeUserInventoryItem(inventoryId, userId, request, callback);
         }
 
         public void CreateIntegrationConfiguration(ServerCreateIntegrationConfigurationRequest request, ResultCallback<ServerIntegrationConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -82,33 +189,93 @@ namespace AccelByte.Server
 
         public void CreateInventoryConfiguration(ServerCreateInventoryConfigurationRequest request, ResultCallback<InventoryConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            if (request == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var optionalParams = new CreateInventoryConfigurationOptionalParameters()
+            {
+                Description = request.Description,
+                Name = request.Description
+            };
+
+            CreateInventoryConfiguration(
+                request.Code
+                , (uint)request.InitialMaxSlots
+                , (uint)request.MaxInstancesPerUser
+                , (uint)request.MaxUpgradeSlots
+                , optionalParams
+                , callback);
+        }
+
+        public void CreateInventoryConfiguration(string code, uint initialMaxSlots, uint maxInstancesPerUser, uint maxUpgradeSlots, CreateInventoryConfigurationOptionalParameters optionalParameters, ResultCallback<InventoryConfiguration> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ServerCreateInventoryConfigurationRequest()
+            {
+                Code = code,
+                InitialMaxSlots = (int)initialMaxSlots,
+                MaxInstancesPerUser = (int)maxInstancesPerUser,
+                MaxUpgradeSlots = (int)maxUpgradeSlots,
+                Description = optionalParameters?.Description,
+                Name = optionalParameters?.Name
+            };
 
             api.CreateInventoryConfiguration(request, callback);
         }
 
         public void CreateInventoryTag(ServerCreateInventoryTagRequest request, ResultCallback<InventoryTag> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+
+            CreateInventoryTag(request?.Name, request?.Owner, callback);
+        }
+
+        public void CreateInventoryTag(string name, string inventoryOwner, ResultCallback<InventoryTag> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ServerCreateInventoryTagRequest()
+            {
+                Name = name,
+                Owner = inventoryOwner
+            };
 
             api.CreateInventoryTag(request, callback);
         }
 
         public void CreateItemTypes(ServerCreateItemTypeRequest request, ResultCallback<InventoryItemType> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -116,12 +283,30 @@ namespace AccelByte.Server
                 return;
             }
 
+            CreateItemTypes(request?.Name, callback);
+        }
+
+        public void CreateItemTypes(string name, ResultCallback<InventoryItemType> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ServerCreateItemTypeRequest()
+            {
+                Name = name
+            };
+
             api.CreateItemTypes(request, callback);
         }
 
         public void CreateUserInventory(ServerCreateInventoryRequest request, ResultCallback<UserInventory> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -134,7 +319,7 @@ namespace AccelByte.Server
 
         public void DeleteInventoryConfiguration(string inventoryConfigurationId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -147,7 +332,7 @@ namespace AccelByte.Server
 
         public void DeleteInventoryTag(string tagName, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -160,7 +345,7 @@ namespace AccelByte.Server
 
         public void DeleteItemTypes(string itemTypeName, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -173,7 +358,7 @@ namespace AccelByte.Server
 
         public void DeleteUserInventory(string inventoryId, ServerDeleteInventoryRequest request, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -186,7 +371,7 @@ namespace AccelByte.Server
 
         public void GetAllInventoryConfigurations(ResultCallback<InventoryConfigurationsPagingResponse> callback, InventoryConfigurationSortBy sortBy = InventoryConfigurationSortBy.CreatedAt, int limit = 25, int offset = 0, string inventoryConfigurationCode = "")
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -199,7 +384,7 @@ namespace AccelByte.Server
 
         public void GetIntegrationConfigurations(ResultCallback<ServerIntegrationConfigurationsPagingResponse> callback, ServerIntegrationConfigurationSortBy sortBy = ServerIntegrationConfigurationSortBy.CreatedAt, int limit = 25, int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -212,7 +397,7 @@ namespace AccelByte.Server
 
         public void GetInventoryConfiguration(string inventoryConfigurationId, ResultCallback<InventoryConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -225,7 +410,7 @@ namespace AccelByte.Server
 
         public void GetInventoryTags(ResultCallback<InventoryTagsPagingResponse> callback, ItemTypeSortBy sortBy = ItemTypeSortBy.CreatedAt, int limit = 25, int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -238,7 +423,7 @@ namespace AccelByte.Server
 
         public void GetItemTypes(ResultCallback<ItemTypesPagingResponse> callback, ItemTypeSortBy sortBy = ItemTypeSortBy.CreatedAt, int limit = 25, int offset = 0)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -251,7 +436,7 @@ namespace AccelByte.Server
 
         public void GetUserInventories(ResultCallback<UserInventoriesPagingResponse> callback, UserInventorySortBy sortBy = UserInventorySortBy.CreatedAt, int limit = 25, int offset = 0, string inventoryConfigurationCode = "", string userId = "")
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -264,7 +449,7 @@ namespace AccelByte.Server
 
         public void GetUserInventory(string inventoryId, ResultCallback<UserInventory> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -282,7 +467,7 @@ namespace AccelByte.Server
         
         public void GetUserInventoryAllItems(string inventoryId, GetUserInventoryAllItemsOptionalParameters optionalParam, ResultCallback<UserItemsPagingResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -309,7 +494,7 @@ namespace AccelByte.Server
 
         public void GetUserInventoryItem(string inventoryId, string slotId, string sourceItemId, ResultCallback<UserItem> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -322,7 +507,7 @@ namespace AccelByte.Server
 
         public void RunChainingOperation(ServerInventoryChainingOperationRequest request, ResultCallback<InventoryChainingOperationResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -364,7 +549,7 @@ namespace AccelByte.Server
             , ResultCallback<UserItem> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -382,9 +567,12 @@ namespace AccelByte.Server
                 , callback: callback);
         }
 
-        public void SaveUserInventoryItemToInventory(string userId, string inventoryId, ServerSaveUserInventoryItemRequest request, ResultCallback<UserItem> callback)
+        public void SaveUserInventoryItemToInventory(string userId
+            , string inventoryId
+            , ServerSaveUserInventoryItemRequest request
+            , ResultCallback<UserItem> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -392,12 +580,68 @@ namespace AccelByte.Server
                 return;
             }
 
-            api.SaveUserInventoryItemToInventory(userId, inventoryId, request, callback);
+            if (request == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var optionalParams = new SaveUserInventoryItemToInventoryOptionalParameters()
+            {
+                CustomAttributes = request.CustomAttributes,
+                ServerCustomAttributes = request.ServerCustomAttributes,
+                SlotId = request.SlotId,
+                SlotUsed = request.SlotUsed,
+                Tags = request.Tags
+            };
+
+            SaveUserInventoryItemToInventory(inventoryId
+                , userId
+                , request.Source
+                , request.SourceItemId
+                , request.Type
+                , (uint)request.Quantity
+                , optionalParams
+                , callback);
+        }
+
+        public void SaveUserInventoryItemToInventory(string inventoryId
+            , string userId
+            , string source
+            , string sourceItemId
+            , string type
+            , uint quantity
+            , SaveUserInventoryItemToInventoryOptionalParameters optionalParameters
+            , ResultCallback<UserItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ServerSaveUserInventoryItemRequest()
+            {
+                Source = source,
+                SourceItemId = sourceItemId,
+                Type = type,
+                Quantity = (int)quantity,
+                CustomAttributes = optionalParameters?.CustomAttributes,
+                ServerCustomAttributes = optionalParameters?.ServerCustomAttributes,
+                SlotId = optionalParameters?.SlotId,
+                SlotUsed = (optionalParameters != null && optionalParameters.SlotUsed.HasValue) 
+                    ? (int)optionalParameters?.SlotUsed : 0,
+                Tags = optionalParameters?.Tags
+            };
+
+            api.SaveUserInventoryItemToInventory(inventoryId, userId, request, callback);
         }
 
         public void SyncUserEntitlements(string userId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -410,7 +654,7 @@ namespace AccelByte.Server
 
         public void UpdateIntegrationConfiguration(string integrationConfigurationId, ServerUpdateIntegrationConfigurationRequest request, ResultCallback<ServerIntegrationConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -423,7 +667,7 @@ namespace AccelByte.Server
 
         public void UpdateIntegrationConfigurationStatus(string integrationConfigurationId, ServerUpdateIntegrationConfigurationStatusRequest request, ResultCallback<ServerIntegrationConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -436,7 +680,7 @@ namespace AccelByte.Server
 
         public void UpdateInventoryConfiguration(string inventoryConfigurationId, ServerUpdateInventoryConfigurationRequest request, ResultCallback<InventoryConfiguration> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -449,7 +693,7 @@ namespace AccelByte.Server
 
         public void UpdateUserInventory(string inventoryId, ServerUpdateInventoryRequest request, ResultCallback<UserInventory> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -462,7 +706,7 @@ namespace AccelByte.Server
 
         public void ValidateUserInventoryCapacity(string userId, ServerValidateUserInventoryCapacityRequest request, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {

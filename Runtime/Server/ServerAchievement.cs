@@ -1,8 +1,10 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+
 using System;
 using AccelByte.Core;
+using AccelByte.Models;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -51,11 +53,11 @@ namespace AccelByte.Server
             , string achievementCode
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (string.IsNullOrEmpty(achievementCode))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't unlock achievement; AchievementCode parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't unlock achievement; AchievementCode parameter is null!"));
                 return;
             }
 
@@ -66,12 +68,38 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
                 Api.UnlockAchievement(userId, session.AuthorizationToken, achievementCode, callback));
+        }
+
+        /// <summary>
+        /// Unlock multiple achievements via achievementCode for the current user.
+        /// </summary>
+        /// <param name="userId">User id of user to unlock achievements for.</param>
+        /// <param name="achievementCodes">Array of achievement codes to be unlocked.</param>
+        /// <param name="callback">Returns a Result via callback that contains an array of BulkUnlockAchievementResponse when completed.</param>
+        public void BulkUnlockAchievement(string userId
+            , string[] achievementCodes
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            {
+                return;
+            }
+
+            Api.BulkUnlockAchievement(userId, achievementCodes, callback);
         }
     }
 }

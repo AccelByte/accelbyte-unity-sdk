@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -11,7 +11,7 @@ using System.ComponentModel;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum QosStatus
     {
         [Description("UNREACHABLE"), EnumMember(Value = "UNREACHABLE")] Unreachable,

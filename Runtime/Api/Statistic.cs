@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Api
@@ -99,6 +100,60 @@ namespace AccelByte.Api
                     limit,
                     sortBy));
         }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        public void GetUserStatItems(ResultCallback<PagedStatItems> callback)
+        {
+            GetUserStatItems(callback: callback, optionalParam: null);
+        }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="optionalParam">Optional parameters to be sent</param>
+        /// <param name="offset">Offset of the list that has been sliced based on Limit parameter (optional, default = 0)</param>
+        public void GetUserStatItems(GetUserStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
+        {
+            ICollection<string> inStatCode = null;
+            ICollection<string> inTags = null;
+            int offset;
+            int limit;
+            StatisticSortBy sortBy;
+
+            if (optionalParam != null)
+            {
+                if (optionalParam.StatCodes != null)
+                {
+                    inStatCode = optionalParam.StatCodes;
+                }
+                if (optionalParam.Tags != null)
+                {
+                    inTags = optionalParam.Tags;
+                }
+
+                offset = optionalParam.Offset > 0 ? optionalParam.Offset : 0;
+                limit = optionalParam.Limit > 0 ? optionalParam.Limit : 0;
+
+                sortBy = optionalParam.sortBy;
+            }
+            else
+            {
+                var optParam = new GetUserStatItemsOptionalParam();
+                offset = optParam.Offset;
+                limit = optParam.Limit;
+                sortBy = optParam.sortBy;
+            }
+            
+            GetUserStatItems(statCodes: inStatCode
+                , tags: inTags
+                , callback: callback
+                , offset: offset
+                , limit: limit
+                , sortBy: sortBy);
+        }      
 
         /// <summary>
         /// Get stat items of a user, filter by statCodes and tags
@@ -437,6 +492,49 @@ namespace AccelByte.Api
             coroutineRunner.Run(api.GetListUserStatCycleItem(cycleId, statCodes, this.session.UserId,
                 this.session.AuthorizationToken, callback, offset, limit));
         }
+
+        /// <summary>
+        /// Get user's own statistic item
+        /// </summary>
+        /// <param name="callback">Returns PagedStatItems via callback</param>
+        public void GetMyStatItems(ResultCallback<PagedStatItems> callback)
+        {
+            GetMyStatItems(callback: callback, optionalParam: null);
+        }
+
+        /// <summary>
+        /// Get user's own statistic item
+        /// </summary>
+        /// <param name="optionalParam">Optional Parameters to be sent</param>
+        /// <param name="callback">Returns PagedStatItems via callback</param>
+        public void GetMyStatItems(GetMyStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
+        {
+            IEnumerable<string> inStatCodes = null;
+            IEnumerable<string> inTags = null;
+            int limit;
+            int offset;
+            if (optionalParam != null)
+            {
+                if (optionalParam.StatCodes != null)
+                {
+                    inStatCodes = optionalParam.StatCodes;
+                }
+                if (optionalParam.Tags != null)
+                {
+                    inTags = optionalParam.Tags;
+                }
+
+                limit = optionalParam.Limit > 0 ? optionalParam.Limit: 0;
+                offset = optionalParam.Offset > 0 ? optionalParam.Offset: 0;
+            }
+            else
+            {
+                var defaultOptionalParam = new GetMyStatItemsOptionalParam();
+                limit = defaultOptionalParam.Limit;
+                offset = defaultOptionalParam.Offset;
+            }
+            GetMyStatItems(inStatCodes, inTags, callback, limit, offset);
+        }
         
         /// <summary>
         /// Get user's own statistic item
@@ -487,6 +585,48 @@ namespace AccelByte.Api
             }
 
             coroutineRunner.Run(api.GetMyStatItemValues(statCodes, tags, additionalKey,session.AuthorizationToken, callback));
+        }
+
+        /// <summary>
+        /// Get user's own statistic cycle item
+        /// </summary>
+        /// <param name="cycleId">The cycle id to which the stat item belong</param>
+        /// <param name="callback">Returns PagedStatCycleItem via callback</param>
+        public void GetMyStatCycleItems(string cycleId, ResultCallback<PagedStatCycleItem> callback)
+        {
+            GetMyStatCycleItems(cycleId: cycleId, callback: callback, optionalParam: null);
+        }
+
+        /// <summary>
+        /// Get user's own statistic cycle item
+        /// </summary>
+        /// <param name="cycleId">The cycle id to which the stat item belong</param>
+        /// <param name="optionalParam">Optional parameter be sent</param>
+        /// <param name="callback">Returns PagedStatCycleItem via callback</param>
+        public void GetMyStatCycleItems(string cycleId, GetMyStatCycleItemsOptionalParam optionalParam, 
+            ResultCallback<PagedStatCycleItem> callback)
+        {
+            IEnumerable<string> inStatCodes = null;
+            int limit;
+            int offset;
+            if (optionalParam != null)
+            {
+                if (optionalParam.StatCodes != null)
+                {
+                    inStatCodes = optionalParam.StatCodes;
+                }
+
+                limit = optionalParam.Limit > 0 ? optionalParam.Limit : 0;
+                offset = optionalParam.Offset > 0 ? optionalParam.Offset : 0;
+            }
+            else
+            {
+                var optParam = new GetMyStatCycleItemsOptionalParam();
+                limit = optParam.Limit;
+                offset = optParam.Offset;
+            }
+
+            GetMyStatCycleItems(cycleId, inStatCodes, callback, limit, offset);
         }
 
         /// <summary>

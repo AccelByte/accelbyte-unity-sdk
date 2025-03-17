@@ -26,30 +26,6 @@ namespace AccelByte.Server
         {
         }
 
-
-        [Obsolete("This interface is deprecated, and will be removed on AGS 3.82. Please access the api from Api.AcceptBackfillProposal(backfillProposal, acceptedTicketIds, stopBackfilling, callback)")]
-        public IEnumerator AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal, bool stopBackfilling, ResultCallback callback)
-        {
-            var optionalParams = new AcceptBackfillProposalOptionalParams()
-            {
-                StopBackfilling = stopBackfilling,
-            };
-
-            AcceptBackfillProposal(backfillProposal, optionalParams, result =>
-            {
-                if (result.IsError)
-                {
-                    callback?.TryError(result.Error);
-                }
-                else
-                {
-                    callback?.TryOk();
-                }
-            });
-
-            yield break;
-        }
-
         public void AcceptBackfillProposal(MatchmakingV2BackfillProposalNotification backfillProposal
             , AcceptBackfillProposalOptionalParams optionalParams
             , ResultCallback<AcceptBackfillProposalResponse> callback)

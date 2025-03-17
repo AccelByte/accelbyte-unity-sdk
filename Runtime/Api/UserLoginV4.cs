@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -670,5 +670,355 @@ namespace AccelByte.Api
             };
             loginAction?.Invoke();
         }
+        
+#region Login Queue Implementation
+        private void LoginWithEmailV4(string email
+            , string password
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool rememberMe = false)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!EmailUtils.IsValidEmailAddress(email))
+            {
+                SharedMemory?.Logger?.LogWarning("Login using username is deprecated, please use email for the replacement.");
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveAuthTrustId(isSuccess =>
+                    {
+                        Session.SaveRefreshToken(email, saveTokenAsLatestUser, (saveSuccess) =>
+                        {
+                            OnLoginSuccess?.Invoke(tokenData);
+                            SendLoginSuccessPredefinedEvent(tokenData);
+                        });
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = email;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    Session.LoadAuthTrustId((isSuccess, authTrustId) =>
+                    {
+                        oAuth2.LoginWithEmailV4(email, password, rememberMe, cb, authTrustId);
+                    });
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted);
+        }
+        
+        private void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(tokenData.platform_user_id, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = string.Empty;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithDeviceIdV4(cb);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted);
+        }
+
+        private void LoginWithOtherPlatformIdV4(string platformId
+            , string platformToken
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool createHeadless
+            , string serviceLabel
+            , LoginWithMacAddress loginWithMacAddress = null)
+        {
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = platformId;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(
+                cb =>
+                {
+                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, loginWithMacAddress, cb);
+                }
+                , onAlreadyLogin
+                , onLoginFailed
+                , onProcessCompleted
+            );
+        }
+
+        private void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
+            , bool extendExp
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = linkingToken;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        private void AuthenticationWithPlatformLinkAndLoginV4(string email
+            , string password
+            , string linkingToken
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            if (string.IsNullOrEmpty(linkingToken))
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidArgument.ToString(),
+                    error_description = "The application was not executed from launcher"
+                };
+                callback?.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(linkingToken, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = linkingToken;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.AuthenticationWithPlatformLinkV4(email, password, linkingToken, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+
+        private void GenerateGameTokenV4(string code
+            , ResultCallback<TokenDataV4, OAuthError> callback)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidArgument.ToString(),
+                    error_description = "The application was not executed from launcher"
+                };
+                callback?.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = code;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.GenerateGameTokenV4(code, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+        
+        private void Verify2FACodeV4(string mfaToken
+            , TwoFAFactorType factor
+            , string code
+            , ResultCallback<TokenDataV4, OAuthError> callback
+            , bool rememberDevice = false)
+        {
+            if (userSession.IsValid())
+            {
+                OAuthError error = new OAuthError()
+                {
+                    error = ErrorCode.InvalidRequest.ToString(),
+                    error_description = "User is already logged in."
+                };
+                callback.TryError(error);
+                return;
+            }
+
+            Action<OAuthError> onAlreadyLogin = (error) =>
+            {
+                callback.TryError(error);
+            };
+
+            Action<OAuthError> onLoginFailed = (error) =>
+            {
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
+                callback.TryError(error);
+            };
+
+            Action<TokenDataV4> onProcessCompleted = (tokenData) =>
+            {
+                if (tokenData.Queue == null)
+                {
+                    const bool saveTokenAsLatestUser = true;
+                    Session.SaveRefreshToken(code, saveTokenAsLatestUser, (saveSuccess) =>
+                    {
+                        OnLoginSuccess?.Invoke(tokenData);
+                        SendLoginSuccessPredefinedEvent(tokenData);
+                    });
+                }
+                else
+                {
+                    tokenData.Queue.Identifier = code;
+                }
+                callback.TryOk(tokenData);
+            };
+
+            Login(cb =>
+            {
+                oAuth2.Verify2FACodeV4(mfaToken, factor, code, rememberDevice, cb);
+            }
+            , onAlreadyLogin
+            , onLoginFailed
+            , onProcessCompleted);
+        }
+#endregion
     }
 }

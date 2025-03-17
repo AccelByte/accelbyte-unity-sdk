@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -29,10 +29,12 @@ namespace AccelByte.Api
         
         private static readonly TimeSpan minimumTelemetryInterval = 
             new TimeSpan(0, 0, 5);
-        private CancellationTokenSource cancelationTokenSource = null;
+        private CancellationTokenSource cancellationTokenSource = null;
 
-        IAccelByteDataStorage cacheStorage;
-        string cacheTableName;
+        internal bool IsUseCache;
+        internal bool IsAutoSendOnStartup;
+        private IAccelByteDataStorage cacheStorage;
+        private string cacheTableName;
         private WaitTimeCommand telemetryLoopCommand;
 
         internal TimeSpan TelemetryInterval
@@ -42,6 +44,8 @@ namespace AccelByte.Api
                 return telemetryInterval;
             }
         }
+
+        internal Action OnTelemetryLoopUpdate;
 
         [UnityEngine.Scripting.Preserve]
         internal GameTelemetry( ClientGameTelemetryApi inApi
@@ -57,28 +61,55 @@ namespace AccelByte.Api
             cacheStorage = session.DataStorage;
             cacheTableName = $"GameTelemetryCache/{AccelByteSDK.Environment.Current}.cache";
 
+            SetUseCache(inApi.Config.GameTelemetryCacheEnabled);
+
+            IsAutoSendOnStartup = inApi.Config.EnableGameTelemetryStartupAutoSend;
+            if (!IsAutoSendOnStartup)
+            {
+                return;
+            }
+
             if (session.IsValid())
             {
-                SendCachedTelemetry();
+                SendCachedTelemetry(callback: null);
+                return;
             }
-            else
+                
+            Action<string> onGetRefreshToken = null;
+            onGetRefreshToken = (newAccessToken) =>
             {
-                Action<string> onGetRefreshToken = null;
-                onGetRefreshToken = (newAccessToken) =>
-                {
-                    session.RefreshTokenCallback -= onGetRefreshToken;
-                    SendCachedTelemetry();
-                };
-                session.RefreshTokenCallback += onGetRefreshToken;
-            }
+                session.RefreshTokenCallback -= onGetRefreshToken;
+                SendCachedTelemetry(callback: null);
+            };
+            session.RefreshTokenCallback += onGetRefreshToken;
         }
 
         ~GameTelemetry()
         {
-            if (cancelationTokenSource != null)
+            if (cancellationTokenSource != null)
             {
-                cancelationTokenSource.Cancel();
-                cancelationTokenSource.Dispose();
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Enable or disable write operations to the file storage cache.
+        /// The cache stores all events in JSON format as a file to be sent on 
+        /// service initialization (can be disabled via client config editor) 
+        /// or SendCachedTelemetry(callback) in case of crash, errors, or unclean game/app termination.
+        /// The cache is enabled by default and can also be configured via client config editor.
+        /// </summary>
+        /// <param name="isUseCache">Enables or disables cache write operations.</param>
+        /// <param name="clearCurrentCache">Clears currently built up cache if true.</param>
+        public void SetUseCache(bool isUseCache, bool clearCurrentCache = false)
+        {
+            IsUseCache = isUseCache;
+
+            if (clearCurrentCache)
+            {
+                eventList.Clear();
+                DeleteCache();
             }
         }
 
@@ -100,6 +131,14 @@ namespace AccelByte.Api
                     $"Set to {minimumTelemetryInterval.TotalSeconds} seconds.");
                 telemetryInterval = minimumTelemetryInterval;
             }
+
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+            }
+
+            InitializeTelemetryHeartbeat();
         }
 
         /// <summary>
@@ -147,9 +186,13 @@ namespace AccelByte.Api
             else
             {
                 jobQueue.Enqueue(new Tuple<TelemetryBody, ResultCallback>(telemetryBody, callback));
-                AppendEventToCache(telemetryBody);
+                
+                if (IsUseCache)
+                {
+                    AppendEventToCache(telemetryBody);
+                }
 
-                if (cancelationTokenSource == null)
+                if (cancellationTokenSource == null)
                 {
                     RunPeriodicTelemetry();
                 }
@@ -157,7 +200,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Send telemetry data in the btach
+        /// Send telemetry data in the batch
         /// </summary>
         /// <param name="callback">Callback after sending telemetry data is complete</param>
         public void SendTelemetryBatch(ResultCallback callback)
@@ -203,7 +246,10 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    RemoveEventsFromCache();
+                    if (IsUseCache)
+                    {
+                        RemoveEventsFromCache();
+                    }
                 }
 
                 foreach (var telemetryCallback in telemetryCallbacks)
@@ -214,24 +260,37 @@ namespace AccelByte.Api
             });
         }
 
+        /// <summary>
+        /// Send cached telemetry events
+        /// </summary>
+        /// <param name="callback">Returns a result via callback when operation is done</param>
+        public void SendCachedTelemetry(ResultCallback callback)
+        {
+            LoadEventsFromCache(telemetryBodies =>
+            {
+                if (telemetryBodies == null || telemetryBodies.Count == 0)
+                {
+                    SharedMemory?.Logger?.LogVerbose("No events loaded from cache, send operation is cancelled.");
+                    callback?.TryError(ErrorCode.InvalidRequest);
+                    return;
+                }
+
+                SendTelemetryRequest(telemetryBodies, result =>
+                {
+                    if (!result.IsError)
+                    {
+                        RemoveEventsFromCache();
+                    }
+
+                    callback?.Try(result);
+                });
+            });
+        }
+
         internal override void SetSharedMemory(ApiSharedMemory newSharedMemory)
         {
             base.SetSharedMemory(newSharedMemory);
             analyticsWrapper.SetSharedMemory(newSharedMemory);
-        }
-
-        private void SendCachedTelemetry()
-        {
-            LoadEventsFromCache(telemetryBodies =>
-            {
-                SendTelemetryRequest(telemetryBodies, cb =>
-                {
-                    if (!cb.IsError)
-                    {
-                        RemoveEventsFromCache();
-                    }
-                });
-            });
         }
 
         internal void ClearQueuedTelemetry()
@@ -242,33 +301,40 @@ namespace AccelByte.Api
             }
         }
 
+        private void InitializeTelemetryHeartbeat()
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+            telemetryLoopCommand = new WaitTimeCommand(waitTime: telemetryInterval.TotalSeconds
+                , cancellationToken: cancellationTokenSource.Token
+                , onDone: TelemetryLoop);
+            SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
+        }
+
         private void RunPeriodicTelemetry()
         {
-            if(cancelationTokenSource != null)
+            if(cancellationTokenSource != null)
             {
                 return;
             }
 
             SendTelemetryBatch(callback: null);
-            
-            cancelationTokenSource = new CancellationTokenSource();
-            telemetryLoopCommand = new WaitTimeCommand(waitTime: telemetryInterval.TotalSeconds
-                , cancellationToken: cancelationTokenSource.Token
-                , onDone: TelemetryLoop);
-            SharedMemory?.CoreHeartBeat?.Wait(telemetryLoopCommand);
+
+            InitializeTelemetryHeartbeat();
         }
 
         private void TelemetryLoop()
         {
-            if (cancelationTokenSource == null || cancelationTokenSource.IsCancellationRequested)
+            OnTelemetryLoopUpdate?.Invoke();
+
+            if (cancellationTokenSource == null || cancellationTokenSource.IsCancellationRequested)
             {
                 return;
             }
             
             if (session == null || !session.IsValid())
             {
-                cancelationTokenSource.Dispose();
-                cancelationTokenSource = null;
+                cancellationTokenSource.Dispose();
+                cancellationTokenSource = null;
                 return;
             }
 
@@ -276,8 +342,8 @@ namespace AccelByte.Api
             {
                 if (jobQueue == null || jobQueue.IsEmpty)
                 {
-                    cancelationTokenSource.Dispose();
-                    cancelationTokenSource = null;
+                    cancellationTokenSource.Dispose();
+                    cancellationTokenSource = null;
                     return;
                 }   
             }
@@ -334,11 +400,25 @@ namespace AccelByte.Api
                 return;
             }
 
+            if (!IsUseCache)
+            {
+                SharedMemory?.Logger?.LogVerbose("Caching is disabled, write event operation is cancelled.");
+                onSaveCacheDone?.Invoke(false);
+                return;
+            }
+
             AppendEventToCache(session.UserId, telemetryBody, onSaveCacheDone);
         }
 
         internal void AppendEventToCache(string key, TelemetryBody telemetryBody, Action<bool> onSaveCacheDone = null)
         {
+            if (!IsUseCache)
+            {
+                SharedMemory?.Logger?.LogVerbose("Caching is disabled, write event operation is cancelled.");
+                onSaveCacheDone?.Invoke(false);
+                return;
+            }
+
             eventList.Add(telemetryBody);
             var telemetryEventsJson = System.Text.Encoding.UTF8.GetString(eventList.ToUtf8Json());
             cacheStorage.SaveItem(key, telemetryEventsJson, onSaveCacheDone, tableName: cacheTableName);

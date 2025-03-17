@@ -12,7 +12,7 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum InventoryConfigurationStatus
     {
         [System.ComponentModel.Description("INIT"), EnumMember(Value = "INIT")]
@@ -21,7 +21,7 @@ namespace AccelByte.Models
         Tied
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum InventoryConfigurationSortBy
     {
         [System.ComponentModel.Description("createdAt")]
@@ -44,7 +44,7 @@ namespace AccelByte.Models
         CodeDesc,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum UserInventorySortBy
     {
         [System.ComponentModel.Description("createdAt")]
@@ -61,7 +61,7 @@ namespace AccelByte.Models
         UpdatedAtDesc
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ItemTypeSortBy
     {
         [System.ComponentModel.Description("createdAt")]
@@ -78,7 +78,7 @@ namespace AccelByte.Models
         NameDesc
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum UserItemSortBy
     {
         [System.ComponentModel.Description("createdAt")]
@@ -260,6 +260,20 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class BulkUpdateInventoryItemsPayload
+    {
+        public BulkUpdateInventoryItemsPayload(string sourceItemId)
+        {
+            SourceItemId = sourceItemId;
+        }
+
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
+    }
+
+    [DataContract, Preserve]
     public class UserItemResponseBase
     {
         [DataMember(Name = "slotId")] public string SlotId;
@@ -279,6 +293,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class BulkDeleteUserInventoryItemsPayload
+    {
+        public BulkDeleteUserInventoryItemsPayload(string sourceItemId)
+        {
+            SourceItemId = sourceItemId;
+        }
+
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
+    }
+
+    [DataContract, Preserve]
     public class DeleteUserInventoryItemResponse : UserItemResponseBase
     {
     }
@@ -295,15 +321,53 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class MoveUserItemResponseData : InventoryOperationBase
+    public class MoveUserItemResponseData
     {
+        [DataMember(Name = "qty")] public int Quantity;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
     }
 
     [DataContract, Preserve]
     public class MoveUserItemsBetweenInventoriesRequest
     {
+        public MoveUserItemsBetweenInventoriesRequest()
+        {
+        }
+
+        internal MoveUserItemsBetweenInventoriesRequest(MoveUserItemsBetweenInventoriesPayload[] payload, string srcInventoryId)
+        {
+            items = new MoveUserItemRequestData[payload.Length];
+            for (int i = 0; i < items.Length; i++)
+            {
+                items[i] = new MoveUserItemRequestData()
+                {
+                    Quantity = payload[i].Quantity,
+                    SlotId = payload[i].SlotId,
+                    SourceItemId = payload[i].SourceItemId
+                };
+            }
+
+            SourceInventoryId = srcInventoryId;
+        }
+
         [DataMember(Name = "items")] public MoveUserItemRequestData[] items;
         [DataMember(Name = "srcInventoryId")] public string SourceInventoryId;
+    }
+
+    [DataContract, Preserve]
+    public class MoveUserItemsBetweenInventoriesPayload
+    {
+        public MoveUserItemsBetweenInventoriesPayload(uint qty, string slotId, string sourceItemId)
+        {
+            Quantity = (int)qty;
+            SlotId = slotId;
+            SourceItemId = sourceItemId;
+        }
+
+        [DataMember(Name = "qty")] public int Quantity;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
     }
 
     [DataContract, Preserve]
@@ -316,12 +380,32 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
     }
 
-    [DataContract, Preserve]
-    public class ConsumeUserItemsRequest : InventoryOperationBase
+    /// <summary>
+    /// Optional parameters for ConsumeUserInventoryItem. Can be null.
+    /// </summary>
+    public class ConsumeUserInventoryItemOptionalParameters
     {
+        /// <summary>
+        /// Only available when item type is OPTIONBOX, values should be item ID.
+        /// </summary>
+        public string[] Options = null;
+
+        /// <summary>
+        /// Slot Id being occupied by the item to consume.
+        /// </summary>
+        public string SlotId = null;
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [DataContract, Preserve]
+    public class ConsumeUserItemsRequest
+    {
+        [DataMember(Name = "qty")] public int Quantity;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
+        [DataMember(Name = "options")] public string[] Options;
+    }
+
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ServerIntegrationConfigurationSortBy
     {
         [System.ComponentModel.Description("createdAt")]
@@ -332,7 +416,7 @@ namespace AccelByte.Models
         CreatedAtDesc
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum IntegrationConfigurationStatus
     {
         [System.ComponentModel.Description("INIT"), EnumMember(Value = "INIT")]
@@ -443,6 +527,53 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class ServerUpdateUserInventoryItemPayload
+    {
+        public ServerUpdateUserInventoryItemPayload(string sourceItemId)
+        {
+            SourceItemId = sourceItemId;
+        }
+
+        [DataMember(Name = "type")] public string Type;
+        [DataMember(Name = "serverCustomAttributes")] public Dictionary<string, object> ServerCustomAttributes;
+        [DataMember(Name = "tags")] public string[] Tags;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "slotId")] public string SlotId;
+        [DataMember(Name = "sourceItemId")] public string SourceItemId;
+    }
+
+    /// <summary>
+    /// Optional parameters for SaveUserInventoryItemToInventory endpoint. Can be null.
+    /// </summary>
+    public class SaveUserInventoryItemToInventoryOptionalParameters
+    {
+        /// <summary>
+        /// Custom metadata for the item.
+        /// </summary>
+        public Dictionary<string, object> CustomAttributes = null;
+
+        /// <summary>
+        /// Custom server-side metadata for the item.
+        /// </summary>
+        public Dictionary<string, object> ServerCustomAttributes = null;
+
+        /// <summary>
+        /// ID of slot to save item to.
+        /// </summary>
+        public string SlotId = null;
+
+        /// <summary>
+        /// Number of slots used by saved item.
+        /// </summary>
+        public int? SlotUsed = null;
+
+        /// <summary>
+        /// Tags related to the item.
+        /// </summary>
+        public string[] Tags = null;
+    }
+
+    [DataContract, Preserve]
     public class ServerSaveUserInventoryItemRequest : UserItemWithSourceBase
     {
     }
@@ -476,6 +607,22 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class ServerCreateInventoryConfigurationRequest : ServerInventoryConfigurationRequestBase
     {
+    }
+
+    /// <summary>
+    /// Optional parameters for CreateInventoryConfiguration. Can be null.
+    /// </summary>
+    public class CreateInventoryConfigurationOptionalParameters
+    {
+        /// <summary>
+        /// Plain text description for the inventory configuration.
+        /// </summary>
+        public string Description = null;
+
+        /// <summary>
+        /// Name identifier for the inventory configuration.
+        /// </summary>
+        public string Name = null;
     }
 
     [DataContract, Preserve]

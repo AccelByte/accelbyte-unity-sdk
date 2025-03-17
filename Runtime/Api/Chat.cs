@@ -7,7 +7,7 @@ using AccelByte.Models;
 using HybridWebSocket;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
+using System.Linq;
 
 namespace AccelByte.Api
 {   
@@ -196,6 +196,90 @@ namespace AccelByte.Api
                 SendCreateTopicPredefinedEvent(otherUserId, cb);
                 HandleCallback(cb, callback);
             });
+        }
+
+        /// <summary>
+        /// Create a group topic
+        /// It can be used to let multiple users connect to each other
+        /// </summary>
+        /// <param name="groupName">group chat name</param>
+        /// <param name="adminUserId">list of moderator/admin for this group chat</param>
+        /// <param name="memberUserIds">list of members for this group chat</param>
+        /// <param name="callback">Result of this operation</param>
+        public void CreateGroupTopic(string groupName, string[] adminUserId, string[] memberUserIds, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            CreateGroupTopic(groupName: groupName, adminUserId: adminUserId, memberUserIds: memberUserIds, callback: callback, optionalParameter: null);
+        }
+
+        /// <summary>
+        /// Create a group topic
+        /// It can be used to let multiple users connect to each other
+        /// </summary>
+        /// <param name="groupName">group chat name</param>
+        /// <param name="adminUserId">list of moderator/admin for this group chat</param>
+        /// <param name="memberUserIds">list of members for this group chat</param>
+        /// <param name="callback">Result of this operation</param>
+        /// <param name="optionalParameter">optional parameter when create a group topic</param>
+        public void CreateGroupTopic(string groupName, string[] adminUserId, string[] memberUserIds, CreateGroupTopicOptionalParameter optionalParameter, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            bool isJoinable = false;
+            if (optionalParameter != null)
+            {
+                isJoinable = optionalParameter.IsJoinable;
+            }
+
+            var adminList = adminUserId.ToList();
+            var memberList = memberUserIds.ToList();
+
+            foreach (var members in memberList)
+            {
+                if (!ValidateAccelByteId(members, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(members), callback))
+                {
+                    return;
+                }
+            }
+
+            foreach (var moderators in adminList)
+            {
+                if (!ValidateAccelByteId(moderators, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(moderators), callback))
+                {
+                    return;
+                }
+
+                if (!memberList.Contains(moderators))
+                {
+                    memberList.Add(moderators);
+                }
+            }
+
+            var finalAdminUserIds = adminList.ToArray();
+            var finalMemberUserIds = memberList.ToArray();
+
+            websocketApi.CreateGroupTopic(groupName, finalAdminUserIds, finalMemberUserIds, callback, isJoinable);
+        }
+
+        /// <summary>
+        /// Join a specific topic id
+        /// </summary>
+        /// <param name="topicId">topic id to be joined</param>
+        /// <param name="callback">Result of this operation</param>
+        public void JoinTopic(string topicId, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            websocketApi.JoinTopic(topicId, callback);
+        }
+
+        /// <summary>
+        /// Delete a topic
+        /// </summary>
+        /// <param name="topicId">topic id to be deleted</param>
+        /// <param name="callback">Result of this operation</param>
+        public void DeleteTopic(string topicId, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            websocketApi.DeleteTopic(topicId, callback);
         }
 
         /// <summary>

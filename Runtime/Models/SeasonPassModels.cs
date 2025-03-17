@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -11,14 +11,14 @@ using UnityEngine.Scripting;
 namespace AccelByte.Models
 {
     #region enum
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SeasonPassStrategyMethod
     {
         NONE = 0,
         CURRENCY
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SeasonPassStatus
     {
         DRAFT = 0,
@@ -26,13 +26,13 @@ namespace AccelByte.Models
         RETIRED
     }
 
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SeasonPassRewardType
     {
         ITEM //currently only support this type
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum SeasonPassSource
     {
         SWEAT = 0,

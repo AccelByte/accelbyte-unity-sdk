@@ -1,16 +1,17 @@
-﻿// Copyright (c) 2019 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using System.Collections;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
-using UnityEngine.Assertions;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {
+    [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use Api.CloudSave instead")]
     public class GameProfilesApi : ApiBase
     {
         /// <summary>

@@ -494,6 +494,10 @@ namespace AccelByte.Api
                     {
                         activePlatform = PlatformType.EpicGames.ToString();
                     }
+                    else if (Resources.Load(AccelByteSettingsV2.OAuthResourcePath(PlatformType.Android.ToString(), isServer)) != null)
+                    {
+                        activePlatform = PlatformType.Android.ToString();
+                    }
                     else
                     {
                         activePlatform = "";
@@ -660,6 +664,10 @@ namespace AccelByte.Api
                 if (overrideConfig.ClientSecret != null)
                 {
                     oAuthConfig.ClientSecret = overrideConfig.ClientSecret;
+                }
+                if (overrideConfig.GoogleWebClientId != null)
+                {
+                    oAuthConfig.GoogleWebClientId = overrideConfig.GoogleWebClientId;
                 }
             }
         }

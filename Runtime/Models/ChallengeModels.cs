@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace AccelByte.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ChallengeSortBy
     {
         [Description("updatedAt:asc"), EnumMember(Value = "updatedAt:asc")]
@@ -25,7 +25,7 @@ namespace AccelByte.Models
         CreatedAtDesc,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ChallengeStatus
     {
         None,
@@ -37,7 +37,7 @@ namespace AccelByte.Models
         Tied
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ChallengeRewardStatus
     {
         None,
@@ -57,10 +57,18 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class ChallengePeriodMeta
+    {
+        [DataMember(Name = "endTime")] public string EndTime;
+        [DataMember(Name = "startTime")] public string StartTime;
+    }
+
+    [DataContract, Preserve]
     public class ChallengeMetaResponse : ChallengeMeta
     {
         [DataMember(Name = "code")] public string Code;
         [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "period")] public ChallengePeriodMeta Period;
     }
 
     [DataContract, Preserve]

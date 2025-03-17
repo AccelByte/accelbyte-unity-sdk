@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -6,7 +6,6 @@ using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
 using System.Collections;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -119,12 +118,12 @@ namespace AccelByte.Api
             , int limit
             , bool isGlobal)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -151,17 +150,17 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedPublicAchievement>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         public IEnumerator GetAchievement(string achievementCode
             , ResultCallback<MultiLanguageAchievement> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -178,7 +177,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<MultiLanguageAchievement>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryUserAchievements( string userId
@@ -189,12 +188,12 @@ namespace AccelByte.Api
             , int limit
             , bool preferUnlocked )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -221,7 +220,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedUserAchievement>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UnlockAchievement( string userId
@@ -229,12 +228,12 @@ namespace AccelByte.Api
             , string achievementCode
             , ResultCallback callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -254,7 +253,40 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
+        }
+
+        public void BulkUnlockAchievement(string[] achievementCodes, ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, Session.UserId, achievementCodes);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBody = new BulkUnlockAchievementRequest()
+            {
+                AchievementCodes = achievementCodes
+            };
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/bulkUnlock")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", Session.UserId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationJson)
+                .WithBody(requestBody.ToUtf8Json())
+                .GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<BulkUnlockAchievementResponse[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator QueryGlobalAchievements(string achievementCode
@@ -266,12 +298,12 @@ namespace AccelByte.Api
             , string tags
             ) 
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -298,7 +330,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedUserGlobalAchievement>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryGlobalAchievementContributors(string achievementCode
@@ -308,12 +340,12 @@ namespace AccelByte.Api
             , int limit
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -334,7 +366,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGlobalAchievementContributors>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryGlobalAchievementUserContributed( string userId
@@ -345,12 +377,12 @@ namespace AccelByte.Api
             , int limit
             )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -372,7 +404,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGlobalAchievementUserContributed>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ClaimGlobalAchievement( string userId
@@ -381,12 +413,12 @@ namespace AccelByte.Api
             , ResultCallback callback
             ) 
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -406,7 +438,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetTags(string name
@@ -419,7 +451,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -441,7 +473,7 @@ namespace AccelByte.Api
             
             var result = response.TryParseJson<PaginatedPublicTag>();
             
-            callback.Try(result);
+            callback?.Try(result);
         }
         #endregion
     }

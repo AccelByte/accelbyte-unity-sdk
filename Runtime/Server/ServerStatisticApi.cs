@@ -7,6 +7,7 @@ using AccelByte.Core;
 using AccelByte.Models;
 using System.Linq;
 using UnityEngine.Assertions;
+using AccelByte.Utils;
 
 namespace AccelByte.Server
 {
@@ -58,10 +59,12 @@ namespace AccelByte.Server
             , CreateStatItemRequest[] statItems
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(statItems, nameof(statItems) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, statItems, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/bulk")
@@ -91,9 +94,12 @@ namespace AccelByte.Server
             , int limit
             , StatisticSortBy sortBy)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems")
@@ -136,10 +142,12 @@ namespace AccelByte.Server
             , StatItemIncrement[] data
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, data);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePatch(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
@@ -164,9 +172,12 @@ namespace AccelByte.Server
         public IEnumerator IncrementManyUsersStatItems(UserStatItemIncrement[] data
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, data, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePatch(BaseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/bulk")
@@ -191,10 +202,12 @@ namespace AccelByte.Server
             , StatItemReset[] data
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, data);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
@@ -219,9 +232,12 @@ namespace AccelByte.Server
         public IEnumerator ResetManyUsersStatItems(UserStatItemReset[] data
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, data, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/statitems/value/reset/bulk")
@@ -247,10 +263,12 @@ namespace AccelByte.Server
             , StatItemUpdate[] data
             , ResultCallback<StatItemOperationResult[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, data);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
@@ -276,9 +294,12 @@ namespace AccelByte.Server
         public IEnumerator UpdateManyUsersStatItems( UserStatItemUpdate[] data
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(data, nameof(data) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, data, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/statitems/value/bulk")
@@ -304,24 +325,30 @@ namespace AccelByte.Server
            , string additionalKey
            , ResultCallback<FetchUser[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, statCode, userIds, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v2/admin/namespaces/{namespace}/statitems/value/bulk/getOrDefault")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithQueryParam("statCode", statCode)
-                .WithQueryParam("additionalKey", additionalKey)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
             foreach (var userId in userIds)
             {
                 builder.WithQueryParam("userIds", userId);
             }
+
+            if (!string.IsNullOrEmpty(additionalKey))
+            {
+                builder.WithQueryParam("additionalKey", additionalKey);
+            }
+
             var request = builder.GetResult();
 
             IHttpResponse response = null;
@@ -338,10 +365,12 @@ namespace AccelByte.Server
            , string[] userIds
            , ResultCallback<FetchUserStatistic> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(userIds, nameof(userIds) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, statCode, userIds, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             string[] processedUserIds = new string[0];
             string[] notProcessedUserIds = new string[0];
@@ -400,9 +429,12 @@ namespace AccelByte.Server
         public IEnumerator BulkUpdateMultipleUserStatItemsValue(UpdateUserStatItem[] bulkUpdateMultipleUserStatItem
            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(bulkUpdateMultipleUserStatItem, nameof(bulkUpdateMultipleUserStatItem) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, bulkUpdateMultipleUserStatItem, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
             .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/statitems/value/bulk")
@@ -428,22 +460,28 @@ namespace AccelByte.Server
             , UserStatItem[] bulkUserStatItems
            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(bulkUserStatItems, nameof(bulkUserStatItems) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId, bulkUserStatItems, Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
             .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/statitems/value/reset/bulk")
             .WithPathParam("namespace", Namespace_)
             .WithBearerAuth(AuthToken)
             .WithPathParam("userId", userId)
-            .WithQueryParam("additionalKey", additionalKey)
             .WithContentType(MediaType.ApplicationJson)
             .WithBody(bulkUserStatItems.ToUtf8Json())
-            .Accepts(MediaType.ApplicationJson)
-            .GetResult();
+            .Accepts(MediaType.ApplicationJson);
+
+            if (!string.IsNullOrEmpty(additionalKey))
+            {
+                builder.WithQueryParam("additionalKey", additionalKey);
+            }
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 
@@ -460,22 +498,28 @@ namespace AccelByte.Server
            , UpdateUserStatItemWithStatCode[] BulkUpdateUserStatItem
            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(userId, nameof(userId) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(BulkUpdateUserStatItem, nameof(BulkUpdateUserStatItem) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId, BulkUpdateUserStatItem, Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
             .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
             .WithPathParam("namespace", Namespace_)
             .WithBearerAuth(AuthToken)
             .WithPathParam("userId", userId)
-            .WithQueryParam("additionalKey", additionalKey)
             .WithContentType(MediaType.ApplicationJson)
             .WithBody(BulkUpdateUserStatItem.ToUtf8Json())
-            .Accepts(MediaType.ApplicationJson)
-            .GetResult();
+            .Accepts(MediaType.ApplicationJson);
+            
+            if (!string.IsNullOrEmpty(additionalKey))
+            {
+                builder.WithQueryParam("additionalKey", additionalKey);
+            }
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 
@@ -493,22 +537,29 @@ namespace AccelByte.Server
            , UpdateUserStatItem UpdateUserStatItemValue
            , ResultCallback<UpdateUserStatItemValueResponse> callback)
         {
-            Assert.IsNotNull(Namespace_, nameof(Namespace_) + " cannot be null");
-            Assert.IsNotNull(statCode, nameof(statCode) + " cannot be null");
-            Assert.IsNotNull(additionalKey, nameof(additionalKey) + " cannot be null");
-            Assert.IsNotNull(AuthToken, nameof(AuthToken) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, statCode, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
             .CreatePut(BaseUrl + "/v2/admin/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems/value")
             .WithPathParam("namespace", Namespace_)
             .WithBearerAuth(AuthToken)
             .WithPathParam("userId", userId)
             .WithPathParam("statCode", statCode)
-            .WithQueryParam("additionalKey", additionalKey)
             .WithBody(UpdateUserStatItemValue.ToUtf8Json())
             .WithContentType(MediaType.ApplicationJson)
-            .Accepts(MediaType.ApplicationJson)
-            .GetResult();
+            .Accepts(MediaType.ApplicationJson);
+
+            if (!string.IsNullOrEmpty(additionalKey))
+            {
+                builder.WithQueryParam("additionalKey", additionalKey);
+            }
+
+            var request = builder.GetResult();
 
             IHttpResponse response = null;
 
@@ -551,7 +602,12 @@ namespace AccelByte.Server
         
         public IEnumerator GetGlobalStatItemsByStatCode(string statCode, ResultCallback<GlobalStatItem> callback)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(statCode), nameof(statCode) + " cannot be null");
+            var error = ApiHelperUtils.CheckForNullOrEmpty(statCode);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                yield break;
+            }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/globalstatitems/{statCode}")

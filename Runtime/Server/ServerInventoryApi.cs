@@ -22,11 +22,14 @@ namespace AccelByte.Server
         {
         }
 
-        public void BulkDeleteUserInventoryItems(string inventoryId, string userId, DeleteUserInventoryItemRequest[] request, ResultCallback<DeleteUserInventoryItemResponse[]> callback)
+        public void BulkDeleteUserInventoryItems(string inventoryId
+            , string userId
+            , BulkDeleteUserInventoryItemsPayload[] payload
+            , ResultCallback<DeleteUserInventoryItemResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, userId, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, userId, payload);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -41,7 +44,7 @@ namespace AccelByte.Server
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("inventoryId", inventoryId)
-                .WithBody(request.ToUtf8Json());
+                .WithBody(payload.ToUtf8Json());
 
             var httpRequest = builder.GetResult();
 
@@ -58,11 +61,14 @@ namespace AccelByte.Server
             });
         }
 
-        public void BulkUpdateUserInventoryItems(string inventoryId, string userId, ServerUpdateUserInventoryItemRequest[] request, ResultCallback<UpdateUserInventoryItemResponse[]> callback)
+        public void BulkUpdateUserInventoryItems(string inventoryId
+            , string userId
+            , ServerUpdateUserInventoryItemPayload[] payload
+            , ResultCallback<UpdateUserInventoryItemResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, userId, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, userId, payload);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -77,7 +83,7 @@ namespace AccelByte.Server
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("inventoryId", inventoryId)
-                .WithBody(request.ToUtf8Json());
+                .WithBody(payload.ToUtf8Json());
 
             var httpRequest = builder.GetResult();
 
@@ -167,7 +173,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request, request.Code);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -200,7 +206,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request, request.Name, request.Owner);
             if (error != null)
             {
                 callback?.TryError(error);
@@ -233,7 +239,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request);
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, request, request.Name);
             if (error != null)
             {
                 callback?.TryError(error);

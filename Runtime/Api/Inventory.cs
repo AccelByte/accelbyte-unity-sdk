@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -32,7 +32,7 @@ namespace AccelByte.Api
             , ResultCallback<DeleteUserInventoryItemResponse[]> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -40,7 +40,40 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.BulkDeleteInventoryItems(inventoryId, deletedItemsRequest, callback);
+            if (deletedItemsRequest == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var payload = new BulkDeleteUserInventoryItemsPayload[deletedItemsRequest.Length];
+            for (int i = 0; i < payload.Length; i++)
+            {
+                if (deletedItemsRequest[i] == null)
+                {
+                    continue;
+                };
+
+                payload[i] = new BulkDeleteUserInventoryItemsPayload(deletedItemsRequest[i].SourceItemId);
+                payload[i].SlotId = deletedItemsRequest[i].SlotId;
+            }
+
+            BulkDeleteInventoryItems(inventoryId, payload, callback);
+        }
+
+        public void BulkDeleteInventoryItems(string inventoryId
+            , BulkDeleteUserInventoryItemsPayload[] payload
+            , ResultCallback<DeleteUserInventoryItemResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.BulkDeleteInventoryItems(inventoryId, payload, callback);
         }
 
         public void BulkUpdateInventoryItems(
@@ -49,7 +82,7 @@ namespace AccelByte.Api
             , ResultCallback<UpdateUserInventoryItemResponse[]> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -57,7 +90,42 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.BulkUpdateInventoryItems(inventoryId, updatedItemsRequest, callback);
+            if (updatedItemsRequest == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var payload = new BulkUpdateInventoryItemsPayload[updatedItemsRequest.Length];
+            for (int i = 0; i < payload.Length; i++)
+            {
+                if (updatedItemsRequest[i] == null)
+                {
+                    continue;
+                };
+
+                payload[i] = new BulkUpdateInventoryItemsPayload(updatedItemsRequest[i].SourceItemId);
+                payload[i].SlotId = updatedItemsRequest[i].SlotId;
+                payload[i].CustomAttributes = updatedItemsRequest[i].CustomAttributes;
+                payload[i].Tags = updatedItemsRequest[i].Tags;
+            }
+
+            BulkUpdateInventoryItems(inventoryId, payload, callback);
+        }
+
+        public void BulkUpdateInventoryItems(string inventoryId
+            , BulkUpdateInventoryItemsPayload[] payload
+            , ResultCallback<UpdateUserInventoryItemResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.BulkUpdateInventoryItems(inventoryId, payload, callback);
         }
 
         public void ConsumeUserInventoryItem(
@@ -66,7 +134,7 @@ namespace AccelByte.Api
             , ResultCallback<UserItem> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -74,7 +142,48 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.ConsumeUserInventoryItem(inventoryId, consumedItemsRequest, callback);
+            if (consumedItemsRequest == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var optionalParams = new ConsumeUserInventoryItemOptionalParameters()
+            {
+                Options = consumedItemsRequest.Options,
+                SlotId = consumedItemsRequest.SlotId
+            };
+
+            ConsumeUserInventoryItem(inventoryId
+                , (uint)consumedItemsRequest.Quantity
+                , consumedItemsRequest.SourceItemId
+                , optionalParams
+                , callback);
+        }
+
+        public void ConsumeUserInventoryItem(string inventoryId
+            , uint qty
+            , string sourceItemId
+            , ConsumeUserInventoryItemOptionalParameters optionalParams
+            , ResultCallback<UserItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var request = new ConsumeUserItemsRequest
+            {
+                Quantity = (int)qty,
+                SourceItemId = sourceItemId,
+                SlotId = optionalParams?.SlotId,
+                Options = optionalParams?.Options
+            };
+
+            api.ConsumeUserInventoryItem(inventoryId, request, callback);
         }
 
         public void GetInventoryConfigurations(
@@ -85,7 +194,7 @@ namespace AccelByte.Api
             , string inventoryConfigurationCode = ""
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -103,7 +212,7 @@ namespace AccelByte.Api
             , int offset = 0
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -120,7 +229,7 @@ namespace AccelByte.Api
             , int offset = 0
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -139,7 +248,7 @@ namespace AccelByte.Api
             , string inventoryConfigurationCode = ""
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -164,7 +273,7 @@ namespace AccelByte.Api
             , ResultCallback<UserItemsPagingResponse> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -207,7 +316,7 @@ namespace AccelByte.Api
             , ResultCallback<UserItem> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -224,7 +333,7 @@ namespace AccelByte.Api
             , ResultCallback<MoveUserItemsBetweenInventoriesResponse> callback
         )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
@@ -232,7 +341,38 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.MoveItemsBetweenInventories(targetInventoryId, moveItemsRequest, callback);
+            if (moveItemsRequest?.items == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            var payload = new MoveUserItemsBetweenInventoriesPayload[moveItemsRequest.items.Length];
+            for(int i = 0; i < payload.Length; i++)
+            {
+                payload[i] = new MoveUserItemsBetweenInventoriesPayload(
+                    (uint)moveItemsRequest.items[i].Quantity
+                    , moveItemsRequest.items[i].SlotId
+                    , moveItemsRequest.items[i].SourceItemId);
+            }
+
+            MoveItemsBetweenInventories(targetInventoryId, moveItemsRequest.SourceInventoryId, payload, callback);
+        }
+
+        public void MoveItemsBetweenInventories(string targetInventoryId
+            , string sourceInventoryId
+            , MoveUserItemsBetweenInventoriesPayload[] payload
+            , ResultCallback<MoveUserItemsBetweenInventoriesResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.MoveItemsBetweenInventories(targetInventoryId, sourceInventoryId, payload, callback);
         }
     }
 }

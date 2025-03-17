@@ -100,18 +100,60 @@ namespace AccelByte.Api
         #region Chat topic
         public void CreatePersonalTopic(string otherUserId, ResultCallback<ChatActionTopicResponse> callback)
         {
+            var memberIds = new string[]
+            {
+                session.UserId,
+                otherUserId
+            };
+            
+            CreateTopic(topicType: ChatTopicType.personal
+                , memberUserIds: memberIds
+                , callback: callback);
+        }
+
+        internal void CreateGroupTopic(string groupName, string[] adminUserId, string[] memberUserIds, ResultCallback<ChatActionTopicResponse> callback, bool isJoinable = false)
+        {
+            CreateTopic(topicType: ChatTopicType.group
+                , groupName: groupName
+                , isJoinable: isJoinable
+                , adminUserIds:adminUserId
+                , memberUserIds: memberUserIds
+                , callback: callback);
+        }
+
+        internal void CreateTopic(ChatTopicType topicType, string[] memberUserIds, ResultCallback<ChatActionTopicResponse> callback,string[] adminUserIds = null, string groupName = null, bool isJoinable = false)
+        {
             ChatActionTopicRequest request = new ChatActionTopicRequest()
             {
                 Namespace = namespace_,
-                type = ChatTopicType.personal.ToString().ToUpper(),
-                members = new[]
-                {
-                    session.UserId,
-                    otherUserId
-                }
+                type = topicType.ToString().ToUpper(),
+                members = memberUserIds,
+                admins = adminUserIds,
+                name = groupName,
+                isJoinable = isJoinable
             };
             
             SendRequest(ChatMessageMethod.actionCreateTopic, request, callback);
+        }
+
+        internal void JoinTopic(string topicId, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            ChatActionJoinTopicRequest request = new ChatActionJoinTopicRequest()
+            {
+                topicId = topicId
+            };
+            
+            SendRequest(ChatMessageMethod.actionJoinTopic, request, callback);
+        }
+        
+        internal void DeleteTopic(string topicId, ResultCallback<ChatActionTopicResponse> callback)
+        {
+            ChatActionJoinTopicRequest request = new ChatActionJoinTopicRequest()
+            {
+                topicId = topicId
+            };
+            
+            SendRequest(ChatMessageMethod.actionDeleteTopic, request, callback);
         }
         #endregion
         

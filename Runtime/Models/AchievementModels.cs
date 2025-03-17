@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
-    [JsonConverter( typeof( StringEnumConverter ) )]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum AchievementSortBy
     {
         NONE,
@@ -24,7 +24,7 @@ namespace AccelByte.Models
         UPDATED_AT_DESC,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum GlobalAchievementStatus
     {
         None,
@@ -32,7 +32,7 @@ namespace AccelByte.Models
         Unlocked
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum GlobalAchievementListSortBy
     {
         None,
@@ -44,7 +44,7 @@ namespace AccelByte.Models
         CreatedAtDesc
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum GlobalAchievementContributorsSortBy
     {
         NONE,
@@ -53,7 +53,7 @@ namespace AccelByte.Models
         ContributedValueDesc
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum ConvertAchievementStatus: int
     {
         InProgress = 1,
@@ -84,8 +84,8 @@ namespace AccelByte.Models
         [DataMember] public float goalValue;
         [DataMember] public string statCode;
         [DataMember] public string createdAt;
-        [DataMember] public string updateAt;
-        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }
 
     [DataContract, Preserve]
@@ -112,8 +112,8 @@ namespace AccelByte.Models
         [DataMember] public float goalValue;
         [DataMember] public string statCode;
         [DataMember] public string createdAt;
-        [DataMember] public string updateAt;
-        [DataMember] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "customAttributes")] public Dictionary<string, object> CustomAttributes;
+        [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }
 
     [DataContract, Preserve]
@@ -146,11 +146,11 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class UserGlobalAchievement
     {
-        [DataMember] public string Id;
-        [DataMember] public Dictionary<string, string> Name;
-        [DataMember] public string AchievementCode;
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "name")] public Dictionary<string, string> Name;
+        [DataMember(Name = "achievementCode")] public string AchievementCode;
         [DataMember(Name = "namespace")] public string Namespace;
-        [DataMember] private int Status; // 1: In-Progress, 2: Unlocked
+        [DataMember(Name = "status")] private int Status; // 1: In-Progress, 2: Unlocked
         [DataMember] public ConvertAchievementStatus StatusCode
         {
             get
@@ -162,62 +162,62 @@ namespace AccelByte.Models
                 Status = (int)value;
             }
         }
-        [DataMember] public float LatestValue;
-        [DataMember] public string AchievedAt;
-        [DataMember] public string CreatedAt;
-        [DataMember] public string UpdatedAt;
+        [DataMember(Name = "latestValue")] public float LatestValue;
+        [DataMember(Name = "achievedAt")] public string AchievedAt;
+        [DataMember(Name = "createdAt")] public string CreatedAt;
+        [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }
 
     [DataContract, Preserve]
     public class PaginatedUserGlobalAchievement
     {
-        [DataMember] public UserGlobalAchievement[] Data;
-        [DataMember] public Paging Paging;
+        [DataMember(Name = "data")] public UserGlobalAchievement[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 
     [DataContract, Preserve]
     public class GlobalAchievementContributors
     {
-        [DataMember] public string Id;
+        [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "namespace")] public string Namespace;
-        [DataMember] public string AchievementCode;
-        [DataMember] public string UserId;
-        [DataMember] public float ContributedValue;
-        [DataMember] public string CreatedAt;
-        [DataMember] public string UpdatedAt;
+        [DataMember(Name = "achievementCode")] public string AchievementCode;
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "contributedValue")] public float ContributedValue;
+        [DataMember(Name = "createdAt")] public string CreatedAt;
+        [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }
 
     [DataContract, Preserve]
     public class PaginatedGlobalAchievementContributors
     {
-        [DataMember] public GlobalAchievementContributors[] Data;
-        [DataMember] public Paging Paging;
+        [DataMember(Name = "data")] public GlobalAchievementContributors[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 
     [DataContract, Preserve]
     public class GlobalAchievementContributed
     {
-        [DataMember] public string Id;
-        [DataMember] public Dictionary<string, string> name;
+        [DataMember(Name = "id")] public string Id;
+        [DataMember(Name = "name")] public Dictionary<string, string> name;
         [DataMember(Name = "namespace")] public string Namespace;
-        [DataMember] public string AchievementCode;
-        [DataMember] public string UserId;
-        [DataMember] public float ContributedValue;
-        [DataMember] public bool CanClaimReward;
+        [DataMember(Name = "achievementCode")] public string AchievementCode;
+        [DataMember(Name = "userId")] public string UserId;
+        [DataMember(Name = "contributedValue")] public float ContributedValue;
+        [DataMember(Name = "canClaimReward")] public bool CanClaimReward;
     }
 
     [DataContract, Preserve]
     public class PaginatedGlobalAchievementUserContributed
     {
-        [DataMember] public GlobalAchievementContributed[] Data;
-        [DataMember] public Paging Paging;
+        [DataMember(Name = "data")] public GlobalAchievementContributed[] Data;
+        [DataMember(Name = "paging")] public Paging Paging;
     }
 
     [DataContract, Preserve]
     public class PublicTag
     {
         [DataMember] public string name;
-        [DataMember] public string Namespace;
+        [DataMember(Name = "namespace")] public string Namespace;
         [DataMember] public string createdAt;
     }
 
@@ -226,5 +226,27 @@ namespace AccelByte.Models
     {
         [DataMember] public PublicTag[] data;
         [DataMember] public Paging paging;
+    }
+
+    [DataContract, Preserve]
+    public class BulkUnlockAchievementRequest
+    {
+        [DataMember(Name = "achievementCodes")] public string[] AchievementCodes;
+    }
+
+    [DataContract, Preserve]
+    public class BulkUnlockAchievementResponse
+    {
+        [DataMember(Name = "achievementCode")] public string AchievementCode;
+        [DataMember(Name = "success")] public bool Success;
+        [DataMember(Name = "errorDetails")] public BulkUnlockAchievementError ErrorDetails;
+    }
+
+    [DataContract, Preserve]
+    public class BulkUnlockAchievementError
+    {
+        [DataMember(Name = "errorCode")] public int ErrorCode;
+        [DataMember(Name = "errorMessage")] public string ErrorMessage;
+        [DataMember(Name = "thirdPartyReferenceId")] public string ThirdPartyReferenceId;
     }
 }

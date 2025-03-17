@@ -60,6 +60,7 @@ namespace AccelByte.Core
         StatusPreconditionRequired = 428,
         HttpTooManyRequests = 429,
         StatusRequestHeaderFieldsTooLarge = 431,
+        RetryWith = 449,
         StatusUnavailableForLegalReasons = 451,
         InternalServerError = 500,
         NotImplemented = 501,

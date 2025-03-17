@@ -3215,7 +3215,7 @@ namespace AccelByte.Models
         [DataMember(Name = "matchPool")] public string MatchPool;
         [DataMember(Name = "gameSessionId")] public string GameSessionId;
         [DataMember(Name = "proposedTeams")] public SessionV2TeamData[] ProposedTeams;
-        [DataMember(Name = "addedTickets")] public MatchmakingV2Ticket[] AddedTickets;
+        [DataMember(Name = "addedTickets")] public ServerMatchmakingV2Ticket[] AddedTickets;
 
         public PredefinedDSBackfillBaseModel(string podName, MatchmakingV2BackfillProposalNotification backfillNotif)
         {
@@ -3225,7 +3225,7 @@ namespace AccelByte.Models
             MatchPool = backfillNotif.matchPool;
             GameSessionId = backfillNotif.matchSessionId;
             ProposedTeams = backfillNotif.proposedTeams;
-            AddedTickets = backfillNotif.addedTickets;
+            AddedTickets = backfillNotif.BackfillProposalTickets;
         }
 
         internal override string GetPredefinedModelName()

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -12,6 +12,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
+    [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use Api.BinaryCloudSave instead")]
     public class CloudStorageApi : ApiBase
     {
         /// <summary>
