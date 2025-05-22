@@ -70,7 +70,7 @@ namespace AccelByte.Api
         public void CreateMatchmakingTicket(string matchPoolName,
             ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             CreateMatchmakingTicket(matchPoolName, null, callback);
         }
         
@@ -86,7 +86,7 @@ namespace AccelByte.Api
             , MatchmakingV2CreateTicketRequestOptionalParams optionalParams,
             ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!session.IsValid())
             {
@@ -96,7 +96,7 @@ namespace AccelByte.Api
 
             if (GetPartySessionStorageRequired(optionalParams))
             {
-                GetPartySessionStorage(optionalParams.sessionId, cb =>
+                GetPartySessionStorage(optionalParams.sessionId, optionalParams, cb =>
                 {
                     if (!cb.IsError)
                     {
@@ -124,7 +124,29 @@ namespace AccelByte.Api
         public void GetMatchmakingTicket(string ticketId
             , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMatchmakingTicketOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetMatchmakingTicket(ticketId, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get details for a specific match ticket
+        /// </summary>
+        /// <param name="ticketId">Targeted matchmaking ticket id</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">
+        /// Returns a Result that contain MatchmakingV2MatchTicketStatus via callback when completed.
+        /// </param>
+        internal void GetMatchmakingTicket(string ticketId
+            , GetMatchmakingTicketOptionalParameters optionalParameters
+            , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(ticketId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetTicketIdInvalidMessage(ticketId), callback))
             {
@@ -137,10 +159,9 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.GetMatchmakingTicket(ticketId, callback));
+            Api.GetMatchmakingTicket(ticketId, optionalParameters, callback);
         }
-        
+
         /// <summary>
         /// Deletes an existing matchmaking ticket.
         /// </summary>
@@ -150,7 +171,22 @@ namespace AccelByte.Api
         /// </param>
         public void DeleteMatchmakingTicket(string ticketId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            DeleteMatchmakingTicket(ticketId, null, callback);
+        }
+
+        /// <summary>
+        /// Deletes an existing matchmaking ticket.
+        /// </summary>
+        /// <param name="ticketId">Targeted matchmaking ticket id</param>
+        /// <param name="optionalParams">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">
+        /// Returns a Result via callback when completed.
+        /// </param>
+        internal void DeleteMatchmakingTicket(string ticketId, DeleteMatchmakingV2OptionalParams optionalParams, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!ValidateAccelByteId(ticketId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetTicketIdInvalidMessage(ticketId), callback))
             {
@@ -162,9 +198,9 @@ namespace AccelByte.Api
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-
+            
             coroutineRunner.Run(
-                Api.DeleteMatchmakingTicket(ticketId, cb =>
+                Api.DeleteMatchmakingTicket(ticketId, optionalParams, cb =>
                 {
                     SendPredefinedEvent(ticketId, cb, callback);
                 }));
@@ -177,16 +213,26 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contain MatchmakingV2Metrics via callback when completed</param>
         public void GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
-            
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GetMatchmakingMetrics(matchPool, optionalParameters: null, callback);
+        }
+
+        /// <summary>
+        /// Get matchmaking's match pool metrics
+        /// </summary>
+        /// <param name="matchPool">Name of the match pool</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns a Result that contain MatchmakingV2Metrics via callback when completed</param>
+        internal void GetMatchmakingMetrics(string matchPool, GetMatchmakingMetricsOptionalParameters optionalParameters, ResultCallback<MatchmakingV2Metrics> callback)
+        {
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.GetMatchmakingMetrics(matchPool, callback));
+            Api.GetMatchmakingMetrics(matchPool, optionalParameters, callback);
         }
 
         /// <summary>
@@ -199,7 +245,27 @@ namespace AccelByte.Api
         public void GetUserMatchmakingTickets(ResultCallback<MatchmakingV2ActiveTickets> callback
             , string matchPool = "", int offset = 0, int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetUserMatchmakingTicketsOptionalParameters()
+            {
+                Limit = limit,
+                Offset = offset,
+                Logger = SharedMemory?.Logger,
+                MatchPool = matchPool
+            };
+
+            GetUserMatchmakingTickets(optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get active matchmaking tickets for current user.
+        /// </summary>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns a result that contain all active tickets of current user.</param>
+        internal void GetUserMatchmakingTickets(GetUserMatchmakingTicketsOptionalParameters optionalParameters, ResultCallback<MatchmakingV2ActiveTickets> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -207,8 +273,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.GetUserMatchmakingTickets(callback, matchPool, offset, limit));
+            Api.GetUserMatchmakingTickets(optionalParameters, callback);
         }
 
         /// <summary>
@@ -299,11 +364,12 @@ namespace AccelByte.Api
             , MatchmakingV2CreateTicketRequestOptionalParams optionalParams
             , ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
+
             if (optionalParams != null)
             {
                 optionalParams.ExcludedGameSessionIds = PopulatePastMemberSessionId(optionalParams);
             }
-
 
             coroutineRunner.Run(Api.CreateMatchmakingTicket(matchPoolName, optionalParams, cb =>
             {
@@ -353,9 +419,10 @@ namespace AccelByte.Api
 
         #region PartySessionStorage
         internal void GetPartySessionStorage(string partyId
+            , MatchmakingV2CreateTicketRequestOptionalParams optionalParams
             , ResultCallback<GetPartySessionStorageResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!ValidateAccelByteId(partyId
                 , Utils.AccelByteIdValidator.HypensRule.NoRule
@@ -371,14 +438,14 @@ namespace AccelByte.Api
                 return;
             }
 
-            PartySessionStorageApi.GetPartySessionStorage(partyId, callback);
+            PartySessionStorageApi.GetPartySessionStorage(partyId, optionalParams, callback);
         }
 
         internal void StorePersonalDataToReservedPartySessionStorage(string partyId
             , PartySessionStorageReservedData body
             , ResultCallback<PartySessionStorageReservedData> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(partyId
                 , Utils.AccelByteIdValidator.HypensRule.NoRule

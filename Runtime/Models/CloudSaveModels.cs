@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -92,7 +92,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class MetadataOptionalParamsBase
+    public class MetadataOptionalParamsBase : OptionalParametersBase
     {
         /// <summary>
         /// Indicates the TTL configuration for the game record.

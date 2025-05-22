@@ -91,15 +91,25 @@ namespace AccelByte.Server
         /// </summary>
         public virtual void Connect(string dsId)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Connect(dsId, new WebsocketConnectOptionalParameters()
+            {
+                Logger = sharedMemory?.Logger
+            });
+        }
+        
+        internal void Connect(string dsId, WebsocketConnectOptionalParameters optionalParameters)
+        {
+            var targetLogger = optionalParameters != null && optionalParameters.Logger != null ? optionalParameters.Logger : sharedMemory?.Logger;
+            
+            Report.GetFunctionLog(GetType().Name, logger: targetLogger);
 
             if (dsId == null || dsId.Length == 0)
             {
-                sharedMemory?.Logger?.LogWarning("dsid not provided, not connecting to AMS");
+                targetLogger?.LogWarning("dsid not provided, not connecting to AMS");
             }
             else
             {
-                websocketApi.Connect(dsId);
+                websocketApi.Connect(dsId, optionalParameters);
             }
         }
 

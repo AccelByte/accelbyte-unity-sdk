@@ -46,7 +46,7 @@ namespace AccelByte.Api
             , LoginWithEmailV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -57,7 +57,7 @@ namespace AccelByte.Api
             Action loginAction = () =>
             {
                 bool rememberMe = optionalParams.RememberMe;
-                LoginWithEmailV4(email, password, loginActionCallback, rememberMe);
+                LoginWithEmailV4(email, password, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -94,7 +94,7 @@ namespace AccelByte.Api
         public void LoginWithDeviceIdV4(LoginWithDeviceIdV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -104,7 +104,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                LoginWithDeviceIdV4(loginActionCallback);
+                LoginWithDeviceIdV4(optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -154,7 +154,7 @@ namespace AccelByte.Api
             , LoginWithOtherPlatformV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (loginPlatformType == null)
             {
@@ -173,10 +173,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                bool createHeadless = optionalParams.CreateHeadless;
-                string serviceLabel = optionalParams.ServiceLabel;
-                LoginWithMacAddress loginWithMacAddress = optionalParams.LoginWithMacAddress;
-                LoginWithOtherPlatformIdV4(loginPlatformType.PlatformId, platformToken, loginActionCallback, createHeadless, serviceLabel, loginWithMacAddress);
+                LoginWithOtherPlatformIdV4(loginPlatformType.PlatformId, platformToken, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -211,7 +208,7 @@ namespace AccelByte.Api
         public void LoginWithLastRefreshTokenV4(LoginWithRefreshTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             LoginWithCachedRefreshTokenV4(UserSession.LastLoginUserCacheKey, optionalParams, loginCallback);
         }
@@ -245,7 +242,7 @@ namespace AccelByte.Api
             , LoginWithRefreshTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
@@ -286,7 +283,7 @@ namespace AccelByte.Api
             , LoginWithRefreshTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             TriggerLoginWithCachedRefreshTokenV4(cacheKey, optionalParams, loginCallback);
         }
@@ -324,7 +321,7 @@ namespace AccelByte.Api
             , CreateHeadlessAccountAndResponseTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -334,7 +331,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, loginActionCallback);
+                CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -381,7 +378,7 @@ namespace AccelByte.Api
             , AuthenticationWithPlatformLinkAndLoginV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -391,7 +388,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                AuthenticationWithPlatformLinkAndLoginV4(email, password, linkingToken, loginActionCallback);
+                AuthenticationWithPlatformLinkAndLoginV4(email, password, linkingToken, optionalParams, loginActionCallback);
 
             };
 
@@ -423,7 +420,7 @@ namespace AccelByte.Api
             , GenerateGameTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -433,7 +430,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                GenerateGameTokenV4(code, loginActionCallback);
+                GenerateGameTokenV4(code, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -472,7 +469,7 @@ namespace AccelByte.Api
             , Verify2FACodeV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (optionalParams == null)
             {
@@ -482,8 +479,7 @@ namespace AccelByte.Api
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                bool rememberDevice = optionalParams.RememberDevice;
-                Verify2FACodeV4(mfaToken, factor, code, loginActionCallback, rememberDevice);
+                Verify2FACodeV4(mfaToken, factor, code, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -494,7 +490,7 @@ namespace AccelByte.Api
         }
 
         protected virtual void TriggerLoginWithCachedRefreshTokenV4(string cacheKey
-            , LoginV4OptionalParameters optionalParams
+            , LoginWithRefreshTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
             userSession.GetRefreshTokenFromCache(cacheKey, (refreshTokenData) =>
@@ -518,7 +514,7 @@ namespace AccelByte.Api
                         error = ErrorCode.CachedTokenExpired.ToString(),
                         error_description = $"Cached token is expired"
                     };
-                    loginCallback.TryError(newError);
+                    loginCallback?.TryError(newError);
                     return;
                 }
 
@@ -528,18 +524,18 @@ namespace AccelByte.Api
 
         private void LoginWithRefreshTokenV4(string refreshToken
             , string cacheKey
-            , LoginV4OptionalParameters optionalParams
+            , LoginWithRefreshTokenV4OptionalParameters optionalParams
             , ResultCallback<TokenData, OAuthError> loginCallback)
         {
             if (optionalParams == null)
             {
-                optionalParams = new LoginV4OptionalParameters();
+                optionalParams = new LoginWithRefreshTokenV4OptionalParameters();
             }
 
             ResultCallback<TokenDataV4, OAuthError> loginActionCallback = null;
             Action loginAction = () =>
             {
-                LoginWithRefreshTokenV4(refreshToken, cacheKey, loginActionCallback);
+                LoginWithRefreshTokenV4(refreshToken, cacheKey, optionalParams, loginActionCallback);
             };
 
             LoginV4(
@@ -629,7 +625,7 @@ namespace AccelByte.Api
                 {
                     Session.LoadAuthTrustId((isSuccess, authTrustId) =>
                     {
-                        oAuth2.GetTokenWithLoginTicket(loginTicket: queueTicket, authTrustId: authTrustId, callback: result =>
+                        oAuth2.GetTokenWithLoginTicket(loginTicket: queueTicket, authTrustId: authTrustId, optionalParameters: optionalParameters, callback: result =>
                         {
                             queuePoller = null;
 
@@ -674,8 +670,8 @@ namespace AccelByte.Api
 #region Login Queue Implementation
         private void LoginWithEmailV4(string email
             , string password
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool rememberMe = false)
+            , LoginWithEmailV4OptionalParameters optionalParameters
+            , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
@@ -686,13 +682,13 @@ namespace AccelByte.Api
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -713,7 +709,7 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = email;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(
@@ -721,7 +717,7 @@ namespace AccelByte.Api
                 {
                     Session.LoadAuthTrustId((isSuccess, authTrustId) =>
                     {
-                        oAuth2.LoginWithEmailV4(email, password, rememberMe, cb, authTrustId);
+                        oAuth2.LoginWithEmailV4(email, password, optionalParameters, cb, authTrustId);
                     });
                 }
                 , onAlreadyLogin
@@ -729,19 +725,19 @@ namespace AccelByte.Api
                 , onProcessCompleted);
         }
         
-        private void LoginWithDeviceIdV4(ResultCallback<TokenDataV4, OAuthError> callback)
+        private void LoginWithDeviceIdV4(LoginWithDeviceIdV4OptionalParameters optionalParameters, ResultCallback<TokenDataV4, OAuthError> callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -759,13 +755,13 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = string.Empty;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithDeviceIdV4(cb);
+                    oAuth2.LoginWithDeviceIdV4(optionalParameters, cb);
                 }
                 , onAlreadyLogin
                 , onLoginFailed
@@ -774,20 +770,18 @@ namespace AccelByte.Api
 
         private void LoginWithOtherPlatformIdV4(string platformId
             , string platformToken
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool createHeadless
-            , string serviceLabel
-            , LoginWithMacAddress loginWithMacAddress = null)
+            , LoginWithOtherPlatformV4OptionalParameters optionalParameters
+            , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -805,13 +799,13 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = platformId;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, createHeadless, serviceLabel, loginWithMacAddress, cb);
+                    oAuth2.LoginWithOtherPlatformIdV4(platformId, platformToken, optionalParameters, cb);
                 }
                 , onAlreadyLogin
                 , onLoginFailed
@@ -821,16 +815,17 @@ namespace AccelByte.Api
 
         private void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
             , bool extendExp
+            , CreateHeadlessAccountAndResponseTokenV4OptionalParameters optionalParameters
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
             {
@@ -847,12 +842,12 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = linkingToken;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(cb =>
             {
-                oAuth2.CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, cb);
+                oAuth2.CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, optionalParameters, cb);
             }
             , onAlreadyLogin
             , onLoginFailed
@@ -862,6 +857,7 @@ namespace AccelByte.Api
         private void AuthenticationWithPlatformLinkAndLoginV4(string email
             , string password
             , string linkingToken
+            , AuthenticationWithPlatformLinkAndLoginV4OptionalParameters optionalParameters
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             if (string.IsNullOrEmpty(linkingToken))
@@ -877,13 +873,13 @@ namespace AccelByte.Api
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -901,12 +897,12 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = linkingToken;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(cb =>
             {
-                oAuth2.AuthenticationWithPlatformLinkV4(email, password, linkingToken, cb);
+                oAuth2.AuthenticationWithPlatformLinkV4(email, password, linkingToken, optionalParameters, cb);
             }
             , onAlreadyLogin
             , onLoginFailed
@@ -914,6 +910,7 @@ namespace AccelByte.Api
         }
 
         private void GenerateGameTokenV4(string code
+            , GenerateGameTokenV4OptionalParameters optionalParameters
             , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             if (string.IsNullOrEmpty(code))
@@ -929,13 +926,13 @@ namespace AccelByte.Api
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -953,12 +950,12 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = code;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(cb =>
             {
-                oAuth2.GenerateGameTokenV4(code, cb);
+                oAuth2.GenerateGameTokenV4(code, optionalParameters, cb);
             }
             , onAlreadyLogin
             , onLoginFailed
@@ -968,8 +965,8 @@ namespace AccelByte.Api
         private void Verify2FACodeV4(string mfaToken
             , TwoFAFactorType factor
             , string code
-            , ResultCallback<TokenDataV4, OAuthError> callback
-            , bool rememberDevice = false)
+            , Verify2FACodeV4OptionalParameters optionalParameters
+            , ResultCallback<TokenDataV4, OAuthError> callback)
         {
             if (userSession.IsValid())
             {
@@ -978,19 +975,19 @@ namespace AccelByte.Api
                     error = ErrorCode.InvalidRequest.ToString(),
                     error_description = "User is already logged in."
                 };
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             Action<OAuthError> onAlreadyLogin = (error) =>
             {
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<OAuthError> onLoginFailed = (error) =>
             {
                 SendLoginFailedPredefinedEvent(api.Config.Namespace, null);
-                callback.TryError(error);
+                callback?.TryError(error);
             };
 
             Action<TokenDataV4> onProcessCompleted = (tokenData) =>
@@ -1008,12 +1005,12 @@ namespace AccelByte.Api
                 {
                     tokenData.Queue.Identifier = code;
                 }
-                callback.TryOk(tokenData);
+                callback?.TryOk(tokenData);
             };
 
             Login(cb =>
             {
-                oAuth2.Verify2FACodeV4(mfaToken, factor, code, rememberDevice, cb);
+                oAuth2.Verify2FACodeV4(mfaToken, factor, code, optionalParameters, cb);
             }
             , onAlreadyLogin
             , onLoginFailed

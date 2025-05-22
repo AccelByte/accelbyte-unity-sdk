@@ -382,7 +382,7 @@ namespace AccelByte.Models
     }
     
     [DataContract, Preserve]
-    public class AcceptBackfillProposalOptionalParams
+    public class AcceptBackfillProposalOptionalParams : OptionalParametersBase
     {
         [DataMember(Name = "acceptedTicketIds")] public string[] AcceptedTicketIds;
         [DataMember(Name = "stop")] public bool? StopBackfilling;

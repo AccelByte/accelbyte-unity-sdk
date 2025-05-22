@@ -51,11 +51,11 @@ namespace AccelByte.Api
         public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
             , ResultCallback<ChallengeResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -73,22 +73,39 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetScheduledChallengeGoalsOptionalParameters()
+            {
+                Offset = offset,
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Tags = tags
+            };
+
+            GetScheduledChallengeGoals(challengeCode, optionalParameters, callback);
+        }
+
+        internal void GetScheduledChallengeGoals(string challengeCode
+            , GetScheduledChallengeGoalsOptionalParameters optionalParameters
+            , ResultCallback<GoalResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            api.GetScheduledChallengeGoals(challengeCode, tags, offset, limit, callback);
+            api.GetScheduledChallengeGoals(challengeCode, optionalParameters, callback);
         }
 
         public void GetChallengeProgress(string challengeCode
@@ -97,22 +114,39 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetChallengeProgressOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset
+            };
+
+            GetChallengeProgress(challengeCode, goalCode, optionalParameters, callback);
+        }
+
+        internal void GetChallengeProgress(string challengeCode
+            , string goalCode
+            , GetChallengeProgressOptionalParameters optionalParameters
+            , ResultCallback<GoalProgressionResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            api.GetChallengeProgress(challengeCode, goalCode, offset, limit, callback);
+            api.GetChallengeProgress(challengeCode, goalCode, optionalParameters, callback);
         }
 
         public void GetRewards(ChallengeRewardStatus status            
@@ -121,36 +155,67 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetRewardsOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                SortBy = sortBy
+            };
+
+            GetRewards(status, optionalParameters, callback);
+        }
+
+        internal void GetRewards(ChallengeRewardStatus status
+            , GetRewardsOptionalParameters optionalParameters
+            , ResultCallback<UserRewards> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             api.GetRewards(status
-                , sortBy
-                , offset
-                , limit
+                , optionalParameters
                 , callback);
         }
 
         public void ClaimReward(string[] rewardIDs
             , ResultCallback<UserReward[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ClaimRewardOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ClaimReward(rewardIDs
+                , optionalParameters
+                , callback);
+        }
+
+        internal void ClaimReward(string[] rewardIDs
+            , ClaimRewardOptionalParameters optionalParameters
+            , ResultCallback<UserReward[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(rewardIDs);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -160,6 +225,7 @@ namespace AccelByte.Api
             };
 
             api.ClaimReward(body
+                , optionalParameters
                 , callback);
         }
 
@@ -170,7 +236,28 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetChallengeProgressWithRotationIndexOptionalParameters()
+            {
+                GoalCode = goalCode,
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset
+            };
+
+            GetChallengeProgress(challengeCode
+                , rotationIndex
+                , optionalParameters
+                , callback);
+        }
+
+        internal void GetChallengeProgress(string challengeCode
+            , int rotationIndex
+            , GetChallengeProgressWithRotationIndexOptionalParameters optionalParameters
+            , ResultCallback<GoalProgressionResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -180,15 +267,25 @@ namespace AccelByte.Api
 
             api.GetChallengeProgress(challengeCode
                 , rotationIndex
-                , callback
-                , goalCode
-                , offset
-                , limit);
+                , optionalParameters
+                , callback);
         }
 
         public void EvaluateChallengeProgress(ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new EvaluateChallengeProgressOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            EvaluateChallengeProgress(optionalParameters, callback);
+        }
+
+        internal void EvaluateChallengeProgress(EvaluateChallengeProgressOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -196,7 +293,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.EvaluateChallengeProgress(callback);
+            api.EvaluateChallengeProgress(optionalParameters, callback);
         }
 
         public void ListScheduleByGoal(string challengeCode
@@ -211,7 +308,7 @@ namespace AccelByte.Api
             , ChallengeListScheduleByGoalOptionalParameters optionalParams
             , ResultCallback<ChallengeListScheduleByGoalResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!session.IsValid())
             {
@@ -232,7 +329,7 @@ namespace AccelByte.Api
             , ChallengeListSchedulesOptionalParameters optionalParams
             , ResultCallback<ChallengeListSchedulesResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!session.IsValid())
             {

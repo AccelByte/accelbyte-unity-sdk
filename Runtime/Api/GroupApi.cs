@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -33,7 +33,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -52,7 +52,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateGroupV2(CreateGroupRequest createGroupRequest
@@ -63,7 +63,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -81,7 +81,7 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SearchGroups(ResultCallback<PaginatedGroupListResponse> callback
@@ -95,7 +95,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -116,7 +116,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupListResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroup(string groupId
@@ -127,7 +127,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -145,7 +145,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGroup(string groupId
@@ -157,7 +157,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -193,7 +193,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGroupV2(string groupId
@@ -205,7 +205,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -241,7 +241,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteGroup(string groupId
@@ -252,7 +252,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -270,7 +270,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteGroupV2(string groupId
@@ -281,7 +281,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -299,7 +299,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGroupCustomRule(string groupId
@@ -311,7 +311,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -334,7 +334,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator UpdateGroupCustomRuleV2(string groupId
@@ -346,7 +346,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -369,7 +369,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGroupPredefinedRule(string groupId
@@ -386,7 +386,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -407,7 +407,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator UpdateGroupPredefinedRuleV2(string groupId
@@ -424,7 +424,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -445,7 +445,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteGroupPredefinedRule(string groupId
@@ -461,7 +461,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -482,7 +482,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator DeleteGroupPredefinedRuleV2(string groupId
@@ -498,7 +498,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -519,7 +519,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserGroupInfo(string userId
@@ -530,7 +530,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -548,7 +548,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AcceptGroupInvitation(string groupId
@@ -559,7 +559,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -577,7 +577,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AcceptGroupInvitationV2(string groupId
@@ -588,7 +588,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -606,7 +606,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectGroupInvitation(string groupId
@@ -617,7 +617,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -635,7 +635,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectGroupInvitationV2(string groupId
@@ -646,7 +646,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -664,7 +664,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator InviteOtherUserToGroup(string userId
@@ -675,7 +675,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -693,7 +693,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserInvitationResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator InviteOtherUserToGroupV2(string userId, string groupId
@@ -704,7 +704,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -723,7 +723,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserInvitationResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator JoinGroup(string groupId
@@ -734,7 +734,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -753,7 +753,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<JoinGroupResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator JoinGroupV2(string groupId
@@ -764,7 +764,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -783,7 +783,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<JoinGroupResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CancelJoinGroupRequest(string groupId
@@ -794,7 +794,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -813,7 +813,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroupMemberList(string groupId
@@ -826,7 +826,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -847,7 +847,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupMemberList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator KickGroupMember(string userId
@@ -858,7 +858,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -877,7 +877,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<KickMemberResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator KickGroupMemberV2(string userId, string groupId
@@ -888,7 +888,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -908,7 +908,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<KickMemberResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator LeaveGroup(ResultCallback<GroupGeneralResponse> callback)
@@ -918,7 +918,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -936,7 +936,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator LeaveGroupV2(string groupId, ResultCallback<GroupGeneralResponse> callback)
@@ -946,7 +946,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -965,7 +965,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroupJoinRequests(string groupId
@@ -978,7 +978,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -999,7 +999,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetGroupJoinRequestsV2(string groupId
@@ -1012,7 +1012,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1033,7 +1033,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetMyJoinRequest(ResultCallback<PaginatedGroupRequestList> callback
@@ -1045,7 +1045,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1065,7 +1065,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroupInvitationRequests(ResultCallback<PaginatedGroupRequestList> callback
@@ -1077,7 +1077,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1097,7 +1097,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetGroupInvitationRequestsV2(string groupId,ResultCallback<PaginatedGroupRequestList> callback
@@ -1109,7 +1109,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1133,7 +1133,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<PaginatedGroupRequestList>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
 
@@ -1145,7 +1145,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1164,7 +1164,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AcceptOtherJoinRequestV2(string userId, string groupId
@@ -1175,7 +1175,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1195,7 +1195,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectOtherJoinRequest(string userId
@@ -1206,7 +1206,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1225,7 +1225,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RejectOtherJoinRequestV2(string userId, string groupId
@@ -1236,7 +1236,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1256,7 +1256,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupGeneralResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AssignRoleToMember(string memberRoleId
@@ -1268,7 +1268,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1290,7 +1290,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AssignRoleToMemberV2(string memberRoleId
@@ -1302,7 +1302,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1325,7 +1325,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RemoveRoleFromMember(string memberRoleId
@@ -1337,7 +1337,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1359,7 +1359,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RemoveRoleFromMemberV2(string memberRoleId
@@ -1371,7 +1371,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, memberRoleId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1395,7 +1395,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetMemberRoles(ResultCallback<PaginatedMemberRoles> callback
@@ -1407,7 +1407,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1426,7 +1426,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PaginatedMemberRoles>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroupsByGroupIds(string[] groupIds, ResultCallback<PaginatedGroupListResponse> callback)
@@ -1436,7 +1436,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupIds);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1457,7 +1457,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedGroupListResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserJoinedGroups(ResultCallback<PaginatedGroupMemberList> callback, int limit = 0,
@@ -1468,7 +1468,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1486,7 +1486,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PaginatedGroupMemberList>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CancelGroupMemberInvitation(string userId, string groupId,
@@ -1497,7 +1497,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1516,7 +1516,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GroupGeneralResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGroupCustomAttributes(string groupId, Dictionary<string, object> customAttributes,
@@ -1526,7 +1526,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, groupId, customAttributes);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1546,7 +1546,7 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserGroupStatusInfo(string userId, string groupId,
@@ -1555,7 +1555,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, groupId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -1573,7 +1573,7 @@ namespace AccelByte.Api
             yield return HttpClient.SendRequest(request, rsp => response = rsp);
 
             var result = response.TryParseJson<GroupMemberInformation>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

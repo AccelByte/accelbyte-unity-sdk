@@ -171,6 +171,12 @@ namespace AccelByte.Models
         [DataMember] public bool eligible = true;
     }
 
+    [Preserve]
+    public class GetUserByUserIdOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
     [DataContract, Preserve]
     public class PublicUserData
     {
@@ -226,7 +232,7 @@ namespace AccelByte.Models
     /// <summary>
     /// Optional parameters for Register and RegisterV4 endpoints. Can be null.
     /// </summary>
-    public class RegisterUserOptionalParameters
+    public class RegisterUserOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Verification code sent to email. Use only when Mandatory Email Verification is enabled on the namespace.
@@ -424,7 +430,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class BulkGetUserByOtherPlatformUserIdsOptionalParameters
+    public class BulkGetUserByOtherPlatformUserIdsOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// When enabled, return un-encrypted platform user id.
@@ -1077,7 +1083,7 @@ namespace AccelByte.Models
     /// <summary>
     /// Request verification code to email address optional parameters. Can be null.
     /// </summary>
-    public class SendVerificationCodeToNewUserOptionalParameters
+    public class SendVerificationCodeToNewUserOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Language of email to be sent if configured.
@@ -1097,11 +1103,369 @@ namespace AccelByte.Models
         [DataMember(Name = "username")] public string Username = null;
     }
 
+    [Preserve]
+    public class ValidateUserInputOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
     [DataContract, Preserve]
     public class ValidateInputResponse
     {
         [DataMember(Name = "message")] public string Message; 
         [DataMember(Name = "valid")] public bool IsValid; 
+    }
+
+    [Preserve]
+    public class LoginWithUsernameV3OptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Set it to true to extend the refresh token expiration time
+        /// </summary>
+        public bool? RememberMe = false;
+    };
+
+    [Preserve]
+    public class LoginWithOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Set it to true  because it doesn't have username yet
+        /// </summary>
+        public bool? CreateHeadless = true;
+
+        /// <summary>
+        /// (Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5
+        /// </summary>
+        public string ServiceLabel = null;
+
+        /// <summary>
+        /// Include mac Address information for PSN and Xbox ban reporting
+        /// </summary>
+        public LoginWithMacAddress LoginWithMacAddress = null;
+    }
+
+    [Preserve]
+    public class LoginWithLauncherOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class LoginWithDeviceIdOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class LoginWithRefreshTokenOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class LogoutOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class CreateHeadlessAccountAndResponseTokenOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class AuthenticationWithPlatformLinkOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Verify2FACodeOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Will record device token when true
+        /// </summary>
+        public bool? RememberDevice = false;
+    }
+
+    [Preserve]
+    public class VerifyTokenOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GenerateCodeForPublisherTokenExchangeOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GenerateGameTokenOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class RetrieveUserThirdPartyPlatformTokenOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GetOrRefreshDataOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Set to true to also retrieve data from all user's linked platform accounts.
+        /// </summary>
+        public bool? IsIncludeAllPlatforms = false;
+    }
+
+    [Preserve]
+    public class UpdateUserDataOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class UpdateEmailOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpgradeHeadlessAccountOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Set to true to require verification code that will be sent to user's registered email
+        /// </summary>
+        public bool NeedVerificationCode = false;
+    }
+
+    [Preserve]
+    public class UpgradeHeadlessAccountV2OptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpgradeAndVerifyHeadlessAccountOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class SendUpgradeVerificationCodeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class VerifyUserEmailOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class SendPasswordResetCodeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class ResetPasswordOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class LinkOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class ForceLinkOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UnlinkOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UnlinkAllOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetPlatformLinksOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class SearchUsersOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 100;
+
+        /// <summary>
+        /// Specify platform type, string type of this field makes support OpenID Connect (OIDC).
+        /// </summary>
+        public string PlatformId = null;
+
+        /// <summary>
+        /// Filter the responded PagedPublicUsersInfo by SearchPlatformType.
+        /// </summary>
+        public SearchPlatformType? SearchPlatformType = Models.SearchPlatformType.None;
+    }
+
+    [Preserve]
+    public class GetUserByOtherPlatformUserIdV4OptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetCountryFromIPOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetCountryGroupV3OptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Change2FAFactorOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Disable2FAAuthenticatorOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Enable2FAAuthenticatorOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GenerateSecretKeyFor3rdPartyAuthenticateAppOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GenerateBackUpCodeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Disable2FABackupCodesOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Enable2FABackupCodesOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetBackUpCodeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetUserEnabledFactorsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class Make2FAFactorDefaultOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetInputValidationsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Should return default language if languageCode is empty or language not available if set to true.
+        /// </summary>
+        public bool? DefaultOnEmpty = true;
+    }
+
+    [Preserve]
+    public class UpdateUserOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetPublisherUserOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetUserInformationOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class LinkHeadlessAccountToCurrentFullAccountOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetConflictResultWhenLinkHeadlessAccountToFullAccountOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class CheckUserAccountAvailabilityByFieldNameOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetConfigValueOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetUserOtherPlatformBasicPublicInfoOptionalParameters : OptionalParametersBase
+    {
+
     }
 
     [DataContract, Preserve]
@@ -1168,6 +1532,11 @@ namespace AccelByte.Models
     {
         [DataMember] public LoginQueueTicket Queue;
     }
+    
+    [DataContract, Preserve]
+    public class GetUserPublicInfoOptionalParameters : OptionalParametersBase
+    {
+    }
 
     [DataContract, Preserve]
     public class GetUserPublicInfoResponse
@@ -1178,7 +1547,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class GetLinkedPlatformAccountsOptionalParams
+    public class GetLinkedPlatformAccountsOptionalParams : OptionalParametersBase
     {
         public PlatformType PlatformId;
         public string TargetNamespace;
@@ -1199,7 +1568,7 @@ namespace AccelByte.Models
     };
 
     [Preserve]
-    public class GenerateOneTimeCodeOptionalParameters
+    public class GenerateOneTimeCodeOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// A Redirect Uri that will be called as DeepLinking uri
@@ -1215,7 +1584,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class RequestTokenByOneTimeLinkCodeOptionalParameters
+    public class RequestTokenByOneTimeLinkCodeOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// A flag to produce transient token
@@ -1229,7 +1598,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class LoginV4OptionalParameters
+    public class LoginV4OptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Cancelation token that can be used to cancel the queue process

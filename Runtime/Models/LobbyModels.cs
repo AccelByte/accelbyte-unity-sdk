@@ -619,7 +619,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class MatchmakingOptionalParam
+    public class MatchmakingOptionalParam : OptionalParametersBase
     {
         [DataMember] public string serverName;
         [DataMember] public string clientVersion;

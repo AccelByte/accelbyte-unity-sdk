@@ -1,6 +1,8 @@
 // Copyright (c) 2019-2023 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
+using AccelByte.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +18,11 @@ namespace AccelByte.Core
 
         public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse> response);
 
+        public abstract void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, System.Action<IHttpResponse> response);
+
         public abstract void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response);
+
+        public abstract void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, System.Action<IHttpResponse, Error> response);
 
         public static HttpOperator CreateDefault(IHttpClient httpClient)
         {
@@ -57,6 +63,18 @@ namespace AccelByte.Core
             HttpSendResult result = await httpClient.SendRequestAsync(request);
             response?.Invoke(result.CallbackResponse, result.CallbackError);
         }
+
+        public async override void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse> response)
+        {
+            HttpSendResult result = await httpClient.SendRequestAsync(additionalParams, request);
+            response?.Invoke(result.CallbackResponse);
+        }
+
+        public async override void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse, Error> response)
+        {
+            HttpSendResult result = await httpClient.SendRequestAsync(additionalParams, request);
+            response?.Invoke(result.CallbackResponse, result.CallbackError);
+        }
     }
 
     public class HttpCoroutineOperator : HttpOperator
@@ -86,6 +104,16 @@ namespace AccelByte.Core
         public override void SendRequest(IHttpRequest request, System.Action<IHttpResponse, Error> response)
         {
             runner.Run(httpClient.SendRequest(request, response));
+        }
+
+        public override void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse> response)
+        {
+            runner.Run(httpClient.SendRequest(additionalParams, request, response));
+        }
+
+        public override void SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse, Error> response)
+        {
+            runner.Run(httpClient.SendRequest(additionalParams, request, response));
         }
     }
 }

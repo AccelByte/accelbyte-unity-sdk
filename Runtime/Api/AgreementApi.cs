@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -6,7 +6,6 @@ using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
 using System.Collections;
-using UnityEngine.Assertions;
 using UnityEngine.Networking;
 
 namespace AccelByte.Api
@@ -32,32 +31,53 @@ namespace AccelByte.Api
             , ResultCallback<PublicPolicy[]> callback )
         {
             string functionName = "GetLegalPolicies";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetLegalPoliciesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetLegalPolicies(agreementPolicyType, tags, defaultOnEmpty, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetLegalPolicies(AgreementPolicyType agreementPolicyType
+            , string[] tags
+            , bool defaultOnEmpty
+            , GetLegalPoliciesOptionalParameters optionalParameters
+            , ResultCallback<PublicPolicy[]> callback)
+        {
+            string functionName = "GetLegalPolicies";
+            Report.GetFunctionLog(GetType().Name, functionName, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/public/policies/namespaces/{namespace}")
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("policyType", (agreementPolicyType == AgreementPolicyType.EMPTY) ? "" : agreementPolicyType.ToString())
-                .WithQueryParam("tags", string.Join(",",tags))
+                .WithQueryParam("tags", string.Join(",", tags))
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PublicPolicy[]>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PublicPolicy[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetLegalPoliciesByCountry(string countryCode
@@ -67,13 +87,33 @@ namespace AccelByte.Api
             , ResultCallback<PublicPolicy[]> callback )
         {
             string functionName = "GetLegalPoliciesByCountry";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetLegalPoliciesByCountryOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetLegalPoliciesByCountry(countryCode, agreementPolicyType, tags, defaultOnEmpty, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetLegalPoliciesByCountry(string countryCode
+            , AgreementPolicyType agreementPolicyType
+            , string[] tags
+            , bool defaultOnEmpty
+            , GetLegalPoliciesByCountryOptionalParameters optionalParameters
+            , ResultCallback<PublicPolicy[]> callback)
+        {
+            string functionName = "GetLegalPoliciesByCountry";
+            Report.GetFunctionLog(GetType().Name, functionName, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(countryCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -84,21 +124,40 @@ namespace AccelByte.Api
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PublicPolicy[]>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PublicPolicy[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator BulkAcceptPolicyVersions( AcceptAgreementRequest[] acceptAgreementRequests
             , ResultCallback<AcceptAgreementResponse> callback )
         {
             string functionName = "BulkAcceptPolicyVersions";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkAcceptPolicyVersionsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkAcceptPolicyVersions(acceptAgreementRequests, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void BulkAcceptPolicyVersions(AcceptAgreementRequest[] acceptAgreementRequests
+            , BulkAcceptPolicyVersionsOptionalParameters optionalParameters
+            , ResultCallback<AcceptAgreementResponse> callback)
+        {
+            string functionName = "BulkAcceptPolicyVersions";
+            Report.GetFunctionLog(GetType().Name, functionName, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 acceptAgreementRequests
@@ -107,7 +166,7 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -117,21 +176,40 @@ namespace AccelByte.Api
                 .WithBody(acceptAgreementRequests.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<AcceptAgreementResponse>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<AcceptAgreementResponse>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator AcceptPolicyVersion( string localizedPolicyVersionId
             , ResultCallback callback )
         {
             string functionName = "AcceptPolicyVersion";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new AcceptPolicyVersionOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            AcceptPolicyVersion(localizedPolicyVersionId, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void AcceptPolicyVersion(string localizedPolicyVersionId
+            , AcceptPolicyVersionOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            string functionName = "AcceptPolicyVersion";
+            Report.GetFunctionLog(GetType().Name, functionName, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(localizedPolicyVersionId
                 , Namespace_
@@ -140,7 +218,7 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -150,26 +228,43 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator QueryLegalEligibilities( ResultCallback<RetrieveUserEligibilitiesResponse[]> callback )
         {
             string functionName = "CheckLegalEligibilities";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new QueryLegalEligibilitiesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            QueryLegalEligibilities(optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryLegalEligibilities(QueryLegalEligibilitiesOptionalParameters optionalParameters, ResultCallback<RetrieveUserEligibilitiesResponse[]> callback)
+        {
+            string functionName = "CheckLegalEligibilities";
+            Report.GetFunctionLog(GetType().Name, functionName, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -179,21 +274,23 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<RetrieveUserEligibilitiesResponse[]>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<RetrieveUserEligibilitiesResponse[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetLegalDocument( string url
             , ResultCallback<string> callback )
         {
             string functionName = "GetLegalDocument";
-            Report.GetFunctionLog(GetType().Name, functionName);
+            Report.GetFunctionLog(GetType().Name, functionName, logger: SharedMemory?.Logger);
             using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
                 yield return webRequest.SendWebRequest();
@@ -213,7 +310,19 @@ namespace AccelByte.Api
 
         internal void ChangePolicyPreferences(ChangeAgreementRequest[] requestBody, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ChangePolicyPreferencesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ChangePolicyPreferences(requestBody, optionalParameters, callback);
+        }
+
+        internal void ChangePolicyPreferences(ChangeAgreementRequest[] requestBody, ChangePolicyPreferencesOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(requestBody, AuthToken);
             if (error != null)
@@ -229,8 +338,12 @@ namespace AccelByte.Api
                 .WithBody(requestBody.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);

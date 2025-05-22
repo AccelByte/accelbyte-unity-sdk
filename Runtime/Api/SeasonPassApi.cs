@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -32,7 +32,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, language);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -52,7 +52,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<SeasonInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserSeason( string userId
@@ -64,7 +64,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, seasonId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -85,7 +85,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<UserSeasonInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetCurrentUserSeason( string userId
@@ -96,7 +96,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -116,7 +116,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<UserSeasonInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ClaimRewards( string userId
@@ -128,7 +128,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -150,7 +150,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<SeasonClaimRewardResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkClaimRewards( string userId
@@ -161,7 +161,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -181,7 +181,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<SeasonClaimRewardResponse>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
     }

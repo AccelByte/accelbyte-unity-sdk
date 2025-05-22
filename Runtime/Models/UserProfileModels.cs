@@ -7,6 +7,72 @@ using UnityEngine.Scripting;
 
 namespace AccelByte.Models
 {
+    [Preserve]
+    public class GetUserProfileOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class CreateUserProfileOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class UpdateUserProfileOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class UpdateCustomAttributesOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GetPublicUserProfileOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GetUserAvatarOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class GetUserProfilePublicInfoByPublicIdOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class GenerateUploadURLOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class GenerateUploadURLForUserContentOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class GetPrivateCustomAttributesOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class UpdatePrivateCustomAttributesOptionalParameter : OptionalParametersBase
+    {
+        
+    }
+    
     [DataContract, Preserve]
     public class UserProfile
     {

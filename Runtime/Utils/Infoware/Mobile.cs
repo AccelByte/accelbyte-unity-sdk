@@ -1,4 +1,4 @@
-// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,7 +13,7 @@ namespace AccelByte.Utils.Infoware
         internal override string GetDeviceID()
         {
             string uniqueIdentifier;
-            if (SystemInfo.deviceUniqueIdentifier != SystemInfo.unsupportedIdentifier)
+            if (SystemInfo.deviceUniqueIdentifier == SystemInfo.unsupportedIdentifier)
             {
                 throw new Exception("Unable to retrieve device id from this device");
             }

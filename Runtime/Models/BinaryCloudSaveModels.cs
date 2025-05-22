@@ -58,12 +58,6 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "file_type")] public string FileType;
     }
-    
-    [Preserve]
-    public class UploadBinaryOptionalParameters
-    {
-        public string ContentType;
-    }
 
     [DataContract, Preserve]
     public class UploadBinaryRecordResponse

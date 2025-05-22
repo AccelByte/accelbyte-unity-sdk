@@ -6,6 +6,7 @@ using AccelByte.Core;
 using UnityEngine.Assertions;
 using HybridWebSocket;
 using AccelByte.Api;
+using AccelByte.Models;
 
 namespace AccelByte.Server
 {
@@ -63,22 +64,32 @@ namespace AccelByte.Server
 
         public void Connect(string id)
         {
+            Connect(id, new WebsocketConnectOptionalParameters()
+            {
+                Logger = sharedMemory?.Logger
+            });
+        }
+        
+        internal void Connect(string id, WebsocketConnectOptionalParameters optionalParameters)
+        {
+            var targetLogger = optionalParameters != null && optionalParameters.Logger != null ? optionalParameters.Logger : sharedMemory?.Logger;
+            
             dsId = id;
-            sharedMemory?.Logger?.Log(string.Format("Connecting to AMS with id: {0}", dsId));
+            targetLogger?.Log(string.Format("Connecting to AMS with id: {0}", dsId));
 
             if (IsConnected)
             {
-                sharedMemory?.Logger?.Log("[AMS] already connected");
+                targetLogger?.Log("[AMS] already connected");
                 return;
             }
 
             if (webSocket.IsConnecting)
             {
-                sharedMemory?.Logger?.Log("[AMS] connecting to AMS");
+                targetLogger?.Log("[AMS] connecting to AMS");
                 return;
             }
 
-            webSocket.Connect(amsWatchdogUrl, string.Empty);
+            webSocket.Connect(amsWatchdogUrl, authorizationToken: string.Empty, optionalParameters: optionalParameters);
         }
 
         /// <summary>

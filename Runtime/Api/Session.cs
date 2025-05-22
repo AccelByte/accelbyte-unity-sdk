@@ -823,7 +823,7 @@ namespace AccelByte.Api
                 sessionApi.PromoteUserToGameSessionLeader(sessionId, leaderId, callback));
         }
 
-        private void OnTicketPollMatchFound(string sessionId)
+        internal void OnTicketPollMatchFound(string sessionId)
         {
             coroutineRunner.Run(OnTicketPollMatchFoundAsync(sessionId));
         }

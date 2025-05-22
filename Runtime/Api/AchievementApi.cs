@@ -110,7 +110,7 @@ namespace AccelByte.Api
             return "";
         }
 
-        public IEnumerator QueryAchievements( string language
+        public IEnumerator QueryAchievements(string language
             , string tags
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedPublicAchievement> callback
@@ -120,113 +120,212 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryAchievementsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                IsGlobal = isGlobal,
+                Limit = limit,
+                Offset = offset,
+                Tags = tags
+            };
+
+            QueryAchievements(language, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryAchievements(string language
+            , AchievementSortBy sortBy
+            , QueryAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedPublicAchievement> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            var tags = optionalParameters?.TagBuilder is null ? optionalParameters?.Tags : optionalParameters.TagBuilder.Build();
+
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/achievements";
             var requestBuilder = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements")
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("language", language)
                 .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("global", isGlobal.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (!string.IsNullOrEmpty(tags))
+            if (optionalParameters != null)
             {
-                requestBuilder.WithQueryParam("tags", tags);
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString())
+                    .WithQueryParam("global", optionalParameters.IsGlobal == null ? "false" : optionalParameters.IsGlobal.ToString());
+
+                if (!string.IsNullOrEmpty(tags))
+                {
+                    requestBuilder.WithQueryParam("tags", tags);
+                }
             }
 
             var request = requestBuilder.GetResult();
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PaginatedPublicAchievement>();
-            callback?.Try(result);
+            
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedPublicAchievement>();
+                    callback?.Try(result);
+                });
         }
+
         public IEnumerator GetAchievement(string achievementCode
             , ResultCallback<MultiLanguageAchievement> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetAchievement(achievementCode, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetAchievement(string achievementCode
+            , GetAchievementOptionalParameters optionalParameters
+            , ResultCallback<MultiLanguageAchievement> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/achievements/{achievementCode}")
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/achievements/{achievementCode}";
+            var request = HttpRequestBuilder.CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("achievementCode", achievementCode)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<MultiLanguageAchievement>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<MultiLanguageAchievement>();
+                    callback?.Try(result);
+                });
         }
 
-        public IEnumerator QueryUserAchievements( string userId
+        public IEnumerator QueryUserAchievements(string userId
             , string tags
             , AchievementSortBy sortBy
             , ResultCallback<PaginatedUserAchievement> callback
             , int offset
             , int limit
-            , bool preferUnlocked )
+            , bool preferUnlocked)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            var optionalParameters = new QueryUserAchievementsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Tags = tags,
+                Limit = limit,
+                Offset = offset,
+                PreferUnlocked = preferUnlocked
+            };
+
+            QueryUserAchievements(userId, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryUserAchievements(string userId
+            , AchievementSortBy sortBy
+            , QueryUserAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedUserAchievement> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            var tags = optionalParameters?.TagBuilder is null ? optionalParameters?.Tags : optionalParameters.TagBuilder.Build();
+
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements";
             var requestBuilder = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements")
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("preferUnlocked", preferUnlocked.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (!string.IsNullOrEmpty(tags))
+            if (optionalParameters != null)
             {
-                requestBuilder.WithQueryParam("tags", tags);
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString())
+                    .WithQueryParam("preferUnlocked", optionalParameters.PreferUnlocked == null ? "true" : optionalParameters.PreferUnlocked.ToString());
+
+                if (!string.IsNullOrEmpty(tags))
+                {
+                    requestBuilder.WithQueryParam("tags", tags);
+                }
             }
 
             var request = requestBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PaginatedUserAchievement>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedUserAchievement>();
+                    callback?.Try(result);
+                });
         }
 
-        public IEnumerator UnlockAchievement( string userId
+        public IEnumerator UnlockAchievement(string userId
             , string AuthToken
             , string achievementCode
-            , ResultCallback callback )
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UnlockAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UnlockAchievement(userId, AuthToken, achievementCode, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void UnlockAchievement(string userId
+            , string AuthToken
+            , string achievementCode
+            , UnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
@@ -234,11 +333,12 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock";
             var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
+                .CreatePut(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("achievementCode", achievementCode)
@@ -247,16 +347,31 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParse();
+                    callback?.Try(result);
+                });
         }
 
         public void BulkUnlockAchievement(string[] achievementCodes, ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkUnlockAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkUnlockAchievement(achievementCodes, optionalParameters, callback);
+        }
+
+        internal void BulkUnlockAchievement(string[] achievementCodes
+            , BulkUnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
@@ -272,8 +387,9 @@ namespace AccelByte.Api
                 AchievementCodes = achievementCodes
             };
 
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/bulkUnlock";
             var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/achievements/bulkUnlock")
+                .CreatePut(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", Session.UserId)
                 .WithBearerAuth(AuthToken)
@@ -282,11 +398,14 @@ namespace AccelByte.Api
                 .WithBody(requestBody.ToUtf8Json())
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<BulkUnlockAchievementResponse[]>();
-                callback?.Try(result);
-            });
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<BulkUnlockAchievementResponse[]>();
+                    callback?.Try(result);
+                });
         }
 
         public IEnumerator QueryGlobalAchievements(string achievementCode
@@ -296,7 +415,28 @@ namespace AccelByte.Api
             , int offset
             , int limit
             , string tags
-            ) 
+            )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new QueryGlobalAchievementsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Tags = tags,
+                Offset = offset,
+                Limit = limit
+            };
+
+            QueryGlobalAchievements(achievementCode, achievementStatus, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryGlobalAchievements(string achievementCode
+            , GlobalAchievementStatus achievementStatus
+            , GlobalAchievementListSortBy sortBy
+            , QueryGlobalAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedUserGlobalAchievement> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
@@ -304,33 +444,43 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            var tags = optionalParameters?.TagBuilder is null ? optionalParameters?.Tags : optionalParameters.TagBuilder.Build();
+
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements";
             var requestBuilder = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements")
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithQueryParam("achievementCode", achievementCode)
                 .WithQueryParam("status", ConvertGlobalAchievementTypeToString(achievementStatus))
                 .WithQueryParam("sortBy", ConvertGlobalAchievementSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (!string.IsNullOrEmpty(tags))
+            if (optionalParameters != null)
             {
-                requestBuilder.WithQueryParam("tags", tags);
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString());
+
+                if (!string.IsNullOrEmpty(tags))
+                {
+                    requestBuilder.WithQueryParam("tags", tags);
+                }
             }
 
             var request = requestBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PaginatedUserGlobalAchievement>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedUserGlobalAchievement>();
+                    callback?.Try(result);
+                });
         }
 
         public IEnumerator QueryGlobalAchievementContributors(string achievementCode
@@ -342,34 +492,62 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryGlobalAchievementContributorsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                Limit = limit
+            };
+
+            QueryGlobalAchievementContributors(achievementCode, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryGlobalAchievementContributors(string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , QueryGlobalAchievementContributorsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedGlobalAchievementContributors> callback
+            )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, achievementCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements/{achievementCode}/contributors";
             var requestBuilder = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/global/achievements/{achievementCode}/contributors")
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("achievementCode", achievementCode)
                 .WithQueryParam("sortBy", ConvertGlobalAchievementContributorsSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
+            if (optionalParameters != null)
+            {
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString());
+            }
+
             var request = requestBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PaginatedGlobalAchievementContributors>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedGlobalAchievementContributors>();
+                    callback?.Try(result);
+                });
         }
 
-        public IEnumerator QueryGlobalAchievementUserContributed( string userId
+        public IEnumerator QueryGlobalAchievementUserContributed(string userId
             , string achievementCode
             , GlobalAchievementContributorsSortBy sortBy
             , ResultCallback<PaginatedGlobalAchievementUserContributed> callback
@@ -379,51 +557,98 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryGlobalAchievementUserContributedOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                Limit = limit
+            };
+
+            QueryGlobalAchievementUserContributed(userId, achievementCode, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void QueryGlobalAchievementUserContributed(string userId
+            , string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , QueryGlobalAchievementUserContributedOptionalParameters optionalParameters
+            , ResultCallback<PaginatedGlobalAchievementUserContributed> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements";
             var requestBuilder = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements")
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithQueryParam("achievementCode", achievementCode)
                 .WithQueryParam("sortBy", ConvertGlobalAchievementContributorsSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
 
+            if (optionalParameters != null)
+            {
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString());
+            }
+
             var request = requestBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PaginatedGlobalAchievementUserContributed>();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedGlobalAchievementUserContributed>();
+                    callback?.Try(result);
+                });
         }
 
-        public IEnumerator ClaimGlobalAchievement( string userId
+        public IEnumerator ClaimGlobalAchievement(string userId
             , string AuthToken
             , string achievementCode
             , ResultCallback callback
-            ) 
+            )
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ClaimGlobalAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+            };
+
+            ClaimGlobalAchievement(userId, AuthToken, achievementCode, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void ClaimGlobalAchievement(string userId
+            , string AuthToken
+            , string achievementCode
+            , ClaimGlobalAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements/{achievementCode}/claim";
             var request = HttpRequestBuilder
-                .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/global/achievements/{achievementCode}/claim")
+                .CreatePost(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("achievementCode", achievementCode)
@@ -432,13 +657,14 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParse();
+                    callback?.Try(result);
+                });
         }
 
         public IEnumerator GetTags(string name
@@ -448,32 +674,59 @@ namespace AccelByte.Api
             , int limit
         )
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetTagsAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset
+            };
+
+            GetTags(name, sortBy, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetTags(string name
+            , AchievementSortBy sortBy
+            , GetTagsAchievementOptionalParameters optionalParameters
+            , ResultCallback<PaginatedPublicTag> callback
+        )
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/tags")
+            string requestUrlFormat = BaseUrl + "/v1/public/namespaces/{namespace}/tags";
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("name",name)
+                .WithQueryParam("name", name)
                 .WithQueryParam("sortBy", ConvertAchievementSortByToString(sortBy))
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-            
-            IHttpResponse response = null;
+                .Accepts(MediaType.ApplicationJson);
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-            
-            var result = response.TryParseJson<PaginatedPublicTag>();
-            
-            callback?.Try(result);
+            if (optionalParameters != null)
+            {
+                requestBuilder
+                    .WithQueryParam("offset", optionalParameters.Offset == null ? "0" : optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit == null ? "20" : optionalParameters.Limit.ToString());
+            }
+
+            var request = requestBuilder.GetResult();
+
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PaginatedPublicTag>();
+                    callback?.Try(result);
+                });
         }
         #endregion
     }

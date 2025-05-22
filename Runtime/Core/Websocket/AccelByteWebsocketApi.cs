@@ -101,7 +101,12 @@ namespace Core
 
         public virtual void Connect(Dictionary<string, string> customHeader)
         {
-            webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader);
+            Connect(customHeader, optionalParameters: null);
+        }
+        
+        internal void Connect(Dictionary<string, string> customHeader, AccelByte.Models.WebsocketConnectOptionalParameters optionalParameters)
+        {
+            webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader, optionalParameters);
         }
 
         public virtual void Disconnect()

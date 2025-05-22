@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
+using AccelByte.Models;
 using System.Collections.Generic;
 using System;
 
@@ -70,6 +71,24 @@ namespace Core.Websocket
 
         public void Connect(string url, string protocols, Dictionary<string, string> customHeaders, string entitlementToken = null, ResultCallback callback = null)
         {
+            Connect(
+                url
+                , protocols
+                , customHeaders
+                , new WebsocketConnectOptionalParameters()
+                {
+                    Logger = sharedMemory?.Logger
+                }
+                , entitlementToken
+                , callback);
+        }
+
+        public void Connect(string url, string protocols, Dictionary<string, string> customHeaders,
+            WebsocketConnectOptionalParameters optionalParameters, string entitlementToken = null,
+            ResultCallback callback = null)
+        {
+            var targetLogger = optionalParameters != null && optionalParameters.Logger != null ? optionalParameters.Logger : sharedMemory?.Logger;
+            
             try
             {
                 webSocket = string.IsNullOrEmpty(protocols) ? new NativeWebSocket.WebSocket(url, customHeaders) : new NativeWebSocket.WebSocket(url, protocols, customHeaders);
@@ -88,7 +107,7 @@ namespace Core.Websocket
                 {
                     string dataStr = System.Text.Encoding.UTF8.GetString(data);
                     
-                    sharedMemory?.ServiceTracker?.OnReceivingWebsocketNotification(dataStr, sharedMemory?.Logger);
+                    sharedMemory?.ServiceTracker?.OnReceivingWebsocketNotification(dataStr, targetLogger);
                     OnMessage?.Invoke(dataStr);
                 };
 
@@ -119,11 +138,11 @@ namespace Core.Websocket
             switch (webSocket.State)
             {
                 case NativeWebSocket.WebSocketState.Open:
-                        sharedMemory?.Logger?.Log($"Websocket connection to {url} already opened");
+                        targetLogger?.Log($"Websocket connection to {url} already opened");
                         callback?.TryOk();
                         return;
                 case NativeWebSocket.WebSocketState.Connecting:
-                        sharedMemory?.Logger?.LogVerbose($"Websocket connection to {url} is connecting");
+                        targetLogger?.LogVerbose($"Websocket connection to {url} is connecting");
                         callback?.TryOk();
                         break;
                 case NativeWebSocket.WebSocketState.Closing:

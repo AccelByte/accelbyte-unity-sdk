@@ -1,11 +1,11 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
-using System;
-using System.Collections.Generic;
 using AccelByte.Core;
 using AccelByte.Models;
-using AccelByte.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Server
@@ -61,7 +61,29 @@ namespace AccelByte.Server
             , CreateStatItemRequest[] statItems
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new CreateUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            CreateUserStatItems(userId, statItems, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Create stat items of a user.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="statItems">List of statCodes to be created for a user</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        internal void CreateUserStatItems(string userId
+            , CreateStatItemRequest[] statItems
+            , CreateUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -70,7 +92,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -84,8 +106,7 @@ namespace AccelByte.Server
             }
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Created);
 
-            coroutineRunner.Run(
-                Api.CreateUserStatItems(userId, statItems, callback));
+            Api.CreateUserStatItems(userId, statItems, optionalParameters, callback);
         }
 
         private void SendPredefinedEvent(string userId, List<string> statCodes, PredefinedUserStatItemMode mode)
@@ -128,7 +149,30 @@ namespace AccelByte.Server
             , int limit = 20
             , StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetUserStatItemsOptionalParam()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                sortBy = sortBy
+            };
+
+            GetAllUserStatItems(userId, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get all stat items of a user.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
+        internal void GetAllUserStatItems(string userId
+            , GetUserStatItemsOptionalParam optionalParameters
+            , ResultCallback<PagedStatItems> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -137,12 +181,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.GetUserStatItems(userId, null, null, callback, offset, limit, sortBy));
+            Api.GetUserStatItems(userId, optionalParameters, callback);
         }
 
         /// <summary>
@@ -152,6 +195,8 @@ namespace AccelByte.Server
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
         public void GetUserStatItems(string userId, ResultCallback<PagedStatItems> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
             GetUserStatItems(userId:userId, callback: callback, optionalParam: null);
         }
 
@@ -163,43 +208,9 @@ namespace AccelByte.Server
         /// <param name="callback">Returns all profile's StatItems via callback when completed</param>
         public void GetUserStatItems(string userId, GetUserStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
         {
-            ICollection<string> inStatCode = null;
-            ICollection<string> inTags = null;
-            int offset;
-            int limit;
-            StatisticSortBy sortBy;
+            Report.GetFunctionLog(GetType().Name, logger: optionalParam?.Logger);
 
-            if (optionalParam != null)
-            {
-                if (optionalParam.StatCodes != null)
-                {
-                    inStatCode = optionalParam.StatCodes;
-                }
-                if (optionalParam.Tags != null)
-                {
-                    inTags = optionalParam.Tags;
-                }
-
-                offset = optionalParam.Offset > 0 ? optionalParam.Offset : 0;
-                limit = optionalParam.Limit > 0 ? optionalParam.Limit : 0;
-
-                sortBy = optionalParam.sortBy;
-            }
-            else
-            {
-                var optParam = new GetUserStatItemsOptionalParam();
-                offset = optParam.Offset;
-                limit = optParam.Limit;
-                sortBy = optParam.sortBy;
-            }
-
-            GetUserStatItems(userId: userId
-                , statCodes: inStatCode
-                , tags: inTags
-                , callback: callback
-                , offset: offset
-                , limit: limit
-                , sortBy: sortBy);
+            GetAllUserStatItems(userId, optionalParam, callback);
         }
 
         /// <summary>
@@ -220,21 +231,19 @@ namespace AccelByte.Server
             , int limit = 20
             , StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
+            var optionalParameters = new GetUserStatItemsOptionalParam()
             {
-                return;
-            }
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                sortBy = sortBy,
+                StatCodes = statCodes?.ToArray(),
+                Tags = tags?.ToArray()
+            };
 
-            if (!session.IsValid())
-            {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                Api.GetUserStatItems(userId, statCodes, tags, callback, offset, limit, sortBy));
+            GetUserStatItems(userId, optionalParameters, callback);
         }
 
         /// <summary>
@@ -247,7 +256,29 @@ namespace AccelByte.Server
             , StatItemIncrement[] increments
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new IncrementUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            IncrementUserStatItems(userId, increments, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Increment stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="increments">Consist of one or more statCode and value to update</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void IncrementUserStatItems(string userId
+            , StatItemIncrement[] increments
+            , IncrementUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -256,7 +287,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -270,8 +301,7 @@ namespace AccelByte.Server
             }
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
-            coroutineRunner.Run(
-                Api.IncrementUserStatItems(userId, increments, callback));
+            Api.IncrementUserStatItems(userId, increments, optionalParameters, callback);
         }
 
         /// <summary>
@@ -282,16 +312,35 @@ namespace AccelByte.Server
         public void IncrementManyUsersStatItems( UserStatItemIncrement[] increments
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new IncrementManyUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            IncrementManyUsersStatItems(increments, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Increment stat items for many users
+        /// </summary>
+        /// <param name="increments">Consist of one or more statCode and value to update</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void IncrementManyUsersStatItems(UserStatItemIncrement[] increments
+            , IncrementManyUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.IncrementManyUsersStatItems(increments, callback));
+            Api.IncrementManyUsersStatItems(increments, optionalParameters, callback);
         }
 
         /// <summary>
@@ -304,7 +353,29 @@ namespace AccelByte.Server
             , StatItemReset[] resets
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ResetUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ResetUserStatItems(userId, resets, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Reset stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="resets">Consist of one or more statCode</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void ResetUserStatItems(string userId
+            , StatItemReset[] resets
+            , ResetUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -313,12 +384,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.ResetUserStatItems(userId, resets, callback));
+            Api.ResetUserStatItems(userId, resets, optionalParameters, callback);
         }
 
         /// <summary>
@@ -329,16 +399,35 @@ namespace AccelByte.Server
         public void ResetManyUsersStatItems( UserStatItemReset[] resets
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ResetManyUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ResetManyUsersStatItems(resets, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Reset stat items for many users
+        /// </summary>
+        /// <param name="resets">Consist of one or more userId and statCode to reset</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void ResetManyUsersStatItems(UserStatItemReset[] resets
+            , ResetManyUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.ResetManyUsersStatItems(resets, callback));
+            Api.ResetManyUsersStatItems(resets, optionalParameters, callback);
         }
 
         /// <summary>
@@ -356,6 +445,8 @@ namespace AccelByte.Server
             , StatItemUpdate[] updates
             , ResultCallback<StatItemOperationResult[]> callback )
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
             UpdateUserStatItems(userId, "", updates, callback);
         }
 
@@ -376,7 +467,35 @@ namespace AccelByte.Server
             , StatItemUpdate[] updates
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UpdateUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                AdditionalKey = additionalKey
+            };
+
+            UpdateUserStatItems(userId, updates, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Update stat items for a user
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="updates">Consist of one or more statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void UpdateUserStatItems(string userId
+            , StatItemUpdate[] updates
+            , UpdateUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -385,7 +504,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -399,8 +518,7 @@ namespace AccelByte.Server
             }
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Updated);
 
-            coroutineRunner.Run(
-                Api.UpdateUserStatItems(userId, additionalKey, updates, callback));
+            Api.UpdateUserStatItems(userId, updates, optionalParameters, callback);
         }
 
         /// <summary>
@@ -416,16 +534,42 @@ namespace AccelByte.Server
         public void UpdateManyUsersStatItems( UserStatItemUpdate[] updates
             , ResultCallback<StatItemOperationResult[]> callback )
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             coroutineRunner.Run(
                 Api.UpdateManyUsersStatItems(updates, callback));
+        }
+
+        /// <summary>
+        /// Update stat items for many users
+        /// </summary>
+        /// <param name="updates">Consist of one or more userId and statCode with its udpate value and update strategy.
+        ///     OVERRIDE update strategy means it will replace the previous statCode value with the new value.
+        ///     INCREMENT update strategy with positive value means it will increase the previous statCode value.
+        ///     INCREMENT update strategy with negative value means it will decrease the previous statCode value.
+        ///     MAX update strategy means it will replace the previous statCode value with the new value if it's larger than the previous statCode value. 
+        ///     MIN update strategy means it will replace the previous statCode value with the new value if it's lower than the previous statCode value. </param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of BulkStatItemOperationResult via callback when completed</param>
+        internal void UpdateManyUsersStatItems(UserStatItemUpdate[] updates
+            , UpdateManyUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            Api.UpdateManyUsersStatItems(updates, optionalParameters, callback);
         }
 
         /// <summary>
@@ -441,16 +585,39 @@ namespace AccelByte.Server
            , string additionalKey
            , ResultCallback<FetchUser[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkFetchUserStatItemsValueOptionalParameters()
+            {
+                AdditionalKey = additionalKey,
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkFetchUserStatItemValues(statCode, userIds, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Bulk fetch multiple user's stat item values for a given namespace and statCode.
+        /// If stat item does not exist, will return default value.
+        /// </summary>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="userIds"> This is the UserId array that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of FetchUser via callback when completed</param>
+        internal void BulkFetchUserStatItemValues(string statCode
+           , string[] userIds
+           , BulkFetchUserStatItemsValueOptionalParameters optionalParameters
+           , ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.BulkFetchUserStatItemValues(statCode, userIds, additionalKey, callback));
+            Api.BulkFetchUserStatItemValues(statCode, userIds, optionalParameters, callback);
         }
 
         /// <summary>
@@ -463,16 +630,37 @@ namespace AccelByte.Server
            , string[] userIds
            , ResultCallback<FetchUserStatistic> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkFetchStatItemsValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkFetchStatItemsValue(statCode, userIds, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Bulk fetch multiple user's stat item values for a given namespace and statCode.
+        /// </summary>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="userIds"> This is the UserId array that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of FetchUserStatistic via callback when completed</param>
+        internal void BulkFetchStatItemsValue(string statCode
+           , string[] userIds
+           , BulkFetchStatItemsValueOptionalParameters optionalParameters
+           , ResultCallback<FetchUserStatistic> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.BulkFetchStatItemsValue(statCode, userIds, callback));
+            Api.BulkFetchStatItemsValue(statCode, userIds, optionalParameters, callback);
         }
 
         /// <summary>
@@ -483,16 +671,35 @@ namespace AccelByte.Server
         public void BulkUpdateMultipleUserStatItemsValue(UpdateUserStatItem[] bulkUpdateMultipleUserStatItem
             , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkUpdateMultipleUserStatItemsValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Bulk update multiple user's statitems value with specific update strategy.
+        /// </summary>
+        /// <param name="bulkUpdateMultipleUserStatItem">This is the BulkUpdateMultipleUserStatItem array that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        internal void BulkUpdateMultipleUserStatItemsValue(UpdateUserStatItem[] bulkUpdateMultipleUserStatItem
+            , BulkUpdateMultipleUserStatItemsValueOptionalParameters optionalParameters
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, callback));
+            Api.BulkUpdateMultipleUserStatItemsValue(bulkUpdateMultipleUserStatItem, optionalParameters, callback);
         }
 
         /// <summary>
@@ -507,7 +714,31 @@ namespace AccelByte.Server
             , UserStatItem[] bulkUserStatItems
             , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkResetUserStatItemsValuesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Bulk reset user's statitem values for given namespace and user.
+        /// </summary>
+        /// <param name="userId">This is the UserId that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="bulkUserStatItems">This is the BulkUserStatItem array that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        internal void BulkResetUserStatItemsValues(string userId
+            , string additionalKey
+            , UserStatItem[] bulkUserStatItems
+            , BulkResetUserStatItemsValuesOptionalParameters optionalParameters
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -516,12 +747,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, callback));
+            Api.BulkResetUserStatItemsValues(userId, additionalKey, bulkUserStatItems, optionalParameters, callback);
         }
 
         /// <summary>
@@ -536,7 +766,31 @@ namespace AccelByte.Server
             , UpdateUserStatItemWithStatCode[] bulkUpdateUserStatItem
             , ResultCallback<UpdateUserStatItemsResponse[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkUpdateUserStatItemValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Bulk update user's statitems value for given namespace and user with specific update strategy.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="bulkUpdateUserStatItem">This is the BulkUpdateUserStatItem array that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemsResponse via callback when completed</param>
+        internal void BulkUpdateUserStatItemValue(string userId
+            , string additionalKey
+            , UpdateUserStatItemWithStatCode[] bulkUpdateUserStatItem
+            , BulkUpdateUserStatItemValueOptionalParameters optionalParameters
+            , ResultCallback<UpdateUserStatItemsResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -545,12 +799,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, callback));
+            Api.BulkUpdateUserStatItemValue(userId, additionalKey, bulkUpdateUserStatItem, optionalParameters, callback);
         }
 
         /// <summary>
@@ -566,7 +819,32 @@ namespace AccelByte.Server
             , UpdateUserStatItem updateUserStatItem
             , ResultCallback<UpdateUserStatItemValueResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UpdateUserStatItemValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Update user's statitem value for a given namespace and user with a certain update strategy.
+        /// </summary>
+        /// <param name="userId">UserId of a user</param>
+        /// <param name="statCode">StatCode</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="updateUserStatItem">This is the FAccelByteModelsUpdateUserStatItem that will be stored in the slot.
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns an array of UpdateUserStatItemValueResponse via callback when completed</param>
+        internal void UpdateUserStatItemValue(string userId, string statCode
+            , string additionalKey
+            , UpdateUserStatItem updateUserStatItem
+            , UpdateUserStatItemValueOptionalParameters optionalParameters
+            , ResultCallback<UpdateUserStatItemValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -575,12 +853,11 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, callback));
+            Api.UpdateUserStatItemValue(userId, statCode, additionalKey, updateUserStatItem, optionalParameters, callback);
         }
 
         /// <summary>
@@ -596,7 +873,32 @@ namespace AccelByte.Server
            , string additionalKey
            , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new DeleteUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            DeleteUserStatItems(userId, statCode, additionalKey, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Delete user's stat items for given namespace, statCode, and user Id.
+        ///     If query param additionalKey is provided, it will delete user stat items of specific key (i.e. characterName).
+        ///     Otherwise, it will delete all stat items related to the user Id.
+        /// </summary>
+        /// <param name="userId">This is the UserId that will be stored in the slot.</param>
+        /// <param name="statCode">This is the StatCode that will be stored in the slot.</param>
+        /// <param name="additionalKey">This is the AdditionalKey that will be stored in the slot.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns via callback when completed</param>
+        internal void DeleteUserStatItems(string userId, string statCode
+           , string additionalKey
+           , DeleteUserStatItemsOptionalParameters optionalParameters
+           , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -605,7 +907,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -615,11 +917,10 @@ namespace AccelByte.Server
             };
 
             SendPredefinedEvent(userId, collectedStatCodes, PredefinedUserStatItemMode.Deleted);
-            
-            coroutineRunner.Run(
-                Api.DeleteUserStatItems(userId, statCode, additionalKey, callback));
+
+            Api.DeleteUserStatItems(userId, statCode, additionalKey, optionalParameters, callback);
         }
-        
+
         /// <summary>
         /// Get global statistic item by statistic code.
         /// </summary>
@@ -627,19 +928,36 @@ namespace AccelByte.Server
         /// <param name="callback">Returns GlobalStatItem via callback when completed</param>
         public void GetGlobalStatItemsByStatCode(string statCode, ResultCallback<GlobalStatItem> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
             
+            var optionalParameters = new GetGlobalStatItemsByStatCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetGlobalStatItemsByStatCode(statCode, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get global statistic item by statistic code.
+        /// </summary>
+        /// <param name="statCode">StatCode.</param>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns GlobalStatItem via callback when completed</param>
+        internal void GetGlobalStatItemsByStatCode(string statCode, GetGlobalStatItemsByStatCodeOptionalParameters optionalParameters, ResultCallback<GlobalStatItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.GetGlobalStatItemsByStatCode(
-                    statCode, 
-                    callback)
-            );
+            Api.GetGlobalStatItemsByStatCode(
+                statCode
+                , optionalParameters
+                , callback);
         }
 
         /// <summary>
@@ -658,15 +976,36 @@ namespace AccelByte.Server
             int offset = 0,
             int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetListStatCycleConfigsOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                Status = status,
+                Type = type
+            };
+
+            GetListStatCycleConfigs(optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get list of statistic cycle config
+        /// </summary>
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// <param name="callback">Returns PagedStatCycleConfigs via callback</param>
+        internal void GetListStatCycleConfigs(GetListStatCycleConfigsOptionalParameters optionalParameters, ResultCallback<PagedStatCycleConfigs> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(Api.GetListStatCycleConfigs(type, status, callback, offset, limit));
+            Api.GetListStatCycleConfigs(optionalParameters, callback);
         }
     }
 }

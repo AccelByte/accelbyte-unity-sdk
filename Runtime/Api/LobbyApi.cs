@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -60,7 +60,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetPartyStorage( string partyID
@@ -86,7 +86,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator WritePartyStorage( PartyDataUpdateRequest data
@@ -123,7 +123,7 @@ namespace AccelByte.Api
             }
             else
             {
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
 
@@ -153,7 +153,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListOfBlockedUser( string userId
@@ -178,7 +178,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<BlockedList>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetListOfBlocker( string userId
@@ -203,7 +203,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<BlockerList>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator BulkGetUserPresence( ICollection<string> userIds
@@ -231,7 +231,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<BulkUserStatusNotif>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SyncThirdPartyFriends(SyncThirdPartyFriendsRequest syncRequest
@@ -239,19 +239,19 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(ErrorCode.NamespaceNotFound);
+                callback?.TryError(ErrorCode.NamespaceNotFound);
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(ErrorCode.Unauthorized);
+                callback?.TryError(ErrorCode.Unauthorized);
                 yield break;
             }
 
             // The request should contain at least one friend sync detail
             if (syncRequest.FriendSyncDetails.Length < 1)
             {
-                callback.TryError(ErrorCode.BadRequest);
+                callback?.TryError(ErrorCode.BadRequest);
                 yield break;
             }
 
@@ -261,7 +261,7 @@ namespace AccelByte.Api
                 if (string.IsNullOrEmpty(syncThirdPartyFriendInfo.PlatformId) ||
                     (string.IsNullOrEmpty(syncThirdPartyFriendInfo.PlatformToken) && !syncThirdPartyFriendInfo.IsLogin))
                 {
-                    callback.TryError(ErrorCode.BadRequest);
+                    callback?.TryError(ErrorCode.BadRequest);
                     yield break;
                 }
             }
@@ -284,7 +284,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SyncThirdPartyFriendsResponse[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public void GetNotifications(ResultCallback<GetUserNotificationsResponse> callback

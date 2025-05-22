@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -20,6 +20,8 @@ namespace AccelByte.Server
         internal OAuthConfig OAuthConfig;
 
         private PredefinedEventScheduler predefinedEventScheduler;
+        private GameStandardAnalyticsServerService gameStandardAnalyticsService;
+        internal AccelByteGameStandardEventCacheImp GameStandardCacheImp;
         private ServerAMS ams;
 
         IHttpClient httpClient;
@@ -42,6 +44,7 @@ namespace AccelByte.Server
         private ApiSharedMemory sharedMemory;
 
         private AccelByteTimeManager timeManager;
+        private IFileStream fileStream;
         private readonly CoreHeartBeat coreHeartBeat;
 
         internal AccelByteTimeManager TimeManager
@@ -77,6 +80,7 @@ namespace AccelByte.Server
             , IHttpRequestSenderFactory requestSenderFactory
             , AccelByteTimeManager timeManager
             , CoreHeartBeat coreHeartBeat
+            , IFileStream fileStream
             , Utils.AccelByteServiceTracker serviceTracker)
         {
             serverApiClientInstances = new Dictionary<string, ServerApiClient>();
@@ -85,6 +89,7 @@ namespace AccelByte.Server
             this.timeManager = timeManager;
             this.Logger = new AccelByteDebuggerV2();
             this.coreHeartBeat = coreHeartBeat;
+            this.fileStream = fileStream;
             this.serviceTracker = serviceTracker;
             
             Initialize(environment, config, oAuthConfig);
@@ -119,6 +124,22 @@ namespace AccelByte.Server
                 ams = CreateAMSConnection(Config, coroutineRunner, autoConnect);
             }
             return ams;
+        }
+
+        public GameStandardAnalyticsServerService GetGameStandardEvents()
+        {
+            if (gameStandardAnalyticsService == null)
+            {
+                ServerAnalyticsService analyticsApiWrapper = null;
+                if (loginUserClientApis.Count > 0)
+                {
+                    analyticsApiWrapper = loginUserClientApis[0].GetAnalyticsService();
+                }
+                gameStandardAnalyticsService = new GameStandardAnalyticsServerService(analyticsApiWrapper, Config);
+                gameStandardAnalyticsService.Scheduler.SetSharedMemory(ref sharedMemory);
+                LoadGameStandardAnalyticsCache(GameStandardCacheImp, gameStandardAnalyticsService, environment.ToString());
+            }
+            return gameStandardAnalyticsService;
         }
 
         internal void SetAMS(ServerAMS newAMS)
@@ -324,23 +345,72 @@ namespace AccelByte.Server
             const ServerAnalyticsService analyticsApiWrapper = null;
             predefinedEventScheduler = CreatePredefinedEventScheduler(analyticsApiWrapper, config);
             predefinedEventScheduler.SetSharedMemory(ref sharedMemory);
+            
+            if(gameStandardAnalyticsService != null)
+            {
+                gameStandardAnalyticsService.Initialize(analyticsApiWrapper, config);
+                LoadGameStandardAnalyticsCache(GameStandardCacheImp, gameStandardAnalyticsService, environment.ToString());
+            }
+            
+            string gameStandardCacheFileName = GameStandardAnalyticsServerService.DefaultCacheFileName;
+            string gameStandardCacheEncryptionKey = OAuthConfig.ClientId;
+            string gameStandardCacheTableName = $"GameStandardCache/{gameStandardCacheFileName}";
+            if (GameStandardCacheImp == null)
+            {
+                IAccelByteDataStorage gameStandardStorage = new AccelByteDataStorageBinaryFile(this.fileStream);
+                GameStandardCacheImp = new AccelByteGameStandardEventCacheImp(
+                    gameStandardCacheTableName
+                    , gameStandardStorage
+                    , gameStandardCacheEncryptionKey
+                );
+            }
+            else
+            {
+                GameStandardCacheImp.UpdateKey(gameStandardCacheEncryptionKey);
+            }
+            GameStandardCacheImp.SetLogger(Logger);
         }
 
         private void ClearAnalytics()
         {
             predefinedEventScheduler.SetEventEnabled(false);
+
+            if (gameStandardAnalyticsService != null)
+            {
+                gameStandardAnalyticsService.StopScheduler();
+                const bool cacheAsync = false;
+                CacheGameStandardAnalytics(GameStandardCacheImp, gameStandardAnalyticsService, environment.ToString(), cacheAsync);
+                gameStandardAnalyticsService.Scheduler.ClearTasks();
+            }
         }
 
         private void AttachAnalyticsSchedulerApi(ServerApiClient apiServer)
         {
-            Server.ServerAnalyticsService analyticsWrapper = apiServer.GetAnalyticsService();
+            ServerAnalyticsService analyticsWrapper = apiServer.GetAnalyticsService();
             predefinedEventScheduler.SetAnalyticsApiWrapper(analyticsWrapper);
+            if (gameStandardAnalyticsService != null)
+            {
+                gameStandardAnalyticsService.SetAnalyticsWrapper(analyticsWrapper);
+            }
         }
 
         private void DetachAnalyticsSchedulerApi()
         {
-            const Api.AnalyticsService analyticsWrapper = null;
+            const ServerAnalyticsService analyticsWrapper = null;
             predefinedEventScheduler.SetAnalyticsApiWrapper(analyticsWrapper);
+            if (gameStandardAnalyticsService != null)
+            {
+                gameStandardAnalyticsService.SetAnalyticsWrapper(analyticsWrapper);
+            }
+        }
+
+        private void CacheGameStandardAnalytics(AccelByteGameStandardEventCacheImp cacheImp, GameStandardAnalyticsServerService gameStandardService, string environment, bool async)
+        {
+            if (cacheImp != null && gameStandardService != null)
+            {
+                cacheImp.SetSaveAsync(async);
+                gameStandardService.CacheEvents(cacheImp, environment);
+            }
         }
 
         internal void SendSDKInitializedEvent(string sdkVersion)
@@ -348,6 +418,15 @@ namespace AccelByte.Server
             var sdkInitializedPayload = new PredefinedSDKInitializedPayload("", sdkVersion);
             var telemetryEvent = new AccelByteTelemetryEvent(sdkInitializedPayload);
             predefinedEventScheduler.SendEvent(telemetryEvent, null);
+        }
+
+        private void LoadGameStandardAnalyticsCache(AccelByteGameStandardEventCacheImp cacheImp, GameStandardAnalyticsServerService gameStandardService, string environment)
+        {
+            if (cacheImp != null && gameStandardService != null)
+            {
+                cacheImp.SetLoadAsync(true);
+                gameStandardService.LoadCachedEvent(cacheImp, environment);
+            }
         }
 
         internal ServerAMS CreateAMSConnection(ServerConfig config, CoroutineRunner coroutineRunner, bool autoConnect = true)

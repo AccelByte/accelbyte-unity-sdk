@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -63,12 +63,15 @@ namespace AccelByte.Server
             if (!session.IsValid())
             {
                 SharedMemory?.Logger?.Log("Server RegisterServer session is not valid");
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             serverName = Environment.GetEnvironmentVariable("POD_NAME");
-            PodName = string.IsNullOrEmpty(serverName) ? PodName : serverName;
+            if (!string.IsNullOrEmpty(serverName))
+            {
+                PodName = serverName;
+            }
             var request = new RegisterServerRequest 
             {
                 pod_name = serverName, 
@@ -101,7 +104,7 @@ namespace AccelByte.Server
             
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -137,7 +140,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -190,7 +193,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
@@ -212,7 +215,7 @@ namespace AccelByte.Server
 
             if(!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -229,7 +232,7 @@ namespace AccelByte.Server
 
             if(!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -246,7 +249,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -411,11 +414,11 @@ namespace AccelByte.Server
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         #endregion

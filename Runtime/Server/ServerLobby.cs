@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -66,11 +66,21 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
             WritePartyStorageRecursive(retryAttempt, partyId, callback, payloadModifier);
+        }
+
+        internal void WritePartyStorage(string partyId, PartyDataUpdateRequest updateRequest, Action onConflictedData, ResultCallback<PartyDataUpdateNotif> callback)
+        {
+            coroutineRunner.Run(
+                api.WritePartyStorage(
+                    updateRequest,
+                    partyId,
+                    callback,
+                    onConflictedData));
         }
         
         private void WritePartyStorageRecursive( int remainingAttempt
@@ -80,7 +90,7 @@ namespace AccelByte.Server
         {
             if (remainingAttempt <= 0)
             {
-                callback.TryError(new Error(ErrorCode.PreconditionFailed, "Exhaust all retry attempt to modify party storage. Please try again."));
+                callback?.TryError(new Error(ErrorCode.PreconditionFailed, "Exhaust all retry attempt to modify party storage. Please try again."));
                 return;
             }
             
@@ -88,11 +98,11 @@ namespace AccelByte.Server
             {
                 if (getPartyStorageResult.IsError)
                 {
-                    callback.TryError(getPartyStorageResult.Error);
+                    callback?.TryError(getPartyStorageResult.Error);
                 }
                 else if(getPartyStorageResult.Value == null)
                 {
-                    callback.TryError(new Error(ErrorCode.UnknownError));
+                    callback?.TryError(new Error(ErrorCode.UnknownError));
                 }
                 else
                 {
@@ -104,16 +114,13 @@ namespace AccelByte.Server
                     var updateRequest = new PartyDataUpdateRequest();
                     updateRequest.custom_attribute = getPartyStorageResult.Value.custom_attribute;
                     updateRequest.updatedAt = getPartyStorageResult.Value.updatedAt;
-                    
-                    coroutineRunner.Run(
-                        api.WritePartyStorage(
-                            updateRequest,
-                            partyId,
-                            callback,
-                            () =>
-                            {
-                                WritePartyStorageRecursive(remainingAttempt - 1, partyId, callback, payloadModifier);
-                            }));
+
+                    Action onDataConflicted = () =>
+                    {
+                        WritePartyStorageRecursive(remainingAttempt - 1, partyId, callback, payloadModifier);
+                    };
+
+                    WritePartyStorage(partyId, updateRequest, onDataConflicted, callback);
                 }
             });
         }
@@ -135,7 +142,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             coroutineRunner.Run(
@@ -159,7 +166,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -186,7 +193,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -211,7 +218,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -238,7 +245,7 @@ namespace AccelByte.Server
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -261,7 +268,7 @@ namespace AccelByte.Server
             if(string.IsNullOrEmpty(key))
             {
                 Error error = new Error(ErrorCode.InvalidRequest, "key parameter cannot be null or empty");
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 

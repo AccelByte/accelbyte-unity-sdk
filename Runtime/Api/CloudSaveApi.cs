@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -83,7 +83,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
             
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SaveUserRecord( string namespace_
@@ -108,7 +108,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -135,7 +135,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
                 
         public IEnumerator GetUserRecord( string userId
@@ -146,7 +146,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -171,7 +171,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserRecord>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
 
@@ -185,7 +185,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -203,7 +203,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key, recordRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -230,7 +230,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator ReplaceUserRecord( string userId
@@ -241,27 +241,27 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(data.ToString()))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -292,7 +292,7 @@ namespace AccelByte.Api
             }
             else
             {
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
         
@@ -304,27 +304,27 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(AuthToken))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(AuthToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(key))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(key) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(data.ToString()))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, nameof(data) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -358,7 +358,7 @@ namespace AccelByte.Api
             }
             else
             {
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
 
@@ -369,7 +369,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -388,7 +388,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator SaveGameRecord( string key
@@ -399,7 +399,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, recordRequest, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -414,7 +414,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, recordRequest, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -434,7 +434,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameRecord( string key
@@ -443,7 +443,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -461,7 +461,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GameRecord>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ReplaceGameRecord( string namespace_
@@ -474,7 +474,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(namespace_, accessToken, key, recordRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -489,7 +489,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, recordRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -509,7 +509,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator ReplaceGameRecord( string key
@@ -520,7 +520,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key, data);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -549,7 +549,7 @@ namespace AccelByte.Api
             }
             else
             {
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
 
@@ -559,7 +559,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -577,7 +577,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         
@@ -599,7 +599,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -618,7 +618,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserRecords>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkGetPublicUserRecords(string key
@@ -640,7 +640,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -663,7 +663,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UserRecords>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkGetGameRecords( BulkGetRecordsByKeyRequest data
@@ -684,7 +684,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -703,7 +703,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<GameRecords>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator BulkGetOtherPlayerPublicRecordKeys( string userId
@@ -714,7 +714,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -736,7 +736,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<PaginatedBulkGetPublicUserRecordKeys>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator BulkGetOtherPlayerPublicRecords( string userId
@@ -758,7 +758,7 @@ namespace AccelByte.Api
             }
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
             
@@ -781,7 +781,7 @@ namespace AccelByte.Api
                 });
 
             var result = response.TryParseJson<UserRecords>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

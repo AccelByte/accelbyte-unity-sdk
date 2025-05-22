@@ -62,20 +62,24 @@ namespace AccelByte.Api
             
             var result = response.TryParseJson<WalletInfoResponse>();
             WalletInfo walletInfo = null;
-            if (result.Value.walletInfos.Length > 0)
+            if (result.Value != null)
             {
-                walletInfo = result.Value.walletInfos[0];
+                if (result.Value.walletInfos != null && result.Value.walletInfos.Length > 0)
+                {
+                    walletInfo = result.Value.walletInfos[0];
+                }
+                else
+                {
+                    walletInfo.id = result.Value.id;
+                    walletInfo.Namespace = result.Value.Namespace;
+                    walletInfo.userId = result.Value.userId;
+                    walletInfo.currencyCode = result.Value.currencyCode;
+                    walletInfo.currencySymbol = result.Value.currencySymbol;
+                    walletInfo.balance = result.Value.balance;
+                    walletInfo.status = result.Value.status;
+                }
             }
-            else
-            {
-                walletInfo.id = result.Value.id;
-                walletInfo.Namespace = result.Value.Namespace;
-                walletInfo.userId = result.Value.userId;
-                walletInfo.currencyCode = result.Value.currencyCode;
-                walletInfo.currencySymbol = result.Value.currencySymbol;
-                walletInfo.balance = result.Value.balance;
-                walletInfo.status = result.Value.status;
-            }
+
             callback?.TryOk(walletInfo);
         }
         

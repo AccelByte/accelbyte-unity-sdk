@@ -57,7 +57,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GrantTierToUser(string userId
@@ -94,7 +94,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetCurrentUserSeasonHistory(string userId
@@ -122,7 +122,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonExpHistory>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserSeasonData(string userId
@@ -150,7 +150,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryUserSeasonExp(string userId
@@ -178,7 +178,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<QueryUserSeasonExp>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetCurrentUserSeasonProgression( string userId
@@ -204,7 +204,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfoWithoutReward>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BulkGetUserSessionProgression(BulkGetUserSessionProgressionRequest requestModel
@@ -230,7 +230,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<UserSeasonInfo[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

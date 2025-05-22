@@ -55,6 +55,23 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            UnlockAchievement(userId, achievementCode, null, callback);
+        }
+
+        /// <summary>
+        /// Unlock specific achievement.
+        /// </summary>
+        /// <param name="userId">The id of the user who will receive achievement.</param>
+        /// <param name="achievementCode">The achievement code which will be unlock.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        internal void UnlockAchievement(string userId
+            , string achievementCode
+            , UnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (string.IsNullOrEmpty(achievementCode))
             {
                 callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't unlock achievement; AchievementCode parameter is null!"));
@@ -72,8 +89,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            coroutineRunner.Run(
-                Api.UnlockAchievement(userId, session.AuthorizationToken, achievementCode, callback));
+            Api.UnlockAchievement(userId, session.AuthorizationToken, achievementCode, optionalParameters, callback);
         }
 
         /// <summary>
@@ -88,6 +104,23 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            BulkUnlockAchievement(userId, achievementCodes, null, callback);
+        }
+
+        /// <summary>
+        /// Unlock multiple achievements via achievementCode for the current user.
+        /// </summary>
+        /// <param name="userId">User id of user to unlock achievements for.</param>
+        /// <param name="achievementCodes">Array of achievement codes to be unlocked.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback that contains an array of BulkUnlockAchievementResponse when completed.</param>
+        internal void BulkUnlockAchievement(string userId
+            , string[] achievementCodes
+            , BulkUnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
@@ -99,7 +132,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            Api.BulkUnlockAchievement(userId, achievementCodes, callback);
+            Api.BulkUnlockAchievement(userId, achievementCodes, optionalParameters, callback);
         }
     }
 }

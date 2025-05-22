@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,7 +13,7 @@ namespace AccelByte.Utils
 {
     public static class Networking
     {
-        public abstract class PingOptionalParameters
+        public abstract class PingOptionalParameters : OptionalParametersBase
         {
             public uint InTimeOutInMs = 10 * 1000;
             public uint MaxRetry = 6;
@@ -53,7 +53,7 @@ namespace AccelByte.Utils
             {
                 optionalParameters = new UdpPingOptionalParameters();
             }
-            UdpPingImp(url, (int) port, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry);
+            UdpPingImp(url, (int) port, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry, optionalParameters.Logger);
 #else
             pingResult.Reject(new Error(ErrorCode.ErrorFromException, message: "UDP ping isn't supported on Web Platform"));
 #endif
@@ -72,11 +72,11 @@ namespace AccelByte.Utils
             {
                 optionalParameters = new HttpPingOptionalParameters();
             }
-            HttpPingImp(url, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry);
+            HttpPingImp(url, pingResult, optionalParameters.InTimeOutInMs, optionalParameters.MaxRetry, optionalParameters.Logger);
             return pingResult;
         }
 
-        private static async System.Threading.Tasks.Task HttpPingImp(string url, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry)
+        private static async System.Threading.Tasks.Task HttpPingImp(string url, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry, IDebugger debugger)
         {
             string completeUrl = url;
             
@@ -93,6 +93,8 @@ namespace AccelByte.Utils
                 {
                     try
                     {
+                        debugger?.LogVerbose($"Ping {tryCount} to {completeUrl}");
+                        
                         webRequest.timeout = (int)(timeOutInMs / 1000);
                         var asyncOp = webRequest.SendWebRequest();
 
@@ -107,15 +109,18 @@ namespace AccelByte.Utils
                         if (asyncOp.webRequest.result != UnityWebRequest.Result.ConnectionError)
                         {
                             latencyResult = stopwatch.Elapsed.TotalMilliseconds;
+                            debugger?.LogVerbose($"Ping {tryCount} Success, took {stopwatch.ElapsedMilliseconds} ms");
                         }
                         else
                         {
+                            debugger?.LogVerbose($"Ping {tryCount} Failed. Reason: {asyncOp.webRequest.error}");
                             lastErrorMessage = asyncOp.webRequest.error;
                         }
                     }
                     catch (System.Exception ex)
                     {
                         lastErrorMessage = ex.Message;
+                        debugger?.LogVerbose($"Ping {tryCount} error: {lastErrorMessage}");
                     }
                 }
             } while (latencyResult == null && tryCount < maxRetry);
@@ -132,7 +137,7 @@ namespace AccelByte.Utils
             }
         }
         
-        private static async System.Threading.Tasks.Task UdpPingImp(string url, int port, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry)
+        private static async System.Threading.Tasks.Task UdpPingImp(string url, int port, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry, IDebugger debugger)
         {
             int? latencyResult = null;
             int tryCount = 0;
@@ -143,11 +148,12 @@ namespace AccelByte.Utils
             {
                 tryCount++;
                 stopwatch.Reset();
-                
                 try
                 {
                     using (var udpClient = new UdpClient(port))
                     {
+                        debugger?.LogVerbose($"Ping {tryCount} to {url}:{port}");
+                        
                         udpClient.Connect(url, port);
                         byte[] sendBytes = System.Text.Encoding.ASCII.GetBytes("PING");
                         stopwatch.Start();
@@ -174,7 +180,17 @@ namespace AccelByte.Utils
                             {
                                 return udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
                             };
-                            await System.Threading.Tasks.Task.Factory.FromAsync(receiveResult, receiveEndMethod);
+                            var waitReceiveTask = System.Threading.Tasks.Task.Factory.FromAsync(receiveResult, receiveEndMethod);
+                           
+                            await waitReceiveTask;
+
+                            byte[] receivedPacket = waitReceiveTask.Result;
+                            string receivedPackagePayloadString = null;
+                            if (receivedPacket != null)
+                            {
+                                receivedPackagePayloadString = System.Text.Encoding.ASCII.GetString(receivedPacket);
+                            }
+                            debugger?.LogVerbose($"Ping {tryCount} receiving response {receivedPackagePayloadString}");
                         }
 
                         udpClient.Close();

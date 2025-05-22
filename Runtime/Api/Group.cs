@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -58,7 +58,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -84,7 +84,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -177,7 +177,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -204,7 +204,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -233,7 +233,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -258,7 +258,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -285,13 +285,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group information! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group information! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -320,13 +320,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -355,13 +355,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -390,13 +390,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group information! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -425,13 +425,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -458,13 +458,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -493,13 +493,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom rule! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -528,13 +528,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom rule! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -565,19 +565,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! groupId parameter is null!"));
                 return;
             }
 
             if (allowedAction == AllowedAction.None)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! allowedAction parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! allowedAction parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -608,19 +608,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! groupId parameter is null!"));
                 return;
             }
 
             if (allowedAction == AllowedAction.None)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! allowedAction parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group predefined rule! allowedAction parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -649,19 +649,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! groupId parameter is null!"));
                 return;
             }
 
             if (allowedAction == AllowedAction.None)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! allowedAction parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! allowedAction parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -690,19 +690,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! groupId parameter is null!"));
                 return;
             }
 
             if (allowedAction == AllowedAction.None)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! allowedAction parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't delete group predefined rule! allowedAction parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -727,7 +727,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -752,7 +752,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -772,13 +772,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept group invitation! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept group invitation! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -805,13 +805,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept group invitation! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept group invitation! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -838,13 +838,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group invitation! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group invitation! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -871,13 +871,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group invitation! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group invitation! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -909,7 +909,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -936,7 +936,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't invite other user to group! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't invite other user to group! groupId parameter is null!"));
                 return;
             }
 
@@ -947,7 +947,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -974,13 +974,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't invite other user to group! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't invite other user to group! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1007,13 +1007,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't join member! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't join member! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1040,13 +1040,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't cancel join group request! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't cancel join group request! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1073,13 +1073,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group member list! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group member list! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1110,13 +1110,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group member list! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group member list! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1148,7 +1148,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1176,7 +1176,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't kick a group member! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't kick a group member! groupId parameter is null!"));
                 return;
             }
 
@@ -1187,7 +1187,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1212,7 +1212,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1238,13 +1238,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't leave group! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't leave group! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1275,13 +1275,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1308,13 +1308,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1343,13 +1343,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1378,7 +1378,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1403,7 +1403,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1428,13 +1428,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get group join requests! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1466,7 +1466,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1494,7 +1494,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept other user join request! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't accept other user join request! groupId parameter is null!"));
                 return;
             }
 
@@ -1505,7 +1505,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1537,7 +1537,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1565,7 +1565,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group join requests! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't reject group join requests! groupId parameter is null!"));
                 return;
             }
 
@@ -1576,7 +1576,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1605,19 +1605,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(memberRoleId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! MemberRoleId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! MemberRoleId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! UserId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! UserId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1647,25 +1647,25 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(memberRoleId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! MemberRoleId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! MemberRoleId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! groupId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! UserId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't assign group role request! UserId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1694,19 +1694,19 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(memberRoleId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! MemberRoleId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! MemberRoleId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! UserId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! UserId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1739,25 +1739,25 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(memberRoleId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! MemberRoleId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! MemberRoleId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! groupId parameter is null!"));
                 return;
             }
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! UserId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't remove group role request! UserId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1790,7 +1790,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1822,13 +1822,13 @@ namespace AccelByte.Api
 
             if (groupIds == null || groupIds.Length == 0)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "GroupId can't null or empty!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "GroupId can't null or empty!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1854,7 +1854,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1874,7 +1874,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't cancel group member invitation! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't cancel group member invitation! groupId parameter is null!"));
                 return;
             }
 
@@ -1885,7 +1885,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1912,13 +1912,13 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom attributes! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't update group custom attributes! groupId parameter is null!"));
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1946,7 +1946,7 @@ namespace AccelByte.Api
 
             if (string.IsNullOrEmpty(groupId))
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "Can't get user group status info! groupId parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "Can't get user group status info! groupId parameter is null!"));
                 return;
             }
 
@@ -1957,7 +1957,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1976,7 +1976,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 

@@ -46,7 +46,7 @@ namespace AccelByte.Api
         public void GetTurnServers(GetTurnServerOptionalParameters optionalParam, 
             ResultCallback<TurnServerList> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParam?.Logger);
 
             if (!session.IsValid())
             {
@@ -54,7 +54,12 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.RequestGetTurnServers(getResult =>
+            api.RequestGetTurnServers(optionalParameters: new RequestGetTurnServersOptionalParam
+            {
+                Logger = optionalParam?.Logger,
+                ApiTracker = optionalParam?.ApiTracker
+            }
+            , getResult =>
             {
                 if (getResult.IsError)
                 {

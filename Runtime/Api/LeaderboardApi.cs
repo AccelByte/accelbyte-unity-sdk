@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020-2022 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -36,7 +36,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, leaderboardCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -78,7 +78,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<LeaderboardRankingResult>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
 
         public IEnumerator GetUserRanking( string leaderboardCode
@@ -90,7 +90,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -111,7 +111,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<UserRankingData>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
 
         public IEnumerator GetLeaderboardList( int offset
@@ -123,7 +123,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -144,7 +144,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<LeaderboardPagedList>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
 
         public IEnumerator GetLeaderboardListV3(int offset, int limit, ResultCallback<LeaderboardPagedListV3> callback)
@@ -154,7 +154,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -177,7 +177,7 @@ namespace AccelByte.Api
 
             Result<LeaderboardPagedListV3> result = response.TryParseJson<LeaderboardPagedListV3>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
 
         [System.Obsolete("Use GetRankingsV3")]
@@ -195,7 +195,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -219,7 +219,7 @@ namespace AccelByte.Api
 
             Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetRankingsByCycle(string leaderboardCode, string cycleId, int offset, int limit,
@@ -230,7 +230,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, cycleId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -255,7 +255,7 @@ namespace AccelByte.Api
 
             Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
         
         public IEnumerator GetUserRankingV3( string leaderboardCode
@@ -267,7 +267,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -291,7 +291,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<UserRankingDataV3>();
 
-            callback.Try( result );
+            callback?.Try( result );
         }
     }
 }

@@ -7,7 +7,7 @@ using AccelByte.Utils;
 
 namespace AccelByte.Core
 {
-    public class DefaultWebGlLatencyCalculator : ILatencyCalculator
+    internal class DefaultWebGlLatencyCalculator : ILatencyCalculator
     {
         private int timeOutSeconds;
         private const string awsPingUrl = "https://{ip}:{port}";
@@ -17,7 +17,7 @@ namespace AccelByte.Core
             this.timeOutSeconds = timeOutSeconds;
         }
         
-        private void StartPing(string url, AccelByteResult<int, Error> resultCallback)
+        private void StartPing(string url, IDebugger debugger, AccelByteResult<int, Error> resultCallback)
         {
             var pingResult = Utils.Networking.HttpPing(url, new Networking.HttpPingOptionalParameters()
             {
@@ -33,12 +33,12 @@ namespace AccelByte.Core
                 });
         }
         
-        public AccelByteResult<int, Error> CalculateLatency(string ip, int port)
+        public AccelByteResult<int, Error> CalculateLatency(string ip, int port, IDebugger debugger)
         {
             var result = new AccelByteResult<int, Error>();
             var url = awsPingUrl.Replace("{ip}", ip).Replace("{port}", port.ToString());
             
-            StartPing(url, result);
+            StartPing(url, debugger, result);
             
             return result;
         }

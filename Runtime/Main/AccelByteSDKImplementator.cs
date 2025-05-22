@@ -145,7 +145,15 @@ namespace AccelByte.Core
             const bool getServerConfig = true;
             AccelByteSettingsV2 settings = AccelByteSettingsV2.GetSettingsByEnv(environment, OverrideConfigs, getServerConfig);
             IHttpRequestSenderFactory httpRequestSenderFactory = SdkHttpSenderFactory;
-            var newServerRegistry = new Server.AccelByteServerRegistry(environment, settings.ServerSdkConfig, settings.OAuthConfig, httpRequestSenderFactory, TimeManager, CoreHeartBeat, ServiceTracker);
+            var newServerRegistry = new Server.AccelByteServerRegistry(
+                environment
+                , settings.ServerSdkConfig
+                , settings.OAuthConfig
+                , httpRequestSenderFactory
+                , TimeManager
+                , CoreHeartBeat
+                , FileStream
+                , ServiceTracker);
             
             return newServerRegistry;
         }

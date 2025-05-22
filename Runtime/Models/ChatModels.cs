@@ -621,7 +621,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class CreateGroupTopicOptionalParameter
+    public class CreateGroupTopicOptionalParameter : OptionalParametersBase
     {
         /// <summary>
         /// Flag if the group topic joinable

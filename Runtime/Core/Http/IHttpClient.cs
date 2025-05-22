@@ -1,7 +1,8 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace AccelByte.Core {
         string Id { get; set; }
         string Method { get; }
         string Url { get; set; }
+        string UrlFormat { get; set; }
         HttpAuth AuthType { get; }
         IDictionary<string, string> Headers { get; }
         byte[] BodyBytes { get; }
@@ -75,6 +77,7 @@ namespace AccelByte.Core {
     {
         void SetLogger(IDebugger logger);
         void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs);
+        void AddTask(IHttpRequest request, Action<HttpSendResult> callback, int timeoutMs, uint delayTimeMs, AdditionalHttpParameters additionalHttpParameters);
         void ClearTasks();
         void ClearCookies(Uri baseUri);
     }
@@ -96,7 +99,9 @@ namespace AccelByte.Core {
         event Action<IHttpRequest> ServerErrorOccured;
         event Action<IHttpRequest> NetworkErrorOccured;
         IEnumerator SendRequest(IHttpRequest request, Action<IHttpResponse, Error> callback);
+        IEnumerator SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse, Error> callback);
         System.Threading.Tasks.Task<HttpSendResult> SendRequestAsync(IHttpRequest request);
+        System.Threading.Tasks.Task<HttpSendResult> SendRequestAsync(AdditionalHttpParameters additionalParams, IHttpRequest request);
         void SetCredentials(string clientId, string clientSecret);
         HttpCredential GetCredentials();
         void SetImplicitBearerAuth(string accessToken);
@@ -113,6 +118,12 @@ namespace AccelByte.Core {
         {
             return client.SendRequest(request, (response, err) => callback?.Invoke(response));
         }
+
+        public static IEnumerator SendRequest(this IHttpClient client, AdditionalHttpParameters additionalParams, IHttpRequest request, Action<IHttpResponse> callback)
+        {
+            return client.SendRequest(additionalParams, request, (response, err) => callback?.Invoke(response));
+        }
+
         public static async System.Threading.Tasks.Task<IHttpResponse> SendRequestAsync(this IHttpClient client, IHttpRequest request)
         {
             var sendTask = client.SendRequestAsync(request);

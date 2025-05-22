@@ -49,5 +49,21 @@ namespace AccelByte.Server
             Report.GetFunctionLog(GetType().Name);
             coroutineRunner.Run(session.GetJwks(callback));
         }
+
+        /// <summary>
+        /// Logout from current session.
+        /// </summary>
+        public void Logout(ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (session == null || (session != null && !session.IsValid()))
+            {
+                callback?.TryError(new Error(ErrorCode.IsNotLoggedIn));
+                return;
+            }
+            
+            session.LogoutAsync(callback);
+        }
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using AccelByte.Core;
@@ -78,7 +78,7 @@ namespace AccelByte.Server
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -99,7 +99,7 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup[]>();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
         
@@ -108,7 +108,7 @@ namespace AccelByte.Server
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, newCountryGroupData);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -124,7 +124,7 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup>();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
         
@@ -133,7 +133,7 @@ namespace AccelByte.Server
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, groupCode, newCountryGroupData);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -150,7 +150,7 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<CountryGroup>();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
         
@@ -159,7 +159,7 @@ namespace AccelByte.Server
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, groupCode);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -174,7 +174,7 @@ namespace AccelByte.Server
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
     }

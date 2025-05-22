@@ -67,30 +67,52 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryAchievementsOptionalParameters()
+            {
+                IsGlobal = isGlobal,
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                TagBuilder = tagBuilder
+            };
+
+            QueryAchievements(language, sortBy, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Query all achievements in the related namespace.
+        /// </summary>
+        /// <param name="language">The language to display the appropiate achievement's name and description. If it is empty, it will use the its default language.
+        /// If the achievement does not have the expected language, it will use its dafault languge.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedPublicAchievement via callback when completed.</param>
+        internal void QueryAchievements(string language
+            , AchievementSortBy sortBy
+            , QueryAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedPublicAchievement> callback
+            )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
-
-            coroutineRunner.Run(
-                api.QueryAchievements(
-                    language, 
-                    tags,
-                    sortBy, 
-                    cb =>
+            api.QueryAchievements(
+                language
+                , sortBy
+                , optionalParameters
+                , cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            SendUserIdPredefinedEvent(session.UserId, EventMode.GetAll);
-                        }
-                        HandleCallback(cb, callback);
-                    }, 
-                    offset, 
-                    limit,
-                    isGlobal));
+                        SendUserIdPredefinedEvent(session.UserId, EventMode.GetAll);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -103,21 +125,35 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            GetAchievement(achievementCode, null, callback);
+        }
+
+        /// <summary>
+        /// Get an specific achievement information.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected achievement.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains MultiLanguageAchievement via callback when completed.</param>
+        internal void GetAchievement(string achievementCode
+            , GetAchievementOptionalParameters optionalParameters
+            , ResultCallback<MultiLanguageAchievement> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetAchievement(achievementCode, cb =>
+            api.GetAchievement(achievementCode, optionalParameters, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
                 {
-                    if (!cb.IsError && cb.Value != null)
-                    {
-                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GetSpecific);
-                    }
-                    HandleCallback(cb, callback);
-                }));
+                    SendAchievementCodePredefinedEvent(achievementCode, EventMode.GetSpecific);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -139,30 +175,48 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryUserAchievementsOptionalParameters()
+            {
+                PreferUnlocked = preferUnlocked,
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                TagBuilder = tagBuilder
+            };
+
+            QueryUserAchievements(sortBy, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Query user's achievements. Include achieved and in-progress.
+        /// </summary>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedUserAchievement via callback when completed.</param>
+        internal void QueryUserAchievements(AchievementSortBy sortBy
+            , QueryUserAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedUserAchievement> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
-
-            coroutineRunner.Run(
-                api.QueryUserAchievements(
-                    session.UserId,
-                    tags,
-                    sortBy, 
-                    cb =>
+            api.QueryUserAchievements(
+                    session.UserId
+                    , sortBy
+                    , optionalParameters
+                    , cb =>
                     {
                         if (!cb.IsError && cb.Value != null)
                         {
                             SendUserIdPredefinedEvent(session.UserId, EventMode.GetUserAchievement);
                         }
                         HandleCallback(cb, callback);
-                    }, 
-                    offset, 
-                    limit,
-                   preferUnlocked));
+                    });
         }
 
         /// <summary>
@@ -175,21 +229,35 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            UnlockAchievement(achievementCode, null, callback);
+        }
+
+        /// <summary>
+        /// Unlock specific achievement.
+        /// </summary>
+        /// <param name="achievementCode">The achievement code which will be unlock.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        internal void UnlockAchievement(string achievementCode
+            , UnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, cb =>
+            api.UnlockAchievement(session.UserId, session.AuthorizationToken, achievementCode, optionalParameters, cb =>
+            {
+                if (cb != null && !cb.IsError)
                 {
-                    if (cb != null && !cb.IsError)
-                    {
-                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.Unlocked);
-                    }
-                    HandleCallback(cb, callback);
-                }));
+                    SendAchievementCodePredefinedEvent(achievementCode, EventMode.Unlocked);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -202,13 +270,28 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            BulkUnlockAchievement(achievementCodes, null, callback);
+        }
+
+        /// <summary>
+        /// Unlock multiple achievements via achievementCode for the current user.
+        /// </summary>
+        /// <param name="achievementCodes">Array of achievement codes to be unlocked.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback that contains an array of BulkUnlockAchievementResponse when completed.</param>
+        internal void BulkUnlockAchievement(string[] achievementCodes
+            , BulkUnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            api.BulkUnlockAchievement(achievementCodes, callback);
+            api.BulkUnlockAchievement(achievementCodes, optionalParameters, callback);
         }
 
         /// <summary>
@@ -232,30 +315,58 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryGlobalAchievementsOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                TagBuilder = tagBuilder
+            };
+
+            QueryGlobalAchievements(
+                achievementCode
+                , achievementStatus
+                , sortBy
+                , optionalParameters
+                , callback);
+        }
+
+        /// <summary>
+        /// Query the progress list of global achievements. Include achieved and in-progress.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="achievementStatus">Achievement status for the achievements result.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedUserGlobalAchievement via callback when completed.</param>
+        internal void QueryGlobalAchievements(string achievementCode
+            , GlobalAchievementStatus achievementStatus
+            , GlobalAchievementListSortBy sortBy
+            , QueryGlobalAchievementsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedUserGlobalAchievement> callback
+            )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            var tags = tagBuilder is null ? string.Empty : tagBuilder.Build();
-
-            coroutineRunner.Run(
-                api.QueryGlobalAchievements(
-                    achievementCode,
-                    achievementStatus,
-                    sortBy,
-                    cb =>
+            api.QueryGlobalAchievements(
+                achievementCode
+                , achievementStatus
+                , sortBy
+                , optionalParameters
+                , cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGet);
-                        }
-                        HandleCallback(cb, callback);
-                    },
-                    offset,
-                    limit,
-                    tags));
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGet);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -281,20 +392,54 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.QueryGlobalAchievementContributors(
-                    achievementCode,
-                    sortBy,
-                    cb =>
+            var optionalParameters = new QueryGlobalAchievementContributorsOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset
+            };
+
+            QueryGlobalAchievementContributors(
+                achievementCode
+                , sortBy
+                , optionalParameters
+                , callback);
+        }
+
+        /// <summary>
+        /// Query the list of contributors for a global achievement.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedGlobalAchievementContributors via callback when completed.</param>
+        internal void QueryGlobalAchievementContributors(string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , QueryGlobalAchievementContributorsOptionalParameters optionalParameters
+            , ResultCallback<PaginatedGlobalAchievementContributors> callback
+            )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            
+            api.QueryGlobalAchievementContributors(
+                achievementCode
+                , sortBy
+                , optionalParameters
+                , cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributors);
-                        }
-                        HandleCallback(cb, callback);
-                    },
-                    offset,
-                    limit));
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributors);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -314,27 +459,49 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new QueryGlobalAchievementUserContributedOptionalParameters()
+            {
+                Offset = offset,
+                Logger = SharedMemory?.Logger,
+                Limit = limit
+            };
+
+            QueryGlobalAchievementUserContributed(achievementCode, sortBy, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Query the list of global achievements that have been contributed by the user.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected achievement.</param>
+        /// <param name="sortBy">Sorting method for the achievements result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedGlobalAchievementUserContributed via callback when completed.</param>
+        internal void QueryGlobalAchievementUserContributed(string achievementCode
+            , GlobalAchievementContributorsSortBy sortBy
+            , QueryGlobalAchievementUserContributedOptionalParameters optionalParameters
+            , ResultCallback<PaginatedGlobalAchievementUserContributed> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.QueryGlobalAchievementUserContributed( 
-                    session.UserId,
-                    achievementCode,
-                    sortBy,
-                    cb =>
+            api.QueryGlobalAchievementUserContributed(
+                session.UserId
+                , achievementCode
+                , sortBy
+                , optionalParameters
+                , cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributed);
-                        }
-                        HandleCallback(cb, callback);
-                    },
-                    offset,
-                    limit));
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalGetContributed);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -343,10 +510,24 @@ namespace AccelByte.Api
         /// <param name="achievementCode">The code of the expected global achievement.</param>
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public void ClaimGlobalAchievement(string achievementCode
-            , ResultCallback callback
-            )
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            ClaimGlobalAchievement(achievementCode, null, callback);
+        }
+
+        /// <summary>
+        /// Claim specific global achievement.
+        /// </summary>
+        /// <param name="achievementCode">The code of the expected global achievement.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result via callback when completed.</param>
+        internal void ClaimGlobalAchievement(string achievementCode
+            , ClaimGlobalAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -354,19 +535,19 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.ClaimGlobalAchievement(
-                    session.UserId, 
-                    session.AuthorizationToken, 
-                    achievementCode,
-                    cb =>
+            api.ClaimGlobalAchievement(
+                session.UserId
+                , session.AuthorizationToken
+                , achievementCode
+                , optionalParameters
+                , cb =>
+                {
+                    if (cb != null && !cb.IsError)
                     {
-                        if (cb != null && !cb.IsError)
-                        {
-                            SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalClaimed);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                        SendAchievementCodePredefinedEvent(achievementCode, EventMode.GlobalClaimed);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -385,21 +566,44 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetTagsAchievementOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset
+            };
+
+            GetTags(name, sortBy, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Query all tags for achievements.
+        /// </summary>
+        /// <param name="name">The name of the expected tag</param>
+        /// <param name="sortBy">Sorting method for the achievement tags result.</param>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Returns a Result that contains PaginatedPublicTag via callback when completed.</param>
+        internal void GetTags(string name
+            , AchievementSortBy sortBy
+            , GetTagsAchievementOptionalParameters optionalParameters
+            , ResultCallback<PaginatedPublicTag> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-            
-            coroutineRunner.Run(
-                api.GetTags(name, sortBy, cb =>
+
+            api.GetTags(name, sortBy, optionalParameters, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
                 {
-                    if (!cb.IsError && cb.Value != null)
-                    {
-                        SendNamePredefinedEvent(name);
-                    }
-                    HandleCallback(cb, callback);
-                }, offset, limit));
+                    SendNamePredefinedEvent(name);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         #region PredefinedEvents

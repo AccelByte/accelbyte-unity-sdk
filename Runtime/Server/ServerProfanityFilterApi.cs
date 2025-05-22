@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -24,6 +24,14 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name, logger: SharedMemory?.Logger);
 
+            BulkCreateProfanityWords(bulkCreateRequest, null, callback);
+        }
+        
+        internal void BulkCreateProfanityWords(
+            CreateProfanityWordRequest[] bulkCreateRequest
+            , BulkCreateProfanityWordsOptionalParameters optionalParams
+            , ResultCallback callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, ServerConfig.PublisherNamespace, bulkCreateRequest);
             if (error != null)
             {
@@ -59,7 +67,11 @@ namespace AccelByte.Server
                     .WithBody(requestBody.ToUtf8Json())
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest
+            (
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams)
+                , request
+                , response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -69,6 +81,17 @@ namespace AccelByte.Server
         public void CreateProfanityWord(string word
             , string[] falseNegatives
             , string[] falsePositives
+            , ResultCallback<ProfanityDictionaryEntry> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name, logger: SharedMemory?.Logger);
+
+            CreateProfanityWord(word, falseNegatives, falsePositives, null, callback);
+        }
+        
+        internal void CreateProfanityWord(string word
+            , string[] falseNegatives
+            , string[] falsePositives
+            , CreateProfanityWordOptionalParameters optionalParams
             , ResultCallback<ProfanityDictionaryEntry> callback)
         {
             Report.GetFunctionLog(this.GetType().Name, logger: SharedMemory?.Logger);
@@ -95,17 +118,24 @@ namespace AccelByte.Server
                     .WithBody(requestBody.ToUtf8Json())
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<ProfanityDictionaryEntry>();
-                callback?.Try(result);
-            });
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams)
+                , request, response =>
+                {
+                    var result = response.TryParseJson<ProfanityDictionaryEntry>();
+                    callback?.Try(result);
+                });
         }
 
         public void DeleteProfanityWord(string id, ResultCallback callback)
         {
             Report.GetFunctionLog(this.GetType().Name, logger: SharedMemory?.Logger);
 
+            DeleteProfanityWord(id, null, callback);
+        }
+
+        internal void DeleteProfanityWord(string id, DeleteProfanityWordOptionalParameters optionalParams, ResultCallback callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, ServerConfig.PublisherNamespace, id);
             if (error != null)
             {
@@ -121,11 +151,14 @@ namespace AccelByte.Server
                     .WithPathParam("id", id)
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParse();
-                callback?.Try(result);
-            });
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams)
+                , request
+                , response =>
+                {
+                    var result = response.TryParse();
+                    callback?.Try(result);
+                });
         }
 
         public void GetProfanityWordGroups(GetProfanityWordGroupsOptionalParameters optionalParameters
@@ -164,7 +197,13 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(
+                new AdditionalHttpParameters()
+                {
+                    Logger = optionalParameters != null ? optionalParameters.Logger : null
+                }
+                , request
+                , response =>
             {
                 var result = response.TryParseJson<ProfanityWordGroupResponse>();
                 callback?.Try(result);
@@ -219,7 +258,10 @@ namespace AccelByte.Server
 
             var request = requestBuilder.GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams)
+                , request
+                , response =>
             {
                 var result = response.TryParseJson<QueryProfanityWordsResponse>();
                 callback?.Try(result);
@@ -234,6 +276,16 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name, logger: SharedMemory?.Logger);
 
+            UpdateProfanityWord(id, word, falseNegatives, falsePositives, null, callback);
+        }
+        
+        internal void UpdateProfanityWord(string id
+            , string word
+            , string[] falseNegatives
+            , string[] falsePositives
+            , UpdateProfanityWordOptionalParameters optionalParams
+            , ResultCallback<ProfanityDictionaryEntry> callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, ServerConfig.PublisherNamespace, word);
             if (error != null)
             {
@@ -258,7 +310,10 @@ namespace AccelByte.Server
                     .WithBody(requestBody.ToUtf8Json())
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams)
+                , request
+                , response =>
             {
                 var result = response.TryParseJson<ProfanityDictionaryEntry>();
                 callback?.Try(result);

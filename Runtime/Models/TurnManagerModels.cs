@@ -27,6 +27,11 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class RequestGetTurnServersOptionalParam : OptionalParametersBase
+    {
+    }
+
+    [DataContract, Preserve]
     public class TurnServerList
     {
         [DataMember] public TurnServer[] servers;
@@ -193,7 +198,7 @@ namespace AccelByte.Models
 #if UNITY_WEBGL && !UNITY_EDITOR
             url = AccelByte.Utils.Networking.GetTestServerUrlByRegion(region);
 #endif
-            retval = calculator.CalculateLatency(url, qos_port);
+            retval = calculator.CalculateLatency(url, qos_port, null);
             retval.OnSuccess(newLatency =>
             {
                 cachedLatency = newLatency;
@@ -261,7 +266,7 @@ namespace AccelByte.Models
     }
     
     [Preserve]
-    public class GetTurnServerOptionalParameters
+    public class GetTurnServerOptionalParameters : OptionalParametersBase
     {
         public bool AutoCalculateLatency = true;
         internal ILatencyCalculator LatencyCalculator;

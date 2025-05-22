@@ -34,7 +34,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userIds, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -53,7 +53,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<UserGameProfiles[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetAllGameProfiles( string userId
@@ -63,7 +63,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -83,7 +83,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfile[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateGameProfile( string userId
@@ -94,7 +94,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, gameProfile);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -115,7 +115,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfile>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameProfile( string userId
@@ -126,7 +126,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, profileId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -147,7 +147,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfile>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGameProfile( string userId
@@ -165,7 +165,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -187,7 +187,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfile>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteGameProfile( string userId
@@ -198,7 +198,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, AuthToken, profileId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -219,7 +219,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGameProfileAtrribute( string userId
@@ -237,7 +237,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -261,7 +261,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfileAttribute>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateGameProfileAtrribute( string userId
@@ -280,7 +280,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -305,7 +305,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<GameProfile>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

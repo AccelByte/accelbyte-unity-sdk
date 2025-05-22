@@ -74,7 +74,7 @@ namespace AccelByte.Server
 
             if (!Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -101,7 +101,7 @@ namespace AccelByte.Server
 
             if (!Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -186,7 +186,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -217,7 +217,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -247,7 +247,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
@@ -277,7 +277,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -297,7 +297,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -317,7 +317,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -345,7 +345,7 @@ namespace AccelByte.Server
 
             if (!this.Session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 

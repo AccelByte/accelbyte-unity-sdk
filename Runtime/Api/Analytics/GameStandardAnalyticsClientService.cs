@@ -6,7 +6,7 @@ using AccelByte.Models;
 
 namespace AccelByte.Api
 {
-    public class GameStandardAnalyticsClientService : GameStandardAnalyticsServiceBase<AnalyticsService>
+    public class GameStandardAnalyticsClientService : Core.GameStandardAnalyticsServiceBase<AnalyticsService>
     {
         internal const string DefaultCacheFileName = "GameStandardClientEvent.cache";
         Config config;

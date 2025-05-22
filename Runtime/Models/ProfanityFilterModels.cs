@@ -29,7 +29,7 @@ namespace AccelByte.Models
     /// QueryProfanityWords optional parameters. Can be null.
     /// </summary>
     [Preserve]
-    public class QueryProfanityWordsOptionalParameters
+    public class QueryProfanityWordsOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Query profanity words starting with set value. Can be null.
@@ -62,11 +62,23 @@ namespace AccelByte.Models
         public int? PageSize = null;
     }
 
+    [Preserve]
+    public class CreateProfanityWordOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class BulkCreateProfanityWordsOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
     /// <summary>
     /// GetProfanityWordGroups optional parameters. Can be null.
     /// </summary>
     [Preserve]
-    public class GetProfanityWordGroupsOptionalParameters
+    public class GetProfanityWordGroupsOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Sort returned results by selection. Default value is None.
@@ -82,6 +94,18 @@ namespace AccelByte.Models
         /// Amount of displayed results per page. Can be null.
         /// </summary>
         public int? PageSize = null;
+    }
+    
+    [Preserve]
+    public class UpdateProfanityWordOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class DeleteProfanityWordOptionalParameters : OptionalParametersBase
+    {
+        
     }
 
     [DataContract, Preserve]

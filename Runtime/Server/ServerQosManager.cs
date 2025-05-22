@@ -48,6 +48,8 @@ namespace AccelByte.Server
 
             apiOptionalParameter.LatencyCalculator = fetchOptionalParams.LatencyCalculator;
             apiOptionalParameter.Status = fetchOptionalParams.Status;
+            apiOptionalParameter.ApiTracker = fetchOptionalParams.ApiTracker;
+            apiOptionalParameter.Logger = fetchOptionalParams.Logger;
             
             api.RequestGetPublicQosServers(apiOptionalParameter, getQosServersResult =>
             {
@@ -90,7 +92,7 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name);
 
-            api.RequestGetAllQosServers(getQosServersResult =>
+            api.RequestGetAllQosServers(optionalParams, getQosServersResult =>
             {
                 if (getQosServersResult.IsError)
                 {
@@ -107,7 +109,7 @@ namespace AccelByte.Server
                             qosServer.LatencyCalculator = optionalParams.LatencyCalculator;
                         }
                     }
-                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = getQosServersResult.Value.GenerateLatenciesMap(useCache: false);
+                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = getQosServersResult.Value.GenerateLatenciesMap(optionalParams?.Logger, useCache: false);
                     generateLatencyResult.OnSuccess(map =>
                     {
                         callback?.TryOk(map);
@@ -140,9 +142,20 @@ namespace AccelByte.Server
         /// <param name="callback">Returns a result via callback when completed</param>
         public void GetAllActiveServerLatencies(ResultCallback<Dictionary<string, int>> callback)
         {
-            var optionalParams = new GetQosServerOptionalParameters();
-            optionalParams.Status = QosStatus.Active;
-            GetServerLatencies(optionalParams, callback);
+            GetAllActiveServerLatencies(optionalParameters: null, callback);
+        }
+        
+        internal void GetAllActiveServerLatencies(GetAllActiveServerLatenciesOptionalParameters optionalParameters, ResultCallback<Dictionary<string, int>> callback)
+        {
+            var getQoSServerOptionalParams = new GetQosServerOptionalParameters();
+            getQoSServerOptionalParams.Status = QosStatus.Active;
+            if (optionalParameters != null)
+            {
+                getQoSServerOptionalParams.Logger = optionalParameters.Logger;
+                getQoSServerOptionalParams.ApiTracker = optionalParameters.ApiTracker;
+            }
+            
+            GetServerLatencies(getQoSServerOptionalParams, callback);
         }
 
         /// <summary>
@@ -175,7 +188,7 @@ namespace AccelByte.Server
                 
                 if (fetchQosServerResult.Value != null && fetchQosServerResult.Value.servers != null && fetchQosServerResult.Value.servers.Length > 0)
                 {
-                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = fetchQosServerResult.Value.GenerateLatenciesMap(useCache: false);
+                    AccelByte.Models.AccelByteResult<Dictionary<string, int>, Error> generateLatencyResult = fetchQosServerResult.Value.GenerateLatenciesMap(optionalParams?.Logger, useCache: false);
                     generateLatencyResult.OnSuccess(map =>
                     {
                         callback?.TryOk(map);

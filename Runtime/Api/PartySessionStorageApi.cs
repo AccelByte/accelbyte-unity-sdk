@@ -23,9 +23,11 @@ namespace AccelByte.Api
         {
         }
 
-        internal void GetPartySessionStorage(string partyId, ResultCallback<GetPartySessionStorageResult> callback)
+        internal void GetPartySessionStorage(string partyId, MatchmakingV2CreateTicketRequestOptionalParams optionalParams, ResultCallback<GetPartySessionStorageResult> callback)
         {
-            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
+
+            var error = Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_
                 , AuthToken
                 , partyId);
 
@@ -42,8 +44,12 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GetPartySessionStorageResult>();
                 callback?.Try(result);

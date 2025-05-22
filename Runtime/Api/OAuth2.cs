@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -81,11 +81,11 @@ public class OAuth2 : ApiBase
                 {
                     RefreshSession(refreshToken, callback);
                 };
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -154,11 +154,11 @@ public class OAuth2 : ApiBase
                 {
                     RefreshSession(refreshToken, callback);
                 };
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -170,11 +170,29 @@ public class OAuth2 : ApiBase
         , bool rememberMe = false
         , string authTrustId = null)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LoginWithUsernameV3OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger,
+            RememberMe = rememberMe
+        };
+
+        LoginWithUsernameV3(username, password, optionalParameters, callback, authTrustId);
+    }
+
+    internal void LoginWithUsernameV3
+        (string username
+        , string password
+        , LoginWithUsernameV3OptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback
+        , string authTrustId = null)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
         if (string.IsNullOrEmpty(username))
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = ErrorCode.InvalidRequest.ToString(),
                 error_description = "username cannot be null or empty"
@@ -183,7 +201,7 @@ public class OAuth2 : ApiBase
         }
         if (string.IsNullOrEmpty(password))
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = ErrorCode.InvalidRequest.ToString(),
                 error_description = "password cannot be null or empty"
@@ -199,11 +217,12 @@ public class OAuth2 : ApiBase
             .WithFormParam("username", username)
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
-            .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .WithFormParam("extend_exp", optionalParameters?.RememberMe is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -232,19 +251,31 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
 
     public void LoginWithDeviceId(ResultCallback<TokenData, OAuthError> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
-        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+        
+        var optionalParameters = new LoginWithDeviceIdOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        LoginWithDeviceId(optionalParameters, callback);
+    }
+
+    internal void LoginWithDeviceId(LoginWithDeviceIdOptionalParameters optionalParameters, ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: optionalParameters?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
         string targetUri = BaseUrl + "/v3/oauth/platforms/device/token";
         IHttpRequest request = HttpRequestBuilder.CreatePost(targetUri)
@@ -256,8 +287,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("namespace", Namespace_)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -281,7 +313,24 @@ public class OAuth2 : ApiBase
         , bool createHeadless = true)
     {
         string platformId = platformType.ToString().ToLower();
-        LoginWithOtherPlatformId(platformId, platformToken, callback, createHeadless);
+
+        var optionalParameters = new LoginWithOtherPlatformOptionalParameters()
+        {
+            CreateHeadless = createHeadless,
+            Logger = SharedMemory?.Logger
+        };
+
+        LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
+    }
+
+    internal void LoginWithOtherPlatform
+        (PlatformType platformType
+        , string platformToken
+        , LoginWithOtherPlatformOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        string platformId = platformType.ToString().ToLower();
+        LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
     }
 
     [Obsolete("Instead, use the overload with the extended callback")]
@@ -328,11 +377,11 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -372,7 +421,25 @@ public class OAuth2 : ApiBase
         , string serviceLabel
         , LoginWithMacAddress loginWithMacAddress)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LoginWithOtherPlatformOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger,
+            CreateHeadless = createHeadless,
+            ServiceLabel = serviceLabel,
+            LoginWithMacAddress = loginWithMacAddress
+        };
+
+        LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
+    }
+
+    internal void LoginWithOtherPlatformId(string platformId
+        , string platformToken
+        , LoginWithOtherPlatformOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
         var error = ApiHelperUtils.CheckForNullOrEmpty(platformId, platformToken);
         if (error != null)
@@ -384,11 +451,9 @@ public class OAuth2 : ApiBase
             });
             return;
         }
-        
-        if (loginWithMacAddress == null)
-        {
-            loginWithMacAddress = new LoginWithMacAddress();
-        }
+
+        var loginWithMacAddress = 
+            optionalParameters?.LoginWithMacAddress != null ? optionalParameters.LoginWithMacAddress : new LoginWithMacAddress();
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
@@ -397,26 +462,27 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
-            .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+            .WithFormParam("createHeadless", optionalParameters?.CreateHeadless is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId);
 
         if (loginWithMacAddress.IsLoginWithMacAddress())
         {
             string[] macAddresses = DeviceProvider.GetMacAddress();
-            if(macAddresses != null && macAddresses.Length > 0)
+            if (macAddresses != null && macAddresses.Length > 0)
             {
                 requestBuilder = requestBuilder.WithFormParam("macAddress", string.Join("-", macAddresses));
             }
         }
 
-        if (!string.IsNullOrEmpty(serviceLabel))
+        if (!string.IsNullOrEmpty(optionalParameters?.ServiceLabel))
         {
-            requestBuilder = requestBuilder.WithFormParam("serviceLabel", serviceLabel);
+            requestBuilder = requestBuilder.WithFormParam("serviceLabel", optionalParameters.ServiceLabel);
         }
 
         var request = requestBuilder.GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -447,11 +513,11 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -474,6 +540,41 @@ public class OAuth2 : ApiBase
             .GetResult();
 
         HttpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginResponse(request, response, error, callback);
+        });
+    }
+
+    internal void CreateHeadlessAccountAndResponseToken
+        (string linkingToken
+        , bool extendExp
+        , CreateHeadlessAccountAndResponseTokenOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+        
+        var error = ApiHelperUtils.CheckForNullOrEmpty(linkingToken);
+        if (error != null)
+        {
+            callback?.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
+
+        var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/headless/token")
+            .WithBasicAuth()
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("linkingToken", linkingToken)
+            .WithFormParam("extend_exp", extendExp ? "true" : "false")
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -507,11 +608,11 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -523,9 +624,26 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenData, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
+        
+        var optionalParameters = new AuthenticationWithPlatformLinkOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        AuthenticationWithPlatformLink(username, password, linkingToken, optionalParameters, callback);
+    }
+
+    internal void AuthenticationWithPlatformLink
+        (string username
+        , string password
+        , string linkingToken
+        , AuthenticationWithPlatformLinkOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         if (string.IsNullOrEmpty(linkingToken))
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = ErrorCode.InvalidRequest.ToString(),
                 error_description = "linkingToken cannot be null or empty"
@@ -543,8 +661,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -575,11 +694,11 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -612,10 +731,24 @@ public class OAuth2 : ApiBase
             (string code
             , ResultCallback<TokenData, OAuthError> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+        
+        var optionalParameters = new LoginWithLauncherOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        LoginWithAuthorizationCodeV3(code, optionalParameters, callback);
+    }
+
+    internal void LoginWithAuthorizationCodeV3(string code
+        , LoginWithLauncherOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         if (string.IsNullOrEmpty(code))
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = ErrorCode.InvalidRequest.ToString(),
                 error_description = "code cannot be null or empty"
@@ -632,8 +765,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("redirect_uri", this.Config.RedirectUri)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -641,17 +775,30 @@ public class OAuth2 : ApiBase
 
     public void Logout(string Bearer, ResultCallback callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LogoutOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        Logout(Bearer, optionalParameters, callback);
+    }
+
+    internal void Logout(string Bearer, LogoutOptionalParameters optionalParameters, ResultCallback callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/logout")
             .WithBearerAuth(Bearer)
             .WithContentType(MediaType.TextPlain)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, response =>
+        HttpOperator.SendRequest(additionalParameters, request, response =>
         {
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         });
     }
 
@@ -676,16 +823,32 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
                 return;
             }
 
-            callback.TryError(result.Error);
+            callback?.TryError(result.Error);
         });
     }
 
     public void RefreshSession(string refreshToken, ResultCallback<TokenData, OAuthError> callback)
     {
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LoginWithRefreshTokenOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        RefreshSession(refreshToken, optionalParameters, callback);
+    }
+
+    internal void RefreshSession(string refreshToken
+        , LoginWithRefreshTokenOptionalParameters optionalParameters 
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/token")
             .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
@@ -696,13 +859,13 @@ public class OAuth2 : ApiBase
             .GetResult();
 
         request.Priority = 0;
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
     }
-
 
     public void Verify2FACode
         (string mfaToken
@@ -711,9 +874,36 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenData, OAuthError> callback
         , bool rememberDevice = false)
     {
-        Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(mfaToken, "mfaToken parameter is null.");
-        Assert.IsNotNull(code, "code parameter is null.");
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new Verify2FACodeOptionalParameters()
+        {
+            RememberDevice = rememberDevice,
+            Logger = SharedMemory?.Logger
+        };
+
+        Verify2FACode(mfaToken, factor, code, optionalParameters, callback);
+    }
+
+    internal void Verify2FACode
+        (string mfaToken
+        , TwoFAFactorType factor
+        , string code
+        , Verify2FACodeOptionalParameters optionalParameters
+        , ResultCallback<TokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(mfaToken, code);
+        if (error != null)
+        {
+            callback?.TryError(new OAuthError()
+            {
+                error = ErrorCode.InvalidRequest.ToString(),
+                error_description = error.Message
+            });
+            return;
+        }
 
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v3/oauth/mfa/verify")
             .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
@@ -722,10 +912,11 @@ public class OAuth2 : ApiBase
             .WithFormParam("mfaToken", mfaToken)
             .WithFormParam("factor", factor.GetString())
             .WithFormParam("code", code)
-            .WithFormParam("rememberDevice", rememberDevice ? "true" : "false")
+            .WithFormParam("rememberDevice", optionalParameters?.RememberDevice is true ? "true" : "false")
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginResponse(request, response, error, callback);
         });
@@ -734,8 +925,28 @@ public class OAuth2 : ApiBase
     public void VerifyToken(string token
        , ResultCallback callback)
     {
-        Report.GetFunctionLog(GetType().Name);
-        Assert.IsNotNull(token, "Can't verify token! token parameter is null!");
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+        
+        var optionalParameters = new VerifyTokenOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        VerifyToken(token, optionalParameters, callback);
+    }
+
+    internal void VerifyToken(string token
+       , VerifyTokenOptionalParameters optionalParameters
+       , ResultCallback callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+        
+        var error = ApiHelperUtils.CheckForNullOrEmpty(token);
+        if (error != null)
+        {
+            callback?.TryError(error);
+            return;
+        }
 
         var request = HttpRequestBuilder
             .CreatePost(BaseUrl + "/v3/oauth/verify")
@@ -744,8 +955,9 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("token", token)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, response =>
+        HttpOperator.SendRequest(additionalParameters, request, response =>
         {
             Result<TokenData> result = response.TryParseJson<TokenData>();
 
@@ -753,21 +965,21 @@ public class OAuth2 : ApiBase
             {
                 if (token.Equals(result.Value.access_token))
                 {
-                    callback.TryOk();
+                    callback?.TryOk();
                 }
                 else
                 {
                     const string errorMessage = "Access Token is not valid, different value between input token and obtained token.";
-                    callback.TryError(new Error(ErrorCode.InvalidResponse, errorMessage));
+                    callback?.TryError(new Error(ErrorCode.InvalidResponse, errorMessage));
                 }
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
             }
         });
     }
-    
+
     public void GenerateOneTimeCode(string AccessToken
         , PlatformType platformId
         , ResultCallback<GeneratedOneTimeCode> callback)
@@ -780,7 +992,7 @@ public class OAuth2 : ApiBase
         , GenerateOneTimeCodeOptionalParameters optionalParameters
         , ResultCallback<GeneratedOneTimeCode> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
         var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken);
         if (error != null)
@@ -808,11 +1020,13 @@ public class OAuth2 : ApiBase
 
         var request = builder.GetResult();
 
-        HttpOperator.SendRequest(request, response =>
+        var additionalParams = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+        HttpOperator.SendRequest(additionalParams, request, response =>
         {
             var result = response.TryParseJson<GeneratedOneTimeCode>();
 
-            callback.Try(result);
+            callback?.Try(result);
         });
     }
 
@@ -820,7 +1034,7 @@ public class OAuth2 : ApiBase
         , RequestTokenByOneTimeLinkCodeOptionalParameters optionalParams
         , ResultCallback<TokenData> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
         var error = ApiHelperUtils.CheckForNullOrEmpty(oneTimeCode);
         if (error != null)
@@ -852,7 +1066,9 @@ public class OAuth2 : ApiBase
 
         var request = builder.GetResult();
 
-        HttpOperator.SendRequest(request, response =>
+        var additionalParams = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+
+        HttpOperator.SendRequest(additionalParams, request, response =>
         {
             var result = response.TryParseJson<TokenData>();
             if (!result.IsError)
@@ -875,12 +1091,35 @@ public class OAuth2 : ApiBase
         , string publisherClientId
         , ResultCallback<CodeForTokenExchangeResponse> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-        var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken, publisherNamespace ,publisherClientId);
+        var optionalParameters = new GenerateCodeForPublisherTokenExchangeOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        GenerateCodeForPublisherTokenExchange(accessToken, publisherNamespace, publisherClientId, optionalParameters, callback);
+    }
+
+    /// <summary>
+    /// This function generate a code that can be exchanged into publisher namespace token (i.e. by web portal)
+    /// </summary>
+    /// <param name="accessToken">Player's access token</param>
+    /// <param name="publisherNamespace">The targeted game's publisher Namespace</param>
+    /// <param name="publisherClientId">The targeted game's publisher ClientID</param>
+    /// <param name="callback">A callback will be called when the operation succeeded</param>
+    internal void GenerateCodeForPublisherTokenExchange(string accessToken
+        , string publisherNamespace
+        , string publisherClientId
+        , GenerateCodeForPublisherTokenExchangeOptionalParameters optionalParameters
+        , ResultCallback<CodeForTokenExchangeResponse> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken, publisherNamespace, publisherClientId);
         if (error != null)
         {
-            callback.TryError(error);
+            callback?.TryError(error);
             return;
         }
 
@@ -891,14 +1130,15 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("client_id", publisherClientId.ToString().ToLower())
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, response =>
+        HttpOperator.SendRequest(additionalParameters, request, response =>
         {
             var result = response.TryParseJson<CodeForTokenExchangeResponse>();
             callback?.Try(result);
         });
     }
-    
+
     public void GenerateGameToken(string code
         , ResultCallback callback)
     {
@@ -919,11 +1159,48 @@ public class OAuth2 : ApiBase
             if (!result.IsError)
             {
                 OnNewTokenObtained?.Invoke(result.Value);
-                callback.TryOk();
+                callback?.TryOk();
             }
             else
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
+            }
+        });
+    }
+
+    internal void GenerateGameToken(string code
+        , GenerateGameTokenOptionalParameters optionalParameters
+        , ResultCallback callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+        var error = ApiHelperUtils.CheckForNullOrEmpty(code);
+        if (error != null)
+        {
+            callback?.TryError(error);
+            return;
+        }
+
+        var request = HttpRequestBuilder
+            .CreatePost(BaseUrl + "/v3/token/exchange")
+            .WithBasicAuth()
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("code", code)
+            .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+        HttpOperator.SendRequest(additionalParameters, request, response =>
+        {
+            var result = response.TryParseJson<TokenData>();
+            if (!result.IsError)
+            {
+                OnNewTokenObtained?.Invoke(result.Value);
+                callback?.TryOk();
+            }
+            else
+            {
+                callback?.TryError(result.Error);
             }
         });
     }
@@ -951,13 +1228,32 @@ public class OAuth2 : ApiBase
         , PlatformType platformType
         , ResultCallback<ThirdPartyPlatformTokenData, OAuthError> callback)
     {
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new RetrieveUserThirdPartyPlatformTokenOptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        RetrieveUserThirdPartyPlatformToken(userId, platformType, optionalParameters, callback);
+
+        yield return null;
+    }
+
+    internal void RetrieveUserThirdPartyPlatformToken(string userId
+        , PlatformType platformType
+        , RetrieveUserThirdPartyPlatformTokenOptionalParameters optionalParameters
+        , ResultCallback<ThirdPartyPlatformTokenData, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
         if (string.IsNullOrEmpty(Namespace_))
         {
             var oauthError = new OAuthError();
             oauthError.error = ErrorCode.BadRequest.ToString();
             oauthError.error_description = nameof(Namespace_) + " cannot be null or empty";
-            callback.TryError(oauthError);
-            yield break;
+            callback?.TryError(oauthError);
+            return;
         }
 
         if (string.IsNullOrEmpty(AuthToken))
@@ -965,20 +1261,20 @@ public class OAuth2 : ApiBase
             var oauthError = new OAuthError();
             oauthError.error = ErrorCode.BadRequest.ToString();
             oauthError.error_description = nameof(AuthToken) + " cannot be null or empty";
-            callback.TryError(oauthError);
-            yield break;
+            callback?.TryError(oauthError);
+            return;
         }
-         
+
         if (IdValidator.IsAccelByteIdValid(userId, AccelByteIdValidator.HypensRule.NoHypens))
         {
             var oauthError = new OAuthError();
             oauthError.error = ErrorCode.BadRequest.ToString();
             oauthError.error_description = nameof(userId) + " is invalid.";
-            callback.TryError(oauthError);
-            yield break;
-        }         
+            callback?.TryError(oauthError);
+            return;
+        }
 
-        switch(platformType)
+        switch (platformType)
         {
             case PlatformType.PS4Web:
             case PlatformType.PS4:
@@ -991,11 +1287,11 @@ public class OAuth2 : ApiBase
                 var oauthError = new OAuthError();
                 oauthError.error = ErrorCode.BadRequest.ToString();
                 oauthError.error_description = nameof(platformType) + " platform is not supported.";
-                callback.TryError(oauthError);
-                yield break;
+                callback?.TryError(oauthError);
+                return;
         }
 
-        string platformId = platformType.ToString().ToLower();          
+        string platformId = platformType.ToString().ToLower();
 
         var request = HttpRequestBuilder
             .CreateGet(BaseUrl + "/v3/oauth/namespaces/{namespace}/users/{userId}/platforms/{platformId}/platformToken")
@@ -1006,22 +1302,20 @@ public class OAuth2 : ApiBase
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        IHttpResponse response = null;
-
-        yield return HttpClient.SendRequest(request, rsp =>
+        HttpOperator.SendRequest(additionalParameters, request, response =>
         {
-            response = rsp;
+            var result = response.TryParseJson<ThirdPartyPlatformTokenData, OAuthError>();
+            callback?.Try(result);
+
+            if (!result.IsError)
+            {
+                Session.SetThirdPartyPlatformTokenData(platformId, result.Value);
+            }
         });
-
-        var result = response.TryParseJson<ThirdPartyPlatformTokenData, OAuthError>();
-        callback.Try(result); 
-
-        if (!result.IsError)
-        {
-            Session.SetThirdPartyPlatformTokenData(platformId, result.Value);
-        }
     }
+
     #region V4
 
     public void LoginWithEmailV4(string emailAddress
@@ -1032,10 +1326,27 @@ public class OAuth2 : ApiBase
     {
         Report.GetFunctionLog(GetType().Name);
 
+        var optionalParameters = new LoginWithEmailV4OptionalParameters()
+        {
+            RememberMe = rememberMe,
+            Logger = SharedMemory?.Logger
+        };
+
+        LoginWithEmailV4(emailAddress, password, optionalParameters, callback, authTrustId);
+    }
+
+    internal void LoginWithEmailV4(string emailAddress
+        , string password
+        , LoginWithEmailV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback
+        , string authTrustId = null)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
         var error = ApiHelperUtils.CheckForNullOrEmpty(emailAddress, password);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1051,11 +1362,12 @@ public class OAuth2 : ApiBase
             .WithFormParam("username", emailAddress)
             .WithFormParam("password", password)
             .WithFormParam("namespace", Namespace_)
-            .WithFormParam("extend_exp", rememberMe ? "true" : "false")
+            .WithFormParam("extend_exp", optionalParameters?.RememberMe is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1077,6 +1389,28 @@ public class OAuth2 : ApiBase
             .GetResult();
 
         HttpOperator.SendRequest(request, (response, error) =>
+        {
+            HandleLoginQueue(request, response, error, callback);
+        });
+    }
+
+    internal void LoginWithDeviceIdV4(LoginWithDeviceIdV4OptionalParameters optionalParameters, ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+        DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
+
+        IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/device/token")
+            .WithPathParam("platformId", deviceProvider.DeviceType)
+            .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
+            .WithContentType(MediaType.ApplicationForm)
+            .Accepts(MediaType.ApplicationJson)
+            .WithFormParam("device_id", deviceProvider.DeviceId)
+            .WithFormParam("namespace", Namespace_)
+            .AddAdditionalData("flightId", AccelByteSDK.FlightId)
+            .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1117,6 +1451,24 @@ public class OAuth2 : ApiBase
     {
         Report.GetFunctionLog(GetType().Name);
         
+        var optionalParameters = new LoginWithOtherPlatformV4OptionalParameters()
+        {
+            ServiceLabel = serviceLabel,
+            CreateHeadless = createHeadless,
+            LoginWithMacAddress = loginWithMacAddress,
+            Logger = SharedMemory?.Logger
+        };
+
+        LoginWithOtherPlatformIdV4(platformId, platformToken, optionalParameters, callback);
+    }
+
+    internal void LoginWithOtherPlatformIdV4(string platformId
+        , string platformToken
+        , LoginWithOtherPlatformV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
         var error = ApiHelperUtils.CheckForNullOrEmpty(platformId, platformToken);
         if (error != null)
         {
@@ -1127,11 +1479,9 @@ public class OAuth2 : ApiBase
             });
             return;
         }
-        
-        if (loginWithMacAddress == null)
-        {
-            loginWithMacAddress = new LoginWithMacAddress();
-        }
+
+        var loginWithMacAddress = 
+            optionalParameters?.LoginWithMacAddress != null ? optionalParameters.LoginWithMacAddress : new LoginWithMacAddress();
 
         HttpRequestBuilder requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/{platformId}/token")
             .WithPathParam("platformId", platformId)
@@ -1140,7 +1490,7 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
-            .WithFormParam("createHeadless", createHeadless ? "true" : "false")
+            .WithFormParam("createHeadless", optionalParameters?.CreateHeadless is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId);
 
         if (loginWithMacAddress.IsLoginWithMacAddress())
@@ -1152,14 +1502,15 @@ public class OAuth2 : ApiBase
             }
         }
 
-        if (!string.IsNullOrEmpty(serviceLabel))
+        if (!string.IsNullOrEmpty(optionalParameters?.ServiceLabel))
         {
-            requestBuilder = requestBuilder.WithFormParam("serviceLabel", serviceLabel);
+            requestBuilder = requestBuilder.WithFormParam("serviceLabel", optionalParameters.ServiceLabel);
         }
 
         var request = requestBuilder.GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1170,7 +1521,7 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name);
         if (string.IsNullOrEmpty(code))
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = ErrorCode.InvalidRequest.ToString(),
                 error_description = "code cannot be null or empty"
@@ -1196,6 +1547,20 @@ public class OAuth2 : ApiBase
 
     public void RefreshSessionV4(string refreshToken, ResultCallback<TokenDataV4, OAuthError> callback)
     {
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LoginWithRefreshTokenV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        RefreshSessionV4(refreshToken, optionalParameters, callback);
+    }
+
+    internal void RefreshSessionV4(string refreshToken, LoginWithRefreshTokenV4OptionalParameters optionalParameters, ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
         var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/token")
             .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
@@ -1206,8 +1571,9 @@ public class OAuth2 : ApiBase
             .GetResult();
 
         request.Priority = 0;
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1219,12 +1585,29 @@ public class OAuth2 : ApiBase
         , bool rememberDevice
         , ResultCallback<TokenDataV4, OAuthError> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new Verify2FACodeV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger,
+            RememberDevice = rememberDevice
+        };
+
+        Verify2FACodeV4(mfaToken, factor, code, optionalParameters, callback);
+    }
+
+    internal void Verify2FACodeV4(string mfaToken
+        , TwoFAFactorType factor
+        , string code
+        , Verify2FACodeV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
         var error = ApiHelperUtils.CheckForNullOrEmpty(mfaToken, code);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1239,10 +1622,11 @@ public class OAuth2 : ApiBase
             .WithFormParam("mfaToken", mfaToken)
             .WithFormParam("factor", factor.GetString())
             .WithFormParam("code", code)
-            .WithFormParam("rememberDevice", rememberDevice ? "true" : "false")
+            .WithFormParam("rememberDevice", optionalParameters?.RememberDevice is true ? "true" : "false")
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1251,11 +1635,25 @@ public class OAuth2 : ApiBase
     public void GenerateGameTokenV4(string code
         , ResultCallback<TokenDataV4, OAuthError> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new GenerateGameTokenV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        GenerateGameTokenV4(code, optionalParameters, callback);
+    }
+
+    internal void GenerateGameTokenV4(string code
+        , GenerateGameTokenV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         var error = ApiHelperUtils.CheckForNullOrEmpty(code);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1270,8 +1668,9 @@ public class OAuth2 : ApiBase
             .Accepts(MediaType.ApplicationJson)
             .WithFormParam("code", code)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, response =>
+        HttpOperator.SendRequest(additionalParameters, request, response =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1283,10 +1682,26 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenDataV4, OAuthError> callback)
     {
         Report.GetFunctionLog(GetType().Name);
+
+        var optionalParameters = new AuthenticationWithPlatformLinkAndLoginV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        AuthenticationWithPlatformLinkV4(email, password, linkingToken, optionalParameters, callback);
+    }
+
+    internal void AuthenticationWithPlatformLinkV4(string email
+        , string password
+        , string linkingToken
+        , AuthenticationWithPlatformLinkAndLoginV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         var error = ApiHelperUtils.CheckForNullOrEmpty(email, password, linkingToken);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1304,8 +1719,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("client_id", AccelByteSDK.GetClientOAuthConfig().ClientId)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1315,11 +1731,26 @@ public class OAuth2 : ApiBase
         , ResultCallback<TokenDataV4, OAuthError> callback
         , string authTrustId = null)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+        var optionalParameters = new LoginV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        GetTokenWithLoginTicket(loginTicket, optionalParameters, callback, authTrustId);
+    }
+
+    internal void GetTokenWithLoginTicket(string loginTicket
+        , LoginV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback
+        , string authTrustId = null)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         var error = ApiHelperUtils.CheckForNullOrEmpty(loginTicket);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1335,8 +1766,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("login_queue_ticket", loginTicket)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1346,11 +1778,26 @@ public class OAuth2 : ApiBase
         , bool extendExp
         , ResultCallback<TokenDataV4, OAuthError> callback)
     {
-        Report.GetFunctionLog(GetType().Name);
+        Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+        
+        var optionalParameters = new CreateHeadlessAccountAndResponseTokenV4OptionalParameters()
+        {
+            Logger = SharedMemory?.Logger
+        };
+
+        CreateHeadlessAccountAndResponseTokenV4(linkingToken, extendExp, optionalParameters, callback);
+    }
+
+    internal void CreateHeadlessAccountAndResponseTokenV4(string linkingToken
+        , bool extendExp
+        , CreateHeadlessAccountAndResponseTokenV4OptionalParameters optionalParameters
+        , ResultCallback<TokenDataV4, OAuthError> callback)
+    {
+        Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         var error = ApiHelperUtils.CheckForNullOrEmpty(linkingToken);
         if (error != null)
         {
-            callback.TryError(new OAuthError()
+            callback?.TryError(new OAuthError()
             {
                 error = error.Code.ToString(),
                 error_description = error.Message
@@ -1366,8 +1813,9 @@ public class OAuth2 : ApiBase
             .WithFormParam("extend_exp", extendExp ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
+        var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-        HttpOperator.SendRequest(request, (response, error) =>
+        HttpOperator.SendRequest(additionalParameters, request, (response, error) =>
         {
             HandleLoginQueue(request, response, error, callback);
         });
@@ -1384,7 +1832,7 @@ public class OAuth2 : ApiBase
         {
             Result<LoginQueueTicketResponse> ticketQueueResult = response.TryParseJson<LoginQueueTicketResponse>();
             tokenData.Queue = ticketQueueResult.Value;
-            callback.TryOk(tokenData);
+            callback?.TryOk(tokenData);
             return;
         }
 
@@ -1409,7 +1857,7 @@ public class OAuth2 : ApiBase
                 RefreshSessionV4(refreshToken, result =>
                 {
                     var refreshTokenData = Result<TokenData, OAuthError>.CreateOk(result.Value);
-                    callback.Try(refreshTokenData);
+                    callback?.Try(refreshTokenData);
                 });
             };
             callback?.TryOk(tokenData);

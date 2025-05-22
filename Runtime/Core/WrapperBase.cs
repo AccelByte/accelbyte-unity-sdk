@@ -61,7 +61,7 @@ namespace AccelByte.Core
             if (!IdValidator.IsAccelByteIdValid(accelByteId, hypensRule))
             {
                 Error error = new Error(ErrorCode.InvalidRequest, errorMessage);
-                callback.TryError(error);
+                callback?.TryError(error);
                 return false;
             }
             return true;
@@ -72,7 +72,7 @@ namespace AccelByte.Core
             if (!IdValidator.IsAccelByteIdValid(accelByteId, hypensRule))
             {
                 Error error = new Error(ErrorCode.InvalidRequest, errorMessage);
-                callback.TryError(error);
+                callback?.TryError(error);
                 return false;
             }
             return true;

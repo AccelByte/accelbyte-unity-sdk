@@ -156,6 +156,11 @@ namespace AccelByte.Api
             
             websocketApi.Connect();
         }
+        
+        internal void Connect(WebsocketConnectOptionalParameters optionalParameters)
+        {
+            websocketApi.Connect(optionalParameters);
+        }
 
         /// <summary>
         /// Disconnect websocket connection from chat service.
@@ -222,7 +227,7 @@ namespace AccelByte.Api
         /// <param name="optionalParameter">optional parameter when create a group topic</param>
         public void CreateGroupTopic(string groupName, string[] adminUserId, string[] memberUserIds, CreateGroupTopicOptionalParameter optionalParameter, ResultCallback<ChatActionTopicResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameter?.Logger);
 
             bool isJoinable = false;
             if (optionalParameter != null)
@@ -472,7 +477,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -501,7 +506,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -530,7 +535,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -555,7 +560,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -579,7 +584,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -607,7 +612,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1184,11 +1189,11 @@ namespace AccelByte.Api
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         private void HandleCallback<T>(Result<T> result, ResultCallback<T> callback)
@@ -1196,11 +1201,11 @@ namespace AccelByte.Api
             {
                 if (result.IsError)
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                     return;
                 }
 
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -39,7 +39,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(ticketId, namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -52,7 +52,7 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParseJson<RefreshTicketResponse>();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
 
@@ -63,7 +63,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(ticketId, namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -76,7 +76,7 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(request, response =>
             {
                 var result = response.TryParse();
-                callback.Try(result);
+                callback?.Try(result);
             });
         }
     }

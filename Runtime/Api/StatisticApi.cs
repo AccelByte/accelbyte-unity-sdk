@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019-2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -8,7 +8,6 @@ using AccelByte.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -61,11 +60,31 @@ namespace AccelByte.Api
             , CreateStatItemRequest[] statItems
             , ResultCallback<StatItemOperationResult[]> callback )
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new CreateUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            CreateUserStatItems(userId, accessToken, statItems, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void CreateUserStatItems(string userId
+            , string accessToken
+            , CreateStatItemRequest[] statItems
+            , CreateUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, accessToken, statItems);
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -77,15 +96,13 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(statItems.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<StatItemOperationResult[]>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<StatItemOperationResult[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetUserStatItems( string userId
@@ -97,11 +114,35 @@ namespace AccelByte.Api
             , int limit
             , StatisticSortBy sortBy)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetUserStatItemsOptionalParam()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                sortBy = sortBy,
+                StatCodes = statCodes?.ToArray(),
+                Tags = tags?.ToArray()
+            };
+
+            GetUserStatItems(userId, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetUserStatItems(string userId
+            , string accessToken
+            , GetUserStatItemsOptionalParam optionalParameters
+            , ResultCallback<PagedStatItems> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var builder = HttpRequestBuilder
@@ -109,37 +150,45 @@ namespace AccelByte.Api
                     BaseUrl + "/v1/public/namespaces/{namespace}/users/{userId}/statitems")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("offset", offset.ToString())
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (statCodes != null && statCodes.Count > 0)
+            if (optionalParameters != null)
             {
-                builder.WithQueryParam("statCodes", string.Join(",", statCodes));
-            }
+                var queryParams = new Dictionary<string, string>();
 
-            if (tags != null && tags.Count > 0)
-            {
-                builder.WithQueryParam("tags", string.Join(",", tags));
-            }
+                if (optionalParameters.Limit >= 1)
+                {
+                    queryParams.Add("limit", optionalParameters.Limit.ToString());
+                }    
+                if (optionalParameters.Offset >= 0)
+                {
+                    queryParams.Add("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    queryParams.Add("statCodes", string.Join(",", optionalParameters.StatCodes));
+                }
+                if (optionalParameters.Tags != null && optionalParameters.Tags.Length > 0)
+                {
+                    queryParams.Add("tags", string.Join(",", optionalParameters.Tags));
+                }
+                if (optionalParameters.sortBy != StatisticSortBy.None)
+                {
+                    queryParams.Add("sortBy", ConvertStatisticSortByToString(optionalParameters.sortBy));
+                }
 
-            if (sortBy != StatisticSortBy.None)
-            {
-                builder.WithQueryParam("sortBy", ConvertStatisticSortByToString(sortBy));
+                builder.WithQueries(queryParams);
             }
-
             var request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PagedStatItems>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PagedStatItems>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator IncrementUserStatItems( string userId
@@ -147,11 +196,31 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback )
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new IncrementUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            IncrementUserStatItems(userId, increments, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void IncrementUserStatItems(string userId
+            , StatItemIncrement[] increments
+            , string accessToken
+            , IncrementUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -163,15 +232,13 @@ namespace AccelByte.Api
                 .WithBody(increments.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<StatItemOperationResult[]>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<StatItemOperationResult[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator ResetUserStatItems( string userId
@@ -179,11 +246,31 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback ) 
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ResetUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ResetUserStatItems(userId, resets, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void ResetUserStatItems(string userId
+            , StatItemReset[] resets
+            , string accessToken
+            , ResetUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken, resets);
             if (error != null)
             {
                 callback.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -195,15 +282,13 @@ namespace AccelByte.Api
                 .WithBody(resets.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<StatItemOperationResult[]>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<StatItemOperationResult[]>();
+                callback.Try(result);
+            });
         }
 
         public IEnumerator UpdateUserStatItems( string userId
@@ -212,32 +297,63 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<StatItemOperationResult[]> callback ) 
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UpdateUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                AdditionalKey = additionalKey
+            };
+
+            UpdateUserStatItems(userId, updates, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void UpdateUserStatItems(string userId
+            , StatItemUpdate[] updates
+            , string accessToken
+            , UpdateUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<StatItemOperationResult[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, userId, accessToken);
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/statitems/value/bulk")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
-                .WithQueryParam("additionalKey", additionalKey)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(updates.ToUtf8Json())
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            IHttpResponse response = null;
+            if (optionalParameters != null)
+            {
+                var queryParams = new Dictionary<string, string>();
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+                if (!string.IsNullOrEmpty(optionalParameters.AdditionalKey))
+                {
+                    queryParams.Add("additionalKey", optionalParameters.AdditionalKey);
+                }
 
-            var result = response.TryParseJson<StatItemOperationResult[]>();
+                builder.WithQueries(queryParams);
+            }
 
-            callback.Try(result);
+            var request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<StatItemOperationResult[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator ListUserStatItems(string userId
@@ -247,6 +363,28 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<FetchUser[]> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ListUserStatItemsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                AdditionalKey = additionalKey,
+                StatCodes = statCodes,
+                Tags = tags
+            };
+
+            ListUserStatItems(userId, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void ListUserStatItems(string userId
+            , string accessToken
+            , ListUserStatItemsOptionalParameters optionalParameters
+            , ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , userId
@@ -254,8 +392,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var builder = HttpRequestBuilder
@@ -266,37 +404,39 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (!string.IsNullOrEmpty(additionalKey))
+            if (optionalParameters != null)
             {
-                builder.WithQueryParam("additionalKey", additionalKey);
-            }
-
-            if (statCodes != null && statCodes.Length > 0)
-            {
-                foreach (var statCode in statCodes)
+                if (!string.IsNullOrEmpty(optionalParameters.AdditionalKey))
                 {
-                    builder.WithQueryParam("statCodes", statCode);
+                    builder.WithQueryParam("additionalKey", optionalParameters.AdditionalKey);
+                }
+
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    foreach (var statCode in optionalParameters.StatCodes)
+                    {
+                        builder.WithQueryParam("statCodes", statCode);
+                    }
+                }
+
+                if (optionalParameters.Tags != null && optionalParameters.Tags.Length > 0)
+                {
+                    foreach (var tag in optionalParameters.Tags)
+                    {
+                        builder.WithQueryParam("tags", tag);
+                    }
                 }
             }
-
-            if (tags != null && tags.Length > 0)
-            {
-                foreach (var tag in tags)
-                {
-                    builder.WithQueryParam("tags", tag);
-                }
-            }
+            
             var request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<FetchUser[]>();
-
-            callback.Try(result);
-        } 
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<FetchUser[]>();
+                callback?.Try(result);
+            });
+        }
 
         public IEnumerator UpdateUserStatItemsValue(string userId
             , string statCode 
@@ -305,6 +445,28 @@ namespace AccelByte.Api
             , string accessToken
             , ResultCallback<UpdateUserStatItemValueResponse> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UpdateUserStatItemsValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                AdditionalKey = additionalKey
+            };
+
+            UpdateUserStatItemsValue(userId, statCode, updateUserStatItem, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void UpdateUserStatItemsValue(string userId
+            , string statCode
+            , PublicUpdateUserStatItem updateUserStatItem
+            , string accessToken
+            , UpdateUserStatItemsValueOptionalParameters optionalParameters
+            , ResultCallback<UpdateUserStatItemValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , userId
@@ -314,36 +476,62 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/v2/public/namespaces/{namespace}/users/{userId}/stats/{statCode}/statitems/value")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("statCode", statCode)
-                .WithQueryParam("additionalKey", additionalKey)
+                
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(updateUserStatItem.ToUtf8Json())
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            IHttpResponse response = null;
+            if (optionalParameters != null)
+            {
+                if (!string.IsNullOrEmpty(optionalParameters.AdditionalKey))
+                {
+                    builder.WithQueryParam("additionalKey", optionalParameters.AdditionalKey);
+                }
+            }
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            var request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            var result = response.TryParseJson<UpdateUserStatItemValueResponse>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<UpdateUserStatItemValueResponse>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator BulkFetchStatItemsValue(string statCode
            , string[] userIds
            , ResultCallback<FetchUserStatistic> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkFetchStatItemsValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkFetchStatItemsValue(statCode, userIds, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void BulkFetchStatItemsValue(string statCode
+           , string[] userIds
+           , BulkFetchStatItemsValueOptionalParameters optionalParameters
+           , ResultCallback<FetchUserStatistic> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , statCode
@@ -352,8 +540,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             string[] processedUserIds = new string[0];
@@ -386,32 +574,47 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<StatItemValue[]>();
-
-            FetchUserStatistic finalResult = new FetchUserStatistic
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
-                UserStatistic = result.Value,
-                NotProcessedUserIds = notProcessedUserIds
-            };
+                var result = response.TryParseJson<StatItemValue[]>();
 
-            if (result.IsError)
-            {
-                callback.Try(Result<FetchUserStatistic>.CreateError(result.Error.Code, result.Error.Message));
-            }
-            else
-            {
-                callback.Try(Result<FetchUserStatistic>.CreateOk(finalResult));
-            }
+                FetchUserStatistic finalResult = new FetchUserStatistic
+                {
+                    UserStatistic = result.Value,
+                    NotProcessedUserIds = notProcessedUserIds
+                };
+
+                if (result.IsError)
+                {
+                    callback?.Try(Result<FetchUserStatistic>.CreateError(result.Error.Code, result.Error.Message));
+                }
+                else
+                {
+                    callback?.Try(Result<FetchUserStatistic>.CreateOk(finalResult));
+                }
+            });
         }
 
         public IEnumerator GetGlobalStatItemsByStatCode(string statCode,string accessToken, ResultCallback<GlobalStatItem> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetGlobalStatItemsByStatCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetGlobalStatItemsByStatCode(statCode, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetGlobalStatItemsByStatCode(string statCode, string accessToken, GetGlobalStatItemsByStatCodeOptionalParameters optionalParameters, ResultCallback<GlobalStatItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , statCode
@@ -419,8 +622,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -430,21 +633,38 @@ namespace AccelByte.Api
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
-            
-            IHttpResponse response = null;
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<GlobalStatItem>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<GlobalStatItem>();
+                callback?.Try(result);
+            });
         }
-        
+
         public IEnumerator GetStatCycleConfig(string cycleId
             , string accessToken
             , ResultCallback<StatCycleConfig> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetStatCycleConfigOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetStatCycleConfig(cycleId, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetStatCycleConfig(string cycleId
+            , string accessToken
+            , GetStatCycleConfigOptionalParameters optionalParameters
+            , ResultCallback<StatCycleConfig> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , cycleId
@@ -452,8 +672,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -464,17 +684,13 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            
-            IHttpResponse response = null;
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            yield return HttpClient.SendRequest(request, rsp =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
-                response = rsp;
+                var result = response.TryParseJson<StatCycleConfig>();
+                callback?.Try(result);
             });
-
-            var result = response.TryParseJson<StatCycleConfig>();
-
-            callback.Try(result);
         }
 
         public IEnumerator GetListStatCycleConfigs(
@@ -485,39 +701,75 @@ namespace AccelByte.Api
             int offset,
             int limit )
         {
-            Assert.IsNotNull(accessToken, "Can't get list cycle config! accessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetListStatCycleConfigsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                Status = status,
+                Type = type
+            };
+
+            GetListStatCycleConfigs(accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetListStatCycleConfigs(
+            string accessToken
+            , GetListStatCycleConfigsOptionalParameters optionalParameters
+            , ResultCallback<PagedStatCycleConfigs> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             HttpRequestBuilder builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/statCycles")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("offset", offset.ToString())
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (type != StatisticCycleType.None)
+            if (optionalParameters != null)
             {
-                builder.WithQueryParam("cycleType", type.ToString().ToUpper());
-            }
+                var queryParams = new Dictionary<string, string>();
 
-            if (status != StatisticCycleStatus.None)
-            {
-                builder.WithQueryParam("status", status.ToString().ToUpper());
-            }
-
-            IHttpRequest request = builder.GetResult();
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp =>
+                if (optionalParameters.Limit != null && optionalParameters.Limit >= 1)
                 {
-                    response = rsp;
-                });
+                    queryParams.Add("limit", optionalParameters.Limit.ToString());
+                }
+                if (optionalParameters.Offset != null && optionalParameters.Offset >= 0)
+                {
+                    queryParams.Add("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.Type != null && optionalParameters.Type != StatisticCycleType.None)
+                {
+                    queryParams.Add("cycleType", optionalParameters.Type.ToString().ToUpper());
+                }
+                if (optionalParameters.Status != null && optionalParameters.Status != StatisticCycleStatus.None)
+                {
+                    queryParams.Add("status", optionalParameters.Status.ToString().ToUpper());
+                }
 
-            var result = response.TryParseJson<PagedStatCycleConfigs>();
+                builder.WithQueries(queryParams);
+            }
 
-            callback.Try(result);
+            var request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PagedStatCycleConfigs>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetListUserStatCycleItem(string cycleId,
@@ -528,6 +780,29 @@ namespace AccelByte.Api
             int offset, 
             int limit)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetListUserStatCycleItemOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                StatCodes = statCodes
+            };
+
+            GetListUserStatCycleItem(cycleId, userId, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetListUserStatCycleItem(string cycleId
+            , string userId
+            , string accessToken
+            , GetListUserStatCycleItemOptionalParameters optionalParameters
+            , ResultCallback<PagedStatCycleItem> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , cycleId
@@ -535,8 +810,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var builder = HttpRequestBuilder
@@ -544,31 +819,40 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("cycleId", cycleId)
-                .WithQueryParam("limit", limit.ToString())
-                .WithQueryParam("offset", offset.ToString())
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (statCodes.Length > 0)
+            if (optionalParameters != null)
             {
-                builder.WithQueryParam("statCodes", string.Join(",", statCodes));
-            }
-            
-            IHttpRequest request = builder.GetResult();
-            IHttpResponse response = null;
+                var queryParams = new Dictionary<string, string>();
 
-            yield return HttpClient.SendRequest(request, 
-                rsp =>
+                if (optionalParameters.Limit != null && optionalParameters.Limit >= 1)
                 {
-                    response = rsp;
-                });
+                    queryParams.Add("limit", optionalParameters.Limit.ToString());
+                }
+                if (optionalParameters.Offset != null && optionalParameters.Offset >= 0)
+                {
+                    queryParams.Add("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    queryParams.Add("statCodes", string.Join(",", optionalParameters.StatCodes));
+                }
 
-            var result = response.TryParseJson<PagedStatCycleItem>();
+                builder.WithQueries(queryParams);
+            }
 
-            callback.Try(result);
+            IHttpRequest request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PagedStatCycleItem>();
+                callback?.Try(result);
+            });
         }
-        
+
         public IEnumerator GetMyStatItems(
             IEnumerable<string> statCodes, 
             IEnumerable<string> tags, 
@@ -577,40 +861,77 @@ namespace AccelByte.Api
             int limit, 
             int offset)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMyStatItemsOptionalParam()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                StatCodes = statCodes?.ToArray(),
+                Tags = tags?.ToArray()
+            };
+
+            GetMyStatItems(accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetMyStatItems(
+            string accessToken
+            , GetMyStatItemsOptionalParam optionalParameters
+            , ResultCallback<PagedStatItems> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, accessToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statitems")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("limit", limit == 0 ? string.Empty : limit.ToString())
-                .WithQueryParam("offset", offset < 0 ? string.Empty : offset.ToString())
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (statCodes != null)
+            if (optionalParameters != null)
             {
-                foreach (string statCode in statCodes)
+                if (optionalParameters.Limit >= 1)
                 {
-                    requestBuilder.WithQueryParam("statCodes", statCode);
+                    requestBuilder.WithQueryParam("limit", optionalParameters.Limit.ToString());
+                }
+                if (optionalParameters.Offset >= 0)
+                {
+                    requestBuilder.WithQueryParam("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    foreach (string statCode in optionalParameters.StatCodes)
+                    {
+                        requestBuilder.WithQueryParam("statCodes", statCode);
+                    }
+                }
+                if (optionalParameters.Tags != null && optionalParameters.Tags.Length > 0)
+                {
+                    foreach (string tag in optionalParameters.Tags)
+                    {
+                        requestBuilder.WithQueryParam("tags", tag);
+                    }
                 }
             }
 
-            if (tags != null)
+            var request = requestBuilder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
-                foreach (string tag in tags)
-                {
-                    requestBuilder.WithQueryParam("tags", tag);
-                }
-            }
-
-            IHttpRequest request = requestBuilder.GetResult();
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<PagedStatItems>();
-
-            callback.Try(result);
+                var result = response.TryParseJson<PagedStatItems>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetMyStatItemValues(
@@ -620,6 +941,35 @@ namespace AccelByte.Api
             string accessToken,
             ResultCallback<FetchUser[]> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMyStatItemValuesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                AdditionalKey = additionalKey,
+                StatCodes = statCodes?.ToArray(),
+                Tags = tags?.ToArray()
+            };
+
+            GetMyStatItemValues(accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetMyStatItemValues(
+            string accessToken
+            , GetMyStatItemValuesOptionalParameters optionalParameters
+            , ResultCallback<FetchUser[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, accessToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statitems/value/bulk")
                 .WithPathParam("namespace", Namespace_)
@@ -627,36 +977,36 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (!string.IsNullOrEmpty(additionalKey))
+            if (optionalParameters != null)
             {
-                requestBuilder.WithQueryParam("additionalKey", additionalKey);
-            }
-
-            if (statCodes != null)
-            {
-                foreach (string statCode in statCodes)
+                if (!string.IsNullOrEmpty(optionalParameters.AdditionalKey))
                 {
-                    requestBuilder.WithQueryParam("statCodes", statCode);
+                    requestBuilder.WithQueryParam("additionalKey", optionalParameters.AdditionalKey);
+                }
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    foreach (string statCode in optionalParameters.StatCodes)
+                    {
+                        requestBuilder.WithQueryParam("statCodes", statCode);
+                    }
+                }
+                if (optionalParameters.Tags != null && optionalParameters.Tags.Length > 0)
+                {
+                    foreach (string tag in optionalParameters.Tags)
+                    {
+                        requestBuilder.WithQueryParam("tags", tag);
+                    }
                 }
             }
 
-            if (tags != null)
+            var request = requestBuilder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
-                foreach (string tag in tags)
-                {
-                    requestBuilder.WithQueryParam("tags", tag);
-                }
-            }
-
-            IHttpRequest request = requestBuilder.GetResult();
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<FetchUser[]>();
-
-            callback.Try(result);
+                var result = response.TryParseJson<FetchUser[]>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetMyStatCycleItems(
@@ -668,40 +1018,72 @@ namespace AccelByte.Api
             ResultCallback<PagedStatCycleItem> callback
         )
         {
-            var error = ApiHelperUtils.CheckForNullOrEmpty(accessToken, cycleId);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMyStatCycleItemsOptionalParam()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                StatCodes = statCodes?.ToArray()
+            };
+
+            GetMyStatCycleItems(cycleId, accessToken, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetMyStatCycleItems(
+            string cycleId
+            , string accessToken
+            , GetMyStatCycleItemsOptionalParam optionalParameters
+            , ResultCallback<PagedStatCycleItem> callback
+        )
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, accessToken, cycleId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/statCycles/{cycleId}/statCycleitems")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("cycleId", cycleId)
-                .WithQueryParam("limit", limit == 0 ? string.Empty : limit.ToString())
-                .WithQueryParam("offset", offset < 0 ? string.Empty : offset.ToString())
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (statCodes != null)
+            if (optionalParameters != null)
             {
-                foreach (string statCode in statCodes)
+                if (optionalParameters.Limit >= 1)
                 {
-                    requestBuilder.WithQueryParam("statCodes", statCode);
+                    requestBuilder.WithQueryParam("limit", optionalParameters.Limit.ToString());
+                }
+                if (optionalParameters.Offset >= 0)
+                {
+                    requestBuilder.WithQueryParam("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.StatCodes != null && optionalParameters.StatCodes.Length > 0)
+                {
+                    foreach (string statCode in optionalParameters.StatCodes)
+                    {
+                        requestBuilder.WithQueryParam("statCodes", statCode);
+                    }
                 }
             }
-            
-            IHttpRequest request = requestBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
+            var request = requestBuilder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            var result = response.TryParseJson<PagedStatCycleItem>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PagedStatCycleItem>();
+                callback?.Try(result);
+            });
         }
     }
 }

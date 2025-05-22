@@ -165,21 +165,31 @@ namespace AccelByte.Api
         /// </summary>
         public void Connect()
         {
+            Connect(new WebsocketConnectOptionalParameters()
+            {
+                Logger = logger
+            });
+        }
+        
+        internal void Connect(WebsocketConnectOptionalParameters optionalParameters)
+        {
+            var targetLogger = optionalParameters != null && optionalParameters.Logger != null ? optionalParameters.Logger : logger;
+            
             if (!session.IsValid())
             {
-                logger?.LogWarning("Cannot connect to websocket because user is not logged in.");
+                targetLogger?.LogWarning("Cannot connect to websocket because user is not logged in.");
                 return;
             }
 
             if (IsConnected)
             {
-                logger?.LogWarning("[Lobby] already connected");
+                targetLogger?.LogWarning("[Lobby] already connected");
                 return;
             }
             
             if (webSocket.IsConnecting)
             {
-                logger?.LogWarning("[Lobby] lobby is connecting");
+                targetLogger?.LogWarning("[Lobby] lobby is connecting");
                 return;
             }
 
@@ -199,7 +209,7 @@ namespace AccelByte.Api
 
             customHeader[AccelByteWebSocket.LobbySessionIdHeaderName] = lobbySessionId.lobbySessionID;
 
-            webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader);
+            webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader, optionalParameters);
         }
 
         /// <summary>
@@ -267,7 +277,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload);
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             };
 
             webSocket.Send(message);
@@ -286,7 +296,7 @@ namespace AccelByte.Api
                     ? Result.CreateError(errorCode) 
                     : Result.CreateOk();
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             };
 
             webSocket.Send(message);
@@ -317,7 +327,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload);
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             };
 
             webSocket.Send(message);
@@ -335,7 +345,7 @@ namespace AccelByte.Api
                     ? Result.CreateError(errorCode) 
                     : Result.CreateOk();
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             };
 
             webSocket.Send(message);
@@ -434,7 +444,7 @@ namespace AccelByte.Api
 
         /// <summary>
         /// Create a party and become a party leader for the party.
-        /// PartyCode is also provided to the party creator through the callback.
+        /// PartyCode is also provided to the party creator through the callback?.
         /// </summary>
         /// <param name="callback">
         /// Returns a Result that contain PartyCreateResponse via callback when completed.
@@ -466,7 +476,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Invite other user by userId with detailed model in response callback.
+        /// Invite other user by userId with detailed model in response callback?.
         /// Only party leader (creator) can invite other user.
         /// </summary>
         /// <param name="userId">User Id of a person to be invited to </param>
@@ -515,7 +525,7 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Kick a member out of our party with detailed model in response callback.
+        /// Kick a member out of our party with detailed model in response callback?.
         /// Only a party leader can kick a party member.
         /// </summary>
         /// <param name="userId">User Id of the user to be kicked out of party</param>
@@ -654,12 +664,12 @@ namespace AccelByte.Api
             {
                 if (result.IsError)
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 }
                 else
                 {
                     ChannelSlug = result.Value.channelSlug;
-                    callback.Try(result);
+                    callback?.Try(result);
                 }
             });
         }
@@ -674,7 +684,7 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(ChannelSlug))
             {
-                callback.TryError(ErrorCode.InvalidRequest, 
+                callback?.TryError(ErrorCode.InvalidRequest, 
                     "You're not in any chat channel.");
             }
             else

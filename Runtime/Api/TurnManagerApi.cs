@@ -20,13 +20,13 @@ namespace AccelByte.Api
 
         public IEnumerator GetTurnServers(ResultCallback<TurnServerList> callback)
         {
-            RequestGetTurnServers(callback);
+            RequestGetTurnServers(null, callback);
             yield break;
         }
 
-        internal void RequestGetTurnServers(ResultCallback<TurnServerList> callback)
+        internal void RequestGetTurnServers(RequestGetTurnServersOptionalParam optionalParameters, ResultCallback<TurnServerList> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken);
             if (error != null)
@@ -42,7 +42,10 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(
+            AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+            , request
+            , response =>
             {
                 var result = response.TryParseJson<TurnServerList>();
                 callback?.Try(result);

@@ -51,7 +51,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<Slot[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetSlot( string userId
@@ -94,7 +94,7 @@ namespace AccelByte.Api
                 break;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreateSlot( string userId
@@ -137,7 +137,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateSlot( string userId
@@ -183,7 +183,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UpdateSlotMetadata( string userId
@@ -225,7 +225,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<Slot>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DeleteSlot( string userId
@@ -253,7 +253,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParse();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

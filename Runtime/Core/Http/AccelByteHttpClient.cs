@@ -1,7 +1,8 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace AccelByte.Core
         public event Func<string, Action<string>, bool> BearerAuthRejected;
 
         public event Action<string> UnauthorizedOccured;
+
+        internal static Utils.IApiTracker GlobalApiTracker;
 
         private AccelByteHttpCache<IAccelByteCacheImplementation<AccelByteCacheItem<AccelByteHttpCacheData>>> httpCache;
 
@@ -178,8 +181,24 @@ namespace AccelByte.Core
             this.maxRetries = maxRetries;
         }
 
-        public async Task<HttpSendResult> SendRequestAsync(IHttpRequest requestInput)
+        public async Task<HttpSendResult> SendRequestAsync(AdditionalHttpParameters additionalParams, IHttpRequest requestInput)
         {
+            var logger = additionalParams.Logger;
+            if (logger == null)
+            {
+                logger = this.logger;
+            }
+
+            if (additionalParams.ApiTracker != null)
+            {
+                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+            }
+
+            if (GlobalApiTracker != null)
+            {
+                GlobalApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+            }
+
             string requestUniqueIdentifier = Guid.NewGuid().ToString();
             var rand = new Random();
             uint retryDelayMs = this.initialDelayMs;
@@ -201,14 +220,14 @@ namespace AccelByte.Core
             {
                 request = requestInput;
             }
-            
+
             this.ApplyImplicitAuthorization(request, out Error applyAuthErr);
             if (applyAuthErr.Code != ErrorCode.None)
             {
                 return new HttpSendResult(null, applyAuthErr);
             }
             this.ApplyImplicitPathParams(request);
-            
+
             this.ApplyAdditionalData(request, AdditionalHeaderInfo, out Error applyAdditionalDataErr);
             if (applyAdditionalDataErr.Code != ErrorCode.None)
             {
@@ -292,7 +311,7 @@ namespace AccelByte.Core
                         sendResult = result;
                     };
                     request.Id = $"{requestUniqueIdentifier}-{retryTimes}";
-                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
+                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs, additionalParams);
                     while (sendResult == null)
                     {
                         await AccelByteHttpHelper.HttpDelayOneFrame;
@@ -307,7 +326,7 @@ namespace AccelByte.Core
                 }
 
                 bool requireToRetry = CheckRequireRetry(request, httpResponse, error, NetworkErrorOccured, ServerErrorOccured);
-                
+
                 if (requireToRetry)
                 {
                     retryTimes++;
@@ -354,8 +373,33 @@ namespace AccelByte.Core
             return new HttpSendResult(httpResponse, error);
         }
 
-        public IEnumerator SendRequest(IHttpRequest requestInput, Action<IHttpResponse, Error> callback)
+        public async Task<HttpSendResult> SendRequestAsync(IHttpRequest requestInput)
         {
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = this.logger
+            };
+            return await SendRequestAsync(additionalParams, requestInput);
+        }
+
+        public IEnumerator SendRequest(AdditionalHttpParameters additionalParams, IHttpRequest requestInput, Action<IHttpResponse, Error> callback)
+        {
+            var logger = additionalParams.Logger;
+            if (logger == null)
+            {
+                logger = this.logger;
+            }
+
+            if (additionalParams.ApiTracker != null)
+            {
+                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+            }
+
+            if (GlobalApiTracker != null)
+            {
+                GlobalApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+            }
+
             string requestUniqueIdentifier = Guid.NewGuid().ToString();
             var rand = new Random();
             uint retryDelayMs = this.initialDelayMs;
@@ -473,7 +517,7 @@ namespace AccelByte.Core
                         sendResult = result;
                     };
                     request.Id = $"{requestUniqueIdentifier}-{retryTimes}";
-                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs);
+                    Sender.AddTask(request, onSendRequestComplete, timeoutMs, delayMs, additionalParams);
                     yield return new WaitUntil(() => sendResult != null);
                     httpResponse = sendResult.Value.CallbackResponse;
                     error = sendResult.Value.CallbackError;
@@ -535,6 +579,15 @@ namespace AccelByte.Core
                 httpCache.TryStoring(request, httpResponse, error);
             }
             callback?.Invoke(httpResponse, error);
+        }
+
+        public IEnumerator SendRequest(IHttpRequest request, Action<IHttpResponse, Error> callback)
+        {
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = this.logger
+            };
+            yield return SendRequest(additionalParams, request, callback);
         }
 
         private bool TryResolveUri(IHttpRequest request)

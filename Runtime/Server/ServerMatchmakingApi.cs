@@ -1,4 +1,4 @@
-﻿// Copyright (c) 20?? - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Collections;
@@ -44,7 +44,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator DequeueJoinableSession(DequeueRequest body
@@ -68,7 +68,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QuerySessionStatus( string matchId
@@ -92,7 +92,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<MatchmakingResult>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator AddUserToSession( string channelName
@@ -128,7 +128,7 @@ namespace AccelByte.Server
 
             var result = respose.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator RemoveUserFromSession( string channelName
@@ -162,7 +162,7 @@ namespace AccelByte.Server
 
             var result = respose.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -52,7 +52,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -70,7 +70,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<RewardInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetRewardByRewardId( string rewardId
@@ -81,7 +81,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, rewardId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -99,7 +99,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<RewardInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryRewards( string eventTopic
@@ -113,7 +113,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -134,7 +134,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<QueryRewardInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

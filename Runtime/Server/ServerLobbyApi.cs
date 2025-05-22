@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -58,7 +58,7 @@ namespace AccelByte.Server
             }
             else
             {
-                callback.Try(result);
+                callback?.Try(result);
             }
         }
         
@@ -85,7 +85,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetPartyDataByUserId( string userId
@@ -111,7 +111,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<PartyDataUpdateNotif>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetSessionAttribute( string userId
@@ -140,7 +140,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<ServerGetSessionAttributeResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetSessionAttributeAll( string userId
@@ -166,7 +166,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<GetSessionAttributeAllResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator SetSessionAttribute( string userId
@@ -197,7 +197,7 @@ namespace AccelByte.Server
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

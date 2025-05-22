@@ -249,4 +249,152 @@ namespace AccelByte.Models
         [DataMember(Name = "errorMessage")] public string ErrorMessage;
         [DataMember(Name = "thirdPartyReferenceId")] public string ThirdPartyReferenceId;
     }
+
+    [Preserve]
+    public class QueryAchievementsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+
+        /// <summary>
+        /// Query expression builder helper for advanced querying. Takes priority over Tags if both are populated.
+        /// </summary>
+        public Core.TagQueryBuilder TagBuilder = null;
+
+        /// <summary>
+        /// Query expression consisting of tags for advanced querying.
+        /// </summary>
+        public string Tags = null;
+
+        /// <summary>
+        /// Set this to true to also display global achievements.
+        /// </summary>
+        public bool? IsGlobal = false;
+    }
+
+    [Preserve]
+    public class GetAchievementOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class QueryUserAchievementsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+
+        /// <summary>
+        /// Query expression builder helper for advanced querying. Takes priority over Tags if both are populated.
+        /// </summary>
+        public Core.TagQueryBuilder TagBuilder = null;
+
+        /// <summary>
+        /// Query expression consisting of tags for advanced querying.
+        /// </summary>
+        public string Tags = null;
+
+        /// <summary>
+        /// Set this to true to display unlocked achievements first.
+        /// </summary>
+        public bool? PreferUnlocked = true;
+    }
+
+    [Preserve]
+    public class UnlockAchievementOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class BulkUnlockAchievementOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class QueryGlobalAchievementsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+
+        /// <summary>
+        /// Query expression builder helper for advanced querying. Takes priority over Tags if both are populated.
+        /// </summary>
+        public Core.TagQueryBuilder TagBuilder = null;
+
+        /// <summary>
+        /// Query expression consisting of tags for advanced querying.
+        /// </summary>
+        public string Tags = null;
+    }
+
+    [Preserve]
+    public class QueryGlobalAchievementContributorsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class QueryGlobalAchievementUserContributedOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class ClaimGlobalAchievementOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetTagsAchievementOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
 }

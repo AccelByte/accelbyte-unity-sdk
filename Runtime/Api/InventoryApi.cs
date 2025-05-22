@@ -30,7 +30,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, payload);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, payload);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -101,14 +101,15 @@ namespace AccelByte.Api
         public void ConsumeUserInventoryItem(
             string inventoryId
             , ConsumeUserItemsRequest consumedItemsRequest
+            , ConsumeUserInventoryItemOptionalParameters optionalParams
             , ResultCallback<UserItem> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, consumedItemsRequest);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -123,7 +124,12 @@ namespace AccelByte.Api
 
             var request = builder.GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<UserItem>();
 
@@ -148,7 +154,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -187,7 +193,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -225,7 +231,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -264,7 +270,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -297,7 +303,7 @@ namespace AccelByte.Api
             , GetUserInventoryAllItemsOptionalParameters optionalParameters
             , ResultCallback<UserItemsPagingResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId);
             if (error != null)
@@ -348,7 +354,12 @@ namespace AccelByte.Api
 
             var request = builder.GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<UserItemsPagingResponse>();
 
@@ -372,7 +383,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, inventoryId, slotId, sourceItemId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -411,7 +422,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, Namespace_, targetInventoryId, payload);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 

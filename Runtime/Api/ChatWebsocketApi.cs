@@ -51,6 +51,11 @@ namespace AccelByte.Api
 
         public override void Connect()
         {
+            Connect(optionalParameters: null);
+        }
+
+        internal void Connect(Models.WebsocketConnectOptionalParameters optionalParameters)
+        {
             Dictionary<string, string> customHeaders = new Dictionary<string, string>()
             {
                 { "X-Ab-ChatSessionID", SessionId },
@@ -60,7 +65,7 @@ namespace AccelByte.Api
 
             messageFragmentProcessor.envelopeEnd = messageFragmentEnd;
             messageFragmentProcessor.envelopeStart = messageFragmentStart;
-            base.Connect(customHeaders);
+            base.Connect(customHeaders, optionalParameters);
         }
 
         public void HandleResponse(string messageId, Error error, string message)
@@ -354,7 +359,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload.result);
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             });
             
             responseCallbacks[messageId] = responseHandler;
@@ -389,7 +394,7 @@ namespace AccelByte.Api
                         : Result.CreateOk();
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             });
             
             responseCallbacks[messageId] = responseHandler;
@@ -425,7 +430,7 @@ namespace AccelByte.Api
                         : Result<U>.CreateOk(responsePayload.result);
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             });
             
             responseCallbacks[messageId] = responseHandler;
@@ -460,7 +465,7 @@ namespace AccelByte.Api
                         : Result.CreateOk();
                 }
 
-                coroutineRunner.Run(() => callback.Try(result));
+                coroutineRunner.Run(() => callback?.Try(result));
             });
 
             responseCallbacks[messageId] = responseHandler;

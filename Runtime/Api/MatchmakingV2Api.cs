@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -7,6 +7,7 @@ using AccelByte.Models;
 using AccelByte.Utils;
 using JetBrains.Annotations;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace AccelByte.Api
 {
@@ -37,7 +38,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -75,7 +76,12 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<MatchmakingV2CreateTicketResponse>();
                 callback?.Try(result);
@@ -87,6 +93,24 @@ namespace AccelByte.Api
         public IEnumerator GetMatchmakingTicket(string ticketId
             , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMatchmakingTicketOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetMatchmakingTicket(ticketId, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetMatchmakingTicket(string ticketId
+            , GetMatchmakingTicketOptionalParameters optionalParameters
+            , ResultCallback<MatchmakingV2MatchTicketStatus> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+            
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , AuthToken
@@ -94,8 +118,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -106,19 +130,28 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<MatchmakingV2MatchTicketStatus>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request,
+                response =>
+                {
+                    var result = response.TryParseJson<MatchmakingV2MatchTicketStatus>();
+                    callback.Try(result);
+                });
         }
 
         public IEnumerator DeleteMatchmakingTicket(string ticketId, ResultCallback callback)
         {
+            return DeleteMatchmakingTicket(ticketId, null, callback);
+        }
+        
+        internal IEnumerator DeleteMatchmakingTicket(string ticketId, DeleteMatchmakingV2OptionalParams optionalParams, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , AuthToken
@@ -126,7 +159,7 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 yield break;
             }
 
@@ -140,17 +173,38 @@ namespace AccelByte.Api
                 .GetResult();
 
             IHttpResponse response = null;
+            
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
 
-            yield return HttpClient.SendRequest(request,
+            yield return HttpClient.SendRequest(additionalParams, request,
                 rsp => response = rsp);
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetMatchmakingMetrics(string matchPool, ResultCallback<MatchmakingV2Metrics> callback)
         {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetMatchmakingMetricsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetMatchmakingMetrics(matchPool, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetMatchmakingMetrics(string matchPool, GetMatchmakingMetricsOptionalParameters optionalParameters, ResultCallback<MatchmakingV2Metrics> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , AuthToken
@@ -158,8 +212,8 @@ namespace AccelByte.Api
             );
             if (error != null)
             {
-                callback.TryError(error);
-                yield break;
+                callback?.TryError(error);
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -171,52 +225,89 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<MatchmakingV2Metrics>();
-
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<MatchmakingV2Metrics>();
+                callback.Try(result);
+            });
         }
 
         public IEnumerator GetUserMatchmakingTickets(ResultCallback<MatchmakingV2ActiveTickets> callback
             , string matchPool, int offset, int limit)
         {
-            if (string.IsNullOrEmpty(Namespace_))
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetUserMatchmakingTicketsOptionalParameters()
             {
-                callback.TryError(ErrorCode.NamespaceNotFound);
-                yield break;
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                MatchPool = matchPool,
+                Offset = offset
+            };
+
+            GetUserMatchmakingTickets(optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetUserMatchmakingTickets(GetUserMatchmakingTicketsOptionalParameters optionalParameters
+            , ResultCallback<MatchmakingV2ActiveTickets> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(
+                Namespace_
+                , AuthToken
+            );
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
             }
 
-            if (string.IsNullOrEmpty(AuthToken))
-            {
-                callback.TryError(ErrorCode.UnauthorizedAccess);
-                yield break;
-            }
-
-            var request = HttpRequestBuilder
+            var builder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v1/namespaces/{namespace}/match-tickets/me")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam("matchPool", matchPool)
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, rsp =>
+            if (optionalParameters != null)
             {
-                response = rsp;
+                var queryParams = new Dictionary<string, string>();
+
+                if (!string.IsNullOrEmpty(optionalParameters.MatchPool))
+                {
+                    queryParams.Add("matchPool", optionalParameters?.MatchPool);
+                }
+                if (optionalParameters.Offset != null && optionalParameters.Offset >= 0)
+                {
+                    queryParams.Add("offset", optionalParameters.Offset.ToString());
+                }
+                if (optionalParameters.Limit != null && optionalParameters.Limit >= 1)
+                {
+                    queryParams.Add("limit", optionalParameters.Limit.ToString());
+                }
+
+                builder.WithQueries(queryParams);
+            }
+
+            var request = builder.GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<MatchmakingV2ActiveTickets>();
+                callback?.Try(result);
             });
-
-            var result = response.TryParseJson<MatchmakingV2ActiveTickets>();
-
-            callback.Try(result);
         }
     }
 }

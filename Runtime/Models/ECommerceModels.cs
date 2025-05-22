@@ -1158,7 +1158,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class QueryUserSubscriptionRequestOptionalParameters
+    public class QueryUserSubscriptionRequestOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Optional param for set the result offset
@@ -1241,7 +1241,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class GetUserEntitlementHistoryOptionalParams
+    public class GetUserEntitlementHistoryOptionalParams : OptionalParametersBase
     {
         /// <summary>
         /// Filter entitlement query based on Clazz.
@@ -1784,10 +1784,15 @@ namespace AccelByte.Models
         /// Optional param for product language
         /// </summary>
         public string Language = null;
+        /// <summary>
+        /// Accelbyte logger instance to use logging functions within the interface.
+        /// </summary>
+        internal IDebugger Logger;
+        internal Utils.IApiTracker ApiTracker;
     }
 
     [Preserve]
-    public class PlatformSyncMobileGoogleOptionalParameters
+    public class PlatformSyncMobileGoogleOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Optional param for AutoConsume.
@@ -1805,7 +1810,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class SyncSteamInventoryOptionalParameters
+    public class SyncSteamInventoryOptionalParameters : OptionalParametersBase
     {
         /// <summary>
         /// Optional param for product region
@@ -1940,5 +1945,14 @@ namespace AccelByte.Models
         [DataMember] public OrderStatus Status = OrderStatus.INIT;
         [DataMember] public int Offset = 0;
         [DataMember] public int Limit = 20;
+    }
+
+    [Preserve]
+    public class GetCurrencyListOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned results via their Currency Type.
+        /// </summary>
+        public CurrencyType? CurrencyType = Models.CurrencyType.NONE;
     }
 }

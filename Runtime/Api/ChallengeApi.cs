@@ -45,7 +45,7 @@ namespace AccelByte.Api
         internal void GetChallenges(GetChallengesOptionalParamenters optionalParameters
             , ResultCallback<ChallengeResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var queries = new Dictionary<string, string>();
             if (optionalParameters?.SortBy != null)
@@ -80,7 +80,12 @@ namespace AccelByte.Api
                     .WithQueries(queries)
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<ChallengeResponse>();
 
@@ -94,24 +99,45 @@ namespace AccelByte.Api
             , int limit
             , ResultCallback<GoalResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetScheduledChallengeGoalsOptionalParameters()
+            {
+                Limit = limit,
+                Logger = SharedMemory?.Logger,
+                Offset = offset,
+                Tags = tags
+            };
+
+            GetScheduledChallengeGoals(challengeCode, optionalParameters, callback);
+        }
+
+        internal void GetScheduledChallengeGoals(string challengeCode
+            , GetScheduledChallengeGoalsOptionalParameters optionalParameters
+            , ResultCallback<GoalResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/challenges/{challengeCode}/goals")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Config.Namespace)
                 .WithPathParam("challengeCode", challengeCode)
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString());
+                .WithQueryParam("offset", optionalParameters?.Offset?.ToString())
+                .WithQueryParam("limit", optionalParameters?.Limit?.ToString());
 
-            if (tags != null && tags.Length > 0)
+            if (optionalParameters?.Tags != null && optionalParameters?.Tags.Length > 0)
             {
-                builder.WithQueryParam("tags", tags);
+                builder.WithQueryParam("tags", optionalParameters?.Tags);
             }
 
             IHttpRequest request = builder.GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GoalResponse>();
                 if (!result.IsError)
@@ -120,7 +146,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 };
             });
         }
@@ -131,7 +157,24 @@ namespace AccelByte.Api
             , int limit
             , ResultCallback<GoalProgressionResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetChallengeProgressOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset
+            };
+
+            GetChallengeProgress(challengeCode, goalCode, optionalParameters, callback);
+        }
+
+        internal void GetChallengeProgress(string challengeCode
+            , string goalCode
+            , GetChallengeProgressOptionalParameters optionalParameters
+            , ResultCallback<GoalProgressionResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/{challengeCode}")
                 .WithBearerAuth(AuthToken)
@@ -139,11 +182,15 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Config.Namespace)
                 .WithPathParam("challengeCode", challengeCode)
                 .WithQueryParam("goalCode", goalCode)
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
+                .WithQueryParam("offset", optionalParameters?.Offset.ToString())
+                .WithQueryParam("limit", optionalParameters?.Limit.ToString())
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GoalProgressionResponse>();
                 if (!result.IsError)
@@ -152,7 +199,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 };
             });
         }
@@ -163,15 +210,41 @@ namespace AccelByte.Api
             , int limit
             , ResultCallback<UserRewards> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetRewardsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                Limit = limit,
+                Offset = offset,
+                SortBy = sortBy
+            };
+
+            GetRewards(status, optionalParameters, callback);
+        }
+
+        internal void GetRewards(ChallengeRewardStatus status
+            , GetRewardsOptionalParameters optionalParameters
+            , ResultCallback<UserRewards> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/rewards")
                     .WithBearerAuth(AuthToken)
                     .Accepts(MediaType.ApplicationJson)
-                    .WithPathParam("namespace", Config.Namespace)
-                    .WithQueryParam("sortBy", ConverterUtils.EnumToDescription(sortBy))
-                    .WithQueryParam("offset", offset.ToString())
-                    .WithQueryParam("limit", limit.ToString());
+                    .WithPathParam("namespace", Config.Namespace);
+
+            if (optionalParameters != null)
+            {
+                if (optionalParameters.SortBy != null)
+                {
+                    builder.WithQueryParam("sortBy", ConverterUtils.EnumToDescription(optionalParameters.SortBy));
+                }
+
+                builder
+                    .WithQueryParam("offset", optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit.ToString());
+            }
 
             if (status != ChallengeRewardStatus.None)
             {
@@ -179,8 +252,12 @@ namespace AccelByte.Api
             }
 
             IHttpRequest request = builder.GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserRewards>();
                 if (!result.IsError)
@@ -189,7 +266,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 };
             });
         }
@@ -201,7 +278,25 @@ namespace AccelByte.Api
             , int offset = 0
             , int limit = 20)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetChallengeProgressWithRotationIndexOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                GoalCode = goalCode,
+                Limit = limit,
+                Offset = offset
+            };
+
+            GetChallengeProgress(challengeCode, rotationIndex, optionalParameters, callback);
+        }
+
+        internal void GetChallengeProgress(string challengeCode
+            , int rotationIndex
+            , GetChallengeProgressWithRotationIndexOptionalParameters optionalParameters
+            , ResultCallback<GoalProgressionResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode);
             error = (rotationIndex < 0) ? new Error(ErrorCode.InvalidRequest) : null;
@@ -212,18 +307,28 @@ namespace AccelByte.Api
                 return;
             }
 
-            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/{challengeCode}/index/{index}")
+            var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/{challengeCode}/index/{index}")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Config.Namespace)
                 .WithPathParam("challengeCode", challengeCode)
-                .WithPathParam("index", rotationIndex.ToString())
-                .WithQueryParam("goalCode", goalCode)
-                .WithQueryParam("offset", offset.ToString())
-                .WithQueryParam("limit", limit.ToString())
-                .GetResult();
+                .WithPathParam("index", rotationIndex.ToString());
 
-            HttpOperator.SendRequest(request, response =>
+            if (optionalParameters != null)
+            {
+                builder
+                    .WithQueryParam("goalCode", optionalParameters.GoalCode)
+                    .WithQueryParam("offset", optionalParameters.Offset.ToString())
+                    .WithQueryParam("limit", optionalParameters.Limit.ToString());
+            }
+
+            var request = builder.GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GoalProgressionResponse>();
                 if (!result.IsError)
@@ -239,15 +344,31 @@ namespace AccelByte.Api
 
         public void EvaluateChallengeProgress(ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new EvaluateChallengeProgressOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            EvaluateChallengeProgress(optionalParameters, callback);
+        }
+
+        internal void EvaluateChallengeProgress(EvaluateChallengeProgressOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/evaluate")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", Config.Namespace)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 if (!result.IsError)
@@ -264,7 +385,21 @@ namespace AccelByte.Api
         internal void ClaimReward(ClaimRewardRequest body
             , ResultCallback<UserReward[]> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ClaimRewardOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ClaimReward(body, optionalParameters, callback);
+        }
+
+        internal void ClaimReward(ClaimRewardRequest body
+            , ClaimRewardOptionalParameters optionalParameters
+            , ResultCallback<UserReward[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/rewards/claim")
                 .Accepts(MediaType.ApplicationJson)
@@ -273,8 +408,12 @@ namespace AccelByte.Api
                 .WithBody(body.ToUtf8Json())
                 .WithBearerAuth(AuthToken)
                 .GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserReward[]>();
                 if (!result.IsError)
@@ -283,7 +422,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    callback.TryError(result.Error);
+                    callback?.TryError(result.Error);
                 };
             });
         }
@@ -293,7 +432,7 @@ namespace AccelByte.Api
             , ChallengeListScheduleByGoalOptionalParameters optionalParams
             , ResultCallback<ChallengeListScheduleByGoalResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode
                 , goalCode
@@ -326,7 +465,12 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<ChallengeListScheduleByGoalResponse>();
                 callback?.Try(result);
@@ -337,7 +481,7 @@ namespace AccelByte.Api
             , ChallengeListSchedulesOptionalParameters optionalParams
             , ResultCallback<ChallengeListSchedulesResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(challengeCode
                 , Namespace_
@@ -372,7 +516,12 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = new AdditionalHttpParameters()
+            {
+                Logger = optionalParams?.Logger
+            };
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParseJson<ChallengeListSchedulesResponse>();
                 callback?.Try(result);

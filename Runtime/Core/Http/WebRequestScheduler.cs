@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,11 +13,13 @@ namespace AccelByte.Core
         public System.Action<AccelByteWebRequest, IDebugger> PostHttpRequest;
         protected List<WebRequestTask> requestTask;
 
-        private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
+        internal static Utils.IApiTracker GlobalApiTracker;
 
         protected IDebugger logger;
         protected CoreHeartBeat heartBeat;
         private bool stopRequested;
+
+        private WebRequestTaskOrderComparer orderComparer = new WebRequestTaskOrderComparer();
         
         public WebRequestScheduler()
         {
@@ -62,6 +64,17 @@ namespace AccelByte.Core
                 }
             }
 
+            IDebugger targetLogger = null;
+            if (task.AdditionalHttpParameters.Logger != null)
+            {
+                targetLogger = task.AdditionalHttpParameters.Logger;
+            }
+            
+            if (targetLogger == null)
+            {
+                targetLogger = this.logger;
+            }
+
             using (AccelByteWebRequest webRequest = task.CreateWebRequest())
             {
                 using (var webRequestCancelTokenSource = new System.Threading.CancellationTokenSource())
@@ -70,13 +83,24 @@ namespace AccelByte.Core
                     bool isTimeout = false;
                     heartBeat.Wait(new WaitTimeCommand(waitTime: timeoutSeconds, cancellationToken: webRequestCancelTokenSource.Token, onDone: () =>
                     {
-                        logger?.LogWarning($"{webRequest.method} {webRequest.uri} reached timeout");
+                        targetLogger?.LogWarning($"{webRequest.method} {webRequest.uri} reached timeout");
                         webRequest?.Abort();
                         isTimeout = true;
                     }));
                     
                     webRequest.SentTimestamp = DateTime.UtcNow;
-                    PreHttpRequest?.Invoke(webRequest, task.HttpRequest.Headers, task.HttpRequest.BodyBytes, logger);
+
+                    if (GlobalApiTracker != null)
+                    {
+                        GlobalApiTracker.NewHttpRequestSent(task.HttpRequest.Method, task.HttpRequest.UrlFormat);
+                    }
+                    
+                    if (task.AdditionalHttpParameters.ApiTracker != null)
+                    {
+                        task.AdditionalHttpParameters.ApiTracker.NewHttpRequestSent(task.HttpRequest.Method, task.HttpRequest.UrlFormat);
+                    }
+                    
+                    PreHttpRequest?.Invoke(webRequest, task.HttpRequest.Headers, task.HttpRequest.BodyBytes, targetLogger);
                     
                     var asyncOp = webRequest.SendWebRequest();
                     while (!asyncOp.isDone && !isTimeout)
@@ -84,7 +108,7 @@ namespace AccelByte.Core
                         await System.Threading.Tasks.Task.Yield();
                     }
                     webRequest.ResponseTimestamp = DateTime.UtcNow;
-                    PostHttpRequest?.Invoke(webRequest, logger);
+                    PostHttpRequest?.Invoke(webRequest, targetLogger);
                     
                     webRequestCancelTokenSource.Cancel();
                     task.SetComplete(webRequest);

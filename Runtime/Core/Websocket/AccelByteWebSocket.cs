@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
+using AccelByte.Models;
 using AccelByte.Utils;
 using System;
 using System.Collections.Generic;
@@ -200,12 +201,20 @@ namespace AccelByte.Api
         /// <param name="callback">A callback that will be triggered when error happens during connect</param>
         public virtual void Connect(string url, string authorizationToken, string sessionId = "", ResultCallback callback = null)
         {
+            Connect(url, authorizationToken, new WebsocketConnectOptionalParameters()
+            {
+                Logger = logger
+            }, sessionId, callback);
+        }
+        
+        internal void Connect(string url, string authorizationToken, WebsocketConnectOptionalParameters optionalParameters, string sessionId = "", ResultCallback callback = null)
+        {
             Dictionary<string, string> customHeader = new Dictionary<string, string>()
             {
                 { LobbySessionIdHeaderName, sessionId }
             };
             
-            Connect(url, authorizationToken, customHeader, callback);
+            Connect(url, authorizationToken, customHeader, optionalParameters, callback);
         }
 
         /// <summary>
@@ -217,9 +226,20 @@ namespace AccelByte.Api
         /// <param name="callback">a callback that will be triggered when Connect is done</param>
         public virtual void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders, ResultCallback callback = null)
         {
+            Connect(url, authorizationToken, customHeaders, new WebsocketConnectOptionalParameters()
+            {
+                Logger = logger
+            }, callback);
+        }
+
+        internal void Connect(string url, string authorizationToken, Dictionary<string, string> customHeaders, WebsocketConnectOptionalParameters optionalParameters,
+            ResultCallback callback = null)
+        {
+            var targetLogger = optionalParameters != null && optionalParameters.Logger != null ? optionalParameters.Logger : logger;
+            
             if(State == WsState.Connecting || State == WsState.Open)
             {
-                logger?.LogVerbose("[AccelByteWebSocket] is connecting or already connected");
+                targetLogger?.LogVerbose("[AccelByteWebSocket] is connecting or already connected");
                 return;
             }
 
@@ -248,10 +268,11 @@ namespace AccelByte.Api
                 callback?.TryError(new Error(ErrorCode.InvalidResponse, "Reconnect attempts failed"));
             };
 
-            logger?.LogVerbose($"Connecting websocket to {url}");
+            targetLogger?.LogVerbose($"Connecting websocket to {url}");
             WebSocketImp.Connect(url: url, 
                 protocols: this.authorizationToken, 
-                customHeaders: customHeaders, 
+                customHeaders: customHeaders,
+                optionalParameters,
                 entitlementToken: string.Empty,
                 callback: result =>
                 {

@@ -126,7 +126,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class GetChallengesOptionalParamenters
+    public class GetChallengesOptionalParamenters : OptionalParametersBase
     {
         /// <summary>
         /// Filter challenges by code
@@ -391,7 +391,7 @@ namespace AccelByte.Models
     }
     
     [DataContract, Preserve]
-    public class ChallengeListScheduleByGoalOptionalParameters
+    public class ChallengeListScheduleByGoalOptionalParameters : OptionalParametersBase
     {
         public int? Limit;
         public int? Offset;
@@ -429,7 +429,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class ChallengeListSchedulesOptionalParameters
+    public class ChallengeListSchedulesOptionalParameters : OptionalParametersBase
     {
         public DateTime? DateTime;
         public int? Limit;
@@ -441,5 +441,211 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "data")] public ChallengeScheduleResponse[] Data;
         [DataMember(Name = "paging")] public Paging Paging;
+    }
+
+    [Preserve]
+    public class GetScheduledChallengeGoalsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned scheduled challenge goals based on their tags.
+        /// </summary>
+        public string[] Tags = null;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetChallengeProgressOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetRewardsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Sort returned entries by provided method.
+        /// </summary>
+        public ChallengeSortBy? SortBy = ChallengeSortBy.UpdatedAtDesc;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class ClaimRewardOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetChallengeProgressWithRotationIndexOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter results returned via their goal code.
+        /// </summary>
+        public string GoalCode = string.Empty;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class EvaluateChallengeProgressOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class BulkClaimRewardOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class CreateChallengeOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class CreateChallengeGoalOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class DeleteChallengeOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class DeleteChallengeGoalOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class DeleteTiedChallengeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetChallengeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetChallengeGoalOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GetChallengeGoalsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Sort returned entries by provided method.
+        /// </summary>
+        public ChallengeSortBy? SortBy = ChallengeSortBy.UpdatedAtDesc;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetChallengePeriodsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetUserRewardsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned entries by their reward status.
+        /// </summary>
+        public ChallengeRewardStatus? RewardStatus = ChallengeRewardStatus.None;
+
+        /// <summary>
+        /// Sort returned entries by provided method.
+        /// </summary>
+        public ChallengeSortBy? SortBy = ChallengeSortBy.UpdatedAtDesc;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class RandomizeChallengeGoalsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpdateChallengeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpdateChallengeGoalOptionalParameters : OptionalParametersBase
+    {
+
     }
 }

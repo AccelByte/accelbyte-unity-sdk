@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -74,7 +74,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator MuteGroupUserChat(string groupId, MuteGroupChatRequest muteGroupChatRequest,
@@ -124,7 +124,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UnmuteGroupUserChat(string groupId, UnmuteGroupChatRequest unmuteGroupChatRequest, ResultCallback callback)
@@ -161,7 +161,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetGroupChatSnapshot(string groupId, string chatId,
@@ -193,7 +193,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<ChatSnapshotResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator BanGroupUserChat(string groupId, BanGroupChatRequest banGroupChatRequest,
@@ -231,7 +231,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<BanGroupChatResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator UnbanGroupUserChat(string groupId, UnbanGroupChatRequest unbanGroupChatRequest,
@@ -269,7 +269,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<UnbanGroupChatResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

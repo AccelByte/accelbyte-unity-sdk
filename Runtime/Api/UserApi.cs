@@ -43,6 +43,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new RegisterUserOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Register(requestModel, optionalParameters, callback);
+        }
+
+        internal void Register(RegisterUserRequest requestModel, RegisterUserOptionalParameters optionalParameters, ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
                 , requestModel
                 , requestModel.authType
@@ -61,8 +73,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response => 
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<RegisterUserResponse>();
                 callback?.Try(result);
@@ -72,6 +85,18 @@ namespace AccelByte.Api
         public void RegisterV2(RegisterUserRequestv2 requestModel, ResultCallback<RegisterUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new RegisterUserOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            RegisterV2(requestModel, optionalParameters, callback);
+        }
+
+        internal void RegisterV2(RegisterUserRequestv2 requestModel, RegisterUserOptionalParameters optionalParameters, ResultCallback<RegisterUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_
                 , requestModel
@@ -91,8 +116,9 @@ namespace AccelByte.Api
                  .WithContentType(MediaType.ApplicationJson)
                  .WithBody(requestModel.ToUtf8Json())
                  .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<RegisterUserResponse>();
                 callback?.Try(result);
@@ -103,7 +129,7 @@ namespace AccelByte.Api
             , SendVerificationCodeToNewUserOptionalParameters optionalParameters
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, emailAddress);
             if (error != null)
@@ -125,7 +151,9 @@ namespace AccelByte.Api
                     .WithBody(requestBody.ToUtf8Json())
                     .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParams = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParams, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -149,9 +177,42 @@ namespace AccelByte.Api
             });
         }
 
+        internal void GetData(GetOrRefreshDataOptionalParameters optionalParameters, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var isIncludeAllPlatforms = optionalParameters?.IsIncludeAllPlatforms is true ? "true" : "false";
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/users/me")
+                .WithQueryParam("includeAllPlatforms", isIncludeAllPlatforms)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<UserData>();
+                callback?.Try(result);
+            });
+        }
+
         public void Update(UpdateUserRequest updateUserRequest, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UpdateUserDataOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Update(updateUserRequest, optionalParameters, callback);
+        }
+
+        internal void Update(UpdateUserRequest updateUserRequest, UpdateUserDataOptionalParameters optionalParameters, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+            
             if (updateUserRequest == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Update failed. updateUserRequest is null!"));
@@ -159,7 +220,7 @@ namespace AccelByte.Api
             }
             if (!string.IsNullOrEmpty(updateUserRequest.emailAddress))
             {
-                callback?.TryError(new Error(ErrorCode.BadRequest,"Cannot update user email using this function. Use UpdateEmail instead."));
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Cannot update user email using this function. Use UpdateEmail instead."));
                 return;
             }
 
@@ -170,8 +231,12 @@ namespace AccelByte.Api
                 .WithBody(updateUserRequest.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(
+                additionalParameters
+                , request
+                , response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -181,6 +246,18 @@ namespace AccelByte.Api
         public void UpdateEmail(UpdateEmailRequest updateEmailRequest, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UpdateEmailOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UpdateEmail(updateEmailRequest, optionalParameters, callback);
+        }
+
+        internal void UpdateEmail(UpdateEmailRequest updateEmailRequest, UpdateEmailOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (updateEmailRequest == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Update failed. updateEmailRequest is null!"));
@@ -194,8 +271,9 @@ namespace AccelByte.Api
                 .WithBody(updateEmailRequest.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -205,6 +283,21 @@ namespace AccelByte.Api
         public void Upgrade(UpgradeRequest requestModel, UpgradeParameter requestParameter, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UpgradeHeadlessAccountOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Upgrade(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        internal void Upgrade(UpgradeRequest requestModel
+            , UpgradeParameter requestParameter
+            , UpgradeHeadlessAccountOptionalParameters optionalParameters
+            , ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! request is null!"));
@@ -228,11 +321,12 @@ namespace AccelByte.Api
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(Session.AuthorizationToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithQueryParam("needVerificationCode", requestParameter.NeedVerificationCode ? "true" : "false")
+                .WithQueryParam("needVerificationCode", requestParameter.NeedVerificationCode.ToString().ToLower())
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -242,6 +336,18 @@ namespace AccelByte.Api
         public void UpgradeV2(UpgradeV2Request requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UpgradeHeadlessAccountV2OptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UpgradeV2(requestModel, optionalParameters, callback);
+        }
+
+        internal void UpgradeV2(UpgradeV2Request requestModel, UpgradeHeadlessAccountV2OptionalParameters optionalParameters, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade headless account! request is null!"));
@@ -267,8 +373,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -278,6 +385,18 @@ namespace AccelByte.Api
         public void UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UpgradeAndVerifyHeadlessAccountOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UpgradeAndVerifyHeadlessAccount(requestModel, optionalParameters, callback);
+        }
+
+        internal void UpgradeAndVerifyHeadlessAccount(UpgradeAndVerifyHeadlessRequest requestModel, UpgradeAndVerifyHeadlessAccountOptionalParameters optionalParameters, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't upgrade the user! request is null!"));
@@ -317,8 +436,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -328,6 +448,19 @@ namespace AccelByte.Api
         public void SendVerificationCode(SendVerificationCodeRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new SendUpgradeVerificationCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            SendVerificationCode(requestModel, optionalParameters, callback);
+        }
+
+        internal void SendVerificationCode(SendVerificationCodeRequest requestModel, SendUpgradeVerificationCodeOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't send verification code! request is null!"));
@@ -347,8 +480,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -358,6 +492,18 @@ namespace AccelByte.Api
         public void Verify(VerifyRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new VerifyUserEmailOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Verify(requestModel, optionalParameters, callback);
+        }
+
+        internal void Verify(VerifyRequest requestModel, VerifyUserEmailOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't post verification code! request is null!"));
@@ -381,8 +527,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -392,6 +539,18 @@ namespace AccelByte.Api
         public void SendPasswordResetCode(SendPasswordResetCodeRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new SendPasswordResetCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            SendPasswordResetCode(requestModel, optionalParameters, callback);
+        }
+
+        internal void SendPasswordResetCode(SendPasswordResetCodeRequest requestModel, SendPasswordResetCodeOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't request reset password code! request is null!"));
@@ -410,8 +569,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -421,6 +581,18 @@ namespace AccelByte.Api
         public void ResetPassword(ResetPasswordRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new ResetPasswordOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ResetPassword(requestModel, optionalParameters, callback);
+        }
+
+        internal void ResetPassword(ResetPasswordRequest requestModel, ResetPasswordOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't reset password! request is null!"));
@@ -448,8 +620,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -459,6 +632,21 @@ namespace AccelByte.Api
         public void LinkOtherPlatform(LinkOtherPlatformRequest requestModel, LinkOtherPlatformParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new LinkOtherPlatformOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            LinkOtherPlatform(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        internal void LinkOtherPlatform(LinkOtherPlatformRequest requestModel
+            , LinkOtherPlatformParameter requestParameter
+            , LinkOtherPlatformOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! request is null!"));
@@ -486,8 +674,9 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithContentType(MediaType.ApplicationForm)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -502,6 +691,27 @@ namespace AccelByte.Api
         public void ForcedLinkOtherPlatform(LinkPlatformAccountRequest requestModel, LinkPlatformAccountParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new ForceLinkOtherPlatformOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ForcedLinkOtherPlatform(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="requestModel"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        internal void ForcedLinkOtherPlatform(LinkPlatformAccountRequest requestModel
+            , LinkPlatformAccountParameter requestParameter
+            , ForceLinkOtherPlatformOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't link platform account! request is null!"));
@@ -532,8 +742,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .WithBody(requestModel.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -543,6 +754,21 @@ namespace AccelByte.Api
         public void UnlinkOtherPlatform(UnlinkPlatformAccountRequest requestModel, UnlinkPlatformAccountParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new UnlinkOtherPlatformOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UnlinkOtherPlatform(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        internal void UnlinkOtherPlatform(UnlinkPlatformAccountRequest requestModel
+            , UnlinkPlatformAccountParameter requestParameter
+            , UnlinkOtherPlatformOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't unlink platform account! request is null!"));
@@ -571,8 +797,9 @@ namespace AccelByte.Api
             }
 
             IHttpRequest request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -582,6 +809,18 @@ namespace AccelByte.Api
         public void UnlinkAllOtherPlatform(UnlinkPlatformAccountParameter requestParameter, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UnlinkAllOtherPlatformOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UnlinkAllOtherPlatform(requestParameter, optionalParameters, callback);
+        }
+
+        internal void UnlinkAllOtherPlatform(UnlinkPlatformAccountParameter requestParameter, UnlinkAllOtherPlatformOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (string.IsNullOrEmpty(requestParameter.PlatformId))
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't unlink platform account! Platform Id parameter is null!"));
@@ -598,17 +837,33 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson);
 
             IHttpRequest request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
             });
         }
 
-        public void GetPlatformLinks(GetPlatformLinkRequest requestModel, ResultCallback<PagedPlatformLinks> callback)
+        public void GetPlatformLinks(GetPlatformLinkRequest requestModel
+            , ResultCallback<PagedPlatformLinks> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new GetPlatformLinksOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetPlatformLinks(requestModel, optionalParameters, callback);
+        }
+
+        internal void GetPlatformLinks(GetPlatformLinkRequest requestModel
+            , GetPlatformLinksOptionalParameters optionalParameters
+            , ResultCallback<PagedPlatformLinks> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get platform link! request is null!"));
@@ -628,8 +883,9 @@ namespace AccelByte.Api
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<PagedPlatformLinks>();
                 callback?.Try(result);
@@ -639,6 +895,20 @@ namespace AccelByte.Api
         public void SearchUsers(SearchUsersRequest requestModel, ResultCallback<PagedPublicUsersInfo> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new SearchUsersOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            SearchUsers(requestModel, optionalParameters, callback);
+        }
+
+        internal void SearchUsers(SearchUsersRequest requestModel
+            , SearchUsersOptionalParameters optionalParameters
+            , ResultCallback<PagedPublicUsersInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (requestModel == null)
             {
@@ -672,15 +942,16 @@ namespace AccelByte.Api
             {
                 builder.WithQueryParam("platformBy", platformBy);
             }
-            
+
             if (requestModel.SearchBy != SearchType.ALL)
             {
                 builder.WithQueryParam("by", requestModel.FilterType[(int)requestModel.SearchBy]);
             }
 
             IHttpRequest request = builder.GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<PagedPublicUsersInfo>();
                 callback?.Try(result);
@@ -691,6 +962,11 @@ namespace AccelByte.Api
         public void GetUserByUserId(GetUserByUserIdRequest requestModel, ResultCallback<PublicUserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            GetUserByUserId(requestModel, optionalParameters: null, callback: callback);
+        }
+
+        internal void GetUserByUserId(GetUserByUserIdRequest requestModel, GetUserByUserIdOptionalParameters optionalParameters, ResultCallback<PublicUserData> callback)
+        {
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
@@ -710,14 +986,24 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<PublicUserData>();
-                callback?.Try(result);
-            });
+            HttpOperator.SendRequest(
+                additionalParams: AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                ,request
+                , response =>
+                {
+                    var result = response.TryParseJson<PublicUserData>();
+                    callback?.Try(result);
+                });
         }
 
         public void GetUserPublicInfo(string userId, ResultCallback<GetUserPublicInfoResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GetUserPublicInfo(userId, null, callback);
+        }
+        
+        internal void GetUserPublicInfo(string userId, GetUserPublicInfoOptionalParameters optionalParams, ResultCallback<GetUserPublicInfoResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
@@ -737,7 +1023,9 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            AdditionalHttpParameters additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+
+            HttpOperator.SendRequest(additionalHttpParameters, request, response =>
             {
                 var result = response.TryParseJson<GetUserPublicInfoResponse>();
                 callback?.Try(result);
@@ -787,6 +1075,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetUserByOtherPlatformUserIdV4OptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetUserByOtherPlatformUserIdV4(platformId, platformUserId, optionalParameters, callback);
+        }
+
+        internal void GetUserByOtherPlatformUserIdV4(string platformId
+            , string platformUserId
+            , GetUserByOtherPlatformUserIdV4OptionalParameters optionalParameters
+            , ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(platformId
                 , platformUserId
                 , AuthToken
@@ -806,8 +1109,9 @@ namespace AccelByte.Api
                 .WithBearerAuth(Session.AuthorizationToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -817,6 +1121,21 @@ namespace AccelByte.Api
         public void BulkGetUserByOtherPlatformUserIdsV4(BulkPlatformUserIdRequest requestModel, BulkPlatformUserIdParameter requestParameter, ResultCallback<BulkPlatformUserIdResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new BulkGetUserByOtherPlatformUserIdsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkGetUserByOtherPlatformUserIdsV4(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        internal void BulkGetUserByOtherPlatformUserIdsV4(BulkPlatformUserIdRequest requestModel
+            , BulkPlatformUserIdParameter requestParameter
+            , BulkGetUserByOtherPlatformUserIdsOptionalParameters optionalParameters
+            , ResultCallback<BulkPlatformUserIdResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
@@ -847,8 +1166,9 @@ namespace AccelByte.Api
                 builder = builder.WithQueryParam("rawPUID", requestParameter.RawPuid.Value.ToString());
             }
             IHttpRequest request = builder.GetResult();
-            
-            HttpOperator.SendRequest(request, response =>
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<BulkPlatformUserIdResponse>();
                 callback?.Try(result);
@@ -859,17 +1179,29 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetCountryFromIPOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetCountryFromIP(optionalParameters, callback);
+        }
+
+        internal void GetCountryFromIP(GetCountryFromIPOptionalParameters optionalParameters, ResultCallback<CountryInfo> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/location/country")
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<CountryInfo>();
                 callback?.Try(result);
             });
         }
-
 
         [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserOtherPlatformBasicPublicInfo instead")]
         public void BulkGetUserInfo(ListBulkUserInfoRequest requestModel, ResultCallback<ListBulkUserInfoResponse> callback)
@@ -904,6 +1236,20 @@ namespace AccelByte.Api
         public void Change2FAFactor(Change2FAFactorParameter requestModel, ResultCallback<TokenData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new Change2FAFactorOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Change2FAFactor(requestModel, optionalParameters, callback);
+        }
+
+        internal void Change2FAFactor(Change2FAFactorParameter requestModel
+            , Change2FAFactorOptionalParameters optionalParameters
+            , ResultCallback<TokenData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't change MFA Factor! request is null!"));
@@ -926,8 +1272,9 @@ namespace AccelByte.Api
                 .WithFormParam("factor", requestModel.Factor)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<TokenData>();
                 callback?.Try(result);
@@ -938,14 +1285,27 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new Disable2FAAuthenticatorOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Disable2FAAuthenticator(optionalParameters, callback);
+        }
+
+        internal void Disable2FAAuthenticator(Disable2FAAuthenticatorOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/disable";
             var request = HttpRequestBuilder.CreateDelete(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -955,6 +1315,20 @@ namespace AccelByte.Api
         public void Enable2FAAuthenticator(Enable2FAAuthenticatorParameter requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new Enable2FAAuthenticatorOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Enable2FAAuthenticator(requestModel, optionalParameters, callback);
+        }
+
+        internal void Enable2FAAuthenticator(Enable2FAAuthenticatorParameter requestModel
+            , Enable2FAAuthenticatorOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't enable MFA! request is null!"));
@@ -973,8 +1347,9 @@ namespace AccelByte.Api
                 .WithFormParam("code", requestModel.Code)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -985,12 +1360,26 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GenerateSecretKeyFor3rdPartyAuthenticateAppOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GenerateSecretKeyFor3rdPartyAuthenticateApp(optionalParameters, callback);
+        }
+
+        internal void GenerateSecretKeyFor3rdPartyAuthenticateApp(GenerateSecretKeyFor3rdPartyAuthenticateAppOptionalParameters optionalParameters
+            , ResultCallback<SecretKey3rdPartyApp> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/authenticator/key";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(request, response =>
             {
@@ -1003,14 +1392,27 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GenerateBackUpCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GenerateBackUpCode(optionalParameters, callback);
+        }
+
+        internal void GenerateBackUpCode(GenerateBackUpCodeOptionalParameters optionalParameters, ResultCallback<TwoFACode> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode";
             var request = HttpRequestBuilder.CreatePost(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<TwoFACode>();
                 callback?.Try(result);
@@ -1021,14 +1423,27 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new Disable2FABackupCodesOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Disable2FABackupCodes(optionalParameters, callback);
+        }
+
+        internal void Disable2FABackupCodes(Disable2FABackupCodesOptionalParameters optionalParameters, ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/disable";
             var request = HttpRequestBuilder.CreateDelete(url)
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -1053,9 +1468,40 @@ namespace AccelByte.Api
             });
         }
 
+        internal void Enable2FABackupCodes(Enable2FABackupCodesOptionalParameters optionalParameters, ResultCallback<TwoFACode> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode/enable";
+            var request = HttpRequestBuilder.CreatePost(url)
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<TwoFACode>();
+                callback?.Try(result);
+            });
+        }
+
         public void GetBackUpCode(ResultCallback<TwoFACode> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetBackUpCodeOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetBackUpCode(optionalParameters, callback);
+        }
+
+        internal void GetBackUpCode(GetBackUpCodeOptionalParameters optionalParameters, ResultCallback<TwoFACode> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/backupCode";
             var request = HttpRequestBuilder.CreateGet(url)
@@ -1063,8 +1509,9 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<TwoFACode>();
                 callback?.Try(result);
@@ -1075,6 +1522,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetUserEnabledFactorsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetUserEnabledFactors(optionalParameters, callback);
+        }
+
+        internal void GetUserEnabledFactors(GetUserEnabledFactorsOptionalParameters optionalParameters, ResultCallback<Enable2FAFactors> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             string url = BaseUrl + "/v4/public/namespaces/{namespace}/users/me/mfa/factor";
 
             var request = HttpRequestBuilder.CreateGet(url)
@@ -1082,8 +1541,9 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<Enable2FAFactors>();
                 callback?.Try(result);
@@ -1093,6 +1553,20 @@ namespace AccelByte.Api
         public void Make2FAFactorDefault(Make2FAFactorDefaultParameter requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new Make2FAFactorDefaultOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            Make2FAFactorDefault(requestModel, optionalParameters, callback);
+        }
+
+        internal void Make2FAFactorDefault(Make2FAFactorDefaultParameter requestModel
+            , Make2FAFactorDefaultOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't set default MFA! request is null!"));
@@ -1112,8 +1586,9 @@ namespace AccelByte.Api
                 .WithFormParam("factor", requestModel.FactorType)
                 .WithContentType(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -1123,6 +1598,20 @@ namespace AccelByte.Api
         public void GetInputValidations(GetInputValidationsParameter requestModel, ResultCallback<InputValidation> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new GetInputValidationsOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetInputValidations(requestModel, optionalParameters, callback);
+        }
+
+        internal void GetInputValidations(GetInputValidationsParameter requestModel
+            , GetInputValidationsOptionalParameters optionalParameters
+            , ResultCallback<InputValidation> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't request input validation! request is null!"));
@@ -1141,8 +1630,9 @@ namespace AccelByte.Api
                .WithBearerAuth(AuthToken)
                .Accepts(MediaType.ApplicationJson)
                .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<InputValidation>();
                 callback?.Try(result);
@@ -1152,6 +1642,18 @@ namespace AccelByte.Api
         public void UpdateUser(UpdateUserRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new UpdateUserOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UpdateUser(requestModel, optionalParameters, callback);
+        }
+
+        internal void UpdateUser(UpdateUserRequest requestModel, UpdateUserOptionalParameters optionalParameters, ResultCallback<UserData> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't update user! request is null!"));
@@ -1170,8 +1672,9 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
@@ -1181,6 +1684,20 @@ namespace AccelByte.Api
         public void GetPublisherUser(GetPublisherUserParameter requestModel, ResultCallback<GetPublisherUserResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new GetPublisherUserOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetPublisherUser(requestModel, optionalParameters, callback);
+        }
+
+        internal void GetPublisherUser(GetPublisherUserParameter requestModel
+            , GetPublisherUserOptionalParameters optionalParameters
+            , ResultCallback<GetPublisherUserResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Get Publisher User failed! request is null!"));
@@ -1199,8 +1716,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GetPublisherUserResponse>();
                 callback?.Try(result);
@@ -1210,6 +1728,20 @@ namespace AccelByte.Api
         public void GetUserInformation(GetUserInformationParameter requestModel, ResultCallback<GetUserInformationResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new GetUserInformationOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetUserInformation(requestModel, optionalParameters, callback);
+        }
+
+        internal void GetUserInformation(GetUserInformationParameter requestModel
+            , GetUserInformationOptionalParameters optionalParameters
+            , ResultCallback<GetUserInformationResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Get User Information failed! request is null!"));
@@ -1228,8 +1760,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<GetUserInformationResponse>();
                 callback?.Try(result);
@@ -1239,6 +1772,20 @@ namespace AccelByte.Api
         public void LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest requestModel, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new LinkHeadlessAccountToCurrentFullAccountOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            LinkHeadlessAccountToCurrentFullAccount(requestModel, optionalParameters, callback);
+        }
+
+        internal void LinkHeadlessAccountToCurrentFullAccount(LinkHeadlessAccountRequest requestModel
+            , LinkHeadlessAccountToCurrentFullAccountOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't link account! request is null!"));
@@ -1251,8 +1798,9 @@ namespace AccelByte.Api
                 .WithBody(requestModel.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -1264,6 +1812,21 @@ namespace AccelByte.Api
             ResultCallback<ConflictLinkHeadlessAccountResult> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            
+            var optionalParameters = new GetConflictResultWhenLinkHeadlessAccountToFullAccountOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetConflictResultWhenLinkHeadlessAccountToFullAccount(requestModel, optionalParameters, callback);
+        }
+
+        internal void GetConflictResultWhenLinkHeadlessAccountToFullAccount(
+            GetConflictResultWhenLinkHeadlessAccountToFullAccountRequest requestModel
+            , GetConflictResultWhenLinkHeadlessAccountToFullAccountOptionalParameters optionalParameters
+            , ResultCallback<ConflictLinkHeadlessAccountResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (requestModel == null)
             {
                 callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get headless link conflict. request is null!"));
@@ -1281,8 +1844,9 @@ namespace AccelByte.Api
                 .WithQueryParam("oneTimeLinkCode", requestModel.OneTimeLinkCode)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<ConflictLinkHeadlessAccountResult>();
                 callback?.Try(result);
@@ -1292,14 +1856,38 @@ namespace AccelByte.Api
         public void CheckUserAccountAvailability(string displayName,
             ResultCallback callback)
         {
-            CheckUserAccountAvailabilityByFieldName(displayName, "displayName", callback);
+            var optionalParameters = new CheckUserAccountAvailabilityByFieldNameOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            CheckUserAccountAvailability(displayName, optionalParameters, callback);
+        }
+
+        internal void CheckUserAccountAvailability(string displayName
+            , CheckUserAccountAvailabilityByFieldNameOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            CheckUserAccountAvailabilityByFieldName(displayName, "displayName", optionalParameters, callback);
         }
 
         public void GetConfigUniqueDisplayNameEnabled(ResultCallback<bool> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            GetConfigValue<UniqueDisplayNameEnabledResponse>("uniqueDisplayNameEnabled", result =>
+            var optionalParameters = new GetConfigValueOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetConfigUniqueDisplayNameEnabled(optionalParameters, callback);
+        }
+
+        internal void GetConfigUniqueDisplayNameEnabled(GetConfigValueOptionalParameters optionalParameters, ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            GetConfigValue<UniqueDisplayNameEnabledResponse>("uniqueDisplayNameEnabled", optionalParameters, result =>
             {
                 if (result.IsError)
                 {
@@ -1315,9 +1903,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            GetConfigValue<DisplayNameDisabledResponse>("usernameDisabled", result =>
+            var optionalParameters = new GetConfigValueOptionalParameters()
             {
-                if(result.IsError)
+                Logger = SharedMemory?.Logger
+            };
+
+            GetConfigUserNameDisabled(optionalParameters, callback);
+        }
+
+        internal void GetConfigUserNameDisabled(GetConfigValueOptionalParameters optionalParameters, ResultCallback<bool> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GetConfigValue<DisplayNameDisabledResponse>("usernameDisabled", optionalParameters, result =>
+            {
+                if (result.IsError)
                 {
                     callback?.TryError(result.Error);
                     return;
@@ -1327,9 +1927,11 @@ namespace AccelByte.Api
             });
         }
 
-        private void GetConfigValue<T>(string configKey, ResultCallback<T> callback) where T : class, new()
+        private void GetConfigValue<T>(string configKey
+            , GetConfigValueOptionalParameters optionalParameters
+            , ResultCallback<T> callback) where T : class, new()
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/config/{configKey}")
                  .WithPathParam("namespace", Namespace_)
@@ -1337,8 +1939,9 @@ namespace AccelByte.Api
                  .WithContentType(MediaType.ApplicationJson)
                  .Accepts(MediaType.ApplicationJson)
                  .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<ConfigValueResponse<T>>();
                 if (result.IsError)
@@ -1357,6 +1960,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetUserOtherPlatformBasicPublicInfoOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetUserOtherPlatformBasicPublicInfo(requestPayload, optionalParameters, callback);
+        }
+
+        internal void GetUserOtherPlatformBasicPublicInfo(
+            PlatformAccountInfoRequest requestPayload
+            , GetUserOtherPlatformBasicPublicInfoOptionalParameters optionalParameters
+            , ResultCallback<AccountUserPlatformInfosResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, Session.AuthorizationToken, requestPayload);
             if (error != null)
             {
@@ -1371,8 +1989,9 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .WithBody(requestPayload.ToUtf8Json())
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<AccountUserPlatformInfosResponse>();
                 callback?.Try(result);
@@ -1383,6 +2002,21 @@ namespace AccelByte.Api
             ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new CheckUserAccountAvailabilityByFieldNameOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            CheckUserAccountAvailabilityByFieldName(valueToCheck, fieldName, optionalParameters, callback);
+        }
+
+        internal void CheckUserAccountAvailabilityByFieldName(string valueToCheck
+            , string fieldName
+            , CheckUserAccountAvailabilityByFieldNameOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, valueToCheck, fieldName);
             if (error != null)
@@ -1399,8 +2033,9 @@ namespace AccelByte.Api
                  .WithQueryParam("query", valueToCheck)
                  .Accepts(MediaType.ApplicationJson)
                  .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 if (response.Code == (int)ErrorCode.NotFound)
                 {
@@ -1420,6 +2055,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            var optionalParameters = new GetCountryGroupV3OptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            GetCountryGroupV3(optionalParameters, callback);
+        }
+
+        internal void GetCountryGroupV3(GetCountryGroupV3OptionalParameters optionalParameters, ResultCallback<Country[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_);
             if (error != null)
             {
@@ -1431,11 +2078,11 @@ namespace AccelByte.Api
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/countries")
                 .WithPathParam("namespace", Namespace_)
                 .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<Country[]>();
-
                 callback?.Try(result);
             });
         }
@@ -1444,6 +2091,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
+            ValidateUserInput(requestBody, null, callback);
+        }
+        
+        internal void ValidateUserInput(ValidateInputRequest requestBody, ValidateUserInputOptionalParameters optionalParams , ResultCallback<ValidateInputResponse> callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, requestBody);
             if (error != null)
             {
@@ -1459,7 +2111,9 @@ namespace AccelByte.Api
                 .WithBody(requestBody.ToUtf8Json())
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+
+            HttpOperator.SendRequest(additionalHttpParameters, request, response =>
             {
                 var result = response.TryParseJson<ValidateInputResponse>();
                 callback?.Try(result);

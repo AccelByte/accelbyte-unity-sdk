@@ -38,7 +38,17 @@ namespace AccelByte.Core
 
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
+            SendEvent(telemetryEvent, logger: null, callback);
+        }
+
+        internal void SendEvent(IAccelByteTelemetryEvent telemetryEvent, IDebugger logger, ResultCallback callback)
+        {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
+            if (logger != null)
+            {
+                eventBody.SetLogger(logger);
+            }
+            
             if (SharedMemory != null && SharedMemory.TimeManager != null)
             {
                 AccelByteGameTelemetryApi.TryAssignTelemetryBodyClientTimestamps(ref eventBody, ref SharedMemory.TimeManager);

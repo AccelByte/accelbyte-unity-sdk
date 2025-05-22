@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2019 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -54,6 +54,7 @@ namespace AccelByte.Core
             {
                 result = new HttpRequestPrototype
                 {
+                    UrlFormat = url,
                     Method = method,
                     Headers = { ["X-Amzn-TraceId"] = AwsXRayTraceIdFactory.GetNewXRayTraceId() }
                 }
@@ -469,7 +470,7 @@ namespace AccelByte.Core
             public string Id { get; set; }
             public string Method { get; set; }
             public string Url { get; set; }
-            
+            public string UrlFormat { get; set; }
             public HttpAuth AuthType { get; set; }
             public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
             public byte[] BodyBytes { get; set; }

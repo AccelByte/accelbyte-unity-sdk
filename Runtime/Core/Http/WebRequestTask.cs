@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2021-2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021-2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
 using System;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 
 namespace AccelByte.Core
 {
@@ -44,13 +44,20 @@ namespace AccelByte.Core
             get;
             private set;
         }
+        
+        public readonly AdditionalHttpParameters AdditionalHttpParameters;
 
-        public WebRequestTask(IHttpRequest httpRequest, int timeoutMs, uint delayMs)
+        public WebRequestTask(IHttpRequest httpRequest, int timeoutMs, uint delayMs) : this(httpRequest, timeoutMs, delayMs, new AdditionalHttpParameters())
+        {
+        }
+
+        public WebRequestTask(IHttpRequest httpRequest, int timeoutMs, uint delayMs, AdditionalHttpParameters additionalParameters)
         {
             HttpRequest = httpRequest;
             DelayMs = delayMs;
             this.TimeoutMs = timeoutMs;
             CreatedTimeStamp = DateTime.UtcNow;
+            AdditionalHttpParameters = additionalParameters;
             SetState(WebRequestState.Waiting);
         }
 

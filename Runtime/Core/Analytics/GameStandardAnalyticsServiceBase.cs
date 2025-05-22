@@ -1,12 +1,10 @@
-﻿// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
-using AccelByte.Core;
 using AccelByte.Models;
-using UnityEngine;
 
-namespace AccelByte.Api
+namespace AccelByte.Core
 {
     public class GameStandardAnalyticsServiceBase<TAnalyticsWrapper> : WrapperBase where TAnalyticsWrapper : IAccelByteAnalyticsWrapper
     {
@@ -92,13 +90,13 @@ namespace AccelByte.Api
 
         internal virtual void SendEvent(GameStandardEventPayload payload, ResultCallback callback = null)
         {
-            var telemetryEvent = new AccelByteTelemetryEvent(payload);
+            var telemetryEvent = new AccelByteTelemetryEvent(payload, payload?.Logger);
             SendEvent(telemetryEvent, callback);
         }
 
         internal void SendEvent(AccelByteTelemetryEvent telemetryEvent, ResultCallback callback = null)
         {
-            Scheduler.SendEvent(telemetryEvent, callback);
+            Scheduler.SendEvent(telemetryEvent, telemetryEvent?.Logger, callback);
 
             if (!Scheduler.IsEventJobEnabled)
             {

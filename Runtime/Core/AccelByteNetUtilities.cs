@@ -11,19 +11,20 @@ namespace AccelByte.Core
 {
     public static class AccelByteNetUtilities
     {
-        private static readonly CoroutineRunner coroutineRunner = new CoroutineRunner();
         private static readonly IHttpClient httpClient;
+        private static readonly HttpOperator httpOperator;
 
         static AccelByteNetUtilities()
         {
             IHttpRequestSender httpSender = AccelByteSDK.Implementation.SdkHttpSenderFactory.CreateHttpRequestSender();
             httpClient = new AccelByteHttpClient(httpSender);
+            httpOperator = HttpOperator.CreateDefault(httpClient);
         }
 
         [Obsolete("ipify supports will be deprecated in future releases)")]
         public static void GetPublicIp(ResultCallback<PublicIp> callback)
         {
-            coroutineRunner.Run(GetPublicIpAsync(callback));
+            GetPublicIpWithIpify(httpOperator, callback);
         }
 
         internal static void GetPublicIpWithIpify(HttpOperator httpOperator, ResultCallback<PublicIp> callback)
@@ -40,21 +41,6 @@ namespace AccelByte.Core
             });
         }
 
-        private static IEnumerator GetPublicIpAsync(ResultCallback<PublicIp> callback)
-        {
-            var getPubIpRequest = HttpRequestBuilder.CreateGet("https://api.ipify.org?format=json")
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return AccelByteSDK.GetClientRegistry().GetApi().httpClient.SendRequest(getPubIpRequest, rsp => response = rsp);
-
-            var result = response.TryParseJson<PublicIp>();
-            callback.Try(result);
-        }
-
         /// <summary>
         /// Upload Json / string data to given URL.
         /// </summary>
@@ -63,18 +49,37 @@ namespace AccelByte.Core
         /// <param name="callback">Returns a Result via callback when completed.</param>
         public static void UploadTo(string url, byte[] data, ResultCallback callback, string contentType = "application/octet-stream")
         {
+            UploadTo(url, data, new UploadToOptionalParameters()
+            {
+                ContentType = contentType
+            }, callback);
+        }
+        
+        internal static void UploadTo(string url, byte[] data, UploadToOptionalParameters optionalParameters, ResultCallback callback)
+        {
             if (string.IsNullOrEmpty(url))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, url cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, url cannot be null!"));
                 return;
             }
             if (data == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, data cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, data cannot be null!"));
                 return;
             }
 
-            coroutineRunner.Run(UploadToAsync(url, data, false, contentType, callback));
+            if (optionalParameters == null)
+            {
+                optionalParameters = new UploadToOptionalParameters();
+            }
+
+            UploadFileOptionalParameters uploadFileOptionalParameters = new UploadFileOptionalParameters()
+            {
+                Logger = optionalParameters.Logger,
+                OverrideHttpOperator = optionalParameters.OverrideHttpOperator
+            };
+
+            UploadFile(url, data, false, optionalParameters.ContentType, uploadFileOptionalParameters, callback);
         }
 
         /// <summary>
@@ -87,7 +92,7 @@ namespace AccelByte.Core
             , byte[] data
             , ResultCallback callback)
         {
-            UploadBinaryTo(url, data, null, callback);
+            UploadBinaryTo(url, data, new UploadBinaryOptionalParameters(), callback);
         }
         
         /// <summary>
@@ -104,27 +109,40 @@ namespace AccelByte.Core
         {
             if (string.IsNullOrEmpty(url))
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, url cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, url cannot be null!"));
                 return;
             }
             if (data == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, data cannot be null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidArgument, "Failed to upload, data cannot be null!"));
                 return;
             }
 
+            if (optionalParameters == null)
+            {
+                optionalParameters = new UploadBinaryOptionalParameters();
+            }
+            
             string contentType = "application/octet-stream";
-            if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.ContentType))
+            if (!string.IsNullOrEmpty(optionalParameters.ContentType))
             {
                 contentType = optionalParameters.ContentType;
             }
-            coroutineRunner.Run(UploadToAsync(url, data, isBinary: true, contentType: contentType, callback: callback));
+            
+            UploadFileOptionalParameters uploadFileOptionalParameters = new UploadFileOptionalParameters()
+            {
+                Logger = optionalParameters.Logger,
+                OverrideHttpOperator = optionalParameters.OverrideHttpOperator
+            };
+            
+            UploadFile(url, data, isBinary: true, contentType: contentType, uploadFileOptionalParameters, callback: callback);
         }
 
-        private static IEnumerator UploadToAsync(string url
+        private static void UploadFile(string url
             , byte[] data
             , bool isBinary
             , string contentType
+            , UploadFileOptionalParameters optionalParameters
             , ResultCallback callback)
         {
             var requestBuilder = HttpRequestBuilder.CreatePut(url)
@@ -142,12 +160,18 @@ namespace AccelByte.Core
 
             var request = requestBuilder.GetResult();
 
-            IHttpResponse response = null;
-
-            yield return httpClient.SendRequest(request, rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback.Try(result);
+            var targetHttpOperator = httpOperator;
+            if (optionalParameters != null && optionalParameters.OverrideHttpOperator != null)
+            {
+                targetHttpOperator = optionalParameters.OverrideHttpOperator;
+            }
+            
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            targetHttpOperator.SendRequest(additionalHttpParameters, request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         /// <summary>
@@ -157,7 +181,18 @@ namespace AccelByte.Core
         /// <param name="callback">Returns a Result that contains byte[] data via callback when completed.</param>
         public static void DownloadFrom(string url, ResultCallback<byte[]> callback)
         {
-            coroutineRunner.Run(DownloadFromAsync(url, false, callback));
+            DownloadFrom(url, new DownloadFromOptionalParameters(), callback);
+        }
+        
+        internal static void DownloadFrom(string url, DownloadFromOptionalParameters optionalOptionalParameters, ResultCallback<byte[]> callback)
+        {
+            var downloadOptionalParameters = new DownloadFileOptionalParameters()
+            {
+                Logger = optionalOptionalParameters?.Logger,
+                IsBinary = false,
+                OverrideHttpOperator = optionalOptionalParameters?.OverrideHttpOperator
+            };
+            DownloadFile(url, downloadOptionalParameters, callback);
         }
 
         /// <summary>
@@ -167,48 +202,69 @@ namespace AccelByte.Core
         /// <param name="callback">Returns a Result that contains byte[] data via callback when completed.</param>
         public static void DownloadBinaryFrom(string url, ResultCallback<byte[]> callback)
         {
-            coroutineRunner.Run(DownloadFromAsync(url, true, callback));
+            DownloadBinaryFrom(url, new DownloadBinaryFromOptionalParameters(), callback);
+        }
+        
+        internal static void DownloadBinaryFrom(string url, DownloadBinaryFromOptionalParameters optionalOptionalParameters, ResultCallback<byte[]> callback)
+        {
+            var downloadOptionalParameters = new DownloadFileOptionalParameters()
+            {
+                Logger = optionalOptionalParameters?.Logger,
+                IsBinary = true,
+                OverrideHttpOperator = optionalOptionalParameters?.OverrideHttpOperator
+            };
+            DownloadFile(url, downloadOptionalParameters, callback);
         }
 
-        private static IEnumerator DownloadFromAsync(string url, bool isBinary, ResultCallback<byte[]> callback)
+        private static void DownloadFile(string url, DownloadFileOptionalParameters optionalParameters, ResultCallback<byte[]> callback)
         {
             var uploadRequest = HttpRequestBuilder.CreateGet(url)
                 .WithContentType(MediaType.ApplicationOctetStream)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return httpClient.SendRequest(uploadRequest, rsp => response = rsp);
-
-            Result<byte[]> result;
-
-            if (response == null)
+            var targetHttpOperator = httpOperator;
+            if (optionalParameters != null && optionalParameters.OverrideHttpOperator != null)
             {
-                result = Result<byte[]>.CreateError(ErrorCode.InvalidResponse);
-                callback.Try(result);
-                yield break;
+                targetHttpOperator = optionalParameters.OverrideHttpOperator;
             }
-
-            switch ((HttpStatusCode)response.Code)
+            
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            targetHttpOperator.SendRequest(additionalHttpParameters, uploadRequest, response =>
             {
-                case HttpStatusCode.OK:
-                    var value = response.BodyBytes;
-                    if (!isBinary && value != null)
-                    {
-                        value = Convert.FromBase64String(System.Text.Encoding.UTF8.GetString(value));
-                    }
-                    result = Result<byte[]>.CreateOk(value);
+                Result<byte[]> result;
 
-                    break;
+                if (response == null)
+                {
+                    result = Result<byte[]>.CreateError(ErrorCode.InvalidResponse);
+                    callback?.Try(result);
+                    return;
+                }
 
-                default:
-                    result = Result<byte[]>.CreateError((ErrorCode)response.Code);
+                bool isBinary = false;
+                if (optionalParameters != null)
+                {
+                    isBinary = optionalParameters.IsBinary;
+                }
 
-                    break;
-            }
+                switch ((HttpStatusCode)response.Code)
+                {
+                    case HttpStatusCode.OK:
+                        var value = response.BodyBytes;
+                        if (!isBinary && value != null)
+                        {
+                            string resultString = System.Text.Encoding.UTF8.GetString(value);
+                            value = Convert.FromBase64String(resultString);
+                        }
+                        result = Result<byte[]>.CreateOk(value);
+                        break;
+                    default:
+                        result = Result<byte[]>.CreateError((ErrorCode)response.Code);
+                        break;
+                }
 
-            callback.Try(result);
+                callback?.Try(result);
+            });
         }
     }
 }

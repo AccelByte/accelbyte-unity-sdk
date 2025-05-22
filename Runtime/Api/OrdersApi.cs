@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -33,22 +33,22 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty")); 
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty")); 
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userAccessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
                 yield break;
             }
             if (orderRequest == null)
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderRequest) + " cannot be null"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(orderRequest) + " cannot be null"));
                 yield break;
             } 
 
@@ -68,7 +68,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<OrderInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CancelOrderApi( string orderNo
@@ -79,22 +79,22 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userAccessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(orderNo))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -115,7 +115,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<OrderInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserOrder( string userId
@@ -126,22 +126,22 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userAccessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(orderNumber))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNumber) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(orderNumber) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -161,7 +161,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<OrderInfo>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetUserOrders( string userId
@@ -173,17 +173,17 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userAccessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -206,7 +206,7 @@ namespace AccelByte.Api
             });
 
             var result = response.TryParseJson<OrderPagingSlicedResult>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator QueryUserOrders(string userId
@@ -273,22 +273,22 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (string.IsNullOrEmpty(Namespace_))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(Namespace_) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(userAccessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userAccessToken) + " cannot be null or empty"));
                 yield break;
             }
             if (string.IsNullOrEmpty(orderNo))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(orderNo) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -308,7 +308,7 @@ namespace AccelByte.Api
                 rsp => response = rsp);
 
             var result = response.TryParseJson<OrderHistoryInfo[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         internal void PreviewOrderPriceWithDiscountCode(string itemId

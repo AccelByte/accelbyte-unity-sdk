@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.7.0] (2025-05-21)
+
+
+### Features
+
+* add log injection for turn manager 
+* add log injection on GetUserStatItems 
+* add method overloads with optional parameters to statistic service 
+* added server game standard event 
+
+
+### Bug Fixes
+
+* android identifier generated when RandomizeDeviceId is false 
+* fix exception when download empty user avatar 
+
+
+### Refactors
+
+* add api tracker to server profanity filter 
+* add api tracker to web request task 
+* add functional injection 
+* add internal config injection to AccelByteNetUtilities 
+* add internal overloads with optional parameters to achievement service 
+* add internal service tracker 
+* add optional parameter to all methods of agreement, challenge, currencies, and matchmaking interface 
+* add safeguard for api callback 
+* iam config injection 
+* improve websocket and qos logging 
+* refactor chat websocket log 
+* refactor statistic api 
+
 ## [17.6.0] (2025-03-17)
 
 

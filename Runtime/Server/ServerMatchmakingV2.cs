@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -86,7 +86,7 @@ namespace AccelByte.Server
 
             if (!_session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -162,7 +162,7 @@ namespace AccelByte.Server
                 return;
             }
 
-            resultCallback.Try(result);
+            resultCallback?.Try(result);
         }
 
         #endregion

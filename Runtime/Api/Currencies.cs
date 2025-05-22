@@ -1,4 +1,4 @@
-// Copyright (c) 2021 - 2023 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -49,16 +49,33 @@ namespace AccelByte.Api
         /// <param name="callback">Return a result that contains CurrencyList via callback</param>
         public void GetCurrencyList( ResultCallback<CurrencyList[]> callback, CurrencyType currencyType = CurrencyType.NONE)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetCurrencyListOptionalParameters()
+            {
+                CurrencyType = currencyType,
+                Logger = SharedMemory?.Logger
+            };
+
+            GetCurrencyList(optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get All Currency List Info by namespace
+        /// <param name="optionalParameters">Endpoint optional parameters. Can be null.</param>
+        /// </summary>
+        /// <param name="callback">Return a result that contains CurrencyList via callback</param>
+        internal void GetCurrencyList(GetCurrencyListOptionalParameters optionalParameters, ResultCallback<CurrencyList[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetCurrencyList(callback, currencyType));
+            api.GetCurrencyList(optionalParameters, callback);
         }
     }
 }

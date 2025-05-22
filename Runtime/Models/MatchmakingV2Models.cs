@@ -40,7 +40,7 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
-    public class MatchmakingV2CreateTicketRequestOptionalParams
+    public class MatchmakingV2CreateTicketRequestOptionalParams : OptionalParametersBase
     {
         [DataMember] public Dictionary<string, object> attributes;
         [DataMember] public Dictionary<string, int> latencies;
@@ -63,6 +63,11 @@ namespace AccelByte.Models
         /// Indicating past session id that will be excluded when creating a match ticket.
         /// </summary>
         [DataMember] public string[] ExcludedGameSessionIds;
+    }
+    
+    [Preserve]
+    public class DeleteMatchmakingV2OptionalParams : OptionalParametersBase
+    {
     }
 
     [DataContract, Preserve]
@@ -131,6 +136,37 @@ namespace AccelByte.Models
     {
         [DataMember(Name = "data")] public MatchmakingV2ActiveTicket[] Data;
         [DataMember(Name = "pagination")] public Paging Paging;
+    }
+
+    [Preserve]
+    public class GetMatchmakingTicketOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [Preserve]
+    public class GetMatchmakingMetricsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetUserMatchmakingTicketsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned results via their match pool.
+        /// </summary>
+        public string MatchPool = string.Empty;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
     }
 
     #region Backfill

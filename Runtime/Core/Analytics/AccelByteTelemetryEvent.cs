@@ -33,10 +33,19 @@ namespace AccelByte.Core
             }
         }
 
+        internal IDebugger Logger;
+
         public AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload)
         {
             Payload = payload;
             CreatedTimestamp = DateTime.Now;
+        }
+
+        internal AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload, IDebugger logger)
+        {
+            Payload = payload;
+            CreatedTimestamp = DateTime.Now;
+            Logger = logger;
         }
     }
 }

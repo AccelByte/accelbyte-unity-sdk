@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -33,19 +33,19 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(accessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(userId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(userId) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(password))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(password) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(password) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -69,7 +69,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SubmitAccountDeletionResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         } 
 
         public IEnumerator SubmitAccountDeletionPlatformId(string accessToken
@@ -79,19 +79,19 @@ namespace AccelByte.Api
         { 
             if (string.IsNullOrEmpty(accessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(platformId))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(platformId) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(platformId) + " cannot be null or empty"));
                 yield break;
             }
 
             if (string.IsNullOrEmpty(platformToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(platformToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(platformToken) + " cannot be null or empty"));
                 yield break;
             }
 
@@ -114,7 +114,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<SubmitAccountDeletionResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CancelAccountDeletion(string accessToken
@@ -122,7 +122,7 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(accessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
                 yield break;
             } 
 
@@ -143,7 +143,7 @@ namespace AccelByte.Api
 
             var result = response.TryParse();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GetAccountDeletionStatus(string accessToken
@@ -151,7 +151,7 @@ namespace AccelByte.Api
         {
             if (string.IsNullOrEmpty(accessToken))
             {
-                callback.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
+                callback?.TryError(new Error(ErrorCode.BadRequest, nameof(accessToken) + " cannot be null or empty"));
                 yield break;
             }
              
@@ -172,7 +172,7 @@ namespace AccelByte.Api
 
             var result = response.TryParseJson<AccountDeletionStatusResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

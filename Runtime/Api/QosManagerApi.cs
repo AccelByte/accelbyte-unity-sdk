@@ -35,6 +35,11 @@ namespace AccelByte.Api
         
         internal void RequestGetAllQosServers( ResultCallback<QosServerList> callback )
         {
+            RequestGetAllQosServers(optionalParams: null, callback);
+        }
+        
+        internal void RequestGetAllQosServers(GetAllServerOptionalParameters optionalParams, ResultCallback<QosServerList> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             var request = HttpRequestBuilder
@@ -43,7 +48,8 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
             
-            HttpOperator.SendRequest(request, response =>
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);
@@ -79,7 +85,8 @@ namespace AccelByte.Api
 
             var request = httpBuilder.GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<QosServerList>();
                 callback?.Try(result);

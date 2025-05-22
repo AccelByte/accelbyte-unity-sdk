@@ -351,7 +351,7 @@ namespace AccelByte.Models
         [DataMember] public Paging Paging;
     }
 
-    public class OptionalParamBase
+    public class StatisticOptionalParamBase : OptionalParametersBase
     {
         /// <summary>
         /// Offset of the list that has been sliced based on Limit parameter (optional, default = 0)
@@ -370,7 +370,7 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class GetUserStatItemsOptionalParam : OptionalParamBase
+    public class GetAllUserStatItemsOptionalParam : StatisticOptionalParamBase
     {
         /// <summary>
         /// List of tags that will be included in the result
@@ -384,16 +384,226 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class GetMyStatCycleItemsOptionalParam : OptionalParamBase
+    public class GetUserStatItemsOptionalParam : StatisticOptionalParamBase
+    {
+        /// <summary>
+        /// List of tags that will be included in the result
+        /// </summary>
+        public string[] Tags;
+
+        /// <summary>
+        /// The sorting method of item on page (optional, default = updated at and ascending) 
+        /// </summary>
+        public StatisticSortBy sortBy = StatisticSortBy.UpdatedAtAsc;
+    }
+
+    [Preserve]
+    public class GetMyStatCycleItemsOptionalParam : StatisticOptionalParamBase
     {
     }
 
     [Preserve]
-    public class GetMyStatItemsOptionalParam : OptionalParamBase
+    public class GetMyStatItemsOptionalParam : StatisticOptionalParamBase
     {        
         /// <summary>
         /// List of tags that will be included in the result
         /// </summary>
         public string[] Tags;
+    }
+
+    [Preserve]
+    public class CreateUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class IncrementUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class ResetUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpdateUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// To identify multi level user statItem, such as character.
+        /// </summary>
+        public string AdditionalKey = string.Empty;
+    }
+
+    [Preserve]
+    public class ListUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// This is the AdditionalKey that will be stored in the slot.
+        /// </summary>
+        public string AdditionalKey = string.Empty;
+
+        /// <summary>
+        /// Filter results via their stat code. 
+        /// <para>If stat code does not exist, will ignore this stat code.</para>
+        /// <para>If stat item does not exist, will return default value</para>
+        /// </summary>
+        public string[] StatCodes = null;
+
+        /// <summary>
+        /// This is the Tag array that will be stored in the slot.
+        /// </summary>
+        public string[] Tags = null;
+    }
+
+    [Preserve]
+    public class UpdateUserStatItemsValueOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// This is the AdditionalKey that will be stored in the slot.
+        /// </summary>
+        public string AdditionalKey = string.Empty;
+    }
+
+    [Preserve]
+    public class BulkFetchStatItemsValueOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetGlobalStatItemsByStatCodeOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetStatCycleConfigOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class GetListStatCycleConfigsOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned results via their type.
+        /// </summary>
+        public StatisticCycleType? Type = StatisticCycleType.None;
+
+        /// <summary>
+        /// Filter returned results via their status.
+        /// </summary>
+        public StatisticCycleStatus? Status = StatisticCycleStatus.None;
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetListUserStatCycleItemOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Filter returned results via their stat codes.
+        /// </summary>
+        public string[] StatCodes = new string[0];
+
+        /// <summary>
+        /// Amount of entries to offset / traverse on the pagination system.
+        /// </summary>
+        public int? Offset = 0;
+
+        /// <summary>
+        /// Amount of entries to display per page on the pagination system.
+        /// </summary>
+        public int? Limit = 20;
+    }
+
+    [Preserve]
+    public class GetMyStatItemValuesOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// This is the AdditionalKey that will be stored in the slot.
+        /// </summary>
+        public string AdditionalKey = string.Empty;
+
+        /// <summary>
+        /// Filter results via their stat code. 
+        /// <para>If stat code does not exist, will ignore this stat code.</para>
+        /// <para>If stat item does not exist, will return default value</para>
+        /// </summary>
+        public string[] StatCodes = null;
+
+        /// <summary>
+        /// This is the Tag array that will be stored in the slot.
+        /// </summary>
+        public string[] Tags = null;
+    }
+
+    [Preserve]
+    public class IncrementManyUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class ResetManyUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpdateManyUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class BulkFetchUserStatItemsValueOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// This is the AdditionalKey that will be stored in the slot.
+        /// </summary>
+        public string AdditionalKey = string.Empty;
+    }
+
+    [Preserve]
+    public class BulkUpdateMultipleUserStatItemsValueOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class BulkResetUserStatItemsValuesOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class BulkUpdateUserStatItemValueOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class UpdateUserStatItemValueOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class DeleteUserStatItemsOptionalParameters : OptionalParametersBase
+    {
+
     }
 }

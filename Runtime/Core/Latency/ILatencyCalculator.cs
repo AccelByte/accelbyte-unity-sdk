@@ -8,7 +8,7 @@ namespace AccelByte.Core
 {
     internal interface ILatencyCalculator
     {
-        AccelByteResult<int, Error> CalculateLatency(string url, int port);
+        AccelByteResult<int, Error> CalculateLatency(string url, int port, IDebugger debugger);
     }
     
     internal static class LatencyCalculatorFactory

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -49,7 +49,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<EntitlementInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator GrantUserEntitlement( string userId
@@ -78,7 +78,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<StackableEntitlementInfo[]>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         [Obsolete("This does not support for multiplatform wallet, use CreditUserWalletV2 instead")] 
@@ -111,7 +111,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<WalletInfo>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator CreditUserWalletV2( string userId
@@ -143,7 +143,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<CreditUserWalletResponse>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         public IEnumerator FulfillUserItem( string userId
@@ -172,7 +172,7 @@ namespace AccelByte.Server
 
             var result = response.TryParseJson<FulfillmentResult>();
 
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator GetStoreList(ResultCallback<PlatformStore[]> callback)
@@ -192,7 +192,7 @@ namespace AccelByte.Server
                 rsp => response = rsp);
 
             var result = response.TryParseJson<PlatformStore[]>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator QueryItemsByCriteria( ItemCriteriaV2 criteria
@@ -232,7 +232,7 @@ namespace AccelByte.Server
             yield return HttpClient.SendRequest(request, 
                 rsp => response = rsp);
             var result = response.TryParseJson<ItemPagingSlicedResultV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
         
         public IEnumerator QueryItemsByCriteriaV2( ItemCriteriaV3 criteria
@@ -274,7 +274,7 @@ namespace AccelByte.Server
             yield return HttpClient.SendRequest(request, 
                 rsp => response = rsp);
             var result = response.TryParseJson<ItemPagingSlicedResultV2>();
-            callback.Try(result);
+            callback?.Try(result);
         }
     }
 }

@@ -1,11 +1,11 @@
-// Copyright (c) 2021 - 2022 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
 using AccelByte.Core;
 using AccelByte.Models;
+using AccelByte.Utils;
 using System.Collections;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
@@ -26,28 +26,50 @@ namespace AccelByte.Api
 
         public IEnumerator GetCurrencyList( ResultCallback<CurrencyList[]> callback, CurrencyType currencyType = CurrencyType.NONE )
         {
-            Report.GetFunctionLog(GetType().Name);
-            Assert.IsNotNull(Namespace_, "Can't Get Currency List! Namespace parameter is null!");
-            Assert.IsNotNull(AuthToken, "Can't Get Currency List! accessToken parameter is null!");
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new GetCurrencyListOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger,
+                CurrencyType = currencyType
+            };
+
+            GetCurrencyList(optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void GetCurrencyList(GetCurrencyListOptionalParameters optionalParameters, ResultCallback<CurrencyList[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
 
             var builder = HttpRequestBuilder.CreateGet(BaseUrl + "/public/namespaces/{namespace}/currencies")
                 .WithPathParam("namespace", Namespace_)
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson);
-            if (currencyType != CurrencyType.NONE)
+            if (optionalParameters?.CurrencyType != null && optionalParameters?.CurrencyType != CurrencyType.NONE)
             {
-                builder.WithQueryParam("currencyType", currencyType.ToString());
+                builder.WithQueryParam("currencyType", optionalParameters.CurrencyType.ToString());
             }
+
             var request = builder.GetResult();
+            var additionalParameters = new AdditionalHttpParameters()
+            {
+                Logger = optionalParameters?.Logger
+            };
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<CurrencyList[]>();
-            callback.Try(result);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<CurrencyList[]>();
+                callback.Try(result);
+            });
         }
-
     }
 }

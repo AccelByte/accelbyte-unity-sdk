@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2020 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -77,10 +77,21 @@ namespace AccelByte.Server
             var result = response.TryParseJson<ServerInfo>();
             if (!result.IsError)
             {
-                ServerSetup.pod_name = result.Value.pod_name;
-                ServerType = ServerType.CLOUDSERVER;
-            }   
-            callback?.Try(response.TryParse());
+                if (result.Value != null)
+                {
+                    ServerSetup.pod_name = result.Value.pod_name;
+                    ServerType = ServerType.CLOUDSERVER;
+                    callback?.TryOk();
+                }
+                else
+                {
+                    callback?.TryError(new Error(ErrorCode.UnknownError, "Server response is null"));
+                }
+            }
+            else
+            {
+                callback?.TryError(result.Error);
+            }
         }
 
         public IEnumerator ShutdownServer( ShutdownServerRequest shutdownServerRequest
@@ -90,8 +101,7 @@ namespace AccelByte.Server
             Assert.IsNotNull(AuthToken, "Can't update a slot! AuthToken parameter is null!");
             if (ServerType != ServerType.CLOUDSERVER)
             {
-                callback.TryError(ErrorCode.Conflict, "Server not registered as Cloud Server.");
-
+                callback?.TryError(ErrorCode.Conflict, "Server not registered as Cloud Server.");
                 yield break;
             }
 
@@ -122,7 +132,7 @@ namespace AccelByte.Server
 
             if (ServerType != ServerType.NONE)
             {
-                callback.TryError(ErrorCode.Conflict, "Server is already registered.");
+                callback?.TryError(ErrorCode.Conflict, "Server is already registered.");
 
                 yield break;
             }
@@ -183,7 +193,7 @@ namespace AccelByte.Server
 
             if (this.ServerType != ServerType.LOCALSERVER)
             {
-                callback.TryError(ErrorCode.Conflict, "Server not registered as Local Server.");
+                callback?.TryError(ErrorCode.Conflict, "Server not registered as Local Server.");
 
                 yield break;
             }
@@ -213,7 +223,7 @@ namespace AccelByte.Server
 
             if(ServerType == ServerType.NONE)
             {
-                callback.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
+                callback?.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
                 yield break;
             }
 
@@ -238,13 +248,13 @@ namespace AccelByte.Server
         {
             if(AuthToken == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "AuthToken parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "AuthToken parameter is null!"));
                 yield break;
             }
 
             if (ServerType == ServerType.NONE)
             {
-                callback.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
+                callback?.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
                 yield break;
             }
 
@@ -269,13 +279,13 @@ namespace AccelByte.Server
         {
             if (AuthToken == null)
             {
-                callback.TryError(new Error(ErrorCode.InvalidRequest, "AuthToken parameter is null!"));
+                callback?.TryError(new Error(ErrorCode.InvalidRequest, "AuthToken parameter is null!"));
                 return;
             }
 
             if (ServerType == ServerType.NONE)
             {
-                callback.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
+                callback?.TryError(new Error(ErrorCode.NotFound, "Server not registered yet"));
                 return;
             }
 

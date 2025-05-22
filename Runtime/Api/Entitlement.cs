@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -76,7 +76,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -113,11 +113,11 @@ namespace AccelByte.Api
         /// <param name="callback">Returns a Result that contains SubscriptionPagingSlicedResult via callback when completed</param>
         public void QueryUserSubscription(PlatformStoreId platformStoreId, string userId, QueryUserSubscriptionRequestOptionalParameters optionalParameters, ResultCallback<SubscriptionPagingSlicedResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -136,7 +136,7 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(entitlementId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -172,13 +172,13 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(appId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -204,13 +204,13 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(sku);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -236,13 +236,13 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(ItemId);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -270,7 +270,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (itemIds == null && appIds == null && skus == null)
             {
-                callback.TryError(new Error(
+                callback?.TryError(new Error(
                     ErrorCode.InvalidRequest
                     , "Can't get user entitlement any ownership! All itemIds, " +
                     "appIds, and skus parameters are null!")
@@ -280,7 +280,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -321,13 +321,13 @@ namespace AccelByte.Api
             var error = ApiHelperUtils.CheckForNullOrEmpty(key);
             if (error != null)
             {
-                callback.TryError(error);
+                callback?.TryError(error);
                 return;
             }
 
             if (itemIds == null && appIds == null && skus == null)
             {
-                callback.TryError(new Error(
+                callback?.TryError(new Error(
                     ErrorCode.InvalidRequest
                     , "Can't get user entitlement any ownership! All itemIds, " +
                     "appIds, and skus parameters are null!")
@@ -358,7 +358,7 @@ namespace AccelByte.Api
         {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 yield break;
             }
 
@@ -373,7 +373,7 @@ namespace AccelByte.Api
 
             if (result.IsError)
             {
-                callback.TryError(result.Error.Code);
+                callback?.TryError(result.Error.Code);
                 yield break;
             }
 
@@ -384,17 +384,17 @@ namespace AccelByte.Api
                     verifyPublicKey, 
                     verifyExpiration))
             {
-                callback.TryError(ErrorCode.InvalidResponse);
+                callback?.TryError(ErrorCode.InvalidResponse);
                 yield break;
             }
 
             if (verifyUserId && session.UserId != payloadResult.sub)
             {
-                callback.TryError(ErrorCode.InvalidResponse);
+                callback?.TryError(ErrorCode.InvalidResponse);
                 yield break;
             }
 
-            callback.TryOk(payloadResult.entitlements);
+            callback?.TryOk(payloadResult.entitlements);
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (itemIds == null && appIds == null && skus == null)
             {
-                callback.TryError(new Error(
+                callback?.TryError(new Error(
                     ErrorCode.InvalidRequest
                     , "Can't get user entitlement any ownership! All itemIds, " +
                     "appIds, and skus parameters are null!")
@@ -424,7 +424,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -463,7 +463,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -514,7 +514,7 @@ namespace AccelByte.Api
             , GetUserEntitlementHistoryOptionalParams optionalParams
             , ResultCallback<UserEntitlementHistoryResponse> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 
             if (!ValidateAccelByteId(userId
                 , AccelByteIdValidator.HypensRule.NoRule
@@ -549,7 +549,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -574,7 +574,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -601,7 +601,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
         
@@ -626,7 +626,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -668,10 +668,10 @@ namespace AccelByte.Api
             , PlatformSyncMobileAppleOptionalParam optionalParameters
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
@@ -783,7 +783,7 @@ namespace AccelByte.Api
             , PlatformSyncMobileGoogleOptionalParameters optionalParameters
             , ResultCallback<GoogleReceiptResolveResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -854,7 +854,7 @@ namespace AccelByte.Api
             , PlatformSyncMobileGoogleOptionalParameters optionalParameters
             , ResultCallback<GoogleReceiptResolveResult> callback)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -884,7 +884,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -909,7 +909,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -965,10 +965,10 @@ namespace AccelByte.Api
             , SyncSteamInventoryOptionalParameters optionalParameters = null
             , ResultCallback callback = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -992,7 +992,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1015,7 +1015,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
@@ -1039,7 +1039,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
@@ -1063,7 +1063,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1086,7 +1086,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
 
                 return;
             }
@@ -1110,7 +1110,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1133,7 +1133,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1156,7 +1156,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1179,7 +1179,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1204,7 +1204,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
@@ -1226,7 +1226,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1246,7 +1246,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -1268,7 +1268,7 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 

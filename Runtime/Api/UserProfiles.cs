@@ -1,4 +1,4 @@
-// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -49,18 +49,22 @@ namespace AccelByte.Api
         /// Get (my) user profile / current logged in user.
         /// </summary>
         /// <param name="callback">Returns a Result that contains UserProfile via callback when completed.</param>
-        public void GetUserProfile( ResultCallback<UserProfile> callback )
+        public void GetUserProfile(ResultCallback<UserProfile> callback )
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetUserProfile(optionalParameters: null, callback: callback);
+        }
+        
+        internal void GetUserProfile(GetUserProfileOptionalParameters optionalParameters, ResultCallback<UserProfile> callback )
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserProfile(callback));
+            api.GetUserProfile(optionalParameters, callback);
         }
 
         /// <summary>
@@ -73,6 +77,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetUserProfile(userId, optionalParameters: null, callback: callback);
+        }
+        
+        internal void GetUserProfile(string userId, GetUserProfileOptionalParameters optionalParameters, ResultCallback<UserProfile> callback )
+        {
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -80,12 +89,11 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserProfile(userId, callback));
+            api.GetUserProfile(userId, optionalParameters, callback);
         }
 
         /// <summary>
@@ -98,20 +106,28 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            CreateUserProfile(createRequest, optionalParameters: null, callback);
+        }
+        
+        internal void CreateUserProfile(
+            CreateUserProfileRequest createRequest
+            , CreateUserProfileOptionalParameters optionalParameters
+            , ResultCallback<UserProfile> callback )
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.CreateUserProfile(createRequest, cb =>
+            api.CreateUserProfile(createRequest, optionalParameters, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
                 {
                     SendPredefinedEvent(cb, PredefinedAnalyticsMode.Create);
                 }
                 HandleCallback(cb, callback);
-            }));
+            });
         }
 
         /// <summary>
@@ -130,6 +146,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            CreateUserProfile(userId
+                , language
+                , customAttributes
+                , timezone
+                , optionalParameters: null
+                , callback);
+        }
+        
+        internal void CreateUserProfile(string userId
+            , string language
+            , Dictionary<string, object> customAttributes
+            , string timezone
+            , CreateUserProfileOptionalParameters optionalParameters
+            , ResultCallback<UserProfile> callback )
+        {
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -137,7 +168,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -148,14 +179,14 @@ namespace AccelByte.Api
                 timeZone = timezone
             };
 
-            coroutineRunner.Run(api.CreateUserProfile(userId, newUserProfile, cb =>
+            api.CreateUserProfile(userId, newUserProfile, optionalParameters, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
                 {
                     SendPredefinedEvent(cb, PredefinedAnalyticsMode.Create);
                 }
                 HandleCallback(cb, callback);
-            }));
+            });
         }
 
         /// <summary>
@@ -168,21 +199,29 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            UpdateUserProfile(updateRequest, optionalParameters: null, callback: callback);
+        }
+        
+        internal void UpdateUserProfile(UpdateUserProfileRequest updateRequest
+            , UpdateUserProfileOptionalParameters optionalParameters
+            , ResultCallback<UserProfile> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.UpdateUserProfile(updateRequest, cb =>
+            api.UpdateUserProfile(updateRequest, optionalParameters, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
                 {
-                    if (!cb.IsError && cb.Value != null)
-                    {
-                        SendPredefinedEvent(cb, PredefinedAnalyticsMode.Update);
-                    }
-                    HandleCallback(cb, callback);
-                }));
+                    SendPredefinedEvent(cb, PredefinedAnalyticsMode.Update);
+                }
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -201,6 +240,19 @@ namespace AccelByte.Api
             , ResultCallback<UserProfile> callback)
         {
             Report.GetFunctionLog(GetType().Name);
+            
+            UpdateUserProfile(userId, language, timezone, customAttributes, zipCode, optionalParameters: null, callback);
+        }
+        
+        internal void UpdateUserProfile(string userId
+            , string language
+            , string timezone
+            , Dictionary<string, object> customAttributes
+            , string zipCode
+            , UpdateUserProfileOptionalParameters optionalParameters
+            , ResultCallback<UserProfile> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
 
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
@@ -209,7 +261,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -221,14 +273,14 @@ namespace AccelByte.Api
                 zipCode = zipCode
             };
 
-            coroutineRunner.Run(api.UpdateUserProfile(userId, newRequest, cb =>
+            api.UpdateUserProfile(userId, newRequest, optionalParameters, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
                 {
                     SendPredefinedEvent(cb, PredefinedAnalyticsMode.Update);
                 }
                 HandleCallback(cb, callback);
-            }));
+            });
         }
 
         /// <summary>
@@ -242,7 +294,7 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
@@ -259,15 +311,24 @@ namespace AccelByte.Api
             , ResultCallback<Dictionary<string, object>> callback )
         {
             Report.GetFunctionLog(GetType().Name);
+            
+            UpdateCustomAttributes(updates, optionalParameters: null, callback: callback);
+        }
+        
+        internal void UpdateCustomAttributes(
+            Dictionary<string, object> updates
+            , UpdateCustomAttributesOptionalParameters optionalParameters
+            , ResultCallback<Dictionary<string, object>> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
-            coroutineRunner.Run(
-                api.UpdateCustomAttributes(session.UserId, updates, callback));
+            api.UpdateCustomAttributes(session.UserId, updates, optionalParameters, callback);
         }
 
         /// <summary>
@@ -280,6 +341,16 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetPublicUserProfile(userId, optionalParameters: null, callback: callback);
+        }
+        
+        internal void GetPublicUserProfile(
+            string userId
+            , GetPublicUserProfileOptionalParameter optionalParameters
+            , ResultCallback<PublicUserProfile> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -287,12 +358,11 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-
-            coroutineRunner.Run(
-                api.GetUserProfilePublicInfo(userId, callback));
+            
+            api.GetUserProfilePublicInfo(userId, optionalParameters, callback);
         }
 
         /// <summary>
@@ -303,18 +373,50 @@ namespace AccelByte.Api
         public void GetUserAvatar( string userID
             , ResultCallback<Texture2D> callback )
         {
-            GetPublicUserProfile(userID,
+            GetUserAvatar(userID, optionalParameters: null, callback: callback);
+        }
+        
+        internal void GetUserAvatar(
+            string userID
+            , GetUserAvatarOptionalParameter optionalParameters
+            , ResultCallback<Texture2D> callback )
+        {
+            GetPublicUserProfileOptionalParameter getUserProfileOptionalParameter = null;
+            if (optionalParameters != null)
+            {
+                getUserProfileOptionalParameter = new GetPublicUserProfileOptionalParameter()
+                {
+                    Logger = optionalParameters.Logger,
+                    ApiTracker = optionalParameters.ApiTracker,
+                };
+            }
+            
+            GetPublicUserProfile(
+                userID,
+                getUserProfileOptionalParameter,
                 result =>
                 {
+                    IDebugger targetLogger = optionalParameters != null && optionalParameters.Logger != null
+                        ? optionalParameters.Logger
+                        : SharedMemory?.Logger;
                     if (result.IsError)
                     {
-                        SharedMemory?.Logger?.LogError(
+                        targetLogger?.LogWarning(
                             $"Unable to get Public User Profile Code:{result.Error.Code} Message:{result.Error.Message}");
-                        callback.TryError(result.Error);
+                        callback?.TryError(result.Error);
                     }
                     else
                     {
-                        coroutineRunner.Run(ABUtilities.DownloadTexture2D(result.Value.avatarUrl, callback, SharedMemory?.Logger));
+                        if (string.IsNullOrEmpty(result.Value.avatarUrl))
+                        {
+                            callback?.TryError(new Error(ErrorCode.GameRecordNotFound, "avatarUrl value is null or empty"));
+                            return;
+                        }
+
+                        ABUtilities.DownloadTexture2DAsync(
+                            result.Value.avatarUrl
+                            , callback
+                            , targetLogger);
                     }
                 });
         }
@@ -329,14 +431,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetUserProfilePublicInfoByPublicId(publicId, optionalParameters: null, callback: callback);
+        }
+        
+        internal void GetUserProfilePublicInfoByPublicId(
+            string publicId
+            , GetUserProfilePublicInfoByPublicIdOptionalParameter optionalParameters
+            , ResultCallback<PublicUserProfile> callback)
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserProfilePublicInfoByPublicId(publicId, callback));
+            api.GetUserProfilePublicInfoByPublicId(publicId, optionalParameters, callback);
         }
 
         /// <summary>
@@ -351,14 +460,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GenerateUploadURL(folder, fileType, optionalParameters: null, callback);
+        }
+
+        internal void GenerateUploadURL(string folder
+            , FileType fileType
+            , GenerateUploadURLOptionalParameter optionalParameters
+            , ResultCallback<GenerateUploadURLResult> callback)
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GenerateUploadURL(folder, fileType, callback));
+            api.GenerateUploadURL(folder, fileType, optionalParameters, callback);
         }
 
         /// <summary>
@@ -375,6 +491,15 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GenerateUploadURLForUserContent(userId, fileType, optionalParameters: null, callback, category);
+        }
+        
+        internal void GenerateUploadURLForUserContent(string userId
+            , FileType fileType 
+            , GenerateUploadURLForUserContentOptionalParameter optionalParameters
+            , ResultCallback<GenerateUploadURLResult> callback
+            , UploadCategory category = UploadCategory.DEFAULT)
+        {
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -382,30 +507,35 @@ namespace AccelByte.Api
 
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GenerateUploadURLForUserContent(userId, fileType, callback, category));
+            api.GenerateUploadURLForUserContent(userId, fileType, category, optionalParameters, callback);
         }
         
         /// <summary>
         /// Get user's own custom private attribute profile information. If it doesn't exist, that will be an error
         /// </summary>
         /// <param name="callback">Returns a Result Json Object via callback when completed.</param>
-        public void GetPrivateCustomAttributes( ResultCallback<Dictionary<string, object>> callback )
+        public void GetPrivateCustomAttributes(ResultCallback<Dictionary<string, object>> callback)
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetPrivateCustomAttributes(optionalParameters:null, callback: callback);
+        }
+        
+        internal void GetPrivateCustomAttributes(
+            GetPrivateCustomAttributesOptionalParameter optionalParameters
+            , ResultCallback<Dictionary<string, object>> callback)
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetPrivateCustomAttributes(callback));
+            api.GetPrivateCustomAttributes(optionalParameters, callback);
         }
 
         /// <summary>
@@ -418,14 +548,21 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            UpdatePrivateCustomAttributes(updates, optionalParameters: null, callback: callback);
+        }
+        
+        internal void UpdatePrivateCustomAttributes(
+            Dictionary<string, object> updates
+            , UpdatePrivateCustomAttributesOptionalParameter optionalParameters
+            , ResultCallback<Dictionary<string, object>> callback )
+        {
             if (!session.IsValid())
             {
-                callback.TryError(ErrorCode.IsNotLoggedIn);
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
             
-            coroutineRunner.Run(
-                api.UpdatePrivateCustomAttributes(updates, callback));
+            api.UpdatePrivateCustomAttributes(updates, optionalParameters, callback);
         }
 
         #region PredefinedEvents
@@ -480,11 +617,11 @@ namespace AccelByte.Api
         {
             if (result.IsError)
             {
-                callback.TryError(result.Error);
+                callback?.TryError(result.Error);
                 return;
             }
 
-            callback.Try(result);
+            callback?.Try(result);
         }
 
         #endregion

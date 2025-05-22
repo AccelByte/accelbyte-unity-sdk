@@ -6,7 +6,6 @@ using System.Collections;
 using AccelByte.Core;
 using AccelByte.Models;
 using AccelByte.Utils;
-using UnityEngine.Assertions;
 
 namespace AccelByte.Server
 {
@@ -25,19 +24,41 @@ namespace AccelByte.Server
         {
         }
 
-        public IEnumerator UnlockAchievement( string userId
+        public IEnumerator UnlockAchievement(string userId
             , string accessToken
             , string achievementCode
-            , ResultCallback callback )
+            , ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            Assert.IsNotNull(Namespace_, "Can't unlock achievement! Namespace parameter is null!");
-            Assert.IsNotNull(accessToken, "Can't unlock achievement! AccessToken parameter is null!");
-            Assert.IsNotNull(userId, "Can't unlock achievement! UserId parameter is null!");
-            Assert.IsNotNull(achievementCode, "Can't unlock achievement! AchievementCode parameter is null!");
 
+            var optionalParameters = new UnlockAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            UnlockAchievement(userId, accessToken, achievementCode, optionalParameters, callback);
+
+            yield return null;
+        }
+
+        internal void UnlockAchievement(string userId
+            , string accessToken
+            , string achievementCode
+            , UnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, accessToken, userId, achievementCode);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            string requestUrlFormat = BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock";
             var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/{achievementCode}/unlock")
+                .CreatePut(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithPathParam("achievementCode", achievementCode)
@@ -46,13 +67,14 @@ namespace AccelByte.Server
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request, 
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-            callback?.Try(result);
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParse();
+                    callback?.Try(result);
+                });
         }
 
         public void BulkUnlockAchievement(string userId
@@ -60,6 +82,21 @@ namespace AccelByte.Server
             , ResultCallback<BulkUnlockAchievementResponse[]> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new BulkUnlockAchievementOptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            BulkUnlockAchievement(userId, achievementCodes, optionalParameters, callback);
+        }
+
+        internal void BulkUnlockAchievement(string userId
+            , string[] achievementCodes
+            , BulkUnlockAchievementOptionalParameters optionalParameters
+            , ResultCallback<BulkUnlockAchievementResponse[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId, achievementCodes);
             if (error != null)
@@ -73,8 +110,9 @@ namespace AccelByte.Server
                 AchievementCodes = achievementCodes
             };
 
+            string requestUrlFormat = BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/bulkUnlock";
             var request = HttpRequestBuilder
-                .CreatePut(BaseUrl + "/v1/admin/namespaces/{namespace}/users/{userId}/achievements/bulkUnlock")
+                .CreatePut(requestUrlFormat)
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithBearerAuth(AuthToken)
@@ -83,11 +121,14 @@ namespace AccelByte.Server
                 .WithBody(requestBody.ToUtf8Json())
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<BulkUnlockAchievementResponse[]>();
-                callback?.Try(result);
-            });
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<BulkUnlockAchievementResponse[]>();
+                    callback?.Try(result);
+                });
         }
     }
 }
