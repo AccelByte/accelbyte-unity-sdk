@@ -366,23 +366,6 @@ namespace AccelByte.Server
             api.GetChallengePeriods(challengeCode, optionalParameters, callback);
         }
 
-        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
-        public void GetChallenges(ResultCallback<ChallengeResponse> callback, ChallengeStatus status = ChallengeStatus.None, ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc, int offset = 0, int limit = 20)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            var optionalParameters = new GetChallengesOptionalParamenters()
-            {
-                Status = status,
-                Logger = SharedMemory?.Logger,
-                Limit = limit,
-                Offset = offset,
-                SortBy = sortBy
-            };
-
-            GetChallenges(optionalParameters, callback);
-        }
-
         public void GetChallenges(ResultCallback<ChallengeResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);

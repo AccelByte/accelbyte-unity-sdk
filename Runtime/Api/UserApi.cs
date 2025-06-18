@@ -958,44 +958,6 @@ namespace AccelByte.Api
             });
         }
 
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserPublicInfo instead")]
-        public void GetUserByUserId(GetUserByUserIdRequest requestModel, ResultCallback<PublicUserData> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            GetUserByUserId(requestModel, optionalParameters: null, callback: callback);
-        }
-
-        internal void GetUserByUserId(GetUserByUserIdRequest requestModel, GetUserByUserIdOptionalParameters optionalParameters, ResultCallback<PublicUserData> callback)
-        {
-            if (requestModel == null)
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
-                return;
-            }
-            if (string.IsNullOrEmpty(requestModel.UserId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! User Id parameter is null!"));
-                return;
-            }
-
-            var request = HttpRequestBuilder
-                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/users/{userId}")
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", requestModel.UserId)
-                .WithBearerAuth(Session.AuthorizationToken)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            HttpOperator.SendRequest(
-                additionalParams: AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
-                ,request
-                , response =>
-                {
-                    var result = response.TryParseJson<PublicUserData>();
-                    callback?.Try(result);
-                });
-        }
-
         public void GetUserPublicInfo(string userId, ResultCallback<GetUserPublicInfoResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
@@ -1028,45 +990,6 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(additionalHttpParameters, request, response =>
             {
                 var result = response.TryParseJson<GetUserPublicInfoResponse>();
-                callback?.Try(result);
-            });
-        }
-
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserByOtherPlatformUserIdV4 instead")]
-        public void GetUserByOtherPlatformUserId(GetUserByOtherPlatformUserIdRequest requestModel, ResultCallback<UserData> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            if (requestModel == null)
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
-                return;
-            }
-            if (string.IsNullOrEmpty(requestModel.PlatformId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform Id is null!"));
-                return;
-            }
-            if (string.IsNullOrEmpty(requestModel.PlatformUserId))
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! Platform User Ids is null!"));
-                return;
-            }
-
-            string url = BaseUrl + "/v3/public/namespaces/{namespace}/platforms/{platformId}/users/{platformUserId}";
-
-            var request = HttpRequestBuilder
-                .CreateGet(url)
-                .WithPathParam("namespace", Namespace_)
-                .WithPathParam("platformId", requestModel.PlatformId)
-                .WithPathParam("platformUserId", requestModel.PlatformUserId)
-                .WithBearerAuth(Session.AuthorizationToken)
-                .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<UserData>();
                 callback?.Try(result);
             });
         }
@@ -1199,36 +1122,6 @@ namespace AccelByte.Api
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParseJson<CountryInfo>();
-                callback?.Try(result);
-            });
-        }
-
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserOtherPlatformBasicPublicInfo instead")]
-        public void BulkGetUserInfo(ListBulkUserInfoRequest requestModel, ResultCallback<ListBulkUserInfoResponse> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            if (requestModel == null)
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! request is null!"));
-                return;
-            }
-            if (requestModel.userIds == null || requestModel.userIds.Length == 0)
-            {
-                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't get user data! User Ids are null!"));
-                return;
-            }
-
-            var request = HttpRequestBuilder
-                .CreatePost(BaseUrl + "/v3/public/namespaces/{namespace}/users/bulk/basic")
-                .WithPathParam("namespace", Namespace_)
-                .WithContentType(MediaType.ApplicationJson)
-                .WithBody(requestModel.ToUtf8Json())
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
-
-            HttpOperator.SendRequest(request, response =>
-            {
-                var result = response.TryParseJson<ListBulkUserInfoResponse>();
                 callback?.Try(result);
             });
         }
@@ -1952,6 +1845,32 @@ namespace AccelByte.Api
 
                 callback?.Try(Result<T>.CreateOk(result.Value.Result));
             });
+        }
+
+        internal void GetPublicSystemConfigValue(GetPublicSystemConfigValueOptionalParameters optionalParameters
+            , ResultCallback<GetPublicSystemConfigValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var request = HttpRequestBuilder.CreateGet(BaseUrl + "/v3/config/public")
+                 .WithContentType(MediaType.ApplicationJson)
+                 .Accepts(MediaType.ApplicationJson)
+                 .GetResult();
+
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<GetPublicSystemConfigValueResponse>();
+                    if (result.IsError)
+                    {
+                        callback?.TryError(result.Error);
+                        return;
+                    }
+
+                    callback?.Try(Result<GetPublicSystemConfigValueResponse>.CreateOk(result.Value));
+                });
         }
 
         public void GetUserOtherPlatformBasicPublicInfo(

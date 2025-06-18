@@ -27,12 +27,15 @@ namespace AccelByte.Core
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            TelemetryBody telemetryBodyWithLogger = telemetryBodies.Find(telemetryBody => telemetryBody.Logger != null);
+            var telemetryBodyWithAdditionalParameters = telemetryBodies.Find(telemetryBody => telemetryBody.TelemetryAdditionalParameters != null);
 
-            AdditionalHttpParameters additionalHttpParameters = new AdditionalHttpParameters()
+            var additionalHttpParameters = new AdditionalHttpParameters();
+            if (telemetryBodyWithAdditionalParameters != null)
             {
-                Logger = telemetryBodyWithLogger?.Logger
-            };
+                additionalHttpParameters =
+                    AdditionalHttpParameters.CreateFromOptionalParameters(telemetryBodyWithAdditionalParameters
+                        .TelemetryAdditionalParameters);
+            }
 
             httpOperator.SendRequest(additionalHttpParameters, request, response =>
             {

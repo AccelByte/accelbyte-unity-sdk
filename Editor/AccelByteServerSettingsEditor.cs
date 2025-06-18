@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System;
@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace AccelByte.Editor
 {
-	public class AccelByteServerSettingsEditor : EditorWindow
+    public class AccelByteServerSettingsEditor : EditorWindow
     {
         private static AccelByteServerSettingsEditor instance;
         public static AccelByteServerSettingsEditor Instance

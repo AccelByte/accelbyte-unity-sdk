@@ -33,15 +33,36 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog( GetType().Name );
 
+            var optionalParameters = new GetRankingsOptionalParameters() { Offset = offset, Limit = limit, TimeFrame = timeFrame};
+
+            GetRankings(leaderboardCode, optionalParameters, callback);
+            
+            yield break;
+        }
+
+        internal void GetRankings(string leaderboardCode
+            , GetRankingsOptionalParameters optionalParams
+            , ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, leaderboardCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
+            if (optionalParams == null)
+            {
+                optionalParams = new GetRankingsOptionalParameters();
+            }
+
+            int offset = optionalParams.Offset;
+            int limit = optionalParams.Limit;
+            
             string timeFrameString = "";
-            switch( timeFrame )
+            switch( optionalParams.TimeFrame )
             {
                 case LeaderboardTimeFrame.ALL_TIME:
                     timeFrameString = "alltime";
@@ -60,25 +81,22 @@ namespace AccelByte.Api
                     break;
             }
 
-            var builder = HttpRequestBuilder
+            IHttpRequest request = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/{timeFrame}" )
                 .WithPathParam( "namespace", Namespace_ )
                 .WithPathParam( "leaderboardCode", leaderboardCode )
                 .WithPathParam( "timeFrame", timeFrameString )
                 .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
                 .WithQueryParam( "limit", ( limit >= 0 ) ? limit.ToString() : "" )
-                .Accepts( MediaType.ApplicationJson );
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
 
-            var request = builder.GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp => response = rsp );
-
-            var result = response.TryParseJson<LeaderboardRankingResult>();
-
-            callback?.Try( result );
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardRankingResult>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetUserRanking( string leaderboardCode
@@ -87,31 +105,46 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog( GetType().Name );
 
+            GetUserRanking(leaderboardCode, userId, optionalParams: null, callback);
+            
+            yield break;
+        }
+
+        internal void GetUserRanking(string leaderboardCode
+            , string userId
+            , GetUserRankingOptionalParameters optionalParams
+            , ResultCallback<UserRankingData> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            var builder = HttpRequestBuilder
+            string targetUserId = userId;
+            if (optionalParams != null && optionalParams.AdditionalKey != null)
+            {
+                targetUserId = $"{userId}_{optionalParams.AdditionalKey}";
+            }
+
+            IHttpRequest request = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/users/{userId}" )
                 .WithPathParam( "namespace", Namespace_ )
                 .WithPathParam( "leaderboardCode", leaderboardCode )
-                .WithPathParam( "userId", userId )
+                .WithPathParam( "userId", targetUserId )
                 .WithBearerAuth( AuthToken )
-                .Accepts( MediaType.ApplicationJson );
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
 
-            var request = builder.GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp => response = rsp );
-
-            var result = response.TryParseJson<UserRankingData>();
-
-            callback?.Try( result );
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<UserRankingData>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetLeaderboardList( int offset
@@ -120,34 +153,14 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog( GetType().Name );
 
-            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
-            if (error != null)
-            {
-                callback?.TryError(error);
-                yield break;
-            }
+            var optionalParameters = new GetLeaderboardListOptionalParameters() { Offset = offset, Limit = limit };
 
-            var builder = HttpRequestBuilder
-                .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards" )
-                .WithPathParam( "namespace", Namespace_ )
-                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
-                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
-                .WithBearerAuth( AuthToken )
-                .Accepts( MediaType.ApplicationJson );
-
-            var request = builder.GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp => response = rsp );
-
-            var result = response.TryParseJson<LeaderboardPagedList>();
-
-            callback?.Try( result );
+            GetLeaderboardList(optionalParameters, callback);
+            
+            yield break;
         }
 
-        public IEnumerator GetLeaderboardListV3(int offset, int limit, ResultCallback<LeaderboardPagedListV3> callback)
+        internal void GetLeaderboardList(GetLeaderboardListOptionalParameters optionalParams, ResultCallback<LeaderboardPagedList> callback)
         {
             Report.GetFunctionLog( GetType().Name );
 
@@ -155,8 +168,64 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
+
+            if (optionalParams == null)
+            {
+                optionalParams = new GetLeaderboardListOptionalParameters();
+            }
+
+            int offset = optionalParams.Offset;
+            int limit = optionalParams.Limit;
+
+            var request = HttpRequestBuilder
+                .CreateGet( BaseUrl + "/v1/public/namespaces/{namespace}/leaderboards" )
+                .WithPathParam( "namespace", Namespace_ )
+                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
+                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
+                .WithBearerAuth( AuthToken )
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
+            
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardPagedList>();
+                callback?.Try(result);
+            });
+        }
+
+        public IEnumerator GetLeaderboardListV3(int offset, int limit, ResultCallback<LeaderboardPagedListV3> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            GetLeaderboardPagedListV3OptionalParameters optionalParameters =
+                new GetLeaderboardPagedListV3OptionalParameters() { Offset = offset, Limit = limit };
+            
+            GetLeaderboardListV3(optionalParameters, callback);
+            
+            yield break;
+        }
+
+        internal void GetLeaderboardListV3(GetLeaderboardPagedListV3OptionalParameters optionalParams, ResultCallback<LeaderboardPagedListV3> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            if (optionalParams == null)
+            {
+                optionalParams = new GetLeaderboardPagedListV3OptionalParameters();
+            }
+
+            int offset = optionalParams.Offset;
+            int limit = optionalParams.Limit;
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards")
@@ -167,17 +236,12 @@ namespace AccelByte.Api
                 .Accepts( MediaType.ApplicationJson )
                 .GetResult();
             
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            Result<LeaderboardPagedListV3> result = response.TryParseJson<LeaderboardPagedListV3>();
-
-            callback?.Try( result );
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardPagedListV3>();
+                callback?.Try(result);
+            });
         }
 
         [System.Obsolete("Use GetRankingsV3")]
@@ -192,12 +256,34 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            var optionalParameters = new GetRankingV3OptionalParameters()
+            {
+                Offset = offset,
+                Limit = limit
+            };
+            GetRankingsV3(leaderboardCode, optionalParameters, callback);
+            
+            yield break;
+        }
+        
+        internal void GetRankingsV3(string leaderboardCode, GetRankingV3OptionalParameters optionalParams, ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
+
+            if (optionalParams == null)
+            {
+                optionalParams = new GetRankingV3OptionalParameters();
+            }
+
+            int offset = optionalParams.Offset;
+            int limit = optionalParams.Limit;
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/alltime")
@@ -208,18 +294,13 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
-
-            callback?.Try(result);
+            
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardRankingResult>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetRankingsByCycle(string leaderboardCode, string cycleId, int offset, int limit,
@@ -227,12 +308,34 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog( GetType().Name );
 
+            var optionalParameters = new GetRankingsByCycleOptionalParameters()
+            {
+                Offset = offset,
+                Limit = limit
+            };
+            GetRankingsByCycle(leaderboardCode, cycleId, optionalParameters, callback);
+            
+            yield break;
+        }
+        
+        internal void GetRankingsByCycle(string leaderboardCode, string cycleId, GetRankingsByCycleOptionalParameters optionalParams, ResultCallback<LeaderboardRankingResult> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, cycleId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
+
+            if (optionalParams == null)
+            {
+                optionalParams = new GetRankingsByCycleOptionalParameters();
+            }
+
+            int offset = optionalParams.Offset;
+            int limit = optionalParams.Limit;
 
             IHttpRequest request = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/cycles/{cycleId}")
@@ -245,17 +348,12 @@ namespace AccelByte.Api
                 .Accepts( MediaType.ApplicationJson )
                 .GetResult();
             
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            Result<LeaderboardRankingResult> result = response.TryParseJson<LeaderboardRankingResult>();
-
-            callback?.Try( result );
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardRankingResult>();
+                callback?.Try(result);
+            });
         }
         
         public IEnumerator GetUserRankingV3( string leaderboardCode
@@ -264,34 +362,37 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog( GetType().Name );
 
+            GetUserRankingV3(leaderboardCode, userId, optionalParams: null, callback);
+            
+            yield break;
+        }
+        
+        internal void GetUserRankingV3(string leaderboardCode, string userId, GetUserRankingV3OptionalParameters optionalParams, ResultCallback<UserRankingDataV3> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode, userId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            var builder = HttpRequestBuilder
+            var request = HttpRequestBuilder
                 .CreateGet( BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}/users/{userId}" )
                 .WithPathParam( "namespace", Namespace_ )
                 .WithPathParam( "leaderboardCode", leaderboardCode )
                 .WithPathParam( "userId", userId )
                 .WithBearerAuth( AuthToken )
-                .Accepts( MediaType.ApplicationJson );
-
-            var request = builder.GetResult();
-
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest( request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<UserRankingDataV3>();
-
-            callback?.Try( result );
+                .Accepts( MediaType.ApplicationJson )
+                .GetResult();
+            
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<UserRankingDataV3>();
+                callback?.Try(result);
+            });
         }
     }
 }

@@ -2,6 +2,7 @@
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Models;
 using System;
 
 namespace AccelByte.Core
@@ -33,7 +34,7 @@ namespace AccelByte.Core
             }
         }
 
-        internal IDebugger Logger;
+        internal OptionalParametersBase TelemetryOptionalParameters;
 
         public AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload)
         {
@@ -41,11 +42,11 @@ namespace AccelByte.Core
             CreatedTimestamp = DateTime.Now;
         }
 
-        internal AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload, IDebugger logger)
+        internal AccelByteTelemetryEvent(Models.IAccelByteTelemetryPayload payload, OptionalParametersBase telemetryOptionalParameters)
         {
             Payload = payload;
             CreatedTimestamp = DateTime.Now;
-            Logger = logger;
+            TelemetryOptionalParameters = telemetryOptionalParameters;
         }
     }
 }

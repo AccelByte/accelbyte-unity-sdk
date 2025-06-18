@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -39,21 +39,28 @@ namespace AccelByte.Core
             return unityWebRequest;
         }
 
-        public static IHttpResponse GetHttpResponse(this UnityWebRequest request)
+        public static IHttpResponse GetHttpResponse(this AccelByteWebRequest request)
         {
             return new UnityHttpResponseAdapter
             {
-                Url = request.url, Code = request.responseCode, Headers = request.GetResponseHeaders(), BodyBytes = request.downloadHandler.data
+                Url = request.url,
+                Method = request.method,
+                Code = request.responseCode,
+                Headers = request.GetResponseHeaders(),
+                BodyBytes = request.downloadHandler.data,
+                Timestamp = request.ResponseTimestamp
             };
         }
 
         private class UnityHttpResponseAdapter : IHttpResponse
         {
             public string Url { get; set; }
+            public string Method { get; set; }
             public long Code { get; set; }
             
             public IDictionary<string, string> Headers { get; set;  }
             public byte[] BodyBytes { get; set; }
+            public DateTime Timestamp { get; set; }
         }
 
         public static System.Runtime.CompilerServices.TaskAwaiter<UnityWebRequest.Result> GetAwaiter(this UnityWebRequestAsyncOperation reqOp)

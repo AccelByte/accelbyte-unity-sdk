@@ -95,6 +95,13 @@ namespace AccelByte.Models
         internal AccelByteResult<int, Error> GetLatency(IDebugger debugger, bool useCache = true)
         {
             AccelByteResult<int, Error> retval = new AccelByteResult<int, Error>();
+            
+            if(string.IsNullOrEmpty(status) || status.ToLower() != QosStatus.Active.ToString().ToLower())
+            {
+                retval.Reject(new Error(ErrorCode.InvalidRequest, message: "Server status isn't active"));
+                return retval;
+            }
+            
             if (LatencyCalculator == null)
             {
                 LatencyCalculator = LatencyCalculatorFactory.CreateDefaultCalculator();

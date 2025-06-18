@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Text;
@@ -392,14 +392,6 @@ namespace AccelByte.Api
             string retval = "";
             var versionFile = Resources.Load(SDKVersionResourcePath());
 
-#if UNITY_EDITOR
-            if (versionFile == null)
-            {
-                CopyAccelByteSDKPackageVersion(null);
-            }
-            versionFile = Resources.Load(SDKVersionResourcePath());
-#endif
-
             if (versionFile != null)
             {
                 string wholeJsonText = ((TextAsset)versionFile).text;
@@ -432,48 +424,6 @@ namespace AccelByte.Api
                 System.IO.File.WriteAllBytes(savePath, Encoding.ASCII.GetBytes(savedConfig.ToJsonString(Formatting.Indented)));
             }
             UnityEditor.AssetDatabase.Refresh();
-#endif
-        }
-        private static void CopyAccelByteSDKPackageVersion(object obj)
-        {
-#if UNITY_EDITOR
-            var accelBytePackageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(AccelByteSettingsV2).Assembly);
-            var versionJsonAbs = System.IO.Path.Combine(accelBytePackageInfo.assetPath, "version.json");
-
-            var versionAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(versionJsonAbs);
-            if (versionAsset == null)
-            {
-                Debug.Log("version.json not found under Package AccelByte SDK directory");
-                goto endfunction;
-            }
-            if (versionAsset.text == string.Empty || versionAsset.text == null)
-            {
-                Debug.Log("version.json for AccelByte SDK is empty");
-                goto endfunction;
-            }
-
-            string versionTextRaw = versionAsset.text;
-            var versionAsObject = versionTextRaw.ToObject<AccelByte.Models.VersionJson>();
-            if (versionAsObject == null)
-            {
-                Debug.Log("Failed to deserialize version.json from AccelByte SDK Package");
-                goto endfunction;
-            }
-
-            string configPath = GeneratedConfigsDirectoryFullPath();
-            if (!System.IO.Directory.Exists(configPath))
-            {
-                System.IO.Directory.CreateDirectory(configPath);
-            }
-
-            string SDKVersionPath = SDKVersionFullPath();
-            System.IO.File.WriteAllBytes(SDKVersionPath, Encoding.ASCII.GetBytes(versionTextRaw));
-            UnityEditor.AssetDatabase.Refresh();
-
-            endfunction:
-            {
-                return;
-            }
 #endif
         }
 

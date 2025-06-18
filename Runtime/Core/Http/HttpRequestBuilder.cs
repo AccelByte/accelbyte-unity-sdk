@@ -4,10 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using AccelByte.Api;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace AccelByte.Core
@@ -475,6 +473,7 @@ namespace AccelByte.Core
             public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
             public byte[] BodyBytes { get; set; }
             public int Priority { get; set; } = AccelByteHttpHelper.HttpRequestDefaultPriority;
+            public DateTime Timestamp { get; set; }
         }
     }
 }

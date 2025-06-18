@@ -3003,42 +3003,6 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Get user data from another user by user id
-        /// </summary>
-        /// <param name="userId"> user id that needed to get user data</param>
-        /// <param name="callback"> Return a Result that contains UserData when completed. </param>
-
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserPublicInfo instead")]
-        public void GetUserByUserId( string userId
-            , ResultCallback<PublicUserData> callback )
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            GetUserByUserId(userId, optionalParameters: null, callback);
-        }
-        
-        internal void GetUserByUserId(string userId
-            , GetUserByUserIdOptionalParameters optionalParameters
-            , ResultCallback<PublicUserData> callback )
-        {
-            if(!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
-            {
-                return;
-            }
-
-            if (!userSession.IsValid())
-            {
-                callback?.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            var requestModel = new GetUserByUserIdRequest
-            {
-                UserId = userId
-            };
-            api.GetUserByUserId(requestModel, optionalParameters, callback);
-        }
-
-        /// <summary>
         /// Get public user info by user id
         /// </summary>
         /// <param name="userId"> user id that needed to get user data</param>
@@ -3070,35 +3034,6 @@ namespace AccelByte.Api
             }
 
             api.GetUserPublicInfo(userId, optionalParams, callback);
-        }
-
-        /// <summary>
-        /// Get other user data by other platform userId (such as SteamID, for example)
-        /// For Nintendo Platform you need to append Environment ID into the Platorm ID, with this format PlatformID:EnvironmentID. e.g csgas12312323f:dd1
-        /// </summary>
-        /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
-        /// <param name="otherPlatformUserId">Platform UserId that needed to get user data</param>
-        /// <param name="callback">Return a Result that contains UserData when completed.</param>
-
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserByOtherPlatformUserIdV4 instead")]
-        public void GetUserByOtherPlatformUserId( PlatformType platformType
-            , string otherPlatformUserId
-            , ResultCallback<UserData> callback )
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (!userSession.IsValid())
-            {
-                callback?.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            var requestModel = new GetUserByOtherPlatformUserIdRequest
-            {
-                PlatformId = platformType.ToString().ToLower(),
-                PlatformUserId = otherPlatformUserId
-            };
-            api.GetUserByOtherPlatformUserId(requestModel, callback);
         }
 
         /// <summary>
@@ -3317,30 +3252,6 @@ namespace AccelByte.Api
         public void RefreshTokenCallback( Action<string> refreshTokenCallback )
         {
             userSession.RefreshTokenCallback += refreshTokenCallback;
-        }
-
-        /// <summary>
-        /// Get multiple user(s) information like user's DisplayName.
-        /// </summary>
-        /// <param name="userIds">List UserId(s) to get.</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        [Obsolete("This method is deprecated and will be removed soon. Please use User.GetUserOtherPlatformBasicPublicInfo instead")]
-        public void BulkGetUserInfo( string[] userIds
-            , ResultCallback<ListBulkUserInfoResponse> callback )
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            if (!userSession.IsValid())
-            {
-                callback?.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            ListBulkUserInfoRequest requestModel = new ListBulkUserInfoRequest
-            {
-                userIds = userIds
-            };
-            api.BulkGetUserInfo(requestModel, callback);
         }
 
         /// <summary>
@@ -4129,12 +4040,13 @@ namespace AccelByte.Api
             }
 
             IDebugger targetLogger = optionalParameter != null && optionalParameter.Logger != null ? optionalParameter.Logger : SharedMemory?.Logger;
-            var getUserByUserIdOptionalParams = new GetUserByUserIdOptionalParameters()
+            var getUserByUserIdOptionalParams = new GetUserPublicInfoOptionalParameters()
             {
-                Logger = targetLogger
+                Logger = targetLogger,
+                ApiTracker = optionalParameter?.ApiTracker
             };
 
-            GetUserByUserId(userId, getUserByUserIdOptionalParams, result =>
+            GetUserPublicInfo(userId, getUserByUserIdOptionalParams, result =>
             {
                 if (result.IsError)
                 {
@@ -4144,12 +4056,12 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(result.Value.avatarUrl))
+                    if (string.IsNullOrEmpty(result.Value.AvatarUrl))
                     {
                         callback?.TryError(new Error(ErrorCode.GameRecordNotFound, "avatarUrl value is null or empty"));
                         return;
                     }
-                    ABUtilities.DownloadTexture2DAsync(result.Value.avatarUrl, callback, targetLogger);
+                    ABUtilities.DownloadTexture2DAsync(result.Value.AvatarUrl, callback, targetLogger);
                 }
             });
         }
@@ -4632,6 +4544,30 @@ namespace AccelByte.Api
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             api.GetConfigUserNameDisabled(optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Get public system config value.
+        /// </summary>
+        /// <param name="callback">Return Result via callback when completed.</param> 
+        public void GetPublicSystemConfigValue(ResultCallback<GetPublicSystemConfigValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            GetPublicSystemConfigValue(null, callback);
+        }
+
+        /// <summary>
+        /// Get public system config value.
+        /// </summary>
+        /// <param name="optionalParameters">Optional parameters for endpoint. Can be null.</param>
+        /// <param name="callback">Return Result via callback when completed.</param>
+        internal void GetPublicSystemConfigValue(GetPublicSystemConfigValueOptionalParameters optionalParameters
+            , ResultCallback<GetPublicSystemConfigValueResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            api.GetPublicSystemConfigValue(optionalParameters, callback);
         }
 
         /// <summary>

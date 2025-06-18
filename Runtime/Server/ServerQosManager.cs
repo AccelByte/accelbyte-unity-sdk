@@ -44,6 +44,7 @@ namespace AccelByte.Server
             {
                 fetchOptionalParams = new FetchQosServerOptionalParameters();
                 fetchOptionalParams.Status = QosStatus.Active;
+                fetchOptionalParams.Logger = SharedMemory?.Logger;
             }
 
             apiOptionalParameter.LatencyCalculator = fetchOptionalParams.LatencyCalculator;
@@ -124,16 +125,6 @@ namespace AccelByte.Server
                     callback?.TryOk(new Dictionary<string, int>());
                 }
             });
-        }
-
-        /// <summary>
-        /// Get server latencies for active QoS server in the namespace.
-        /// </summary>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        [System.Obsolete("Deprecated, please use GetAllActiveServerLatencies instead. This interface will be removed in 2025.4.AGS versions.")]
-        public void GetServerLatencies( ResultCallback<Dictionary<string, int>> callback )
-        {
-            GetServerLatencies(null, callback);
         }
 
         /// <summary>

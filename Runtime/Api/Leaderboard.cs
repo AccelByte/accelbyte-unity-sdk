@@ -62,31 +62,40 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetRankings(leaderboardCode, optionalParameters: new GetRankingsOptionalParameters()
+            {
+                Limit = limit,
+                Offset = offset,
+                TimeFrame = timeFrame
+            }, callback);
+        }
+        
+        internal void GetRankings( string leaderboardCode
+            , GetRankingsOptionalParameters optionalParameters
+            , ResultCallback<LeaderboardRankingResult> callback )
+        {
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetRankings(
-                    leaderboardCode,
-                    timeFrame,
-                    offset,
-                    limit,
-                    cb =>
+            api.GetRankings(
+                leaderboardCode,
+                optionalParameters,
+                cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
+                        var param = new LeaderboardPredefinedParameters()
                         {
-                            var param = new LeaderboardPredefinedParameters()
-                            {
-                                LeaderboardCode = leaderboardCode,
-                                UserId = session.UserId
-                            };
-                            SendPredefinedEvent(param, EventMode.GetRankings);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                            LeaderboardCode = leaderboardCode,
+                            UserId = session.UserId
+                        };
+                        SendPredefinedEvent(param, EventMode.GetRankings);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -103,34 +112,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
-            if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
-            {
-                return;
-            }
-
-            if (!session.IsValid())
-            {
-                callback?.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                api.GetUserRanking(
-                    leaderboardCode,
-                    userId,
-                    cb =>
-                    {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            var param = new LeaderboardPredefinedParameters()
-                            {
-                                LeaderboardCode = leaderboardCode,
-                                UserId = userId
-                            };
-                            SendPredefinedEvent(param, EventMode.GetUserRanking);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+            GetUserRanking(userId, leaderboardCode, optionalParameters: null, callback);
         }
 
         /// <summary>
@@ -152,6 +134,19 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetUserRanking(userId, leaderboardCode, optionalParameters: new GetUserRankingOptionalParameters()
+            {
+                AdditionalKey = additionalKey
+            }, callback);
+        }
+        
+        internal void GetUserRanking( string userId
+            , string leaderboardCode
+            , GetUserRankingOptionalParameters optionalParameters
+            , ResultCallback<UserRankingData> callback )
+        {
+            Report.GetFunctionLog(GetType().Name);
+
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -163,23 +158,23 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserRanking(
-                    leaderboardCode,
-                    string.Format("{0}_{1}", userId, additionalKey),
-                    cb =>
+            api.GetUserRanking(
+                leaderboardCode,
+                userId,
+                optionalParameters,
+                cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
+                        var param = new LeaderboardPredefinedParameters()
                         {
-                            var param = new LeaderboardPredefinedParameters()
-                            {
-                                LeaderboardCode = leaderboardCode,
-                                UserId = userId
-                            };
-                            SendPredefinedEvent(param, EventMode.GetUserRanking);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                            LeaderboardCode = leaderboardCode,
+                            UserId = userId
+                        };
+                        SendPredefinedEvent(param, EventMode.GetUserRanking);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -196,28 +191,38 @@ namespace AccelByte.Api
             , int limit = 0 )
         {
             Report.GetFunctionLog(GetType().Name);
+
+            GetLeaderboardList(new GetLeaderboardListOptionalParameters()
+                {
+                    Limit = limit,
+                    Offset = offset
+                },
+                callback);
+        }
+        
+        internal void GetLeaderboardList(GetLeaderboardListOptionalParameters optionalParameters, ResultCallback<LeaderboardPagedList> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetLeaderboardList(
-                    offset,
-                    limit,
-                    cb =>
+            api.GetLeaderboardList(
+                optionalParameters,
+                cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
+                        var param = new LeaderboardPredefinedParameters()
                         {
-                            var param = new LeaderboardPredefinedParameters()
-                            {
-                                UserId = session.UserId
-                            };
-                            SendPredefinedEvent(param, EventMode.GetLeaderboards);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                            UserId = session.UserId
+                        };
+                        SendPredefinedEvent(param, EventMode.GetLeaderboards);
+                    }
+                    HandleCallback(cb, callback);
+                });
         }
 
         /// <summary>
@@ -230,25 +235,34 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetLeaderboardListV3(new GetLeaderboardPagedListV3OptionalParameters()
+                {
+                    Limit = limit,
+                    Offset = offset
+                },
+                callback);
+        }
+        
+        internal void GetLeaderboardListV3(GetLeaderboardPagedListV3OptionalParameters optionalParameters, ResultCallback<LeaderboardPagedListV3> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetLeaderboardListV3(offset, limit, cb =>
+            api.GetLeaderboardListV3(optionalParameters, cb =>
+            {
+                if (!cb.IsError && cb.Value != null)
                 {
-                    if (!cb.IsError && cb.Value != null)
-                    {
-                        var param = new LeaderboardPredefinedParameters()
-                        {
-                            UserId = session.UserId
-                        };
-                        SendPredefinedEvent(param, EventMode.GetLeaderboards);
-                    }
-                    HandleCallback(cb, callback);
-                }));
+                    var param = new LeaderboardPredefinedParameters() { UserId = session.UserId };
+                    SendPredefinedEvent(param, EventMode.GetLeaderboards);
+                }
+
+                HandleCallback(cb, callback);
+            });
         }
 
         /// <summary>
@@ -277,13 +291,22 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetRankingsV3(leaderboardCode, new GetRankingV3OptionalParameters()
+            {
+                Offset = offset,
+                Limit = limit
+            }, callback);
+        }
+        
+        internal void GetRankingsV3(string leaderboardCode, GetRankingV3OptionalParameters optionalParameters, ResultCallback<LeaderboardRankingResult> callback)
+        {
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.GetRankingsV3(leaderboardCode, offset, limit, cb =>
+            api.GetRankingsV3(leaderboardCode, optionalParameters, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
                 {
@@ -295,7 +318,7 @@ namespace AccelByte.Api
                     SendPredefinedEvent(param, EventMode.GetRankings);
                 }
                 HandleCallback(cb, callback);
-            }));
+            });
         }
 
         /// <summary>
@@ -311,13 +334,22 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetRankingsByCycle(leaderboardCode, cycleId, new GetRankingsByCycleOptionalParameters()
+            {
+                Offset = offset,
+                Limit = limit
+            }, callback);
+        }
+        
+        internal void GetRankingsByCycle(string leaderboardCode, string cycleId, GetRankingsByCycleOptionalParameters optionalParameters, ResultCallback<LeaderboardRankingResult> callback)
+        {
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
 
-            coroutineRunner.Run(api.GetRankingsByCycle(leaderboardCode, cycleId, offset, limit, cb =>
+            api.GetRankingsByCycle(leaderboardCode, cycleId, optionalParameters, cb =>
             {
                 if (!cb.IsError && cb.Value != null)
                 {
@@ -330,7 +362,7 @@ namespace AccelByte.Api
                     SendPredefinedEvent(param, EventMode.GetRankingByCycleId);
                 }
                 HandleCallback(cb, callback);
-            }));
+            });
         }
         
         /// <summary>
@@ -346,6 +378,11 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name);
 
+            GetUserRankingV3(userId, leaderboardCode, optionalParameters: null, callback);
+        }
+        
+        internal void GetUserRankingV3(string userId, string leaderboardCode, GetUserRankingV3OptionalParameters optionalParameters, ResultCallback<UserRankingDataV3> callback)
+        {
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -357,23 +394,23 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.GetUserRankingV3(
-                    leaderboardCode,
-                    userId,
-                    cb =>
+            api.GetUserRankingV3(
+                leaderboardCode,
+                userId,
+                optionalParameters,
+                cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
                     {
-                        if (!cb.IsError && cb.Value != null)
+                        var param = new LeaderboardPredefinedParameters()
                         {
-                            var param = new LeaderboardPredefinedParameters()
-                            {
-                                LeaderboardCode = leaderboardCode,
-                                UserId = userId
-                            };
-                            SendPredefinedEvent(param, EventMode.GetUserRanking);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+                            LeaderboardCode = leaderboardCode, UserId = userId
+                        };
+                        SendPredefinedEvent(param, EventMode.GetUserRanking);
+                    }
+
+                    HandleCallback(cb, callback);
+                });
         }
 
         #region PredefinedEvents

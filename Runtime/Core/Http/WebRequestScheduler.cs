@@ -87,17 +87,18 @@ namespace AccelByte.Core
                         webRequest?.Abort();
                         isTimeout = true;
                     }));
-                    
+
+                    task.HttpRequest.Timestamp = DateTime.UtcNow;
                     webRequest.SentTimestamp = DateTime.UtcNow;
 
                     if (GlobalApiTracker != null)
                     {
-                        GlobalApiTracker.NewHttpRequestSent(task.HttpRequest.Method, task.HttpRequest.UrlFormat);
+                        GlobalApiTracker.NewHttpRequestSent(task.HttpRequest);
                     }
                     
                     if (task.AdditionalHttpParameters.ApiTracker != null)
                     {
-                        task.AdditionalHttpParameters.ApiTracker.NewHttpRequestSent(task.HttpRequest.Method, task.HttpRequest.UrlFormat);
+                        task.AdditionalHttpParameters.ApiTracker.NewHttpRequestSent(task.HttpRequest);
                     }
                     
                     PreHttpRequest?.Invoke(webRequest, task.HttpRequest.Headers, task.HttpRequest.BodyBytes, targetLogger);

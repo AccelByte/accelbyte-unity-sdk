@@ -618,6 +618,6 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class VersionJson
     {
-        [DataMember] public string Version;
+        [DataMember(Name = "version")] public string Version;
     }
 }

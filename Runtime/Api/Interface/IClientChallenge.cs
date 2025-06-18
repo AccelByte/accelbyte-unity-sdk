@@ -11,21 +11,6 @@ namespace AccelByte.Api.Interface
     public interface IClientChallenge
     {
         /// <summary>
-        /// Send a request to get all challenges.
-        /// </summary>
-        /// <param name="callback">Api Result Callback</param>
-        /// <param name="status">Determines how the returned challenge list should be filtered</param>
-        /// <param name="sortBy">Determines the returned sort order of the challenges</param>
-        /// <param name="offset">Number of challenges to skip when returning the challenge list, defaults to 0</param>
-        /// <param name="limit">Number of challenges that should be included in the challenge list, defaults to 20</param>
-        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
-        public void GetChallenges(ResultCallback<ChallengeResponse> callback
-            , ChallengeStatus status = ChallengeStatus.None
-            , ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc
-            , int offset = 0
-            , int limit = 20);
-
-        /// <summary>
         /// Send a request to get challenges.
         /// </summary>
         /// <param name="optionalParameters">Optional parameter to get challenges list</param>

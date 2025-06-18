@@ -39,7 +39,7 @@ namespace AccelByte.Models
             private set;
         }
 
-        internal IDebugger Logger;
+        internal OptionalParametersBase TelemetryAdditionalParameters;
 
         public TelemetryBody()
         {
@@ -57,9 +57,9 @@ namespace AccelByte.Models
             DeviceType = GameCommonInfo.PlatformName;
         }
 
-        internal void SetLogger(IDebugger logger)
+        internal void SetOptionalParameters(OptionalParametersBase optionalParameters)
         {
-            Logger = logger;
+            TelemetryAdditionalParameters = optionalParameters;
         }
 
         internal void SetTimeReference(TimeSpan timeReference)

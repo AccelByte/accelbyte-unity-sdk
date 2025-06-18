@@ -30,24 +30,6 @@ namespace AccelByte.Api
             session = inSession;
         }
 
-        [Obsolete("This interface is deprecated, and will be removed on AGS 2025.4. Please use GetChallenges(optionalParameters, callback).")]
-        public void GetChallenges(ResultCallback<ChallengeResponse> callback
-            , ChallengeStatus status = ChallengeStatus.None
-            , ChallengeSortBy sortBy = ChallengeSortBy.UpdatedAtDesc
-            , int offset = 0
-            , int limit = 20)
-        {
-            var optionalParams = new GetChallengesOptionalParamenters()
-            {
-                Limit = limit,
-                Offset = offset,
-                SortBy = sortBy,
-                Status = status
-            };
-
-            GetChallenges(optionalParams, callback);
-        }
-
         public void GetChallenges(GetChallengesOptionalParamenters optionalParameters
             , ResultCallback<ChallengeResponse> callback)
         {

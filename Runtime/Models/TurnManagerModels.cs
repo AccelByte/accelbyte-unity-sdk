@@ -1,4 +1,4 @@
-// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -181,6 +181,13 @@ namespace AccelByte.Models
         public AccelByteResult<int, Error> GetLatency(bool useCache = true)
         {
             AccelByteResult<int, Error> retval = new AccelByteResult<int, Error>();
+
+            if (status != TurnServerStatus.ACTIVE)
+            {
+                retval.Reject(new Error(ErrorCode.InvalidRequest, message: "Server status isn't active"));
+                return retval;
+            }
+            
             if (LatencyCalculator == null)
             {
                 LatencyCalculator = LatencyCalculatorFactory.CreateDefaultCalculator();

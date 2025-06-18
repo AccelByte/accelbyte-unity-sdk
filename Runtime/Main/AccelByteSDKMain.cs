@@ -19,6 +19,7 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.UnitySDKGoogleCore")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("com.accelbyte.NintendoSDK")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("AccelByte.Networking")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("AccelByte.TestExtension")]
 
 namespace AccelByte.Core
 {

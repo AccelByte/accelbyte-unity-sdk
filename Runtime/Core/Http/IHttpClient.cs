@@ -26,14 +26,17 @@ namespace AccelByte.Core {
         IDictionary<string, string> Headers { get; }
         byte[] BodyBytes { get; }
         int Priority { get; set; }
+        DateTime Timestamp { get; set; }
     }
 
     public interface IHttpResponse 
     {
         string Url { get; }
+        string Method { get; }
         long Code { get; }
         IDictionary<string, string> Headers { get; }
         byte[] BodyBytes { get; }
+        DateTime Timestamp { get; set; }
     }
 
     internal class HttpHeaderHelper

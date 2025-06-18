@@ -178,8 +178,6 @@ namespace AccelByte.Models
         [DataMember(Name = "namespace")] public string Namespace;
         [DataMember(Name = "requirementGroups")] public ChallengeRequirement[] RequirementGroups;
         [DataMember(Name = "rewards")] public ChallengeReward[] Rewards;
-        [Obsolete("This field will be removed on AGS 2025.4. Please use AccelByte.Api.Challenge.ListSchedules or AccelByte.Api.Challenge.ListScheduleByGoal to get schedule information")]
-        [DataMember(Name = "schedule")] public ChallengeGoalSchedule Schedule;
         [DataMember(Name = "tags")] public string[] Tags;
         [DataMember(Name = "updatedAt")] public string UpdatedAt;
     }

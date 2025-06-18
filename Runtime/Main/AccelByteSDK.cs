@@ -1,4 +1,4 @@
-// Copyright (c) 2023 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2023 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -16,7 +16,11 @@ namespace AccelByte.Core
             {
                 if (implementation == null)
                 {
+                    VersionLogger = new VersionLogger();
+                    
                     implementation = new AccelByteSDKImplementator();
+                    implementation.OnClientRegistryCreated += OnClientRegistryCreated;
+                    implementation.OnServerRegistryCreated += OnServerRegistryCreated;
                 }
                 return implementation;
             }
@@ -134,6 +138,22 @@ namespace AccelByte.Core
             {
                 return Implementation.TimeManager;
             }
+        }
+
+        internal static VersionLogger VersionLogger
+        {
+            get;
+            private set;
+        }
+
+        private static void OnClientRegistryCreated(Api.AccelByteClientRegistry clientRegistry)
+        {
+            VersionLogger.PrintVersion();
+        }
+
+        private static void OnServerRegistryCreated(Server.AccelByteServerRegistry serverRegistry)
+        {
+            VersionLogger.PrintVersion();
         }
     }
 }

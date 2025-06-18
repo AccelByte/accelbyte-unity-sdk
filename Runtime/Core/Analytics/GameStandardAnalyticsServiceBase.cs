@@ -90,13 +90,13 @@ namespace AccelByte.Core
 
         internal virtual void SendEvent(GameStandardEventPayload payload, ResultCallback callback = null)
         {
-            var telemetryEvent = new AccelByteTelemetryEvent(payload, payload?.Logger);
+            var telemetryEvent = new AccelByteTelemetryEvent(payload, payload?.OptionalParameters);
             SendEvent(telemetryEvent, callback);
         }
 
         internal void SendEvent(AccelByteTelemetryEvent telemetryEvent, ResultCallback callback = null)
         {
-            Scheduler.SendEvent(telemetryEvent, telemetryEvent?.Logger, callback);
+            Scheduler.SendEvent(telemetryEvent, telemetryEvent?.TelemetryOptionalParameters, callback);
 
             if (!Scheduler.IsEventJobEnabled)
             {

@@ -41,6 +41,12 @@ namespace AccelByte.Models
         [DataMember] public Dictionary<string, object> additionalData {get; set;}
     }
 
+    [Preserve]
+    public class GetUserRankingOptionalParameters : OptionalParametersBase
+    {
+        public string AdditionalKey;
+    }
+
     [DataContract, Preserve]
     public class UserRankingData
     {
@@ -50,6 +56,28 @@ namespace AccelByte.Models
         [DataMember] public UserRanking monthly;
         [DataMember] public string userId;
         [DataMember] public UserRanking weekly;
+    }
+    
+    [Preserve]
+    public class GetRankingsByCycleOptionalParameters : OptionalParametersBase
+    {
+        public int Offset = 0;
+        public int Limit = 20;
+    }
+
+    [Preserve]
+    public class GetRankingV3OptionalParameters : OptionalParametersBase
+    {
+        public int Offset = 0;
+        public int Limit = 20;
+    }
+    
+    [Preserve]
+    public class GetRankingsOptionalParameters : OptionalParametersBase
+    {
+        public LeaderboardTimeFrame TimeFrame = LeaderboardTimeFrame.ALL_TIME;
+        public int Offset = 0;
+        public int Limit = 20;
     }
 
     [DataContract, Preserve]
@@ -77,6 +105,13 @@ namespace AccelByte.Models
         [DataMember] public string Previous;
     }
 
+    [Preserve]
+    public class GetLeaderboardListOptionalParameters : OptionalParametersBase
+    {
+        public int Offset = 0;
+        public int Limit = 20;
+    }
+
     [DataContract, Preserve]
     public class LeaderboardPagedList
     {
@@ -101,6 +136,13 @@ namespace AccelByte.Models
         [DataMember] public string DeletedAt;
     }
 
+    [Preserve]
+    public class GetLeaderboardPagedListV3OptionalParameters : OptionalParametersBase
+    {
+        public int Offset = 0;
+        public int Limit = 20;
+    }
+
     [DataContract, Preserve]
     public class LeaderboardPagedListV3
     {
@@ -116,6 +158,12 @@ namespace AccelByte.Models
         [DataMember] public bool Hidden;
         [DataMember] public Dictionary<string, object> AdditionalData;
         [DataMember] public string CycleId;
+    }
+
+    [Preserve]
+    public class GetUserRankingV3OptionalParameters : OptionalParametersBase
+    {
+        
     }
     
     [DataContract, Preserve]

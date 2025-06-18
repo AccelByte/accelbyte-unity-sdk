@@ -5,6 +5,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Tests")]
+[assembly: InternalsVisibleTo("AccelByte.TestExtension")]
 [assembly: InternalsVisibleTo("com.accelbytetest.core")]
 [assembly: InternalsVisibleTo("com.accelbytetest.unit")]
 public class AssemblyInfo

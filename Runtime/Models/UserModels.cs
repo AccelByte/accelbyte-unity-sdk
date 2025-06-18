@@ -171,37 +171,6 @@ namespace AccelByte.Models
         [DataMember] public bool eligible = true;
     }
 
-    [Preserve]
-    public class GetUserByUserIdOptionalParameters : OptionalParametersBase
-    {
-        
-    }
-
-    [DataContract, Preserve]
-    public class PublicUserData
-    {
-        [DataMember] public string authType;
-        [DataMember] public string avatarUrl;
-        [DataMember] public Ban[] bans;
-        [DataMember] public DateTime createdAt;
-        [DataMember] public bool deletionStatus;
-        [DataMember] public string displayName;
-        [DataMember] public bool emailVerified;
-        [DataMember] public bool enabled;
-        [DataMember] public DateTime lastDateOfBirthChangedTime;
-        [DataMember] public DateTime lastEnabledChangedTime;
-        [DataMember(Name = "namespace")] public string namespace_;
-        [DataMember] public Permission[] permissions;
-        [DataMember] public bool phoneVerified;
-        [DataMember] public string platformId;
-        [DataMember] public string platformUserId;
-        [DataMember] public string[] roles;
-        [DataMember] public string userId;
-        [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
-        [DataMember] public string userName;
-        [DataMember] public bool eligible = true;
-    }
-
     [DataContract, Preserve]
     public class PublicUserInfo
     {
@@ -776,12 +745,6 @@ namespace AccelByte.Models
         [DataMember] public string publisherAvatarUrl;
         [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember] public string username;
-    }
-
-    [DataContract, Preserve]
-    public class ListBulkUserInfoResponse
-    {
-        [DataMember] public BaseUserInfo[] data;
     }
 
     [DataContract, Preserve]
@@ -1541,9 +1504,24 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class GetUserPublicInfoResponse
     {
+        [DataMember(Name = "avatarUrl")] public string AvatarUrl;
         [DataMember(Name = "displayName")] public string DisplayName;
         [DataMember(Name = "uniqueDisplayName")] public string UniqueDisplayName;
         [DataMember(Name = "userId")] public string UserId;
+    }
+
+    [DataContract, Preserve]
+    public class GetPublicSystemConfigValueResponse
+    {
+        [DataMember(Name = "searchQueryMaxLength")] public uint SearchQueryMaxLength;
+        [DataMember(Name = "searchQueryMaxLengthForEmail")] public uint SearchQueryMaxLengthForEmail;
+        [DataMember(Name = "searchQueryMinLength")] public uint SearchQueryMinLength;
+    }
+
+    [Preserve]
+    public class GetPublicSystemConfigValueOptionalParameters : OptionalParametersBase
+    {
+
     }
 
     [DataContract, Preserve]

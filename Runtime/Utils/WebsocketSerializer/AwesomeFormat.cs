@@ -187,7 +187,7 @@ namespace AccelByte.Utils
         {
             payload = new T();
             var fieldInfos = typeof(T).GetFields().Where(x => x.IsDefined(typeof(DataMemberAttribute), false));
-
+            
             foreach (var fieldInfo in fieldInfos)
             {
                 string fieldValue;

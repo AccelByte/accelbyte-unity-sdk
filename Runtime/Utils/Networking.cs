@@ -152,49 +152,67 @@ namespace AccelByte.Utils
                 {
                     using (var udpClient = new UdpClient(port))
                     {
-                        debugger?.LogVerbose($"Ping {tryCount} to {url}:{port}");
-                        
-                        udpClient.Connect(url, port);
-                        byte[] sendBytes = System.Text.Encoding.ASCII.GetBytes("PING");
-                        stopwatch.Start();
-
-                        using (var cts = new System.Threading.CancellationTokenSource())
+                        try
                         {
-                            System.Threading.Tasks.Task<int> sendPingTask = null;
-                            UdpPingTimer((int) timeOutInMs, udpClient, cts.Token);
-
-                            System.IAsyncResult sendResult = udpClient.BeginSend(
-                                sendBytes,
-                                sendBytes.Length,
-                                null,
-                                null);
-
-                            sendPingTask = System.Threading.Tasks.Task.Factory.FromAsync(sendResult, udpClient.EndSend);
-                            await sendPingTask;
-
-                            var remoteIpEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
-
-                            System.IAsyncResult receiveResult = udpClient.BeginReceive(null, null);
-
-                            System.Func<System.IAsyncResult, byte[]> receiveEndMethod = (asyncResult) =>
+                            debugger?.LogVerbose($"Ping {tryCount} to {url}:{port}");
+                            
+                            udpClient.Connect(url, port);
+                            byte[] sendBytes = System.Text.Encoding.ASCII.GetBytes("PING");
+                            stopwatch.Start();
+    
+                            using (var cts = new System.Threading.CancellationTokenSource())
                             {
-                                return udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
-                            };
-                            var waitReceiveTask = System.Threading.Tasks.Task.Factory.FromAsync(receiveResult, receiveEndMethod);
-                           
-                            await waitReceiveTask;
-
-                            byte[] receivedPacket = waitReceiveTask.Result;
-                            string receivedPackagePayloadString = null;
-                            if (receivedPacket != null)
-                            {
-                                receivedPackagePayloadString = System.Text.Encoding.ASCII.GetString(receivedPacket);
+                                System.Threading.Tasks.Task<int> sendPingTask = null;
+                                UdpPingTimer((int) timeOutInMs, udpClient, cts.Token);
+    
+                                System.IAsyncResult sendResult = udpClient.BeginSend(
+                                    sendBytes,
+                                    sendBytes.Length,
+                                    null,
+                                    null);
+    
+                                sendPingTask = System.Threading.Tasks.Task.Factory.FromAsync(sendResult, udpClient.EndSend);
+                                await sendPingTask;
+    
+                                var remoteIpEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
+    
+                                System.IAsyncResult receiveResult = udpClient.BeginReceive(null, null);
+    
+                                System.Func<System.IAsyncResult, byte[]> receiveEndMethod = (asyncResult) =>
+                                {
+                                    try
+                                    {
+                                        return udpClient.EndReceive(asyncResult, ref remoteIpEndPoint);
+                                    }
+                                    catch (System.Exception)
+                                    {
+                                        return null;
+                                    }
+                                };
+                                var waitReceiveTask = System.Threading.Tasks.Task.Factory.FromAsync(receiveResult, receiveEndMethod);
+                               
+                                await waitReceiveTask;
+    
+                                byte[] receivedPacket = waitReceiveTask.Result;
+                                if (receivedPacket != null)
+                                {
+                                    string receivedPackagePayloadString = System.Text.Encoding.ASCII.GetString(receivedPacket);
+                                    latencyResult = stopwatch.Elapsed.Milliseconds;
+                                    debugger?.LogVerbose($"Ping {tryCount} receiving response {receivedPackagePayloadString}");
+                                }
+                                else
+                                {
+                                    debugger?.LogVerbose($"Ping {tryCount} receiving no response");
+                                    lastErrorMessage = "Receiving no response";
+                                }
                             }
-                            debugger?.LogVerbose($"Ping {tryCount} receiving response {receivedPackagePayloadString}");
                         }
-
+                        catch (System.Exception udpException)
+                        {
+                            lastErrorMessage = udpException.Message;
+                        }
+                        
                         udpClient.Close();
-                        latencyResult = stopwatch.Elapsed.Milliseconds;
                     }
                 }
                 catch (System.Exception ex)

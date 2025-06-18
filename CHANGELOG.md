@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.8.0] (2025-06-18)
+
+
+### Features
+
+* add http request and response timestamp 
+* decommissioned challenge GetChallenges and get challenge response.schedule 
+* Decommissioned qos GetServerLatencies 
+* decommissioned server agreement service 
+* decommissioned user interfaces: GetUserByUserId, GetUserByOtherPlatformUserId, BulkGetUserInfo 
+* implement new API to get public system config 
+* log every accelbyte sdk module version 
+
+
+### Bug Fixes
+
+* skip qos and turn server latency calculation when server status is not active 
+
+
+### Refactors
+
+* add optional parameter on leaderboard service 
+* improve instance created event handling 
+* udp ping error handling improvement 
+* update service tracker output 
+
 ## [17.7.0] (2025-05-21)
 
 

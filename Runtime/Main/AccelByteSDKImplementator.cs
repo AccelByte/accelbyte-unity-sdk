@@ -1,4 +1,4 @@
-// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2024 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -49,6 +49,8 @@ namespace AccelByte.Core
         internal readonly Utils.AccelByteServiceTracker ServiceTracker;
         
         internal System.Action<IHttpClient> OnHttpClientCreated;
+        internal Utils.SingularCallEvent<AccelByteClientRegistry> OnClientRegistryCreated;
+        internal Utils.SingularCallEvent<Server.AccelByteServerRegistry> OnServerRegistryCreated;
 
         public AccelByteSDKImplementator()
         {
@@ -69,6 +71,7 @@ namespace AccelByte.Core
             if (ClientRegistry == null)
             {
                 ClientRegistry = CreateClientRegistry(Environment.Current);
+                OnClientRegistryCreated.Invoke(ClientRegistry);
             }
             return ClientRegistry;
         }
@@ -78,6 +81,7 @@ namespace AccelByte.Core
             if (ServerRegistry == null)
             {
                 ServerRegistry = CreateServerRegistry(Environment.Current);
+                OnServerRegistryCreated.Invoke(ServerRegistry);
             }
             return ServerRegistry;
         }

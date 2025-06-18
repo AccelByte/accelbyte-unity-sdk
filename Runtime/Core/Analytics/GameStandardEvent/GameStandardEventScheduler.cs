@@ -38,15 +38,15 @@ namespace AccelByte.Core
 
         public override void SendEvent(IAccelByteTelemetryEvent telemetryEvent, ResultCallback callback)
         {
-            SendEvent(telemetryEvent, logger: null, callback);
+            SendEvent(telemetryEvent, optionalParameters: null, callback);
         }
 
-        internal void SendEvent(IAccelByteTelemetryEvent telemetryEvent, IDebugger logger, ResultCallback callback)
+        internal void SendEvent(IAccelByteTelemetryEvent telemetryEvent, OptionalParametersBase optionalParameters, ResultCallback callback)
         {
             TelemetryBody eventBody = new TelemetryBody(telemetryEvent);
-            if (logger != null)
+            if (optionalParameters != null)
             {
-                eventBody.SetLogger(logger);
+                eventBody.SetOptionalParameters(optionalParameters);
             }
             
             if (SharedMemory != null && SharedMemory.TimeManager != null)

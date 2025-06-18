@@ -17,7 +17,7 @@ namespace AccelByte.Models
         internal const string EventType = "GameStandardEvent";
         [DataMember(Name = "gameStandardEventName")] public string GameStandardEventName;
 
-        internal Core.IDebugger Logger;
+        internal OptionalParametersBase OptionalParameters;
 
         public GameStandardEventPayload()
         {
@@ -200,7 +200,7 @@ namespace AccelByte.Models
             MissionId = missionId.ToString();
             MissionInstanceId = missionInstanceId.ToString();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -241,7 +241,7 @@ namespace AccelByte.Models
             MissionInstanceId = missionInstanceId.ToString();
             MissionStep = missionStep.GetValue();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -282,7 +282,7 @@ namespace AccelByte.Models
             MissionInstanceId = missionInstanceId.ToString();
             MissionSuccess = missionSuccess.GetValue();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -316,7 +316,7 @@ namespace AccelByte.Models
         {
             MatchInfoId = matchInfoId.ToString();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -358,7 +358,7 @@ namespace AccelByte.Models
             UserId = userId.ToString();
             MatchInfoId = matchInfoId.ToString();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -429,7 +429,7 @@ namespace AccelByte.Models
             UserId = userId.ToString();
             PopupId = popupId.ToString();
             this.CopyField(optionalParameters);
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -488,7 +488,7 @@ namespace AccelByte.Models
             LevelStat = optionalParameters.LevelStat;
             LevelChange = optionalParameters.LevelChange;
             LevelCurrent = optionalParameters.LevelCurrent;
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()
@@ -551,7 +551,7 @@ namespace AccelByte.Models
             DeathLocation = optionalParameters.DeathLocation;
             DeathType = optionalParameters.DeathType;
             DeathSource = optionalParameters.DeathSource;
-            this.Logger = optionalParameters?.Logger;
+            OptionalParameters = optionalParameters;
         }
 
         protected override string GetGameStandardModelName()

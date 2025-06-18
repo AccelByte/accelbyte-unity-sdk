@@ -191,12 +191,12 @@ namespace AccelByte.Core
 
             if (additionalParams.ApiTracker != null)
             {
-                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput);
             }
 
             if (GlobalApiTracker != null)
             {
-                GlobalApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+                GlobalApiTracker.NewHttpRequestScheduled(requestInput);
             }
 
             string requestUniqueIdentifier = Guid.NewGuid().ToString();
@@ -319,6 +319,16 @@ namespace AccelByte.Core
                     httpResponse = sendResult.Value.CallbackResponse;
                     error = sendResult.Value.CallbackError;
                 }
+                
+                if (additionalParams.ApiTracker != null)
+                {
+                    additionalParams.ApiTracker.NewHttpResponseReceived(request, httpResponse);
+                }
+
+                if (GlobalApiTracker != null)
+                {
+                    GlobalApiTracker.NewHttpResponseReceived(request, httpResponse);
+                }
 
                 if (httpResponse == null)
                 {
@@ -392,12 +402,12 @@ namespace AccelByte.Core
 
             if (additionalParams.ApiTracker != null)
             {
-                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+                additionalParams.ApiTracker.NewHttpRequestScheduled(requestInput);
             }
 
             if (GlobalApiTracker != null)
             {
-                GlobalApiTracker.NewHttpRequestScheduled(requestInput.Method, requestInput.UrlFormat);
+                GlobalApiTracker.NewHttpRequestScheduled(requestInput);
             }
 
             string requestUniqueIdentifier = Guid.NewGuid().ToString();
@@ -521,6 +531,16 @@ namespace AccelByte.Core
                     yield return new WaitUntil(() => sendResult != null);
                     httpResponse = sendResult.Value.CallbackResponse;
                     error = sendResult.Value.CallbackError;
+                }
+                
+                if (additionalParams.ApiTracker != null)
+                {
+                    additionalParams.ApiTracker.NewHttpResponseReceived(request, httpResponse);
+                }
+
+                if (GlobalApiTracker != null)
+                {
+                    GlobalApiTracker.NewHttpResponseReceived(request, httpResponse);
                 }
 
                 if (httpResponse == null)
