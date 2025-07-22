@@ -1,4 +1,4 @@
-// Copyright (c) 2022 - 2024 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -57,13 +57,14 @@ namespace AccelByte.Api
             , int port
             , ResultCallback<TurnServerCredential> callback)
         {
-            RequestGetTurnServerCredential(region, ip, port,callback);
+            RequestGetTurnServerCredential(region, ip, port, optionalParameters: null, callback);
             yield break;
         }
 
         internal void RequestGetTurnServerCredential(string region
             , string ip
             , int port
+            , RequestGetTurnServerCredentialOptionalParameters optionalParameters
             , ResultCallback<TurnServerCredential> callback)
         {
             Report.GetFunctionLog(GetType().Name);
@@ -91,7 +92,8 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            HttpOperator.SendRequest(additionalHttpParameters, request, response =>
             {
                 var result = response.TryParseJson<TurnServerCredential>();
                 callback?.Try(result);

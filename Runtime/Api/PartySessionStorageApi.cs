@@ -44,10 +44,7 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParams?.Logger
-            };
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {

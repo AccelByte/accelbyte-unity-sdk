@@ -42,6 +42,11 @@ namespace AccelByte.Models
         /// <returns>Return the closest TURN server based on latencies.</returns>
         public AccelByteResult<TurnServer, Error> GetClosestTurnServer()
         {
+            return GetClosestTurnServer(new GetClosestTurnServerOptionalParameters());
+        }
+
+        internal AccelByteResult<TurnServer, Error> GetClosestTurnServer(GetClosestTurnServerOptionalParameters optionalParameters)
+        {
             var retval = new AccelByteResult<TurnServer, Error>();
             if (servers == null || servers.Length == 0) 
             {
@@ -52,7 +57,7 @@ namespace AccelByte.Models
             System.Action<int, TurnServer[], int?, TurnServer, AccelByteResult<TurnServer, Error>> GetTurnServerTask = null;
             GetTurnServerTask = (index, turnServers, bestLatency, closestTurnServer, resultTask) =>
             {
-                turnServers[index].GetLatency(useCache: true)
+                turnServers[index].GetLatency(debugger: optionalParameters?.Logger, useCache: true)
                     .OnSuccess(latency => 
                     {
                         if (bestLatency == null || bestLatency > latency)
@@ -109,17 +114,27 @@ namespace AccelByte.Models
         /// </summary>
         public AccelByteResult<Dictionary<string, int>, Error> GenerateLatenciesMap(bool useCache = true)
         {
+            return GenerateLatenciesMap(new GenerateLatencyMapOptionalParameters());
+        }
+        
+        internal AccelByteResult<Dictionary<string, int>, Error> GenerateLatenciesMap(GenerateLatencyMapOptionalParameters optionalParameters)
+        {
             var retval = new AccelByteResult<Dictionary<string, int>, Error>();
             if (servers == null || servers.Length == 0) 
             {
                 retval.Reject(new Error(ErrorCode.InvalidRequest, message: "Server length is 0"));
                 return retval;
             }
+
+            if (optionalParameters == null)
+            {
+                optionalParameters = new GenerateLatencyMapOptionalParameters();
+            }
             
             System.Action<int, TurnServer[], Dictionary<string, int>, AccelByteResult<Dictionary<string, int>, Error>> buildLatencyMap = null;
             buildLatencyMap = (index, turnServers, latenciesMap, resultTask) =>
             {
-                turnServers[index].GetLatency(useCache)
+                turnServers[index].GetLatency(optionalParameters.UseCache)
                     .OnSuccess(latency => 
                     {
                         if (!latenciesMap.ContainsKey(turnServers[index].region))
@@ -180,6 +195,11 @@ namespace AccelByte.Models
         /// </summary>
         public AccelByteResult<int, Error> GetLatency(bool useCache = true)
         {
+            return GetLatency(debugger: null, useCache: useCache);
+        }
+        
+        internal AccelByteResult<int, Error> GetLatency(IDebugger debugger, bool useCache = true)
+        {
             AccelByteResult<int, Error> retval = new AccelByteResult<int, Error>();
 
             if (status != TurnServerStatus.ACTIVE)
@@ -205,7 +225,7 @@ namespace AccelByte.Models
 #if UNITY_WEBGL && !UNITY_EDITOR
             url = AccelByte.Utils.Networking.GetTestServerUrlByRegion(region);
 #endif
-            retval = calculator.CalculateLatency(url, qos_port, null);
+            retval = calculator.CalculateLatency(url, qos_port, debugger);
             retval.OnSuccess(newLatency =>
             {
                 cachedLatency = newLatency;
@@ -218,8 +238,22 @@ namespace AccelByte.Models
         /// </summary>
         public AccelByteResult<Dictionary<string, int>, Error> GenerateLatencyMap(bool useCache = true)
         {
+            return GenerateLatencyMap(new GenerateLatencyMapOptionalParameters()
+            {
+                UseCache = useCache
+            });
+        }
+        
+        internal AccelByteResult<Dictionary<string, int>, Error> GenerateLatencyMap(GenerateLatencyMapOptionalParameters optionalParameters)
+        {
             var retval = new AccelByteResult<Dictionary<string, int>, Error>();
-            GetLatency(useCache)
+
+            if (optionalParameters == null)
+            {
+                optionalParameters = new GenerateLatencyMapOptionalParameters();
+            }
+            
+            GetLatency(optionalParameters?.Logger, optionalParameters.UseCache)
                 .OnSuccess(latency =>
                 {
                     Dictionary<string, int> latencyMap = new Dictionary<string, int>();
@@ -277,5 +311,22 @@ namespace AccelByte.Models
     {
         public bool AutoCalculateLatency = true;
         internal ILatencyCalculator LatencyCalculator;
+    }
+    
+    [Preserve]
+    public class GetClosestTurnServerOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+    
+    [Preserve]
+    public class GenerateLatencyMapOptionalParameters : OptionalParametersBase
+    {
+        public bool UseCache = true;
+    }
+    
+    [Preserve]
+    public class RequestGetTurnServerCredentialOptionalParameters : OptionalParametersBase
+    {
     }
 }

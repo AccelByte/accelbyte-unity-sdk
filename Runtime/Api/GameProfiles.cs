@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use Api.CloudSave instead")]
+    [Obsolete("This interface is deprecated. Please use Api.CloudSave instead")]
     public class GameProfiles : WrapperBase
     {
         private readonly GameProfilesApi api;

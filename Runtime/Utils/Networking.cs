@@ -137,26 +137,29 @@ namespace AccelByte.Utils
             }
         }
         
-        private static async System.Threading.Tasks.Task UdpPingImp(string url, int port, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry, IDebugger debugger)
+        private static async System.Threading.Tasks.Task UdpPingImp(string url, int targetPort, AccelByteResult<int, Error> pingResult, uint timeOutInMs, uint maxRetry, IDebugger debugger)
         {
+            const int minPort = 0, maxPort = 10000;
             int? latencyResult = null;
             int tryCount = 0;
             var stopwatch = new Stopwatch();
             string lastErrorMessage = null;
-
+            var randomizer = new System.Random();
+            int selectedPort = targetPort;
+            
             do
             {
                 tryCount++;
                 stopwatch.Reset();
                 try
                 {
-                    using (var udpClient = new UdpClient(port))
+                    using (var udpClient = new UdpClient(selectedPort))
                     {
                         try
                         {
-                            debugger?.LogVerbose($"Ping {tryCount} to {url}:{port}");
+                            debugger?.LogVerbose($"Ping {tryCount} from port {selectedPort} to {url}:{targetPort}");
                             
-                            udpClient.Connect(url, port);
+                            udpClient.Connect(url, targetPort);
                             byte[] sendBytes = System.Text.Encoding.ASCII.GetBytes("PING");
                             stopwatch.Start();
     
@@ -217,7 +220,8 @@ namespace AccelByte.Utils
                 }
                 catch (System.Exception ex)
                 {
-                    lastErrorMessage = ex.Message;
+                    lastErrorMessage = $"Unable to utilize port {selectedPort}\nError Message: {ex.Message}";
+                    selectedPort = randomizer.Next(minPort, maxPort);
                 }
 
                 stopwatch.Stop();
@@ -230,7 +234,7 @@ namespace AccelByte.Utils
             else
             {
                 string errorMessage =
-                    $"Encountered issue on calculating latency to \"{url}:{port}\". {lastErrorMessage}";
+                    $"Encountered issue on calculating latency to \"{url}:{targetPort}\". {lastErrorMessage}";
                 pingResult.Reject(new Error(ErrorCode.InternalServerError, errorMessage));
             }
         }

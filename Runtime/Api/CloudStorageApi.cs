@@ -12,7 +12,7 @@ using UnityEngine.Assertions;
 
 namespace AccelByte.Api
 {
-    [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. Please use Api.BinaryCloudSave instead")]
+    [Obsolete("This interface is deprecated. Please use Api.BinaryCloudSave instead")]
     public class CloudStorageApi : ApiBase
     {
         /// <summary>

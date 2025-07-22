@@ -92,7 +92,7 @@ namespace AccelByte.Api
                         ILatencyCalculator calculator =
                             optionalParam?.LatencyCalculator == null ? LatencyCalculatorFactory.CreateDefaultCalculator() : optionalParam?.LatencyCalculator;
                         server.LatencyCalculator = calculator;
-                        server.GetLatency(useCache: false).OnComplete(onCalculateLatencyDone);
+                        server.GetLatency(debugger: optionalParam?.Logger, useCache: false).OnComplete(onCalculateLatencyDone);
                     }
                 }
                 else
@@ -114,6 +114,15 @@ namespace AccelByte.Api
             , int port
             , ResultCallback<TurnServerCredential> callback)
         {
+            GetTurnServerCredential(region, ip, port, optionalParameters: null, callback);
+        }
+        
+        internal void GetTurnServerCredential(string region
+            , string ip
+            , int port
+            , RequestGetTurnServerCredentialOptionalParameters optionalParameters
+            , ResultCallback<TurnServerCredential> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -122,7 +131,7 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.RequestGetTurnServerCredential(region, ip, port, callback);
+            api.RequestGetTurnServerCredential(region, ip, port, optionalParameters, callback);
         }
 
         /// <summary>

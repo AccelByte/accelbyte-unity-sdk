@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.9.0] (2025-07-22)
+
+
+### Features
+
+* decommissioned CloudStorage and GameProfiles 
+* re-enable CloudStorage and GameProfiles 
+
+
+### Bug Fixes
+
+* use random port prior udp ping execution 
+
 ## [17.8.0] (2025-06-18)
 
 

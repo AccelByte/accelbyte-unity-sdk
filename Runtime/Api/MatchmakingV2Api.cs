@@ -76,10 +76,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            var additionalParams = new AdditionalHttpParameters()
-            {
-                Logger = optionalParams?.Logger
-            };
+            var additionalParams = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
 
             HttpOperator.SendRequest(additionalParams, request, response =>
             {
@@ -130,11 +127,9 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
 
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            
             HttpOperator.SendRequest(additionalParameters, request,
                 response =>
                 {
@@ -173,11 +168,8 @@ namespace AccelByte.Api
                 .GetResult();
 
             IHttpResponse response = null;
-            
-            var additionalParams = new AdditionalHttpParameters()
-            {
-                Logger = optionalParams?.Logger
-            };
+
+            var additionalParams = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
 
             yield return HttpClient.SendRequest(additionalParams, request,
                 rsp => response = rsp);
@@ -225,10 +217,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -298,10 +287,7 @@ namespace AccelByte.Api
             }
 
             var request = builder.GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {

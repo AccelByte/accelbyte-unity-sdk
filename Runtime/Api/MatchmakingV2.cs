@@ -281,9 +281,9 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="ticketId">String ID of ticket to poll status for.</param>
         /// <param name="matchPoolName">Matchpool name used in matchmaking</param>
-        internal void StartMatchmakingTicketPoll(string ticketId, string matchPoolName)
+        internal void StartMatchmakingTicketPoll(string ticketId, string matchPoolName, GetMatchmakingTicketOptionalParameters optionalParams)
         {
-            coroutineRunner.Run(StartMatchmakingTicketPollAsync(ticketId, matchPoolName));
+            coroutineRunner.Run(StartMatchmakingTicketPollAsync(ticketId, matchPoolName, optionalParams));
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace AccelByte.Api
         /// </summary>
         /// <param name="ticketId">String ID of ticket to poll status for.</param>
         /// <param name="matchPoolName">Matchpool name used in matchmaking</param>
-        internal IEnumerator StartMatchmakingTicketPollAsync(string ticketId, string matchPoolName)
+        internal IEnumerator StartMatchmakingTicketPollAsync(string ticketId, string matchPoolName, GetMatchmakingTicketOptionalParameters optionalParams)
         {
             if (!Api.Config.EnableMatchmakingTicketCheck)
             {
@@ -303,43 +303,42 @@ namespace AccelByte.Api
             bool shouldContinuePolling = true;
             while (shouldContinuePolling)
             {
-                coroutineRunner.Run(
-                    Api.GetMatchmakingTicket(ticketId, result =>
+                Api.GetMatchmakingTicket(ticketId, optionalParams, result =>
+                {
+                    MatchmakingTicketPolled?.Invoke(result);
+                
+                    if (result.IsError)
                     {
-                        MatchmakingTicketPolled?.Invoke(result);
-
-                        if (result.IsError)
+                        if (result.Error.Code == ErrorCode.MatchmakingTicketNotFound || result.Error.Code == ErrorCode.NotFound)
                         {
-                            if (result.Error.Code == ErrorCode.MatchmakingTicketNotFound || result.Error.Code == ErrorCode.NotFound)
+                            var expiredNotif = new MatchmakingV2TicketExpiredNotification()
                             {
-                                var expiredNotif = new MatchmakingV2TicketExpiredNotification()
-                                {
-                                    ticketId = ticketId,
-                                    matchPool = matchPoolName,
-                                    namespace_ = Api.Config.Namespace,
-                                    createdAt = DateTime.UtcNow
-                                };
-                                var expiredNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
-                                    "OnMatchmakingTicketExpired"
-                                    , expiredNotif.ToJsonString()
-                                    , isEncoded: true);
-                                SharedMemory.NotificationSender.SendLobbyNotification(expiredNotifMessage);
-
-                                shouldContinuePolling = false;
-                            }
-
-                            return;
-                        }
-
-                        if (result.Value.matchFound)
-                        {
-                            SharedMemory.MessagingSystem
-                                .SendMessage(AccelByteMessagingTopic.MatchFoundOnPoll, result.Value.sessionId);
-
+                                ticketId = ticketId,
+                                matchPool = matchPoolName,
+                                namespace_ = Api.Config.Namespace,
+                                createdAt = DateTime.UtcNow
+                            };
+                            var expiredNotifMessage = AccelByteNotificationSenderUtility.ComposeMMv2Notification(
+                                "OnMatchmakingTicketExpired"
+                                , expiredNotif.ToJsonString()
+                                , isEncoded: true);
+                            SharedMemory.NotificationSender.SendLobbyNotification(expiredNotifMessage);
+                
                             shouldContinuePolling = false;
-                            return;
                         }
-                    }));
+                
+                        return;
+                    }
+                
+                    if (result.Value.matchFound)
+                    {
+                        SharedMemory.MessagingSystem
+                            .SendMessage(AccelByteMessagingTopic.MatchFoundOnPoll, result.Value.sessionId);
+                
+                        shouldContinuePolling = false;
+                        return;
+                    }
+                });
 
                 if (shouldContinuePolling)
                 {
@@ -375,7 +374,13 @@ namespace AccelByte.Api
             {
                 if (!cb.IsError)
                 {
-                    StartMatchmakingTicketPoll(cb.Value.matchTicketId, matchPoolName);
+                    var ticketPollOptionalParams = new GetMatchmakingTicketOptionalParameters();
+                    if (optionalParams != null)
+                    {
+                        ticketPollOptionalParams.Logger = optionalParams.Logger;
+                        ticketPollOptionalParams.ApiTracker = optionalParams.ApiTracker;
+                    }
+                    StartMatchmakingTicketPoll(cb.Value.matchTicketId, matchPoolName, ticketPollOptionalParams);
                     SharedMemory.MessagingSystem.SendMessage(AccelByteMessagingTopic.MatchmakingStarted, cb.Value.matchTicketId);
                 }
                 SendPredefinedEvent(matchPoolName, optionalParams, cb, callback);
