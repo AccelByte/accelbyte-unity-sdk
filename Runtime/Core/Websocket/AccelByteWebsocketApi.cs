@@ -106,7 +106,14 @@ namespace Core
         
         internal void Connect(Dictionary<string, string> customHeader, AccelByte.Models.WebsocketConnectOptionalParameters optionalParameters)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR            
+            string newUrl = WebsocketUrlBuilder.CreateWsUrl(websocketUrl)
+                            .WithQueryParam(customHeader)
+                            .GetResult();
+            webSocket.Connect(newUrl, session.AuthorizationToken, optionalParameters);            
+#else
             webSocket.Connect(websocketUrl, session.AuthorizationToken, customHeader, optionalParameters);
+#endif
         }
 
         public virtual void Disconnect()

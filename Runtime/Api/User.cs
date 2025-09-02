@@ -541,8 +541,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            string platformId = platformType.ToString().ToLower();
-
             var optionalParameters = new LoginWithOtherPlatformOptionalParameters()
             {
                 Logger = SharedMemory?.Logger,
@@ -551,7 +549,7 @@ namespace AccelByte.Api
                 ServiceLabel = serviceLabel
             };
 #pragma warning disable AB0001
-            LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
+            LoginWithOtherPlatformV3(new LoginPlatformType(platformType), platformToken, optionalParameters, callback);
 #pragma warning restore AB0001
         }
 
@@ -576,7 +574,7 @@ namespace AccelByte.Api
 
             string platformId = platformType.ToString().ToLower();
 #pragma warning disable AB0001
-            LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
+            LoginWithOtherPlatformV3(new LoginPlatformType(platformId), platformToken, optionalParameters, callback);
 #pragma warning restore AB0001
         }
 
@@ -692,7 +690,7 @@ namespace AccelByte.Api
             };
 
 #pragma warning disable AB0001
-            LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, callback);
+            LoginWithOtherPlatformV3(new LoginPlatformType(platformId), platformToken, optionalParameters, callback);
 #pragma warning restore AB0001
         }
 
@@ -707,8 +705,7 @@ namespace AccelByte.Api
         /// <param name="createHeadless">Set it to true  because it doesn't have username yet </param>
         /// <param name="serviceLabel">(Early-access: for PS5 only currently)Used to validate PSN app when AppId is set on Admin Portal for PS4/PS5</param>
         /// <param name="loginWithMacAddress">Include mac Address information for PSN and Xbox ban reporting</param>
-        [AccelByte.Utils.Attributes.AccelBytePreview]
-        internal void LoginWithOtherPlatformId(string platformId
+        public void LoginWithOtherPlatformV3(LoginPlatformType loginPlatformType
             , string platformToken
             , LoginWithOtherPlatformOptionalParameters optionalParameters
             , ResultCallback<TokenData, OAuthError> callback)
@@ -721,13 +718,13 @@ namespace AccelByte.Api
             };
             Action<OAuthError> onLoginFailed = (error) =>
             {
-                SendLoginFailedPredefinedEvent(api.Config.Namespace, platformId);
+                SendLoginFailedPredefinedEvent(api.Config.Namespace, loginPlatformType.PlatformId);
                 callback?.TryError(error);
             };
             Action<TokenData> onLoginSuccess = (tokenData) =>
             {
                 const bool saveTokenAsLatestUser = true;
-                Session.SaveRefreshToken(platformId, saveTokenAsLatestUser, (saveSuccess) =>
+                Session.SaveRefreshToken(loginPlatformType.PlatformId, saveTokenAsLatestUser, (saveSuccess) =>
                 {
                     OnLoginSuccess?.Invoke(tokenData);
                     SendLoginSuccessPredefinedEvent(tokenData);
@@ -738,7 +735,7 @@ namespace AccelByte.Api
             Login(
                 cb =>
                 {
-                    oAuth2.LoginWithOtherPlatformId(platformId, platformToken, optionalParameters, cb);
+                    oAuth2.LoginWithOtherPlatformId(loginPlatformType.PlatformId, platformToken, optionalParameters, cb);
                 }
                 , onAlreadyLogin
                 , onLoginFailed

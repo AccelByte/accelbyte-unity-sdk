@@ -377,6 +377,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class JoinGameSessionOptionalParameters : OptionalParametersBase
+    {
+        
+    }
+
+    [DataContract, Preserve]
     public class AcceptBackfillProposalResponse : SessionV2GameSession
     {
     }
@@ -519,6 +525,11 @@ namespace AccelByte.Models
     }
     
     [DataContract, Preserve]
+    public class InviteUserToGameSessionOptionalParameters : OptionalParametersBase
+    {
+    }
+    
+    [DataContract, Preserve]
     public class InviteUserToGameSessionResponse
     {
         [DataMember(Name = "platformUserID")] public string PlatformUserID;
@@ -543,6 +554,11 @@ namespace AccelByte.Models
     public class SessionV2GameUserKickedNotification
     {
         [DataMember] public string partyId;
+    }
+    
+    [DataContract, Preserve]
+    public class RejectSessionInvitationOptionalParameters : OptionalParametersBase
+    {
     }
     
     [DataContract, Preserve]

@@ -8,6 +8,7 @@ namespace AccelByte.Core
 {
     internal class WaitTimeCommand : IWaitCommand
     {
+        internal int SkipCounter;
         private double originalWaitTime;
         private double waitTime;
 
@@ -34,6 +35,12 @@ namespace AccelByte.Core
         
         public override bool Update(float dt)
         {
+            if (SkipCounter > 0)
+            {
+                SkipCounter--;
+                return false;
+            }
+            
             waitTime -= dt;
             if (waitTime <= 0)
             {

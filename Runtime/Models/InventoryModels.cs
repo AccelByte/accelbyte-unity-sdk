@@ -323,6 +323,7 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class MoveUserItemResponseData
     {
+        [DataMember(Name = "id")] public string Id;
         [DataMember(Name = "qty")] public int Quantity;
         [DataMember(Name = "slotId")] public string SlotId;
         [DataMember(Name = "sourceItemId")] public string SourceItemId;

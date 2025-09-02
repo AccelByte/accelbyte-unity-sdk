@@ -656,11 +656,12 @@ namespace AccelByte.Api
         public IEnumerator GetGameSessionDetailsBySessionId(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
-            GetGameSessionDetailsBySessionIdInternal(sessionId, callback);
+            GetGameSessionDetailsBySessionIdInternal(sessionId, null, callback);
             yield break;
         }
         
         internal void GetGameSessionDetailsBySessionIdInternal(string sessionId
+            , OptionalParametersBase optionalParameters
             , ResultCallback<SessionV2GameSession> callback)
         {
             var error = Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, sessionId);
@@ -679,7 +680,8 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            HttpOperator.SendRequest(additionalHttpParameters, request, response =>
             {
                 var result = response.TryParseJson<SessionV2GameSession>();
                 callback?.Try(result); 
@@ -789,7 +791,7 @@ namespace AccelByte.Api
             callback?.Try(result);
         }
         
-        internal void InviteUserToGameSession(string sessionId, string userId, ResultCallback<InviteUserToGameSessionResponse> callback)
+        internal void InviteUserToGameSession(string sessionId, string userId, InviteUserToGameSessionOptionalParameters optionalParameters, ResultCallback<InviteUserToGameSessionResponse> callback)
         {
             var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, sessionId, userId);
             if (error != null)
@@ -813,7 +815,7 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            HttpOperator.SendRequest(request, response =>
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
             {
                 var result = response.TryParseJson<InviteUserToGameSessionResponse>();
                 callback?.Try(result);
@@ -847,6 +849,14 @@ namespace AccelByte.Api
         public IEnumerator JoinGameSession(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
+            JoinGameSession(sessionId, null, callback);
+            yield break;
+        }
+
+        internal void JoinGameSession(string sessionId
+            , JoinGameSessionOptionalParameters optionalParameters
+            , ResultCallback<SessionV2GameSession> callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
                 , AuthToken
                 , Namespace_);
@@ -854,7 +864,7 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -866,14 +876,11 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParseJson<SessionV2GameSession>();
-
-            callback?.Try(result);
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParseJson<SessionV2GameSession>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator LeaveGameSession(string sessionId
@@ -911,6 +918,14 @@ namespace AccelByte.Api
         public IEnumerator RejectGameSessionInvitation(string sessionId
             , ResultCallback callback)
         {
+            RejectGameSessionInvitation(sessionId, null, callback);
+            yield break;
+        }
+        
+        public void RejectGameSessionInvitation(string sessionId
+            , RejectSessionInvitationOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
                 , AuthToken
                 , Namespace_);
@@ -918,7 +933,7 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -930,14 +945,11 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
-
-            var result = response.TryParse();
-
-            callback?.Try(result);
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator GetUserGameSessions(SessionV2StatusFilter? statusFilter,

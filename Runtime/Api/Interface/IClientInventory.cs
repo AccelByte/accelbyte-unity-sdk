@@ -109,40 +109,12 @@ namespace AccelByte.Api.Interface
         /// Updates user's inventory items in bulk
         /// </summary>
         /// <param name="inventoryId">Id of inventory to update items for</param>
-        /// <param name="updatedItemsRequest">Data of items to update</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with payload parameter instead.")]
-        public void BulkUpdateInventoryItems(
-            string inventoryId
-            , UpdateUserInventoryItemRequest[] updatedItemsRequest
-            , ResultCallback<UpdateUserInventoryItemResponse[]> callback
-        );
-
-        /// <summary>
-        /// Updates user's inventory items in bulk
-        /// </summary>
-        /// <param name="inventoryId">Id of inventory to update items for</param>
         /// <param name="payload">Data of items to update</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void BulkUpdateInventoryItems(
             string inventoryId
             , BulkUpdateInventoryItemsPayload[] payload
             , ResultCallback<UpdateUserInventoryItemResponse[]> callback
-        );
-
-        /// <summary>
-        /// Deletes user's inventory items in bulk
-        /// </summary>
-        /// <param name="inventoryId">Id of inventory to delete items for</param>
-        /// <param name="deletedItemsRequest">Data of items to delete</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with payload parameter instead.")]
-        public void BulkDeleteInventoryItems(
-            string inventoryId
-            , DeleteUserInventoryItemRequest[] deletedItemsRequest
-            , ResultCallback<DeleteUserInventoryItemResponse[]> callback
         );
 
         /// <summary>
@@ -161,20 +133,6 @@ namespace AccelByte.Api.Interface
         /// Moves user's item from one inventory to another.
         /// </summary>
         /// <param name="targetInventoryId">Id of inventory to move items to</param>
-        /// <param name="moveItemsRequest">Data of items to be moved</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with payload parameter instead.")]
-        public void MoveItemsBetweenInventories(
-            string targetInventoryId
-            , MoveUserItemsBetweenInventoriesRequest moveItemsRequest
-            , ResultCallback<MoveUserItemsBetweenInventoriesResponse> callback
-        );
-
-        /// <summary>
-        /// Moves user's item from one inventory to another.
-        /// </summary>
-        /// <param name="targetInventoryId">Id of inventory to move items to</param>
         /// <param name="sourceInventoryId">Id of inventory to move items from</param>
         /// <param name="payload">Data of items to be moved</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
@@ -183,20 +141,6 @@ namespace AccelByte.Api.Interface
             , string sourceInventoryId
             , MoveUserItemsBetweenInventoriesPayload[] payload
             , ResultCallback<MoveUserItemsBetweenInventoriesResponse> callback
-        );
-
-        /// <summary>
-        /// Consume item from user's inventory
-        /// </summary>
-        /// <param name="inventoryId">Id of inventory to consume items from</param>
-        /// <param name="consumedItemsRequest">Data of items to be consumed</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with optional parameters instead.")]
-        public void ConsumeUserInventoryItem(
-            string inventoryId
-            , ConsumeUserItemsRequest consumedItemsRequest
-            , ResultCallback<UserItem> callback
         );
 
         /// <summary>

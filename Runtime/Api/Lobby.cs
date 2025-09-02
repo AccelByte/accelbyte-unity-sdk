@@ -2099,7 +2099,6 @@ namespace AccelByte.Api
                 return;
             }
 
-            // var notificationEventEnvelope = Accelbyte.Proto.Session.NotificationEventEnvelope.Parser.ParseFrom(payloadString);
             var jsonString = Encoding.UTF8.GetString(payloadBytes);
 
             switch (notificationType)
@@ -2404,6 +2403,7 @@ namespace AccelByte.Api
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
             messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
+            messagingSystem?.UnsubscribeToTopic(AccelByteMessagingTopic.RejectGameSessionNotification, OnSessionRejectedReceivedHandle);
             
             base.SetSharedMemory(newSharedMemory);
 
@@ -2411,6 +2411,7 @@ namespace AccelByte.Api
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.QosRegionLatenciesUpdated, OnReceivedQosLatenciesUpdatedHandle);
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.MatchmakingStarted, OnMatchmakingStartedHandle);
             messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.NotificationSenderLobby, OnNotificationSenderMessageReceivedHandle);
+            messagingSystem?.SubscribeToTopic(AccelByteMessagingTopic.RejectGameSessionNotification, OnSessionRejectedReceivedHandle);
             notificationBuffer?.SetLogger(SharedMemory?.Logger);
             
             websocketApi?.SetLogger(SharedMemory?.Logger);
@@ -2474,6 +2475,15 @@ namespace AccelByte.Api
             }
 
             HandleOnMessage(payload, true);
+        }
+
+        private void OnSessionRejectedReceivedHandle(string sessionId)
+        {
+            string sessionCacheId = $"sessionInvited_{sessionId}";
+            if (processedMatchmakingMessages != null && processedMatchmakingMessages.Contains(sessionCacheId))
+            {
+                processedMatchmakingMessages.Remove(sessionCacheId);
+            }
         }
 
         #region PredefinedEvents

@@ -22,6 +22,7 @@ namespace AccelByte.Models
         OnLeftPartyNotification,
         OnJoinedGameSessionNotification,
         OnLeftGameSessionNotification,
+        RejectGameSessionNotification
     }
 
     [DataContract, Preserve]

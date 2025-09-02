@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.10.0] (2025-09-02)
+
+
+### Features
+
+* add skip set cookie on login with other platform opt param option 
+* added id field response on moving inventory item response 
+* sunset google play games v1 interface 
+* sunset inventory and server cloudsave deprecated interfaces 
+
+
+### Bug Fixes
+
+* clean session invitation cache after the session is rejected 
+* fix chat websocket behavior on webgl 
+* fixed refresh session maintainer behavior 
+
 ## [17.9.0] (2025-07-22)
 
 

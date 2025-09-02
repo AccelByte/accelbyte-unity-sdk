@@ -92,6 +92,14 @@ namespace AccelByte.Server
         public IEnumerator GetGameSessionDetails(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
+            GetGameSessionDetails(sessionId, null, callback);
+            yield break;
+        }
+
+        internal void GetGameSessionDetails(string sessionId
+            , OptionalParametersBase optionalParameters
+            , ResultCallback<SessionV2GameSession> callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId
                 , AuthToken
                 , Namespace_);
@@ -99,7 +107,7 @@ namespace AccelByte.Server
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var request = HttpRequestBuilder
@@ -110,18 +118,14 @@ namespace AccelByte.Server
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
+            
+            var additionalHttpParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            IHttpResponse response = null;
-
-            yield return HttpClient.SendRequest(request,
-                rsp =>
-                {
-                    response = rsp;
-                });
-
-            var result = response.TryParseJson<SessionV2GameSession>();
-
-            callback?.Try(result);
+            HttpOperator.SendRequest(additionalHttpParameters, request, response =>
+            {
+                var result = response.TryParseJson<SessionV2GameSession>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator DeleteGameSession(string sessionId

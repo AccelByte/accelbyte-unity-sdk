@@ -1105,6 +1105,11 @@ namespace AccelByte.Models
         /// Include mac Address information for PSN and Xbox ban reporting
         /// </summary>
         public LoginWithMacAddress LoginWithMacAddress = null;
+
+        /// <summary>
+        /// If need skip set cookie. Default is false
+        /// </summary>
+        public bool SkipSetCookie;
     }
 
     [Preserve]
@@ -1640,6 +1645,11 @@ namespace AccelByte.Models
         /// Include mac Address information for PSN and Xbox ban reporting
         /// </summary>
         public LoginWithMacAddress LoginWithMacAddress = null;
+
+        /// <summary>
+        /// If need skip set cookie. Default is false
+        /// </summary>
+        public bool SkipSetCookie;
     }
 
     [Preserve]

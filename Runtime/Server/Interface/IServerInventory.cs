@@ -163,22 +163,6 @@ namespace AccelByte.Server.Interface
         /// </summary>
         /// <param name="inventoryId">InventoryId to be process</param>
         /// <param name="userId">User id to be processed</param>
-        /// <param name="request">Detailed data to be processed</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with optional parameters instead.")]
-        public void ConsumeUserInventoryItem(
-            string inventoryId
-            , string userId
-            , ConsumeUserItemsRequest request
-            , ResultCallback<UserItem> callback
-        );
-
-        /// <summary>
-        /// Make a user consume item
-        /// </summary>
-        /// <param name="inventoryId">InventoryId to be process</param>
-        /// <param name="userId">User id to be processed</param>
         /// <param name="qty">Amount of item to consume</param>
         /// <param name="sourceItemId">Item id to consume</param>
         /// <param name="optionalParameters">Optional parameters. Can be null.</param>
@@ -197,22 +181,6 @@ namespace AccelByte.Server.Interface
         /// </summary>
         /// <param name="inventoryId">InventoryId to be process</param>
         /// <param name="userId">User id to be processed</param>
-        /// <param name="request">Detailed data to be processed</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with payload parameter instead.")]
-        public void BulkUpdateUserInventoryItems(
-            string inventoryId
-            , string userId
-            , ServerUpdateUserInventoryItemRequest[] request
-            , ResultCallback<UpdateUserInventoryItemResponse[]> callback
-        );
-
-        /// <summary>
-        /// Update item attributes and tags for a specidic user
-        /// </summary>
-        /// <param name="inventoryId">InventoryId to be process</param>
-        /// <param name="userId">User id to be processed</param>
         /// <param name="payload">Detailed data to be processed</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void BulkUpdateUserInventoryItems(
@@ -220,22 +188,6 @@ namespace AccelByte.Server.Interface
             , string userId
             , ServerUpdateUserInventoryItemPayload[] payload
             , ResultCallback<UpdateUserInventoryItemResponse[]> callback
-        );
-
-        /// <summary>
-        /// Add item to player inventory using inventoryId
-        /// </summary>
-        /// <param name="inventoryId">InventoryId to be process</param>
-        /// <param name="userId">user to be process</param>
-        /// <param name="request">request body contains the item detail</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with optional parameters instead.")]
-        public void SaveUserInventoryItemToInventory(
-            string inventoryId
-            , string userId
-            , ServerSaveUserInventoryItemRequest request
-            , ResultCallback<UserItem> callback
         );
 
         /// <summary>
@@ -258,22 +210,6 @@ namespace AccelByte.Server.Interface
             , uint quantity
             , SaveUserInventoryItemToInventoryOptionalParameters optionalParameters
             , ResultCallback<UserItem> callback
-        );
-
-        /// <summary>
-        /// Remove items from player's inventory
-        /// </summary>
-        /// <param name="inventoryId">InventoryId to be process</param>
-        /// <param name="userId">user to be process</param>
-        /// <param name="request">request body contains the item detail</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with payload parameter instead.")]
-        public void BulkDeleteUserInventoryItems(
-            string inventoryId
-            , string userId
-            , DeleteUserInventoryItemRequest[] request
-            , ResultCallback<DeleteUserInventoryItemResponse[]> callback
         );
 
         /// <summary>
@@ -361,18 +297,6 @@ namespace AccelByte.Server.Interface
         /// <summary>
         /// Creates a new inventory configuration for the current namespace.
         /// </summary>
-        /// <param name="request">Inventory configuration request data</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with optional parameters instead.")]
-        public void CreateInventoryConfiguration(
-            ServerCreateInventoryConfigurationRequest request
-            , ResultCallback<InventoryConfiguration> callback
-        );
-
-        /// <summary>
-        /// Creates a new inventory configuration for the current namespace.
-        /// </summary>
         /// <param name="code">Configuration code for the new inventory configuration</param>
         /// <param name="initialMaxSlots">Starting slots when an inventory is created using the configuration</param>
         /// <param name="maxInstancesPerUser">Maximum instances of the inventory type per user</param>
@@ -437,18 +361,6 @@ namespace AccelByte.Server.Interface
         /// <summary>
         /// Create a new item type on the current namespace.
         /// </summary>
-        /// <param name="request">Data of item type to create.</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with string parameter instead.")]
-        public void CreateItemTypes(
-            ServerCreateItemTypeRequest request,
-            ResultCallback<InventoryItemType> callback
-        );
-
-        /// <summary>
-        /// Create a new item type on the current namespace.
-        /// </summary>
         /// <param name="name">Name of item type to create.</param>
         /// <param name="callback">Returns a result via callback when completed</param>
         public void CreateItemTypes(
@@ -478,18 +390,6 @@ namespace AccelByte.Server.Interface
             , ItemTypeSortBy sortBy = ItemTypeSortBy.CreatedAt
             , int limit = 25
             , int offset = 0
-        );
-
-        /// <summary>
-        /// Create an inventory tag on the current namespace
-        /// </summary>
-        /// <param name="request">Data of tag to create</param>
-        /// <param name="callback">Returns a result via callback when completed</param>
-        [System.Obsolete("This method is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use overload with string parameters instead.")]
-        public void CreateInventoryTag(
-            ServerCreateInventoryTagRequest request
-            , ResultCallback<InventoryTag> callback
         );
 
         /// <summary>

@@ -46,21 +46,6 @@ namespace AccelByte.Server
             coroutineRunner = inCoroutineRunner;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="inAi"></param>
-        /// <param name="inSession"></param>
-        /// <param name="inNamespace">DEPRECATED - Now passed to Api from Config</param>
-        /// <param name="inCoroutineRunner"></param>
-        [Obsolete("namespace param is deprecated (now passed to Api from Config): Use the overload without it"), UnityEngine.Scripting.Preserve]
-        internal ServerCloudSave( ServerCloudSaveApi inApi
-            , ISession inSession
-            , string inNamespace
-            , CoroutineRunner inCoroutineRunner )
-            : this( inApi, inSession, inCoroutineRunner )
-        {
-        }
-
         private void SendPredefinedEvent(
             PredefinedGameRecordMode mode, 
             string key, 
@@ -305,45 +290,6 @@ namespace AccelByte.Server
                 callback);
         }
 
-
-        /// <summary>
-        /// Save a game record. If the record doesn't exist, it will create and
-        /// save the record, if already exists, it will append to the existing one.
-        /// </summary>
-        /// <param name="key">Key of record</param>
-        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
-        /// <param name="setBy">Record set by.</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use SaveGameRecord(key, recordRequest, optionalParams, callback).")]
-        public void SaveGameRecord( string key
-            , Dictionary<string, object> recordRequest
-            , RecordSetBy setBy
-            , ResultCallback callback )
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            GameRecordMetadataOptionalParams optionalParams = new GameRecordMetadataOptionalParams()
-            {
-                SetBy = setBy
-            };
-
-            SaveGameRecord(
-                key
-                , recordRequest
-                , optionalParams
-                , result =>
-                {
-                    if (result.IsError)
-                    {
-                        callback?.TryError(result.Error);
-                        return;
-                    }
-
-                    callback?.TryOk();
-                });
-        }
-
         /// <summary>
         /// Save a game record.If the record doesn't exist, it will create and
         /// save the record, if already exists, it will append to the existing one.
@@ -403,44 +349,6 @@ namespace AccelByte.Server
             SendPredefinedEvent(PredefinedGameRecordMode.Deleted, key);
 
             api.DeleteGameRecord(key, callback);
-        }
-
-        /// <summary>
-        /// Replace a game record. If the record doesn't exist, it will create and
-        /// save the record, if already exists, it will append to the existing one.
-        /// </summary>
-        /// <param name="key">Key of record</param>
-        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
-        /// <param name="setBy">Record set by.</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use ReplaceGameRecord(key, recordRequest, optionalParams, callback).")]
-        public void ReplaceGameRecord( string key
-            , Dictionary<string, object> recordRequest
-            , RecordSetBy setBy
-            , ResultCallback callback )
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            GameRecordMetadataOptionalParams optionalParams = new GameRecordMetadataOptionalParams()
-            {
-                SetBy = setBy
-            };
-
-            ReplaceGameRecord(
-                key, 
-                recordRequest,
-                optionalParams,
-                result =>
-                {
-                    if (result.IsError)
-                    {
-                        callback?.TryError(result.Error);
-                        return;
-                    }
-
-                    callback?.TryOk();
-                });
         }
 
         /// <summary>
@@ -565,24 +473,6 @@ namespace AccelByte.Server
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use CreateAdminGameRecord(key, recordRequest, optionalParams, callback).")]
-        public void CreateAdminGameRecord(string key
-            , Dictionary<string, object> recordRequest
-            , ResultCallback<AdminGameRecord> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            var optionalParams = new AdminRecordMetadataOptionalParams();
-            CreateAdminGameRecord(key, recordRequest, optionalParams, callback);
-        }
-
-        /// <summary>
-        /// Create new admin game record or append the existing admin game record.
-        /// </summary>
-        /// <param name="key">Key of record</param>
-        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
         /// <param name="optionalParams">Optional params to set metadata (Can be null)</param>
         /// <param name="callback">Returns a Result via callback when completed</param>
         public void CreateAdminGameRecord(string key
@@ -658,24 +548,6 @@ namespace AccelByte.Server
             }
 
             api.QueryAdminGameRecordKeys(callback, limit, offset);
-        }
-
-        /// <summary>
-        /// Create new admin game record or replace the existing admin game record.
-        /// </summary>
-        /// <param name="key">Key of record</param>
-        /// <param name="recordRequest">The request of the record with JSON formatted.</param>
-        /// <param name="callback">Returns a Result via callback when completed</param>
-        [Obsolete("This interface is deprecated and will be removed on 2025.5.AGS. " +
-            "Please use ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback).")]
-        public void ReplaceAdminGameRecord(string key
-            , Dictionary<string, object> recordRequest
-            , ResultCallback<AdminGameRecord> callback)
-        {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
-            var optionalParams = new AdminRecordMetadataOptionalParams();
-            ReplaceAdminGameRecord(key, recordRequest, optionalParams, callback);
         }
 
         /// <summary>

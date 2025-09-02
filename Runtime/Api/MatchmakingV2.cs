@@ -83,8 +83,8 @@ namespace AccelByte.Api
         /// Returns a Result that contain MatchmakingV2CreateTicketResponse via callback when completed.
         /// </param>
         public void CreateMatchmakingTicket(string matchPoolName
-            , MatchmakingV2CreateTicketRequestOptionalParams optionalParams,
-            ResultCallback<MatchmakingV2CreateTicketResponse> callback)
+            , MatchmakingV2CreateTicketRequestOptionalParams optionalParams
+            , ResultCallback<MatchmakingV2CreateTicketResponse> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParams?.Logger);
 

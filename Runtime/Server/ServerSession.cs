@@ -111,6 +111,13 @@ namespace AccelByte.Server
         public void GetGameSessionDetails(string sessionId
             , ResultCallback<SessionV2GameSession> callback)
         {
+            GetGameSessionDetails(sessionId, null, callback);
+        }
+        
+        internal void GetGameSessionDetails(string sessionId
+            , OptionalParametersBase optionalParameters
+            , ResultCallback<SessionV2GameSession> callback)
+        {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
@@ -124,10 +131,10 @@ namespace AccelByte.Server
                 return;
             }
 
-            _coroutineRunner.Run(
-                Api.GetGameSessionDetails(
-                    sessionId,
-                    callback));
+            Api.GetGameSessionDetails(
+                sessionId,
+                optionalParameters,
+                callback);
         }
 
         /// <summary>

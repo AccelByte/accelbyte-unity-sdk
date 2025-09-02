@@ -414,7 +414,8 @@ public class OAuth2 : ApiBase
     }
     
     internal void LoginWithOtherPlatformId
-    (string platformId
+    (
+        string platformId
         , string platformToken
         , ResultCallback<TokenData, OAuthError> callback
         , bool createHeadless
@@ -463,6 +464,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", optionalParameters?.CreateHeadless is true ? "true" : "false")
+            .WithFormParam("skipSetCookie", optionalParameters?.SkipSetCookie is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId);
 
         if (loginWithMacAddress.IsLoginWithMacAddress())
@@ -1491,6 +1493,7 @@ public class OAuth2 : ApiBase
             .WithFormParam("platform_token", platformToken)
             .WithFormParam("namespace", Namespace_)
             .WithFormParam("createHeadless", optionalParameters?.CreateHeadless is true ? "true" : "false")
+            .WithFormParam("skipSetCookie", optionalParameters?.SkipSetCookie is true ? "true" : "false")
             .AddAdditionalData("flightId", AccelByteSDK.FlightId);
 
         if (loginWithMacAddress.IsLoginWithMacAddress())

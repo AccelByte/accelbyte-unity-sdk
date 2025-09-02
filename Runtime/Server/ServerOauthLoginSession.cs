@@ -80,7 +80,7 @@ namespace AccelByte.Server
                 if (!getClientTokenResult.IsError)
                 {
                     OnReceivedLoginToken(getClientTokenResult.Value);
-                    SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, tokenData.expires_in);
+                    SessionMaintainer?.Start(SharedMemory?.CoreHeartBeat, SharedMemory?.Logger, tokenData.expires_in * 0.8f);
 
                     callback?.TryOk(getClientTokenResult.Value);
                 }

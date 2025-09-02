@@ -55,6 +55,7 @@ namespace AccelByte.Core
                     });
             };
             WaitTimeCommand cmd = new WaitTimeCommand(initialDelay, onWaitDone, cts.Token);
+            cmd.SkipCounter = 1;
             sdkHeartbeat.Wait(cmd);
         }
 
@@ -91,8 +92,8 @@ namespace AccelByte.Core
                     });
             };
             WaitTimeCommand cmd = new WaitTimeCommand(delay, onWaitDone, cts.Token);
+            cmd.SkipCounter = 1;
             sdkHeartbeat.Wait(cmd);
         }
-
     }
 }
