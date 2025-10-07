@@ -152,6 +152,16 @@ namespace AccelByte.Server.Interface
             , ResultCallback callback);
 
         /// <summary>
+        /// Send a request to attempt to evaluate many user's challenge progress
+        /// </summary>
+        /// <param name="userIds">List of the User IDs to be evaluated their challenge progress</param>
+        /// <param name="optionalParam">optional parameter to evaluate challenge progress</param>
+        /// <param name="callback">ResultCallback whether it success or failed</param>
+        public void EvaluateChallengeProgress(string[] userIds
+            , EvaluateChallengeProgressOptionalParameters optionalParam
+            , ResultCallback callback);
+
+        /// <summary>
         /// Claim challenge rewards for multiple users.
         /// </summary>
         /// <param name="challengeBulkClaimRewardRequest">Bulk claim reward request model</param>

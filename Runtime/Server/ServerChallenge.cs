@@ -231,7 +231,7 @@ namespace AccelByte.Server
             EvaluateChallengeProgress(userIds, optionalParameters, callback);
         }
 
-        internal void EvaluateChallengeProgress(string[] userIds
+        public void EvaluateChallengeProgress(string[] userIds
             , EvaluateChallengeProgressOptionalParameters optionalParameters
             , ResultCallback callback)
         {

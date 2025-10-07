@@ -521,7 +521,10 @@ namespace AccelByte.Models
     [Preserve]
     public class EvaluateChallengeProgressOptionalParameters : OptionalParametersBase
     {
-        
+        /// <summary>
+        /// Fill with desired challenge code to evaluate
+        /// </summary>
+        public string[] ChallengeCodesToEvaluate;
     }
 
     [Preserve]

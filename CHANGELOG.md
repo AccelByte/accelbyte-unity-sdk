@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.11.0] (2025-10-07)
+
+
+### Features
+
+* add missing sold enum in entitlement status 
+* add optional param for evaluate challenge progress 
+* add user id as getstatuseritem param 
+* added EndDatetime to auth ban error 
+* added Get Legal Policies by Namespace and Country 
+* added GetLeaderboardV3 
+* added ServerStatistic.ListUserStatCycleItems 
+
+
+### Bug Fixes
+
+* fix incorrect namespace value 
+* removed format validation of stat cycle id 
+
 ## [17.10.0] (2025-09-02)
 
 

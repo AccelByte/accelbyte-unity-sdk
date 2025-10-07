@@ -98,6 +98,13 @@ namespace AccelByte.Api.Interface
         public void EvaluateChallengeProgress(ResultCallback callback);
 
         /// <summary>
+        /// Send a request to attempt to evaluate the current user's challenge progress
+        /// </summary>
+        /// <param name="optionalParam">optional parameter to evaluate challenge progress</param>
+        /// <param name="callback">ResultCallback if operation is successful or not</param>
+        public void EvaluateChallengeProgress(EvaluateChallengeProgressOptionalParameters optionalParam, ResultCallback callback);
+
+        /// <summary>
         /// List schedules of given challenge for specific user.
         /// </summary>
         /// <param name="challengeCode">Challenge code</param>

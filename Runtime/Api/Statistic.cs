@@ -155,6 +155,27 @@ namespace AccelByte.Api
         /// <param name="callback">>Returns all profile's StatItems via callback when completed</param>
         public void GetUserStatItems(GetUserStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
         {
+            GetUserStatItems(session.UserId, optionalParam, callback);
+        }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="targetUserId">target user to be queried</param>
+        /// <param name="callback">Returns target user StatItems via callback when completed</param>
+        public void GetUserStatItems(string targetUserId, ResultCallback<PagedStatItems> callback)
+        {
+            GetUserStatItems(targetUserId:targetUserId, callback: callback, optionalParam: null);
+        }
+
+        /// <summary>
+        /// Get stat items of a user, filter by statCodes and tags
+        /// </summary>
+        /// <param name="targetUserId">target user to be queried</param>
+        /// <param name="optionalParam">Optional parameters to be sent</param>
+        /// <param name="callback">Returns target user StatItems via callback when completed</param>
+        public void GetUserStatItems(string targetUserId, GetUserStatItemsOptionalParam optionalParam, ResultCallback<PagedStatItems> callback)
+        {
             Report.GetFunctionLog(GetType().Name, logger: optionalParam?.Logger);
 
             if (!session.IsValid())
@@ -163,8 +184,8 @@ namespace AccelByte.Api
                 return;
             }
 
-            api.GetUserStatItems(session.UserId, session.AuthorizationToken, optionalParam, callback);
-        }      
+            api.GetUserStatItems(targetUserId, session.AuthorizationToken, optionalParam, callback);
+        }
 
         /// <summary>
         /// Get stat items of a user, filter by statCodes and tags
@@ -583,11 +604,6 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
-            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
-            {
-                return;
-            }
-
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
@@ -691,11 +707,6 @@ namespace AccelByte.Api
             , ResultCallback<PagedStatCycleItem> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
-
-            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
-            {
-                return;
-            }
 
             if (!session.IsValid())
             {
@@ -836,11 +847,6 @@ namespace AccelByte.Api
             ResultCallback<PagedStatCycleItem> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParam?.Logger);
-
-            if (!ValidateAccelByteId(cycleId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetCycleIdInvalidMessage(cycleId), callback))
-            {
-                return;
-            }
 
             if (!session.IsValid())
             {

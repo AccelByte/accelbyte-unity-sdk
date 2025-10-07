@@ -227,14 +227,20 @@ namespace AccelByte.Api
             int offset = optionalParams.Offset;
             int limit = optionalParams.Limit;
 
-            IHttpRequest request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards")
                 .WithPathParam("namespace", Namespace_)
-                .WithQueryParam( "offset", ( offset >= 0 ) ? offset.ToString() : "" )
-                .WithQueryParam( "limit", ( limit > 0 ) ? limit.ToString() : "" )
-                .WithBearerAuth( AuthToken )
-                .Accepts( MediaType.ApplicationJson )
-                .GetResult();
+                .WithQueryParam("offset", (offset >= 0) ? offset.ToString() : "")
+                .WithQueryParam("limit", (limit > 0) ? limit.ToString() : "")
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParams.IsDeleted != null)
+            {
+                requestBuilder.WithQueryParam("isDeleted", optionalParams.IsDeleted.ToString());
+            }
+            
+            IHttpRequest request = requestBuilder.GetResult();
             
             var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
             HttpOperator.SendRequest(additionalParameters, request, response =>
@@ -264,6 +270,33 @@ namespace AccelByte.Api
             GetRankingsV3(leaderboardCode, optionalParameters, callback);
             
             yield break;
+        }
+        
+        internal void GetLeaderboardV3(string leaderboardCode, GetLeaderboardOptionalParameters optionalParams, ResultCallback<LeaderboardDataV3> callback)
+        {
+            Report.GetFunctionLog( GetType().Name );
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, leaderboardCode);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            IHttpRequest request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/leaderboards/{leaderboardCode}")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("leaderboardCode", leaderboardCode)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+            
+            var additionalParameters = Models.AdditionalHttpParameters.CreateFromOptionalParameters(optionalParams);
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<LeaderboardDataV3>();
+                callback?.Try(result);
+            });
         }
         
         internal void GetRankingsV3(string leaderboardCode, GetRankingV3OptionalParameters optionalParams, ResultCallback<LeaderboardRankingResult> callback)

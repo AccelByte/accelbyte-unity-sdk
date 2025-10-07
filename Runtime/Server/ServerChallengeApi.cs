@@ -381,13 +381,20 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
-            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/progress/evaluate")
+            var requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/admin/namespaces/{namespace}/progress/evaluate")
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .WithPathParam("namespace", ServerConfig.Namespace)
-                .WithBody(requestBody.ToUtf8Json())
-                .GetResult();
+                .WithBody(requestBody.ToUtf8Json());
+
+            if (optionalParameters?.ChallengeCodesToEvaluate?.Length > 0)
+            {
+                requestBuilder.WithQueryParam("challengeCode", string.Join(",", optionalParameters.ChallengeCodesToEvaluate));
+            }
+
+            var request = requestBuilder.GetResult();
+
             var additionalParameters = new AdditionalHttpParameters()
             {
                 Logger = optionalParameters?.Logger

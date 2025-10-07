@@ -83,6 +83,38 @@ namespace AccelByte.Models
         [EnumMember(Value = "UPDATED_AT_DESC")]
         UpdatedAtDesc,
     }
+    
+    public static class StatisticSortByStringConverter
+    {
+        public static string ConvertToString(this StatisticSortBy sortBy)
+        {
+            switch (sortBy)
+            {
+                case StatisticSortBy.None:
+                    return string.Empty;
+                case StatisticSortBy.StatCode:
+                    return "statCode";
+                case StatisticSortBy.StatCodeAsc:
+                    return "statCode:asc";
+                case StatisticSortBy.StatCodeDesc:
+                    return "statCode:desc";
+                case StatisticSortBy.CreatedAt:
+                    return "createdAt";
+                case StatisticSortBy.CreatedAtAsc:
+                    return "createdAt:asc";
+                case StatisticSortBy.CreatedAtDesc:
+                    return "createdAt:desc";
+                case StatisticSortBy.UpdatedAt:
+                    return "updatedAt";
+                case StatisticSortBy.UpdatedAtAsc:
+                    return "updatedAt:asc";
+                case StatisticSortBy.UpdatedAtDesc:
+                    return "updatedAt:desc";
+                default:
+                    return string.Empty;
+            }
+        }
+    }
 
     [DataContract, Preserve]
     public class StatConfig
@@ -605,5 +637,29 @@ namespace AccelByte.Models
     public class DeleteUserStatItemsOptionalParameters : OptionalParametersBase
     {
 
+    }
+
+    [Preserve, DataContract]
+    public class ListUserStatCycleItemsResult
+    {
+        [DataMember(Name = "data")] public StatCycleItem[] Data;
+        [DataMember(Name = "paging")] public ListUserStatCycleItemsPaging Paging;
+    }
+
+    [Preserve, DataContract]
+    public class ListUserStatCycleItemsPaging
+    {
+        [DataMember(Name = "previous")] public StatCycleItem[] Previous;
+        [DataMember(Name = "next")] public Paging Next;
+    }
+
+    [Preserve]
+    public class ListUserStatCycleItemsOptionalParameters : OptionalParametersBase
+    {
+        public string StatCodes;
+        public bool? IsPublic;
+        public int Offset = 0;
+        public int Limit = 20;
+        public StatisticSortBy[] SortBy;
     }
 }

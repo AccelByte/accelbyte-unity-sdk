@@ -264,6 +264,39 @@ namespace AccelByte.Api
                 HandleCallback(cb, callback);
             });
         }
+        
+        /// <summary>
+        /// Get leaderboard configuration by given leaderboard code
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains leaderboard configuration</param>
+        /// <param name="leaderboardCode"></param>
+        public void GetLeaderboardV3(string leaderboardCode, ResultCallback<LeaderboardDataV3> callback)
+        {
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            api.GetLeaderboardV3(leaderboardCode, null, callback);
+        }
+        
+        /// <summary>
+        /// Get leaderboard configuration by given leaderboard code
+        /// </summary>
+        /// <param name="callback">Returns a Result that contains leaderboard configuration</param>
+        /// <param name="optionalParams">Returns a Result that contains leaderboard configuration</param>
+        /// <param name="leaderboardCode"></param>
+        internal void GetLeaderboardV3(string leaderboardCode, GetLeaderboardOptionalParameters optionalParams, ResultCallback<LeaderboardDataV3> callback)
+        {
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+            
+            api.GetLeaderboardV3(leaderboardCode, optionalParams, callback);
+        }
 
         /// <summary>
         /// Get leaderboard ranking data from the beginning.

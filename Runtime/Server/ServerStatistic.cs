@@ -1007,5 +1007,26 @@ namespace AccelByte.Server
 
             Api.GetListStatCycleConfigs(optionalParameters, callback);
         }
+
+        /// <summary>
+        /// Fetch the list of user's stat cycle items
+        /// </summary>
+        public void ListUserStatCycleItems(string userId, string cycleId,
+            ResultCallback<ListUserStatCycleItemsResult> callback)
+        {
+            ListUserStatCycleItems(userId, cycleId, null, callback);
+        }
+
+        /// <summary>
+        /// Fetch the list of user's stat cycle items
+        /// </summary>
+        public void ListUserStatCycleItems(string userId, string cycleId,
+            ListUserStatCycleItemsOptionalParameters optionalParameters,
+            ResultCallback<ListUserStatCycleItemsResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            Api.ListUserStatCycleItems(userId, cycleId, optionalParameters, callback);
+        }
     }
 }

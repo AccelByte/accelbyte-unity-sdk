@@ -159,6 +159,59 @@ namespace AccelByte.Server
             var result = response.TryParseJson<UserBanResponseV3>();
             callback?.Try(result);
         }
+        
+        internal void BanUser(string userId
+            , BanType banType
+            , BanReason reason
+            , System.DateTime endDate
+            , BanUserOptionalParameters optionalParameters
+            , ResultCallback<UserBanResponseV3> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_,
+                AuthToken,
+                userId,
+                endDate);
+
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            BanCreateRequest banRequest = new BanCreateRequest()
+            {
+                ban = banType.ToString(),
+                reason = reason.ToString(),
+                endDate = endDate.ToString("o"),
+            };
+
+            if (optionalParameters != null)
+            {
+                banRequest.skipNotif = optionalParameters.SkipNotif;
+                banRequest.comment = optionalParameters.Comment;
+            }
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/iam/v3/admin/namespaces/{namespace}/users/{userId}/bans")
+                .WithPathParam("namespace",
+                    Namespace_)
+                .WithPathParam("userId",
+                    userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .WithBody(banRequest.ToUtf8Json())
+                .GetResult();
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+            HttpOperator.SendRequest(additionalParameters,
+                request,
+                response =>
+                {
+                    var result = response.TryParseJson<UserBanResponseV3>();
+                    callback?.Try(result);
+                });
+        }
 
         public IEnumerator ChangeUserBanStatus(string userId, string banId, bool enabled, ResultCallback<UserBanResponseV3> callback)
         {

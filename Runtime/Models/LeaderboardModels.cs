@@ -71,6 +71,11 @@ namespace AccelByte.Models
         public int Offset = 0;
         public int Limit = 20;
     }
+
+    [Preserve]
+    public class GetLeaderboardOptionalParameters : OptionalParametersBase
+    {
+    }
     
     [Preserve]
     public class GetRankingsOptionalParameters : OptionalParametersBase
@@ -141,6 +146,7 @@ namespace AccelByte.Models
     {
         public int Offset = 0;
         public int Limit = 20;
+        public bool? IsDeleted;
     }
 
     [DataContract, Preserve]

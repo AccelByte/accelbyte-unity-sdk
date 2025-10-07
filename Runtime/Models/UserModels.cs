@@ -59,11 +59,11 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class TokenBans
     {
-        [DataMember] public string Ban;
-        [DataMember] public DateTime DisabledDate;
-        [DataMember] public bool Enabled;
-        [DataMember] public DateTime EndDate;
-        [DataMember] public string TargetedNamespace;
+        [DataMember(Name = "ban")] public string Ban;
+        [DataMember(Name = "disabledDate")] public DateTime DisabledDate;
+        [DataMember(Name = "enabled")] public bool Enabled;
+        [DataMember(Name = "endDate")] public DateTime EndDate;
+        [DataMember(Name = "targetedNamespace")] public string TargetedNamespace;
     }
 
     [DataContract, Preserve]
@@ -652,6 +652,13 @@ namespace AccelByte.Models
         [DataMember] public string reason;
         [DataMember] public bool skipNotif;
     }
+    
+    [Preserve]
+    public class BanUserOptionalParameters : OptionalParametersBase
+    {
+        public bool SkipNotif;
+        public string Comment;
+    }
 
     /// <summary>
     /// Template for Ban response
@@ -673,7 +680,7 @@ namespace AccelByte.Models
         [DataMember] public BanType ban;
         [DataMember] public string banId;
         [DataMember] public BannedByV3 bannedBy;
-        [DataMember] public string comment;
+        [DataMember] public string comment; 
         [DataMember] public DateTime createdAt;
         [DataMember] public DateTime disabledDate;
         [DataMember] public bool enabled;

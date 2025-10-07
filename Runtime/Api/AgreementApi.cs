@@ -68,10 +68,8 @@ namespace AccelByte.Api
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -124,10 +122,8 @@ namespace AccelByte.Api
                 .WithQueryParam("defaultOnEmpty", defaultOnEmpty.ToString())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -176,10 +172,8 @@ namespace AccelByte.Api
                 .WithBody(acceptAgreementRequests.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -228,10 +222,8 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -274,10 +266,8 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
@@ -338,14 +328,75 @@ namespace AccelByte.Api
                 .WithBody(requestBody.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
-            var additionalParameters = new AdditionalHttpParameters()
-            {
-                Logger = optionalParameters?.Logger
-            };
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
             HttpOperator.SendRequest(additionalParameters, request, response =>
             {
                 var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetLegalPoliciesByNamespaceAndCountry(string countryCode, GetPoliciesByNamespaceAndCountryOptionalParameters optionalParameters, ResultCallback<PublicPolicy[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            string targetNamespace = Config.Namespace;
+            if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.Namespace))
+            {
+                targetNamespace = optionalParameters.Namespace;
+            }
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(countryCode, targetNamespace);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/public/policies/namespaces/{namespace}/countries/{countryCode}")
+                .WithPathParam("namespace", targetNamespace)
+                .WithPathParam("countryCode", countryCode)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters != null)
+            {
+                if (optionalParameters.PolicyType != null &&
+                    optionalParameters.PolicyType.Value != AgreementPolicyType.EMPTY)
+                {
+                    requestBuilder.WithQueryParam("policyType", optionalParameters.PolicyType.Value.ToString());
+                }
+                
+                if (optionalParameters.Tags != null && optionalParameters.Tags.Length > 0)
+                {
+                    requestBuilder.WithQueryParam("tags", string.Join(",", optionalParameters.Tags));
+                }
+                
+                if (optionalParameters.DefaultOnEmpty != null)
+                {
+                    requestBuilder.WithQueryParam("defaultOnEmpty", optionalParameters.DefaultOnEmpty.Value.ToString());
+                }
+                
+                if (optionalParameters.AlwaysIncludeDefault != null)
+                {
+                    requestBuilder.WithQueryParam("alwaysIncludeDefault", optionalParameters.AlwaysIncludeDefault.Value.ToString());
+                }
+                
+                if (optionalParameters.VisibleOnly != null)
+                {
+                    requestBuilder.WithQueryParam("visibleOnly", optionalParameters.VisibleOnly.Value.ToString());
+                }
+            }
+
+            var request = requestBuilder.GetResult();
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<PublicPolicy[]>();
                 callback?.Try(result);
             });
         }

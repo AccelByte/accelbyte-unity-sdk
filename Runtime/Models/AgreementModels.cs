@@ -252,4 +252,18 @@ namespace AccelByte.Models
     {
 
     }
+
+    [Preserve]
+    public class GetPoliciesByNamespaceAndCountryOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// If empty by default will use Namespace in the config.
+        /// </summary>
+        public string Namespace;
+        public AgreementPolicyType? PolicyType;
+        public string[] Tags;
+        public bool? DefaultOnEmpty;
+        public bool? AlwaysIncludeDefault;
+        public bool? VisibleOnly;
+    }
 }

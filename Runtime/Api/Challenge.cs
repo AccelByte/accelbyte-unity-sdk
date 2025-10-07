@@ -265,7 +265,7 @@ namespace AccelByte.Api
             EvaluateChallengeProgress(optionalParameters, callback);
         }
 
-        internal void EvaluateChallengeProgress(EvaluateChallengeProgressOptionalParameters optionalParameters, ResultCallback callback)
+        public void EvaluateChallengeProgress(EvaluateChallengeProgressOptionalParameters optionalParameters, ResultCallback callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 

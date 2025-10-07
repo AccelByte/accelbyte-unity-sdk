@@ -37,6 +37,31 @@ namespace AccelByte.Models
         [DataMember] public string comment;
         [DataMember] public string endDate;
         [DataMember] public BanReason reason;
+
+        public System.DateTime EndDateTime
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(endDate))
+                {
+                    return new System.DateTime();
+                }
+
+                try
+                {
+                    long ticks = long.Parse(endDate);
+                    System.DateTimeOffset dateTimeOffset = System.DateTimeOffset.FromUnixTimeSeconds(ticks);
+                    System.DateTime dateTime = dateTimeOffset.UtcDateTime;
+                    
+                    return dateTime;
+                }
+                catch (System.Exception ex)
+                {
+                    AccelByte.Core.AccelByteDebug.LogWarning($"Unable to parse ban endDate\n{ex.Message}");
+                    return new System.DateTime();
+                }
+            }
+        }
     }
 
     [DataContract, Preserve]

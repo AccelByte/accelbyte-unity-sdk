@@ -358,11 +358,18 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
-            var request = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/evaluate")
+            var requestBuilder = HttpRequestBuilder.CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/users/me/progress/evaluate")
                 .WithBearerAuth(AuthToken)
                 .Accepts(MediaType.ApplicationJson)
-                .WithPathParam("namespace", Config.Namespace)
-                .GetResult();
+                .WithPathParam("namespace", Config.Namespace);
+
+            if (optionalParameters?.ChallengeCodesToEvaluate?.Length > 0)
+            {
+                requestBuilder.WithQueryParam("challengeCode", string.Join(",", optionalParameters.ChallengeCodesToEvaluate));
+            };
+
+            var request = requestBuilder.GetResult();
+
             var additionalParameters = new AdditionalHttpParameters()
             {
                 Logger = optionalParameters?.Logger

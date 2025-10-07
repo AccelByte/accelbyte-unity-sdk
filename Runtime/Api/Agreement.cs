@@ -405,5 +405,37 @@ namespace AccelByte.Api
 
             api.ChangePolicyPreferences(requestBody, optionalParameters, callback);
         }
+        
+        /// <summary>
+        /// Retrieve all active latest policies based on a namespace and country.
+        /// - Main overload
+        /// </summary>
+        /// <param name="countryCode">Country code.</param>
+        /// <param name="callback">
+        /// Returns a Result that contains an array of public policy via callback when completed
+        /// </param>
+        public void GetLegalPoliciesByNamespaceAndCountry(string countryCode
+            , ResultCallback<PublicPolicy[]> callback)
+        {
+            GetLegalPoliciesByNamespaceAndCountry(countryCode, null, callback);
+        }
+
+        /// <summary>
+        /// Retrieve all active latest policies based on a namespace and country.
+        /// - Main overload
+        /// </summary>
+        /// <param name="countryCode">Country code.</param>
+        /// <param name="optionalParameters">Contains optional parameters.</param>
+        /// <param name="callback">
+        /// Returns a Result that contains an array of public policy via callback when completed
+        /// </param>
+        public void GetLegalPoliciesByNamespaceAndCountry(string countryCode
+            , GetPoliciesByNamespaceAndCountryOptionalParameters optionalParameters
+            , ResultCallback<PublicPolicy[]> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            api.GetLegalPoliciesByNamespaceAndCountry(countryCode, optionalParameters, callback);
+        }
     }
 }

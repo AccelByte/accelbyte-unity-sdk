@@ -72,6 +72,58 @@ namespace AccelByte.Api
             , EntitlementAppType entitlementAppType = EntitlementAppType.NONE
             , string[] features = null)
         {
+            var optionalParam = new QueryUserEntitlementsOptionalParameters()
+            {
+                EntitlementName = entitlementName,
+                ItemId = itemId,
+                Offset = offset,
+                Limit = limit,
+                EntitlementClazz = entitlementClazz,
+                EntitlementAppType = entitlementAppType,
+                Features = features
+            };
+
+            QueryUserEntitlements(optionalParam, callback);
+        }
+
+        /// <summary>
+        /// Query user entitlements.
+        /// </summary>
+        /// <param name="optionalParameters">List of optional parameter that can be set to narrow the query result</param>
+        /// <param name="callback">Returns a Result that contains EntitlementPagingSlicedResult via callback when completed</param>
+        public void QueryUserEntitlements(QueryUserEntitlementsOptionalParameters optionalParameters
+            , ResultCallback<EntitlementPagingSlicedResult> callback)
+        {
+            if (session == null)
+            {
+                callback?.TryError(ErrorCode.InvalidSession);
+                return;
+            }
+
+            QueryUserEntitlements(session.UserId, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Query user entitlements.
+        /// </summary>
+        /// <param name="targetUserId">Target user to be queried</param>
+        /// <param name="callback">Returns a Result that contains EntitlementPagingSlicedResult via callback when completed</param>
+        public void QueryUserEntitlements(string targetUserId
+            , ResultCallback<EntitlementPagingSlicedResult> callback)
+        {
+            QueryUserEntitlements(targetUserId, null, callback);
+        }
+
+        /// <summary>
+        /// Query user entitlements.
+        /// </summary>
+        /// <param name="targetUserId">Target user to be queried</param>
+        /// <param name="optionalParameters">List of optional parameter that can be set to narrow the query result</param>
+        /// <param name="callback">Returns a Result that contains EntitlementPagingSlicedResult via callback when completed</param>
+        public void QueryUserEntitlements(string targetUserId
+            , QueryUserEntitlementsOptionalParameters optionalParameters
+            , ResultCallback<EntitlementPagingSlicedResult> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             if (!session.IsValid())
@@ -80,17 +132,9 @@ namespace AccelByte.Api
                 return;
             }
 
-            coroutineRunner.Run(
-                api.QueryUserEntitlements(
-                    session.UserId,
-                    entitlementName,
-                    itemId,
-                    features, 
-                    offset,
-                    limit,
-                    entitlementClazz,
-                    entitlementAppType,
-                    callback));
+            api.QueryUserEntitlements(targetUserId
+                , optionalParameters
+                , callback);
         }
 
         /// <summary>
@@ -1192,7 +1236,7 @@ namespace AccelByte.Api
         }
         
         /// <summary>
-        /// Sell User Entitlement.
+        /// Sell User Entitlement back to the platform if the item is configured to be sellable
         /// </summary>
         /// <param name="userEntitlementSoldParams">The user entitlement parameters containing the user ID and entitlement ID to sell.</param>
         /// <param name="entitlementSoldRequest">The entitlement sold request containing the use count and request ID.</param>
@@ -1201,20 +1245,69 @@ namespace AccelByte.Api
             , EntitlementSoldRequest entitlementSoldRequest
             , ResultCallback<SellItemEntitlementInfo> callback)
         {
+            SellUserEntitlement(userEntitlementSoldParams, entitlementSoldRequest, null, callback);
+        }
+
+        /// <summary>
+        /// Sell User Entitlement back to the platform if the item is configured to be sellable
+        /// </summary>
+        /// <param name="userEntitlementSoldParams">The user entitlement parameters containing the user ID and entitlement ID to sell.</param>
+        /// <param name="entitlementSoldRequest">The entitlement sold request containing the use count and request ID.</param>
+        /// <param name="optionalParameters">The optional parameter that can be set.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SellUserEntitlement(UserEntitlementSoldParams userEntitlementSoldParams
+            , EntitlementSoldRequest entitlementSoldRequest
+            , SellUserEntitlementOptionalParameters optionalParameters
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
+            if (userEntitlementSoldParams == null)
+            {
+                callback?.TryError(ErrorCode.InvalidRequest);
+                return;
+            }
+
+            SellUserEntitlement(userEntitlementSoldParams.EntitlementId, entitlementSoldRequest, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Sell User Entitlement back to the platform if the item is configured to be sellable
+        /// </summary>
+        /// <param name="entitlementId">The user entitlement ID to sell.</param>
+        /// <param name="entitlementSoldRequest">The entitlement sold request containing the use count and request ID.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SellUserEntitlement(string entitlementId
+            , EntitlementSoldRequest entitlementSoldRequest
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
+            SellUserEntitlement(entitlementId, entitlementSoldRequest, null, callback);
+        }
+
+        /// <summary>
+        /// Sell User Entitlement back to the platform if the item is configured to be sellable
+        /// </summary>
+        /// <param name="entitlementId">The user entitlement ID to sell.</param>
+        /// <param name="entitlementSoldRequest">The entitlement sold request containing the use count and request ID.</param>
+        /// <param name="optionalParameters">The optional parameter that can be set.</param>
+        /// <param name="callback"> Returns a Result via callback when completed</param>
+        public void SellUserEntitlement(string entitlementId
+            , EntitlementSoldRequest entitlementSoldRequest
+            , SellUserEntitlementOptionalParameters optionalParameters
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-            
-            userEntitlementSoldParams.UserId = session.UserId;
-            coroutineRunner.Run(
-                api.SellUserEntitlement(
-                    userEntitlementSoldParams,
-                    entitlementSoldRequest,
-                    callback
-                ));
+
+            api.SellUserEntitlement(
+                session.UserId,
+                entitlementId,
+                entitlementSoldRequest,
+                optionalParameters,
+                callback
+            );
         }
 
         /// <summary>

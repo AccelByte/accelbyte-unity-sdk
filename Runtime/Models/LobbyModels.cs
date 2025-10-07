@@ -961,6 +961,8 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class UserBannedNotification
     {
+        [DataMember(Name = "id"), Preserve] public string Id;
+        [DataMember(Name = "code"), Preserve] public string Code;
         [DataMember, Preserve] public string userId;
         [DataMember(Name = "namespace"), Preserve] public string Namespace;
         [DataMember, Preserve] public BanType ban;

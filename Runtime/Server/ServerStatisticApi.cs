@@ -1008,5 +1008,69 @@ namespace AccelByte.Server
                 callback?.Try(result);
             });
         }
+
+        internal void ListUserStatCycleItems(string userId
+            , string cycleId
+            , ListUserStatCycleItemsOptionalParameters optionalParameters
+            , ResultCallback<ListUserStatCycleItemsResult> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            string targetNamespace = Namespace_;
+            var error = ApiHelperUtils.CheckForNullOrEmpty(targetNamespace, userId, cycleId, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl +
+                           "/v1/admin/namespaces/{namespace}/users/{userId}/statCycles/{cycleId}/statCycleitems")
+                .WithPathParam("namespace", targetNamespace)
+                .WithPathParam("userId", userId)
+                .WithPathParam("cycleId", cycleId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters == null)
+            {
+                optionalParameters = new ListUserStatCycleItemsOptionalParameters();
+            }
+
+            if (optionalParameters.StatCodes != null)
+            {
+                requestBuilder = requestBuilder.WithQueryParam("statCodes", optionalParameters.StatCodes);
+            }
+
+            if (optionalParameters.IsPublic != null)
+            {
+                requestBuilder = requestBuilder.WithQueryParam("isPublic",
+                    optionalParameters.IsPublic.ToString().ToLower());
+            }
+
+            requestBuilder = requestBuilder.WithQueryParam("offset", optionalParameters.Offset.ToString());
+            requestBuilder = requestBuilder.WithQueryParam("limit", optionalParameters.Limit.ToString());
+            if (optionalParameters.SortBy != null && optionalParameters.SortBy.Length > 0)
+            {
+                string[] sortByString = new string[optionalParameters.SortBy.Length];
+                for (int i = 0; i < optionalParameters.SortBy.Length; i++)
+                {
+                    sortByString[i] = optionalParameters.SortBy[i].ConvertToString();
+                }
+
+                requestBuilder = requestBuilder.WithQueryParam("sortBy", string.Join(",", sortByString));
+            }
+
+            var request = requestBuilder.GetResult();
+
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<ListUserStatCycleItemsResult>();
+                callback?.Try(result);
+            });
+        }
     }        
 }

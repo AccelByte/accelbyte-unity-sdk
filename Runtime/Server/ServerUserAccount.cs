@@ -132,6 +132,27 @@ namespace AccelByte.Server
         {
             Report.GetFunctionLog(this.GetType().Name);
 
+            BanUser(userId,
+                banType,
+                reason,
+                endDate,
+                new BanUserOptionalParameters()
+                {
+                    SkipNotif = !notifyUser,
+                    Comment = comment
+                },
+                callback);
+        }
+        
+        internal void BanUser(string userId
+            , BanType banType
+            , BanReason reason
+            , DateTime endDate
+            , BanUserOptionalParameters optionalParameters
+            , ResultCallback<UserBanResponseV3> callback)
+        {
+            Report.GetFunctionLog(this.GetType().Name);
+
             if (!ValidateAccelByteId(userId, Utils.AccelByteIdValidator.HypensRule.NoHypens, Utils.AccelByteIdValidator.GetUserIdInvalidMessage(userId), callback))
             {
                 return;
@@ -142,21 +163,13 @@ namespace AccelByte.Server
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
-
-            var banRequest = new BanCreateRequest
-            {
-                ban = banType.ToString(),
-                comment = comment,
-                endDate = endDate.ToString("o"),
-                reason = reason.ToString(),
-                skipNotif = !notifyUser
-            };
-
-            this.coroutineRunner.Run(
-                this.Api.BanUser(
-                    userId,
-                    banRequest,
-                    callback));
+            
+            this.Api.BanUser(userId,
+                banType,
+                reason,
+                endDate,
+                optionalParameters,
+                callback);
         }
 
         /// <summary>

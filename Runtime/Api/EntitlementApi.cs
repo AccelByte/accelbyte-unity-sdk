@@ -38,13 +38,32 @@ namespace AccelByte.Api
             , EntitlementAppType entitlementAppType
             , ResultCallback<EntitlementPagingSlicedResult> callback)
         {
+            var optionalParam = new QueryUserEntitlementsOptionalParameters()
+            {
+                EntitlementName = entitlementName,
+                ItemId = itemId,
+                Features = features,
+                Offset = offset,
+                Limit = limit,
+                EntitlementClazz = entitlementClazz,
+                EntitlementAppType = entitlementAppType
+            };
+
+            QueryUserEntitlements(userId, optionalParam, callback);
+            yield break;
+        }
+
+        internal void QueryUserEntitlements(string userId
+            , QueryUserEntitlementsOptionalParameters optionalParameters
+            , ResultCallback<EntitlementPagingSlicedResult> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
 
             var error = ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken, userId);
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
             var httpBuilder = HttpRequestBuilder
@@ -55,59 +74,55 @@ namespace AccelByte.Api
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson);
 
-            if (offset >= 0)
+            if (optionalParameters == null)
             {
-                httpBuilder.WithQueryParam("offset", offset.ToString());
-            }
-            else
-            {
-                httpBuilder.WithQueryParam("offset", "0");
+                optionalParameters = new QueryUserEntitlementsOptionalParameters();
             }
 
-            if (limit >= 0)
+            if (optionalParameters.Offset >= 0)
             {
-                httpBuilder.WithQueryParam("limit", limit.ToString());
-            }
-            else
-            {
-                httpBuilder.WithQueryParam("limit", "20");
+                httpBuilder.WithQueryParam("offset", optionalParameters.Offset.ToString());
             }
 
-            if (features != null && features.Length > 0)
+            if (optionalParameters.Limit >= 0)
             {
-                httpBuilder.WithQueryParam("features", features);
+                httpBuilder.WithQueryParam("limit", optionalParameters.Limit.ToString());
             }
 
-            if (entitlementClazz != EntitlementClazz.NONE)
+            if (optionalParameters.Features != null && optionalParameters.Features.Length > 0)
             {
-                httpBuilder.WithQueryParam("entitlementClazz", entitlementClazz.ToString());
+                httpBuilder.WithQueryParam("features", optionalParameters.Features);
             }
 
-            if (entitlementAppType != EntitlementAppType.NONE)
+            if (optionalParameters.EntitlementClazz != EntitlementClazz.NONE)
             {
-                httpBuilder.WithQueryParam("entitlementAppType", entitlementAppType.ToString());
+                httpBuilder.WithQueryParam("entitlementClazz", optionalParameters.EntitlementClazz.ToString());
             }
 
-            if (!string.IsNullOrEmpty(entitlementName))
+            if (optionalParameters.EntitlementAppType != EntitlementAppType.NONE)
             {
-                httpBuilder.WithQueryParam("entitlementName", entitlementName);
+                httpBuilder.WithQueryParam("entitlementAppType", optionalParameters.EntitlementAppType.ToString());
             }
 
-            if (!string.IsNullOrEmpty(itemId))
+            if (!string.IsNullOrEmpty(optionalParameters.EntitlementName))
             {
-                httpBuilder.WithQueryParam("itemId", itemId);
+                httpBuilder.WithQueryParam("entitlementName", optionalParameters.EntitlementName);
+            }
+
+            if (!string.IsNullOrEmpty(optionalParameters.ItemId))
+            {
+                httpBuilder.WithQueryParam("itemId", optionalParameters.ItemId);
             }
 
             IHttpRequest request = httpBuilder.GetResult();
-            IHttpResponse response = null;
 
-            yield return HttpClient.SendRequest(request, result =>
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, result =>
             {
-                response = result;
+                var response = result.TryParseJson<EntitlementPagingSlicedResult>();
+                callback?.Try(response);
             });
-
-            var result = response.TryParseJson<EntitlementPagingSlicedResult>();
-            callback?.Try(result);
         }
 
         internal void QueryUserSubscription(string userId, PlatformStoreId platformStoreId, ResultCallback<SubscriptionPagingSlicedResult> callback, QueryUserSubscriptionRequestOptionalParameters optionalParameters)
@@ -1156,47 +1171,54 @@ namespace AccelByte.Api
             , EntitlementSoldRequest entitlementSoldRequest
             , ResultCallback<SellItemEntitlementInfo> callback)
         {
+            SellUserEntitlement(userEntitlementSoldParams.UserId, userEntitlementSoldParams.EntitlementId, entitlementSoldRequest, null, callback);
+            yield break;
+        }
+
+        internal void SellUserEntitlement(string userId
+            , string entitlementId
+            , EntitlementSoldRequest entitlementSoldRequest
+            , SellUserEntitlementOptionalParameters optionalParameters
+            , ResultCallback<SellItemEntitlementInfo> callback)
+        {
             Report.GetFunctionLog(GetType().Name);
             var error = ApiHelperUtils.CheckForNullOrEmpty(
                 Namespace_
                 , AuthToken
-                , userEntitlementSoldParams
-                , userEntitlementSoldParams?.UserId
-                , userEntitlementSoldParams?.EntitlementId
+                , userId
+                , entitlementId
                 , entitlementSoldRequest
             );
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            EntitlementSoldRequest entitlementSoldRequestBody = new EntitlementSoldRequest
+            if (optionalParameters != null
+                && !string.IsNullOrEmpty(optionalParameters.RequestId))
             {
-                UseCount = entitlementSoldRequest.UseCount,
-                RequestId = string.IsNullOrEmpty(entitlementSoldRequest.RequestId) ? null : entitlementSoldRequest.RequestId
-            };
-            
+                entitlementSoldRequest.RequestId = optionalParameters.RequestId;
+            }
+
             var request = HttpRequestBuilder
                 .CreatePut(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/entitlements/{entitlementId}/sell")
                 .WithPathParam("namespace", Namespace_)
-                .WithPathParam("userId", userEntitlementSoldParams.UserId)
-                .WithPathParam("entitlementId", userEntitlementSoldParams.EntitlementId)
+                .WithPathParam("userId", userId)
+                .WithPathParam("entitlementId", entitlementId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .WithBody(entitlementSoldRequestBody.ToUtf8Json())
+                .WithBody(entitlementSoldRequest.ToUtf8Json())
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
-            IHttpResponse response = null;
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
 
-            yield return HttpClient.SendRequest(request, rsp =>
+            HttpOperator.SendRequest(additionalParameters, request, rsp =>
             {
-                response = rsp;
+                var result = rsp.TryParseJson<SellItemEntitlementInfo>();
+                callback?.Try(result);
             });
-
-            var result = response.TryParseJson<SellItemEntitlementInfo>();
-            callback?.Try(result);
         }
 
         public IEnumerator SyncOculusConsumableEntitlements(string userId
