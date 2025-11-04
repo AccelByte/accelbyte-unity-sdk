@@ -60,6 +60,16 @@ namespace AccelByte.Api.Interface
             ResultCallback callback);
 
         /// <summary>
+        /// Invite a user to a party.
+        /// </summary>
+        /// <param name="partyId">Targeted party ID</param>
+        /// <param name="userId">Targeted user ID</param>
+        /// <param name="optionalParameters">Optional parameters to be set</param>
+        /// <param name="callback">Returns a Result with status code</param>
+        public void InviteUserToParty(string partyId, string userId, InviteUserToPartyOptionalParameters optionalParameters,
+            ResultCallback callback);
+
+        /// <summary>
         /// Promotes a party member to be a party leader. Only leader can promote a new leader.
         /// </summary>
         /// <param name="partyId">Targeted party ID</param>
@@ -163,13 +173,37 @@ namespace AccelByte.Api.Interface
 
         /// <summary>
         /// Query Game Session
-        /// By default, API will return a list of available game sessions
+        /// By default, API will return a list of available game sessions with free form input
         /// </summary>
         /// <param name="request">List of attributes to filter from available sessions</param>
         /// <param name="callback">
         /// Returns a paginated result of SessionV2GameSession via callback when completed.
         /// </param>
         public void QueryGameSession(Dictionary<string, object> request
+            , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback);
+
+        /// <summary>
+        /// Query Game Session
+        /// By default, API will return a list of available game sessions
+        /// </summary>
+        /// <param name="query">Query Object</param>
+        /// <param name="callback">
+        /// Returns a paginated result of SessionV2GameSession via callback when completed.
+        /// </param>
+        public void QueryGameSession(GameSessionQuery query
+            , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback);
+        
+        /// <summary>
+        /// Query Game Session
+        /// By default, API will return a list of available game sessions
+        /// </summary>
+        /// <param name="query">Query Object</param>
+        /// <param name="optionalParameters">Contains query optional parameter</param>
+        /// <param name="callback">
+        /// Returns a paginated result of SessionV2GameSession via callback when completed.
+        /// </param>
+        public void QueryGameSession(GameSessionQuery query
+            , QueryGameSessionOptionalParameters optionalParameters
             , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback);
 
         /// <summary>
@@ -224,6 +258,18 @@ namespace AccelByte.Api.Interface
         /// Returns a result of SessionV2GameSession via callback when completed.
         /// </param>
         public void InviteUserToGameSession(string sessionId, string userId
+            , ResultCallback callback);
+
+        /// <summary>
+        /// Invite a user to a game session.
+        /// </summary>
+        /// <param name="sessionId">Targeted game session's sessionId</param>
+        /// <param name="userId">Targeted user's userId</param>
+        /// <param name="optionalParameters">Optional parameters can be used</param>
+        /// <param name="callback">
+        /// Returns a result of SessionV2GameSession via callback when completed.
+        /// </param>
+        public void InviteUserToGameSession(string sessionId, string userId, InviteUserToGameSessionOptionalParameters optionalParameters
             , ResultCallback callback);
 
         /// <summary>

@@ -202,7 +202,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Raised when there is an incoming friend request
         /// </summary>
-        public event ResultCallback<Friend> OnIncomingFriendRequest;
+        public event ResultCallback<RequestFriend> OnIncomingFriendRequest;
 
         /// <summary>
         /// Raised when friend remove user from friendlist

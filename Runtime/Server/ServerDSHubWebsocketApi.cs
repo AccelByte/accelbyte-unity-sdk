@@ -103,7 +103,7 @@ namespace AccelByte.Server
             return retval;
         }
 
-        public void Connect(string serverName, ResultCallback callback = null)
+        public void Connect(string serverId, ResultCallback callback = null)
         {
             if (!session.IsValid())
             {
@@ -144,7 +144,7 @@ namespace AccelByte.Server
                     Dictionary<string, string> headers = new Dictionary<string, string>()
                     {
                         { "Authorization", $"Bearer {session.AuthorizationToken}"},
-                        { "X-Ab-ServerID", serverName },
+                        { "X-Ab-ServerID", serverId },
                         { "X-Ab-Custom", isUsingCustomService }
                     };
 

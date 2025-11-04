@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2018 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2018 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
+using AccelByte.Core;
 using System.Runtime.Serialization;
 using UnityEngine.Scripting;
 
@@ -100,5 +101,29 @@ namespace AccelByte.Models
         [DataMember(Name = "platformId")] public string PlatformId;
         [DataMember(Name = "remainingBackupCodeCount")] public double RemainingBackupCodeCount;
         [DataMember] public UserBan userBan;
+    }
+    
+    public class ResultErrorOptionalParameters
+    {
+        /// <summary>
+        /// Error code of an error
+        /// </summary>
+        public string Message = null;
+
+        /// <summary>
+        /// A free form additional message that possibly attached after getting an error
+        /// eg: additional string that explain what cause the error
+        /// </summary>
+        public object MessageVariables = null;
+
+        /// <summary>
+        /// A nested or child error
+        /// </summary>
+        public Error InnerError = null;
+
+        /// <summary>
+        /// An Http response received from the service
+        /// </summary>
+        public IHttpResponse HttpResponse;
     }
 }

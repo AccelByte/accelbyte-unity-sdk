@@ -112,17 +112,19 @@ namespace AccelByte.Server
 
         /// <summary>
         /// Connect to DSHub
+        /// Note: ServerId is the DsId value that passed to the dedicated server with "-dsid" argument
+        ///         Which has "ds_<uuid-v4>" format
         /// </summary>
-        /// <param name="serverName">this server's name</param>
-        public void Connect(string serverName)
+        /// <param name="serverId">this server's id</param>
+        public void Connect(string serverId)
         {
             Report.GetFunctionLog(GetType().Name);
 
-            podName = serverName;
+            podName = serverId;
 
             try
             {
-                serverDSHubWebsocketApi.Connect(serverName, result =>
+                serverDSHubWebsocketApi.Connect(serverId, result =>
                 {
                     if (result.IsError)
                     {

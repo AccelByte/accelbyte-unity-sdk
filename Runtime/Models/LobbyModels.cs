@@ -688,6 +688,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class RequestFriend : Friend
+    {
+        [DataMember, Preserve] public Dictionary<string, string> metadata;
+    }
+
+    [DataContract, Preserve]
     public class FriendByPublicId
     {
         [DataMember, Preserve] public string friendPublicId;

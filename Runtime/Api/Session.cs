@@ -127,14 +127,22 @@ namespace AccelByte.Api
         public void InviteUserToParty(string partyId, string userId,
             ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            InviteUserToParty(partyId, userId, null, callback);
+        }
+
+        public void InviteUserToParty(string partyId
+            , string userId
+            , InviteUserToPartyOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
             {
                 return;
             }
 
-            if(string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId))
             {
                 callback?.TryError(new Error(ErrorCode.InvalidRequest, "User id cannot be null or empty"));
                 return;
@@ -158,9 +166,10 @@ namespace AccelByte.Api
             sessionApi.InviteUserToParty(
                 partyId,
                 userId,
+                optionalParameters,
                 inviteUserCallback);
-        }        
-        
+        }
+
         public void PromoteUserToPartyLeader(string partyId, string leaderId,
             ResultCallback<SessionV2PartySession> callback)
         {
@@ -472,22 +481,36 @@ namespace AccelByte.Api
         public void QueryGameSession(Dictionary<string, object> request
             , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
         {
+            QueryGameSession(new GameSessionQuery(request), null, callback);
+        }
+        
+        public void QueryGameSession(GameSessionQuery query
+            , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
+        {
+            QueryGameSession(query, null, callback);
+        }
+
+        public void QueryGameSession(GameSessionQuery query
+            , QueryGameSessionOptionalParameters optionalParameters
+            , ResultCallback<PaginatedResponse<SessionV2GameSession>> callback)
+        {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-            if (request == null)
-            {
-                request = new Dictionary<string, object>();
-            }
 
             if (!session.IsValid())
             {
                 callback?.TryError(ErrorCode.IsNotLoggedIn);
                 return;
             }
+            
+            if (query == null)
+            {
+                query = new GameSessionQuery();
+            }
 
-            coroutineRunner.Run(
-                sessionApi.QueryGameSession(
-                    request,
-                    callback));
+            sessionApi.QueryGameSession(
+                query.Request,
+                optionalParameters,
+                callback);
         }
 
         public void GetGameSessionDetailsByPodName(string podName
@@ -585,18 +608,16 @@ namespace AccelByte.Api
         
         public void InviteUserToGameSession(string sessionId, string userId, ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
-
             InviteUserToGameSession(sessionId, userId, null, callback);
         }
         
-        internal void InviteUserToGameSession(
+        public void InviteUserToGameSession(
             string sessionId
             , string userId
             , InviteUserToGameSessionOptionalParameters optionalParameters
             , ResultCallback callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
             {

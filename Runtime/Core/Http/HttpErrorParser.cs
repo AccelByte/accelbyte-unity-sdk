@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2021 - 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2021 - 2025 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -55,7 +55,11 @@ namespace AccelByte.Core
                 }
                 catch (Exception e)
                 {
-                    retval = Result<T>.CreateError(ErrorCode.ErrorFromException, e.Message);
+                    ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+                    optionalParameters.MessageVariables = e.Message;
+                    optionalParameters.HttpResponse = response;
+
+                    retval = Result<T>.CreateError(ErrorCode.ErrorFromException, optionalParameters);
                 }
             }
             return retval;
@@ -120,7 +124,10 @@ namespace AccelByte.Core
         {
             if (response == null)
             {
-                return new Error(ErrorCode.NetworkError, NoResponseMessage);
+                ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+                optionalParameters.Message = NoResponseMessage;
+
+                return new Error(ErrorCode.NetworkError, optionalParameters);
             }
             if (response.Code >= 200 && response.Code < 300)
             {
@@ -134,7 +141,10 @@ namespace AccelByte.Core
 
             if (response.BodyBytes == null)
             {
-                return new Error((ErrorCode)response.Code);
+                ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+                optionalParameters.HttpResponse = response;
+
+                return new Error((ErrorCode)response.Code, optionalParameters);
             }
 
             try
@@ -143,7 +153,10 @@ namespace AccelByte.Core
             }
             catch (Exception)
             {
-                return new Error((ErrorCode)response.Code);
+                ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+                optionalParameters.HttpResponse = response;
+
+                return new Error((ErrorCode)response.Code, optionalParameters);
             }
         }
 
@@ -192,17 +205,28 @@ namespace AccelByte.Core
             var error = response.BodyBytes.ToObject<ServiceError>();
 
             Error retval;
+            ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+            optionalParameters.HttpResponse = response;
+
             if (error.numericErrorCode != 0)
             {
-                retval = new Error((ErrorCode)error.numericErrorCode, error.errorMessage, error.messageVariables);
+                optionalParameters.Message = error.errorMessage;
+                optionalParameters.MessageVariables = error.messageVariables;
+
+                retval = new Error((ErrorCode)error.numericErrorCode, optionalParameters);
             }
             else if (error.errorCode != 0)
             {
-                retval = new Error((ErrorCode)error.errorCode, error.errorMessage, error.messageVariables);
+                optionalParameters.Message = error.errorMessage;
+                optionalParameters.MessageVariables = error.messageVariables;
+
+                retval = new Error((ErrorCode)error.errorCode, optionalParameters);
             }
             else if (error.code != 0)
             {
-                retval = new Error((ErrorCode)error.code, error.message);
+                optionalParameters.Message = error.message;
+
+                retval = new Error((ErrorCode)error.code, optionalParameters);
             }
             else if (error.error != null)
             {
@@ -212,11 +236,14 @@ namespace AccelByte.Core
                 {
                     message += ": " + error.error_description;
                 }
-                retval = new Error((ErrorCode)response.Code, message);
+
+                optionalParameters.Message = message;
+
+                retval = new Error((ErrorCode)response.Code, optionalParameters);
             }
             else
             {
-                retval = new Error((ErrorCode)response.Code);
+                retval = new Error((ErrorCode)response.Code, optionalParameters);
             }
 
             return retval;
@@ -225,14 +252,20 @@ namespace AccelByte.Core
         private static Error ParseDefaultError(IHttpResponse response)
         {
             Error retval;
+            ResultErrorOptionalParameters optionalParameters = new ResultErrorOptionalParameters();
+            optionalParameters.HttpResponse = response;
+
             if (response.BodyBytes == null)
             {
-                retval = new Error((ErrorCode)response.Code);
+                retval = new Error((ErrorCode)response.Code, optionalParameters);
             }
             else
             {
                 string body = System.Text.Encoding.UTF8.GetString(response.BodyBytes);
-                retval = new Error((ErrorCode)response.Code, "Unknown error: " + body);
+
+                optionalParameters.Message = "Unknown error: " + body;
+
+                retval = new Error((ErrorCode)response.Code, optionalParameters);
             }
             return retval;
         }

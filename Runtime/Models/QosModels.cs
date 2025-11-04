@@ -15,7 +15,7 @@ namespace AccelByte.Models
     public enum QosStatus
     {
         [Description("UNREACHABLE"), EnumMember(Value = "UNREACHABLE")] Unreachable,
-        [Description("INACTIVE"), EnumMember(Value = "ACTIVE")] Inactive,
+        [Description("INACTIVE"), EnumMember(Value = "INACTIVE")] Inactive,
         [Description("ACTIVE"), EnumMember(Value = "ACTIVE")] Active
     }
 

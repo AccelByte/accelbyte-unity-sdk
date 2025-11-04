@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.12.0] (2025-11-04)
+
+
+### Features
+
+* add endpoint url when encountered an error 
+* add metadata optional parameter GameSessionInvite and PartyInvite 
+* added offset and limit option to query game session 
+
+
+### Bug Fixes
+
+* fix wrong qos status enum 
+
+
+### Refactors
+
+* add strong type input to session query 
+
 ## [17.11.0] (2025-10-07)
 
 
