@@ -17,6 +17,12 @@ namespace AccelByte.Core
 
         private static List<AccelByteILogger> loggers = new List<AccelByteILogger>();
 
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState()
+        {
+            Reset();
+        }
+
         internal static AccelByteLogType currentSeverity;
 
         private static readonly AccelByteILogger defaultLogger = new AccelByteLogHandler();

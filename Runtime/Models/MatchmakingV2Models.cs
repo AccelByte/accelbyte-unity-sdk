@@ -192,6 +192,12 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class SessionSecretUpdateNotification
+    {
+        [DataMember] public string secret;
+    }
+
+    [DataContract, Preserve]
     public class ServerMatchmakingV2Ticket : MatchmakingV2Ticket
     {
         [DataMember] public string matchPool;

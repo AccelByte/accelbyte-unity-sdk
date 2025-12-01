@@ -35,6 +35,19 @@ namespace AccelByte.Api
 
         IHttpClient httpClient;
 
+        private INetUtilities netUtilities;
+        public INetUtilities NetUtilities
+        {
+            get
+            {
+                if (netUtilities == null)
+                {
+                    netUtilities = new AccelByteNetUtilitiesService(HttpClient);
+                }
+                return netUtilities;
+            }
+        }
+
         private ApiSharedMemory sharedMemory;
         
         internal IHttpClient HttpClient
@@ -247,6 +260,7 @@ namespace AccelByte.Api
 
             gameClient = null;
             httpClient = null;
+            netUtilities = null;
 
             loginUserClientApis.Clear();
 

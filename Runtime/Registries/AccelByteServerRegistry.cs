@@ -37,6 +37,19 @@ namespace AccelByte.Server
             }
         }
 
+        private INetUtilities netUtilities;
+        public INetUtilities NetUtilities
+        {
+            get
+            {
+                if (netUtilities == null)
+                {
+                    netUtilities = new AccelByteNetUtilitiesService(HttpClient);
+                }
+                return netUtilities;
+            }
+        }
+
         private List<ServerApiClient> loginUserClientApis;
 
         private readonly IHttpRequestSenderFactory requestSenderFactory;
@@ -207,6 +220,7 @@ namespace AccelByte.Server
             ClearAnalytics();
 
             httpClient = null;
+            netUtilities = null;
 
             loginUserClientApis.Clear();
         }

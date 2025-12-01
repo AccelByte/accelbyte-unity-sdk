@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.13.0] (2025-12-01)
+
+
+### Features
+
+* add default logging for GetLatency function 
+* add session server secret notification in dshub 
+* added GetRecentPlayers to Session's client and server 
+
+
+### Bug Fixes
+
+* fixed domain reload issue 
+
 ## [17.12.0] (2025-11-04)
 
 

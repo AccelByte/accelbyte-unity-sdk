@@ -1237,6 +1237,33 @@ namespace AccelByte.Api
 
             sessionApi.RemovePlayerAttributes(callback);
         }
+
+        /// <summary>
+        /// Get recent players
+        /// </summary>
+        /// <param name="callback">Returns SessionV2RecentPlayers via callback when completed</param>
+        public void GetRecentPlayers(ResultCallback<SessionV2RecentPlayers> callback)
+        {
+            GetRecentPlayers(null, callback);
+        }
+
+        /// <summary>
+        /// Get recent players
+        /// </summary>
+        /// <param name="optionalParameters">Optional parameters including limit (default: 20, max: 200)</param>
+        /// <param name="callback">Returns SessionV2RecentPlayers via callback when completed</param>
+        public void GetRecentPlayers(GetRecentPlayersOptionalParameters optionalParameters, ResultCallback<SessionV2RecentPlayers> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.GetRecentPlayers(optionalParameters, callback);
+        }
 #endregion
     }
 }

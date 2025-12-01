@@ -52,18 +52,41 @@ namespace AccelByte.Core
         internal Utils.SingularCallEvent<AccelByteClientRegistry> OnClientRegistryCreated;
         internal Utils.SingularCallEvent<Server.AccelByteServerRegistry> OnServerRegistryCreated;
 
+        private Utils.AccelByteServiceLogger serviceLogger;
+
         public AccelByteSDKImplementator()
         {
             Environment = new AccelByteEnvironment();
             Environment.OnEnvironmentChanged += ChangeInterfaceEnvironment;
-            
+
             ServiceTracker = new Utils.AccelByteServiceTracker();
-            var serviceLogger = new Utils.AccelByteServiceLogger();
-            
+            serviceLogger = new Utils.AccelByteServiceLogger();
+
             ServiceTracker.OnNewRequestSentEvent += serviceLogger.LogServiceActivity;
             ServiceTracker.OnNewResponseReceivedEvent += serviceLogger.LogServiceActivity;
             ServiceTracker.OnSendingWebsocketRequestEvent += serviceLogger.LogServiceActivity;
             ServiceTracker.OnReceivingWebsocketNotificationEvent += serviceLogger.LogServiceActivity;
+        }
+
+        ~AccelByteSDKImplementator()
+        {
+            Cleanup();
+        }
+
+        private void Cleanup()
+        {
+            if (Environment != null)
+            {
+                Environment.OnEnvironmentChanged -= ChangeInterfaceEnvironment;
+            }
+
+            if (ServiceTracker != null && serviceLogger != null)
+            {
+                ServiceTracker.OnNewRequestSentEvent -= serviceLogger.LogServiceActivity;
+                ServiceTracker.OnNewResponseReceivedEvent -= serviceLogger.LogServiceActivity;
+                ServiceTracker.OnSendingWebsocketRequestEvent -= serviceLogger.LogServiceActivity;
+                ServiceTracker.OnReceivingWebsocketNotificationEvent -= serviceLogger.LogServiceActivity;
+            }
         }
 
         public AccelByteClientRegistry GetClientRegistry()

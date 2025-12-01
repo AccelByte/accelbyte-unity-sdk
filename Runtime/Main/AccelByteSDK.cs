@@ -30,6 +30,12 @@ namespace AccelByte.Core
             }
         }
         
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticMembers()
+        {
+            implementation = null;
+        }
+        
         public static AccelByteEnvironment Environment
         {
             get

@@ -164,7 +164,8 @@ namespace AccelByte.Models
 
         // SessionV2 - DS
         OnDSStatusChanged,
-        
+        OnSessionJoinedSecret,
+
         // MatchmakingV2
         OnMatchFound,
         OnMatchmakingStarted,

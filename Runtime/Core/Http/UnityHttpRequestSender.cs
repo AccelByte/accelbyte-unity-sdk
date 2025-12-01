@@ -17,7 +17,14 @@ namespace AccelByte.Core
         private CoreHeartBeat heartBeat;
 
         private static HashSet<string> clearedCookiesUrl;
-        
+
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetClearedCookies()
+        {
+            clearedCookiesUrl?.Clear();
+            clearedCookiesUrl = null;
+        }
+
         public UnityHttpRequestSender(WebRequestScheduler httpTaskScheduler)
         {
             this.httpTaskScheduler = httpTaskScheduler;

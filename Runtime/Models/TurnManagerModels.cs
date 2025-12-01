@@ -197,8 +197,8 @@ namespace AccelByte.Models
         {
             return GetLatency(debugger: null, useCache: useCache);
         }
-        
-        internal AccelByteResult<int, Error> GetLatency(IDebugger debugger, bool useCache = true)
+
+        public AccelByteResult<int, Error> GetLatency(IDebugger debugger, bool useCache = true)
         {
             AccelByteResult<int, Error> retval = new AccelByteResult<int, Error>();
 

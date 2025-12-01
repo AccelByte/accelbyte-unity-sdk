@@ -20,6 +20,13 @@ public class MainThreadUtil : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void Setup()
     {
+        // Check for existing instance to prevent duplicates when domain reload is disabled
+        if (Instance != null)
+        {
+            UnityEngine.Object.Destroy(Instance.gameObject);
+            Instance = null;
+        }
+
         Instance = new GameObject("MainThreadUtil")
             .AddComponent<MainThreadUtil>();
         synchronizationContext = SynchronizationContext.Current;
@@ -734,6 +741,13 @@ namespace NativeWebSocket
 #if UNITY_WEBGL && !UNITY_EDITOR
     /* Map of websocket instances */
     public static Dictionary<Int32, WebSocket> instances = new Dictionary<Int32, WebSocket> ();
+
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetWebSocketInstances()
+    {
+        instances?.Clear();
+        instances = new Dictionary<Int32, WebSocket>();
+    }
 
     /* Delegates */
     public delegate void OnOpenCallback (int instanceId);

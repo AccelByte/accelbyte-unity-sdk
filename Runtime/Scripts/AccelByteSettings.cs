@@ -234,6 +234,14 @@ namespace AccelByte.Api
 
         private static AccelByteSettings instance;
 
+#if UNITY_EDITOR
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetInstance()
+        {
+            instance = null;
+        }
+#endif
+
         public static AccelByteSettings Instance
         {
             get

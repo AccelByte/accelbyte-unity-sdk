@@ -39,10 +39,18 @@ namespace AccelByte.Core
 
         ~AccelByteMessagingSystem()
         {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
             UnsubscribeAll();
 
-            poller.OnHeartbeatTrigger -= PollMessages;
-            poller = null;
+            if (poller != null)
+            {
+                poller.OnHeartbeatTrigger -= PollMessages;
+                poller = null;
+            }
         }
 
         public void SubscribeToTopic(AccelByteMessagingTopic topic, Action<string> callback)

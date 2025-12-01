@@ -20,7 +20,14 @@ namespace AccelByte.Core
         private uint pingRetry;
 
         private static Dictionary<int, List<CalculateLatencyTask>> portQueue;
-        
+
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetPortQueue()
+        {
+            portQueue?.Clear();
+            portQueue = null;
+        }
+
         public DefaultLatencyCalculator(int timeOutSeconds = 10, uint pingRetry = 6)
         {
             if (portQueue == null)

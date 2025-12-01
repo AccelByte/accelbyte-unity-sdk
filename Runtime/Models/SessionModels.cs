@@ -389,7 +389,14 @@ namespace AccelByte.Models
         [DataMember] public DateTime updatedAt;
         [DataMember] public int version;
     }
-    
+
+    [DataContract, Preserve]
+    public class SessionV2JoinedSecret
+    {
+        [DataMember] public string secret;
+    }
+
+
     [Preserve]
     public class GameSessionQuery
     {
@@ -819,6 +826,31 @@ namespace AccelByte.Models
         [System.ComponentModel.Description("STEAM")] Steam,
         [System.ComponentModel.Description("XBOX")] Xbox,
         [System.ComponentModel.Description("PSN")] Psn
+    }
+
+    [Preserve, DataContract]
+    public class SessionV2RecentPlayer
+    {
+        [DataMember(Name = "namespace")] public string Namespace;
+        [DataMember(Name = "platformName")] public string PlatformName;
+        [DataMember(Name = "userID")] public string UserId;
+        [DataMember(Name = "lastPlayedTime")] public DateTime LastPlayedTime;
+        [DataMember(Name = "matchPool")] public string MatchPool;
+        [DataMember(Name = "sessionTemplate")] public string SessionTemplate;
+    }
+
+    [Preserve, DataContract]
+    public class SessionV2RecentPlayers
+    {
+        [DataMember(Name = "data")] public SessionV2RecentPlayer[] Data;
+    }
+
+    public class GetRecentPlayersOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Maximum number of recent players to retrieve (default: 20, max: 200)
+        /// </summary>
+        public uint? Limit;
     }
 
     #endregion

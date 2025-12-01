@@ -150,6 +150,11 @@ namespace AccelByte.Api
         public event ResultCallback<SessionStorageChangedNotification> SessionV2StorageChanged;
 
         /// <summary>
+        /// SessionV2 - Raised when received Joined change
+        /// </summary>
+        public event ResultCallback<SessionV2JoinedSecret> SessionV2JoinedSecret;
+
+        /// <summary>
         /// MatchmakingV2 - Raised when match is found
         /// </summary>
         public event ResultCallback<MatchmakingV2MatchFoundNotification> MatchmakingV2MatchFound;
@@ -2177,6 +2182,12 @@ namespace AccelByte.Api
                         JsonConvert.DeserializeObject<SessionV2GameMembersChangedNotification>(jsonString);
                     websocketApi.DispatchNotification(gameSessionNotificationMembersChanged,
                         SessionV2GameSessionMemberChanged);
+                    break;
+                case MultiplayerV2NotifType.OnSessionJoinedSecret:
+                    var sessionJoinedSecretNotif =
+                        JsonConvert.DeserializeObject<SessionV2JoinedSecret>(jsonString);
+                    websocketApi.DispatchNotification(sessionJoinedSecretNotif,
+                        SessionV2JoinedSecret);
                     break;
                 case MultiplayerV2NotifType.OnGameSessionUpdated:
                     var gameSession =

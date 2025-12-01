@@ -29,4 +29,19 @@ namespace AccelByte.Models
             this.randomizeDeviceId = randomizeDeviceId;
         }
     }
+
+    public class GenerateTotpOptionalParameter
+    {
+        /// <summary>
+        /// Set Expected TOTP code length
+        /// Default = 6
+        /// </summary>
+        public uint CodeLength = 6;
+
+        /// <summary>
+        /// Set expected TOTP time step
+        /// Default = 30
+        /// </summary>
+        public uint TimeStep = 30;
+    }
 }

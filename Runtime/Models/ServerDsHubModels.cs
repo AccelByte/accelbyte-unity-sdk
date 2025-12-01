@@ -17,7 +17,8 @@ namespace AccelByte.Models
         [EnumMember(Value = "SESSION_ENDED_NOTIF")] SessionEnded,
         [EnumMember(Value = "SESSION_MEMBER_CHANGED")] SessionMemberChanged,
         [EnumMember(Value = "DSHUB_CONNECTED")] DsHubConnected,
-        [EnumMember(Value = "BACKFILL_TICKET_EXPIRE")] BackfillTicketExpire
+        [EnumMember(Value = "BACKFILL_TICKET_EXPIRE")] BackfillTicketExpire,
+        [EnumMember(Value = "SESSION_SERVER_SECRET")] SessionServerSecret
     }
     
     [DataContract, Preserve]

@@ -85,9 +85,13 @@ namespace AccelByte.Core
             ExecuteBootstraps();
 
 #if UNITY_EDITOR
+            // Unsubscribe first to prevent duplicates when domain reload is disabled
+            UnityEditor.EditorApplication.playModeStateChanged -= EditorApplicationPlayyModeStateChanged;
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationPlayyModeStateChanged;
 #endif
 #if !UNITY_SWITCH
+            // Unsubscribe first to prevent duplicates when domain reload is disabled
+            Application.quitting -= ApplicationQuitting;
             Application.quitting += ApplicationQuitting;
 #endif
         }

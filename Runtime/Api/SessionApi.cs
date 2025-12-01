@@ -1265,6 +1265,47 @@ namespace AccelByte.Api
                 callback?.Try(result);
             });
         }
+
+        internal void GetRecentPlayers(GetRecentPlayersOptionalParameters optionalParameters, ResultCallback<SessionV2RecentPlayers> callback)
+        {
+            var error = AccelByte.Utils.ApiHelperUtils.CheckForNullOrEmpty(Namespace_, AuthToken);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            uint limit = 20; // Default value
+            if (optionalParameters?.Limit != null)
+            {
+                limit = optionalParameters.Limit.Value;
+                if (limit > 200)
+                {
+                    AccelByteDebug.LogWarning("GetRecentPlayers limit exceeds 200, clamping to 200");
+                    limit = 200;
+                }
+            }
+
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/recent-player")
+                .WithPathParam("namespace", Namespace_)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters?.Limit != null)
+            {
+                requestBuilder.WithQueryParam("limit", limit.ToString());
+            }
+
+            var request = requestBuilder.GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SessionV2RecentPlayers>();
+                callback?.Try(result);
+            });
+        }
 #endregion
     }
 }

@@ -364,5 +364,47 @@ namespace AccelByte.Server
                 callback?.Try(result);
             });
         }
+
+        internal void GetRecentPlayers(string userId, GetRecentPlayersOptionalParameters optionalParameters, ResultCallback<SessionV2RecentPlayers> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(userId, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            uint limit = 20; // Default value
+            if (optionalParameters?.Limit != null)
+            {
+                limit = optionalParameters.Limit.Value;
+                if (limit > 200)
+                {
+                    AccelByteDebug.LogWarning($"Requesting recent player limit with {limit} will only return 200 items");
+                    limit = 200;
+                }
+            }
+
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/admin/namespaces/{namespace}/recent-player")
+                .WithPathParam("namespace", Namespace_)
+                .WithQueryParam("userId", userId)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters?.Limit != null)
+            {
+                requestBuilder.WithQueryParam("limit", limit.ToString());
+            }
+
+            var request = requestBuilder.GetResult();
+
+            HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParseJson<SessionV2RecentPlayers>();
+                callback?.Try(result);
+            });
+        }
     }
 }
