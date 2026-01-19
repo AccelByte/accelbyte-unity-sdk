@@ -331,7 +331,7 @@ namespace AccelByte.Api
 #if UNITY_WEBGL && !UNITY_EDITOR
             var maintainerBehaviour = GetOrCreateMaintainerBehaviour();
             maintainerBehaviour.StartCoroutine(
-                RetryBackoffUtils.RunCoroutine(WebsocketSend(message), logger: logger));
+                RetryBackoffUtils.RunCoroutine(() => WebsocketSend(message), logger: logger));
 #else
             await RetryBackoffUtils.Run<int>(() => WebsocketSend(message), logger: logger);
 #endif

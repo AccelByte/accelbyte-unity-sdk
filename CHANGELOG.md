@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+### [17.13.1] (2026-01-19)
+
+
+### Bug Fixes
+
+* fix retry backoff utils for coroutine version 
+* remove trailing '/' on base url 
+
+
+### Documentations
+
+* improved save user record and replace user record doc 
+
 ## [17.13.0] (2025-12-01)
 
 

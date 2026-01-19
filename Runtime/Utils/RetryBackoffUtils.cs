@@ -16,40 +16,74 @@ namespace AccelByte.Utils
         /// Coroutine ver. This function is to let a Task Operation to perform retry backoff mechanism
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="operation"></param>
-        /// <param name="initialDelayInSeconds"></param>
-        /// <param name="maxDelayInSeconds"></param>
-        /// <param name="maxRetries"></param>
-        /// <param name="logger"></param>
-        /// <returns></returns>
-        public static IEnumerator RunCoroutine<T>(Task<T> operation,
+        /// <param name="operation">Function that returns a Task to execute. Called on each retry attempt.</param>
+        /// <param name="initialDelayInSeconds">Initial retry delay in seconds</param>
+        /// <param name="maxDelayInSeconds">Maximum retry delay in seconds</param>
+        /// <param name="maxRetries">Maximum number of retry attempts</param>
+        /// <param name="logger">Optional logger for retry messages</param>
+        /// <returns>Coroutine enumerator. Returns default(T) if all retries fail.</returns>
+        public static IEnumerator RunCoroutine<T>(Func<Task<T>> operation,
             int initialDelayInSeconds = 1,
             int maxDelayInSeconds = 2,
             int maxRetries = 5,
             IDebugger logger = null)
         {
             int retryCount = 0;
-            int currentDelay = initialDelayInSeconds;
+            float currentDelay = initialDelayInSeconds;
+            T lastResult = default;
 
-            while (retryCount < maxRetries)
+            while (retryCount <= maxRetries)
             {
-                yield return new WaitUntil(() => operation.IsCompleted);
-                T result = operation.Result;
-                if (IsOperationSuccess(result))
+                Task<T> ongoingTask = null;
+
+                // Attempt phase / Code execution
+                try
                 {
-                    yield break;
+                    ongoingTask = operation();
+                }
+                catch (Exception ex)
+                {
+                    logger?.LogWarning($"RetryBackoff: Exception while starting task: {ex}");
+                }
+
+                // Observation phase / Attempting to retry
+                if (ongoingTask != null)
+                {
+                    yield return new WaitUntil(() => ongoingTask.IsCompleted);
+                    
+                    if (ongoingTask.IsFaulted)
+                    {
+                        logger?.LogWarning($"RetryBackoff: Task faulted on attempt {retryCount}: {ongoingTask.Exception}");
+                    }
+                    else if (ongoingTask.IsCanceled)
+                    {
+                        logger?.LogWarning($"RetryBackoff: Task canceled on attempt {retryCount}");
+                    }
+                    else
+                    {
+                        lastResult = ongoingTask.Result;
+
+                        if (IsOperationSuccess(lastResult))
+                        {
+                            yield return lastResult;
+                            yield break;
+                        }
+                    }
                 }
 
                 retryCount++;
-                if (retryCount < maxRetries)
+                if (retryCount > maxRetries)
                 {
-                    logger?.LogVerbose($"[{retryCount}/{maxRetries}] Websocket send failed, attempting to retry.");
-
-                    // Calculate the next delay using exponential backoff
-                    currentDelay = Math.Min(currentDelay * 2, maxDelayInSeconds);
-                    yield return new WaitForSeconds(currentDelay);
+                    logger?.LogWarning("[RetryBackoffUtils] The operation is not a success");
+                    break;
                 }
+
+                logger?.LogVerbose($"[{retryCount}/{maxRetries}] operation failed, attempting to retry.");
+                yield return new WaitForSecondsRealtime(currentDelay);
+                currentDelay = Mathf.Min(currentDelay * 2f, maxDelayInSeconds);
             }
+
+            yield return default(T);
         }
 
         /// <summary>

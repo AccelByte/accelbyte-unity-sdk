@@ -52,6 +52,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Save a user-level record. If the record doesn't exist, it will create
         /// and save the record, if already exists, it will append to the existing one.
+        /// To replace an exiting record please use <see cref="ReplaceUserRecord">ReplaceUserRecord</see>.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
@@ -85,6 +86,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Save a user-level record. If the record doesn't exist, it will create and
         /// save the record, if already exists, it will append to the existing one.
+        /// To replace an exiting record please use <see cref="ReplaceUserRecord">ReplaceUserRecord</see>.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
@@ -180,6 +182,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Replace a record in user-level. If the record doesn't exist, it will create and
         /// save the record. If already exists, it will replace the existing one.
+        /// To append an exiting record please use <see cref="SaveUserRecord">SaveUserRecord</see>.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
@@ -216,6 +219,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Replace a record in user-level. If the record doesn't exist, it will create and
         /// save the record. If already exists, it will replace the existing one.
+        /// To append an exiting record please use <see cref="SaveUserRecord">SaveUserRecord</see>.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>
@@ -251,6 +255,7 @@ namespace AccelByte.Api
         /// <summary>
         /// Replace a record in user-level. If the record doesn't exist, it will create and
         /// save the record. If already exists, it will replace the existing one.
+        /// To append an exiting record please use <see cref="SaveUserRecord">SaveUserRecord</see>.
         /// </summary>
         /// <param name="key">Key of record</param>
         /// <param name="recordRequest">The request of the record with JSON formatted.</param>

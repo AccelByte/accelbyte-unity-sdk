@@ -1,4 +1,4 @@
-// Copyright (c) 2019 - 2025 AccelByte Inc. All Rights Reserved.
+// Copyright (c) 2019 - 2026 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 using System.Text;
@@ -221,51 +221,30 @@ namespace AccelByte.Api
 
         public static MultiConfigs LoadSDKConfigFile()
         {
-            MultiConfigs retval = null;
-            UnityEngine.Object targetConfigFile = null;
-            bool moveConfigFile = false;
-
             var oldConfigFile = Resources.Load(OldSDKConfigResourcePath(false));
             var configFile = Resources.Load(SDKConfigResourcePath(false));
-            if (oldConfigFile != null && configFile == null)
-            {
-                targetConfigFile = oldConfigFile;
-                moveConfigFile = true;
-            }
-            else if (configFile != null)
-            {
-                targetConfigFile = configFile;
-            }
 
-            if (targetConfigFile != null)
-            {
-                string wholeJsonText = ((TextAsset)targetConfigFile).text;
-                retval = wholeJsonText.ToObject<MultiConfigs>();
-            }
-
-            if (moveConfigFile)
-            {
-#if UNITY_EDITOR
-                SaveConfig(retval, SDKConfigFullPath(false));
-#endif
-            }
-
-            if (retval != null)
-            {
-                retval.Expand();
-            }
-
+            var retval = LoadConfigFile<MultiConfigs>(oldConfigFile, configFile);
             return retval;
         }
 
         public static MultiServerConfigs LoadSDKServerConfigFile()
         {
-            MultiServerConfigs retval = null;
+            var oldConfigFile = Resources.Load(OldSDKConfigResourcePath(true));
+            var configFile = Resources.Load(SDKConfigResourcePath(true));
+            var retval = LoadConfigFile<MultiServerConfigs>(oldConfigFile, configFile, isServerConfig: true);
+            return retval;
+        }
+
+        /// <summary>
+        /// Config file must be a TextAsset
+        /// </summary>
+        internal static T LoadConfigFile<T>(UnityEngine.Object oldConfigFile, UnityEngine.Object configFile, bool isServerConfig = false) where T : IAccelByteMultiConfigs
+        {
+            T retval = default(T);
             UnityEngine.Object targetConfigFile = null;
             bool moveConfigFile = false;
 
-            var oldConfigFile = Resources.Load(OldSDKConfigResourcePath(true));
-            var configFile = Resources.Load(SDKConfigResourcePath(true));
             if (oldConfigFile != null && configFile == null)
             {
                 targetConfigFile = oldConfigFile;
@@ -279,13 +258,13 @@ namespace AccelByte.Api
             if (targetConfigFile != null)
             {
                 string wholeJsonText = ((TextAsset)targetConfigFile).text;
-                retval = wholeJsonText.ToObject<MultiServerConfigs>();
+                retval = wholeJsonText.ToObject<T>();
             }
 
             if (moveConfigFile)
             {
 #if UNITY_EDITOR
-                SaveConfig(retval, SDKConfigFullPath(true));
+                SaveConfig(retval, SDKConfigFullPath(isServerConfig));
 #endif
             }
 

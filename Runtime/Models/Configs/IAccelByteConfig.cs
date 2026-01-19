@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2024 - 2026 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -13,7 +13,7 @@ namespace AccelByte.Models
 
     internal interface IAccelByteMultiConfigs
     {
-        public void Expand(bool forceExpandServiceUrl);
+        public void Expand(bool forceExpandServiceUrl = false);
         void InitializeNullEnv();
         internal IAccelByteConfig GetConfigFromEnvironment(SettingsEnvironment targetEnvironment);
         internal void SetConfigToEnv(IAccelByteConfig newConfig, SettingsEnvironment targetEnvironment);
