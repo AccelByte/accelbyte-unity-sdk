@@ -118,6 +118,14 @@ namespace AccelByte.Server
                 webSocket.Send(string.Format("{{\"ready\":{{\"dsid\":\"{0}\"}}}}", dsId));
             }
         }
+        
+        public void SendClaimMessage(string sessionId)
+        {
+            if(webSocket.IsConnected)
+            {
+                webSocket.Send(string.Format("{{\"claim\":{{\"sessionId\":\"{0}\"}}}}", sessionId));
+            }
+        }
 
         public void SendHeartBeat()
         {
