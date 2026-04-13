@@ -3,6 +3,7 @@
 // and restrictions contact your company contract manager.
 
 using AccelByte.Models;
+using Newtonsoft.Json;
 
 namespace AccelByte.Core
 {
@@ -488,9 +489,17 @@ namespace AccelByte.Core
         /// <summary>
         /// An http Response detail on what endpoint that causes an error
         /// </summary>
-        public IHttpResponse HttpResponse { private set; get; } 
+        public IHttpResponse HttpResponse { private set; get; }
 
-        public Error(ErrorCode code, string message = null, object messageVariables = null, Error innerError = null)
+        /// <summary>
+        /// Default constructor for JSON deserialization
+        /// </summary>
+        [JsonConstructor]
+        public Error(
+            [JsonProperty("code")] ErrorCode code = ErrorCode.UnknownError,
+            [JsonProperty("message")] string message = null,
+            [JsonProperty("messageVariables")] object messageVariables = null,
+            [JsonProperty("innerError")] Error innerError = null)
         {
             InitValue(code
                 , message

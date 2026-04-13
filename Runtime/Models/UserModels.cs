@@ -1394,6 +1394,20 @@ namespace AccelByte.Models
         /// </summary>
         public bool? DefaultOnEmpty = true;
     }
+    
+    [Preserve]
+    public class GetInputValidationsByNamespaceOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Language Code for description
+        /// </summary>
+        public string LanguageCode;
+        
+        /// <summary>
+        /// Should return default language if languageCode is empty or language not available if set to true.
+        /// </summary>
+        public bool? DefaultOnEmpty;
+    }
 
     [Preserve]
     public class UpdateUserOptionalParameters : OptionalParametersBase

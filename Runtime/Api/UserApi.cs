@@ -1532,6 +1532,37 @@ namespace AccelByte.Api
             });
         }
 
+        internal void GetInputValidationsByNamespace(GetInputValidationsByNamespaceOptionalParameters optionalParameters
+            , ResultCallback<InputValidation> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var requestBuilder = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v3/public/namespaces/{namespace}/inputValidations")
+                .WithPathParam("namespace", Namespace_)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters != null)
+            {
+                requestBuilder =
+                    requestBuilder.WithQueryParam("defaultOnEmpty", optionalParameters.DefaultOnEmpty is true ? "true" : "false");
+                if (optionalParameters.LanguageCode != null)
+                {
+                    requestBuilder.WithQueryParam("languageCode", optionalParameters.LanguageCode);
+                }
+            }
+            
+            var request = requestBuilder.GetResult();
+            
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParseJson<InputValidation>();
+                callback?.Try(result);
+            });
+        }
+
         public void UpdateUser(UpdateUserRequest requestModel, ResultCallback<UserData> callback)
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);

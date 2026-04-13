@@ -3720,6 +3720,7 @@ namespace AccelByte.Api
         /// <param name="languageCode">Language Code for description</param>
         /// <param name="callback">Returns a result via callback when completed</param>
         /// <param name="defaultOnEmpty">will return default language if languageCode is empty or language not available</param>
+        [Obsolete("Deprecated and will be removed on 2026.5 release. Please use GetInputValidationsByNamespace()")]
         public void GetInputValidations( string languageCode
             , ResultCallback<InputValidation> callback
             , bool defaultOnEmpty = true )
@@ -3745,7 +3746,7 @@ namespace AccelByte.Api
             , GetInputValidationsOptionalParameters optionalParameters
             , ResultCallback<InputValidation> callback)
         {
-            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);  
 
             if (!userSession.IsValid())
             {
@@ -3761,6 +3762,33 @@ namespace AccelByte.Api
             };
 
             api.GetInputValidations(requestModel, optionalParameters, callback);
+        }
+        
+        /// <summary>
+        /// Get IAM Input Validation by Namespace
+        /// </summary>
+        /// <param name="languageCode">Language Code for description</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="defaultOnEmpty">will return default language if languageCode is empty or language not available</param>
+        public void GetInputValidationsByNamespace(ResultCallback<InputValidation> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            GetInputValidationsByNamespace(null, callback);
+        }
+        
+        /// <summary>
+        /// Get IAM Input Validation by Namespace
+        /// </summary>
+        /// <param name="optionalParameters">Returns a result via callback when completed</param>
+        /// <param name="callback">Returns a result via callback when completed</param>
+        /// <param name="defaultOnEmpty">will return default language if languageCode is empty or language not available</param>
+        public void GetInputValidationsByNamespace(GetInputValidationsByNamespaceOptionalParameters optionalParameters
+            , ResultCallback<InputValidation> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            api.GetInputValidationsByNamespace(optionalParameters, callback);
         }
 
         /// <summary>

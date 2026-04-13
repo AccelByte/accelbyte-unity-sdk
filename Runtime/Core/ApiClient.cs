@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2022 - 2025 AccelByte Inc. All Rights Reserved.
+﻿// Copyright (c) 2022 - 2026 AccelByte Inc. All Rights Reserved.
 // This is licensed software from AccelByte Inc, for limitations
 // and restrictions contact your company contract manager.
 
@@ -248,6 +248,86 @@ namespace AccelByte.Core
             return retval;
         }
         public StoreDisplay GetStoreDisplayService() { return GetApi<StoreDisplay, StoreDisplayApi>(); }
+
+        /// <summary>
+        /// Get wrapper instance based on the wrapper type.
+        /// If the wrapper doesn't exist, it will be auto-created using reflection.
+        /// </summary>
+        /// <typeparam name="T">Wrapper type to get (e.g., User, Lobby, CloudSave, or custom wrappers)</typeparam>
+        /// <returns>The wrapper instance of type T</returns>
+        public T Get<T>() where T : WrapperBase
+        {
+            string wrapperTypeName = typeof(T).FullName;
+
+            if (wrapperBaseCollection.TryGetValue(wrapperTypeName, out WrapperBase wrapper))
+            {
+                return (T)wrapper;
+            }
+
+            // Auto-create the wrapper using reflection
+            T newWrapper = CreateWrapperInstance<T>();
+            if (newWrapper != null)
+            {
+                SetApi(newWrapper);
+            }
+
+            return newWrapper;
+        }
+
+        private T CreateWrapperInstance<T>() where T : WrapperBase
+        {
+            Type wrapperType = typeof(T);
+
+            // Get the wrapper's constructor and extract the API type from its first parameter
+            ConstructorInfo[] constructors = wrapperType.GetConstructors(reflectionBindingToFindInternal);
+            if (constructors.Length == 0)
+            {
+                return default;
+            }
+
+            ParameterInfo[] parameters = constructors[0].GetParameters();
+            if (parameters.Length == 0)
+            {
+                return default;
+            }
+
+            // First parameter is the API type
+            Type apiType = parameters[0].ParameterType;
+
+            // Create the API instance
+            // Expected Api constructor params: (IHttpClient, Config, ISession)
+            object[] apiArgs = getApiArgs();
+
+            object apiInstance = Activator.CreateInstance(
+                apiType,
+                bindingAttr: reflectionBindingToFindInternal,
+                binder: null,
+                args: apiArgs,
+                culture: null);
+
+            if (apiInstance is ApiBase apiBase)
+            {
+                apiBase.SetSharedMemory(sharedMemory);
+            }
+
+            // Create the Wrapper instance
+            // Expected Wrapper constructor params: (TApi, UserSession, CoroutineRunner)
+            object[] wrapperArgs = new object[]
+            {
+                apiInstance,
+                session,
+                coroutineRunner
+            };
+
+            T newWrapper = (T)Activator.CreateInstance(
+                wrapperType,
+                bindingAttr: reflectionBindingToFindInternal,
+                binder: null,
+                args: wrapperArgs,
+                culture: null);
+
+            return newWrapper;
+        }
         #endregion
 
         private void StopHeartBeat()

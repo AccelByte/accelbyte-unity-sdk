@@ -145,6 +145,15 @@ namespace AccelByte.Server
             sharedMemory?.Logger?.LogVerbose("Send ready to AMS");
             SendReadyMessageImplementation();
         }
+        
+        /// <summary>
+        /// Send claim message to AMS.
+        /// </summary>
+        public void SendClaimMessage(string sessionId)
+        {
+            sharedMemory?.Logger?.LogVerbose("Send claim to AMS");
+            SendClaimMessageImplementation(sessionId);
+        }
 
         /// <summary>
         /// Set DS session timeout to new value. Calling this will refresh the timeout timer.
@@ -189,6 +198,11 @@ namespace AccelByte.Server
             StartHeartBeatScheduler();
         }
 
+        protected virtual void SendClaimMessageImplementation(string sessionId)
+        {
+            websocketApi.SendClaimMessage(sessionId);
+        }
+        
         #region protected/private methods
         protected void HandleOnOpen()
         {
