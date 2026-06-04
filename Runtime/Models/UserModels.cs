@@ -281,6 +281,20 @@ namespace AccelByte.Models
         }
     }
 
+    [Preserve]
+    public class UserPlatformType : LoginPlatformType
+    {
+        public UserPlatformType(PlatformType typeEnum) : base(typeEnum)
+        {
+            
+        }
+        
+        public UserPlatformType(string platformId) : base(platformId)
+        {
+            
+        }
+    }
+
     [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
     public enum PlatformGroup
     {
@@ -1128,7 +1142,7 @@ namespace AccelByte.Models
     [Preserve]
     public class LoginWithDeviceIdOptionalParameters : OptionalParametersBase
     {
-
+        internal string TestDeviceId;
     }
 
     [Preserve]
@@ -1262,6 +1276,12 @@ namespace AccelByte.Models
 
     [Preserve]
     public class ForceLinkOtherPlatformOptionalParameters : OptionalParametersBase
+    {
+
+    }
+
+    [Preserve]
+    public class ForcePlatformLinkV3OptionalParameters : OptionalParametersBase
     {
 
     }
@@ -1647,7 +1667,10 @@ namespace AccelByte.Models
     }
 
     [Preserve]
-    public class LoginWithDeviceIdV4OptionalParameters : LoginV4OptionalParameters { }
+    public class LoginWithDeviceIdV4OptionalParameters : LoginV4OptionalParameters
+    {
+        internal string TestDeviceId;
+    }
 
     [Preserve]
     public class LoginWithOtherPlatformV4OptionalParameters : LoginV4OptionalParameters

@@ -28,7 +28,8 @@ namespace AccelByte.Models
         EMPTY,
         CLOSED,
         INVITE_ONLY,
-        OPEN
+        OPEN,
+        PASSWORD_PROTECTED
     }
 
     [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
@@ -175,6 +176,7 @@ namespace AccelByte.Models
         [DataMember(Name = "joinType")] public SessionV2Joinability joinability;
         [DataMember] public SessionV2MemberData[] members;
         [DataMember] public bool textChat;
+        [DataMember(EmitDefaultValue = false)] public string password;
     }
 
     [DataContract, Preserve]
@@ -364,6 +366,7 @@ namespace AccelByte.Models
         [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
         [DataMember(EmitDefaultValue = false)] public SessionV2MemberData[] members;
         [DataMember] public bool textChat;
+        [DataMember(EmitDefaultValue = false)] public string password;
     }
 
     [DataContract, Preserve]
@@ -458,7 +461,41 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class JoinGameSessionOptionalParameters : OptionalParametersBase
     {
-        
+        /// <summary>
+        /// Required when joining a PASSWORD_PROTECTED session.
+        /// </summary>
+        public string Password;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2SessionPasswordResponse
+    {
+        [DataMember(Name = "password")] public string Password;
+    }
+
+    [DataContract, Preserve]
+    public class SessionV2UpdateSessionPasswordRequest
+    {
+        [DataMember(Name = "newPassword")] public string NewPassword;
+    }
+
+    [Preserve]
+    public class JoinPartyOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Required when joining a PASSWORD_PROTECTED party.
+        /// </summary>
+        public string Password;
+    }
+
+    [Preserve]
+    public class GetSessionPasswordOptionalParameters : OptionalParametersBase
+    {
+    }
+
+    [Preserve]
+    public class UpdateSessionPasswordOptionalParameters : OptionalParametersBase
+    {
     }
 
     [DataContract, Preserve]

@@ -683,6 +683,49 @@ namespace AccelByte.Api
             });
         }
 
+        internal void ForcePlatformLinkV3(LinkOtherPlatformRequest requestModel
+            , LinkOtherPlatformParameter requestParameter
+            , ForcePlatformLinkV3OptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            if (requestModel == null)
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't force link platform account! request is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestModel.PlatformId))
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't force link platform account! Platform Id parameter is null!"));
+                return;
+            }
+            if (string.IsNullOrEmpty(requestParameter.Ticket))
+            {
+                callback?.TryError(new Error(ErrorCode.BadRequest, "Can't force link platform account! Ticket parameter is null!"));
+                return;
+            }
+
+            string url = BaseUrl + "/v3/public/namespaces/{namespace}/users/me/platforms/{platformId}/force";
+
+            var request = HttpRequestBuilder
+                .CreatePost(url)
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("platformId", requestModel.PlatformId)
+                .WithFormParam("ticket", requestParameter.Ticket)
+                .WithBearerAuth(Session.AuthorizationToken)
+                .Accepts(MediaType.ApplicationJson)
+                .WithContentType(MediaType.ApplicationForm)
+                .GetResult();
+            var additionalParameters = AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters);
+
+            HttpOperator.SendRequest(additionalParameters, request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="requestModel"></param>

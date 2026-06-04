@@ -210,28 +210,7 @@ namespace AccelByte.Api
         {
             Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
 
-            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
-            {
-                return;
-            }
-
-            if (!session.IsValid())
-            {
-                callback?.TryError(ErrorCode.IsNotLoggedIn);
-                return;
-            }
-
-            coroutineRunner.Run(
-                sessionApi.JoinParty(
-                    partyId,
-                    cb =>
-                    {
-                        if (!cb.IsError && cb.Value != null)
-                        {
-                            SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionJoin);
-                        }
-                        HandleCallback(cb, callback);
-                    }));
+            JoinParty(partyId, null, callback);
         }
 
         public void LeaveParty(string partyId, ResultCallback callback)
@@ -445,6 +424,90 @@ namespace AccelByte.Api
             }
 
             sessionApi.CancelPartyInvitation(partyId, userId, callback);
+        }
+
+        public void JoinParty(string partyId
+            , JoinPartyOptionalParameters optionalParameters
+            , ResultCallback<SessionV2PartySession> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.JoinParty(
+                partyId,
+                optionalParameters,
+                cb =>
+                {
+                    if (!cb.IsError && cb.Value != null)
+                    {
+                        SendPredefinedEvent(cb, PredefinedAnalyticsMode.PartySessionJoin);
+                    }
+                    HandleCallback(cb, callback);
+                });
+        }
+
+        public void GetPartyPassword(string partyId
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            GetPartyPassword(partyId, null, callback);
+        }
+
+        internal void GetPartyPassword(string partyId
+            , GetSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.GetPartyPassword(partyId, optionalParameters, callback);
+        }
+
+        public void UpdatePartyPassword(string partyId
+            , string newPassword
+            , ResultCallback callback)
+        {
+            UpdatePartyPassword(partyId, newPassword, null, callback);
+        }
+
+        internal void UpdatePartyPassword(string partyId
+            , string newPassword
+            , UpdateSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(partyId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetPartyIdInvalidMessage(partyId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.UpdatePartyPassword(partyId, newPassword, optionalParameters, callback);
         }
 
 #endregion
@@ -681,7 +744,7 @@ namespace AccelByte.Api
             JoinGameSession(sessionId, null, callback);
         }
 
-        internal void JoinGameSession(
+        public void JoinGameSession(
             string sessionId
             , JoinGameSessionOptionalParameters optionalParameters
             , ResultCallback<SessionV2GameSession> callback)
@@ -989,6 +1052,60 @@ namespace AccelByte.Api
                     yield return new WaitForSeconds(sessionApi.Config.MatchmakingTicketCheckPollRate / 1000f);
                 }
             }
+        }
+
+        public void GetGameSessionPassword(string sessionId
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            GetGameSessionPassword(sessionId, null, callback);
+        }
+
+        internal void GetGameSessionPassword(string sessionId
+            , GetSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.GetGameSessionPassword(sessionId, optionalParameters, callback);
+        }
+
+        public void UpdateGameSessionPassword(string sessionId
+            , string newPassword
+            , ResultCallback callback)
+        {
+            UpdateGameSessionPassword(sessionId, newPassword, null, callback);
+        }
+
+        internal void UpdateGameSessionPassword(string sessionId
+            , string newPassword
+            , UpdateSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            if (!ValidateAccelByteId(sessionId, Utils.AccelByteIdValidator.HypensRule.NoRule, Utils.AccelByteIdValidator.GetSessionIdInvalidMessage(sessionId), callback))
+            {
+                return;
+            }
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            sessionApi.UpdateGameSessionPassword(sessionId, newPassword, optionalParameters, callback);
         }
 
 #endregion

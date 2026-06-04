@@ -2479,7 +2479,62 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Force to Link other platform's account to the currently logged in user. 
+        /// Force link a platform account to the currently logged in user using a ticket/token.
+        /// If the platform account is already linked to another user, that link is removed across all namespaces.
+        /// </summary>
+        /// <param name="platformType">Platform type to force link</param>
+        /// <param name="ticket">Ticket / token from the platform</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        public void ForcePlatformLinkV3(UserPlatformType platformType
+            , string ticket
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: SharedMemory?.Logger);
+
+            var optionalParameters = new ForcePlatformLinkV3OptionalParameters()
+            {
+                Logger = SharedMemory?.Logger
+            };
+
+            ForcePlatformLinkV3(platformType, ticket, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Force link a platform account to the currently logged in user using a ticket/token. Supports OIDC platforms.
+        /// If the platform account is already linked to another user, that link is removed across all namespaces.
+        /// </summary>
+        /// <param name="platformType">Platform ID string, supports OpenID Connect (OIDC)</param>
+        /// <param name="platformTicket">Ticket / token from the platform</param>
+        /// <param name="optionalParameters">Optional parameters</param>
+        /// <param name="callback">Returns a Result via callback when completed</param>
+        internal void ForcePlatformLinkV3(UserPlatformType platformType
+            , string platformTicket
+            , ForcePlatformLinkV3OptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            if (!userSession.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var requestModel = new LinkOtherPlatformRequest
+            {
+                PlatformId = platformType.PlatformId
+            };
+
+            var requestParameter = new LinkOtherPlatformParameter
+            {
+                Ticket = platformTicket
+            };
+
+            api.ForcePlatformLinkV3(requestModel, requestParameter, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Force to Link other platform's account to the currently logged in user.
         /// </summary>
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformUserId"> UserId from other platform to be linked to </param>
@@ -2504,6 +2559,7 @@ namespace AccelByte.Api
         /// <param name="platformType">Other platform's type (Google, Steam, Facebook, etc)</param>
         /// <param name="platformUserId"> UserId from other platform to be linked to </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Deprecated: Use ForcePlatformLinkV3 instead. This endpoint will be removed from IAM service.")]
         public void ForcedLinkOtherPlatform(PlatformType platformType
             , string platformUserId
             , ForceLinkOtherPlatformOptionalParameters optionalParameters
@@ -2553,6 +2609,7 @@ namespace AccelByte.Api
         /// <param name="platformId">Specify platform's type, string type of this field makes support OpenID Connect (OIDC)</param>
         /// <param name="platformUserId"> UserId from other platform to be linked to </param>
         /// <param name="callback">Returns a Result via callback when completed</param>
+        [Obsolete("Deprecated: Use ForcePlatformLinkV3 instead. This endpoint will be removed from IAM service.")]
         public void ForcedLinkOtherPlatformId(string platformId
             , string platformUserId
             , ResultCallback callback )

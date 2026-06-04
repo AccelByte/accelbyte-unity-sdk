@@ -209,6 +209,14 @@ namespace AccelByte.Api
 
         public IEnumerator JoinParty(string partyId, ResultCallback<SessionV2PartySession> callback)
         {
+            JoinParty(partyId, null, callback);
+            yield break;
+        }
+
+        internal void JoinParty(string partyId
+            , JoinPartyOptionalParameters optionalParameters
+            , ResultCallback<SessionV2PartySession> callback)
+        {
             var error = ApiHelperUtils.CheckForNullOrEmpty(partyId
                 , AuthToken
                 , Namespace_);
@@ -216,26 +224,30 @@ namespace AccelByte.Api
             if (error != null)
             {
                 callback?.TryError(error);
-                yield break;
+                return;
             }
 
-            var request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/users/me/join")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("partyId", partyId)
                 .WithBearerAuth(AuthToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
 
-            IHttpResponse response = null;
+            if (!string.IsNullOrEmpty(optionalParameters?.Password))
+            {
+                var body = new { password = optionalParameters.Password };
+                requestBuilder.WithBody(body.ToUtf8Json());
+            }
 
-            yield return HttpClient.SendRequest(request,
-                rsp => response = rsp);
+            var request = requestBuilder.GetResult();
 
-            var result = response.TryParseJson<SessionV2PartySession>();
-
-            callback?.Try(result);
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParseJson<SessionV2PartySession>();
+                callback?.Try(result);
+            });
         }
 
         public IEnumerator LeaveParty(string partyId, ResultCallback callback)
@@ -517,6 +529,63 @@ namespace AccelByte.Api
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
             HttpOperator.SendRequest(request, response =>
+            {
+                var result = response.TryParse();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetPartyPassword(string partyId
+            , GetSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/password")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("partyId", partyId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParseJson<SessionV2SessionPasswordResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void UpdatePartyPassword(string partyId
+            , string newPassword
+            , UpdateSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(partyId, newPassword, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var body = new SessionV2UpdateSessionPasswordRequest { NewPassword = newPassword };
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/parties/{partyId}/password")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("partyId", partyId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(body.ToUtf8Json())
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
             {
                 var result = response.TryParse();
                 callback?.Try(result);
@@ -850,18 +919,82 @@ namespace AccelByte.Api
                 return;
             }
 
-            var request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/join")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("sessionId", sessionId)
                 .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationJson)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (!string.IsNullOrEmpty(optionalParameters?.Password))
+            {
+                var body = new { password = optionalParameters.Password };
+                requestBuilder.WithBody(body.ToUtf8Json());
+            }
+
+            var request = requestBuilder.GetResult();
+
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParseJson<SessionV2GameSession>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void GetGameSessionPassword(string sessionId
+            , GetSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback<SessionV2SessionPasswordResponse> callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var request = HttpRequestBuilder
+                .CreateGet(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/password")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithBearerAuth(AuthToken)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
+            {
+                var result = response.TryParseJson<SessionV2SessionPasswordResponse>();
+                callback?.Try(result);
+            });
+        }
+
+        internal void UpdateGameSessionPassword(string sessionId
+            , string newPassword
+            , UpdateSessionPasswordOptionalParameters optionalParameters
+            , ResultCallback callback)
+        {
+            var error = ApiHelperUtils.CheckForNullOrEmpty(sessionId, newPassword, AuthToken, Namespace_);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var body = new SessionV2UpdateSessionPasswordRequest { NewPassword = newPassword };
+
+            var request = HttpRequestBuilder
+                .CreatePut(BaseUrl + "/v1/public/namespaces/{namespace}/gamesessions/{sessionId}/password")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("sessionId", sessionId)
+                .WithBearerAuth(AuthToken)
+                .WithBody(body.ToUtf8Json())
                 .WithContentType(MediaType.ApplicationJson)
                 .Accepts(MediaType.ApplicationJson)
                 .GetResult();
 
             HttpOperator.SendRequest(AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters), request, response =>
             {
-                var result = response.TryParseJson<SessionV2GameSession>();
+                var result = response.TryParse();
                 callback?.Try(result);
             });
         }

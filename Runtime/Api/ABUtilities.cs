@@ -27,7 +27,7 @@ namespace AccelByte.Api
                 yield break;
             }
             
-            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
 
@@ -47,7 +47,7 @@ namespace AccelByte.Api
                 }
                 else
                 {
-                    Texture2D returnedTexture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                    Texture2D returnedTexture = TryCreateTexture(request);
                     callback?.Try(returnedTexture == null
                         ? Result<Texture2D>.CreateError(ErrorCode.NotFound, $"Could not find specified image file {request.url}")
                         : Result<Texture2D>.CreateOk(returnedTexture));
@@ -69,8 +69,8 @@ namespace AccelByte.Api
                 callback?.Try(Result<Texture2D>.CreateError(ErrorCode.ErrorFromException, "Download url is empty"));
                 return;
             }
-            
-            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 await request.SendWebRequest();
 
@@ -92,7 +92,7 @@ namespace AccelByte.Api
                     }
                     else
                     {
-                        Texture2D returnedTexture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                        Texture2D returnedTexture = TryCreateTexture(request);
                         callback?.Try(returnedTexture == null
                             ? Result<Texture2D>.CreateError(ErrorCode.NotFound, $"Could not find specified image file {request.url}")
                             : Result<Texture2D>.CreateOk(returnedTexture));
@@ -103,6 +103,19 @@ namespace AccelByte.Api
                     callback?.Try(Result<Texture2D>.CreateError(ErrorCode.ErrorFromException, $"{ex.Message}"));
                 }
             }
+        }
+
+        private static Texture2D TryCreateTexture(UnityWebRequest request)
+        {
+            byte[] imageBytes = request.downloadHandler?.data;
+            if (imageBytes == null || imageBytes.Length == 0)
+            {
+                return null;
+            }
+
+            const int sizePlaceHolder = 2;
+            var texture = new Texture2D(sizePlaceHolder, sizePlaceHolder, TextureFormat.RGBA32, false);
+            return texture.LoadImage(imageBytes) ? texture : null;
         }
     }
 }

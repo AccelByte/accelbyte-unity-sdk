@@ -277,13 +277,19 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: optionalParameters?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
+        string deviceId = deviceProvider.DeviceId;
+        if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.TestDeviceId))
+        {
+            deviceId = optionalParameters.TestDeviceId;
+        }
+        
         string targetUri = BaseUrl + "/v3/oauth/platforms/device/token";
         IHttpRequest request = HttpRequestBuilder.CreatePost(targetUri)
             .WithPathParam("platformId", deviceProvider.DeviceType)
             .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("device_id", deviceProvider.DeviceId)
+            .WithFormParam("device_id", deviceId)
             .WithFormParam("namespace", Namespace_)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();
@@ -1401,12 +1407,17 @@ public class OAuth2 : ApiBase
         Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
         DeviceProvider deviceProvider = DeviceProvider.GetFromSystemInfo(Config.PublisherNamespace, logger: SharedMemory?.Logger, fs: null, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig);
 
+        string deviceId = deviceProvider.DeviceId;
+        if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.TestDeviceId))
+        {
+            deviceId = optionalParameters.TestDeviceId;
+        }
         IHttpRequest request = HttpRequestBuilder.CreatePost(BaseUrl + "/v4/oauth/platforms/device/token")
             .WithPathParam("platformId", deviceProvider.DeviceType)
             .WithBasicAuthWithCookie(Config.PublisherNamespace, deviceIdGeneratorConfig: SharedMemory?.DeviceIdGeneratorConfig)
             .WithContentType(MediaType.ApplicationForm)
             .Accepts(MediaType.ApplicationJson)
-            .WithFormParam("device_id", deviceProvider.DeviceId)
+            .WithFormParam("device_id", deviceId)
             .WithFormParam("namespace", Namespace_)
             .AddAdditionalData("flightId", AccelByteSDK.FlightId)
             .GetResult();

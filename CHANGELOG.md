@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.16.0] (2026-06-04)
+
+
+### Features
+
+* add password protected join session and join party 
+* added User.ForcePaltformLinkV3 interface 
+* deprecated User.ForceLinkOtherPlatform 
+
+
+### Documentations
+
+* added introduction doc 
+
+
+### Refactors
+
+* removed UnityWebRequestTexture Module in utilities 
+
+## [17.15.0] (2026-06-04)
+
+
+### Features
+
+* add password protected join session and join party 
+* added User.ForcePaltformLinkV3 interface 
+* deprecated User.ForceLinkOtherPlatform 
+
+
+### Documentations
+
+* added introduction doc 
+
+
+### Refactors
+
+* removed UnityWebRequestTexture Module in utilities 
+
 ## [17.14.0] (2026-04-13)
 
 
