@@ -27,6 +27,9 @@ namespace AccelByte.Models
         None,
         EMPTY,
         CLOSED,
+        FRIENDS_OF_FRIENDS,
+        FRIENDS_OF_LEADER,
+        FRIENDS_OF_MEMBERS,
         INVITE_ONLY,
         OPEN,
         PASSWORD_PROTECTED
@@ -171,11 +174,16 @@ namespace AccelByte.Models
     [DataContract, Preserve]
     public class SessionV2PartySessionCreateRequest
     {
-        [DataMember] public Dictionary<string, object> attributes;
-        [DataMember] public string configurationName;
-        [DataMember(Name = "joinType")] public SessionV2Joinability joinability;
-        [DataMember] public SessionV2MemberData[] members;
-        [DataMember] public bool textChat;
+        [DataMember(EmitDefaultValue = false)] public Dictionary<string, object> attributes;
+        [DataMember(EmitDefaultValue = false)] public string configurationName;
+        [DataMember(EmitDefaultValue = false)] public int? inactiveTimeout;
+        [DataMember(EmitDefaultValue = false)] public int? inviteTimeout;
+        [DataMember(Name = "joinability", EmitDefaultValue = false)] public SessionV2Joinability joinability;
+        [DataMember(EmitDefaultValue = false)] public int? maxPlayers;
+        [DataMember(EmitDefaultValue = false)] public SessionV2MemberData[] members;
+        [DataMember(EmitDefaultValue = false)] public int? minPlayers;
+        [DataMember(EmitDefaultValue = false)] public bool? textChat;
+        [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType? type;
         [DataMember(EmitDefaultValue = false)] public string password;
     }
 
@@ -349,7 +357,7 @@ namespace AccelByte.Models
     public class SessionV2GameSessionCreateRequest
     {
         [DataMember(EmitDefaultValue = false)] public Dictionary<string, object> attributes;
-        [DataMember(EmitDefaultValue = false)] public string backfillTicketId;
+        [DataMember(Name = "backfillTicketID", EmitDefaultValue = false)] public string backfillTicketId;
         [DataMember(EmitDefaultValue = false)] public string clientVersion;
         [DataMember(EmitDefaultValue = false)] public string configurationName;
         [DataMember(EmitDefaultValue = false)] public string deployment;
@@ -362,7 +370,7 @@ namespace AccelByte.Models
         [DataMember(EmitDefaultValue = false)] public string[] requestedRegions;
         [DataMember(EmitDefaultValue = false)] public string serverName;
         [DataMember(EmitDefaultValue = false)] public SessionV2TeamData[] teams;
-        [DataMember(EmitDefaultValue = false)] public string[] ticketIds;
+        [DataMember(Name = "ticketIDs", EmitDefaultValue = false)] public string[] ticketIds;
         [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
         [DataMember(EmitDefaultValue = false)] public SessionV2MemberData[] members;
         [DataMember] public bool textChat;
@@ -521,7 +529,7 @@ namespace AccelByte.Models
     public class SessionV2GameSessionUpdateRequest
     {
         [DataMember(EmitDefaultValue = false)] public Dictionary<string, object> attributes;
-        [DataMember(EmitDefaultValue = false)] public string backfillTicketId;
+        [DataMember(Name = "backfillTicketID", EmitDefaultValue = false)] public string backfillTicketId;
         [DataMember(EmitDefaultValue = false)] public string clientVersion;
         [DataMember(EmitDefaultValue = false)] public string deployment;
         [DataMember(EmitDefaultValue = false)] public int inactiveTimeout;
@@ -532,7 +540,7 @@ namespace AccelByte.Models
         [DataMember(EmitDefaultValue = false)] public int minPlayers;
         [DataMember(EmitDefaultValue = false)] public string[] requestedRegions;
         [DataMember(EmitDefaultValue = false)] public SessionV2TeamData[] teams;
-        [DataMember(EmitDefaultValue = false)] public string[] ticketIds;
+        [DataMember(Name = "ticketIDs", EmitDefaultValue = false)] public string[] ticketIds;
         [DataMember(EmitDefaultValue = false)] public SessionConfigurationTemplateType type;
         [DataMember(EmitDefaultValue = false)] public int version;
     }
@@ -602,11 +610,23 @@ namespace AccelByte.Models
     }
 
     [DataContract, Preserve]
+    public class SessionV2TeamPartyData
+    {
+        [DataMember(Name = "partyID"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string partyId;
+        [DataMember(Name = "userIDs"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string[] userIds;
+    }
+
+    [DataContract, Preserve]
     public class SessionV2TeamData
     {
-        [DataMember] public string[] userIds;
-        [DataMember(Name = "TeamID"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [DataMember(Name = "userIDs"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string[] userIds;
+        [DataMember(Name = "teamID"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string TeamId;
+        [DataMember(Name = "parties"), JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public SessionV2TeamPartyData[] parties;
     }
 
     [DataContract, Preserve]

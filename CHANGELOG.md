@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+### [17.16.1] (2026-07-15)
+
+
+### Bug Fixes
+
+* session API payload field names 
+
 ## [17.16.0] (2026-06-04)
 
 
