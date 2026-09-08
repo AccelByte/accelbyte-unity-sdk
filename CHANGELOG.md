@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.17.0] (2026-09-08)
+
+
+### Features
+
+* **gdpr:** add headless personal data requests and gameplay ban check 
+
+
+### Refactors
+
+* **gdpr:** return void from the new personal data request api methods 
+
+
+### Documentations
+
+* update supported Unity versions (min 2021.3.26f1 LTS) 
+
 ### [17.16.1] (2026-07-15)
 
 

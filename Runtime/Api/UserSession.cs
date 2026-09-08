@@ -85,6 +85,39 @@ namespace AccelByte.Api
 
         public bool IsComply => tokenData?.is_comply ?? false;
 
+        /// <summary>
+        /// Check the decoded token for an active, enabled ban of the given type.
+        /// Reads the cached token, so it does not make a network call.
+        /// </summary>
+        /// <param name="banType">Ban type to look for, e.g. BanType.GAMEPLAY_BLOCKED</param>
+        /// <returns>True while a ban of that type is enabled and has not expired</returns>
+        public bool IsBanned(BanType banType)
+        {
+            TokenBans[] bans = tokenData?.Bans;
+            if (bans == null)
+            {
+                return false;
+            }
+
+            DateTime utcNow = DateTime.UtcNow;
+            string banName = banType.ToString();
+
+            foreach (TokenBans ban in bans)
+            {
+                if (!ban.Enabled || ban.EndDate.ToUniversalTime() < utcNow)
+                {
+                    continue;
+                }
+
+                if (string.Equals(ban.Ban, banName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal IAccelByteDataStorage DataStorage
         {
             get

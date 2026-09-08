@@ -628,7 +628,7 @@ namespace AccelByte.Models
     /// Type of Ban that available
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter)), System.Serializable]
-    public enum BanType { LOGIN, CHAT_SEND, CHAT_ALL, ORDER_AND_PAYMENT, STATISTICS, LEADERBOARD, MATCHMAKING, UGC_CREATE_UPDATE }
+    public enum BanType { LOGIN, CHAT_SEND, CHAT_ALL, ORDER_AND_PAYMENT, STATISTICS, LEADERBOARD, MATCHMAKING, UGC_CREATE_UPDATE, GAMEPLAY_BLOCKED }
 
     /// <summary>
     /// Type of Ban reason that available

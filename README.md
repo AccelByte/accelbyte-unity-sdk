@@ -5,7 +5,7 @@ The Unity SDK acts as a bridge between your game and AccelByte Cloud services, m
 The setup and implementation guideline are available in [our portal](https://docs.accelbyte.io/gaming-services/getting-started/setup-game-sdk/unity-sdk/).
 
 ## Supported Unity ##
-The current supported Unity versions are 2020, 2021, 2022, Unity 6.
+The current supported Unity versions are 2021, 2022, and Unity 6. The minimum supported version is 2021.3.26f1 (LTS).
 
 ## How To Install ##
 From Unity Package Manager, add package from git URL: "https://github.com/AccelByte/accelbyte-unity-sdk.git"
