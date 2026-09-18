@@ -79,11 +79,14 @@ namespace AccelByte.Api
         public static DeviceProvider GetFromSystemInfo(string encodeKey, string generatedIdCacheFileDir = null, IDebugger logger = null, IFileStream fs = null, Models.DeviceIdGeneratorConfig deviceIdGeneratorConfig = null)
         {
 #if UNITY_WEBGL
+            bool randomizeUniqueIdentifier = false;
             string platformUniqueIdentifier = null;
             bool isIdentifierGenerated = true;
 #else
             bool randomizeUniqueIdentifier = deviceIdGeneratorConfig != null ? deviceIdGeneratorConfig.RandomizeDeviceId : false;
-            string platformUniqueIdentifier = !randomizeUniqueIdentifier ? GetDeviceId(encodeKey, logger: logger) : null;
+            string platformUniqueIdentifier = !randomizeUniqueIdentifier
+                ? GetPersistentPlatformIdentifier(encodeKey, generatedIdCacheFileDir, logger, fs)
+                : null;
             bool isIdentifierGenerated = string.IsNullOrEmpty(platformUniqueIdentifier);
 #endif
 
@@ -97,7 +100,7 @@ namespace AccelByte.Api
                     }
                     
                     var fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir, fs, logger);
-                    if (fileCache.Contains(CacheFileName))
+                    if (fileCache.Contains(CacheFileName) && !randomizeUniqueIdentifier)
                     {
                         platformUniqueIdentifier = fileCache.Retrieve(CacheFileName);
                         logger?.LogVerbose($"Retrieve cached device id: {platformUniqueIdentifier}");
@@ -128,6 +131,83 @@ namespace AccelByte.Api
                 platformUniqueIdentifier,
                 isIdentifierGenerated);
             return retval;
+        }
+
+        /// <summary>
+        /// Desktop platforms derive their identifier from the network adapter that is currently up
+        /// (see GetDeviceId), so the value changes whenever the player changes network.
+        /// </summary>
+        private static bool IsPlatformIdentifierNetworkDerived()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.OSXEditor:
+                case RuntimePlatform.OSXPlayer:
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.LinuxPlayer:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the device id already established for this installation, deriving a new one from
+        /// the machine only when nothing has been established yet. This matches the Unreal SDK, and
+        /// keeps the device id stable when the network adapter in use changes.
+        /// </summary>
+        private static string GetPersistentPlatformIdentifier(string encodeKey
+            , string generatedIdCacheFileDir
+            , IDebugger logger
+            , IFileStream fs)
+        {
+            if (!IsPlatformIdentifierNetworkDerived())
+            {
+                return GetDeviceId(encodeKey, logger: logger);
+            }
+
+            string cachedIdentifier = RetrieveCachedDeviceId(generatedIdCacheFileDir, logger, fs);
+            if (!string.IsNullOrEmpty(cachedIdentifier))
+            {
+                logger?.LogVerbose($"Retrieve cached device id: {cachedIdentifier}");
+                return cachedIdentifier;
+            }
+
+            string platformIdentifier = GetDeviceId(encodeKey, logger: logger);
+            if (!string.IsNullOrEmpty(platformIdentifier))
+            {
+                CacheDeviceId(platformIdentifier, generatedIdCacheFileDir, logger, fs);
+                logger?.LogVerbose($"Cache new device id: {platformIdentifier}");
+            }
+
+            return platformIdentifier;
+        }
+
+        private static string RetrieveCachedDeviceId(string generatedIdCacheFileDir
+            , IDebugger logger
+            , IFileStream fs)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(generatedIdCacheFileDir))
+                {
+                    generatedIdCacheFileDir = DefaultGeneratedIdCacheFileDir;
+                }
+
+                var fileCache = new AccelByteFileCacheImplementation(generatedIdCacheFileDir, fs, logger);
+                if (fileCache.Contains(CacheFileName))
+                {
+                    return fileCache.Retrieve(CacheFileName);
+                }
+            }
+            catch (System.Exception exception)
+            {
+                logger?.LogWarning($"Unable to access device id cache, {exception.Message}");
+            }
+
+            return null;
         }
 
         public static void CacheDeviceId(string cachedDeviceId, string generatedIdCacheFileDir = null, IDebugger logger = null, IFileStream fs = null)

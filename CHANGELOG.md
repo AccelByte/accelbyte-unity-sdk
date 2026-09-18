@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+### [17.17.1] (2026-09-18)
+
+
+### Bug Fixes
+
+* **deviceid:** keep the desktop device id stable across network changes 
+
 ## [17.17.0] (2026-09-08)
 
 
