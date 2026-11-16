@@ -82,4 +82,30 @@ namespace AccelByte.Models
     public class CancelMyPersonalDataRequestOptionalParameters : OptionalParametersBase
     {
     }
+
+    [DataContract, Preserve]
+    public class PersonalDataDownloadUrlResponse
+    {
+        [DataMember(Name = "URL")] public string Url;
+    }
+
+    public class SubmitPersonalDataRequestOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Language tag for the notification email.
+        /// </summary>
+        public string LanguageTag;
+    }
+
+    public class GeneratePersonalDataDownloadUrlOptionalParameters : OptionalParametersBase
+    {
+    }
+
+    public class SubmitAccountDeletionOptionalParameters : OptionalParametersBase
+    {
+        /// <summary>
+        /// Language tag for the notification email.
+        /// </summary>
+        public string LanguageTag;
+    }
 }

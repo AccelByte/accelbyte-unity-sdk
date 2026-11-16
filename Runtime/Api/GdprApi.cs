@@ -32,7 +32,8 @@ namespace AccelByte.Api
         public IEnumerator SubmitAccountDeletion(string accessToken
           , string userId
           , string password
-          , ResultCallback<SubmitAccountDeletionResponse> callback)
+          , ResultCallback<SubmitAccountDeletionResponse> callback
+          , SubmitAccountDeletionOptionalParameters optionalParameters = null)
         {
             if (string.IsNullOrEmpty(accessToken))
             {
@@ -52,15 +53,21 @@ namespace AccelByte.Api
                 yield break;
             } 
 
-            var request = HttpRequestBuilder
+            var requestBuilder = HttpRequestBuilder
                 .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/deletions")
                 .WithPathParam("namespace", Namespace_)
                 .WithPathParam("userId", userId)
                 .WithFormParam("password", password)
                 .WithBearerAuth(accessToken)
                 .WithContentType(MediaType.ApplicationJson)
-                .Accepts(MediaType.ApplicationJson)
-                .GetResult();
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.LanguageTag))
+            {
+                requestBuilder.WithFormParam("languageTag", optionalParameters.LanguageTag);
+            }
+
+            var request = requestBuilder.GetResult();
 
             IHttpResponse response = null;
 
@@ -296,6 +303,87 @@ namespace AccelByte.Api
                 , response =>
                 {
                     var result = response.TryParse();
+                    callback?.Try(result);
+                });
+        }
+
+        internal void SubmitPersonalDataRequest(string userId
+            , string password
+            , SubmitPersonalDataRequestOptionalParameters optionalParameters
+            , ResultCallback<SubmitPersonalDataRequestResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, userId, password);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            var requestBuilder = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/requests")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithFormParam("password", password)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson);
+
+            if (optionalParameters != null && !string.IsNullOrEmpty(optionalParameters.LanguageTag))
+            {
+                requestBuilder.WithFormParam("languageTag", optionalParameters.LanguageTag);
+            }
+
+            var request = requestBuilder.GetResult();
+
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<SubmitPersonalDataRequestResponse>();
+                    callback?.Try(result);
+                });
+        }
+
+        internal void GeneratePersonalDataDownloadUrl(string userId
+            , DateTime requestDate
+            , string password
+            , GeneratePersonalDataDownloadUrlOptionalParameters optionalParameters
+            , ResultCallback<PersonalDataDownloadUrlResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            var error = ApiHelperUtils.CheckForNullOrEmpty(AuthToken, userId, password);
+            if (error != null)
+            {
+                callback?.TryError(error);
+                return;
+            }
+
+            // WithPathParam Uri-escapes the value, so pass the raw ISO 8601 string.
+            string requestDateIso = requestDate
+                .ToUniversalTime()
+                .ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
+
+            var request = HttpRequestBuilder
+                .CreatePost(BaseUrl + "/public/namespaces/{namespace}/users/{userId}/requests/{requestDate}/generate")
+                .WithPathParam("namespace", Namespace_)
+                .WithPathParam("userId", userId)
+                .WithPathParam("requestDate", requestDateIso)
+                .WithFormParam("password", password)
+                .WithBearerAuth(AuthToken)
+                .WithContentType(MediaType.ApplicationForm)
+                .Accepts(MediaType.ApplicationJson)
+                .GetResult();
+
+            HttpOperator.SendRequest(
+                AdditionalHttpParameters.CreateFromOptionalParameters(optionalParameters)
+                , request
+                , response =>
+                {
+                    var result = response.TryParseJson<PersonalDataDownloadUrlResponse>();
                     callback?.Try(result);
                 });
         }

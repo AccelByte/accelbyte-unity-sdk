@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version] for commit guidelines.
 
+## [17.18.0] (2026-11-16)
+
+
+### Features
+
+* **gdpr:** add full account personal data request and download url 
+
+
+### Refactors
+
+* **gdpr:** pass SubmitAccountDeletion languageTag through optional parameters 
+* **gdpr:** take optional parameters on the full account public wrappers 
+
 ### [17.17.1] (2026-09-18)
 
 

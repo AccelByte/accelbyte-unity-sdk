@@ -31,14 +31,19 @@ namespace AccelByte.Api
         }
 
         /// <summary>
-        /// Submit user's account deletion request 
+        /// Submit user's account deletion request. Used when the account is a full account.
+        /// A successful submission revokes every token the player holds, so log the player in again
+        /// before calling GetAccountDeletionStatus or CancelAccountDeletion.
+        /// For a headless account, use SubmitAccountDeletionOtherPlatform or SubmitAccountDeletionPlatformId instead.
         /// </summary>
         /// <param name="password">IAM password of the user</param>
         /// <param name="callback">Returns Delete Account Response via callback when completed</param>
+        /// <param name="optionalParameters">Optional parameters containing the notification email's language tag</param>
         public void SubmitAccountDeletion(string password
-            , ResultCallback<SubmitAccountDeletionResponse> callback)
+            , ResultCallback<SubmitAccountDeletionResponse> callback
+            , SubmitAccountDeletionOptionalParameters optionalParameters = null)
         {
-            Report.GetFunctionLog(GetType().Name);
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
 
             if (!session.IsValid())
             {
@@ -51,7 +56,8 @@ namespace AccelByte.Api
                     session.AuthorizationToken,
                     session.UserId,
                     password,
-                    callback));
+                    callback,
+                    optionalParameters));
         }
 
         /// <summary>
@@ -269,6 +275,66 @@ namespace AccelByte.Api
             var optionalParameters = new CancelMyPersonalDataRequestOptionalParameters();
 
             api.CancelMyPersonalDataRequest(requestDate, optionalParameters, callback);
+        }
+
+        /// <summary>
+        /// Submit a personal data request. Used when the account is a full account; the request is
+        /// verified with the player's password.
+        /// List or cancel it with GetMyPersonalDataRequests / CancelMyPersonalDataRequest, and fetch the
+        /// download link with GeneratePersonalDataDownloadUrl once it completes.
+        /// For a headless account, use SubmitMyPersonalDataRequest or SubmitMyPersonalDataRequestPlatformId instead.
+        /// </summary>
+        /// <param name="password">IAM password of the user</param>
+        /// <param name="callback">Returns Submit Personal Data Request Response via callback when completed</param>
+        /// <param name="optionalParameters">Optional parameters containing the notification email's language tag</param>
+        public void SubmitPersonalDataRequest(string password
+            , ResultCallback<SubmitPersonalDataRequestResponse> callback
+            , SubmitPersonalDataRequestOptionalParameters optionalParameters = null)
+        {
+            Report.GetFunctionLog(GetType().Name, logger: optionalParameters?.Logger);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            api.SubmitPersonalDataRequest(session.UserId
+                , password
+                , optionalParameters
+                , callback);
+        }
+
+        /// <summary>
+        /// Generate the download URL of a completed personal data request. Used when the account is a full
+        /// account; the request is verified with the player's password.
+        /// Succeeds only for a request whose status is Completed. Otherwise it fails with error code 13261 (still
+        /// being processed), 13283 (failed), 13279 (expired), 13004 (not found) or 13122 (wrong password).
+        /// A headless account can't use this method; its download link is delivered by email only.
+        /// </summary>
+        /// <param name="requestDate">The request date identifying which request to download, as returned by
+        /// SubmitPersonalDataRequest or GetMyPersonalDataRequests</param>
+        /// <param name="password">IAM password of the user</param>
+        /// <param name="callback">Returns the download URL via callback when completed</param>
+        public void GeneratePersonalDataDownloadUrl(DateTime requestDate
+            , string password
+            , ResultCallback<PersonalDataDownloadUrlResponse> callback)
+        {
+            Report.GetFunctionLog(GetType().Name);
+
+            if (!session.IsValid())
+            {
+                callback?.TryError(ErrorCode.IsNotLoggedIn);
+                return;
+            }
+
+            var optionalParameters = new GeneratePersonalDataDownloadUrlOptionalParameters();
+
+            api.GeneratePersonalDataDownloadUrl(session.UserId
+                , requestDate
+                , password
+                , optionalParameters
+                , callback);
         }
     }
 }
